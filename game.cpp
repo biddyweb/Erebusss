@@ -1,0 +1,842 @@
+#include "rpg/location.h"
+#include "rpg/character.h"
+
+#include "game.h"
+#include "qt_screen.h"
+
+#include <ctime>
+
+#include <sstream>
+using std::stringstream;
+
+Game *game_g = NULL;
+OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
+PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
+
+const int versionMajor = 0;
+const int versionMinor = 1;
+
+//const int scene_item_character_key_c = 0;
+
+AnimationSet::AnimationSet(AnimationType animation_type, int n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
+    if( pixmaps.size() != N_DIRECTIONS * n_frames ) {
+        LOG("AnimationSet error: pixmaps size %d, n_frames %d, N_DIRECTIONS %d\n", pixmaps.size(), n_frames, N_DIRECTIONS);
+        throw string("AnimationSet has incorrect pixmaps size");
+    }
+    /*this->pixmaps = new QPixmap[N_DIRECTIONS * n_frames];
+    for(int i=0;i<N_DIRECTIONS * n_frames;i++) {
+        this->pixmaps[i] = pixmaps[i];
+    }*/
+
+    /*this->bounding_rect.x = 0.0f;
+    this->bounding_rect.y = 0.0f;
+    this->bounding_rect.x = 0.0f;
+    this->bounding_rect.x = 0.0f;*/
+    //this->setFrame(0);
+}
+
+AnimationSet::~AnimationSet() {
+    //delete this->pixmaps;
+}
+
+/*QPixmap *AnimationSet::getFrames(Direction c_direction) {
+    return &this->pixmaps[((int)c_direction)*n_frames];
+}*/
+
+const QPixmap &AnimationSet::getFrame(Direction c_direction, int c_frame) const {
+    //qDebug("animation type: %d", this->animation_type);
+    switch( this->animation_type ) {
+    case ANIMATIONTYPE_BOUNCE:
+        if( n_frames == 1 )
+            c_frame = 0;
+        else {
+            int n_total_frames = 2*n_frames-2;
+            c_frame = c_frame % n_total_frames;
+            if( c_frame > n_frames-1 )
+                c_frame = n_total_frames-c_frame;
+        }
+        break;
+    case ANIMATIONTYPE_SINGLE:
+        //qDebug("%d : %d", c_frame, n_frames);
+        if( c_frame > n_frames-1 )
+            c_frame = n_frames-1;
+        break;
+    default:
+        c_frame = c_frame % n_frames;
+        break;
+    }
+
+    //qDebug("get frame %d", c_frame);
+    return this->pixmaps[((int)c_direction)*n_frames + c_frame];
+}
+
+AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, int x_offset, int n_frames) {
+    vector<QPixmap> frames;
+    for(int i=0;i<N_DIRECTIONS;i++) {
+        for(int j=0;j<n_frames;j++) {
+            //frames.push_back( game_g->loadImage(filename, true, 64*(x_offset+j), 64*i, 64, 64) );
+            frames.push_back( image.copy(64*(x_offset+j), 64*i, 64, 64));
+        }
+    }
+    AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
+    return animation_set;
+}
+
+/*AnimationLayer *AnimationLayer::create(const char *filename) {
+    AnimationLayer *layer = new AnimationLayer();
+    QPixmap image = game_g->loadImage(filename);
+    {
+        AnimationSet *animation_set_idle = AnimationSet::create(image, 0, 4);
+        layer->addAnimationSet("", animation_set_idle);
+        AnimationSet *animation_set_run = AnimationSet::create(image, 4, 8);
+        layer->addAnimationSet("run", animation_set_run);
+        AnimationSet *animation_set_attack = AnimationSet::create(image, 12, 4);
+        layer->addAnimationSet("attack", animation_set_attack);
+        AnimationSet *animation_set_death = AnimationSet::create(image, 18, 6);
+        layer->addAnimationSet("death", animation_set_death);
+    }
+    return layer;
+}*/
+
+AnimationLayer *AnimationLayer::create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+    AnimationLayer *layer = new AnimationLayer();
+    QPixmap image = game_g->loadImage(filename);
+    for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
+        const AnimationLayerDefinition animation_layer_definition = *iter;
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, animation_layer_definition.position, animation_layer_definition.n_frames);
+        layer->addAnimationSet(animation_layer_definition.name, animation_set);
+    }
+    return layer;
+}
+
+AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/ c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0) {
+    //this->setFrame(0);
+    for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
+        const AnimationSet *c_animation_set = *iter;
+        delete c_animation_set;
+    }
+}
+
+AnimatedObject::~AnimatedObject() {
+    //this->setPixmap(NULL); // just in case of ownership issues??
+}
+
+#if 0
+void AnimatedObject::setFrame(int c_frame) {
+    //this->c_frame = c_frame;
+    //qDebug("set frame %d", c_frame);
+    //this->setPixmap(this->pixmaps[((int)c_direction)*n_frames + c_frame]);
+    /*if( this->c_animation_set != NULL ) {
+        const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
+        this->setPixmap(pixmap);
+    }
+    else {
+        this->setPixmap(NULL);
+    }*/
+    /*if( this->c_animation_sets.size() > 0 ) {
+        for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
+            const AnimationSet *c_animation_set = *iter;
+            const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
+            this->setPixmap(pixmap);
+            break;
+        }
+    }
+    else {
+        this->setPixmap(NULL);
+    }*/
+}
+#endif
+
+/*void AnimationSet::update() {
+    int next_frame = (c_frame + 1) % n_frames;
+    this->setFrame(next_frame);
+}*/
+
+void AnimatedObject::advance(int phase) {
+    //qDebug("advance: %d", phase);
+    if( phase == 1 ) {
+        int ms_per_frame = 100;
+        int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
+        /*int c_frame = ( time_elapsed_ms / ms_per_frame );
+        this->setFrame(c_frame);*/
+        int n_frame = ( time_elapsed_ms / ms_per_frame );
+        if( n_frame != c_frame ) {
+            c_frame = n_frame;
+            this->update();
+        }
+    }
+}
+
+QRectF AnimatedObject::boundingRect() const {
+    //qDebug("boundingRect");
+    return QRectF(0.0f, 0.0f, 64.0f, 64.0f);
+}
+
+void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    //qDebug("paint");
+
+    /*int ms_per_frame = 100;
+    int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
+    int c_frame = ( time_elapsed_ms / ms_per_frame );*/
+
+    for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
+        const AnimationSet *c_animation_set = *iter;
+        const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
+        painter->drawPixmap(0, 0, pixmap);
+        //break;
+    }
+}
+
+/*void AnimatedObject::setAnimationLayer(AnimationLayer *animation_layer) {
+    this->animation_layer = animation_layer;
+    this->c_animation_set = animation_layer->getAnimationSet("");
+    this->setFrame(0);
+}*/
+
+void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
+    this->animation_layers.push_back(animation_layer);
+    const AnimationSet *c_animation_set = animation_layer->getAnimationSet("");
+    this->c_animation_sets.push_back(c_animation_set);
+    //this->setFrame(0);
+    this->update();
+}
+
+void AnimatedObject::setAnimationSet(string name) {
+    /*const AnimationSet *new_animation_set = animation_layer->getAnimationSet(name);
+    if( new_animation_set != c_animation_set ) {
+        c_animation_set = new_animation_set;
+        animation_time_start_ms = 0;
+        this->setFrame(0);
+    }*/
+    //qDebug("set animation set: %s", name.c_str());
+    this->c_animation_sets.clear();
+    for(vector<AnimationLayer *>::const_iterator iter = animation_layers.begin(); iter != animation_layers.end(); ++iter) {
+        const AnimationLayer *animation_layer = *iter;
+        const AnimationSet *c_animation_set = animation_layer->getAnimationSet(name);
+        if( c_animation_set == NULL ) {
+            qDebug("unknown animation set: %s", name.c_str());
+            throw string("Unknown animation set");
+        }
+        this->c_animation_sets.push_back(c_animation_set);
+    }
+    animation_time_start_ms = 0;
+    //this->setFrame(0);
+    this->c_frame = 0;
+    this->update();
+}
+
+void AnimatedObject::setDirection(Direction c_direction) {
+    if( this->c_direction != c_direction ) {
+        this->c_direction = c_direction;
+        //this->setFrame(0);
+        this->update();
+    }
+}
+
+OptionsGamestate::OptionsGamestate()
+{
+    optionsGamestate = this;
+
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+#else
+    QFont font("Verdana", 48, QFont::Bold);
+    window->setFont(font);
+#endif
+
+    QWidget *centralWidget = new QWidget(window);
+    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(centralWidget);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    centralWidget->setLayout(layout);
+
+    QPushButton *startButton = new QPushButton("Start game");
+    layout->addWidget(startButton);
+    connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
+    //this->initButton(prevButton);
+
+    QPushButton *loadButton = new QPushButton("Load game");
+    layout->addWidget(loadButton);
+    connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
+    //this->initButton(prevButton);
+
+    QPushButton *quitButton = new QPushButton("Quit game");
+    layout->addWidget(quitButton);
+    connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+    //this->initButton(prevButton);
+
+}
+
+OptionsGamestate::~OptionsGamestate() {
+    /*VI_flush(0); // delete all the gamestate objects, but leave the game level objects (which should be set at persistence level -1)
+    VI_GraphicsEnvironment *genv = game_g->getGraphicsEnvironment();
+    game_g->getGraphicsEnvironment()->setPanel(NULL); // as the main panel is now destroyed
+    */
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->centralWidget()->deleteLater();
+    window->setCentralWidget(NULL);
+
+    optionsGamestate = NULL;
+    qDebug("deleted OptionsGamestate");
+}
+
+void OptionsGamestate::quitGame() {
+    LOG("OptionsGamestate::quitGame()\n");
+    qApp->quit();
+}
+
+void OptionsGamestate::clickedStart() {
+    LOG("OptionsGamestate::clickedStart()\n");
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
+    game_g->pushMessage(game_message);
+}
+
+void OptionsGamestate::clickedLoad() {
+    LOG("OptionsGamestate::clickedLoad()\n");
+}
+
+void OptionsGamestate::clickedQuit() {
+    LOG("OptionsGamestate::clickedQuit()\n");
+    this->quitGame();
+}
+
+
+void MainGraphicsView::mousePressEvent(QMouseEvent *event) {
+    //qDebug("MainGraphicsView::mousePressEvent");
+    if( event->button() == Qt::LeftButton ) {
+        this->mouse_down_x = event->x();
+        this->mouse_down_y = event->y();
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
+void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
+    //qDebug("MainGraphicsView::mouseReleaseEvent");
+    if( event->button() == Qt::LeftButton ) {
+        int m_x = event->x();
+        int m_y = event->y();
+        int xdist = abs(this->mouse_down_x - m_x);
+        int ydist = abs(this->mouse_down_y - m_y);
+        const int drag_tol_c = 8;
+        // on a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
+        //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
+        if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
+            QPointF m_scene = this->mapToScene(m_x, m_y);
+            qDebug("clicked: %f, %f", m_scene.x(), m_scene.y());
+            gamestate->clickedMainView(m_scene.x(), m_scene.y());
+        }
+        // else, this was a drag operation
+    }
+
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), location(NULL)
+{
+    LOG("PlayingGamestate::PlayingGamestate()\n");
+    playingGamestate = this;
+
+    // create RPG world
+    LOG("create RPG world\n");
+
+    location = new Location();
+
+    this->player = new Character("player", false);
+    player->initialiseHealth(100);
+    location->addCharacter(player, 2.0f, 2.0f);
+
+    Character *enemy = new Character("goblin", true);
+    enemy->initialiseHealth(5);
+    location->addCharacter(enemy, 4.0f, 4.0f);
+
+    FloorRegion *floor_regions = NULL;
+    floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+    location->addFloorRegion(floor_regions);
+    floor_regions = FloorRegion::createRectangle(5.0f, 2.0f, 5.0f, 1.0f);
+    location->addFloorRegion(floor_regions);
+    floor_regions = FloorRegion::createRectangle(10.0f, 2.0f, 1.0f, 5.0f);
+    location->addFloorRegion(floor_regions);
+    floor_regions = FloorRegion::createRectangle(10.0f, 7.0f, 10.0f, 10.0f);
+    location->addFloorRegion(floor_regions);
+    floor_regions = FloorRegion::createRectangle(20.0f, 9.0f, 5.0f, 2.0f);
+    location->addFloorRegion(floor_regions);
+
+    {
+        Polygon2D boundary;
+        boundary.addPoint(Vector2D(0.0f, 0.0f));
+        boundary.addPoint(Vector2D(0.0f, 5.0f));
+        boundary.addPoint(Vector2D(5.0f, 5.0f));
+        boundary.addPoint(Vector2D(5.0f, 3.0f));
+        boundary.addPoint(Vector2D(10.0f, 3.0f));
+        boundary.addPoint(Vector2D(10.0f, 17.0f));
+        boundary.addPoint(Vector2D(20.0f, 17.0f));
+        boundary.addPoint(Vector2D(20.0f, 11.0f));
+        boundary.addPoint(Vector2D(25.0f, 11.0f));
+        boundary.addPoint(Vector2D(25.0f, 9.0f));
+        boundary.addPoint(Vector2D(20.0f, 9.0f));
+        boundary.addPoint(Vector2D(20.0f, 7.0f));
+        boundary.addPoint(Vector2D(11.0f, 7.0f));
+        boundary.addPoint(Vector2D(11.0f, 2.0f));
+        boundary.addPoint(Vector2D(5.0f, 2.0f));
+        boundary.addPoint(Vector2D(5.0f, 0.0f));
+        location->addBoundary(boundary);
+    }
+
+    // create UI
+    LOG("create UI\n");
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+#else
+    window->setFont(qApp->font());
+#endif
+
+    /*QWidget *centralWidget = new QWidget(window);
+    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(centralWidget);*/
+
+    scene = new QGraphicsScene(window);
+    //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
+    //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    //view = new QGraphicsView(scene, window);
+    view = new MainGraphicsView(this, scene, window);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setBackgroundBrush(QBrush(Qt::black));
+    view->setFrameStyle(QFrame::NoFrame);
+    view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
+    view->setDragMode(QGraphicsView::ScrollHandDrag);
+    view->setCacheMode(QGraphicsView::CacheBackground);
+
+    // set up the view on the RPG world
+
+    int pixels_per_unit = 64;
+    //int pixels_per_unit = 32;
+    float scale = 1.0f/(float)pixels_per_unit;
+    //scene->setSceneRect(0, 0, location->getWidth(), location->getHeight());
+    const float offset_y = 0.5f;
+    float location_width = 0.0f, location_height = 0.0f;
+    location->calculateSize(&location_width, &location_height);
+    //location_height += offset_y;
+    scene->setSceneRect(0, -offset_y, location_width, location_height);
+    //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
+    //int pixels_per_unit = 32;
+    view->scale(pixels_per_unit, pixels_per_unit);
+
+    LOG("load floor image\n");
+    QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
+    QBrush floor_brush(floor_image);
+    floor_brush.setTransform(QTransform::fromScale(scale, scale));
+    for(size_t i=0;i<location->getNFloorRegions();i++) {
+        const FloorRegion *floor_region = location->getFloorRegion(i);
+        QPolygonF polygon;
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D point = floor_region->getPoint(j);
+            //QPointF qpoint(point.x, point.y + offset_y);
+            QPointF qpoint(point.x, point.y);
+            polygon.push_back(qpoint);
+        }
+        //QBrush floor_brush(Qt::white);
+        scene->addPolygon(polygon, Qt::NoPen, floor_brush);
+    }
+    QPen wall_pen(Qt::red);
+    for(size_t i=0;i<location->getNBoundaries();i++) {
+        const Polygon2D *boundary = location->getBoundary(i);
+        for(size_t j=0;j<boundary->getNPoints();j++) {
+            Vector2D p0 = boundary->getPoint(j);
+            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+            //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
+            scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+        }
+    }
+    {
+        vector<Vector2D> path_way_points = location->calculatePathWayPoints();
+        for(vector<Vector2D>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
+            Vector2D path_way_point = *iter;
+            const float radius = 0.05f;
+            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
+        }
+    }
+
+    LOG("create animation frames\n");
+    LOG("load player image\n");
+    LOG("clothes layer\n");
+    vector<AnimationLayerDefinition> player_animation_layer_definition;
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    int time_s = clock();
+    //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
+    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
+    qDebug("time to load: %d", clock() - time_s);
+    /*LOG("head layer\n");
+    string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
+    AnimationLayer *head_layer = new AnimationLayer();*/
+    //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
+    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
+
+    float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
+
+    LOG("load goblin image\n");
+    //AnimationLayer *goblin_layer = AnimationLayer::create(":/gfx/textures/goblin.png");
+    vector<AnimationLayerDefinition> goblin_animation_layer_definition;
+    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 20, 3, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/goblin.png", goblin_animation_layer_definition);
+
+    LOG("add graphics items\n");
+    for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        AnimatedObject *item = new AnimatedObject();
+        if( character == player ) {
+            item->addAnimationLayer( this->animation_layers["clothes"] );
+            item->addAnimationLayer( this->animation_layers["head"] );
+        }
+        else {
+            item->addAnimationLayer( this->animation_layers[ character->getName() ] );
+        }
+        scene->addItem(item);
+        //item->setPos(character->getX(), character->getY() + offset_y);
+        item->setPos(character->getX(), character->getY());
+        item->setTransformOriginPoint(-32.0f*player_scale, -46.0f*player_scale);
+        item->setScale(player_scale);
+
+        character->setListener(this, item);
+        //item->setAnimationSet("attack"); // test
+    }
+    /*QGraphicsTextItem *text_item = scene->addText("Blah");
+    text_item->setDefaultTextColor(Qt::white);*/
+
+    LOG("done\n");
+
+    //window->setCentralWidget(view);
+
+    /*{
+        QLabel *Button = new QLabel("Test");
+        Button->setFixedSize(64, 16);
+        QGraphicsProxyWidget *ButtonItem = scene->addWidget(Button);
+        ButtonItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+    }*/
+
+    QWidget *centralWidget = new QWidget(window);
+    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(centralWidget);
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    centralWidget->setLayout(layout);
+
+    {
+        QVBoxLayout *v_layout = new QVBoxLayout();
+        layout->addLayout(v_layout);
+
+        QPushButton *statsButton = new QPushButton("Stats");
+        v_layout->addWidget(statsButton);
+
+        QPushButton *itemsButton = new QPushButton("Items");
+        v_layout->addWidget(itemsButton);
+
+        QPushButton *spellsButton = new QPushButton("Spells");
+        v_layout->addWidget(spellsButton);
+
+        QPushButton *journalButton = new QPushButton("Journal");
+        v_layout->addWidget(journalButton);
+
+        QPushButton *optionsButton = new QPushButton("Options");
+        v_layout->addWidget(optionsButton);
+
+        QPushButton *quitButton = new QPushButton("Quit");
+        v_layout->addWidget(quitButton);
+        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+    }
+
+    layout->addWidget(view);
+
+    view->showFullScreen();
+    LOG("Is transformed? %d\n", view->isTransformed());
+}
+
+PlayingGamestate::~PlayingGamestate() {
+    playingGamestate = NULL;
+
+    for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+        AnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
+    }
+}
+
+void PlayingGamestate::clickedQuit() {
+    qDebug("clickedQuit()");
+    qApp->quit();
+}
+
+void PlayingGamestate::quitGame() {
+}
+
+void PlayingGamestate::update(int time_ms) {
+    //qDebug("update");
+
+    scene->advance();
+    vector< set<Character *>::iterator > delete_characters;
+    for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        if( character->update(this, time_ms) ) {
+            qDebug("character is about to die: %s", character->getName().c_str());
+            delete_characters.push_back(iter);
+        }
+    }
+    for(vector< set<Character *>::iterator >::iterator iter2 = delete_characters.begin(); iter2 != delete_characters.end(); ++iter2) {
+        set<Character *>::iterator iter = *iter2;
+        Character *character = *iter;
+        qDebug("character has died: %s", character->getName().c_str());
+        location->charactersErase(iter);
+
+        for(set<Character *>::iterator iter3 = location->charactersBegin(); iter3 != location->charactersEnd(); ++iter3) {
+            Character *ch = *iter3;
+            if( ch->getTargetNPC() == character ) {
+                ch->setTargetNPC(NULL);
+            }
+        }
+
+        delete character; // also removes character from the QGraphicsScene, via the listeners
+    }
+
+    // update the view
+    /*for(set<QGraphicsItem *>::iterator iter = this->graphicsitems_characters.begin(); iter != this->graphicsitems_characters.end(); ++iter) {
+        QGraphicsItem *item = *iter;
+        //const Character *character = qgraphicsitem_cast<const Character *>(item->data(scene_item_character_key_c));
+        const Character *character = static_cast<const Character *>(item->data(scene_item_character_key_c).value<void *>());
+        //qDebug("character at: %f, %f", character->getX(), character->getY());
+    }*/
+}
+
+void PlayingGamestate::characterTurn(const Character *character, void *user_data, Vector2D dir) {
+    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    float angle = atan2(dir.y, dir.x);
+    if( angle < 0.0f )
+        angle += 2.0*M_PI;
+    angle /= 2.0*M_PI;
+    float turn = angle*((int)N_DIRECTIONS) + 0.5f;
+    int turn_i = (int)turn;
+    /*qDebug("angle %f", angle);
+    qDebug("turn %f", turn);
+    qDebug("turn_i %d", turn_i);*/
+    turn_i += 4; // 0 is west
+    Direction direction = (Direction)(turn_i % (int)N_DIRECTIONS);
+    item->setDirection(direction);
+}
+
+void PlayingGamestate::characterMoved(const Character *character, void *user_data) {
+    //QGraphicsItem *item = static_cast<QGraphicsItem *>(user_data);
+    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    QPointF old_pos = item->pos();
+    QPointF new_pos(character->getX(), character->getY());
+    if( new_pos != old_pos ) {
+        item->setPos(new_pos);
+        /*Direction direction = DIRECTION_W;
+        if( new_pos.x() > old_pos.x() ) {
+            direction = DIRECTION_E;
+        }*/
+        QPointF dir = new_pos - old_pos;
+        Vector2D vdir(dir.x(), dir.y());
+        this->characterTurn(character, user_data, vdir);
+    }
+}
+
+void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, string name) {
+    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    item->setAnimationSet(name);
+}
+
+void PlayingGamestate::characterDeath(Character *character, void *user_data) {
+    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    character->setListener(NULL, NULL);
+    delete item;
+}
+
+/*void PlayingGamestate::mouseClick(int m_x, int m_y) {
+    qDebug("PlayingGamestate::mouseClick(%d, %d)", m_x, m_y);
+}*/
+
+void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
+    if( player != NULL ) {
+        //player->setPos(scene_x, scene_y);
+
+        Vector2D dest(scene_x, scene_y);
+
+        // search for clicking on NPC
+        float min_dist = 0.0f;
+        Character *target_npc = NULL;
+        for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+            Character *character = *iter;
+            if( character == player )
+                continue;
+            double dist = (dest - character->getPos()).magnitude();
+            if( dist <= character->getRadius() ) {
+                if( target_npc == NULL || dist < min_dist ) {
+                    target_npc = character;
+                    min_dist = dist;
+                }
+            }
+        }
+        player->setTargetNPC(target_npc); // n.b., if no NPC selected, we therefore set to NULL
+
+        if( dest != player->getPos() ) {
+            Vector2D hit_pos;
+            bool hit = location->intersectSweptSquareWithBoundaries(player, &hit_pos, player->getPos(), dest, player->getRadius());
+            if( hit ) {
+                qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
+                dest = hit_pos;
+            }
+            player->setDestination(dest.x, dest.y);
+        }
+    }
+}
+
+
+Game::Game() {
+    game_g = this;
+
+    // initialise paths
+    QString pathQt (QDesktopServices::storageLocation (QDesktopServices::DataLocation));
+    QString nativePath(QDir::toNativeSeparators(pathQt));
+    application_path = nativePath.toStdString();
+    logfilename = getApplicationFilename("log.txt");
+    oldlogfilename = getApplicationFilename("log_old.txt");
+    qDebug("application_path: %s", application_path.c_str());
+    qDebug("logfilename: %s", logfilename.c_str());
+    qDebug("oldlogfilename: %s", oldlogfilename.c_str());
+
+    remove(oldlogfilename.c_str());
+    rename(logfilename.c_str(), oldlogfilename.c_str());
+    remove(logfilename.c_str());
+
+    LOG("Initialising Log File...\n");
+    LOG("erebus startup\n");
+    LOG("Version %d.%d\n", versionMajor, versionMinor);
+
+#ifdef _DEBUG
+    LOG("Running in Debug mode\n");
+#else
+    LOG("Running in Release mode\n");
+#endif
+
+#if defined(Q_WS_SIMULATOR)
+    LOG("Platform: Qt Smartphone Simulator\n");
+#elif defined(_WIN32)
+    LOG("Platform: Windows\n");
+#elif defined(Q_WS_MAEMO_5)
+    // must be before __linux, as Maemo/Meego also defines __linux
+    LOG("Platform: Maemo/Meego\n");
+#elif __linux
+    LOG("Platform: Linux\n");
+#elif defined(__APPLE__) && defined(__MACH__)
+    LOG("Platform: MacOS X\n");
+#elif defined(Q_OS_SYMBIAN)
+    LOG("Platform: Symbian\n");
+#else
+    LOG("Platform: UNKNOWN\n");
+#endif
+}
+
+void Game::run() {
+    screen = new Screen();
+
+    gamestate = new OptionsGamestate();
+
+    screen->runMainLoop();
+
+    delete gamestate;
+    delete screen;
+}
+
+void Game::update(int time_ms) {
+    while( !message_queue.empty() ) {
+        GameMessage *message = message_queue.front();
+        message_queue.pop();
+        switch( message->getGameMessageType() ) {
+        case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING:
+            delete gamestate;
+            try {
+                gamestate = new PlayingGamestate();
+            }
+            catch(string &error) {
+                this->getScreen()->getMainWindow()->unsetCursor();
+                gamestate = NULL;
+                LOG("exception creating new gamestate: %s\n", error.c_str());
+                stringstream message;
+                message << "Failed to load game data:\n" << error;
+                game_g->showErrorWindow(message.str().c_str());
+                qApp->quit();
+            }
+            this->getScreen()->getMainWindow()->unsetCursor();
+            break;
+        default:
+            Q_ASSERT(false);
+        }
+        delete message;
+    }
+
+    if( gamestate != NULL ) {
+        gamestate->update(time_ms);
+    }
+}
+
+/*void Game::mouseClick(int m_x, int m_y) {
+    gamestate->mouseClick(m_x, m_y);
+}*/
+
+string Game::getApplicationFilename(const char *name) {
+    // not safe to use LOG here, as logfile may not have been initialised!
+    QString pathQt = QString(application_path.c_str()) + QString("/") + QString(name);
+    QString nativePath(QDir::toNativeSeparators(pathQt));
+    string filename = nativePath.toStdString();
+    qDebug("getApplicationFilename returns: %s", filename.c_str());
+    return filename;
+}
+
+void Game::log(const char *text, ...) {
+    FILE *logfile = fopen(logfilename.c_str(), "at+");
+    va_list vlist;
+    char buffer[65536] = "";
+    va_start(vlist, text);
+    vsprintf(buffer,text,vlist);
+    if( logfile != NULL )
+        fprintf(logfile,buffer);
+    //printf(buffer);
+    //qDebug("###: %s", buffer);
+    va_end(vlist);
+    if( logfile != NULL )
+        fclose(logfile);
+}
+
+QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int width, int height) const {
+    // need to use QImageReader - QPixmap::load doesn't work on large images on Symbian!
+    QImageReader reader(filename);
+    if( clip ) {
+        reader.setClipRect(QRect(xpos, ypos, width, height));
+    }
+    QImage image = reader.read();
+    if( image.isNull() ) {
+        LOG("failed to read image: %s\n", filename);
+        LOG("error: %d\n", reader.error());
+        LOG("error string: %s\n", reader.errorString().toStdString().c_str());
+        stringstream error;
+        error << "Failed to load image: " << filename;
+        throw error.str();
+    }
+    QPixmap pixmap = QPixmap::fromImage(image);
+    if( pixmap.isNull() ) {
+        LOG("failed to convert image to pixmap: %s\n", filename);
+        throw string("Failed to convert image to pixmap");
+    }
+    return pixmap;
+}
+
+void Game::showErrorWindow(const char *message) {
+    QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message);
+}

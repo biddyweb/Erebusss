@@ -1,0 +1,299 @@
+#pragma once
+
+#include "rpg/character.h"
+
+class Screen;
+
+#include <QtGui>
+
+#include <queue>
+using std::queue;
+
+#include <set>
+using std::set;
+
+#include <map>
+using std::map;
+using std::pair;
+
+#include <string>
+using std::string;
+
+class PlayingGamestate;
+class Location;
+
+enum Direction {
+    DIRECTION_W = 0,
+    DIRECTION_NW = 1,
+    DIRECTION_N = 2,
+    DIRECTION_NE = 3,
+    DIRECTION_E = 4,
+    DIRECTION_SE = 5,
+    DIRECTION_S = 6,
+    DIRECTION_SW = 7,
+    N_DIRECTIONS = 8
+};
+
+//class AnimationSet : public QGraphicsItem {
+class AnimationSet {
+public:
+    enum AnimationType {
+        ANIMATIONTYPE_LOOP   = 0,
+        ANIMATIONTYPE_BOUNCE = 1,
+        ANIMATIONTYPE_SINGLE = 2
+    };
+
+protected:
+    AnimationType animation_type;
+    int n_frames;
+    //QPixmap *pixmaps; // array of length N_DIRECTIONS * n_frames
+    vector<QPixmap> pixmaps; // vector of length N_DIRECTIONS * n_frames
+    /*QRectF bounding_rect;
+
+    virtual QRectF boundingRect() const;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);*/
+public:
+    AnimationSet(AnimationType animation_type, int n_frames, vector<QPixmap> pixmaps); // pixmaps array of length N_DIRECTIONS * n_frames
+    virtual ~AnimationSet();
+
+    int getNFrames() const {
+        return this->n_frames;
+    }
+    //QPixmap *getFrames(Direction c_direction);
+    const QPixmap &getFrame(Direction c_direction, int c_frame) const;
+
+    static AnimationSet *create(QPixmap image, AnimationType animation_type, int x_offset, int n_frames);
+};
+
+/* Helper class used to define animation image formats, when loading in the
+ * animation frames.
+ */
+class AnimationLayerDefinition {
+    friend class AnimationLayer;
+    string name;
+    int position;
+    int n_frames;
+    AnimationSet::AnimationType animation_type;
+public:
+    AnimationLayerDefinition(string name, int position, int n_frames, AnimationSet::AnimationType animation_type) :
+        name(name), position(position), n_frames(n_frames), animation_type(animation_type) {
+    }
+};
+
+class AnimationLayer {
+    map<string, const AnimationSet *> animation_sets;
+public:
+    AnimationLayer() {
+    }
+    ~AnimationLayer() {
+    }
+
+    void addAnimationSet(string name, const AnimationSet *animation_set) {
+        //this->animation_sets[name] = animation_set;
+        //this->animation_sets.insert(pair<string, const AnimationSet *>(name, animation_set));
+        this->animation_sets[name] = animation_set;
+    }
+    const AnimationSet *getAnimationSet(string name) const {
+        map<string, const AnimationSet *>::const_iterator iter = this->animation_sets.find(name);
+        if( iter == this->animation_sets.end() )
+            return NULL;
+        return iter->second;
+    }
+
+    static AnimationLayer *create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+};
+
+//class AnimatedObject : public QGraphicsPixmapItem {
+class AnimatedObject : public QGraphicsItem {
+    //AnimationLayer *animation_layer;
+    vector<AnimationLayer *> animation_layers;
+    //const AnimationSet *c_animation_set;
+    vector<const AnimationSet *> c_animation_sets;
+    Direction c_direction;
+    int c_frame;
+    int animation_time_start_ms;
+
+    virtual void advance(int phase);
+    virtual QRectF boundingRect() const;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    //void setFrame(int c_frame);
+public:
+    AnimatedObject();
+    virtual ~AnimatedObject();
+
+    //void setAnimationSet(AnimationSet *animation_set);
+    //void setAnimationLayer(AnimationLayer *animation_layer);
+    void addAnimationLayer(AnimationLayer *animation_layer);
+    void setAnimationSet(string name);
+    void setDirection(Direction c_direction);
+};
+
+class Gamestate : public QObject {
+public:
+    //virtual VI_Panel *getPanel()=0;
+    virtual void quitGame()=0;
+    virtual void update(int time_ms)=0;
+    /*virtual bool isPaused() const {
+        return false;
+    }*/
+    /*virtual void mouseClick(int m_x, int m_y) {
+    }*/
+};
+
+class OptionsGamestate : public Gamestate {
+    Q_OBJECT
+
+    static OptionsGamestate *optionsGamestate; // singleton pointer, needed for static member functions
+    /*VI_Panel  *gamePanel;
+    VI_Button *startgameButton;
+    VI_Button *quitgameButton;*/
+
+    //static void action(VI_Panel *source);
+
+private slots:
+    void clickedStart();
+    void clickedLoad();
+    void clickedQuit();
+
+public:
+    OptionsGamestate();
+    virtual ~OptionsGamestate();
+
+    /*virtual VI_Panel *getPanel() {
+        return gamePanel;
+    }*/
+
+    virtual void quitGame();
+    virtual void update(int time_ms) {
+    }
+};
+
+class MainGraphicsView : public QGraphicsView {
+    PlayingGamestate *gamestate;
+    int mouse_down_x, mouse_down_y;
+
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+public:
+    MainGraphicsView(PlayingGamestate *gamestate, QGraphicsScene *scene, QWidget *parent) :
+        QGraphicsView(scene, parent), gamestate(gamestate), mouse_down_x(0), mouse_down_y(0)
+    {
+    }
+    virtual ~MainGraphicsView() {
+    }
+};
+
+
+class PlayingGamestate : public Gamestate, CharacterListener {
+    Q_OBJECT
+
+    static PlayingGamestate *playingGamestate; // singleton pointer, needed for static member functions
+
+    QGraphicsScene *scene;
+    QGraphicsView  *view;
+
+    Character *player;
+
+    Location *location;
+
+    // character items in the view
+    set<QGraphicsItem *> graphicsitems_characters;
+
+    map<string, AnimationLayer *> animation_layers;
+
+private slots:
+    void clickedQuit();
+
+public:
+    PlayingGamestate();
+    virtual ~PlayingGamestate();
+
+    virtual void quitGame();
+    virtual void update(int time_ms);
+    //virtual void mouseClick(int m_x, int m_y);
+
+    virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
+    virtual void characterMoved(const Character *character, void *user_data);
+    virtual void characterSetAnimation(const Character *character, void *user_data, string name);
+    virtual void characterDeath(Character *character, void *user_data);
+
+    void clickedMainView(float scene_x, float scene_y);
+
+    Character *getPlayer() {
+        return this->player;
+    }
+    const Character *getPlayer() const {
+        return this->player;
+    }
+    Location *getLocation() {
+        return this->location;
+    }
+    const Location *getLocation() const {
+        return this->location;
+    }
+};
+
+// used for passing messages
+class GameMessage {
+public:
+    enum GameMessageType {
+        GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING = 0
+    };
+
+protected:
+    GameMessageType game_message_type;
+
+public:
+    GameMessage(GameMessageType game_message_type) : game_message_type(game_message_type) {
+    }
+
+    GameMessageType getGameMessageType() const {
+        return game_message_type;
+    }
+};
+
+class Game {
+    string application_path;
+    string logfilename;
+    string oldlogfilename;
+
+    Gamestate *gamestate;
+    Screen *screen;
+    queue<GameMessage *> message_queue;
+
+public:
+    Game();
+    ~Game() {
+    }
+
+    Screen *getScreen() {
+        return this->screen;
+    }
+    const Screen *getScreen() const {
+        return this->screen;
+    }
+
+    void pushMessage(GameMessage *message) {
+        message_queue.push(message);
+    }
+
+    void run();
+    void update(int time_ms);
+    //void mouseClick(int m_x, int m_y);
+    string getApplicationFilename(const char *name);
+    void log(const char *text, ...);
+    QPixmap loadImage(const char *filename, bool clip, int xpos, int ypos, int width, int height) const;
+    QPixmap loadImage(const char *filename) const {
+        return loadImage(filename, false, 0, 0, 0, 0);
+    }
+    void showErrorWindow(const char *message);
+};
+
+extern Game *game_g;
+
+const bool LOGGING = true; // enable logging even for release builds, for now
+
+#ifndef LOG
+#define LOG if( !LOGGING ) ((void)0); else game_g->log
+#endif

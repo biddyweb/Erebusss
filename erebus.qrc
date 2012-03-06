@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>gfx/textures/floor_paved.png</file>
+        <file>gfx/textures/isometric_hero/clothes.png</file>
+        <file>gfx/textures/isometric_hero/male_head1.png</file>
+        <file>gfx/textures/goblin.png</file>
+    </qresource>
+</RCC>
