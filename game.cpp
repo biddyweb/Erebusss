@@ -153,7 +153,7 @@ void AnimatedObject::setFrame(int c_frame) {
 }*/
 
 void AnimatedObject::advance(int phase) {
-    //qDebug("advance: %d", phase);
+    //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
         int ms_per_frame = 100;
         int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
@@ -302,7 +302,6 @@ void OptionsGamestate::clickedQuit() {
     this->quitGame();
 }
 
-
 void MainGraphicsView::mousePressEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mousePressEvent");
     if( event->button() == Qt::LeftButton ) {
@@ -326,13 +325,76 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
         if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
             QPointF m_scene = this->mapToScene(m_x, m_y);
             qDebug("clicked: %f, %f", m_scene.x(), m_scene.y());
-            gamestate->clickedMainView(m_scene.x(), m_scene.y());
+            playing_gamestate->clickedMainView(m_scene.x(), m_scene.y());
         }
         // else, this was a drag operation
     }
 
     QGraphicsView::mouseReleaseEvent(event);
 }
+
+void MainGraphicsView::resizeEvent(QResizeEvent *event) {
+    qDebug("MainGraphicsView resized to: %d, %d", event->size().width(), event->size().height());
+    if( this->gui_overlay != NULL ) {
+        //this->gui_overlay->setFixedSize(event->size());
+        this->gui_overlay->resize(event->size());
+        // needed as resizing moves the position, for some reason!
+        //qDebug("### %d, %d", scene()->sceneRect().x(), scene()->sceneRect().y());
+        //this->gui_overlay_item->setPos( this->scene()->sceneRect().topLeft() );
+    }
+}
+
+GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
+    QWidget(view), playing_gamestate(playing_gamestate)
+{
+    //this->setAttribute(Qt::WA_NoSystemBackground);
+}
+
+void GUIOverlay::paintEvent(QPaintEvent *event) {
+    //qDebug("GUIOverlay::paintEvent()");
+
+    //this->move(0, 0);
+    //QPainter painter(this);
+    /*QBrush brush(QColor(255, 0, 0, 255));
+    painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
+    //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
+    /*painter.setPen(Qt::green);
+    painter.drawText(16, 16, "test blah blah blah 123");*/
+    if( playing_gamestate->getPlayer() != NULL ) {
+        const Character *player = playing_gamestate->getPlayer();
+        float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
+        this->drawBar(16, 16, 100, 16, fraction, Qt::darkGreen);
+        if( player->getTargetNPC() != NULL ) {
+            const Character *enemy = player->getTargetNPC();
+            fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
+            this->drawBar(132, 16, 100, 16, fraction, Qt::darkRed);
+        }
+    }
+}
+
+void GUIOverlay::drawBar(int x, int y, int width, int height, float fraction, QColor color) {
+    int x2 = x+1;
+    int y2 = y+1;
+    int width2 = width-2;
+    int height2 = height-2;
+    QPainter painter(this);
+    QBrush brush_bg(Qt::black);
+    QBrush brush_fg(color);
+    painter.setPen(Qt::white);
+    painter.drawRect(x, y, width-1, height-1);
+    painter.fillRect(x2, y2, width2, height2, brush_bg);
+    painter.fillRect(x2, y2, width2*fraction, height2, brush_fg);
+}
+
+/*void GUIOverlayItem::advance(int phase) {
+    //qDebug("GUIOverlayItem::advance() phase %d", phase);
+}*/
+
+/*void StatusBar::paintEvent(QPaintEvent *event) {
+    QPainter painter(this);
+    QBrush brush(color);
+    painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
+}*/
 
 PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), location(NULL)
 {
@@ -516,13 +578,6 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
 
     //window->setCentralWidget(view);
 
-    /*{
-        QLabel *Button = new QLabel("Test");
-        Button->setFixedSize(64, 16);
-        QGraphicsProxyWidget *ButtonItem = scene->addWidget(Button);
-        ButtonItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    }*/
-
     QWidget *centralWidget = new QWidget(window);
     centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
     window->setCentralWidget(centralWidget);
@@ -535,28 +590,68 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
         layout->addLayout(v_layout);
 
         QPushButton *statsButton = new QPushButton("Stats");
+        statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(statsButton);
 
         QPushButton *itemsButton = new QPushButton("Items");
+        itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(itemsButton);
 
         QPushButton *spellsButton = new QPushButton("Spells");
+        spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);
 
         QPushButton *journalButton = new QPushButton("Journal");
+        journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(journalButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
+        optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(optionsButton);
 
         QPushButton *quitButton = new QPushButton("Quit");
+        quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
     }
 
+    /*GUIOverlay *guiOverlay = new GUIOverlay(this, window);
+    layout->addWidget(guiOverlay);*/
+
     layout->addWidget(view);
 
     view->showFullScreen();
+
+    /*{
+        QPushButton *button = new QPushButton("Test", view);
+        QGraphicsProxyWidget *item = scene->addWidget(button);
+        item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+    }*/
+    {
+        GUIOverlay *guiOverlay = new GUIOverlay(this, view);
+        guiOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+        //guiOverlay->setFixedSize(view->size());
+        //GUIOverlayItem *guiOverlayItem = new GUIOverlayItem(view);
+        /*QGraphicsProxyWidget *guiOverlayItem = new QGraphicsProxyWidget();
+        guiOverlayItem->setWidget(guiOverlay);
+        scene->addItem(guiOverlayItem);*/
+        QGraphicsProxyWidget *guiOverlayItem = scene->addWidget(guiOverlay);
+        //guiOverlay->move(0,0);
+        guiOverlayItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+        //guiOverlayItem->setPos(0, -offset_y);
+        //qDebug("### %d, %d", scene->sceneRect().x(), scene->sceneRect().y());
+        //guiOverlayItem->setPos( scene->sceneRect().topLeft() );
+        view->setGUIOverlay(guiOverlayItem, guiOverlay);
+    }
+    /*{
+        StatusBar *statusBar = new StatusBar();
+        statusBar->setFixedSize(64, 16);
+        QGraphicsProxyWidget *statusBarItem = scene->addWidget(statusBar);
+        //statusBarItem->setPos();
+        statusBarItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
+        statusBarItem->setPos(0, -offset_y);
+    }*/
+
     LOG("Is transformed? %d\n", view->isTransformed());
 }
 

@@ -169,21 +169,71 @@ public:
     }
 };
 
+class GUIOverlay;
+
 class MainGraphicsView : public QGraphicsView {
-    PlayingGamestate *gamestate;
+    PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
+    QGraphicsProxyWidget *gui_overlay_item;
+    GUIOverlay *gui_overlay;
 
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void resizeEvent(QResizeEvent *event);
+
 public:
-    MainGraphicsView(PlayingGamestate *gamestate, QGraphicsScene *scene, QWidget *parent) :
-        QGraphicsView(scene, parent), gamestate(gamestate), mouse_down_x(0), mouse_down_y(0)
+    MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
+        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), gui_overlay_item(NULL), gui_overlay(NULL)
     {
     }
     virtual ~MainGraphicsView() {
     }
+
+    void setGUIOverlay(QGraphicsProxyWidget *gui_overlay_item, GUIOverlay *gui_overlay) {
+        this->gui_overlay_item = gui_overlay_item;
+        this->gui_overlay = gui_overlay;
+    }
 };
 
+class GUIOverlay : public QWidget {
+    PlayingGamestate *playing_gamestate;
+
+    virtual void paintEvent(QPaintEvent *event);
+    /*virtual QSize sizeHint() const {
+        return QSize(640, 360);
+    }*/
+
+    void drawBar(int x, int y, int width, int height, float fraction, QColor color);
+public:
+    GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view);
+    virtual ~GUIOverlay() {
+    }
+};
+
+/*class GUIOverlayItem : public QGraphicsProxyWidget {
+    MainGraphicsView *view;
+
+    virtual void advance(int phase);
+
+public:
+    GUIOverlayItem(MainGraphicsView *view) : QGraphicsProxyWidget(), view(view) {
+    }
+    virtual ~GUIOverlayItem() {
+    }
+};*/
+
+/*class StatusBar : public QWidget {
+    int percent;
+    QColor color;
+
+    virtual void paintEvent(QPaintEvent *event);
+
+public:
+    StatusBar() : percent(100), color(Qt::white) {
+    }
+    virtual ~StatusBar() {
+    }
+};*/
 
 class PlayingGamestate : public Gamestate, CharacterListener {
     Q_OBJECT
@@ -191,7 +241,7 @@ class PlayingGamestate : public Gamestate, CharacterListener {
     static PlayingGamestate *playingGamestate; // singleton pointer, needed for static member functions
 
     QGraphicsScene *scene;
-    QGraphicsView  *view;
+    MainGraphicsView *view;
 
     Character *player;
 
