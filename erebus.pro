@@ -27,13 +27,15 @@ SOURCES += main.cpp mainwindow.cpp \
     qt_screen.cpp \
     rpg/location.cpp \
     rpg/character.cpp \
-    rpg/utils.cpp
+    rpg/utils.cpp \
+    rpg/item.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
     rpg/location.h \
     rpg/character.h \
-    rpg/utils.h
+    rpg/utils.h \
+    rpg/item.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
