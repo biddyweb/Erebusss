@@ -6,12 +6,13 @@
 
 #include <cmath>
 
-Character::Character(string name, bool is_ai) :
-    name(name), is_ai(is_ai),
+Character::Character(string name, string animation_name, bool is_ai) :
+    name(name), animation_name(animation_name), is_ai(is_ai),
     is_dead(false), time_of_death_ms(0),
     listener(NULL), listener_data(NULL),
     has_destination(false), target_npc(NULL), time_last_action_ms(0), is_hitting(false),
-    health(0), max_health(0)
+    health(0), max_health(0),
+    current_weapon(NULL)
 {
 
 }
@@ -130,4 +131,12 @@ bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
     }
 
     return false;
+}
+
+void Character::addItem(Item *item) {
+    this->items.push_back(item);
+    if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
+        // automatically arm weapon
+        this->current_weapon = static_cast<Weapon *>(item);
+    }
 }

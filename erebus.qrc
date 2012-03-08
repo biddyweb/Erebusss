@@ -4,5 +4,6 @@
         <file>gfx/textures/isometric_hero/clothes.png</file>
         <file>gfx/textures/isometric_hero/male_head1.png</file>
         <file>gfx/textures/goblin.png</file>
+        <file>gfx/textures/isometric_hero/longsword.png</file>
     </qresource>
 </RCC>

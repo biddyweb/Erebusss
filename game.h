@@ -203,7 +203,7 @@ class GUIOverlay : public QWidget {
         return QSize(640, 360);
     }*/
 
-    void drawBar(int x, int y, int width, int height, float fraction, QColor color);
+    void drawBar(QPainter &painter, int x, int y, int width, int height, float fraction, QColor color);
 public:
     GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view);
     virtual ~GUIOverlay() {

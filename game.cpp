@@ -252,16 +252,19 @@ OptionsGamestate::OptionsGamestate()
     centralWidget->setLayout(layout);
 
     QPushButton *startButton = new QPushButton("Start game");
+    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
     //this->initButton(prevButton);
 
     QPushButton *loadButton = new QPushButton("Load game");
+    loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
     //this->initButton(prevButton);
 
     QPushButton *quitButton = new QPushButton("Quit game");
+    quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
     //this->initButton(prevButton);
@@ -319,7 +322,7 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
         int m_y = event->y();
         int xdist = abs(this->mouse_down_x - m_x);
         int ydist = abs(this->mouse_down_y - m_y);
-        const int drag_tol_c = 8;
+        const int drag_tol_c = 16;
         // on a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
         //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
         if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
@@ -354,30 +357,35 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
     //qDebug("GUIOverlay::paintEvent()");
 
     //this->move(0, 0);
-    //QPainter painter(this);
+    QPainter painter(this);
     /*QBrush brush(QColor(255, 0, 0, 255));
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
     //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
     /*painter.setPen(Qt::green);
     painter.drawText(16, 16, "test blah blah blah 123");*/
     if( playing_gamestate->getPlayer() != NULL ) {
+        int bar_y = 32;
+        int text_y = bar_y - 4;
         const Character *player = playing_gamestate->getPlayer();
+        painter.drawText(16, text_y, player->getName().c_str());
         float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
-        this->drawBar(16, 16, 100, 16, fraction, Qt::darkGreen);
+        this->drawBar(painter, 16, bar_y, 100, 16, fraction, Qt::darkGreen);
         if( player->getTargetNPC() != NULL ) {
             const Character *enemy = player->getTargetNPC();
+            //qDebug("enemy: %d", enemy);
+            //qDebug("name: %s", enemy->getName().c_str());
+            painter.drawText(132, text_y, enemy->getName().c_str());
             fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
-            this->drawBar(132, 16, 100, 16, fraction, Qt::darkRed);
+            this->drawBar(painter, 132, bar_y, 100, 16, fraction, Qt::darkRed);
         }
     }
 }
 
-void GUIOverlay::drawBar(int x, int y, int width, int height, float fraction, QColor color) {
+void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height, float fraction, QColor color) {
     int x2 = x+1;
     int y2 = y+1;
     int width2 = width-2;
     int height2 = height-2;
-    QPainter painter(this);
     QBrush brush_bg(Qt::black);
     QBrush brush_fg(color);
     painter.setPen(Qt::white);
@@ -410,12 +418,12 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
 
     location = new Location();
 
-    this->player = new Character("player", false);
+    this->player = new Character("Player", "", false);
     player->initialiseHealth(100);
     player->addItem( this->cloneStandardItem("Long Sword") );
     location->addCharacter(player, 2.0f, 2.0f);
 
-    Character *enemy = new Character("goblin", true);
+    Character *enemy = new Character("Goblin", "goblin", true);
     enemy->initialiseHealth(5);
     location->addCharacter(enemy, 4.0f, 4.0f);
 
@@ -529,12 +537,12 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
 
     LOG("create animation frames\n");
     LOG("load player image\n");
-    LOG("clothes layer\n");
     vector<AnimationLayerDefinition> player_animation_layer_definition;
     player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    LOG("clothes layer\n");
     int time_s = clock();
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
     this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
@@ -544,6 +552,8 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
     AnimationLayer *head_layer = new AnimationLayer();*/
     //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
     this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
+    LOG("longsword layer");
+    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
 
     float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 
@@ -563,9 +573,12 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
         if( character == player ) {
             item->addAnimationLayer( this->animation_layers["clothes"] );
             item->addAnimationLayer( this->animation_layers["head"] );
+            if( character->getCurrentWeapon() != NULL ) {
+                item->addAnimationLayer( this->animation_layers["longsword"] );
+            }
         }
         else {
-            item->addAnimationLayer( this->animation_layers[ character->getName() ] );
+            item->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
         }
         scene->addItem(item);
         //item->setPos(character->getX(), character->getY() + offset_y);

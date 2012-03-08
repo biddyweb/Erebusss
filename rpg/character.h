@@ -11,6 +11,7 @@ using std::vector;
 class Character;
 class PlayingGamestate;
 class Item;
+class Weapon;
 
 class CharacterListener {
 public:
@@ -24,6 +25,7 @@ class Character {
     // basic info
     string name;
     bool is_ai;
+    string animation_name; // for NPCs (player is handled separately)
 
     // game data
     bool is_dead;
@@ -41,9 +43,10 @@ class Character {
     int health;
     int max_health;
     vector<Item *> items;
+    Weapon *current_weapon;
 
 public:
-    Character(string name, bool is_ai);
+    Character(string name, string animation_name, bool is_ai);
     ~Character();
 
     void setPos(float xpos, float ypos) {
@@ -63,6 +66,9 @@ public:
     }
     string getName() const {
         return this->name;
+    }
+    string getAnimationName() const {
+        return this->animation_name;
     }
     void setListener(CharacterListener *listener, void *listener_data) {
         this->listener = listener;
@@ -119,7 +125,11 @@ public:
         return this->health;
     }
 
-    void addItem(Item *item) {
-        this->items.push_back(item);
+    const Weapon *getCurrentWeapon() const {
+        return this->current_weapon;
     }
+    Weapon *getCurrentWeapon() {
+        return this->current_weapon;
+    }
+    void addItem(Item *item);
 };
