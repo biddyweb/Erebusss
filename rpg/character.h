@@ -3,10 +3,14 @@
 #include <string>
 using std::string;
 
+#include <vector>
+using std::vector;
+
 #include "utils.h"
 
 class Character;
 class PlayingGamestate;
+class Item;
 
 class CharacterListener {
 public:
@@ -36,6 +40,8 @@ class Character {
     // rpg data
     int health;
     int max_health;
+    vector<Item *> items;
+
 public:
     Character(string name, bool is_ai);
     ~Character();
@@ -111,5 +117,9 @@ public:
         if( health > max_health )
             health = max_health;
         return this->health;
+    }
+
+    void addItem(Item *item) {
+        this->items.push_back(item);
     }
 };

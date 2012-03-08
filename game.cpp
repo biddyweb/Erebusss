@@ -1,5 +1,5 @@
 #include "rpg/location.h"
-#include "rpg/character.h"
+#include "rpg/item.h"
 
 #include "game.h"
 #include "qt_screen.h"
@@ -401,6 +401,10 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
 
+    // create RPG data
+    //this->items.insert( new Weapon("Long Sword", "longsword.png") );
+    this->addStandardItem( new Weapon("Long Sword", "longsword.png") );
+
     // create RPG world
     LOG("create RPG world\n");
 
@@ -408,6 +412,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
 
     this->player = new Character("player", false);
     player->initialiseHealth(100);
+    player->addItem( this->cloneStandardItem("Long Sword") );
     location->addCharacter(player, 2.0f, 2.0f);
 
     Character *enemy = new Character("goblin", true);
@@ -662,6 +667,10 @@ PlayingGamestate::~PlayingGamestate() {
         AnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
     }
+    for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
+        Item *item = iter->second;
+        delete item;
+    }
 }
 
 void PlayingGamestate::clickedQuit() {
@@ -792,6 +801,19 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     }
 }
 
+void PlayingGamestate::addStandardItem(Item *item) {
+    this->standard_items[item->getName()] = item;
+}
+
+Item *PlayingGamestate::cloneStandardItem(string name) {
+    map<string, Item *>::const_iterator iter = this->standard_items.find(name);
+    if( iter == this->standard_items.end() ) {
+        LOG("can't clone standard item which doesn't exist: %s\n", name.c_str());
+        throw string("Unknown standard item");
+    }
+    const Item *item = iter->second;
+    return item->clone();
+}
 
 Game::Game() {
     game_g = this;

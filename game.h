@@ -2,8 +2,6 @@
 
 #include "rpg/character.h"
 
-class Screen;
-
 #include <QtGui>
 
 #include <queue>
@@ -19,8 +17,10 @@ using std::pair;
 #include <string>
 using std::string;
 
+class Screen;
 class PlayingGamestate;
 class Location;
+class Item;
 
 enum Direction {
     DIRECTION_W = 0,
@@ -250,7 +250,9 @@ class PlayingGamestate : public Gamestate, CharacterListener {
     // character items in the view
     set<QGraphicsItem *> graphicsitems_characters;
 
+    // data
     map<string, AnimationLayer *> animation_layers;
+    map<string, Item *> standard_items;
 
 private slots:
     void clickedQuit();
@@ -282,6 +284,9 @@ public:
     const Location *getLocation() const {
         return this->location;
     }
+
+    void addStandardItem(Item *item);
+    Item *cloneStandardItem(string name);
 };
 
 // used for passing messages

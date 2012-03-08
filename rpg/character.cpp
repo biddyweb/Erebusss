@@ -1,5 +1,6 @@
 #include "character.h"
 #include "location.h"
+#include "item.h"
 #include "../game.h"
 #include "../qt_screen.h"
 
@@ -18,6 +19,10 @@ Character::Character(string name, bool is_ai) :
 Character::~Character() {
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
+    }
+    for(vector<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        Item *item = *iter;
+        delete item;
     }
 }
 
