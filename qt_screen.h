@@ -17,4 +17,5 @@ public:
     }
     int getElapsedMS();
     void runMainLoop();
+    void enableTimers(bool enabled);
 };

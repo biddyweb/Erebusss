@@ -8,6 +8,7 @@ using std::set;
 #include "utils.h"
 
 class Character;
+class Item;
 
 class FloorRegion : public Polygon2D {
 protected:
@@ -27,6 +28,7 @@ class Location {
     vector<Polygon2D> boundaries; // first boundary is always the outside one
 
     set<Character *> characters;
+    set<Item *> items;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
 public:
@@ -78,6 +80,19 @@ public:
     }
     void charactersErase(set<Character *>::iterator iter) {
         this->characters.erase(iter);
+    }
+    void addItem(Item *item, float xpos, float ypos);
+    set<Item *>::iterator itemsBegin() {
+        return this->items.begin();
+    }
+    set<Item *>::const_iterator itemsBegin() const {
+        return this->items.begin();
+    }
+    set<Item *>::iterator itemsEnd() {
+        return this->items.end();
+    }
+    set<Item *>::const_iterator itemsEnd() const {
+        return this->items.end();
     }
 
     bool intersectSweptSquareWithBoundaries(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width);

@@ -1,5 +1,6 @@
 #include "location.h"
 #include "character.h"
+#include "item.h"
 //#include "../game.h"
 
 #include <qdebug.h>
@@ -28,6 +29,14 @@ Location::~Location() {
         FloorRegion *floor_region = *iter;
         delete floor_region;
     }
+    for(set<Character *>::iterator iter = characters.begin(); iter != characters.end(); ++iter) {
+        Character *character = *iter;
+        delete character;
+    }
+    for(set<Item *>::iterator iter = items.begin(); iter != items.end(); ++iter) {
+        Item *item = *iter;
+        delete item;
+    }
 }
 
 void Location::calculateSize(float *w, float *h) const {
@@ -46,6 +55,11 @@ void Location::calculateSize(float *w, float *h) const {
 void Location::addCharacter(Character *character, float xpos, float ypos) {
     character->setPos(xpos, ypos);
     this->characters.insert(character);
+}
+
+void Location::addItem(Item *item, float xpos, float ypos) {
+    item->setPos(xpos, ypos);
+    this->items.insert(item);
 }
 
 void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) {

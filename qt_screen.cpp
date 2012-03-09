@@ -21,3 +21,12 @@ void Screen::runMainLoop() {
 
     qApp->exec();
 }
+
+void Screen::enableTimers(bool enabled) {
+    if( enabled ) {
+        timer.start();
+    }
+    else {
+        timer.stop();
+    }
+}

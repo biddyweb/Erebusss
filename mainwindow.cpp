@@ -77,8 +77,12 @@ void MainWindow::showExpanded()
 }
 
 void MainWindow::updateScene() {
-    //qDebug("MainWindow::updateScene()");
+    qDebug("MainWindow::updateScene()");
     //qApp->beep();
+    /*if( this->signalsBlocked() ) {
+        qDebug("no signals");
+        return;
+    }*/
     int new_time = game_g->getScreen()->getElapsedMS();
     int d_time = new_time - elapsed_time;
     //qDebug("time: %d", d_time);

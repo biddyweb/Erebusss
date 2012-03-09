@@ -174,7 +174,7 @@ class GUIOverlay;
 class MainGraphicsView : public QGraphicsView {
     PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
-    QGraphicsProxyWidget *gui_overlay_item;
+    //QGraphicsProxyWidget *gui_overlay_item;
     GUIOverlay *gui_overlay;
 
     virtual void mousePressEvent(QMouseEvent *event);
@@ -183,14 +183,14 @@ class MainGraphicsView : public QGraphicsView {
 
 public:
     MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
-        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), gui_overlay_item(NULL), gui_overlay(NULL)
+        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL)
     {
     }
     virtual ~MainGraphicsView() {
     }
 
-    void setGUIOverlay(QGraphicsProxyWidget *gui_overlay_item, GUIOverlay *gui_overlay) {
-        this->gui_overlay_item = gui_overlay_item;
+    void setGUIOverlay(/*QGraphicsProxyWidget *gui_overlay_item, */GUIOverlay *gui_overlay) {
+        //this->gui_overlay_item = gui_overlay_item;
         this->gui_overlay = gui_overlay;
     }
 };
@@ -293,7 +293,8 @@ public:
 class GameMessage {
 public:
     enum GameMessageType {
-        GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING = 0
+        GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING = 0,
+        GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS = 1
     };
 
 protected:
@@ -343,6 +344,8 @@ public:
         return loadImage(filename, false, 0, 0, 0, 0);
     }
     void showErrorWindow(const char *message);
+    void showInfoWindow(const char *title, const char *message);
+    bool askQuestionWindow(const char *title, const char *message);
 };
 
 extern Game *game_g;

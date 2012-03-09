@@ -18,6 +18,8 @@ Character::Character(string name, string animation_name, bool is_ai) :
 }
 
 Character::~Character() {
+    LOG("Character::~Character(): %s\n", this->name.c_str());
+    qDebug("Character::~Character(): %s", this->name.c_str());
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
     }
@@ -93,17 +95,23 @@ bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
     if( is_ai && !is_hitting ) {
         //qDebug("ping");
         this->setTargetNPC( playing_gamestate->getPlayer() );
-        Vector2D dest = playing_gamestate->getPlayer()->getPos();
-        Vector2D hit_pos;
-        bool hit = playing_gamestate->getLocation()->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
-        if( hit ) {
-            //qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
-            dest = hit_pos;
+        if( playing_gamestate->getPlayer() != NULL ) {
+            Vector2D dest = playing_gamestate->getPlayer()->getPos();
+            Vector2D hit_pos;
+            bool hit = playing_gamestate->getLocation()->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
+            if( hit ) {
+                //qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
+                dest = hit_pos;
+            }
+            this->setDestination(dest.x, dest.y);
         }
-        this->setDestination(dest.x, dest.y);
+        else {
+            this->has_destination = false;
+        }
     }
 
-    if( this->has_destination ) {
+    if( this->has_destination && !is_hitting ) {
+        //qDebug("move character");
         /*float diff_x = this->dest.x - this->pos.x;
         float diff_y = this->dest.y - this->pos.y;
         float step = 0.1f;

@@ -3,6 +3,8 @@
 #include <string>
 using std::string;
 
+#include "utils.h"
+
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
     ITEMTYPE_WEAPON = 1,
@@ -12,6 +14,7 @@ enum ItemType {
 
 class Item {
     string name;
+    Vector2D pos; // when stored in a Location
 
 public:
     Item(string name);
@@ -23,6 +26,21 @@ public:
     }
     virtual Item *clone() const; // virtual copy constructor
 
+    void setPos(float xpos, float ypos) {
+        this->pos.set(xpos, ypos);
+        /*if( this->listener != NULL ) {
+            this->listener->characterMoved(this, this->listener_data);
+        }*/
+    }
+    float getX() const {
+        return this->pos.x;
+    }
+    float getY() const {
+        return this->pos.y;
+    }
+    Vector2D getPos() const {
+        return this->pos;
+    }
     string getName() const {
         return this->name;
     }

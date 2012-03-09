@@ -70,6 +70,9 @@ public:
     string getAnimationName() const {
         return this->animation_name;
     }
+    bool isDead() const {
+        return this->is_dead;
+    }
     void setListener(CharacterListener *listener, void *listener_data) {
         this->listener = listener;
         this->listener_data = listener_data;
