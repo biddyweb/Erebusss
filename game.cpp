@@ -381,6 +381,12 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
             this->drawBar(painter, 132, bar_y, 100, 16, fraction, Qt::darkRed);
         }
     }
+
+    if( this->display_progress ) {
+        const int x_off = 16;
+        const int hgt = 64;
+        this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
+    }
 }
 
 void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height, float fraction, QColor color) {
@@ -411,9 +417,88 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
 
+    // create UI
+    LOG("create UI\n");
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+#else
+    window->setFont(qApp->font());
+#endif
+
+    scene = new QGraphicsScene(window);
+    //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
+    //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    //view = new QGraphicsView(scene, window);
+    view = new MainGraphicsView(this, scene, window);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setBackgroundBrush(QBrush(Qt::black));
+    view->setFrameStyle(QFrame::NoFrame);
+    view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
+    view->setDragMode(QGraphicsView::ScrollHandDrag);
+    view->setCacheMode(QGraphicsView::CacheBackground);
+
+    QWidget *centralWidget = new QWidget(window);
+    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(centralWidget);
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    centralWidget->setLayout(layout);
+
+    {
+        QVBoxLayout *v_layout = new QVBoxLayout();
+        layout->addLayout(v_layout);
+
+        QPushButton *statsButton = new QPushButton("Stats");
+        statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(statsButton);
+
+        QPushButton *itemsButton = new QPushButton("Items");
+        itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(itemsButton);
+
+        QPushButton *spellsButton = new QPushButton("Spells");
+        spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(spellsButton);
+
+        QPushButton *journalButton = new QPushButton("Journal");
+        journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(journalButton);
+
+        QPushButton *optionsButton = new QPushButton("Options");
+        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(optionsButton);
+
+        QPushButton *quitButton = new QPushButton("Quit");
+        quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        v_layout->addWidget(quitButton);
+        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+    }
+
+    layout->addWidget(view);
+
+    view->showFullScreen();
+
+    gui_overlay = new GUIOverlay(this, view);
+    gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    view->setGUIOverlay(gui_overlay);
+
+    gui_overlay->setProgress(0);
+    qApp->processEvents();
+
     // create RPG data
+    LOG("create RPG data\n");
     //this->items.insert( new Weapon("Long Sword", "longsword.png") );
     this->addStandardItem( new Weapon("Long Sword", "longsword.png") );
+
+    gui_overlay->setProgress(10);
+    qApp->processEvents();
 
     // create RPG world
     LOG("create RPG world\n");
@@ -465,30 +550,8 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         location->addBoundary(boundary);
     }
 
-    // create UI
-    LOG("create UI\n");
-    MainWindow *window = game_g->getScreen()->getMainWindow();
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-#else
-    window->setFont(qApp->font());
-#endif
-
-    /*QWidget *centralWidget = new QWidget(window);
-    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(centralWidget);*/
-
-    scene = new QGraphicsScene(window);
-    //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
-    //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    //view = new QGraphicsView(scene, window);
-    view = new MainGraphicsView(this, scene, window);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setBackgroundBrush(QBrush(Qt::black));
-    view->setFrameStyle(QFrame::NoFrame);
-    view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
-    view->setDragMode(QGraphicsView::ScrollHandDrag);
-    view->setCacheMode(QGraphicsView::CacheBackground);
+    gui_overlay->setProgress(20);
+    qApp->processEvents();
 
     // set up the view on the RPG world
 
@@ -540,6 +603,9 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         }
     }
 
+    gui_overlay->setProgress(30);
+    qApp->processEvents();
+
     LOG("create animation frames\n");
     LOG("load player image\n");
     vector<AnimationLayerDefinition> player_animation_layer_definition;
@@ -560,6 +626,9 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     LOG("longsword layer");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
 
+    gui_overlay->setProgress(50);
+    qApp->processEvents();
+
     float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 
     LOG("load goblin image\n");
@@ -571,6 +640,9 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/goblin.png", goblin_animation_layer_definition);
 
+    gui_overlay->setProgress(70);
+    qApp->processEvents();
+
     LOG("add graphics items\n");
     for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
         Item *item = *iter;
@@ -581,6 +653,10 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         graphics_item->setPos(item->getX(), item->getY());
         graphics_item->setScale(player_scale);
     }
+
+    gui_overlay->setProgress(80);
+    qApp->processEvents();
+
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
         AnimatedObject *item = new AnimatedObject();
@@ -603,78 +679,12 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         character->setListener(this, item);
         //item->setAnimationSet("attack"); // test
     }
-    /*QGraphicsTextItem *text_item = scene->addText("Blah");
-    text_item->setDefaultTextColor(Qt::white);*/
 
+    gui_overlay->unsetProgress();
+    qApp->processEvents();
+
+    LOG("View is transformed? %d\n", view->isTransformed());
     LOG("done\n");
-
-    QWidget *centralWidget = new QWidget(window);
-    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(centralWidget);
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    centralWidget->setLayout(layout);
-
-    {
-        QVBoxLayout *v_layout = new QVBoxLayout();
-        layout->addLayout(v_layout);
-
-        QPushButton *statsButton = new QPushButton("Stats");
-        statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(statsButton);
-
-        QPushButton *itemsButton = new QPushButton("Items");
-        itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(itemsButton);
-
-        QPushButton *spellsButton = new QPushButton("Spells");
-        spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(spellsButton);
-
-        QPushButton *journalButton = new QPushButton("Journal");
-        journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(journalButton);
-
-        QPushButton *optionsButton = new QPushButton("Options");
-        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(optionsButton);
-
-        QPushButton *quitButton = new QPushButton("Quit");
-        quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(quitButton);
-        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
-    }
-
-    layout->addWidget(view);
-
-    view->showFullScreen();
-
-    /*{
-        QPushButton *button = new QPushButton("Test", view);
-        QGraphicsProxyWidget *item = scene->addWidget(button);
-        item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-    }*/
-    {
-        gui_overlay = new GUIOverlay(this, view);
-        gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-        view->setGUIOverlay(gui_overlay);
-    }
-    /*{
-        StatusBar *statusBar = new StatusBar();
-        statusBar->setFixedSize(64, 16);
-        QGraphicsProxyWidget *statusBarItem = scene->addWidget(statusBar);
-        //statusBarItem->setPos();
-        statusBarItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-        statusBarItem->setPos(0, -offset_y);
-    }*/
-
-    LOG("Is transformed? %d\n", view->isTransformed());
 }
 
 PlayingGamestate::~PlayingGamestate() {
