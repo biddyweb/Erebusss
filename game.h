@@ -242,6 +242,7 @@ class PlayingGamestate : public Gamestate, CharacterListener {
 
     QGraphicsScene *scene;
     MainGraphicsView *view;
+    GUIOverlay *gui_overlay;
 
     Character *player;
 

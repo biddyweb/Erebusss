@@ -406,7 +406,7 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
 }*/
 
-PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), location(NULL)
+PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL), player(NULL), location(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -620,39 +620,36 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
         layout->addLayout(v_layout);
 
         QPushButton *statsButton = new QPushButton("Stats");
-        //statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(statsButton);
 
         QPushButton *itemsButton = new QPushButton("Items");
-        //itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(itemsButton);
 
         QPushButton *spellsButton = new QPushButton("Spells");
-        //spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);
 
         QPushButton *journalButton = new QPushButton("Journal");
-        //journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(journalButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
-        //optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(optionsButton);
 
         QPushButton *quitButton = new QPushButton("Quit");
-        //quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
     }
-
-    /*GUIOverlay *guiOverlay = new GUIOverlay(this, window);
-    layout->addWidget(guiOverlay);*/
 
     layout->addWidget(view);
 
@@ -664,22 +661,9 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
         item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     }*/
     {
-        //GUIOverlay *guiOverlay = new GUIOverlay(this, view);
-        GUIOverlay *guiOverlay = new GUIOverlay(this, view);
-        guiOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-        //guiOverlay->setFixedSize(view->size());
-        //GUIOverlayItem *guiOverlayItem = new GUIOverlayItem(view);
-        /*QGraphicsProxyWidget *guiOverlayItem = new QGraphicsProxyWidget();
-        guiOverlayItem->setWidget(guiOverlay);
-        scene->addItem(guiOverlayItem);*/
-        /*QGraphicsProxyWidget *guiOverlayItem = scene->addWidget(guiOverlay);
-        //guiOverlay->move(0,0);
-        guiOverlayItem->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-        //guiOverlayItem->setPos(0, -offset_y);
-        //qDebug("### %d, %d", scene->sceneRect().x(), scene->sceneRect().y());
-        //guiOverlayItem->setPos( scene->sceneRect().topLeft() );
-        view->setGUIOverlay(guiOverlayItem, guiOverlay);*/
-        view->setGUIOverlay(guiOverlay);
+        gui_overlay = new GUIOverlay(this, view);
+        gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+        view->setGUIOverlay(gui_overlay);
     }
     /*{
         StatusBar *statusBar = new StatusBar();
@@ -724,6 +708,8 @@ void PlayingGamestate::update(int time_ms) {
     //qDebug("update");
 
     scene->advance();
+    gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
+
     vector< set<Character *>::iterator > delete_characters;
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
