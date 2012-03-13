@@ -608,8 +608,6 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
 
     LOG("done\n");
 
-    //window->setCentralWidget(view);
-
     QWidget *centralWidget = new QWidget(window);
     centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
     window->setCentralWidget(centralWidget);
@@ -622,26 +620,32 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), player(NULL), lo
         layout->addLayout(v_layout);
 
         QPushButton *statsButton = new QPushButton("Stats");
+        //statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(statsButton);
 
         QPushButton *itemsButton = new QPushButton("Items");
+        //itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(itemsButton);
 
         QPushButton *spellsButton = new QPushButton("Spells");
+        //spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);
 
         QPushButton *journalButton = new QPushButton("Journal");
+        //journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(journalButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
+        //optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(optionsButton);
 
         QPushButton *quitButton = new QPushButton("Quit");
+        //quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));

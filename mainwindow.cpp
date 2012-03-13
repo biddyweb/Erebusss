@@ -77,7 +77,7 @@ void MainWindow::showExpanded()
 }
 
 void MainWindow::updateScene() {
-    qDebug("MainWindow::updateScene()");
+    //qDebug("MainWindow::updateScene()");
     //qApp->beep();
     /*if( this->signalsBlocked() ) {
         qDebug("no signals");
