@@ -62,3 +62,20 @@ public:
         return this->animation_filename;
     }
 };
+
+class Armour : public Item {
+    int rating;
+public:
+    Armour(string name, int rating);
+    virtual ~Armour() {
+    }
+
+    virtual ItemType getType() const {
+        return ITEMTYPE_ARMOUR;
+    }
+    virtual Armour *clone() const; // virtual copy constructor
+
+    int getRating() const {
+        return this->rating;
+    }
+};

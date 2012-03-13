@@ -496,6 +496,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     LOG("create RPG data\n");
     //this->items.insert( new Weapon("Long Sword", "longsword.png") );
     this->addStandardItem( new Weapon("Long Sword", "longsword.png") );
+    this->addStandardItem( new Armour("Leather Armour", 2));
 
     gui_overlay->setProgress(10);
     qApp->processEvents();
@@ -507,8 +508,9 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
 
     this->player = new Character("Player", "", false);
     player->initialiseHealth(100);
-    //player->initialiseHealth(5);
+    //player->initialiseHealth(5); // test
     player->addItem( this->cloneStandardItem("Long Sword") );
+    player->addItem( this->cloneStandardItem("Leather Armour") );
     location->addCharacter(player, 2.0f, 2.0f);
 
     Character *enemy = new Character("Goblin", "goblin", true);
@@ -618,15 +620,18 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
     this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
     qDebug("time to load: %d", clock() - time_s);
+    gui_overlay->setProgress(40);
+    qApp->processEvents();
     /*LOG("head layer\n");
     string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
     AnimationLayer *head_layer = new AnimationLayer();*/
     //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
     this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
+    gui_overlay->setProgress(50);
+    qApp->processEvents();
     LOG("longsword layer");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
-
-    gui_overlay->setProgress(50);
+    gui_overlay->setProgress(60);
     qApp->processEvents();
 
     float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
