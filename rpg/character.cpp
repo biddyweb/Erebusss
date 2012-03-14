@@ -23,7 +23,7 @@ Character::~Character() {
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
     }
-    for(vector<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+    for(set<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
         Item *item = *iter;
         delete item;
     }
@@ -142,7 +142,7 @@ bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
 }
 
 void Character::addItem(Item *item) {
-    this->items.push_back(item);
+    this->items.insert(item);
     if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon
         this->current_weapon = static_cast<Weapon *>(item);

@@ -6,6 +6,9 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#include <set>
+using std::set;
+
 #include "utils.h"
 
 class Character;
@@ -42,7 +45,7 @@ class Character {
     // rpg data
     int health;
     int max_health;
-    vector<Item *> items;
+    set<Item *> items;
     Weapon *current_weapon;
 
 public:
@@ -135,4 +138,16 @@ public:
         return this->current_weapon;
     }
     void addItem(Item *item);
+    set<Item *>::iterator itemsBegin() {
+        return this->items.begin();
+    }
+    set<Item *>::const_iterator itemsBegin() const {
+        return this->items.begin();
+    }
+    set<Item *>::iterator itemsEnd() {
+        return this->items.end();
+    }
+    set<Item *>::const_iterator itemsEnd() const {
+        return this->items.end();
+    }
 };

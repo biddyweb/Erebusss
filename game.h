@@ -255,6 +255,8 @@ class PlayingGamestate : public Gamestate, CharacterListener {
     MainGraphicsView *view;
     GUIOverlay *gui_overlay;
 
+    QWidget *subwindow;
+
     Character *player;
 
     Location *location;
@@ -267,7 +269,9 @@ class PlayingGamestate : public Gamestate, CharacterListener {
     map<string, Item *> standard_items;
 
 private slots:
+    void clickedItems();
     void clickedQuit();
+    void clickedCloseSubwindow();
 
 public:
     PlayingGamestate();

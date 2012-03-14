@@ -412,7 +412,7 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
 }*/
 
-PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL), player(NULL), location(NULL)
+PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL), subwindow(NULL), player(NULL), location(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -457,6 +457,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         QPushButton *itemsButton = new QPushButton("Items");
         itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
         QPushButton *spellsButton = new QPushButton("Spells");
@@ -705,9 +706,49 @@ PlayingGamestate::~PlayingGamestate() {
     }
 }
 
+void PlayingGamestate::clickedItems() {
+    qDebug("clickedItems()");
+    this->clickedCloseSubwindow();
+
+    //subwindow = new QWidget(this->view);
+    subwindow = new QWidget();
+    //subwindow = new QWidget(game_g->getScreen()->getMainWindow());
+    //game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    subwindow->setLayout(layout);
+
+    QListWidget *list = new QListWidget();
+    layout->addWidget(list);
+    QFont font = game_g->getScreen()->getMainWindow()->font();
+    font.setPointSize( font.pointSize() + 6 );
+    list->setFont(font);
+
+    for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        const Item *item = *iter;
+        list->addItem( item->getName().c_str() );
+    }
+
+    QPushButton *closeButton = new QPushButton("Close");
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
+
+    subwindow->showFullScreen();
+    game_g->getScreen()->getMainWindow()->hide();
+}
+
 void PlayingGamestate::clickedQuit() {
     qDebug("clickedQuit()");
     this->quitGame();
+}
+
+void PlayingGamestate::clickedCloseSubwindow() {
+    if( subwindow != NULL ) {
+        game_g->getScreen()->getMainWindow()->show();
+        subwindow->close();
+        delete subwindow;
+        subwindow = NULL;
+    }
 }
 
 void PlayingGamestate::quitGame() {
