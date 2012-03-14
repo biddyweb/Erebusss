@@ -270,6 +270,7 @@ class PlayingGamestate : public Gamestate, CharacterListener {
 
 private slots:
     void clickedItems();
+    void clickedOptions();
     void clickedQuit();
     void clickedCloseSubwindow();
 

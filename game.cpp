@@ -473,13 +473,14 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         QPushButton *optionsButton = new QPushButton("Options");
         optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
         v_layout->addWidget(optionsButton);
 
-        QPushButton *quitButton = new QPushButton("Quit");
+        /*QPushButton *quitButton = new QPushButton("Quit");
         quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
-        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
     }
 
     layout->addWidget(view);
@@ -694,6 +695,11 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
 }
 
 PlayingGamestate::~PlayingGamestate() {
+    this->clickedCloseSubwindow();
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->centralWidget()->deleteLater();
+    window->setCentralWidget(NULL);
+
     playingGamestate = NULL;
 
     for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
@@ -737,6 +743,29 @@ void PlayingGamestate::clickedItems() {
     game_g->getScreen()->getMainWindow()->hide();
 }
 
+void PlayingGamestate::clickedOptions() {
+    qDebug("clickedOptions()");
+    this->clickedCloseSubwindow();
+
+    subwindow = new QWidget();
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    subwindow->setLayout(layout);
+
+    QPushButton *quitButton = new QPushButton("Quit game");
+    quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(quitButton);
+    connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+
+    QPushButton *closeButton = new QPushButton("Back to game");
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
+
+    subwindow->showFullScreen();
+    game_g->getScreen()->getMainWindow()->hide();
+}
+
 void PlayingGamestate::clickedQuit() {
     qDebug("clickedQuit()");
     this->quitGame();
@@ -746,7 +775,8 @@ void PlayingGamestate::clickedCloseSubwindow() {
     if( subwindow != NULL ) {
         game_g->getScreen()->getMainWindow()->show();
         subwindow->close();
-        delete subwindow;
+        //delete subwindow;
+        subwindow->deleteLater();
         subwindow = NULL;
     }
 }
@@ -1066,7 +1096,8 @@ bool Game::askQuestionWindow(const char *title, const char *message) {
     qDebug("Game::askQuestionWindow: %s", message);
     //this->getScreen()->getMainWindow()->blockSignals(true);
     this->getScreen()->enableTimers(false);
-    int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
+    //int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
+    int res = QMessageBox::question(NULL, title, message, QMessageBox::Yes, QMessageBox::No);
     //this->getScreen()->getMainWindow()->blockSignals(false);
     this->getScreen()->enableTimers(true);
     //LOG("    answer is %d", res);
