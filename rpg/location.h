@@ -9,6 +9,12 @@ using std::set;
 
 class Character;
 class Item;
+class Location;
+
+class LocationListener {
+public:
+    virtual void locationAddItem(const Location *location, Item *item)=0;
+};
 
 class FloorRegion : public Polygon2D {
 protected:
@@ -23,6 +29,7 @@ public:
 class Location {
     /*float width;
     float height;*/
+    LocationListener *listener;
 
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries; // first boundary is always the outside one
@@ -65,6 +72,9 @@ public:
         return this->boundaries.size();
     }
 
+    void setListener(LocationListener *listener) {
+        this->listener = listener;
+    }
     void addCharacter(Character *character, float xpos, float ypos);
     set<Character *>::iterator charactersBegin() {
         return this->characters.begin();

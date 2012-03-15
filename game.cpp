@@ -16,6 +16,9 @@ PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 const int versionMajor = 0;
 const int versionMinor = 1;
 
+const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
+const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
+
 //const int scene_item_character_key_c = 0;
 
 AnimationSet::AnimationSet(AnimationType animation_type, int n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
@@ -203,6 +206,7 @@ void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
 
 void AnimatedObject::clearAnimationLayers() {
     this->animation_layers.clear();
+    this->c_animation_sets.clear();
 }
 
 void AnimatedObject::setAnimationSet(string name) {
@@ -562,6 +566,8 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         location->addBoundary(boundary);
     }
 
+    location->setListener(this); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+
     gui_overlay->setProgress(20);
     qApp->processEvents();
 
@@ -644,9 +650,6 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
-    float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
-    float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
-
     LOG("load goblin image\n");
     //AnimationLayer *goblin_layer = AnimationLayer::create(":/gfx/textures/goblin.png");
     vector<AnimationLayerDefinition> goblin_animation_layer_definition;
@@ -662,13 +665,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     LOG("add graphics items\n");
     for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
         Item *item = *iter;
-        QGraphicsPixmapItem *graphics_item = new QGraphicsPixmapItem();
-        //QPixmap image = game_g->loadImage(":/gfx/textures/items/longsword.png", true, 160, 48, 32, 16);
-        //graphics_item->setPixmap(image);
-        graphics_item->setPixmap( item->getImage()->getPixmap() );
-        scene->addItem(graphics_item);
-        graphics_item->setPos(item->getX(), item->getY());
-        graphics_item->setScale(item_scale);
+        this->locationAddItem(location, item);
     }
 
     gui_overlay->setProgress(80);
@@ -719,6 +716,16 @@ PlayingGamestate::~PlayingGamestate() {
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
         Item *item = iter->second;
         delete item;
+    }
+}
+
+void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
+    if( this->location == location ) {
+        QGraphicsPixmapItem *graphics_item = new QGraphicsPixmapItem();
+        graphics_item->setPixmap( item->getImage()->getPixmap() );
+        scene->addItem(graphics_item);
+        graphics_item->setPos(item->getX(), item->getY());
+        graphics_item->setScale(item_scale);
     }
 }
 

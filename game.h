@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rpg/character.h"
+#include "rpg/location.h"
 
 #include <QtGui>
 
@@ -260,7 +261,7 @@ public:
     }
 };*/
 
-class PlayingGamestate : public Gamestate, CharacterListener {
+class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Q_OBJECT
 
     static PlayingGamestate *playingGamestate; // singleton pointer, needed for static member functions
@@ -304,6 +305,8 @@ public:
     virtual void characterMoved(const Character *character, void *user_data);
     virtual void characterSetAnimation(const Character *character, void *user_data, string name);
     virtual void characterDeath(Character *character, void *user_data);
+
+    virtual void locationAddItem(const Location *location, Item *item);
 
     void clickedMainView(float scene_x, float scene_y);
 
