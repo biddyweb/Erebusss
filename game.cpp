@@ -201,6 +201,10 @@ void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
     this->update();
 }
 
+void AnimatedObject::clearAnimationLayers() {
+    this->animation_layers.clear();
+}
+
 void AnimatedObject::setAnimationSet(string name) {
     /*const AnimationSet *new_animation_set = animation_layer->getAnimationSet(name);
     if( new_animation_set != c_animation_set ) {
@@ -497,8 +501,11 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     // create RPG data
     LOG("create RPG data\n");
     //this->items.insert( new Weapon("Long Sword", "longsword.png") );
-    this->addStandardItem( new Weapon("Long Sword", "longsword.png") );
-    this->addStandardItem( new Armour("Leather Armour", 2));
+    Image *image = NULL;
+    image = new Image( game_g->loadImage(":/gfx/textures/items/longsword.png") );
+    this->addStandardItem( new Weapon("Long Sword", image, "longsword") );
+    image = new Image( game_g->loadImage(":/gfx/textures/items/leather_armor.png") );
+    this->addStandardItem( new Armour("Leather Armour", image, 2));
 
     gui_overlay->setProgress(10);
     qApp->processEvents();
@@ -520,6 +527,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     location->addCharacter(enemy, 4.0f, 4.0f);
 
     location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
+    location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -637,6 +645,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     qApp->processEvents();
 
     float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
+    float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
 
     LOG("load goblin image\n");
     //AnimationLayer *goblin_layer = AnimationLayer::create(":/gfx/textures/goblin.png");
@@ -654,11 +663,12 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
         Item *item = *iter;
         QGraphicsPixmapItem *graphics_item = new QGraphicsPixmapItem();
-        QPixmap image = game_g->loadImage(":/gfx/textures/items/longsword.png", true, 160, 48, 32, 16);
-        graphics_item->setPixmap(image);
+        //QPixmap image = game_g->loadImage(":/gfx/textures/items/longsword.png", true, 160, 48, 32, 16);
+        //graphics_item->setPixmap(image);
+        graphics_item->setPixmap( item->getImage()->getPixmap() );
         scene->addItem(graphics_item);
         graphics_item->setPos(item->getX(), item->getY());
-        graphics_item->setScale(player_scale);
+        graphics_item->setScale(item_scale);
     }
 
     gui_overlay->setProgress(80);
@@ -666,24 +676,24 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
 
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
-        AnimatedObject *item = new AnimatedObject();
-        if( character == player ) {
-            item->addAnimationLayer( this->animation_layers["clothes"] );
-            item->addAnimationLayer( this->animation_layers["head"] );
+        AnimatedObject *object = new AnimatedObject();
+        /*if( character == player ) {
+            object->addAnimationLayer( this->animation_layers["clothes"] );
+            object->addAnimationLayer( this->animation_layers["head"] );
             if( character->getCurrentWeapon() != NULL ) {
-                item->addAnimationLayer( this->animation_layers["longsword"] );
+                object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationFilename().c_str() ] );
             }
         }
         else {
-            item->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
-        }
-        scene->addItem(item);
-        //item->setPos(character->getX(), character->getY() + offset_y);
-        item->setPos(character->getX(), character->getY());
-        item->setTransformOriginPoint(-32.0f*player_scale, -46.0f*player_scale);
-        item->setScale(player_scale);
+            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
+        }*/
+        this->characterUpdateGraphics(character, object);
+        scene->addItem(object);
+        object->setPos(character->getX(), character->getY());
+        object->setTransformOriginPoint(-32.0f*player_scale, -46.0f*player_scale);
+        object->setScale(player_scale);
 
-        character->setListener(this, item);
+        character->setListener(this, object);
         //item->setAnimationSet("attack"); // test
     }
 
@@ -724,15 +734,26 @@ void PlayingGamestate::clickedItems() {
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
 
-    QListWidget *list = new QListWidget();
+    list = new QListWidget();
     layout->addWidget(list);
     QFont font = game_g->getScreen()->getMainWindow()->font();
     font.setPointSize( font.pointSize() + 6 );
     list->setFont(font);
 
-    for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        const Item *item = *iter;
+    list_items.clear();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
         list->addItem( item->getName().c_str() );
+        list_items.push_back(item);
+    }
+
+    {
+        QVBoxLayout *h_layout = new QVBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *dropButton = new QPushButton("Drop Item");
+        layout->addWidget(dropButton);
+        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
     }
 
     QPushButton *closeButton = new QPushButton("Close");
@@ -741,6 +762,24 @@ void PlayingGamestate::clickedItems() {
 
     subwindow->showFullScreen();
     game_g->getScreen()->getMainWindow()->hide();
+}
+
+void PlayingGamestate::clickedDropItem() {
+    qDebug("clickedDropItem()");
+    /*QList<QListWidgetItem *> selected_items = list->selectedItems();
+    if( selected_items.size() == 1 ) {
+        QListWidgetItem *selected_item = selected_items.at(0);*/
+    int index = list->currentRow();
+    Item *item = list_items.at(index);
+    player->dropItem(this->location, item);
+
+    list->clear();
+    list_items.clear();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        list->addItem( item->getName().c_str() );
+        list_items.push_back(item);
+    }
 }
 
 void PlayingGamestate::clickedOptions() {
@@ -835,8 +874,23 @@ void PlayingGamestate::update(int time_ms) {
     }*/
 }
 
+void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
+    AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
+    object->clearAnimationLayers();
+    if( character == player ) {
+        object->addAnimationLayer( this->animation_layers["clothes"] );
+        object->addAnimationLayer( this->animation_layers["head"] );
+        if( character->getCurrentWeapon() != NULL ) {
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationFilename().c_str() ] );
+        }
+    }
+    else {
+        object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
+    }
+}
+
 void PlayingGamestate::characterTurn(const Character *character, void *user_data, Vector2D dir) {
-    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     float angle = atan2(dir.y, dir.x);
     if( angle < 0.0f )
         angle += 2.0*M_PI;
@@ -848,16 +902,16 @@ void PlayingGamestate::characterTurn(const Character *character, void *user_data
     qDebug("turn_i %d", turn_i);*/
     turn_i += 4; // 0 is west
     Direction direction = (Direction)(turn_i % (int)N_DIRECTIONS);
-    item->setDirection(direction);
+    object->setDirection(direction);
 }
 
 void PlayingGamestate::characterMoved(const Character *character, void *user_data) {
     //QGraphicsItem *item = static_cast<QGraphicsItem *>(user_data);
-    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
-    QPointF old_pos = item->pos();
+    AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
+    QPointF old_pos = object->pos();
     QPointF new_pos(character->getX(), character->getY());
     if( new_pos != old_pos ) {
-        item->setPos(new_pos);
+        object->setPos(new_pos);
         /*Direction direction = DIRECTION_W;
         if( new_pos.x() > old_pos.x() ) {
             direction = DIRECTION_E;
@@ -869,14 +923,14 @@ void PlayingGamestate::characterMoved(const Character *character, void *user_dat
 }
 
 void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, string name) {
-    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
-    item->setAnimationSet(name);
+    AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
+    object->setAnimationSet(name);
 }
 
 void PlayingGamestate::characterDeath(Character *character, void *user_data) {
-    AnimatedObject *item = static_cast<AnimatedObject *>(user_data);
+    AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     character->setListener(NULL, NULL);
-    delete item;
+    delete object;
 }
 
 /*void PlayingGamestate::mouseClick(int m_x, int m_y) {
@@ -996,11 +1050,13 @@ void Game::update(int time_ms) {
             switch( message->getGameMessageType() ) {
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING:
                 delete gamestate;
+                gamestate = NULL;
                 gamestate = new PlayingGamestate();
                 this->getScreen()->getMainWindow()->unsetCursor();
                 break;
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS:
                 delete gamestate;
+                gamestate = NULL;
                 gamestate = new OptionsGamestate();
                 break;
             default:
@@ -1008,13 +1064,13 @@ void Game::update(int time_ms) {
             }
         }
         catch(string &error) {
+            LOG("exception creating new gamestate: %s\n", error.c_str());
             this->getScreen()->getMainWindow()->unsetCursor();
             if( gamestate != NULL ) {
                 delete gamestate;
                 gamestate = NULL;
             }
             delete message;
-            LOG("exception creating new gamestate: %s\n", error.c_str());
             stringstream message;
             message << "Failed to load game data:\n" << error;
             game_g->showErrorWindow(message.str().c_str());

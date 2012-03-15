@@ -4,6 +4,7 @@
 using std::string;
 
 #include "utils.h"
+#include "../game.h"
 
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
@@ -14,11 +15,15 @@ enum ItemType {
 
 class Item {
     string name;
+    Image *image;
     Vector2D pos; // when stored in a Location
 
 public:
-    Item(string name);
+    Item(string name, Image *image);
     virtual ~Item() {
+        if( image != NULL ) {
+            delete image;
+        }
     }
 
     virtual ItemType getType() const {
@@ -26,6 +31,9 @@ public:
     }
     virtual Item *clone() const; // virtual copy constructor
 
+    const Image *getImage() const {
+        return this->image;
+    }
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
         /*if( this->listener != NULL ) {
@@ -49,7 +57,7 @@ public:
 class Weapon : public Item {
     string animation_filename;
 public:
-    Weapon(string name, string animation_filename);
+    Weapon(string name, Image *image, string animation_filename);
     virtual ~Weapon() {
     }
 
@@ -66,7 +74,7 @@ public:
 class Armour : public Item {
     int rating;
 public:
-    Armour(string name, int rating);
+    Armour(string name, Image *image, int rating);
     virtual ~Armour() {
     }
 

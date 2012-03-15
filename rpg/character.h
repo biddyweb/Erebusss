@@ -15,9 +15,11 @@ class Character;
 class PlayingGamestate;
 class Item;
 class Weapon;
+class Location;
 
 class CharacterListener {
 public:
+    virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir)=0;
     virtual void characterMoved(const Character *character, void *user_data)=0;
     virtual void characterSetAnimation(const Character *character, void *user_data, string name)=0;
@@ -138,6 +140,7 @@ public:
         return this->current_weapon;
     }
     void addItem(Item *item);
+    void dropItem(Location *location, Item *item);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();
     }

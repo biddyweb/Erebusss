@@ -6,5 +6,6 @@
         <file>gfx/textures/goblin.png</file>
         <file>gfx/textures/isometric_hero/longsword.png</file>
         <file>gfx/textures/items/longsword.png</file>
+        <file>gfx/textures/items/leather_armor.png</file>
     </qresource>
 </RCC>

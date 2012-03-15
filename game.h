@@ -125,8 +125,22 @@ public:
     //void setAnimationSet(AnimationSet *animation_set);
     //void setAnimationLayer(AnimationLayer *animation_layer);
     void addAnimationLayer(AnimationLayer *animation_layer);
+    void clearAnimationLayers();
     void setAnimationSet(string name);
     void setDirection(Direction c_direction);
+};
+
+class Image {
+    QPixmap pixmap;
+public:
+    Image(const QPixmap &pixmap) : pixmap(pixmap) {
+    }
+    virtual ~Image() {
+    }
+
+    const QPixmap &getPixmap() const {
+        return this->pixmap;
+    }
 };
 
 class Gamestate : public QObject {
@@ -256,6 +270,8 @@ class PlayingGamestate : public Gamestate, CharacterListener {
     GUIOverlay *gui_overlay;
 
     QWidget *subwindow;
+    QListWidget *list;
+    vector<Item *> list_items;
 
     Character *player;
 
@@ -270,6 +286,7 @@ class PlayingGamestate : public Gamestate, CharacterListener {
 
 private slots:
     void clickedItems();
+    void clickedDropItem();
     void clickedOptions();
     void clickedQuit();
     void clickedCloseSubwindow();
@@ -282,6 +299,7 @@ public:
     virtual void update(int time_ms);
     //virtual void mouseClick(int m_x, int m_y);
 
+    virtual void characterUpdateGraphics(const Character *character, void *user_data);
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
     virtual void characterMoved(const Character *character, void *user_data);
     virtual void characterSetAnimation(const Character *character, void *user_data, string name);

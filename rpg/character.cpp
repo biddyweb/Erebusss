@@ -143,8 +143,28 @@ bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
 
 void Character::addItem(Item *item) {
     this->items.insert(item);
+    bool graphics_changed = false;
     if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon
         this->current_weapon = static_cast<Weapon *>(item);
+        graphics_changed = true;
+    }
+    if( this->listener != NULL && graphics_changed ) {
+        this->listener->characterUpdateGraphics(this, this->listener_data);
+    }
+}
+
+void Character::dropItem(Location *location, Item *item) {
+    this->items.erase(item);
+    bool graphics_changed = false;
+    if( this->current_weapon == item ) {
+        this->current_weapon = NULL;
+        graphics_changed = true;
+    }
+    if( location != NULL ) {
+        location->addItem(item, this->pos.x, this->pos.y);
+    }
+    if( this->listener != NULL && graphics_changed ) {
+        this->listener->characterUpdateGraphics(this, this->listener_data);
     }
 }
