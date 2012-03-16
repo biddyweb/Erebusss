@@ -420,6 +420,72 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
 }*/
 
+ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) : playing_gamestate(playing_gamestate), list(NULL) {
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    list = new QListWidget();
+    layout->addWidget(list);
+    list->setSelectionMode(QAbstractItemView::SingleSelection);
+    QFont font = game_g->getScreen()->getMainWindow()->font();
+    font.setPointSize( font.pointSize() + 6 );
+    list->setFont(font);
+
+    Character *player = playing_gamestate->getPlayer();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        QString item_str = item->getName().c_str();
+        if( player->getCurrentWeapon() == item ) {
+            item_str += " [Current Weapon]";
+        }
+        list->addItem( item_str );
+        list_items.push_back(item);
+    }
+
+    {
+        QVBoxLayout *h_layout = new QVBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *dropButton = new QPushButton("Drop Item");
+        layout->addWidget(dropButton);
+        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
+    }
+
+    QPushButton *closeButton = new QPushButton("Close");
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+}
+
+void ItemsWindow::clickedDropItem() {
+    qDebug("clickedDropItem()");
+    /*QList<QListWidgetItem *> selected_items = list->selectedItems();
+    if( selected_items.size() == 1 ) {
+        QListWidgetItem *selected_item = selected_items.at(0);*/
+    int index = list->currentRow();
+    qDebug("clicked index %d", index);
+    if( index == -1 ) {
+        return;
+    }
+    Item *item = list_items.at(index);
+    playing_gamestate->getPlayer()->dropItem(playing_gamestate->getLocation(), item);
+
+    /*list->clear();
+    list_items.clear();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        list->addItem( item->getName().c_str() );
+        list_items.push_back(item);
+    }*/
+    QListWidgetItem *list_item = list->takeItem(index);
+    delete list_item;
+    list_items.erase(list_items.begin() + index);
+    if( list_items.size() > 0 ) {
+        if( index > list_items.size()-1 )
+            index = list_items.size()-1;
+        list->setCurrentRow(index);
+    }
+}
+
 PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL), subwindow(NULL), player(NULL), location(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -725,6 +791,8 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         graphics_item->setPixmap( item->getImage()->getPixmap() );
         scene->addItem(graphics_item);
         graphics_item->setPos(item->getX(), item->getY());
+        //graphics_item->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
+        graphics_item->setTransformOriginPoint(-0.5f*graphics_item->pixmap().width()*item_scale, -0.5f*graphics_item->pixmap().height()*item_scale);
         graphics_item->setScale(item_scale);
     }
 }
@@ -733,6 +801,8 @@ void PlayingGamestate::clickedItems() {
     qDebug("clickedItems()");
     this->clickedCloseSubwindow();
 
+    subwindow = new ItemsWindow(this);
+    /*
     //subwindow = new QWidget(this->view);
     subwindow = new QWidget();
     //subwindow = new QWidget(game_g->getScreen()->getMainWindow());
@@ -743,6 +813,7 @@ void PlayingGamestate::clickedItems() {
 
     list = new QListWidget();
     layout->addWidget(list);
+    list->setSelectionMode(QAbstractItemView::SingleSelection);
     QFont font = game_g->getScreen()->getMainWindow()->font();
     font.setPointSize( font.pointSize() + 6 );
     list->setFont(font);
@@ -750,7 +821,11 @@ void PlayingGamestate::clickedItems() {
     list_items.clear();
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
-        list->addItem( item->getName().c_str() );
+        QString item_str = item->getName().c_str();
+        if( player->getCurrentWeapon() == item ) {
+            item_str += " [Current Weapon]";
+        }
+        list->addItem( item_str );
         list_items.push_back(item);
     }
 
@@ -766,27 +841,10 @@ void PlayingGamestate::clickedItems() {
     QPushButton *closeButton = new QPushButton("Close");
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
+    */
 
     subwindow->showFullScreen();
     game_g->getScreen()->getMainWindow()->hide();
-}
-
-void PlayingGamestate::clickedDropItem() {
-    qDebug("clickedDropItem()");
-    /*QList<QListWidgetItem *> selected_items = list->selectedItems();
-    if( selected_items.size() == 1 ) {
-        QListWidgetItem *selected_item = selected_items.at(0);*/
-    int index = list->currentRow();
-    Item *item = list_items.at(index);
-    player->dropItem(this->location, item);
-
-    list->clear();
-    list_items.clear();
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        list->addItem( item->getName().c_str() );
-        list_items.push_back(item);
-    }
 }
 
 void PlayingGamestate::clickedOptions() {

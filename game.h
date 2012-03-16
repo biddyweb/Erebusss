@@ -261,6 +261,22 @@ public:
     }
 };*/
 
+class ItemsWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+    QListWidget *list;
+    vector<Item *> list_items;
+
+private slots:
+    void clickedDropItem();
+
+public:
+    ItemsWindow(PlayingGamestate *playing_gamestate);
+    virtual ~ItemsWindow() {
+    }
+};
+
 class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Q_OBJECT
 
@@ -271,8 +287,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     GUIOverlay *gui_overlay;
 
     QWidget *subwindow;
-    QListWidget *list;
-    vector<Item *> list_items;
+    //QListWidget *list;
+    //vector<Item *> list_items;
 
     Character *player;
 
@@ -287,7 +303,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
 private slots:
     void clickedItems();
-    void clickedDropItem();
     void clickedOptions();
     void clickedQuit();
     void clickedCloseSubwindow();
