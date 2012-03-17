@@ -139,6 +139,7 @@ public:
     Weapon *getCurrentWeapon() {
         return this->current_weapon;
     }
+    void armWeapon(Weapon *item);
     void addItem(Item *item);
     void pickupItem(Location *location, Item *item);
     void dropItem(Location *location, Item *item);

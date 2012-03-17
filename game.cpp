@@ -420,7 +420,10 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
 }*/
 
-ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) : playing_gamestate(playing_gamestate), list(NULL) {
+ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
+    playing_gamestate(playing_gamestate), list(NULL),
+    armButton(NULL)
+{
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
@@ -434,13 +437,12 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) : playing_gamestat
     Character *player = playing_gamestate->getPlayer();
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
-        QString item_str = item->getName().c_str();
-        if( player->getCurrentWeapon() == item ) {
-            item_str += " [Current Weapon]";
-        }
+        QString item_str = this->getItemString(item);
         list->addItem( item_str );
         list_items.push_back(item);
     }
+
+    connect(list, SIGNAL(currentRowChanged()), this, SLOT(changedSelectedItem()));
 
     {
         QVBoxLayout *h_layout = new QVBoxLayout();
@@ -449,11 +451,32 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) : playing_gamestat
         QPushButton *dropButton = new QPushButton("Drop Item");
         layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
+
+        armButton = new QPushButton("Arm Weapon");
+        layout->addWidget(armButton);
+        connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
     }
 
     QPushButton *closeButton = new QPushButton("Close");
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+
+    int index = list->currentRow();
+    if( index != -1 ) {
+        this->changedSelectedItem(index);
+    }
+}
+
+QString ItemsWindow::getItemString(const Item *item) const {
+    QString item_str = item->getName().c_str();
+    if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
+        item_str += " [Current Weapon]";
+    }
+    return item_str;
+}
+
+void ItemsWindow::changedSelectedItem(int currentRow) {
+    LOG("changedSelectedItem(%d)\n", currentRow);
 }
 
 void ItemsWindow::clickedDropItem() {
@@ -484,6 +507,32 @@ void ItemsWindow::clickedDropItem() {
             index = list_items.size()-1;
         list->setCurrentRow(index);
     }
+}
+
+void ItemsWindow::clickedArmWeapon() {
+    LOG("clickedArmWeapon()\n");
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    Item *item = list_items.at(index);
+    if( item->getType() != ITEMTYPE_WEAPON ) {
+        LOG("not a weapon?!\n");
+        return;
+    }
+    Weapon *weapon = static_cast<Weapon *>(item);
+    if( playing_gamestate->getPlayer()->getCurrentWeapon() == weapon ) {
+        // disarm instead
+        LOG("player disarmed weapon\n");
+        playing_gamestate->getPlayer()->armWeapon(NULL);
+    }
+    else {
+        LOG("player armed weapon: %s\n", item->getName().c_str());
+        playing_gamestate->getPlayer()->armWeapon(weapon);
+    }
+    QListWidgetItem *item_widget = list->item(index);
+    item_widget->setText( this->getItemString(item) );
 }
 
 PlayingGamestate::PlayingGamestate() :

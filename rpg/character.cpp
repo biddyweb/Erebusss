@@ -142,16 +142,22 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     return false;
 }
 
+void Character::armWeapon(Weapon *item) {
+    // n.b., must be an item owned by Character!
+    // set NULL to disarm
+    if( this->current_weapon != item ) {
+        this->current_weapon = item;
+        if( this->listener != NULL ) {
+            this->listener->characterUpdateGraphics(this, this->listener_data);
+        }
+    }
+}
+
 void Character::addItem(Item *item) {
     this->items.insert(item);
-    bool graphics_changed = false;
     if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon
-        this->current_weapon = static_cast<Weapon *>(item);
-        graphics_changed = true;
-    }
-    if( this->listener != NULL && graphics_changed ) {
-        this->listener->characterUpdateGraphics(this, this->listener_data);
+        this->armWeapon( static_cast<Weapon *>(item) );
     }
 }
 
