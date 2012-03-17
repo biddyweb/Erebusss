@@ -21,7 +21,7 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
 
 Location::Location(/*float width, float height*/) /*:
     width(width), height(height)*/
-    : listener(NULL)
+    : listener(NULL), listener_data(NULL)
 {
 }
 
@@ -63,6 +63,13 @@ void Location::addItem(Item *item, float xpos, float ypos) {
     this->items.insert(item);
     if( this->listener != NULL ) {
         this->listener->locationAddItem(this, item);
+    }
+}
+
+void Location::removeItem(Item *item) {
+    this->items.erase(item);
+    if( this->listener != NULL ) {
+        this->listener->locationRemoveItem(this, item);
     }
 }
 

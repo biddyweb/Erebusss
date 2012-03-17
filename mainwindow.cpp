@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 #include "qt_screen.h"
-#include "game.h"
+//#include "game.h"
 
 #include <QtCore/QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), elapsed_time(0)
+    : QMainWindow(parent)/*, elapsed_time(0)*/
 {
 }
 
@@ -76,6 +76,7 @@ void MainWindow::showExpanded()
     //show();
 }
 
+#if 0
 void MainWindow::updateScene() {
     //qDebug("MainWindow::updateScene()");
     //qApp->beep();
@@ -83,9 +84,23 @@ void MainWindow::updateScene() {
         qDebug("no signals");
         return;
     }*/
-    int new_time = game_g->getScreen()->getElapsedMS();
-    int d_time = new_time - elapsed_time;
+    /*int new_time = game_g->getScreen()->getElapsedMS();
+    int d_time = new_time - elapsed_time;*/
     //qDebug("time: %d", d_time);
-    game_g->update(d_time);
-    elapsed_time = new_time;
+
+    int new_elapsed_time_ms = game_g->getScreen()->getElapsedMS();
+    if( paused ) {
+        this->game_time_frame_ms = 0;
+    }
+    else {
+        this->game_time_frame_ms = new_elapsed_time_ms - this->saved_elapsed_time_ms;
+        this->game_time_total_ms += this->game_time_frame_ms;
+    }
+    this->saved_elapsed_time_ms = new_elapsed_time_ms;
+    time_ms = this->game_time_frame_ms;
+
+    game_g->update(game_time_frame_ms);
+
+    //elapsed_time = new_time;
 }
+#endif

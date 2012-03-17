@@ -29,7 +29,7 @@ Character::~Character() {
     }
 }
 
-bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
+bool Character::update(PlayingGamestate *playing_gamestate) {
     /*if( is_ai )
         return false;*/
     int elapsed_ms = game_g->getScreen()->getElapsedMS();
@@ -117,6 +117,7 @@ bool Character::update(PlayingGamestate *playing_gamestate, int time_ms) {
         float step = 0.1f;
         float dist = sqrt(diff_x*diff_x + diff_y*diff_y);*/
         Vector2D diff = this->dest - this->pos;
+        int time_ms = game_g->getScreen()->getGameTimeFrameMS();
         float step = 0.002f * time_ms;
         float dist = diff.magnitude();
         Vector2D new_pos = pos;
@@ -152,6 +153,13 @@ void Character::addItem(Item *item) {
     if( this->listener != NULL && graphics_changed ) {
         this->listener->characterUpdateGraphics(this, this->listener_data);
     }
+}
+
+void Character::pickupItem(Location *location, Item *item) {
+    if( location != NULL ) {
+        location->removeItem(item);
+    }
+    this->addItem(item);
 }
 
 void Character::dropItem(Location *location, Item *item) {

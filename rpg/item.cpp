@@ -1,6 +1,13 @@
 #include "item.h"
+#include "../game.h"
 
-Item::Item(string name, Image *image) : name(name), image(image) {
+Item::Item(string name, Image *image) : name(name), image(image), user_data_gfx(NULL) {
+}
+
+Item::~Item() {
+    if( image != NULL ) {
+        delete image;
+    }
 }
 
 Item *Item::clone() const {

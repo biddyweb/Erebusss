@@ -90,7 +90,7 @@ public:
             this->listener->characterSetAnimation(this, this->listener_data, "run");
         }
     }
-    bool update(PlayingGamestate *playing_gamestate, int time_ms);
+    bool update(PlayingGamestate *playing_gamestate);
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {
             this->target_npc = target_npc;
@@ -140,6 +140,7 @@ public:
         return this->current_weapon;
     }
     void addItem(Item *item);
+    void pickupItem(Location *location, Item *item);
     void dropItem(Location *location, Item *item);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();

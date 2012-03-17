@@ -4,7 +4,8 @@
 using std::string;
 
 #include "utils.h"
-#include "../game.h"
+
+class Image;
 
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
@@ -17,14 +18,11 @@ class Item {
     string name;
     Image *image;
     Vector2D pos; // when stored in a Location
+    void *user_data_gfx;
 
 public:
     Item(string name, Image *image);
-    virtual ~Item() {
-        if( image != NULL ) {
-            delete image;
-        }
-    }
+    virtual ~Item();
 
     virtual ItemType getType() const {
         return ITEMTYPE_GENERAL;
@@ -51,6 +49,12 @@ public:
     }
     string getName() const {
         return this->name;
+    }
+    void setUserGfxData(void *user_data_gfx) {
+        this->user_data_gfx = user_data_gfx;
+    }
+    void *getUserGfxData() {
+        return this->user_data_gfx;
     }
 };
 

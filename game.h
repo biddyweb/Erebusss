@@ -148,10 +148,7 @@ class Gamestate : public QObject {
 public:
     //virtual VI_Panel *getPanel()=0;
     virtual void quitGame()=0;
-    virtual void update(int time_ms)=0;
-    /*virtual bool isPaused() const {
-        return false;
-    }*/
+    virtual void update()=0;
     /*virtual void mouseClick(int m_x, int m_y) {
     }*/
 };
@@ -180,7 +177,7 @@ public:
     }*/
 
     virtual void quitGame();
-    virtual void update(int time_ms) {
+    virtual void update() {
     }
 };
 
@@ -312,7 +309,7 @@ public:
     virtual ~PlayingGamestate();
 
     virtual void quitGame();
-    virtual void update(int time_ms);
+    virtual void update();
     //virtual void mouseClick(int m_x, int m_y);
 
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
@@ -322,6 +319,7 @@ public:
     virtual void characterDeath(Character *character, void *user_data);
 
     virtual void locationAddItem(const Location *location, Item *item);
+    virtual void locationRemoveItem(const Location *location, Item *item);
 
     void clickedMainView(float scene_x, float scene_y);
 
@@ -388,7 +386,7 @@ public:
     }
 
     void run();
-    void update(int time_ms);
+    void update();
     //void mouseClick(int m_x, int m_y);
     string getApplicationFilename(const char *name);
     void log(const char *text, ...);

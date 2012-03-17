@@ -7,7 +7,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    int elapsed_time;
+    //int elapsed_time;
     //virtual void mouseReleaseEvent(QMouseEvent *event);
 public:
     enum ScreenOrientation {
@@ -24,8 +24,8 @@ public:
 
     void showExpanded();
 
-public slots:
-    void updateScene();
+/*public slots:
+    void updateScene();*/
 };
 
 #endif // MAINWINDOW_H

@@ -222,7 +222,7 @@ void AnimatedObject::setAnimationSet(string name) {
         const AnimationLayer *animation_layer = *iter;
         const AnimationSet *c_animation_set = animation_layer->getAnimationSet(name);
         if( c_animation_set == NULL ) {
-            qDebug("unknown animation set: %s", name.c_str());
+            LOG("unknown animation set: %s\n", name.c_str());
             throw string("Unknown animation set");
         }
         this->c_animation_sets.push_back(c_animation_set);
@@ -289,7 +289,7 @@ OptionsGamestate::~OptionsGamestate() {
     window->setCentralWidget(NULL);
 
     optionsGamestate = NULL;
-    qDebug("deleted OptionsGamestate");
+    LOG("deleted OptionsGamestate\n");
 }
 
 void OptionsGamestate::quitGame() {
@@ -335,7 +335,7 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
         //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
         if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
             QPointF m_scene = this->mapToScene(m_x, m_y);
-            qDebug("clicked: %f, %f", m_scene.x(), m_scene.y());
+            LOG("clicked: %f, %f\n", m_scene.x(), m_scene.y());
             playing_gamestate->clickedMainView(m_scene.x(), m_scene.y());
         }
         // else, this was a drag operation
@@ -345,7 +345,7 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void MainGraphicsView::resizeEvent(QResizeEvent *event) {
-    qDebug("MainGraphicsView resized to: %d, %d", event->size().width(), event->size().height());
+    LOG("MainGraphicsView resized to: %d, %d\n", event->size().width(), event->size().height());
     if( this->gui_overlay != NULL ) {
         //this->gui_overlay->setFixedSize(event->size());
         this->gui_overlay->resize(event->size());
@@ -457,12 +457,12 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) : playing_gamestat
 }
 
 void ItemsWindow::clickedDropItem() {
-    qDebug("clickedDropItem()");
+    LOG("clickedDropItem()\n");
     /*QList<QListWidgetItem *> selected_items = list->selectedItems();
     if( selected_items.size() == 1 ) {
         QListWidgetItem *selected_item = selected_items.at(0);*/
     int index = list->currentRow();
-    qDebug("clicked index %d", index);
+    LOG("clicked index %d\n", index);
     if( index == -1 ) {
         return;
     }
@@ -486,10 +486,14 @@ void ItemsWindow::clickedDropItem() {
     }
 }
 
-PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL), subwindow(NULL), player(NULL), location(NULL)
+PlayingGamestate::PlayingGamestate() :
+    scene(NULL), view(NULL), gui_overlay(NULL), subwindow(NULL),
+    player(NULL), location(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
+
+    game_g->getScreen()->setPaused(true);
 
     // create UI
     LOG("create UI\n");
@@ -555,6 +559,11 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
+
+        QPushButton *pauseButton = new QPushButton("Pause");
+        pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
+        v_layout->addWidget(pauseButton);
     }
 
     layout->addWidget(view);
@@ -632,7 +641,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
         location->addBoundary(boundary);
     }
 
-    location->setListener(this); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
 
     gui_overlay->setProgress(20);
     qApp->processEvents();
@@ -701,7 +710,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     int time_s = clock();
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
     this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
-    qDebug("time to load: %d", clock() - time_s);
+    LOG("time to load: %d\n", clock() - time_s);
     gui_overlay->setProgress(40);
     qApp->processEvents();
     /*LOG("head layer\n");
@@ -711,7 +720,7 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
     gui_overlay->setProgress(50);
     qApp->processEvents();
-    LOG("longsword layer");
+    LOG("longsword layer\n");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
     gui_overlay->setProgress(60);
     qApp->processEvents();
@@ -763,6 +772,10 @@ PlayingGamestate::PlayingGamestate() : scene(NULL), view(NULL), gui_overlay(NULL
     gui_overlay->unsetProgress();
     qApp->processEvents();
 
+    game_g->getScreen()->setPaused(false);
+    game_g->getScreen()->restartElapsedTimer();
+    //this->paused = false;
+    //this->saved_elapsed_time_ms = game_g->getScreen()->getElapsedMS();
     LOG("View is transformed? %d\n", view->isTransformed());
     LOG("done\n");
 }
@@ -787,21 +800,33 @@ PlayingGamestate::~PlayingGamestate() {
 
 void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
     if( this->location == location ) {
-        QGraphicsPixmapItem *graphics_item = new QGraphicsPixmapItem();
-        graphics_item->setPixmap( item->getImage()->getPixmap() );
-        scene->addItem(graphics_item);
-        graphics_item->setPos(item->getX(), item->getY());
-        //graphics_item->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
-        graphics_item->setTransformOriginPoint(-0.5f*graphics_item->pixmap().width()*item_scale, -0.5f*graphics_item->pixmap().height()*item_scale);
-        graphics_item->setScale(item_scale);
+        QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
+        item->setUserGfxData(object);
+        object->setPixmap( item->getImage()->getPixmap() );
+        scene->addItem(object);
+        object->setPos(item->getX(), item->getY());
+        //object->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
+        object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
+        object->setScale(item_scale);
+    }
+}
+
+void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) {
+    if( this->location == location ) {
+        QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+        item->setUserGfxData(NULL);
+        scene->removeItem(object);
+        delete object;
     }
 }
 
 void PlayingGamestate::clickedItems() {
-    qDebug("clickedItems()");
+    LOG("clickedItems()\n");
     this->clickedCloseSubwindow();
 
     subwindow = new ItemsWindow(this);
+    game_g->getScreen()->setPaused(true);
+
     /*
     //subwindow = new QWidget(this->view);
     subwindow = new QWidget();
@@ -848,10 +873,11 @@ void PlayingGamestate::clickedItems() {
 }
 
 void PlayingGamestate::clickedOptions() {
-    qDebug("clickedOptions()");
+    LOG("clickedOptions()\n");
     this->clickedCloseSubwindow();
 
     subwindow = new QWidget();
+    game_g->getScreen()->setPaused(true);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -871,13 +897,14 @@ void PlayingGamestate::clickedOptions() {
 }
 
 void PlayingGamestate::clickedQuit() {
-    qDebug("clickedQuit()");
+    LOG("clickedQuit()\n");
     this->quitGame();
 }
 
 void PlayingGamestate::clickedCloseSubwindow() {
     if( subwindow != NULL ) {
         game_g->getScreen()->getMainWindow()->show();
+        game_g->getScreen()->setPaused(false);
         subwindow->close();
         //delete subwindow;
         subwindow->deleteLater();
@@ -894,8 +921,12 @@ void PlayingGamestate::quitGame() {
     }
 }
 
-void PlayingGamestate::update(int time_ms) {
-    //qDebug("update");
+void PlayingGamestate::update() {
+    //LOG("update: %d\n", time_ms);
+
+    if( game_g->getScreen()->isPaused() ) {
+        return;
+    }
 
     scene->advance();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
@@ -903,15 +934,15 @@ void PlayingGamestate::update(int time_ms) {
     vector< set<Character *>::iterator > delete_characters;
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
-        if( character->update(this, time_ms) ) {
-            qDebug("character is about to die: %s", character->getName().c_str());
+        if( character->update(this) ) {
+            LOG("character is about to die: %s\n", character->getName().c_str());
             delete_characters.push_back(iter);
         }
     }
     for(vector< set<Character *>::iterator >::iterator iter2 = delete_characters.begin(); iter2 != delete_characters.end(); ++iter2) {
         set<Character *>::iterator iter = *iter2;
         Character *character = *iter;
-        qDebug("character has died: %s", character->getName().c_str());
+        LOG("character has died: %s\n", character->getName().c_str());
         location->charactersErase(iter);
 
         for(set<Character *>::iterator iter3 = location->charactersBegin(); iter3 != location->charactersEnd(); ++iter3) {
@@ -1003,12 +1034,16 @@ void PlayingGamestate::characterDeath(Character *character, void *user_data) {
 }*/
 
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
+    if( game_g->getScreen()->isPaused() ) {
+        game_g->getScreen()->setPaused(false);
+    }
+
     if( player != NULL && !player->isDead() ) {
         //player->setPos(scene_x, scene_y);
 
         Vector2D dest(scene_x, scene_y);
 
-        // search for clicking on NPC
+        // search for clicking on an NPC
         float min_dist = 0.0f;
         Character *target_npc = NULL;
         for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
@@ -1029,10 +1064,29 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             Vector2D hit_pos;
             bool hit = location->intersectSweptSquareWithBoundaries(player, &hit_pos, player->getPos(), dest, player->getRadius());
             if( hit ) {
-                qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
+                LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
                 dest = hit_pos;
             }
             player->setDestination(dest.x, dest.y);
+        }
+
+        if( target_npc == NULL ) {
+            // search for clicking on an item
+            Item *picked_item = NULL;
+            for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
+                Item *item = *iter;
+                double dist_from_click = (dest - item->getPos()).magnitude();
+                double dist_from_player = (player->getPos() - item->getPos()).magnitude();
+                if( dist_from_click <= 0.5f && dist_from_player <= player->getRadius() ) {
+                    if( picked_item == NULL || dist_from_click < min_dist ) {
+                        picked_item = item;
+                        min_dist = dist_from_click;
+                    }
+                }
+            }
+            if( picked_item != NULL ) {
+                player->pickupItem(location, picked_item);
+            }
         }
     }
 }
@@ -1060,6 +1114,7 @@ Game::Game() {
     application_path = nativePath.toStdString();
     logfilename = getApplicationFilename("log.txt");
     oldlogfilename = getApplicationFilename("log_old.txt");
+    // n.b., not safe to use logging until after copied/removed old log files!
     qDebug("application_path: %s", application_path.c_str());
     qDebug("logfilename: %s", logfilename.c_str());
     qDebug("oldlogfilename: %s", oldlogfilename.c_str());
@@ -1107,7 +1162,7 @@ void Game::run() {
     delete screen;
 }
 
-void Game::update(int time_ms) {
+void Game::update() {
     while( !message_queue.empty() ) {
         GameMessage *message = message_queue.front();
         message_queue.pop();
@@ -1145,7 +1200,7 @@ void Game::update(int time_ms) {
     }
 
     if( gamestate != NULL ) {
-        gamestate->update(time_ms);
+        gamestate->update();
     }
 }
 
@@ -1171,7 +1226,7 @@ void Game::log(const char *text, ...) {
     if( logfile != NULL )
         fprintf(logfile,buffer);
     //printf(buffer);
-    //qDebug("###: %s", buffer);
+    qDebug("%s", buffer);
     va_end(vlist);
     if( logfile != NULL )
         fclose(logfile);
@@ -1201,27 +1256,25 @@ QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int
 }
 
 void Game::showErrorWindow(const char *message) {
-    this->getScreen()->enableTimers(false);
+    this->getScreen()->enableUpdateTimer(false);
     QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message);
-    this->getScreen()->enableTimers(true);
+    this->getScreen()->enableUpdateTimer(true);
 }
 
 void Game::showInfoWindow(const char *title, const char *message) {
-    this->getScreen()->enableTimers(false);
+    this->getScreen()->enableUpdateTimer(false);
     QMessageBox::information(this->getScreen()->getMainWindow(), title, message);
-    this->getScreen()->enableTimers(true);
+    this->getScreen()->enableUpdateTimer(true);
 }
 
 bool Game::askQuestionWindow(const char *title, const char *message) {
-    //LOG("Game::askQuestionWindow: %s\n", message);
-    qDebug("Game::askQuestionWindow: %s", message);
+    LOG("Game::askQuestionWindow: %s\n", message);
     //this->getScreen()->getMainWindow()->blockSignals(true);
-    this->getScreen()->enableTimers(false);
+    this->getScreen()->enableUpdateTimer(false);
     //int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
     int res = QMessageBox::question(NULL, title, message, QMessageBox::Yes, QMessageBox::No);
     //this->getScreen()->getMainWindow()->blockSignals(false);
-    this->getScreen()->enableTimers(true);
-    //LOG("    answer is %d", res);
-    qDebug("    answer is %d", res);
+    this->getScreen()->enableUpdateTimer(true);
+    LOG("    answer is %d\n", res);
     return res == QMessageBox::Yes;
 }

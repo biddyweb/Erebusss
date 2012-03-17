@@ -14,6 +14,7 @@ class Location;
 class LocationListener {
 public:
     virtual void locationAddItem(const Location *location, Item *item)=0;
+    virtual void locationRemoveItem(const Location *location, Item *item)=0;
 };
 
 class FloorRegion : public Polygon2D {
@@ -30,6 +31,7 @@ class Location {
     /*float width;
     float height;*/
     LocationListener *listener;
+    void *listener_data;
 
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries; // first boundary is always the outside one
@@ -72,8 +74,9 @@ public:
         return this->boundaries.size();
     }
 
-    void setListener(LocationListener *listener) {
+    void setListener(LocationListener *listener, void *listener_data) {
         this->listener = listener;
+        this->listener_data = listener_data;
     }
     void addCharacter(Character *character, float xpos, float ypos);
     set<Character *>::iterator charactersBegin() {
@@ -92,6 +95,7 @@ public:
         this->characters.erase(iter);
     }
     void addItem(Item *item, float xpos, float ypos);
+    void removeItem(Item *item);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();
     }
