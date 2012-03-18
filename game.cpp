@@ -496,7 +496,10 @@ QString ItemsWindow::getItemString(const Item *item) const {
     if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
         item_str += " [Current Weapon]";
     }
-    if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
+    else if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
+        item_str += " [Current Shield]";
+    }
+    else if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
         item_str += " [Current Armour]";
     }
     return item_str;
@@ -513,10 +516,7 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     }
     dropButton->setVisible(true);
     Item *item = list_items.at(currentRow);
-    if( item->getType() != ITEMTYPE_WEAPON ) {
-        armButton->setVisible(false);
-    }
-    else {
+    if( item->getType() == ITEMTYPE_WEAPON ) {
         armButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
             armButton->setText("Disarm Weapon");
@@ -524,6 +524,18 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         else {
             armButton->setText("Arm Weapon");
         }
+    }
+    else if( item->getType() == ITEMTYPE_SHIELD ) {
+        armButton->setVisible(true);
+        if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
+            armButton->setText("Disarm Shield");
+        }
+        else {
+            armButton->setText("Arm Shield");
+        }
+    }
+    else {
+        armButton->setVisible(false);
     }
     if( item->getType() != ITEMTYPE_ARMOUR ) {
         wearButton->setVisible(false);
@@ -577,20 +589,34 @@ void ItemsWindow::clickedArmWeapon() {
         return;
     }
     Item *item = list_items.at(index);
-    if( item->getType() != ITEMTYPE_WEAPON ) {
-        LOG("not a weapon?!\n");
-        return;
+    if( item->getType() == ITEMTYPE_WEAPON ) {
+        Weapon *weapon = static_cast<Weapon *>(item);
+        if( playing_gamestate->getPlayer()->getCurrentWeapon() == weapon ) {
+            // disarm instead
+            LOG("player disarmed weapon\n");
+            playing_gamestate->getPlayer()->armWeapon(NULL);
+        }
+        else {
+            LOG("player armed weapon: %s\n", item->getName().c_str());
+            playing_gamestate->getPlayer()->armWeapon(weapon);
+        }
     }
-    Weapon *weapon = static_cast<Weapon *>(item);
-    if( playing_gamestate->getPlayer()->getCurrentWeapon() == weapon ) {
-        // disarm instead
-        LOG("player disarmed weapon\n");
-        playing_gamestate->getPlayer()->armWeapon(NULL);
+    else if( item->getType() == ITEMTYPE_SHIELD ) {
+        Shield *shield = static_cast<Shield *>(item);
+        if( playing_gamestate->getPlayer()->getCurrentShield() == shield ) {
+            // disarm instead
+            LOG("player disarmed shield");
+            playing_gamestate->getPlayer()->armShield(NULL);
+        }
+        else {
+            LOG("player armed shield: %s\n", item->getName().c_str());
+            playing_gamestate->getPlayer()->armShield(shield);
+        }
     }
     else {
-        LOG("player armed weapon: %s\n", item->getName().c_str());
-        playing_gamestate->getPlayer()->armWeapon(weapon);
+        LOG("not a weapon or shield?!\n");
     }
+
     QListWidgetItem *item_widget = list->item(index);
     item_widget->setText( this->getItemString(item) );
     this->changedSelectedItem(index);
@@ -739,6 +765,8 @@ PlayingGamestate::PlayingGamestate() :
     this->addStandardItem( new Currency("Gold", image));*/
     this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
     this->addStandardItem( new Weapon("Long Sword", "longsword", "longsword") );
+    this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
+    this->addStandardItem( new Shield("Shield", "shield", "shield") );
     this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
     this->addStandardItem( new Armour("Leather Armour", "leather_armour", 2));
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
@@ -751,6 +779,7 @@ PlayingGamestate::PlayingGamestate() :
     player->initialiseHealth(100);
     //player->initialiseHealth(5); // test
     player->addItem( this->cloneStandardItem("Long Sword") );
+    player->addItem( this->cloneStandardItem("Shield") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
 
     // create RPG world
@@ -765,6 +794,7 @@ PlayingGamestate::PlayingGamestate() :
     location->addCharacter(enemy, 4.0f, 4.0f);
 
     location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
+    location->addItem( this->cloneStandardItem("Shield"), 4.0f, 3.0f );
     location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
     /*{
         Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
@@ -890,6 +920,8 @@ PlayingGamestate::PlayingGamestate() :
     qApp->processEvents();
     LOG("longsword layer\n");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
+    LOG("shield layer\n");
+    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
@@ -1183,6 +1215,9 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         object->addAnimationLayer( this->animation_layers["head"] );
         if( character->getCurrentWeapon() != NULL ) {
             object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName().c_str() ] );
+        }
+        if( character->getCurrentShield() != NULL ) {
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName().c_str() ] );
         }
     }
     else {

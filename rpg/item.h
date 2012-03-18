@@ -77,6 +77,23 @@ public:
     }
 };
 
+class Shield : public Item {
+    string animation_name;
+public:
+    Shield(string name, string image_name, string animation_name);
+    virtual ~Shield() {
+    }
+
+    virtual ItemType getType() const {
+        return ITEMTYPE_SHIELD;
+    }
+    virtual Shield *clone() const; // virtual copy constructor
+
+    string getAnimationName() const {
+        return this->animation_name;
+    }
+};
+
 class Armour : public Item {
     int rating;
 public:

@@ -15,6 +15,7 @@ class Character;
 class PlayingGamestate;
 class Item;
 class Weapon;
+class Shield;
 class Armour;
 class Location;
 
@@ -51,6 +52,7 @@ class Character {
     int max_health;
     set<Item *> items;
     Weapon *current_weapon;
+    Shield *current_shield;
     Armour *current_armour;
     int gold;
 
@@ -145,6 +147,13 @@ public:
         return this->current_weapon;
     }
     void armWeapon(Weapon *item);
+    const Shield *getCurrentShield() const {
+        return this->current_shield;
+    }
+    Shield *getCurrentShield() {
+        return this->current_shield;
+    }
+    void armShield(Shield *item);
     const Armour *getCurrentArmour() const {
         return this->current_armour;
     }

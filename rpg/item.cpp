@@ -17,6 +17,13 @@ Weapon *Weapon::clone() const {
     return new Weapon(*this);
 }
 
+Shield::Shield(string name, string image_name, string animation_name) : Item(name, image_name), animation_name(animation_name) {
+}
+
+Shield *Shield::clone() const {
+    return new Shield(*this);
+}
+
 Armour::Armour(string name, string image_name, int rating) : Item(name, image_name), rating(rating) {
 }
 

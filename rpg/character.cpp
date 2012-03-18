@@ -12,7 +12,7 @@ Character::Character(string name, string animation_name, bool is_ai) :
     listener(NULL), listener_data(NULL),
     has_destination(false), target_npc(NULL), time_last_action_ms(0), is_hitting(false),
     health(0), max_health(0),
-    current_weapon(NULL), current_armour(NULL), gold(0)
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
 {
 
 }
@@ -165,6 +165,17 @@ void Character::armWeapon(Weapon *item) {
     }
 }
 
+void Character::armShield(Shield *item) {
+    // n.b., must be an item owned by Character!
+    // set NULL to disarm
+    if( this->current_shield != item ) {
+        this->current_shield = item;
+        if( this->listener != NULL ) {
+            this->listener->characterUpdateGraphics(this, this->listener_data);
+        }
+    }
+}
+
 void Character::wearArmour(Armour *item) {
     // n.b., must be an item owned by Character!
     // set NULL to disarm
@@ -191,6 +202,10 @@ void Character::addItem(Item *item) {
         // automatically arm weapon
         this->armWeapon( static_cast<Weapon *>(item) );
     }
+    if( this->current_shield == NULL && item->getType() == ITEMTYPE_SHIELD ) {
+        // automatically arm shield
+        this->armShield( static_cast<Shield *>(item) );
+    }
     if( this->current_armour == NULL && item->getType() == ITEMTYPE_ARMOUR ) {
         // automatically wear aromur
         this->wearArmour( static_cast<Armour *>(item) );
@@ -209,6 +224,10 @@ void Character::dropItem(Item *item) {
     bool graphics_changed = false;
     if( this->current_weapon == item ) {
         this->current_weapon = NULL;
+        graphics_changed = true;
+    }
+    if( this->current_shield == item ) {
+        this->current_shield = NULL;
         graphics_changed = true;
     }
     if( this->current_armour == item ) {
