@@ -8,7 +8,7 @@
 
 Character::Character(string name, string animation_name, bool is_ai) :
     name(name), animation_name(animation_name), is_ai(is_ai),
-    is_dead(false), time_of_death_ms(0),
+    location(NULL), is_dead(false), time_of_death_ms(0),
     listener(NULL), listener_data(NULL),
     has_destination(false), target_npc(NULL), time_last_action_ms(0), is_hitting(false),
     health(0), max_health(0),
@@ -30,9 +30,13 @@ Character::~Character() {
 }
 
 bool Character::update(PlayingGamestate *playing_gamestate) {
+    if( this->location == NULL ) {
+        return false;
+    }
     /*if( is_ai )
         return false;*/
-    int elapsed_ms = game_g->getScreen()->getElapsedMS();
+    //int elapsed_ms = game_g->getScreen()->getElapsedMS();
+    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     if( is_dead ) {
         if( elapsed_ms > time_of_death_ms + 400 ) {
@@ -59,18 +63,16 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             this->listener->characterSetAnimation(this, this->listener_data, "");
         }
         if( !target_npc->is_dead ) {
-            int new_health = target_npc->changeHealth(-1);
+            target_npc->changeHealth(playing_gamestate, -1);
+            /*int new_health = target_npc->changeHealth(-1);
             qDebug("    health now %d", new_health);
             if( new_health <= 0 ) {
                 target_npc->is_dead = true;
                 target_npc->time_of_death_ms = elapsed_ms;
-                /*if( target_npc->listener != NULL ) {
-                    target_npc->listener->characterDeath(target_npc, target_npc->listener_data);
-                }*/
                 if( target_npc->listener != NULL ) {
                     target_npc->listener->characterSetAnimation(target_npc, target_npc->listener_data, "death");
                 }
-            }
+            }*/
         }
     }
     else if( elapsed_ms > time_last_action_ms + 1000 && !is_hitting && target_npc != NULL ) {
@@ -98,7 +100,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         if( playing_gamestate->getPlayer() != NULL ) {
             Vector2D dest = playing_gamestate->getPlayer()->getPos();
             Vector2D hit_pos;
-            bool hit = playing_gamestate->getLocation()->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
+            bool hit = location->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
             if( hit ) {
                 //qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
                 dest = hit_pos;
@@ -140,6 +142,37 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     return false;
+}
+
+int Character::changeHealth(PlayingGamestate *playing_gamestate, int change) {
+    if( this->is_dead ) {
+        LOG("tried to changeHealth of %s by %d - already dead!\n", this->getName().c_str(), change);
+        throw string("can't change health of dead character");
+    }
+    this->health += change;
+    if( health > max_health )
+        health = max_health;
+    if( health <= 0 ) {
+        LOG("%s has died\n", this->getName().c_str());
+        int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+        this->is_dead = true;
+        this->time_of_death_ms = elapsed_ms;
+        if( this->listener != NULL ) {
+            this->listener->characterSetAnimation(this, this->listener_data, "death");
+        }
+        if( this->location != NULL ) {
+            while( this->items.size() > 0 ) {
+                Item *item = *this->items.begin();
+                this->dropItem(item);
+            }
+            if( this->gold > 0 ) {
+                Currency *currency = playing_gamestate->cloneGoldItem(this->gold);
+                location->addItem(currency, this->pos.x, this->pos.y);
+                this->gold = 0;
+            }
+        }
+    }
+    return this->health;
 }
 
 void Character::armWeapon(Weapon *item) {
@@ -185,14 +218,14 @@ void Character::addItem(Item *item) {
     }
 }
 
-void Character::pickupItem(Location *location, Item *item) {
+void Character::pickupItem(Item *item) {
     if( location != NULL ) {
         location->removeItem(item);
     }
     this->addItem(item);
 }
 
-void Character::dropItem(Location *location, Item *item) {
+void Character::dropItem(Item *item) {
     this->items.erase(item);
     bool graphics_changed = false;
     if( this->current_weapon == item ) {
@@ -206,7 +239,18 @@ void Character::dropItem(Location *location, Item *item) {
     if( location != NULL ) {
         location->addItem(item, this->pos.x, this->pos.y);
     }
+    else {
+        delete item;
+    }
     if( this->listener != NULL && graphics_changed ) {
         this->listener->characterUpdateGraphics(this, this->listener_data);
+    }
+}
+
+void Character::addGold(int change) {
+    this->gold += change;
+    if( this->gold < 0 ) {
+        LOG("Character::addGold(), removed %d, leaves %d\n", change, this->gold);
+        throw string("removed too much gold from character");
     }
 }

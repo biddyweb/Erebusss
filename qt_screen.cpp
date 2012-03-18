@@ -12,7 +12,7 @@ Screen::Screen() :
 Screen::~Screen() {
 }
 
-int Screen::getElapsedMS() {
+int Screen::getElapsedMS() const {
     return static_cast<int>(elapsed_timer.elapsed());
 }
 

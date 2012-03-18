@@ -159,7 +159,8 @@ void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
         int ms_per_frame = 100;
-        int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
+        //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
+        int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
         /*int c_frame = ( time_elapsed_ms / ms_per_frame );
         this->setFrame(c_frame);*/
         int n_frame = ( time_elapsed_ms / ms_per_frame );
@@ -167,6 +168,7 @@ void AnimatedObject::advance(int phase) {
             c_frame = n_frame;
             this->update();
         }
+        this->setZValue( this->pos().y() );
     }
 }
 
@@ -539,7 +541,7 @@ void ItemsWindow::clickedDropItem() {
         return;
     }
     Item *item = list_items.at(index);
-    playing_gamestate->getPlayer()->dropItem(playing_gamestate->getLocation(), item);
+    playing_gamestate->getPlayer()->dropItem(item);
 
     /*list->clear();
     list_items.clear();
@@ -713,12 +715,12 @@ PlayingGamestate::PlayingGamestate() :
     this->addStandardItem( new Armour("Leather Armour", image, 2));
     image = new Image( game_g->loadImage(":/gfx/textures/items/gold.png") );
     this->addStandardItem( new Currency("Gold", image));*/
-    this->item_images["Long Sword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
-    this->addStandardItem( new Weapon("Long Sword", NULL, "longsword") );
-    this->item_images["Leather Armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
-    this->addStandardItem( new Armour("Leather Armour", NULL, 2));
-    this->item_images["Gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
-    this->addStandardItem( new Currency("Gold", NULL));
+    this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
+    this->addStandardItem( new Weapon("Long Sword", "longsword", "longsword") );
+    this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
+    this->addStandardItem( new Armour("Leather Armour", "leather_armour", 2));
+    this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
+    this->addStandardItem( new Currency("Gold", "gold"));
 
     gui_overlay->setProgress(10);
     qApp->processEvents();
@@ -736,16 +738,19 @@ PlayingGamestate::PlayingGamestate() :
 
     Character *enemy = new Character("Goblin", "goblin", true);
     enemy->initialiseHealth(5);
+    enemy->addGold(8);
+    //enemy->addItem( this->cloneStandardItem("Leather Armour") ); // test
     location->addCharacter(enemy, 4.0f, 4.0f);
 
     location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
     location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
-    {
+    /*{
         Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
         LOG("gold location item: %d\n", item);
         item->setValue(5);
         location->addItem(item, 1.0f, 1.0f);
-    }
+    }*/
+    location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -948,7 +953,15 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
         //object->setPixmap( item->getImage()->getPixmap() );
-        object->setPixmap( this->item_images[item->getName().c_str()] );
+        //object->setPixmap( this->item_images[item->getName().c_str()] );
+        //object->setPixmap( this->item_images[item->getImageName().c_str()] );
+        map<string, QPixmap>::iterator image_iter = this->item_images.find(item->getImageName().c_str());
+        if( image_iter == this->item_images.end() ) {
+            LOG("failed to find image for item: %s\n", item->getName().c_str());
+            LOG("    image name: %s\n", item->getImageName().c_str());
+            throw string("Failed to find item's image");
+        }
+        object->setPixmap( image_iter->second );
         scene->addItem(object);
         object->setPos(item->getX(), item->getY());
         //object->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
@@ -1089,7 +1102,7 @@ void PlayingGamestate::update() {
         set<Character *>::iterator iter = *iter2;
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
-        location->charactersErase(iter);
+        location->removeCharacter(character);
 
         for(set<Character *>::iterator iter3 = location->charactersBegin(); iter3 != location->charactersEnd(); ++iter3) {
             Character *ch = *iter3;
@@ -1123,7 +1136,7 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         object->addAnimationLayer( this->animation_layers["clothes"] );
         object->addAnimationLayer( this->animation_layers["head"] );
         if( character->getCurrentWeapon() != NULL ) {
-            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationFilename().c_str() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName().c_str() ] );
         }
     }
     else {
@@ -1231,7 +1244,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
             if( picked_item != NULL ) {
-                player->pickupItem(location, picked_item);
+                player->pickupItem(picked_item);
             }
         }
     }
@@ -1249,6 +1262,12 @@ Item *PlayingGamestate::cloneStandardItem(string name) {
     }
     const Item *item = iter->second;
     return item->clone();
+}
+
+Currency *PlayingGamestate::cloneGoldItem(int value) {
+    Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
+    item->setValue(value);
+    return item;
 }
 
 Game::Game() {

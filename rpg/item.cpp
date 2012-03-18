@@ -1,34 +1,30 @@
 #include "item.h"
-//#include "../game.h"
 
-Item::Item(string name, Image *image) : name(name), image(image), user_data_gfx(NULL) {
+Item::Item(string name, string image_name) : name(name), image_name(image_name), user_data_gfx(NULL) {
 }
 
 Item::~Item() {
-    /*if( image != NULL ) {
-        delete image;
-    }*/
 }
 
 Item *Item::clone() const {
     return new Item(*this);
 }
 
-Weapon::Weapon(string name, Image *image, string animation_filename) : Item(name, image), animation_filename(animation_filename) {
+Weapon::Weapon(string name, string image_name, string animation_name) : Item(name, image_name), animation_name(animation_name) {
 }
 
 Weapon *Weapon::clone() const {
     return new Weapon(*this);
 }
 
-Armour::Armour(string name, Image *image, int rating) : Item(name, image), rating(rating) {
+Armour::Armour(string name, string image_name, int rating) : Item(name, image_name), rating(rating) {
 }
 
 Armour *Armour::clone() const {
     return new Armour(*this);
 }
 
-Currency::Currency(string name, Image *image) : Item(name, image) {
+Currency::Currency(string name, string image_name) : Item(name, image_name) {
 }
 
 Currency *Currency::clone() const {

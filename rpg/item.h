@@ -5,8 +5,6 @@ using std::string;
 
 #include "utils.h"
 
-class Image;
-
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
     ITEMTYPE_WEAPON = 1,
@@ -17,12 +15,12 @@ enum ItemType {
 
 class Item {
     string name;
-    Image *image;
+    string image_name;
     Vector2D pos; // when stored in a Location
     void *user_data_gfx;
 
 public:
-    Item(string name, Image *image);
+    Item(string name, string image_name);
     virtual ~Item();
 
     virtual ItemType getType() const {
@@ -51,6 +49,9 @@ public:
     string getName() const {
         return this->name;
     }
+    string getImageName() const {
+        return this->image_name;
+    }
     void setUserGfxData(void *user_data_gfx) {
         this->user_data_gfx = user_data_gfx;
     }
@@ -60,9 +61,9 @@ public:
 };
 
 class Weapon : public Item {
-    string animation_filename;
+    string animation_name;
 public:
-    Weapon(string name, Image *image, string animation_filename);
+    Weapon(string name, string image_name, string animation_name);
     virtual ~Weapon() {
     }
 
@@ -71,15 +72,15 @@ public:
     }
     virtual Weapon *clone() const; // virtual copy constructor
 
-    string getAnimationFilename() const {
-        return this->animation_filename;
+    string getAnimationName() const {
+        return this->animation_name;
     }
 };
 
 class Armour : public Item {
     int rating;
 public:
-    Armour(string name, Image *image, int rating);
+    Armour(string name, string image_name, int rating);
     virtual ~Armour() {
     }
 
@@ -96,7 +97,7 @@ public:
 class Currency : public Item {
     int value;
 public:
-    Currency(string name, Image *image);
+    Currency(string name, string image_name);
     virtual ~Currency() {
     }
 

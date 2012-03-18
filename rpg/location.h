@@ -79,6 +79,7 @@ public:
         this->listener_data = listener_data;
     }
     void addCharacter(Character *character, float xpos, float ypos);
+    void removeCharacter(Character *character);
     set<Character *>::iterator charactersBegin() {
         return this->characters.begin();
     }
@@ -90,9 +91,6 @@ public:
     }
     set<Character *>::const_iterator charactersEnd() const {
         return this->characters.end();
-    }
-    void charactersErase(set<Character *>::iterator iter) {
-        this->characters.erase(iter);
     }
     void addItem(Item *item, float xpos, float ypos);
     void removeItem(Item *item);

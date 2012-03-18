@@ -34,6 +34,7 @@ class Character {
     string animation_name; // for NPCs (player is handled separately)
 
     // game data
+    Location *location;
     bool is_dead;
     int time_of_death_ms;
     Vector2D pos;
@@ -77,6 +78,9 @@ public:
     }
     string getAnimationName() const {
         return this->animation_name;
+    }
+    void setLocation(Location *location) {
+        this->location = location;
     }
     bool isDead() const {
         return this->is_dead;
@@ -129,12 +133,7 @@ public:
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }
-    int changeHealth(int change) {
-        this->health += change;
-        if( health > max_health )
-            health = max_health;
-        return this->health;
-    }
+    int changeHealth(PlayingGamestate *playing_gamestate, int change);
 
     const Weapon *getCurrentWeapon() const {
         return this->current_weapon;
@@ -151,8 +150,8 @@ public:
     }
     void wearArmour(Armour *item);
     void addItem(Item *item);
-    void pickupItem(Location *location, Item *item);
-    void dropItem(Location *location, Item *item);
+    void pickupItem(Item *item);
+    void dropItem(Item *item);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();
     }
@@ -168,4 +167,5 @@ public:
     int getGold() const {
         return this->gold;
     }
+    void addGold(int change);
 };

@@ -54,8 +54,14 @@ void Location::calculateSize(float *w, float *h) const {
 }
 
 void Location::addCharacter(Character *character, float xpos, float ypos) {
+    character->setLocation(this);
     character->setPos(xpos, ypos);
     this->characters.insert(character);
+}
+
+void Location::removeCharacter(Character *character) {
+    character->setLocation(NULL);
+    this->characters.erase(character);
 }
 
 void Location::addItem(Item *item, float xpos, float ypos) {

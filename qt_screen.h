@@ -11,6 +11,8 @@ class Screen : public QObject {
     QTimer timer; // used to call update() per frame
     QElapsedTimer elapsed_timer; // used to measure game time
 
+    int getElapsedMS() const;
+
     bool paused;
     int saved_paused_time_ms;
     int saved_elapsed_time_ms;
@@ -27,7 +29,6 @@ public:
     MainWindow *getMainWindow() {
         return &mainWindow;
     }
-    int getElapsedMS();
     void runMainLoop();
     bool isPaused() const {
         return this->paused;

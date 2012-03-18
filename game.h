@@ -22,6 +22,7 @@ class Screen;
 class PlayingGamestate;
 class Location;
 class Item;
+class Currency;
 
 enum Direction {
     DIRECTION_W = 0,
@@ -129,19 +130,6 @@ public:
     void clearAnimationLayers();
     void setAnimationSet(string name);
     void setDirection(Direction c_direction);
-};
-
-class Image {
-    QPixmap pixmap;
-public:
-    Image(const QPixmap &pixmap) : pixmap(pixmap) {
-    }
-    virtual ~Image() {
-    }
-
-    const QPixmap &getPixmap() const {
-        return this->pixmap;
-    }
 };
 
 class Gamestate : public QObject {
@@ -348,6 +336,7 @@ public:
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(string name);
+    Currency *cloneGoldItem(int value);
 };
 
 // used for passing messages
