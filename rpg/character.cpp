@@ -19,7 +19,6 @@ Character::Character(string name, string animation_name, bool is_ai) :
 
 Character::~Character() {
     LOG("Character::~Character(): %s\n", this->name.c_str());
-    qDebug("Character::~Character(): %s", this->name.c_str());
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
     }
@@ -40,7 +39,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
     if( is_dead ) {
         if( elapsed_ms > time_of_death_ms + 400 ) {
-            //qDebug("kill this character");
             return true; // now remove from location/scene and delete character
         }
         return false;
@@ -49,30 +47,14 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     if( is_hitting && target_npc == NULL ) {
         throw string("is_hitting is true, but no target_npc");
     }
-    /*if( target_npc != NULL && !is_hitting ) {
-        qDebug("### %d vs %d : %d", elapsed_ms, time_last_action_ms, time_last_action_ms + 1000);
-    }*/
-    /*if( target_npc != NULL ) {
-        qDebug("is_hitting? %d", is_hitting);
-    }*/
     if( elapsed_ms > time_last_action_ms + 400 && target_npc != NULL && is_hitting ) {
         is_hitting = false;
         LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
-        qDebug("character %s hit %s", this->getName().c_str(), target_npc->getName().c_str());
         if( this->listener != NULL ) {
             this->listener->characterSetAnimation(this, this->listener_data, "");
         }
         if( !target_npc->is_dead ) {
             target_npc->changeHealth(playing_gamestate, -1);
-            /*int new_health = target_npc->changeHealth(-1);
-            qDebug("    health now %d", new_health);
-            if( new_health <= 0 ) {
-                target_npc->is_dead = true;
-                target_npc->time_of_death_ms = elapsed_ms;
-                if( target_npc->listener != NULL ) {
-                    target_npc->listener->characterSetAnimation(target_npc, target_npc->listener_data, "death");
-                }
-            }*/
         }
     }
     else if( elapsed_ms > time_last_action_ms + 1000 && !is_hitting && target_npc != NULL ) {
@@ -95,14 +77,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     if( is_ai && !is_hitting ) {
-        //qDebug("ping");
         this->setTargetNPC( playing_gamestate->getPlayer() );
         if( playing_gamestate->getPlayer() != NULL ) {
             Vector2D dest = playing_gamestate->getPlayer()->getPos();
             Vector2D hit_pos;
             bool hit = location->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
             if( hit ) {
-                //qDebug("hit at: %f, %f", hit_pos.x, hit_pos.y);
                 dest = hit_pos;
             }
             this->setDestination(dest.x, dest.y);
@@ -113,7 +93,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     if( this->has_destination && !is_hitting ) {
-        //qDebug("move character");
         /*float diff_x = this->dest.x - this->pos.x;
         float diff_y = this->dest.y - this->pos.y;
         float step = 0.1f;
@@ -144,7 +123,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     return false;
 }
 
-int Character::changeHealth(PlayingGamestate *playing_gamestate, int change) {
+int Character::changeHealth(const PlayingGamestate *playing_gamestate, int change) {
     if( this->is_dead ) {
         LOG("tried to changeHealth of %s by %d - already dead!\n", this->getName().c_str(), change);
         throw string("can't change health of dead character");

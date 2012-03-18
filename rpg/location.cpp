@@ -1,7 +1,7 @@
 #include "location.h"
 #include "character.h"
 #include "item.h"
-//#include "../game.h"
+#include "../game.h"
 
 #include <qdebug.h>
 
@@ -62,6 +62,17 @@ void Location::addCharacter(Character *character, float xpos, float ypos) {
 void Location::removeCharacter(Character *character) {
     character->setLocation(NULL);
     this->characters.erase(character);
+}
+
+bool Location::hasEnemies(const PlayingGamestate *playing_gamstate) const {
+    bool has_enemies = false;
+    for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !has_enemies; ++iter) {
+        const Character *character = *iter;
+        if( character != playing_gamstate->getPlayer() ) {
+            has_enemies = true;
+        }
+    }
+    return has_enemies;
 }
 
 void Location::addItem(Item *item, float xpos, float ypos) {
@@ -188,7 +199,7 @@ bool Location::intersectSweptSquareWithBoundaries(const Character *character, Ve
     Vector2D dv = end - start;
     float dv_length = dv.magnitude();
     if( dv_length == 0.0f ) {
-        qDebug("Location::intersectSweptSquareWithBoundaries received equal start and end");
+        LOG("Location::intersectSweptSquareWithBoundaries received equal start and end\n");
         throw "Location::intersectSweptSquareWithBoundaries received equal start and end";
     }
     dv /= dv_length;
@@ -293,7 +304,7 @@ bool Location::intersectSweptSquareWithBoundaries(const Character *character, Ve
                 iy -= width;
                 iy = max(iy, 0.0f);
                 if( iy > ymax ) {
-                    qDebug("intersection is beyond end of swept box");
+                    LOG("intersection is beyond end of swept box\n");
                     throw "intersection is beyond end of swept box";
                 }
                 if( !hit || iy < hit_dist ) {

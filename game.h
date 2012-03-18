@@ -247,12 +247,14 @@ public:
 };*/
 
 class ItemsWindow : public QWidget {
+//class ItemsWindow : public QMainWindow {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
     QListWidget *list;
     vector<Item *> list_items;
 
+    QPushButton *dropButton;
     QPushButton *armButton;
     QPushButton *wearButton;
 
@@ -280,7 +282,9 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MainGraphicsView *view;
     GUIOverlay *gui_overlay;
 
+    //QWidget *mainwindow;
     QWidget *subwindow;
+    QStackedWidget *main_stacked_widget;
     //QListWidget *list;
     //vector<Item *> list_items;
 
@@ -299,6 +303,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 private slots:
     void clickedItems();
     void clickedOptions();
+    void clickedRest();
     void clickedQuit();
     void clickedCloseSubwindow();
 
@@ -320,6 +325,7 @@ public:
     virtual void locationRemoveItem(const Location *location, Item *item);
 
     void clickedMainView(float scene_x, float scene_y);
+    void addWidget(QWidget *widget);
 
     Character *getPlayer() {
         return this->player;
@@ -335,8 +341,8 @@ public:
     }
 
     void addStandardItem(Item *item);
-    Item *cloneStandardItem(string name);
-    Currency *cloneGoldItem(int value);
+    Item *cloneStandardItem(string name) const;
+    Currency *cloneGoldItem(int value) const;
 };
 
 // used for passing messages

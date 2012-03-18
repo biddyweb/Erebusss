@@ -133,7 +133,10 @@ public:
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }
-    int changeHealth(PlayingGamestate *playing_gamestate, int change);
+    int changeHealth(const PlayingGamestate *playing_gamestate, int change);
+    void restoreHealth() {
+        this->health = this->max_health;
+    }
 
     const Weapon *getCurrentWeapon() const {
         return this->current_weapon;

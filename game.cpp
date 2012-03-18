@@ -426,23 +426,28 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
-    armButton(NULL), wearButton(NULL)
+    dropButton(NULL), armButton(NULL), wearButton(NULL)
 {
+
+    playing_gamestate->addWidget(this);
+
     Character *player = playing_gamestate->getPlayer();
 
-    QFont font = game_g->getScreen()->getMainWindow()->font();
+    /*QFont font = game_g->getScreen()->getMainWindow()->font();
     font.setPointSize( font.pointSize() + 6 );
-    this->setFont(font);
+    this->setFont(font);*/
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
     list = new QListWidget();
+    {
+        QFont list_font = list->font();
+        list_font.setPointSize( list_font.pointSize() + 4 );
+        list->setFont(list_font);
+    }
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
-    /*QFont font = game_g->getScreen()->getMainWindow()->font();
-    font.setPointSize( font.pointSize() + 6 );
-    list->setFont(font);*/
 
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
@@ -454,13 +459,14 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
 
     QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
+    goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
     layout->addWidget(goldLabel);
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *dropButton = new QPushButton("Drop Item");
+        dropButton = new QPushButton("Drop Item");
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
@@ -478,10 +484,11 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 
+    /*if( list_items.size() > 0 ) {
+        list->setCurrentRow(0);
+    }*/
     int index = list->currentRow();
-    if( index != -1 ) {
-        this->changedSelectedItem(index);
-    }
+    this->changedSelectedItem(index);
 }
 
 QString ItemsWindow::getItemString(const Item *item) const {
@@ -499,10 +506,12 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     LOG("changedSelectedItem(%d)\n", currentRow);
 
     if( currentRow == -1 ) {
+        dropButton->setVisible(false);
         armButton->setVisible(false);
         wearButton->setVisible(false);
         return;
     }
+    dropButton->setVisible(true);
     Item *item = list_items.at(currentRow);
     if( item->getType() != ITEMTYPE_WEAPON ) {
         armButton->setVisible(false);
@@ -615,7 +624,7 @@ void ItemsWindow::clickedWearArmour() {
 }
 
 PlayingGamestate::PlayingGamestate() :
-    scene(NULL), view(NULL), gui_overlay(NULL), subwindow(NULL),
+    scene(NULL), view(NULL), gui_overlay(NULL), /*mainwindow(NULL),*/ subwindow(NULL), main_stacked_widget(NULL),
     player(NULL), location(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -644,9 +653,17 @@ PlayingGamestate::PlayingGamestate() :
     view->setDragMode(QGraphicsView::ScrollHandDrag);
     view->setCacheMode(QGraphicsView::CacheBackground);
 
-    QWidget *centralWidget = new QWidget(window);
+    /*QWidget *centralWidget = new QWidget(window);
+    this->mainwindow = centralWidget;
+    LOG("mainwindow: %d\n", mainwindow);
     centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(centralWidget);
+    window->setCentralWidget(centralWidget);*/
+    this->main_stacked_widget = new QStackedWidget();
+    main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(main_stacked_widget);
+
+    QWidget *centralWidget = new QWidget();
+    main_stacked_widget->addWidget(centralWidget);
 
     QHBoxLayout *layout = new QHBoxLayout();
     centralWidget->setLayout(layout);
@@ -676,12 +693,6 @@ PlayingGamestate::PlayingGamestate() :
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(journalButton);
 
-        QPushButton *optionsButton = new QPushButton("Options");
-        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
-        v_layout->addWidget(optionsButton);
-
         /*QPushButton *quitButton = new QPushButton("Quit");
         quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -692,6 +703,17 @@ PlayingGamestate::PlayingGamestate() :
         pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
+
+        QPushButton *restButton = new QPushButton("Rest");
+        restButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
+        v_layout->addWidget(restButton);
+
+        QPushButton *optionsButton = new QPushButton("Options");
+        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
+        v_layout->addWidget(optionsButton);
     }
 
     layout->addWidget(view);
@@ -1027,8 +1049,13 @@ void PlayingGamestate::clickedItems() {
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
     */
 
-    subwindow->showFullScreen();
-    game_g->getScreen()->getMainWindow()->hide();
+    //subwindow->showFullScreen();
+    //game_g->getScreen()->getMainWindow()->hide();
+    /*mainwindow->setParent(NULL); // stop it being deleted!
+    game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
+    game_g->getScreen()->getMainWindow()->update();*/
+    //this->main_stacked_widget->addWidget(subwindow);
+    //this->main_stacked_widget->setCurrentWidget(subwindow);
 }
 
 void PlayingGamestate::clickedOptions() {
@@ -1036,6 +1063,11 @@ void PlayingGamestate::clickedOptions() {
     this->clickedCloseSubwindow();
 
     subwindow = new QWidget();
+    //subwindow = new QWidget( game_g->getScreen()->getMainWindow() );
+    //mainwindow->setParent(NULL); // stop it being deleted!
+    //game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
+    this->main_stacked_widget->addWidget(subwindow);
+    this->main_stacked_widget->setCurrentWidget(subwindow);
     game_g->getScreen()->setPaused(true);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -1051,8 +1083,19 @@ void PlayingGamestate::clickedOptions() {
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
 
-    subwindow->showFullScreen();
-    game_g->getScreen()->getMainWindow()->hide();
+    //subwindow->showFullScreen();
+    //game_g->getScreen()->getMainWindow()->hide();
+}
+
+void PlayingGamestate::clickedRest() {
+    LOG("clickedRest()\n");
+    if( location->hasEnemies(this) ) {
+        game_g->showInfoWindow("Rest", "You cannot rest here - enemies are nearby");
+        return;
+    }
+    if( game_g->askQuestionWindow("Rest", "Rest until fully healed?") ) {
+        this->player->restoreHealth();
+    }
 }
 
 void PlayingGamestate::clickedQuit() {
@@ -1061,10 +1104,13 @@ void PlayingGamestate::clickedQuit() {
 }
 
 void PlayingGamestate::clickedCloseSubwindow() {
+    LOG("clickedCloseSubwindow\n");
     if( subwindow != NULL ) {
-        game_g->getScreen()->getMainWindow()->show();
+        //game_g->getScreen()->getMainWindow()->setCentralWidget(mainwindow);
+        //game_g->getScreen()->getMainWindow()->show();
+        this->main_stacked_widget->setCurrentIndex(0);
         game_g->getScreen()->setPaused(false);
-        subwindow->close();
+        //subwindow->close();
         //delete subwindow;
         subwindow->deleteLater();
         subwindow = NULL;
@@ -1250,11 +1296,16 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     }
 }
 
+void PlayingGamestate::addWidget(QWidget *widget) {
+    this->main_stacked_widget->addWidget(widget);
+    this->main_stacked_widget->setCurrentWidget(widget);
+}
+
 void PlayingGamestate::addStandardItem(Item *item) {
     this->standard_items[item->getName()] = item;
 }
 
-Item *PlayingGamestate::cloneStandardItem(string name) {
+Item *PlayingGamestate::cloneStandardItem(string name) const {
     map<string, Item *>::const_iterator iter = this->standard_items.find(name);
     if( iter == this->standard_items.end() ) {
         LOG("can't clone standard item which doesn't exist: %s\n", name.c_str());
@@ -1264,7 +1315,7 @@ Item *PlayingGamestate::cloneStandardItem(string name) {
     return item->clone();
 }
 
-Currency *PlayingGamestate::cloneGoldItem(int value) {
+Currency *PlayingGamestate::cloneGoldItem(int value) const {
     Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
     item->setValue(value);
     return item;
@@ -1437,7 +1488,7 @@ bool Game::askQuestionWindow(const char *title, const char *message) {
     //this->getScreen()->getMainWindow()->blockSignals(true);
     this->getScreen()->enableUpdateTimer(false);
     //int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
-    int res = QMessageBox::question(NULL, title, message, QMessageBox::Yes, QMessageBox::No);
+    int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
     //this->getScreen()->getMainWindow()->blockSignals(false);
     this->getScreen()->enableUpdateTimer(true);
     LOG("    answer is %d\n", res);

@@ -10,6 +10,7 @@ using std::set;
 class Character;
 class Item;
 class Location;
+class PlayingGamestate;
 
 class LocationListener {
 public:
@@ -92,6 +93,7 @@ public:
     set<Character *>::const_iterator charactersEnd() const {
         return this->characters.end();
     }
+    bool hasEnemies(const PlayingGamestate *playing_gamstate) const;
     void addItem(Item *item, float xpos, float ypos);
     void removeItem(Item *item);
     set<Item *>::iterator itemsBegin() {
