@@ -266,6 +266,7 @@ class ItemsWindow : public QWidget {
     vector<Item *> list_items;
 
     QPushButton *armButton;
+    QPushButton *wearButton;
 
     QString getItemString(const Item *item) const;
 
@@ -274,6 +275,7 @@ private slots:
 
     void clickedDropItem();
     void clickedArmWeapon();
+    void clickedWearArmour();
 
 public:
     ItemsWindow(PlayingGamestate *playing_gamestate);

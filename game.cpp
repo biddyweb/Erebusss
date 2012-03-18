@@ -422,7 +422,7 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
-    armButton(NULL)
+    armButton(NULL), wearButton(NULL)
 {
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
@@ -442,7 +442,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         list_items.push_back(item);
     }
 
-    connect(list, SIGNAL(currentRowChanged()), this, SLOT(changedSelectedItem()));
+    connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
 
     {
         QVBoxLayout *h_layout = new QVBoxLayout();
@@ -452,9 +452,14 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
-        armButton = new QPushButton("Arm Weapon");
+        //armButton = new QPushButton("Arm Weapon");
+        armButton = new QPushButton(""); // text set in changedSelectedItem()
         layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
+
+        wearButton = new QPushButton(""); // text set in changedSelectedItem()
+        layout->addWidget(wearButton);
+        connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
     }
 
     QPushButton *closeButton = new QPushButton("Close");
@@ -472,11 +477,45 @@ QString ItemsWindow::getItemString(const Item *item) const {
     if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
         item_str += " [Current Weapon]";
     }
+    if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
+        item_str += " [Current Armour]";
+    }
     return item_str;
 }
 
 void ItemsWindow::changedSelectedItem(int currentRow) {
     LOG("changedSelectedItem(%d)\n", currentRow);
+
+    if( currentRow == -1 ) {
+        armButton->setVisible(false);
+        wearButton->setVisible(false);
+        return;
+    }
+    Item *item = list_items.at(currentRow);
+    if( item->getType() != ITEMTYPE_WEAPON ) {
+        armButton->setVisible(false);
+    }
+    else {
+        armButton->setVisible(true);
+        if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
+            armButton->setText("Disarm Weapon");
+        }
+        else {
+            armButton->setText("Arm Weapon");
+        }
+    }
+    if( item->getType() != ITEMTYPE_ARMOUR ) {
+        wearButton->setVisible(false);
+    }
+    else {
+        wearButton->setVisible(true);
+        if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
+            wearButton->setText("Take Off Armour");
+        }
+        else {
+            wearButton->setText("Wear Armour");
+        }
+    }
 }
 
 void ItemsWindow::clickedDropItem() {
@@ -533,6 +572,34 @@ void ItemsWindow::clickedArmWeapon() {
     }
     QListWidgetItem *item_widget = list->item(index);
     item_widget->setText( this->getItemString(item) );
+    this->changedSelectedItem(index);
+}
+
+void ItemsWindow::clickedWearArmour() {
+    LOG("clickedWearArmour()\n");
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    Item *item = list_items.at(index);
+    if( item->getType() != ITEMTYPE_ARMOUR ) {
+        LOG("not armour?!\n");
+        return;
+    }
+    Armour *armour = static_cast<Armour *>(item);
+    if( playing_gamestate->getPlayer()->getCurrentArmour() == armour ) {
+        // take off instead
+        LOG("player took off armour\n");
+        playing_gamestate->getPlayer()->wearArmour(NULL);
+    }
+    else {
+        LOG("player put on armour: %s\n", item->getName().c_str());
+        playing_gamestate->getPlayer()->wearArmour(armour);
+    }
+    QListWidgetItem *item_widget = list->item(index);
+    item_widget->setText( this->getItemString(item) );
+    this->changedSelectedItem(index);
 }
 
 PlayingGamestate::PlayingGamestate() :

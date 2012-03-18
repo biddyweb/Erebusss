@@ -15,6 +15,7 @@ class Character;
 class PlayingGamestate;
 class Item;
 class Weapon;
+class Armour;
 class Location;
 
 class CharacterListener {
@@ -49,6 +50,7 @@ class Character {
     int max_health;
     set<Item *> items;
     Weapon *current_weapon;
+    Armour *current_armour;
 
 public:
     Character(string name, string animation_name, bool is_ai);
@@ -140,6 +142,13 @@ public:
         return this->current_weapon;
     }
     void armWeapon(Weapon *item);
+    const Armour *getCurrentArmour() const {
+        return this->current_armour;
+    }
+    Armour *getCurrentArmour() {
+        return this->current_armour;
+    }
+    void wearArmour(Armour *item);
     void addItem(Item *item);
     void pickupItem(Location *location, Item *item);
     void dropItem(Location *location, Item *item);
