@@ -7,5 +7,6 @@
         <file>gfx/textures/isometric_hero/longsword.png</file>
         <file>gfx/textures/items/longsword.png</file>
         <file>gfx/textures/items/leather_armor.png</file>
+        <file>gfx/textures/items/gold.png</file>
     </qresource>
 </RCC>

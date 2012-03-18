@@ -11,7 +11,8 @@ enum ItemType {
     ITEMTYPE_GENERAL = 0,
     ITEMTYPE_WEAPON = 1,
     ITEMTYPE_SHIELD = 2,
-    ITEMTYPE_ARMOUR = 3
+    ITEMTYPE_ARMOUR = 3,
+    ITEMTYPE_CURRENCY = 4
 };
 
 class Item {
@@ -29,9 +30,9 @@ public:
     }
     virtual Item *clone() const; // virtual copy constructor
 
-    const Image *getImage() const {
+    /*const Image *getImage() const {
         return this->image;
-    }
+    }*/
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
         /*if( this->listener != NULL ) {
@@ -89,5 +90,25 @@ public:
 
     int getRating() const {
         return this->rating;
+    }
+};
+
+class Currency : public Item {
+    int value;
+public:
+    Currency(string name, Image *image);
+    virtual ~Currency() {
+    }
+
+    virtual ItemType getType() const {
+        return ITEMTYPE_CURRENCY;
+    }
+    virtual Currency *clone() const; // virtual copy constructor
+
+    int getValue() const {
+        return this->value;
+    }
+    void setValue(int value) {
+        this->value = value;
     }
 };

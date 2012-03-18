@@ -243,6 +243,7 @@ void AnimatedObject::setDirection(Direction c_direction) {
 
 OptionsGamestate::OptionsGamestate()
 {
+    LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
@@ -280,6 +281,7 @@ OptionsGamestate::OptionsGamestate()
 }
 
 OptionsGamestate::~OptionsGamestate() {
+    LOG("OptionsGamestate::~OptionsGamestate()\n");
     /*VI_flush(0); // delete all the gamestate objects, but leave the game level objects (which should be set at persistence level -1)
     VI_GraphicsEnvironment *genv = game_g->getGraphicsEnvironment();
     game_g->getGraphicsEnvironment()->setPanel(NULL); // as the main panel is now destroyed
@@ -424,17 +426,22 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
     armButton(NULL), wearButton(NULL)
 {
+    Character *player = playing_gamestate->getPlayer();
+
+    QFont font = game_g->getScreen()->getMainWindow()->font();
+    font.setPointSize( font.pointSize() + 6 );
+    this->setFont(font);
+
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
     list = new QListWidget();
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
-    QFont font = game_g->getScreen()->getMainWindow()->font();
+    /*QFont font = game_g->getScreen()->getMainWindow()->font();
     font.setPointSize( font.pointSize() + 6 );
-    list->setFont(font);
+    list->setFont(font);*/
 
-    Character *player = playing_gamestate->getPlayer();
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
         QString item_str = this->getItemString(item);
@@ -444,21 +451,24 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
 
+    QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
+    layout->addWidget(goldLabel);
+
     {
-        QVBoxLayout *h_layout = new QVBoxLayout();
+        QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
         QPushButton *dropButton = new QPushButton("Drop Item");
-        layout->addWidget(dropButton);
+        h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
         //armButton = new QPushButton("Arm Weapon");
         armButton = new QPushButton(""); // text set in changedSelectedItem()
-        layout->addWidget(armButton);
+        h_layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
 
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
-        layout->addWidget(wearButton);
+        h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
     }
 
@@ -696,26 +706,33 @@ PlayingGamestate::PlayingGamestate() :
     // create RPG data
     LOG("create RPG data\n");
     //this->items.insert( new Weapon("Long Sword", "longsword.png") );
-    Image *image = NULL;
+    /*Image *image = NULL;
     image = new Image( game_g->loadImage(":/gfx/textures/items/longsword.png") );
     this->addStandardItem( new Weapon("Long Sword", image, "longsword") );
     image = new Image( game_g->loadImage(":/gfx/textures/items/leather_armor.png") );
     this->addStandardItem( new Armour("Leather Armour", image, 2));
+    image = new Image( game_g->loadImage(":/gfx/textures/items/gold.png") );
+    this->addStandardItem( new Currency("Gold", image));*/
+    this->item_images["Long Sword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
+    this->addStandardItem( new Weapon("Long Sword", NULL, "longsword") );
+    this->item_images["Leather Armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
+    this->addStandardItem( new Armour("Leather Armour", NULL, 2));
+    this->item_images["Gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
+    this->addStandardItem( new Currency("Gold", NULL));
 
     gui_overlay->setProgress(10);
     qApp->processEvents();
-
-    // create RPG world
-    LOG("create RPG world\n");
-
-    location = new Location();
 
     this->player = new Character("Player", "", false);
     player->initialiseHealth(100);
     //player->initialiseHealth(5); // test
     player->addItem( this->cloneStandardItem("Long Sword") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
-    location->addCharacter(player, 2.0f, 2.0f);
+
+    // create RPG world
+    LOG("create RPG world\n");
+
+    location = new Location();
 
     Character *enemy = new Character("Goblin", "goblin", true);
     enemy->initialiseHealth(5);
@@ -723,6 +740,12 @@ PlayingGamestate::PlayingGamestate() :
 
     location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
     location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
+    {
+        Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
+        LOG("gold location item: %d\n", item);
+        item->setValue(5);
+        location->addItem(item, 1.0f, 1.0f);
+    }
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -756,6 +779,8 @@ PlayingGamestate::PlayingGamestate() :
         boundary.addPoint(Vector2D(5.0f, 0.0f));
         location->addBoundary(boundary);
     }
+
+    location->addCharacter(player, 2.0f, 2.0f);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
 
@@ -897,6 +922,7 @@ PlayingGamestate::PlayingGamestate() :
 }
 
 PlayingGamestate::~PlayingGamestate() {
+    LOG("PlayingGamestate::~PlayingGamestate()\n");
     this->clickedCloseSubwindow();
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();
@@ -910,15 +936,19 @@ PlayingGamestate::~PlayingGamestate() {
     }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
         Item *item = iter->second;
+        LOG("about to delete standard item: %d\n", item);
+        LOG("    name: %s\n", item->getName().c_str());
         delete item;
     }
+    LOG("done\n");
 }
 
 void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
     if( this->location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
-        object->setPixmap( item->getImage()->getPixmap() );
+        //object->setPixmap( item->getImage()->getPixmap() );
+        object->setPixmap( this->item_images[item->getName().c_str()] );
         scene->addItem(object);
         object->setPos(item->getX(), item->getY());
         //object->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);

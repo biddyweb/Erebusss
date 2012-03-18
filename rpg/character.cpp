@@ -12,7 +12,7 @@ Character::Character(string name, string animation_name, bool is_ai) :
     listener(NULL), listener_data(NULL),
     has_destination(false), target_npc(NULL), time_last_action_ms(0), is_hitting(false),
     health(0), max_health(0),
-    current_weapon(NULL), current_armour(NULL)
+    current_weapon(NULL), current_armour(NULL), gold(0)
 {
 
 }
@@ -165,6 +165,15 @@ void Character::wearArmour(Armour *item) {
 }
 
 void Character::addItem(Item *item) {
+    if( item->getType() == ITEMTYPE_CURRENCY ) {
+        // special case
+        Currency *currency = static_cast<Currency *>(item);
+        this->gold += currency->getValue();
+        LOG("delete gold item: %d\n", item);
+        delete item;
+        return;
+    }
+
     this->items.insert(item);
     if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon

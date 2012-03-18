@@ -51,6 +51,7 @@ class Character {
     set<Item *> items;
     Weapon *current_weapon;
     Armour *current_armour;
+    int gold;
 
 public:
     Character(string name, string animation_name, bool is_ai);
@@ -163,5 +164,8 @@ public:
     }
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
+    }
+    int getGold() const {
+        return this->gold;
     }
 };

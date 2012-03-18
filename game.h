@@ -306,6 +306,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     // data
     map<string, AnimationLayer *> animation_layers;
     map<string, Item *> standard_items;
+    map<string, QPixmap> item_images;
 
 private slots:
     void clickedItems();
