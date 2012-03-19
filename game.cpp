@@ -465,14 +465,16 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     list = new QListWidget();
     {
         QFont list_font = list->font();
-        list_font.setPointSize( list_font.pointSize() + 4 );
+        list_font.setPointSize( list_font.pointSize() + 8 );
         list->setFont(list_font);
     }
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    int weight = 0;
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
+        weight += item->getWeight();
         QString item_str = this->getItemString(item);
         list->addItem( item_str );
         list_items.push_back(item);
@@ -480,9 +482,19 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
 
-    QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
-    goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
-    layout->addWidget(goldLabel);
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
+        goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
+        h_layout->addWidget(goldLabel);
+
+        weightLabel = new QLabel(""); // label set in setWeightLabel()
+        weightLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(weightLabel);
+        this->setWeightLabel(weight);
+    }
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -573,6 +585,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     }
 }
 
+void ItemsWindow::setWeightLabel(int weight) {
+    this->weightLabel->setText("Weight: " + QString::number(weight));
+}
+
 void ItemsWindow::clickedDropItem() {
     LOG("clickedDropItem()\n");
     /*QList<QListWidgetItem *> selected_items = list->selectedItems();
@@ -584,7 +600,8 @@ void ItemsWindow::clickedDropItem() {
         return;
     }
     Item *item = list_items.at(index);
-    playing_gamestate->getPlayer()->dropItem(item);
+    Character *player = playing_gamestate->getPlayer();
+    player->dropItem(item);
 
     /*list->clear();
     list_items.clear();
@@ -601,6 +618,13 @@ void ItemsWindow::clickedDropItem() {
             index = list_items.size()-1;
         list->setCurrentRow(index);
     }
+
+    int weight = 0;
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        weight += item->getWeight();
+    }
+    this->setWeightLabel(weight);
 }
 
 void ItemsWindow::clickedArmWeapon() {
@@ -777,20 +801,16 @@ PlayingGamestate::PlayingGamestate() :
 
     // create RPG data
     LOG("create RPG data\n");
-    //this->items.insert( new Weapon("Long Sword", "longsword.png") );
-    /*Image *image = NULL;
-    image = new Image( game_g->loadImage(":/gfx/textures/items/longsword.png") );
-    this->addStandardItem( new Weapon("Long Sword", image, "longsword") );
-    image = new Image( game_g->loadImage(":/gfx/textures/items/leather_armor.png") );
-    this->addStandardItem( new Armour("Leather Armour", image, 2));
-    image = new Image( game_g->loadImage(":/gfx/textures/items/gold.png") );
-    this->addStandardItem( new Currency("Gold", image));*/
+
     this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
-    this->addStandardItem( new Weapon("Long Sword", "longsword", "longsword") );
+    this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
+
     this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
-    this->addStandardItem( new Shield("Shield", "shield", "shield") );
+    this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
+
     this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
-    this->addStandardItem( new Armour("Leather Armour", "leather_armour", 2));
+    this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
+
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
     this->addStandardItem( new Currency("Gold", "gold"));
 

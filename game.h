@@ -256,11 +256,14 @@ class ItemsWindow : public QWidget {
     QListWidget *list;
     vector<Item *> list_items;
 
+    QLabel *weightLabel;
+
     QPushButton *dropButton;
     QPushButton *armButton;
     QPushButton *wearButton;
 
     QString getItemString(const Item *item) const;
+    void setWeightLabel(int weight);
 
 private slots:
     void changedSelectedItem(int currentRow);

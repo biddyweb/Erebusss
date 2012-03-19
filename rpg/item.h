@@ -18,9 +18,10 @@ class Item {
     string image_name;
     Vector2D pos; // when stored in a Location
     void *user_data_gfx;
+    int weight; // in multiples of 100g
 
 public:
-    Item(string name, string image_name);
+    Item(string name, string image_name, int weight);
     virtual ~Item();
 
     virtual ItemType getType() const {
@@ -58,12 +59,18 @@ public:
     void *getUserGfxData() {
         return this->user_data_gfx;
     }
+    void setWeight(int weight) {
+        this->weight = weight;
+    }
+    int getWeight() const {
+        return this->weight;
+    }
 };
 
 class Weapon : public Item {
     string animation_name;
 public:
-    Weapon(string name, string image_name, string animation_name);
+    Weapon(string name, string image_name, int weight, string animation_name);
     virtual ~Weapon() {
     }
 
@@ -80,7 +87,7 @@ public:
 class Shield : public Item {
     string animation_name;
 public:
-    Shield(string name, string image_name, string animation_name);
+    Shield(string name, string image_name, int weight, string animation_name);
     virtual ~Shield() {
     }
 
@@ -97,7 +104,7 @@ public:
 class Armour : public Item {
     int rating;
 public:
-    Armour(string name, string image_name, int rating);
+    Armour(string name, string image_name, int weight, int rating);
     virtual ~Armour() {
     }
 
