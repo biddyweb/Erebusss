@@ -663,8 +663,13 @@ void ItemsWindow::clickedArmWeapon() {
         LOG("not a weapon or shield?!\n");
     }
 
-    QListWidgetItem *item_widget = list->item(index);
-    item_widget->setText( this->getItemString(item) );
+    /*QListWidgetItem *item_widget = list->item(index);
+    item_widget->setText( this->getItemString(item) );*/
+    for(int i=0;i<list_items.size();i++) {
+        const Item *item = list_items.at(i);
+        QListWidgetItem *item_widget = list->item(i);
+        item_widget->setText( this->getItemString(item) );
+    }
     this->changedSelectedItem(index);
 }
 
@@ -690,8 +695,14 @@ void ItemsWindow::clickedWearArmour() {
         LOG("player put on armour: %s\n", item->getName().c_str());
         playing_gamestate->getPlayer()->wearArmour(armour);
     }
-    QListWidgetItem *item_widget = list->item(index);
-    item_widget->setText( this->getItemString(item) );
+
+    /*QListWidgetItem *item_widget = list->item(index);
+    item_widget->setText( this->getItemString(item) );*/
+    for(int i=0;i<list_items.size();i++) {
+        const Item *item = list_items.at(i);
+        QListWidgetItem *item_widget = list->item(i);
+        item_widget->setText( this->getItemString(item) );
+    }
     this->changedSelectedItem(index);
 }
 
@@ -805,6 +816,9 @@ PlayingGamestate::PlayingGamestate() :
     this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
     this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
 
+    this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
+    this->addStandardItem( new Weapon("Longbow", "longbow", 5, "longbow") );
+
     this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
     this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
 
@@ -822,6 +836,7 @@ PlayingGamestate::PlayingGamestate() :
     //player->initialiseHealth(5); // test
     player->addItem( this->cloneStandardItem("Long Sword") );
     player->addItem( this->cloneStandardItem("Shield") );
+    player->addItem( this->cloneStandardItem("Longbow") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
 
     // create RPG world
@@ -844,7 +859,8 @@ PlayingGamestate::PlayingGamestate() :
         location->addCharacter(enemy, 16.0f, 14.0f);
     }
 
-    location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
+    //location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
+    location->addItem( this->cloneStandardItem("Longbow"), 4.0f, 4.0f );
     location->addItem( this->cloneStandardItem("Shield"), 4.0f, 3.0f );
     location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
     /*{
@@ -971,6 +987,8 @@ PlayingGamestate::PlayingGamestate() :
     qApp->processEvents();
     LOG("longsword layer\n");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
+    LOG("longbow layer\n");
+    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition);
     LOG("shield layer\n");
     this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
     gui_overlay->setProgress(60);

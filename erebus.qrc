@@ -10,5 +10,7 @@
         <file>gfx/textures/items/gold.png</file>
         <file>gfx/textures/isometric_hero/shield.png</file>
         <file>gfx/textures/items/shield.png</file>
+        <file>gfx/textures/isometric_hero/longbow.png</file>
+        <file>gfx/textures/items/longbow.png</file>
     </qresource>
 </RCC>
