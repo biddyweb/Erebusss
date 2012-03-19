@@ -110,6 +110,8 @@ class AnimatedObject : public QGraphicsItem {
     //AnimationLayer *animation_layer;
     vector<AnimationLayer *> animation_layers;
     //const AnimationSet *c_animation_set;
+    bool set_c_animation_name;
+    string c_animation_name;
     vector<const AnimationSet *> c_animation_sets;
     Direction c_direction;
     int c_frame;

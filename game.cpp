@@ -112,7 +112,9 @@ AnimationLayer *AnimationLayer::create(const char *filename, const vector<Animat
     return layer;
 }
 
-AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/ c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0) {
+AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
+    set_c_animation_name(false), c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0)
+{
     //this->setFrame(0);
     for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
         const AnimationSet *c_animation_set = *iter;
@@ -218,21 +220,30 @@ void AnimatedObject::setAnimationSet(string name) {
         animation_time_start_ms = 0;
         this->setFrame(0);
     }*/
-    //qDebug("set animation set: %s", name.c_str());
-    this->c_animation_sets.clear();
-    for(vector<AnimationLayer *>::const_iterator iter = animation_layers.begin(); iter != animation_layers.end(); ++iter) {
-        const AnimationLayer *animation_layer = *iter;
-        const AnimationSet *c_animation_set = animation_layer->getAnimationSet(name);
-        if( c_animation_set == NULL ) {
-            LOG("unknown animation set: %s\n", name.c_str());
-            throw string("Unknown animation set");
+    if( !this->set_c_animation_name || this->c_animation_name != name ) {
+        qDebug("set animation set: %s", name.c_str());
+        this->c_animation_sets.clear();
+        for(vector<AnimationLayer *>::const_iterator iter = animation_layers.begin(); iter != animation_layers.end(); ++iter) {
+            const AnimationLayer *animation_layer = *iter;
+            const AnimationSet *c_animation_set = animation_layer->getAnimationSet(name);
+            if( c_animation_set == NULL ) {
+                LOG("unknown animation set: %s\n", name.c_str());
+                throw string("Unknown animation set");
+            }
+            this->c_animation_sets.push_back(c_animation_set);
         }
-        this->c_animation_sets.push_back(c_animation_set);
     }
+    else {
+        qDebug("reset animation set: %s", name.c_str());
+    }
+
     animation_time_start_ms = 0;
     //this->setFrame(0);
     this->c_frame = 0;
     this->update();
+
+    this->set_c_animation_name = true;
+    this->c_animation_name = name;
 }
 
 void AnimatedObject::setDirection(Direction c_direction) {
@@ -787,11 +798,20 @@ PlayingGamestate::PlayingGamestate() :
 
     location = new Location();
 
-    Character *enemy = new Character("Goblin", "goblin", true);
-    enemy->initialiseHealth(5);
-    enemy->addGold(8);
-    //enemy->addItem( this->cloneStandardItem("Leather Armour") ); // test
-    location->addCharacter(enemy, 4.0f, 4.0f);
+    {
+        Character *enemy = new Character("Goblin", "goblin", true);
+        enemy->initialiseHealth(5);
+        enemy->addGold(8);
+        //enemy->setHostile(false); // test
+        //enemy->addItem( this->cloneStandardItem("Leather Armour") ); // test
+        location->addCharacter(enemy, 4.0f, 4.0f);
+    }
+    {
+        Character *enemy = new Character("Goblin", "goblin", true);
+        enemy->initialiseHealth(6);
+        enemy->addGold(9);
+        location->addCharacter(enemy, 16.0f, 14.0f);
+    }
 
     location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
     location->addItem( this->cloneStandardItem("Shield"), 4.0f, 3.0f );

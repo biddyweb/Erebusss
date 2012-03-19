@@ -19,6 +19,8 @@ class Shield;
 class Armour;
 class Location;
 
+const float npc_visibility_c = 10.0f;
+
 class CharacterListener {
 public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
@@ -32,6 +34,7 @@ class Character {
     // basic info
     string name;
     bool is_ai;
+    bool is_hostile;
     string animation_name; // for NPCs (player is handled separately)
 
     // game data
@@ -84,6 +87,15 @@ public:
     void setLocation(Location *location) {
         this->location = location;
     }
+    bool isAI() const {
+        return this->is_ai;
+    }
+    bool isHostile() const {
+        return this->is_hostile;
+    }
+    void setHostile(bool is_hostile) {
+        this->is_hostile = is_hostile;
+    }
     bool isDead() const {
         return this->is_dead;
     }
@@ -92,10 +104,11 @@ public:
         this->listener_data = listener_data;
     }
     void setDestination(float xdest, float ydest) {
+        bool old_has_destination = this->has_destination;
         this->has_destination = true;
         this->dest.set(xdest, ydest);
         this->is_hitting = false;
-        if( this->listener != NULL ) {
+        if( this->listener != NULL && !old_has_destination ) {
             this->listener->characterSetAnimation(this, this->listener_data, "run");
         }
     }
@@ -103,9 +116,11 @@ public:
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {
             this->target_npc = target_npc;
-            this->is_hitting = false;
-            if( this->listener != NULL ) {
-                this->listener->characterSetAnimation(this, this->listener_data, "");
+            if( this->is_hitting ) {
+                this->is_hitting = false;
+                if( this->listener != NULL ) {
+                    this->listener->characterSetAnimation(this, this->listener_data, "");
+                }
             }
         }
     }

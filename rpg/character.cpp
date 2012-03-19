@@ -7,7 +7,8 @@
 #include <cmath>
 
 Character::Character(string name, string animation_name, bool is_ai) :
-    name(name), animation_name(animation_name), is_ai(is_ai),
+    name(name), animation_name(animation_name),
+    is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     location(NULL), is_dead(false), time_of_death_ms(0),
     listener(NULL), listener_data(NULL),
     has_destination(false), target_npc(NULL), time_last_action_ms(0), is_hitting(false),
@@ -44,50 +45,69 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         return false;
     }
 
+    float hit_range_c = target_npc == NULL ? 0.0f : sqrt(2.0f) * ( this->getRadius() + target_npc->getRadius() );
+    bool ai_try_moving = true;
+
     if( is_hitting && target_npc == NULL ) {
         throw string("is_hitting is true, but no target_npc");
     }
     if( elapsed_ms > time_last_action_ms + 400 && target_npc != NULL && is_hitting ) {
         is_hitting = false;
-        LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
         if( this->listener != NULL ) {
             this->listener->characterSetAnimation(this, this->listener_data, "");
         }
-        if( !target_npc->is_dead ) {
-            target_npc->changeHealth(playing_gamestate, -1);
+
+        float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+        if( dist <= hit_range_c ) {
+            LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
+            ai_try_moving = false; // no point trying to move, just wait to hit again
+            if( !target_npc->is_dead ) {
+                target_npc->changeHealth(playing_gamestate, -1);
+            }
         }
     }
-    else if( elapsed_ms > time_last_action_ms + 1000 && !is_hitting && target_npc != NULL ) {
+    else if( !is_hitting && target_npc != NULL ) {
     //else if( !is_hitting && target_npc != NULL ) {
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        if( dist <= sqrt(2.0f) * ( this->getRadius() + target_npc->getRadius() ) ) {
-            // take a swing!
-            is_hitting = true;
-            has_destination = false;
-            time_last_action_ms = elapsed_ms;
-            if( this->listener != NULL ) {
-                this->listener->characterSetAnimation(this, this->listener_data, "attack");
-                Vector2D dir = target_npc->getPos() - this->getPos();
-                if( dist > 0.0f ) {
-                    dir.normalise();
-                    this->listener->characterTurn(this, this->listener_data, dir);
+        if( dist <= hit_range_c ) {
+            ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
+            if( elapsed_ms > time_last_action_ms + 1000 ) {
+                // take a swing!
+                is_hitting = true;
+                has_destination = false;
+                time_last_action_ms = elapsed_ms;
+                if( this->listener != NULL ) {
+                    this->listener->characterSetAnimation(this, this->listener_data, "attack");
+                    Vector2D dir = target_npc->getPos() - this->getPos();
+                    if( dist > 0.0f ) {
+                        dir.normalise();
+                        this->listener->characterTurn(this, this->listener_data, dir);
+                    }
                 }
             }
         }
     }
 
-    if( is_ai && !is_hitting ) {
-        this->setTargetNPC( playing_gamestate->getPlayer() );
-        if( playing_gamestate->getPlayer() != NULL ) {
-            Vector2D dest = playing_gamestate->getPlayer()->getPos();
-            Vector2D hit_pos;
-            bool hit = location->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
-            if( hit ) {
-                dest = hit_pos;
+    if( is_ai && !is_hitting && ai_try_moving ) {
+        bool done_target = false;
+        if( is_hostile && playing_gamestate->getPlayer() != NULL ) {
+            double dist = (playing_gamestate->getPlayer()->getPos() - this->getPos() ).magnitude();
+            if( dist <= npc_visibility_c ) {
+                this->setTargetNPC( playing_gamestate->getPlayer() );
+                Vector2D dest = playing_gamestate->getPlayer()->getPos();
+                Vector2D hit_pos;
+                bool hit = location->intersectSweptSquareWithBoundaries(this, &hit_pos, this->getPos(), dest, this->getRadius());
+                if( hit ) {
+                    dest = hit_pos;
+                }
+                //qDebug("move to player, dist %f", dist);
+                this->setDestination(dest.x, dest.y);
+                done_target = true;
             }
-            this->setDestination(dest.x, dest.y);
         }
-        else {
+
+        if( !done_target ) {
+            this->setTargetNPC(NULL);
             this->has_destination = false;
         }
     }

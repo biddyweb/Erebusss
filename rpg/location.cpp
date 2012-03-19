@@ -64,12 +64,15 @@ void Location::removeCharacter(Character *character) {
     this->characters.erase(character);
 }
 
-bool Location::hasEnemies(const PlayingGamestate *playing_gamstate) const {
+bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
     bool has_enemies = false;
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !has_enemies; ++iter) {
         const Character *character = *iter;
-        if( character != playing_gamstate->getPlayer() ) {
-            has_enemies = true;
+        if( character->isHostile() ) {
+            float dist = (character->getPos() - playing_gamestate->getPlayer()->getPos()).magnitude();
+            if( dist <= npc_visibility_c ) {
+                has_enemies = true;
+            }
         }
     }
     return has_enemies;
