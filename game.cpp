@@ -221,7 +221,7 @@ void AnimatedObject::setAnimationSet(string name) {
         this->setFrame(0);
     }*/
     if( !this->set_c_animation_name || this->c_animation_name != name ) {
-        qDebug("set animation set: %s", name.c_str());
+        //qDebug("set animation set: %s", name.c_str());
         this->c_animation_sets.clear();
         for(vector<AnimationLayer *>::const_iterator iter = animation_layers.begin(); iter != animation_layers.end(); ++iter) {
             const AnimationLayer *animation_layer = *iter;
@@ -272,6 +272,17 @@ OptionsGamestate::OptionsGamestate()
 
     QVBoxLayout *layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
+
+    QLabel *titleLabel = new QLabel("erebus");
+    titleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed for fix layout problem on Qt Simulator at least, when returning to the options gamestate after playing the game
+    titleLabel->setStyleSheet("QLabel { color : red; }");
+    titleLabel->setAlignment(Qt::AlignCenter);
+    {
+        QFont font = titleLabel->font();
+        font.setPointSize( font.pointSize() + 8 );
+        titleLabel->setFont(font);
+    }
+    layout->addWidget(titleLabel);
 
     QPushButton *startButton = new QPushButton("Start game");
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
