@@ -560,12 +560,17 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         }
     }
     else if( item->getType() == ITEMTYPE_SHIELD ) {
-        armButton->setVisible(true);
-        if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
-            armButton->setText("Disarm Shield");
+        if( playing_gamestate->getPlayer()->getCurrentWeapon() != NULL && playing_gamestate->getPlayer()->getCurrentWeapon()->isTwoHanded() ) {
+            armButton->setVisible(false);
         }
         else {
-            armButton->setText("Arm Shield");
+            armButton->setVisible(true);
+            if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
+                armButton->setText("Disarm Shield");
+            }
+            else {
+                armButton->setText("Arm Shield");
+            }
         }
     }
     else {
@@ -813,11 +818,15 @@ PlayingGamestate::PlayingGamestate() :
     // create RPG data
     LOG("create RPG data\n");
 
+    Weapon *weapon = NULL;
+
     this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
     this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
 
     this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
-    this->addStandardItem( new Weapon("Longbow", "longbow", 5, "longbow") );
+    this->addStandardItem( weapon = new Weapon("Longbow", "longbow", 5, "longbow") );
+    weapon->setRanged(true);
+    weapon->setTwoHanded(true);
 
     this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
     this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );

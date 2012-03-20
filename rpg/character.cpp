@@ -179,6 +179,9 @@ void Character::armWeapon(Weapon *item) {
     // set NULL to disarm
     if( this->current_weapon != item ) {
         this->current_weapon = item;
+        if( item != NULL && item->isTwoHanded() && this->current_shield != NULL ) {
+            this->current_shield = NULL;
+        }
         if( this->listener != NULL ) {
             this->listener->characterUpdateGraphics(this, this->listener_data);
         }
@@ -188,7 +191,10 @@ void Character::armWeapon(Weapon *item) {
 void Character::armShield(Shield *item) {
     // n.b., must be an item owned by Character!
     // set NULL to disarm
-    if( this->current_shield != item ) {
+    if( item != NULL && this->current_weapon != NULL && this->current_weapon->isTwoHanded() ) {
+        // can't arm shield!
+    }
+    else if( this->current_shield != item ) {
         this->current_shield = item;
         if( this->listener != NULL ) {
             this->listener->characterUpdateGraphics(this, this->listener_data);

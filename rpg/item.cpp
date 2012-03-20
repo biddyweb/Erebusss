@@ -13,7 +13,7 @@ Item *Item::clone() const {
 }
 
 Weapon::Weapon(string name, string image_name, int weight, string animation_name) :
-    Item(name, image_name, weight), animation_name(animation_name)
+    Item(name, image_name, weight), animation_name(animation_name), is_ranged(false), is_two_handed(false)
 {
 }
 

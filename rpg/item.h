@@ -69,6 +69,8 @@ public:
 
 class Weapon : public Item {
     string animation_name;
+    bool is_ranged;
+    bool is_two_handed;
 public:
     Weapon(string name, string image_name, int weight, string animation_name);
     virtual ~Weapon() {
@@ -81,6 +83,19 @@ public:
 
     string getAnimationName() const {
         return this->animation_name;
+    }
+
+    void setRanged(bool is_ranged) {
+        this->is_ranged = is_ranged;
+    }
+    bool isRanged() const {
+        return this->is_ranged;
+    }
+    void setTwoHanded(bool is_two_handed) {
+        this->is_two_handed = is_two_handed;
+    }
+    bool isTwoHanded() const {
+        return this->is_two_handed;
     }
 };
 
