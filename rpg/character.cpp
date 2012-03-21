@@ -52,13 +52,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         throw string("is_hitting is true, but no target_npc");
     }
     if( elapsed_ms > time_last_action_ms + 400 && target_npc != NULL && is_hitting ) {
-        is_hitting = false;
-        if( this->listener != NULL ) {
-            this->listener->characterSetAnimation(this, this->listener_data, "");
-        }
+        this->setStateIdle();
 
+        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        if( dist <= hit_range_c ) {
+        if( is_ranged || dist <= hit_range_c ) {
             LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
             ai_try_moving = false; // no point trying to move, just wait to hit again
             if( !target_npc->is_dead ) {
@@ -68,8 +66,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
     else if( !is_hitting && target_npc != NULL ) {
     //else if( !is_hitting && target_npc != NULL ) {
+        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        if( dist <= hit_range_c ) {
+        if( is_ranged || dist <= hit_range_c ) {
             ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
             if( elapsed_ms > time_last_action_ms + 1000 ) {
                 // take a swing!
@@ -77,7 +76,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 has_destination = false;
                 time_last_action_ms = elapsed_ms;
                 if( this->listener != NULL ) {
-                    this->listener->characterSetAnimation(this, this->listener_data, "attack");
+                    string anim = is_ranged ? "ranged" : "attack";
+                    this->listener->characterSetAnimation(this, this->listener_data, anim);
                     Vector2D dir = target_npc->getPos() - this->getPos();
                     if( dist > 0.0f ) {
                         dir.normalise();
@@ -124,10 +124,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         Vector2D new_pos = pos;
         if( step >= dist ) {
             new_pos = this->dest;
-            this->has_destination = false;
-            if( this->listener != NULL ) {
-                this->listener->characterSetAnimation(this, this->listener_data, "");
-            }
+            this->setStateIdle();
         }
         else {
             /*diff_x /= dist;
@@ -141,6 +138,14 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     return false;
+}
+
+void Character::setStateIdle() {
+    has_destination = false;
+    is_hitting = false;
+    if( this->listener != NULL ) {
+        this->listener->characterSetAnimation(this, this->listener_data, "");
+    }
 }
 
 int Character::changeHealth(const PlayingGamestate *playing_gamestate, int change) {
@@ -179,6 +184,10 @@ void Character::armWeapon(Weapon *item) {
     // set NULL to disarm
     if( this->current_weapon != item ) {
         this->current_weapon = item;
+        if( this->is_hitting ) {
+            qDebug("cancel attack due to changing weapon");
+            this->setStateIdle();
+        }
         if( item != NULL && item->isTwoHanded() && this->current_shield != NULL ) {
             this->current_shield = NULL;
         }

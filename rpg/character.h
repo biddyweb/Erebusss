@@ -59,6 +59,8 @@ class Character {
     Armour *current_armour;
     int gold;
 
+    void setStateIdle();
+
 public:
     Character(string name, string animation_name, bool is_ai);
     ~Character();

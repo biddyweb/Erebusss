@@ -979,6 +979,7 @@ PlayingGamestate::PlayingGamestate() :
     player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     LOG("clothes layer\n");
     int time_s = clock();
@@ -1009,6 +1010,7 @@ PlayingGamestate::PlayingGamestate() :
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 20, 3, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 24, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/goblin.png", goblin_animation_layer_definition);
 
