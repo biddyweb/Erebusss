@@ -341,6 +341,7 @@ public:
 
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
+    void addTextEffect(string text, Vector2D pos, int duration_ms);
 
     Character *getPlayer() {
         return this->player;

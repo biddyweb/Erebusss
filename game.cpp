@@ -515,10 +515,6 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        dropButton = new QPushButton("Drop Item");
-        h_layout->addWidget(dropButton);
-        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
-
         //armButton = new QPushButton("Arm Weapon");
         armButton = new QPushButton(""); // text set in changedSelectedItem()
         h_layout->addWidget(armButton);
@@ -527,6 +523,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
+
+        dropButton = new QPushButton("Drop Item");
+        h_layout->addWidget(dropButton);
+        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
     }
 
     QPushButton *closeButton = new QPushButton("Close");
@@ -851,8 +851,8 @@ PlayingGamestate::PlayingGamestate() :
     this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
 
     this->item_images["arrow"] = game_g->loadImage(":/gfx/textures/items/arrow.png", true, 0, 16, 64, 32);
-    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
-    this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 3) );
+    this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
+    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 3) );
 
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
     this->addStandardItem( new Currency("Gold", "gold"));
@@ -900,7 +900,7 @@ PlayingGamestate::PlayingGamestate() :
         location->addItem(item, 1.0f, 1.0f);
     }*/
     location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
-    //location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
+    location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -1071,11 +1071,12 @@ PlayingGamestate::PlayingGamestate() :
         //item->setAnimationSet("attack"); // test
     }
 
-    {
+    /*{
         TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
         text_effect->setPos( player->getPos().x, player->getPos().y );
         scene->addItem(text_effect);
-    }
+    }*/
+    this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
     gui_overlay->unsetProgress();
     qApp->processEvents();
@@ -1433,14 +1434,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
             if( picked_item != NULL ) {
-                TextEffect *text_effect = new TextEffect(picked_item->getName().c_str(), 2000);
+                /*TextEffect *text_effect = new TextEffect(picked_item->getName().c_str(), 2000);
                 text_effect->setPos( player->getPos().x - 0.5*font_scale*text_effect->boundingRect().width(), player->getPos().y - 1.0f );
-                /*QFont font = text_effect->font();
-                font.setPointSize(1);
-                text_effect->setFont(font);*/
                 text_effect->setScale(font_scale);
                 text_effect->setZValue(text_effect->pos().y() + 1.0f);
-                scene->addItem(text_effect);
+                scene->addItem(text_effect);*/
+                this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
 
                 player->pickupItem(picked_item);
             }
@@ -1451,6 +1450,17 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 void PlayingGamestate::addWidget(QWidget *widget) {
     this->main_stacked_widget->addWidget(widget);
     this->main_stacked_widget->setCurrentWidget(widget);
+}
+
+void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms) {
+    TextEffect *text_effect = new TextEffect(text.c_str(), duration_ms);
+    text_effect->setPos( pos.x - 0.5*font_scale*text_effect->boundingRect().width(), pos.y - 1.0f );
+    /*QFont font = text_effect->font();
+    font.setPointSize(1);
+    text_effect->setFont(font);*/
+    text_effect->setScale(font_scale);
+    text_effect->setZValue(text_effect->pos().y() + 1.0f);
+    scene->addItem(text_effect);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {

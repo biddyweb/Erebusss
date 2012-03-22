@@ -66,3 +66,9 @@ Currency::Currency(string name, string image_name) :
 Currency *Currency::clone() const {
     return new Currency(*this);
 }
+
+string Currency::getName() const {
+    stringstream currency_name;
+    currency_name << value << " " << this->name;
+    return currency_name.str();
+}

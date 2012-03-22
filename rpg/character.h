@@ -63,7 +63,7 @@ class Character {
     void setStateIdle();
 
     Item *findItem(string key);
-    void useAmmo(Ammo *ammo);
+    bool useAmmo(Ammo *ammo);
 
 public:
     Character(string name, string animation_name, bool is_ai);

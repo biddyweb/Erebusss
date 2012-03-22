@@ -190,6 +190,7 @@ public:
     }
     virtual Currency *clone() const; // virtual copy constructor
 
+    virtual string getName() const;
     int getValue() const {
         return this->value;
     }

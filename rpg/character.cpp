@@ -41,8 +41,9 @@ Item *Character::findItem(string key) {
     return NULL;
 }
 
-void Character::useAmmo(Ammo *ammo) {
+bool Character::useAmmo(Ammo *ammo) {
     // n.b., must be an item owned by Character!
+    bool used_up = false;
     int amount = ammo->getAmount();
     if( amount <= 0 ) {
         LOG("ammo is already non-positive: %d\n", amount);
@@ -55,7 +56,9 @@ void Character::useAmmo(Ammo *ammo) {
     else {
         this->items.erase(ammo);
         delete ammo;
+        used_up = true;
     }
+    return used_up;
 }
 
 bool Character::update(PlayingGamestate *playing_gamestate) {
@@ -103,8 +106,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 // take a swing!
                 bool can_hit = true;
                 Ammo *ammo = NULL;
+                string ammo_key;
                 if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
-                    string ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                    ammo_key = this->getCurrentWeapon()->getAmmoKey();
                     Item *item = this->findItem(ammo_key);
                     if( item == NULL ) {
                         can_hit = false;
@@ -119,7 +123,16 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 }
                 if( can_hit ) {
                     if( ammo != NULL ) {
-                        this->useAmmo(ammo);
+                        // ammo will be deleted if used up!
+                        if( this->useAmmo(ammo) ) {
+                            ammo = NULL; // just to be safe, as pointer now deleted
+                            if( this->findItem(ammo_key) == NULL ) {
+                                // really has used up all available ammo
+                                if( this == playing_gamestate->getPlayer() ) {
+                                    playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                }
+                            }
+                        }
                     }
                     is_hitting = true;
                     has_destination = false;
