@@ -1,5 +1,8 @@
 #include "item.h"
 
+#include <sstream>
+using std::stringstream;
+
 Item::Item(string name, string image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), weight(weight)
 {
@@ -13,7 +16,8 @@ Item *Item::clone() const {
 }
 
 Weapon::Weapon(string name, string image_name, int weight, string animation_name) :
-    Item(name, image_name, weight), animation_name(animation_name), is_ranged(false), is_two_handed(false)
+    Item(name, image_name, weight), animation_name(animation_name),
+    is_two_handed(false), is_ranged(false), requires_ammo(false)
 {
 }
 
@@ -39,8 +43,23 @@ Armour *Armour::clone() const {
     return new Armour(*this);
 }
 
+Ammo::Ammo(string name, string image_name, string projectile_image_name, int amount) :
+    Item(name, image_name, 0), projectile_image_name(projectile_image_name), amount(amount)
+{
+}
+
+Ammo *Ammo::clone() const {
+    return new Ammo(*this);
+}
+
+string Ammo::getName() const {
+    stringstream ammo_name;
+    ammo_name << this->name << " (" << amount << ")";
+    return ammo_name.str();
+}
+
 Currency::Currency(string name, string image_name) :
-    Item(name, image_name, 0)
+    Item(name, image_name, 0), value(0)
 {
 }
 

@@ -134,6 +134,16 @@ public:
     void setDirection(Direction c_direction);
 };
 
+class TextEffect : public QGraphicsTextItem {
+    int time_expire;
+
+    virtual void advance(int phase);
+public:
+    TextEffect(const QString &text, int duration_ms);
+    virtual ~TextEffect() {
+    }
+};
+
 class Gamestate : public QObject {
 public:
     //virtual VI_Panel *getPanel()=0;

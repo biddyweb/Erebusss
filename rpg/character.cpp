@@ -29,6 +29,35 @@ Character::~Character() {
     }
 }
 
+Item *Character::findItem(string key) {
+    //qDebug("Character::findItem(%s)", key.c_str());
+    for(set<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        Item *item = *iter;
+        //qDebug("    compare to: %s", item->getKey().c_str());
+        if( item->getKey() == key )
+            return item;
+    }
+    //qDebug("    not found");
+    return NULL;
+}
+
+void Character::useAmmo(Ammo *ammo) {
+    // n.b., must be an item owned by Character!
+    int amount = ammo->getAmount();
+    if( amount <= 0 ) {
+        LOG("ammo is already non-positive: %d\n", amount);
+        throw "ammo amount not greater than 0";
+    }
+    amount--;
+    if( amount > 0 ) {
+        ammo->setAmount(amount);
+    }
+    else {
+        this->items.erase(ammo);
+        delete ammo;
+    }
+}
+
 bool Character::update(PlayingGamestate *playing_gamestate) {
     if( this->location == NULL ) {
         return false;
@@ -72,16 +101,37 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
             if( elapsed_ms > time_last_action_ms + 1000 ) {
                 // take a swing!
-                is_hitting = true;
-                has_destination = false;
-                time_last_action_ms = elapsed_ms;
-                if( this->listener != NULL ) {
-                    string anim = is_ranged ? "ranged" : "attack";
-                    this->listener->characterSetAnimation(this, this->listener_data, anim);
-                    Vector2D dir = target_npc->getPos() - this->getPos();
-                    if( dist > 0.0f ) {
-                        dir.normalise();
-                        this->listener->characterTurn(this, this->listener_data, dir);
+                bool can_hit = true;
+                Ammo *ammo = NULL;
+                if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                    string ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                    Item *item = this->findItem(ammo_key);
+                    if( item == NULL ) {
+                        can_hit = false;
+                    }
+                    else if( item->getType() != ITEMTYPE_AMMO ) {
+                        LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                        throw "required ammo type is not ammo";
+                    }
+                    else {
+                        ammo = static_cast<Ammo *>(item);
+                    }
+                }
+                if( can_hit ) {
+                    if( ammo != NULL ) {
+                        this->useAmmo(ammo);
+                    }
+                    is_hitting = true;
+                    has_destination = false;
+                    time_last_action_ms = elapsed_ms;
+                    if( this->listener != NULL ) {
+                        string anim = is_ranged ? "ranged" : "attack";
+                        this->listener->characterSetAnimation(this, this->listener_data, anim);
+                        Vector2D dir = target_npc->getPos() - this->getPos();
+                        if( dist > 0.0f ) {
+                            dir.normalise();
+                            this->listener->characterTurn(this, this->listener_data, dir);
+                        }
                     }
                 }
             }

@@ -10,10 +10,12 @@ enum ItemType {
     ITEMTYPE_WEAPON = 1,
     ITEMTYPE_SHIELD = 2,
     ITEMTYPE_ARMOUR = 3,
-    ITEMTYPE_CURRENCY = 4
+    ITEMTYPE_AMMO = 4,
+    ITEMTYPE_CURRENCY = 5
 };
 
 class Item {
+protected:
     string name;
     string image_name;
     Vector2D pos; // when stored in a Location
@@ -47,7 +49,12 @@ public:
     Vector2D getPos() const {
         return this->pos;
     }
-    string getName() const {
+    string getKey() const {
+        // the name is used as an ID key
+        return this->name;
+    }
+    virtual string getName() const {
+        // may be overloaded to give more descriptive names
         return this->name;
     }
     string getImageName() const {
@@ -69,8 +76,10 @@ public:
 
 class Weapon : public Item {
     string animation_name;
-    bool is_ranged;
     bool is_two_handed;
+    bool is_ranged;
+    bool requires_ammo;
+    string ammo_key;
 public:
     Weapon(string name, string image_name, int weight, string animation_name);
     virtual ~Weapon() {
@@ -85,17 +94,27 @@ public:
         return this->animation_name;
     }
 
+    void setTwoHanded(bool is_two_handed) {
+        this->is_two_handed = is_two_handed;
+    }
+    bool isTwoHanded() const {
+        return this->is_two_handed;
+    }
     void setRanged(bool is_ranged) {
         this->is_ranged = is_ranged;
     }
     bool isRanged() const {
         return this->is_ranged;
     }
-    void setTwoHanded(bool is_two_handed) {
-        this->is_two_handed = is_two_handed;
+    void setRequiresAmmo(bool requires_ammo, string ammo_key) {
+        this->requires_ammo = requires_ammo;
+        this->ammo_key = ammo_key;
     }
-    bool isTwoHanded() const {
-        return this->is_two_handed;
+    bool getRequiresAmmo() const {
+        return this->requires_ammo;
+    }
+    string getAmmoKey() const {
+        return this->requires_ammo ? this->ammo_key : "";
     }
 };
 
@@ -130,6 +149,32 @@ public:
 
     int getRating() const {
         return this->rating;
+    }
+};
+
+class Ammo : public Item {
+    string projectile_image_name;
+    int amount;
+public:
+    Ammo(string name, string image_name, string projectile_image_name, int amount);
+    virtual ~Ammo() {
+    }
+
+    virtual ItemType getType() const {
+        return ITEMTYPE_AMMO;
+    }
+    virtual Ammo *clone() const; // virtual copy constructor
+
+    virtual string getName() const;
+
+    string getProjectileImageName() const {
+        return this->projectile_image_name;
+    }
+    int getAmount() const {
+        return this->amount;
+    }
+    void setAmount(int amount) {
+        this->amount = amount;
     }
 };
 

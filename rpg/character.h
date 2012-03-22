@@ -17,6 +17,7 @@ class Item;
 class Weapon;
 class Shield;
 class Armour;
+class Ammo;
 class Location;
 
 const float npc_visibility_c = 10.0f;
@@ -60,6 +61,9 @@ class Character {
     int gold;
 
     void setStateIdle();
+
+    Item *findItem(string key);
+    void useAmmo(Ammo *ammo);
 
 public:
     Character(string name, string animation_name, bool is_ai);

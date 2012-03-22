@@ -18,6 +18,7 @@ const int versionMinor = 1;
 
 const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
+const float font_scale = 1.0f/64.0f;
 
 //const int scene_item_character_key_c = 0;
 
@@ -251,6 +252,20 @@ void AnimatedObject::setDirection(Direction c_direction) {
         this->c_direction = c_direction;
         //this->setFrame(0);
         this->update();
+    }
+}
+
+TextEffect::TextEffect(const QString &text, int duration_ms) :
+    QGraphicsTextItem(text), time_expire(0) {
+    this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
+}
+
+void TextEffect::advance(int phase) {
+    if( phase == 0 ) {
+        if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
+            this->scene()->removeItem(this);
+            this->deleteLater();
+        }
     }
 }
 
@@ -825,14 +840,19 @@ PlayingGamestate::PlayingGamestate() :
 
     this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
     this->addStandardItem( weapon = new Weapon("Longbow", "longbow", 5, "longbow") );
-    weapon->setRanged(true);
     weapon->setTwoHanded(true);
+    weapon->setRanged(true);
+    weapon->setRequiresAmmo(true, "Arrows");
 
     this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
     this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
 
     this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
     this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
+
+    this->item_images["arrow"] = game_g->loadImage(":/gfx/textures/items/arrow.png", true, 0, 16, 64, 32);
+    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
+    this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 3) );
 
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
     this->addStandardItem( new Currency("Gold", "gold"));
@@ -847,6 +867,7 @@ PlayingGamestate::PlayingGamestate() :
     player->addItem( this->cloneStandardItem("Shield") );
     player->addItem( this->cloneStandardItem("Longbow") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
+    player->addItem( this->cloneStandardItem("Arrows") );
 
     // create RPG world
     LOG("create RPG world\n");
@@ -879,6 +900,7 @@ PlayingGamestate::PlayingGamestate() :
         location->addItem(item, 1.0f, 1.0f);
     }*/
     location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
+    //location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -1047,6 +1069,12 @@ PlayingGamestate::PlayingGamestate() :
 
         character->setListener(this, object);
         //item->setAnimationSet("attack"); // test
+    }
+
+    {
+        TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
+        text_effect->setPos( player->getPos().x, player->getPos().y );
+        scene->addItem(text_effect);
     }
 
     gui_overlay->unsetProgress();
@@ -1405,6 +1433,15 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
             if( picked_item != NULL ) {
+                TextEffect *text_effect = new TextEffect(picked_item->getName().c_str(), 2000);
+                text_effect->setPos( player->getPos().x - 0.5*font_scale*text_effect->boundingRect().width(), player->getPos().y - 1.0f );
+                /*QFont font = text_effect->font();
+                font.setPointSize(1);
+                text_effect->setFont(font);*/
+                text_effect->setScale(font_scale);
+                text_effect->setZValue(text_effect->pos().y() + 1.0f);
+                scene->addItem(text_effect);
+
                 player->pickupItem(picked_item);
             }
         }
@@ -1417,7 +1454,7 @@ void PlayingGamestate::addWidget(QWidget *widget) {
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
-    this->standard_items[item->getName()] = item;
+    this->standard_items[item->getKey()] = item;
 }
 
 Item *PlayingGamestate::cloneStandardItem(string name) const {
