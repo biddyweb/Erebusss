@@ -13,5 +13,7 @@
         <file>gfx/textures/isometric_hero/longbow.png</file>
         <file>gfx/textures/items/longbow.png</file>
         <file>gfx/textures/items/arrow.png</file>
+        <file>gfx/textures/items/potion_red.png</file>
+        <file>gfx/textures/scenery/containers.png</file>
     </qresource>
 </RCC>

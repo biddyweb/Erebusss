@@ -109,6 +109,12 @@ public:
     const float magnitude() const {
         return sqrt( x*x + y*y );
     }
+    /*const float magnitudeChebyshev() const {
+        double dist_x = abs(x);
+        double dist_y = abs(y);
+        double max_dist = dist_x > dist_y ? dist_x : dist_y;
+        return max_dist;
+    }*/
     const float dot(const Vector2D *v) const {
         return ( x * v->x + y * v->y);
     }

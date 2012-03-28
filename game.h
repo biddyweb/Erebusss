@@ -271,9 +271,12 @@ class ItemsWindow : public QWidget {
     QPushButton *dropButton;
     QPushButton *armButton;
     QPushButton *wearButton;
+    QPushButton *useButton;
 
     QString getItemString(const Item *item) const;
-    void setWeightLabel(int weight);
+    //void setWeightLabel(int weight);
+    void setWeightLabel();
+    void itemIsDeleted(int index);
 
 private slots:
     void changedSelectedItem(int currentRow);
@@ -281,6 +284,7 @@ private slots:
     void clickedDropItem();
     void clickedArmWeapon();
     void clickedWearArmour();
+    void clickedUseItem();
 
 public:
     ItemsWindow(PlayingGamestate *playing_gamestate);
@@ -314,6 +318,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, AnimationLayer *> animation_layers;
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
+    map<string, QPixmap> scenery_images;
 
 private slots:
     void clickedItems();
@@ -338,6 +343,9 @@ public:
 
     virtual void locationAddItem(const Location *location, Item *item);
     virtual void locationRemoveItem(const Location *location, Item *item);
+
+    virtual void locationAddScenery(const Location *location, Scenery *scenery);
+    virtual void locationRemoveScenery(const Location *location, Scenery *scenery);
 
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);

@@ -92,7 +92,19 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
             ai_try_moving = false; // no point trying to move, just wait to hit again
             if( !target_npc->is_dead ) {
-                target_npc->changeHealth(playing_gamestate, -1);
+                //target_npc->changeHealth(playing_gamestate, -1);
+                target_npc->decreaseHealth(playing_gamestate, 1);
+                string text;
+                int r = rand() % 4;
+                if( r == 0 )
+                    text = "Argh!";
+                else if( r == 1 )
+                    text = "Ow!";
+                else if( r == 2 )
+                    text = "Ouch!";
+                else
+                    text = "Eek!";
+                playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
             }
         }
     }
@@ -211,7 +223,7 @@ void Character::setStateIdle() {
     }
 }
 
-int Character::changeHealth(const PlayingGamestate *playing_gamestate, int change) {
+/*int Character::changeHealth(const PlayingGamestate *playing_gamestate, int change) {
     if( this->is_dead ) {
         LOG("tried to changeHealth of %s by %d - already dead!\n", this->getName().c_str(), change);
         throw string("can't change health of dead character");
@@ -219,6 +231,52 @@ int Character::changeHealth(const PlayingGamestate *playing_gamestate, int chang
     this->health += change;
     if( health > max_health )
         health = max_health;
+    if( health <= 0 ) {
+        LOG("%s has died\n", this->getName().c_str());
+        int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+        this->is_dead = true;
+        this->time_of_death_ms = elapsed_ms;
+        if( this->listener != NULL ) {
+            this->listener->characterSetAnimation(this, this->listener_data, "death");
+        }
+        if( this->location != NULL ) {
+            while( this->items.size() > 0 ) {
+                Item *item = *this->items.begin();
+                this->dropItem(item);
+            }
+            if( this->gold > 0 ) {
+                Currency *currency = playing_gamestate->cloneGoldItem(this->gold);
+                location->addItem(currency, this->pos.x, this->pos.y);
+                this->gold = 0;
+            }
+        }
+    }
+    return this->health;
+}*/
+
+int Character::increaseHealth(int increase) {
+    if( this->is_dead ) {
+        LOG("tried to increaseHealth of %s by %d - already dead!\n", this->getName().c_str(), increase);
+        throw string("can't increase health of dead character");
+    }
+    else if( increase <= 0 ) {
+        LOG("increaseHealth: received non-positive increase: %d\n", increase);
+    }
+    this->health += increase;
+    if( health > max_health )
+        health = max_health;
+    return this->health;
+}
+
+int Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease) {
+    if( this->is_dead ) {
+        LOG("tried to decreaseHealth of %s by %d - already dead!\n", this->getName().c_str(), decrease);
+        throw string("can't decrease health of dead character");
+    }
+    else if( decrease <= 0 ) {
+        LOG("decreaseHealth: received non-positive decrease: %d\n", decrease);
+    }
+    this->health -= decrease;
     if( health <= 0 ) {
         LOG("%s has died\n", this->getName().c_str());
         int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
@@ -349,4 +407,13 @@ void Character::addGold(int change) {
         LOG("Character::addGold(), removed %d, leaves %d\n", change, this->gold);
         throw string("removed too much gold from character");
     }
+}
+
+int Character::getItemsWeight() const {
+    int weight = 0;
+    for(set<Item *>::const_iterator iter = this->items.begin();iter != this->items.end(); ++iter) {
+        const Item *item = *iter;
+        weight += item->getWeight();
+    }
+    return weight;
 }

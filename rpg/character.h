@@ -156,7 +156,9 @@ public:
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }
-    int changeHealth(const PlayingGamestate *playing_gamestate, int change);
+    //int changeHealth(const PlayingGamestate *playing_gamestate, int change);
+    int increaseHealth(int increase);
+    int decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease);
     void restoreHealth() {
         this->health = this->max_health;
     }
@@ -201,4 +203,5 @@ public:
         return this->gold;
     }
     void addGold(int change);
+    int getItemsWeight() const;
 };

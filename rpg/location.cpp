@@ -10,6 +10,19 @@ using std::min;
 using std::max;
 using std::swap;
 
+Scenery::Scenery(string name, string image_name) :
+    name(name), image_name(image_name), user_data_gfx(NULL)
+{
+}
+
+void Scenery::addItem(Item *item) {
+    this->items.insert(item);
+}
+
+void Scenery::removeItem(Item *item) {
+    this->items.erase(item);
+}
+
 FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     FloorRegion *floor_regions = new FloorRegion();
     floor_regions->points.push_back(Vector2D(x, y));
@@ -37,6 +50,10 @@ Location::~Location() {
     for(set<Item *>::iterator iter = items.begin(); iter != items.end(); ++iter) {
         Item *item = *iter;
         delete item;
+    }
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        delete scenery;
     }
 }
 
@@ -91,6 +108,50 @@ void Location::removeItem(Item *item) {
     if( this->listener != NULL ) {
         this->listener->locationRemoveItem(this, item);
     }
+}
+
+void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
+    scenery->setPos(xpos, ypos);
+    this->scenerys.insert(scenery);
+    if( this->listener != NULL ) {
+        this->listener->locationAddScenery(this, scenery);
+    }
+}
+
+// n.b., would require us to remove the corresponding boundary for collision detection too!
+/*void Location::removeScenery(Scenery *scenery) {
+    this->scenerys.erase(scenery);
+    if( this->listener != NULL ) {
+        this->listener->locationRemoveScenery(this, scenery);
+    }
+}*/
+
+void Location::createBoundariesForScenery() {
+    LOG("createBoundariesForScenery()\n");
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        Polygon2D boundary;
+        /*Vector2D pos = scenery->getPos();
+        // clockwise, as "inside" should be on the left
+        boundary.addPoint(pos);
+        boundary.addPoint(pos + Vector2D(1.0f, 0.0f));
+        boundary.addPoint(pos + Vector2D(1.0f, 1.0f));
+        boundary.addPoint(pos + Vector2D(0.0f, 1.0f));*/
+        float width = 1.0f, height = 1.0f;
+        Vector2D pos = scenery->getPos();
+        //qDebug("scenery at %f, %f", pos.x, pos.y);
+        // clockwise, as "inside" should be on the left
+        Vector2D p0 = pos; p0.x -= 0.5f*width; p0.y -= 0.5f*height;
+        Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
+        Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
+        Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
+        boundary.addPoint(p0);
+        boundary.addPoint(p1);
+        boundary.addPoint(p2);
+        boundary.addPoint(p3);
+        this->addBoundary(boundary);
+    }
+    LOG("    done\n");
 }
 
 void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) {
@@ -513,7 +574,7 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
     vector<Vector2D> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
-        int n_points = boundary->getNPoints();
+        size_t n_points = boundary->getNPoints();
         for(size_t j=0;j<n_points;j++) {
             Vector2D p_point = boundary->getPoint((j+n_points-1) % n_points);
             Vector2D point = boundary->getPoint(j);
@@ -521,6 +582,9 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
             Vector2D d0 = point - p_point;
             Vector2D d1 = n_point - point;
             if( d0.magnitude() < E_TOL_LINEAR || d1.magnitude() < E_TOL_LINEAR ) {
+                LOG("p_point: %f, %f\n", p_point.x, p_point.y);
+                LOG("point: %f, %f\n", point.x, point.y);
+                LOG("n_point: %f, %f\n", n_point.x, n_point.y);
                 throw string("coi boundary points not allowed");
             }
             d0.normalise();

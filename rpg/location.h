@@ -4,11 +4,14 @@
 using std::vector;
 #include <set>
 using std::set;
+#include <string>
+using std::string;
 
 #include "utils.h"
 
 class Character;
 class Item;
+class Scenery;
 class Location;
 class PlayingGamestate;
 
@@ -16,6 +19,68 @@ class LocationListener {
 public:
     virtual void locationAddItem(const Location *location, Item *item)=0;
     virtual void locationRemoveItem(const Location *location, Item *item)=0;
+
+    virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
+    virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
+};
+
+class Scenery {
+protected:
+    string name;
+    string image_name;
+    Vector2D pos; // pos in Location
+    void *user_data_gfx;
+
+    set<Item *> items;
+
+public:
+    Scenery(string name, string image_name);
+    virtual ~Scenery() {
+    }
+
+    void setPos(float xpos, float ypos) {
+        this->pos.set(xpos, ypos);
+    }
+    float getX() const {
+        return this->pos.x;
+    }
+    float getY() const {
+        return this->pos.y;
+    }
+    Vector2D getPos() const {
+        return this->pos;
+    }
+    string getName() const {
+        return this->name;
+    }
+    string getImageName() const {
+        return this->image_name;
+    }
+    void setUserGfxData(void *user_data_gfx) {
+        this->user_data_gfx = user_data_gfx;
+    }
+    void *getUserGfxData() {
+        return this->user_data_gfx;
+    }
+
+    void addItem(Item *item);
+    void removeItem(Item *item);
+    void eraseAllItems() {
+        // n.b., don't delete
+        this->items.clear();
+    }
+    set<Item *>::iterator itemsBegin() {
+        return this->items.begin();
+    }
+    set<Item *>::const_iterator itemsBegin() const {
+        return this->items.begin();
+    }
+    set<Item *>::iterator itemsEnd() {
+        return this->items.end();
+    }
+    set<Item *>::const_iterator itemsEnd() const {
+        return this->items.end();
+    }
 };
 
 class FloorRegion : public Polygon2D {
@@ -39,6 +104,7 @@ class Location {
 
     set<Character *> characters;
     set<Item *> items;
+    set<Scenery *> scenerys;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
 public:
@@ -107,6 +173,21 @@ public:
     }
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
+    }
+    void addScenery(Scenery *scenery, float xpos, float ypos);
+    //void removeScenery(Scenery *scenery);
+    void createBoundariesForScenery();
+    set<Scenery *>::iterator scenerysBegin() {
+        return this->scenerys.begin();
+    }
+    set<Scenery *>::const_iterator scenerysBegin() const {
+        return this->scenerys.begin();
+    }
+    set<Scenery *>::iterator scenerysEnd() {
+        return this->scenerys.end();
+    }
+    set<Scenery *>::const_iterator scenerysEnd() const {
+        return this->scenerys.end();
     }
 
     bool intersectSweptSquareWithBoundaries(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width);

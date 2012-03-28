@@ -17,7 +17,9 @@ const int versionMajor = 0;
 const int versionMinor = 1;
 
 const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
-const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
+//const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
+const float item_width = 1.0f;
+const float scenery_width = item_width;
 const float font_scale = 1.0f/64.0f;
 
 //const int scene_item_character_key_c = 0;
@@ -463,7 +465,7 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
-    dropButton(NULL), armButton(NULL), wearButton(NULL)
+    dropButton(NULL), armButton(NULL), wearButton(NULL), useButton(NULL)
 {
 
     playing_gamestate->addWidget(this);
@@ -486,10 +488,16 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    int weight = 0;
+    /*int weight = 0;
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
         Item *item = *iter;
         weight += item->getWeight();
+        QString item_str = this->getItemString(item);
+        list->addItem( item_str );
+        list_items.push_back(item);
+    }*/
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
         QString item_str = this->getItemString(item);
         list->addItem( item_str );
         list_items.push_back(item);
@@ -508,7 +516,8 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         weightLabel = new QLabel(""); // label set in setWeightLabel()
         weightLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(weightLabel);
-        this->setWeightLabel(weight);
+        //this->setWeightLabel(weight);
+        this->setWeightLabel();
     }
 
     {
@@ -523,6 +532,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
+
+        useButton = new QPushButton(""); // text set in changedSelectedItem()
+        h_layout->addWidget(useButton);
+        connect(useButton, SIGNAL(clicked()), this, SLOT(clickedUseItem()));
 
         dropButton = new QPushButton("Drop Item");
         h_layout->addWidget(dropButton);
@@ -561,6 +574,7 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         dropButton->setVisible(false);
         armButton->setVisible(false);
         wearButton->setVisible(false);
+        useButton->setVisible(false);
         return;
     }
     dropButton->setVisible(true);
@@ -603,9 +617,23 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
             wearButton->setText("Wear Armour");
         }
     }
+
+    if( !item->canUse() ) {
+        useButton->setVisible(false);
+    }
+    else {
+        useButton->setVisible(true);
+        useButton->setText(item->getUseVerb().c_str());
+    }
 }
 
-void ItemsWindow::setWeightLabel(int weight) {
+/*void ItemsWindow::setWeightLabel(int weight) {
+    this->weightLabel->setText("Weight: " + QString::number(weight));
+}*/
+
+void ItemsWindow::setWeightLabel() {
+    Character *player = this->playing_gamestate->getPlayer();
+    int weight = player->getItemsWeight();
     this->weightLabel->setText("Weight: " + QString::number(weight));
 }
 
@@ -630,21 +658,7 @@ void ItemsWindow::clickedDropItem() {
         list->addItem( item->getName().c_str() );
         list_items.push_back(item);
     }*/
-    QListWidgetItem *list_item = list->takeItem(index);
-    delete list_item;
-    list_items.erase(list_items.begin() + index);
-    if( list_items.size() > 0 ) {
-        if( index > list_items.size()-1 )
-            index = list_items.size()-1;
-        list->setCurrentRow(index);
-    }
-
-    int weight = 0;
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        weight += item->getWeight();
-    }
-    this->setWeightLabel(weight);
+    this->itemIsDeleted(index);
 }
 
 void ItemsWindow::clickedArmWeapon() {
@@ -685,7 +699,7 @@ void ItemsWindow::clickedArmWeapon() {
 
     /*QListWidgetItem *item_widget = list->item(index);
     item_widget->setText( this->getItemString(item) );*/
-    for(int i=0;i<list_items.size();i++) {
+    for(size_t i=0;i<list_items.size();i++) {
         const Item *item = list_items.at(i);
         QListWidgetItem *item_widget = list->item(i);
         item_widget->setText( this->getItemString(item) );
@@ -718,12 +732,41 @@ void ItemsWindow::clickedWearArmour() {
 
     /*QListWidgetItem *item_widget = list->item(index);
     item_widget->setText( this->getItemString(item) );*/
-    for(int i=0;i<list_items.size();i++) {
+    for(size_t i=0;i<list_items.size();i++) {
         const Item *item = list_items.at(i);
         QListWidgetItem *item_widget = list->item(i);
         item_widget->setText( this->getItemString(item) );
     }
     this->changedSelectedItem(index);
+}
+
+void ItemsWindow::clickedUseItem() {
+    LOG("clickedUseItem()\n");
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    Item *item = list_items.at(index);
+    Character *player = this->playing_gamestate->getPlayer();
+    if( item->use(this->playing_gamestate, player) ) {
+        // item is deleted
+        item = NULL;
+        this->itemIsDeleted(index);
+    }
+}
+
+void ItemsWindow::itemIsDeleted(int index) {
+    QListWidgetItem *list_item = list->takeItem(index);
+    delete list_item;
+    list_items.erase(list_items.begin() + index);
+    if( list_items.size() > 0 ) {
+        if( index > list_items.size()-1 )
+            index = list_items.size()-1;
+        list->setCurrentRow(index);
+    }
+
+    this->setWeightLabel();
 }
 
 PlayingGamestate::PlayingGamestate() :
@@ -833,6 +876,7 @@ PlayingGamestate::PlayingGamestate() :
     // create RPG data
     LOG("create RPG data\n");
 
+    Item *item = NULL;
     Weapon *weapon = NULL;
 
     this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
@@ -854,10 +898,24 @@ PlayingGamestate::PlayingGamestate() :
     this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
     //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 3) );
 
+    this->item_images["potion_red"] = game_g->loadImage(":/gfx/textures/items/potion_red.png");
+    this->addStandardItem( item = new Item("Potion of Healing", "potion_red", 1) );
+    item->setUse(ITEMUSE_POTION_HEALING);
+    item->setRating(1);
+
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
     this->addStandardItem( new Currency("Gold", "gold"));
 
     gui_overlay->setProgress(10);
+
+    {
+        QPixmap containers = game_g->loadImage(":/gfx/textures/scenery/containers.png");
+        this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
+        this->scenery_images["barrel"] = containers.copy(64, 0, 64, 64);
+        this->scenery_images["crate"] = containers.copy(128, 0, 64, 64);
+    }
+
+    gui_overlay->setProgress(20);
     qApp->processEvents();
 
     this->player = new Character("Player", "", false);
@@ -901,6 +959,12 @@ PlayingGamestate::PlayingGamestate() :
     }*/
     location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
     location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
+    location->addItem( this->cloneStandardItem("Potion of Healing"), 3.0f, 4.0f );
+
+    Scenery *scenery = NULL;
+    location->addScenery( scenery = new Scenery("Chest", "chest"), 1.0f, 2.0f );
+    scenery->addItem( this->cloneStandardItem("Potion of Healing") );
+    scenery->addItem( this->cloneStandardItem("Longbow") );
 
     FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
@@ -934,12 +998,13 @@ PlayingGamestate::PlayingGamestate() :
         boundary.addPoint(Vector2D(5.0f, 0.0f));
         location->addBoundary(boundary);
     }
+    location->createBoundariesForScenery();
 
     location->addCharacter(player, 2.0f, 2.0f);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
 
-    gui_overlay->setProgress(20);
+    gui_overlay->setProgress(30);
     qApp->processEvents();
 
     // set up the view on the RPG world
@@ -992,7 +1057,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
 
-    gui_overlay->setProgress(30);
+    gui_overlay->setProgress(40);
     qApp->processEvents();
 
     LOG("create animation frames\n");
@@ -1008,14 +1073,14 @@ PlayingGamestate::PlayingGamestate() :
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
     this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
     LOG("time to load: %d\n", clock() - time_s);
-    gui_overlay->setProgress(40);
+    gui_overlay->setProgress(50);
     qApp->processEvents();
     /*LOG("head layer\n");
     string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
     AnimationLayer *head_layer = new AnimationLayer();*/
     //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
     this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
-    gui_overlay->setProgress(50);
+    gui_overlay->setProgress(60);
     qApp->processEvents();
     LOG("longsword layer\n");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
@@ -1023,7 +1088,7 @@ PlayingGamestate::PlayingGamestate() :
     this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition);
     LOG("shield layer\n");
     this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
-    gui_overlay->setProgress(60);
+    gui_overlay->setProgress(70);
     qApp->processEvents();
 
     LOG("load goblin image\n");
@@ -1036,7 +1101,7 @@ PlayingGamestate::PlayingGamestate() :
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/goblin.png", goblin_animation_layer_definition);
 
-    gui_overlay->setProgress(70);
+    gui_overlay->setProgress(80);
     qApp->processEvents();
 
     LOG("add graphics items\n");
@@ -1044,8 +1109,12 @@ PlayingGamestate::PlayingGamestate() :
         Item *item = *iter;
         this->locationAddItem(location, item);
     }
+    for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
+        Scenery *scenery = *iter;
+        this->locationAddScenery(location, scenery);
+    }
 
-    gui_overlay->setProgress(80);
+    gui_overlay->setProgress(90);
     qApp->processEvents();
 
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
@@ -1128,7 +1197,9 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         scene->addItem(object);
         object->setPos(item->getX(), item->getY());
         //object->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
+        float item_scale = item_width / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
+        //object->setTransformOriginPoint(-0.5f*item_width, -0.5f*(object->pixmap().height()*item_width)/(float)object->pixmap().width());
         object->setScale(item_scale);
     }
 }
@@ -1137,6 +1208,35 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
     if( this->location == location ) {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
         item->setUserGfxData(NULL);
+        scene->removeItem(object);
+        delete object;
+    }
+}
+
+void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
+    if( this->location == location ) {
+        QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
+        scenery->setUserGfxData(object);
+        map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName().c_str());
+        if( image_iter == this->scenery_images.end() ) {
+            LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
+            LOG("    image name: %s\n", scenery->getImageName().c_str());
+            throw string("Failed to find scenery's image");
+        }
+        object->setPixmap( image_iter->second );
+        scene->addItem(object);
+        object->setPos(scenery->getX(), scenery->getY());
+        object->setZValue(object->pos().y());
+        float scenery_scale = scenery_width / object->pixmap().width();
+        object->setTransformOriginPoint(-0.5f*object->pixmap().width()*scenery_scale, -0.5f*object->pixmap().height()*scenery_scale);
+        object->setScale(scenery_scale);
+    }
+}
+
+void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
+    if( this->location == location ) {
+        QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+        scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
     }
@@ -1338,7 +1438,7 @@ void PlayingGamestate::characterTurn(const Character *character, void *user_data
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     float angle = atan2(dir.y, dir.x);
     if( angle < 0.0f )
-        angle += 2.0*M_PI;
+        angle += (float)(2.0*M_PI);
     angle /= 2.0*M_PI;
     float turn = angle*((int)N_DIRECTIONS) + 0.5f;
     int turn_i = (int)turn;
@@ -1392,6 +1492,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         Vector2D dest(scene_x, scene_y);
 
+        bool done = false;
+
         // search for clicking on an NPC
         float min_dist = 0.0f;
         Character *target_npc = NULL;
@@ -1399,9 +1501,10 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             Character *character = *iter;
             if( character == player )
                 continue;
-            double dist = (dest - character->getPos()).magnitude();
+            float dist = (dest - character->getPos()).magnitude();
             if( dist <= character->getRadius() ) {
                 if( target_npc == NULL || dist < min_dist ) {
+                    done = true;
                     target_npc = character;
                     min_dist = dist;
                 }
@@ -1409,25 +1512,16 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         }
         player->setTargetNPC(target_npc); // n.b., if no NPC selected, we therefore set to NULL
 
-        if( dest != player->getPos() ) {
-            Vector2D hit_pos;
-            bool hit = location->intersectSweptSquareWithBoundaries(player, &hit_pos, player->getPos(), dest, player->getRadius());
-            if( hit ) {
-                LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
-                dest = hit_pos;
-            }
-            player->setDestination(dest.x, dest.y);
-        }
-
-        if( target_npc == NULL ) {
+        if( !done ) {
             // search for clicking on an item
             Item *picked_item = NULL;
             for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
                 Item *item = *iter;
-                double dist_from_click = (dest - item->getPos()).magnitude();
-                double dist_from_player = (player->getPos() - item->getPos()).magnitude();
+                float dist_from_click = (dest - item->getPos()).magnitude();
+                float dist_from_player = (player->getPos() - item->getPos()).magnitude();
                 if( dist_from_click <= 0.5f && dist_from_player <= player->getRadius() ) {
                     if( picked_item == NULL || dist_from_click < min_dist ) {
+                        done = true;
                         picked_item = item;
                         min_dist = dist_from_click;
                     }
@@ -1444,6 +1538,51 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 player->pickupItem(picked_item);
             }
         }
+
+        if( !done ) {
+            // search for clicking on a scenery
+            Scenery *selected_scenery = NULL;
+            for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
+                Scenery *scenery = *iter;
+                Vector2D scenery_pos = scenery->getPos();
+                float scenery_height = scenery_width;
+                if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
+                    dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {
+                    // clicked on this scenery
+                    Vector2D player_pos = player->getPos();
+                    float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
+                    float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
+                    float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;
+                    if( player_dist <= player->getRadius() + 0.5f ) {
+                        if( selected_scenery == NULL ) {
+                            done = true;
+                            selected_scenery = scenery;
+                            min_dist = 0.0f;
+                        }
+                    }
+                }
+            }
+
+            if( selected_scenery != NULL ) {
+                for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
+                    Item *item = *iter;
+                    location->addItem(item, player->getX(), player->getY());
+                }
+                selected_scenery->eraseAllItems();
+                this->addTextEffect("Found some items!", player->getPos(), 2000);
+            }
+        }
+
+        if( dest != player->getPos() ) {
+            Vector2D hit_pos;
+            bool hit = location->intersectSweptSquareWithBoundaries(player, &hit_pos, player->getPos(), dest, player->getRadius());
+            if( hit ) {
+                LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
+                dest = hit_pos;
+            }
+            player->setDestination(dest.x, dest.y);
+        }
+
     }
 }
 

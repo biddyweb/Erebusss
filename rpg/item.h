@@ -5,6 +5,9 @@ using std::string;
 
 #include "utils.h"
 
+class Character;
+class PlayingGamestate;
+
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
     ITEMTYPE_WEAPON = 1,
@@ -12,6 +15,11 @@ enum ItemType {
     ITEMTYPE_ARMOUR = 3,
     ITEMTYPE_AMMO = 4,
     ITEMTYPE_CURRENCY = 5
+};
+
+enum ItemUse {
+    ITEMUSE_NONE = 0,
+    ITEMUSE_POTION_HEALING = 1
 };
 
 class Item {
@@ -22,6 +30,8 @@ protected:
     void *user_data_gfx;
     int weight; // in multiples of 100g
 
+    ItemUse item_use;
+    int rating;
 public:
     Item(string name, string image_name, int weight);
     virtual ~Item();
@@ -71,6 +81,17 @@ public:
     }
     int getWeight() const {
         return this->weight;
+    }
+    bool canUse() const {
+        return item_use != ITEMUSE_NONE;
+    }
+    string getUseVerb() const;
+    bool use(PlayingGamestate *playing_gamestate, Character *character);
+    void setUse(ItemUse item_use) {
+        this->item_use = item_use;
+    }
+    void setRating(int rating) {
+        this->rating = rating;
     }
 };
 
