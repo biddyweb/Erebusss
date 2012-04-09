@@ -11,7 +11,9 @@ using std::max;
 using std::swap;
 
 Scenery::Scenery(string name, string image_name) :
-    name(name), image_name(image_name), user_data_gfx(NULL)
+    location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
+    is_blocking(false), width(1.0f), height(1.0f),
+    opened(false)
 {
 }
 
@@ -23,6 +25,13 @@ void Scenery::removeItem(Item *item) {
     this->items.erase(item);
 }
 
+void Scenery::setOpened(bool opened) {
+    this->opened = opened;
+    if( this->location != NULL ) {
+        this->location->updateScenery(this);
+    }
+}
+
 FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     FloorRegion *floor_regions = new FloorRegion();
     floor_regions->points.push_back(Vector2D(x, y));
@@ -32,9 +41,9 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     return floor_regions;
 }
 
-Location::Location(/*float width, float height*/) /*:
-    width(width), height(height)*/
-    : listener(NULL), listener_data(NULL)
+Location::Location() :
+    listener(NULL), listener_data(NULL),
+    distance_graph(NULL)
 {
 }
 
@@ -54,6 +63,9 @@ Location::~Location() {
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
         Scenery *scenery = *iter;
         delete scenery;
+    }
+    if( distance_graph != NULL ) {
+        delete distance_graph;
     }
 }
 
@@ -111,6 +123,7 @@ void Location::removeItem(Item *item) {
 }
 
 void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
+    scenery->setLocation(this);
     scenery->setPos(xpos, ypos);
     this->scenerys.insert(scenery);
     if( this->listener != NULL ) {
@@ -120,16 +133,26 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
 
 // n.b., would require us to remove the corresponding boundary for collision detection too!
 /*void Location::removeScenery(Scenery *scenery) {
+    scenery->setLocation(NULL);
     this->scenerys.erase(scenery);
     if( this->listener != NULL ) {
         this->listener->locationRemoveScenery(this, scenery);
     }
 }*/
 
+void Location::updateScenery(Scenery *scenery) {
+    if( this->listener != NULL ) {
+        this->listener->locationUpdateScenery(scenery);
+    }
+}
+
 void Location::createBoundariesForScenery() {
     LOG("createBoundariesForScenery()\n");
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
         Scenery *scenery = *iter;
+        if( !scenery->isBlocking() ) {
+            continue;
+        }
         Polygon2D boundary;
         /*Vector2D pos = scenery->getPos();
         // clockwise, as "inside" should be on the left
@@ -137,7 +160,7 @@ void Location::createBoundariesForScenery() {
         boundary.addPoint(pos + Vector2D(1.0f, 0.0f));
         boundary.addPoint(pos + Vector2D(1.0f, 1.0f));
         boundary.addPoint(pos + Vector2D(0.0f, 1.0f));*/
-        float width = 1.0f, height = 1.0f;
+        float width = scenery->getWidth(), height = scenery->getHeight();
         Vector2D pos = scenery->getPos();
         //qDebug("scenery at %f, %f", pos.x, pos.y);
         // clockwise, as "inside" should be on the left
@@ -175,6 +198,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     if( normal_from_wall.y >= 0.0f ) {
         return; // okay to move along or away from wall (if there are any intersections, it means we've already started from an intersection point, so best to allow us to move away!)
     }
+
     // trivial rejections:
     if( p0.x < xmin && p1.x < xmin )
         return;
@@ -182,89 +206,162 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
         return;
     if( p0.y < ymin && p1.y < ymin )
         return;
-    if( p0.y > ymax && p1.y > ymax )
+    if( p0.y > ymax + width && p1.y > ymax + width )
         return;
-    // use Liang-Barsky Line Clipping to intersect line segment with axis-aligned 2D box
-    // see http://www.cs.helsinki.fi/group/goa/viewing/leikkaus/intro.html
-    // and http://www.skytopia.com/project/articles/compsci/clipping.html
-    float tmin = 0.0f, tmax = 1.0f;
-    const int n_edges_c = 4;
-    // left, right, bottom, top
-    bool has_t_value[n_edges_c] = {false, false, false, false};
-    float t_value[n_edges_c] = {0.0f, 0.0f, 0.0f, 0.0f};
-    if( p1.x != p0.x ) {
-        has_t_value[0] = true;
-        t_value[0] = ( xmin - p0.x ) / ( p1.x - p0.x );
-        has_t_value[1] = true;
-        t_value[1] = ( xmax - p0.x ) / ( p1.x - p0.x );
-    }
-    if( p1.y != p0.y ) {
-        has_t_value[2] = true;
-        t_value[2] = ( ymin - p0.y ) / ( p1.y - p0.y );
-        has_t_value[3] = true;
-        t_value[3] = ( ymax - p0.y ) / ( p1.y - p0.y );
-    }
-    Vector2D normals[n_edges_c];
-    normals[0] = Vector2D(-1.0f, 0.0f);
-    normals[1] = Vector2D(1.0f, 0.0f);
-    normals[2] = Vector2D(0.0f, -1.0f);
-    normals[3] = Vector2D(0.0f, 1.0f);
-    for(int k=0;k<n_edges_c;k++) {
-        if( !has_t_value[k] )
-            continue;
-        /*if( t_value[k] < tmin || t_value[k] > tmax )
-            continue;*/
-        bool entering = ( dp % normals[k] ) < 0.0f;
-        //qDebug("    edge %d: t value %f, is entering? %d", k, t_value[k], entering?1:0);
-        // modification from standard algorithm - we only want to clip if it's hit the main box!
-        /*Vector2D ix = p0 + dp * t_value[k];
-        if( ix.x < xmin || ix.x > xmax || ix.y < ymin || ix.y > ymax ) {
-            continue;
-        }*/
-        //qDebug("        intersects against swept square");
-        if( entering ) {
-            if( t_value[k] > tmin )
-                tmin = t_value[k];
+
+    if( p0.y <= ymax || p1.y <= ymax ) {
+        // check for collision with main 2D box
+
+        // use Liang-Barsky Line Clipping to intersect line segment with axis-aligned 2D box
+        // see http://www.cs.helsinki.fi/group/goa/viewing/leikkaus/intro.html
+        // and http://www.skytopia.com/project/articles/compsci/clipping.html
+        double tmin = 0.0f, tmax = 1.0f;
+        const int n_edges_c = 4;
+        // left, right, bottom, top
+        bool has_t_value[n_edges_c] = {false, false, false, false};
+        double t_value[n_edges_c] = {0.0f, 0.0f, 0.0f, 0.0f};
+        if( p1.x != p0.x ) {
+            has_t_value[0] = true;
+            t_value[0] = ( xmin - p0.x ) / (double)( p1.x - p0.x );
+            has_t_value[1] = true;
+            t_value[1] = ( xmax - p0.x ) / (double)( p1.x - p0.x );
         }
-        else {
-            if( t_value[k] < tmax )
-                tmax = t_value[k];
+        if( p1.y != p0.y ) {
+            has_t_value[2] = true;
+            t_value[2] = ( ymin - p0.y ) / (double)( p1.y - p0.y );
+            has_t_value[3] = true;
+            t_value[3] = ( ymax - p0.y ) / (double)( p1.y - p0.y );
+        }
+        Vector2D normals[n_edges_c];
+        normals[0] = Vector2D(-1.0f, 0.0f);
+        normals[1] = Vector2D(1.0f, 0.0f);
+        normals[2] = Vector2D(0.0f, -1.0f);
+        normals[3] = Vector2D(0.0f, 1.0f);
+        for(int k=0;k<n_edges_c;k++) {
+            if( !has_t_value[k] )
+                continue;
+            /*if( t_value[k] < tmin || t_value[k] > tmax )
+                continue;*/
+            bool entering = ( dp % normals[k] ) < 0.0f;
+            //qDebug("    edge %d: t value %f, is entering? %d", k, t_value[k], entering?1:0);
+            // modification from standard algorithm - we only want to clip if it's hit the main box!
+            /*Vector2D ix = p0 + dp * t_value[k];
+            if( ix.x < xmin || ix.x > xmax || ix.y < ymin || ix.y > ymax ) {
+                continue;
+            }*/
+            //qDebug("        intersects against swept square");
+            if( entering ) {
+                if( t_value[k] > tmin )
+                    tmin = t_value[k];
+            }
+            else {
+                if( t_value[k] < tmax )
+                    tmax = t_value[k];
+            }
+        }
+        if( tmin <= tmax ) {
+            // n.b., intersection positions still in the swept square space
+            Vector2D i0 = p0 + dp * tmin;
+            Vector2D i1 = p0 + dp * tmax;
+            /*if( p0.x == 0.250071f && p0.y == 4.749929f && p1.x == 0.249929f && p1.y == 2.750071f )
+            {
+                qDebug("hit wall from %f, %f to %f, %f: parms %f, %f", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y, tmin, tmax);
+                qDebug("    in swept square space: %f, %f and %f, %f", i0.x, i0.y, i1.x, i1.y);
+            }*/
+            float iy = min(i0.y, i1.y);
+            iy -= width;
+            iy = max(iy, 0.0f);
+            if( iy > ymax ) {
+                qDebug("intersection is beyond end of swept box");
+                throw string("intersection is beyond end of swept box");
+            }
+            if( !(*hit) || iy < *hit_dist ) {
+                *hit = true;
+                *hit_dist = iy;
+                //qDebug("    hit dist is now %f", *hit_dist);
+                if( *hit_dist == 0.0f )
+                    *done = true; // no point doing anymore collisions
+            }
         }
     }
-    if( tmin <= tmax ) {
-        //qDebug("hit wall from %f, %f to %f, %f: parms %f, %f", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y, tmin, tmax);
-        // n.b., intersection positions still in the swept square space
-        Vector2D i0 = p0 + dp * tmin;
-        Vector2D i1 = p0 + dp * tmax;
-        //qDebug("    in swept square space: %f, %f and %f, %f", i0.x, i0.y, i1.x, i1.y);
-        float iy = min(i0.y, i1.y);
-        iy -= width;
-        iy = max(iy, 0.0f);
-        if( iy > ymax ) {
-            qDebug("intersection is beyond end of swept box");
-            throw "intersection is beyond end of swept box";
-        }
-        if( !(*hit) || iy < *hit_dist ) {
-            *hit = true;
-            *hit_dist = iy;
-            //qDebug("    hit dist is now %f", *hit_dist);
-            if( *hit_dist == 0.0f )
-                *done = true; // no point doing anymore collisions
+
+    if( !(*done) ) {
+        // check for collision with end circle
+        Vector2D end(0.0f, ymax);
+        Vector2D diff = end - p0;
+        float dt = ( diff % dp ) / dp_length;
+        if( dt >= 0.0f && dt <= 1.0f ) {
+            Vector2D closest_pt = p0 + dp * dt; // point on line seg closest to end
+            if( closest_pt.y > ymax ) {
+                double dist = (closest_pt - end).magnitude();
+                if( dist <= width ) {
+                    // we don't bother calculating the exact collision point - just move back far enough
+                    float this_hit_dist = ymax - width;
+                    this_hit_dist = max(this_hit_dist, 0.0f);
+                    if( !(*hit) || this_hit_dist < *hit_dist ) {
+                        *hit = true;
+                        *hit_dist = this_hit_dist;
+                        if( *hit_dist == 0.0f )
+                            *done = true; // no point doing anymore collisions
+                    }
+                }
+            }
         }
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) {
+    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
+        const Polygon2D *boundary = &*iter;
+        for(size_t j=0;j<boundary->getNPoints() && !(*done);j++) {
+            Vector2D p0 = boundary->getPoint(j);
+            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+            intersectSweptSquareWithBoundarySeg(hit, hit_dist, done, p0, p1, start, du, dv, width, xmin, xmax, ymin, ymax);
+        }
+    }
+}
+
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width) {
+    bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
-
-    //qDebug("start: %f, %f", start.x, start.y);
 
     Vector2D dv = end - start;
     float dv_length = dv.magnitude();
     if( dv_length == 0.0f ) {
         LOG("Location::intersectSweptSquareWithBoundaries received equal start and end\n");
-        throw "Location::intersectSweptSquareWithBoundaries received equal start and end";
+        throw string("Location::intersectSweptSquareWithBoundaries received equal start and end");
+    }
+    dv /= dv_length;
+    Vector2D du = dv.perpendicularYToX();
+    //qDebug("du = %f, %f", du.x, du.y);
+    //qDebug("dv = %f, %f", dv.x, dv.y);
+    //qDebug("dv_length: %f", dv_length);
+    float xmin = - width;
+    float xmax = width;
+    //float ymin = - width;
+    float ymin = 0.0f;
+    //float ymax = dv_length + width;
+    float ymax = dv_length;
+
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax);
+
+    if( hit ) {
+        *hit_pos = start + dv * hit_dist;
+    }
+    return hit;
+}
+
+bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) {
+    bool done = false;
+    bool hit = false;
+    float hit_dist = 0.0f;
+
+    Vector2D dv = end - start;
+    float dv_length = dv.magnitude();
+    if( dv_length == 0.0f ) {
+        LOG("Location::intersectSweptSquareWithBoundaries received equal start and end\n");
+        throw string("Location::intersectSweptSquareWithBoundaries received equal start and end");
     }
     dv /= dv_length;
     Vector2D du = dv.perpendicularYToX();
@@ -276,119 +373,16 @@ bool Location::intersectSweptSquareWithBoundaries(const Character *character, Ve
     //float ymin = - width;
     float ymin = 0.0f;
     float ymax = dv_length + width;
-    bool done = false;
-    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !done; ++iter) {
-        const Polygon2D *boundary = &*iter;
-        for(size_t j=0;j<boundary->getNPoints() && !done;j++) {
-            Vector2D p0 = boundary->getPoint(j);
-            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-            intersectSweptSquareWithBoundarySeg(&hit, &hit_dist, &done, p0, p1, start, du, dv, width, xmin, xmax, ymin, ymax);
-#if 0
-            Vector2D saved_p0 = p0; // for debugging
-            Vector2D saved_p1 = p1;
-            // transform into the space of the swept square
-            p0 -= start;
-            p0 = Vector2D( p0 % du, p0 % dv );
-            p1 -= start;
-            p1 = Vector2D( p1 % du, p1 % dv );
-            Vector2D dp = p1 - p0;
-            float dp_length = dp.magnitude();
-            if( dp_length == 0.0f )
-                continue;
-            // n.b., dp is kept as non-unit vector
-            Vector2D normal_from_wall = dp.perpendicularYToX(); // since walls are defined anti-clockwise, this vector must point away from the wall
-            //qDebug("candidate hit wall from %f, %f to %f, %f:", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y);
-            //qDebug("    transformed to: %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
-            //qDebug("    normal_from_wall = %f, %f", normal_from_wall.x, normal_from_wall.y);
-            if( normal_from_wall.y >= 0.0f )
-                continue; // okay to move along or away from wall (if there are any intersections, it means we've already started from an intersection point, so best to allow us to move away!)
-            // trivial rejections:
-            if( p0.x < xmin && p1.x < xmin )
-                continue;
-            if( p0.x > xmax && p1.x > xmax )
-                continue;
-            if( p0.y < ymin && p1.y < ymin )
-                continue;
-            if( p0.y > ymax && p1.y > ymax )
-                continue;
-            // use Liang-Barsky Line Clipping to intersect line segment with axis-aligned 2D box
-            // see http://www.cs.helsinki.fi/group/goa/viewing/leikkaus/intro.html
-            // and http://www.skytopia.com/project/articles/compsci/clipping.html
-            float tmin = 0.0f, tmax = 1.0f;
-            const int n_edges_c = 4;
-            // left, right, bottom, top
-            bool has_t_value[n_edges_c] = {false, false, false, false};
-            float t_value[n_edges_c] = {0.0f, 0.0f, 0.0f, 0.0f};
-            if( p1.x != p0.x ) {
-                has_t_value[0] = true;
-                t_value[0] = ( xmin - p0.x ) / ( p1.x - p0.x );
-                has_t_value[1] = true;
-                t_value[1] = ( xmax - p0.x ) / ( p1.x - p0.x );
-            }
-            if( p1.y != p0.y ) {
-                has_t_value[2] = true;
-                t_value[2] = ( ymin - p0.y ) / ( p1.y - p0.y );
-                has_t_value[3] = true;
-                t_value[3] = ( ymax - p0.y ) / ( p1.y - p0.y );
-            }
-            Vector2D normals[n_edges_c];
-            normals[0] = Vector2D(-1.0f, 0.0f);
-            normals[1] = Vector2D(1.0f, 0.0f);
-            normals[2] = Vector2D(0.0f, -1.0f);
-            normals[3] = Vector2D(0.0f, 1.0f);
-            for(int k=0;k<n_edges_c;k++) {
-                if( !has_t_value[k] )
-                    continue;
-                /*if( t_value[k] < tmin || t_value[k] > tmax )
-                    continue;*/
-                bool entering = ( dp % normals[k] ) < 0.0f;
-                //qDebug("    edge %d: t value %f, is entering? %d", k, t_value[k], entering?1:0);
-                // modification from standard algorithm - we only want to clip if it's hit the main box!
-                /*Vector2D ix = p0 + dp * t_value[k];
-                if( ix.x < xmin || ix.x > xmax || ix.y < ymin || ix.y > ymax ) {
-                    continue;
-                }*/
-                //qDebug("        intersects against swept square");
-                if( entering ) {
-                    if( t_value[k] > tmin )
-                        tmin = t_value[k];
-                }
-                else {
-                    if( t_value[k] < tmax )
-                        tmax = t_value[k];
-                }
-            }
-            if( tmin <= tmax ) {
-                //qDebug("hit wall from %f, %f to %f, %f: parms %f, %f", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y, tmin, tmax);
-                // n.b., intersection positions still in the swept square space
-                Vector2D i0 = p0 + dp * tmin;
-                Vector2D i1 = p0 + dp * tmax;
-                //qDebug("    in swept square space: %f, %f and %f, %f", i0.x, i0.y, i1.x, i1.y);
-                float iy = min(i0.y, i1.y);
-                iy -= width;
-                iy = max(iy, 0.0f);
-                if( iy > ymax ) {
-                    LOG("intersection is beyond end of swept box\n");
-                    throw "intersection is beyond end of swept box";
-                }
-                if( !hit || iy < hit_dist ) {
-                    hit = true;
-                    hit_dist = iy;
-                    //qDebug("    hit dist is now %f", hit_dist);
-                    if( hit_dist == 0.0f )
-                        done = true; // no point doing anymore collisions
-                }
-            }
-#endif
-        }
-    }
+
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax);
+
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !done; ++iter) {
         const Character *npc = *iter;
         //if( character == playing_gamestate->getPlayer() ) {
         if( npc == character ) {
             continue;
         }
-        float npc_width = npc->getRadius();
+        float npc_width = npc_radius_c;
         Vector2D npc_pos = npc->getPos();
         //qDebug("npc at %f, %f", npc_pos.x, npc_pos.y);
         // clockwise, as "inside" should be on the left
@@ -411,166 +405,26 @@ bool Location::intersectSweptSquareWithBoundaries(const Character *character, Ve
     return hit;
 }
 
-#if 0
-bool Location::intersectSweptCircleWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float radius) {
+bool Location::collideWithTransient(const Character *character, Vector2D pos) const {
+    // does collision detection with entities like NPCs, that do not have boundaries due to not having a permanent position (and hence can't be avoided in pathfinding)
     bool hit = false;
-    float hit_dist = 0.0f;
-
-    //qDebug("start: %f, %f", start.x, start.y);
-    float radius2 = radius*radius;
-    // first find intersection of lines - http://en.wikipedia.org/wiki/Line-line_intersection
-    Vector2D ds = end - start;
-    float ds_length = ds.magnitude();
-    if( ds_length == 0.0f ) {
-        throw "Location::intersectSweptCircleWithBoundaries received equal start and end";
-    }
-    ds /= ds_length;
-    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
-        const Polygon2D *boundary = &*iter;
-        for(size_t j=0;j<boundary->getNPoints();j++) {
-            Vector2D p0 = boundary->getPoint(j);
-            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-            Vector2D dp = p1 - p0;
-            float dp_length = dp.magnitude();
-            if( dp_length == 0.0f )
-                continue;
-            dp /= dp_length;
-            float det = (start.x - end.x) * (p0.y - p1.y) - (start.y - end.y) * (p0.x - p1.x);
-            if( fabs(det) < E_TOL_MACHINE ) {
-                qDebug("special case - parallel lines");
-                //throw "special case";
-                float t0 = (p0 - start) % ds;
-                float t1 = (p1 - start) % ds;
-                float t = min(t0, t1);
-                if( t >= 0.0f && t < ds_length ) {
-                    // actually assumes square rather than circle here, but good enough!
-                    t -= radius;
-                    if( t < 0.0f )
-                        t = 0.0f;
-                    if( !hit || t < hit_dist ) {
-                        hit = true;
-                        hit_dist = t;
-                    }
-                }
-            }
-            else {
-                /*Vector2D this_hit;
-                this_hit.x = (start.x * end.y - start.y * end.x) * (p0.x - p1.x) - (start.x - end.x) * (p0.x * p1.y - p0.y * p1.x);
-                this_hit.y = (start.x * end.y - start.y * end.x) * (p0.y - p1.y) - (start.y - end.y) * (p0.x * p1.y - p0.y * p1.x);
-                this_hit /= det;*/
-                // intersect parameter for swept sphere
-                float t = (p1.x - p0.x) * (start.y - p0.y) - (p1.y - p0.y) * (start.x - p0.x);
-                t *= ds_length;
-                t /= det;
-                if( t > 0.0f ) {
-                    // if intersection point is behind the start, we must be trying to move away from this wall
-                    // now find points where sphere starts and ends intersect
-                    float signed_cos_theta = ds % dp;
-                    float cos_theta = fabs( signed_cos_theta );
-                    float theta = acos(cos_theta);
-                    // parameters on swept sphere
-                    float t_step = radius / sin(theta);
-                    float t0 = t - t_step;
-                    float t1 = t + t_step;
-                    if( t1 >= -E_TOL_LINEAR && t0 <= ds_length + E_TOL_LINEAR ) {
-                        // intersect parameter for line
-                        float alpha = (end.x - start.x) * (start.y - p0.y) - (end.y - start.y) * (start.x - p0.x);
-                        alpha *= dp_length;
-                        alpha /= det;
-                        // limit by line seg
-                        float p0_from_x = 0.0f - alpha;
-                        float p0_on_sphere_line = t + p0_from_x / signed_cos_theta;
-                        float p1_from_x = dp_length - alpha;
-                        float p1_on_sphere_line = t + p1_from_x / signed_cos_theta;
-                        //qDebug("candidate hit wall from %f, %f to %f, %f: parms %f, %f", p0.x, p0.y, p1.x, p1.y, t, alpha);
-                        //qDebug("t0 = %f, t1 = %f", t0, t1);
-                        if( p1_on_sphere_line < p0_on_sphere_line )
-                            swap(p0_on_sphere_line, p1_on_sphere_line);
-                        //qDebug("p0_on_sphere_line = %f, p1_on_sphere_line = %f", p0_on_sphere_line, p1_on_sphere_line);
-                        if( p0_on_sphere_line > t0 )
-                            t0 = p0_on_sphere_line;
-                        if( p1_on_sphere_line < t1 )
-                            t1 = p1_on_sphere_line;
-                        //if( t1 >= -E_TOL_LINEAR && t0 <= ds_length + E_TOL_LINEAR ) {
-                        if( t1 > 0.0f && t0 < ds_length ) {
-                            if( t0 < 0.0f )
-                                t0 = 0.0f;
-                            float alpha_step = radius / tan(theta);
-                            float alpha0 = alpha - alpha_step;
-                            float alpha1 = alpha + alpha_step;
-                            //qDebug("hit wall from %f, %f to %f, %f: parms %f, %f", p0.x, p0.y, p1.x, p1.y, t, alpha);
-                            Vector2D sphere_pos = start + ds * t;
-                            Vector2D wall_pos = p0 + dp * alpha;
-                            //qDebug("    sphere pos: %f, %f", sphere_pos.x, sphere_pos.y);
-                            //qDebug("    wall pos: %f, %f", wall_pos.x, wall_pos.y);
-                            //qDebug("    sphere range: %f -> %f", t0, t1);
-                            //qDebug("    wall range: %f -> %f", alpha0, alpha1);
-                            if( !hit || t0 < hit_dist ) {
-                                hit = true;
-                                hit_dist = t0;
-                            }
-                        }
-                    }
-                }
-            }
+    for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !hit; ++iter) {
+        const Character *npc = *iter;
+        //if( character == playing_gamestate->getPlayer() ) {
+        if( npc == character ) {
+            continue;
         }
-    }
-
-    if( hit ) {
-        *hit_pos = start + ds * hit_dist;
-    }
-    return hit;
-}
-#endif
-
-#if 0
-bool Location::intersectSweptCircleWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float radius) {
-    // see http://www.gamasutra.com/view/feature/3383/simple_intersection_tests_for_games.php?page=2
-    // also Core Techniques and Algorithms in Game Programming, Daniel Sanchez-Crespo Dalmau, pp. 696+
-    bool hit = false;
-    float hit_dist = 0.0f;
-
-    Vector2D ds = end - start;
-    float ds_length = ds.magnitude();
-    if( ds_length == 0.0f ) {
-        throw "Location::intersectSweptCircleWithBoundaries received equal start and end";
-    }
-    ds /= ds_length;
-    float radius2 = radius * radius;
-    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
-        const Polygon2D *boundary = &*iter;
-        for(size_t j=0;j<boundary->getNPoints();j++) {
-            Vector2D p0 = boundary->getPoint(j);
-            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-            Vector2D dp = p1 - p0;
-            float dp_length = dp.magnitude();
-            if( dp_length == 0.0f )
-                continue;
-            dp /= dp_length;
-            Vector2D dpos = p0 - start;
-            Vector2D dv = dp - ds;
-            if( dv.magnitude() < E_TOL_MACHINE ) {
-                // special case - parallel lines
-                throw "special case";
-            }
-            else {
-                float a = dv.square();
-                float b = 2.0f * ( dpos % dv );
-                float c = dpos.square() - radius2;
-                float det = b*b - 4.0f*a*c;
-                if( det > E_TOL_MACHINE ) {
-                    float sqrt_det = sqrt(det);
-                    float t0 = ( - b - sqrt_det ) / ( 2.0f * a );
-                    float t1 = ( - b + sqrt_det ) / ( 2.0f * a );
-                }
-            }
+        Vector2D npc_pos = npc->getPos();
+        float dist = (pos - npc_pos).magnitude();
+        if( dist <= 2.0f * npc_radius_c ) {
+            hit = true;
         }
     }
     return hit;
 }
-#endif
 
 vector<Vector2D> Location::calculatePathWayPoints() const {
+    qDebug("Location::calculatePathWayPoints");
     vector<Vector2D> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
@@ -594,8 +448,12 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
             Vector2D normal_from_wall1 = d1.perpendicularYToX();
             Vector2D inwards = normal_from_wall0 + normal_from_wall1;
             if( inwards.magnitude() > E_TOL_MACHINE ) {
+                float angle = acos(normal_from_wall0 % normal_from_wall1);
+                float ratio = cos( 0.5f * angle );
                 inwards.normalise();
-                Vector2D path_way_point = point + inwards * 0.5f;
+                //const float offset = npc_radius_c/ratio;
+                const float offset = npc_radius_c/ratio + E_TOL_LINEAR;
+                Vector2D path_way_point = point + inwards * offset;
                 path_way_points.push_back( path_way_point );
             }
         }
@@ -604,6 +462,46 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
     return path_way_points;
 }
 
+void Location::calculateDistanceGraph() {
+    qDebug("Location::calculateDistanceGraph()");
+    if( this->distance_graph != NULL ) {
+        delete this->distance_graph;
+    }
+    this->distance_graph = new Graph();
+
+    vector<Vector2D> path_way_points = this->calculatePathWayPoints();
+
+    for(size_t i=0;i<path_way_points.size();i++) {
+        Vector2D A = path_way_points.at(i);
+        GraphVertex vertex(A, NULL);
+        this->distance_graph->addVertex(vertex);
+    }
+
+    for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
+        GraphVertex *v_A = this->distance_graph->getVertex(i);
+        Vector2D A = v_A->getPos();
+        for(size_t j=i+1;j<this->distance_graph->getNVertices();j++) {
+            GraphVertex *v_B = this->distance_graph->getVertex(j);
+            Vector2D B = v_B->getPos();
+            Vector2D hit_pos;
+            float dist = (A - B).magnitude();
+            bool hit = false;
+            if( dist <= E_TOL_LINEAR ) {
+                // needed for coi way points?
+                hit = false;
+            }
+            else {
+                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c);
+            }
+            if( !hit ) {
+                v_A->addNeighbour(j, dist);
+                v_B->addNeighbour(i, dist);
+            }
+        }
+    }
+}
+
+#if 0
 void Location::precalculate() {
     /*boundaries.clear();
 
@@ -661,5 +559,5 @@ void Location::precalculate() {
             }
         }
     }*/
-
 }
+#endif

@@ -32,6 +32,7 @@ protected:
 
     ItemUse item_use;
     int rating;
+    bool is_magical;
 public:
     Item(string name, string image_name, int weight);
     virtual ~Item();
@@ -92,6 +93,12 @@ public:
     }
     void setRating(int rating) {
         this->rating = rating;
+    }
+    void setMagical(bool is_magical) {
+        this->is_magical = is_magical;
+    }
+    bool isMagical() const {
+        return this->is_magical;
     }
 };
 

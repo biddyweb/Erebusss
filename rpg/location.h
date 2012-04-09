@@ -22,15 +22,21 @@ public:
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
     virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
+    virtual void locationUpdateScenery(Scenery *scenery)=0;
 };
 
 class Scenery {
 protected:
+    Location *location;
     string name;
     string image_name;
     Vector2D pos; // pos in Location
     void *user_data_gfx;
 
+    bool is_blocking;
+    float width, height;
+
+    bool opened;
     set<Item *> items;
 
 public:
@@ -38,6 +44,9 @@ public:
     virtual ~Scenery() {
     }
 
+    void setLocation(Location *location) {
+        this->location = location;
+    }
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
     }
@@ -63,6 +72,24 @@ public:
         return this->user_data_gfx;
     }
 
+    void setBlocking(bool is_blocking) {
+        this->is_blocking = is_blocking;
+    }
+    bool isBlocking() const {
+        return this->is_blocking;
+    }
+    float getWidth() const {
+        return this->width;
+    }
+    float getHeight() const {
+        return this->height;
+    }
+    void setSize(float width, float height) {
+        // n.b., aspect-ratio should match that of the corresponding image for this scenery!
+        this->width = width;
+        this->height = height;
+    }
+
     void addItem(Item *item);
     void removeItem(Item *item);
     void eraseAllItems() {
@@ -80,6 +107,10 @@ public:
     }
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
+    }
+    void setOpened(bool opened);
+    bool isOpened() const {
+        return this->opened;
     }
 };
 
@@ -99,6 +130,8 @@ class Location {
     LocationListener *listener;
     void *listener_data;
 
+    Graph *distance_graph;
+
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries; // first boundary is always the outside one
 
@@ -107,6 +140,9 @@ class Location {
     set<Scenery *> scenerys;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
+
+    vector<Vector2D> calculatePathWayPoints() const;
 public:
     Location();
     ~Location();
@@ -176,6 +212,7 @@ public:
     }
     void addScenery(Scenery *scenery, float xpos, float ypos);
     //void removeScenery(Scenery *scenery);
+    void updateScenery(Scenery *scenery);
     void createBoundariesForScenery();
     set<Scenery *>::iterator scenerysBegin() {
         return this->scenerys.begin();
@@ -190,10 +227,14 @@ public:
         return this->scenerys.end();
     }
 
-    bool intersectSweptSquareWithBoundaries(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width);
-    //bool intersectSweptCircleWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float radius);
+    bool collideWithTransient(const Character *character, Vector2D pos) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width);
+    bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width);
 
-    vector<Vector2D> calculatePathWayPoints() const;
+    void calculateDistanceGraph();
+    const Graph *getDistanceGraph() const {
+        return this->distance_graph;
+    }
 
-    void precalculate();
+    //void precalculate();
 };

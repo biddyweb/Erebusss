@@ -7,7 +7,7 @@ using std::stringstream;
 
 Item::Item(string name, string image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), weight(weight),
-    item_use(ITEMUSE_NONE), rating(1)
+    item_use(ITEMUSE_NONE), rating(1), is_magical(false)
 {
 }
 

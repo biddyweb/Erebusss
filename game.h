@@ -273,13 +273,32 @@ class ItemsWindow : public QWidget {
     QPushButton *wearButton;
     QPushButton *useButton;
 
+    enum ViewType {
+        VIEWTYPE_ALL = 0,
+        VIEWTYPE_WEAPONS = 1,
+        VIEWTYPE_SHIELDS = 2,
+        VIEWTYPE_ARMOUR = 3,
+        VIEWTYPE_AMMO = 4,
+        VIEWTYPE_MAGIC = 5
+    };
+    ViewType view_type;
+
+    void refreshList();
+    void changeView(ViewType view_type);
     QString getItemString(const Item *item) const;
     //void setWeightLabel(int weight);
     void setWeightLabel();
-    void itemIsDeleted(int index);
+    void itemIsDeleted(size_t index);
 
 private slots:
     void changedSelectedItem(int currentRow);
+
+    void clickedViewAll();
+    void clickedViewWeapons();
+    void clickedViewShields();
+    void clickedViewArmour();
+    void clickedViewAmmo();
+    void clickedViewMagic();
 
     void clickedDropItem();
     void clickedArmWeapon();
@@ -319,6 +338,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
     map<string, QPixmap> scenery_images;
+    map<string, QPixmap> scenery_opened_images;
 
 private slots:
     void clickedItems();
@@ -346,6 +366,7 @@ public:
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery);
     virtual void locationRemoveScenery(const Location *location, Scenery *scenery);
+    virtual void locationUpdateScenery(Scenery *scenery);
 
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
@@ -394,6 +415,9 @@ class Game {
     string logfilename;
     string oldlogfilename;
 
+    QFont font_std;
+    QFont font_big;
+
     Gamestate *gamestate;
     Screen *screen;
     queue<GameMessage *> message_queue;
@@ -408,6 +432,12 @@ public:
     }
     const Screen *getScreen() const {
         return this->screen;
+    }
+    QFont getFontStd() const {
+        return this->font_std;
+    }
+    QFont getFontBig() const {
+        return this->font_big;
     }
 
     void pushMessage(GameMessage *message) {

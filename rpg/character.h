@@ -21,6 +21,7 @@ class Ammo;
 class Location;
 
 const float npc_visibility_c = 10.0f;
+const float npc_radius_c = 0.25f;
 
 class CharacterListener {
 public:
@@ -45,8 +46,10 @@ class Character {
     Vector2D pos;
     CharacterListener *listener;
     void *listener_data;
-    bool has_destination;
-    Vector2D dest;
+    /*bool has_destination;
+    Vector2D dest;*/
+    bool has_path;
+    vector<Vector2D> path;
     Character *target_npc;
     int time_last_action_ms;
     bool is_hitting;
@@ -109,7 +112,7 @@ public:
         this->listener = listener;
         this->listener_data = listener_data;
     }
-    void setDestination(float xdest, float ydest) {
+    /*void setDestination(float xdest, float ydest) {
         bool old_has_destination = this->has_destination;
         this->has_destination = true;
         this->dest.set(xdest, ydest);
@@ -117,7 +120,17 @@ public:
         if( this->listener != NULL && !old_has_destination ) {
             this->listener->characterSetAnimation(this, this->listener_data, "run");
         }
+    }*/
+    void setPath(vector<Vector2D> &path) {
+        bool old_has_path = this->has_path;
+        this->has_path = true;
+        this->path = path;
+        this->is_hitting = false;
+        if( this->listener != NULL && !old_has_path ) {
+            this->listener->characterSetAnimation(this, this->listener_data, "run");
+        }
     }
+    void setDestination(float xdest, float ydest);
     bool update(PlayingGamestate *playing_gamestate);
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {
@@ -133,9 +146,9 @@ public:
     Character *getTargetNPC() const {
         return this->target_npc;
     }
-    float getRadius() const {
+    /*float getRadius() const {
         return 0.25f;
-    }
+    }*/
 
     void initialiseHealth(int max_health) {
         if( max_health <= 0 ) {
@@ -203,5 +216,9 @@ public:
         return this->gold;
     }
     void addGold(int change);
-    int getItemsWeight() const;
+    int calculateItemsWeight() const;
+    int getCanCarryWeight() const {
+        return 400;
+    }
+    bool canMove() const;
 };

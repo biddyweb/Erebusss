@@ -5,6 +5,10 @@
 #include <vector>
 using std::vector;
 
+const float E_TOL_MACHINE = 1.0e-12f;
+const float E_TOL_ANGULAR = 1.0e-6f;
+const float E_TOL_LINEAR = 1.0e-4f;
+
 class Vector2D {
 public:
     float x, y;
@@ -177,6 +181,89 @@ public:
     }
 };
 
-const float E_TOL_MACHINE = 1.0e-12f;
-const float E_TOL_ANGULAR = 1.0e-6f;
-const float E_TOL_LINEAR = 1.0e-4f;
+class Graph;
+
+class GraphVertex {
+    //vector<GraphVertex *> neighbours;
+    vector<size_t> neighbour_ids;
+    vector<float> distances;
+    Vector2D pos;
+    void *user_data;
+
+    // for path finding:
+    bool visited;
+    float value;
+    //size_t path_traceback_id; // the id of the neighbouring vertex that is part of the currently shortest path to this vertex
+    GraphVertex *path_traceback; // the neighbouring vertex that is part of the currently shortest path to this vertex
+public:
+    GraphVertex(Vector2D pos, void *user_data) : pos(pos), user_data(user_data), visited(false), value(0) {
+    }
+
+    void addNeighbour(size_t neighbour_id, float distance) {
+        neighbour_ids.push_back(neighbour_id);
+        distances.push_back(distance);
+    }
+    size_t getNNeighbours() const {
+        return neighbour_ids.size();
+    }
+    GraphVertex *getNeighbour(Graph *graph, float *distance, size_t i) const;
+    const GraphVertex *getNeighbour(const Graph *graph, float *distance, size_t i) const;
+    GraphVertex *getNeighbour(Graph *graph, size_t i) const;
+    const GraphVertex *getNeighbour(const Graph *graph, size_t i) const;
+    void *getUserData() const {
+        return this->user_data;
+    }
+    Vector2D getPos() const {
+        return this->pos;
+    }
+    void initPathFinding() {
+        this->visited = false;
+        this->value = -1.0f; // -ve represents "infinity"
+        //this->path_traceback_id = 0;
+        this->path_traceback = NULL;
+    }
+    float getValue() const {
+        return this->value;
+    }
+    /*void setValue(float value, size_t path_traceback_id) {
+        this->value = value;
+        this->path_traceback_id = path_traceback_id;
+    }*/
+    void setValue(float value, GraphVertex *path_traceback) {
+        this->value = value;
+        this->path_traceback = path_traceback;
+    }
+    GraphVertex *getPathTraceback() const {
+        return this->path_traceback;
+    }
+    bool isVisited() const {
+        return this->visited;
+    }
+    void setVisited() {
+        this->visited = true;
+    }
+};
+
+class Graph {
+    vector<GraphVertex> vertices;
+public:
+    Graph() {
+    }
+
+    size_t addVertex(GraphVertex &vertex) {
+        vertices.push_back(vertex);
+        return (vertices.size()-1);
+    }
+    size_t getNVertices() const {
+        return vertices.size();
+    }
+    GraphVertex *getVertex(size_t i) {
+        return &vertices.at(i);
+    }
+    const GraphVertex *getVertex(size_t i) const {
+        return &vertices.at(i);
+    }
+
+    Graph *clone() const;
+    vector<GraphVertex *> shortestPath(size_t start, size_t end);
+};

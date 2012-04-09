@@ -19,7 +19,7 @@ const int versionMinor = 1;
 const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 //const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
 const float item_width = 1.0f;
-const float scenery_width = item_width;
+//const float scenery_width = item_width;
 const float font_scale = 1.0f/64.0f;
 
 //const int scene_item_character_key_c = 0;
@@ -259,6 +259,7 @@ void AnimatedObject::setDirection(Direction c_direction) {
 
 TextEffect::TextEffect(const QString &text, int duration_ms) :
     QGraphicsTextItem(text), time_expire(0) {
+    this->setDefaultTextColor(Qt::white);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
 }
 
@@ -277,11 +278,13 @@ OptionsGamestate::OptionsGamestate()
     optionsGamestate = this;
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+/*#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 #else
     QFont font("Verdana", 48, QFont::Bold);
     window->setFont(font);
-#endif
+#endif*/
+    QFont font = game_g->getFontBig();
+    window->setFont(font);
 
     QWidget *centralWidget = new QWidget(window);
     centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
@@ -292,13 +295,14 @@ OptionsGamestate::OptionsGamestate()
 
     QLabel *titleLabel = new QLabel("erebus");
     titleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed for fix layout problem on Qt Simulator at least, when returning to the options gamestate after playing the game
-    titleLabel->setStyleSheet("QLabel { color : red; }");
     titleLabel->setAlignment(Qt::AlignCenter);
-    {
+    titleLabel->setStyleSheet("QLabel { color : red; }");
+    titleLabel->setFont(font);
+    /*{
         QFont font = titleLabel->font();
         font.setPointSize( font.pointSize() + 8 );
         titleLabel->setFont(font);
-    }
+    }*/
     layout->addWidget(titleLabel);
 
     QPushButton *startButton = new QPushButton("Start game");
@@ -313,12 +317,14 @@ OptionsGamestate::OptionsGamestate()
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
     //this->initButton(prevButton);
 
+#ifndef Q_OS_ANDROID
+    // applications don't quite on Android.
     QPushButton *quitButton = new QPushButton("Quit game");
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
     //this->initButton(prevButton);
-
+#endif
 }
 
 OptionsGamestate::~OptionsGamestate() {
@@ -465,11 +471,11 @@ void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height,
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
-    dropButton(NULL), armButton(NULL), wearButton(NULL), useButton(NULL)
+    dropButton(NULL), armButton(NULL), wearButton(NULL), useButton(NULL),
+    view_type(VIEWTYPE_ALL)
 {
 
     playing_gamestate->addWidget(this);
-
     Character *player = playing_gamestate->getPlayer();
 
     /*QFont font = game_g->getScreen()->getMainWindow()->font();
@@ -478,6 +484,35 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *viewAllButton = new QPushButton("All");
+        h_layout->addWidget(viewAllButton);
+        connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
+
+        QPushButton *viewWeaponsButton = new QPushButton("Weapons");
+        h_layout->addWidget(viewWeaponsButton);
+        connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
+
+        QPushButton *viewShieldsButton = new QPushButton("Shields");
+        h_layout->addWidget(viewShieldsButton);
+        connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
+
+        QPushButton *viewArmourButton = new QPushButton("Armour");
+        h_layout->addWidget(viewArmourButton);
+        connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
+
+        QPushButton *viewAmmoButton = new QPushButton("Ammo");
+        h_layout->addWidget(viewAmmoButton);
+        connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
+
+        QPushButton *viewMagicButton = new QPushButton("Magic");
+        h_layout->addWidget(viewMagicButton);
+        connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
+    }
 
     list = new QListWidget();
     {
@@ -496,12 +531,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         list->addItem( item_str );
         list_items.push_back(item);
     }*/
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        QString item_str = this->getItemString(item);
-        list->addItem( item_str );
-        list_items.push_back(item);
-    }
+    this->refreshList();
 
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
 
@@ -551,6 +581,66 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     }*/
     int index = list->currentRow();
     this->changedSelectedItem(index);
+}
+
+void ItemsWindow::refreshList() {
+    qDebug("ItemsWindow::refreshList()");
+    list_items.clear();
+    list->clear();
+    Character *player = playing_gamestate->getPlayer();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        if( view_type == VIEWTYPE_WEAPONS && item->getType() != ITEMTYPE_WEAPON ) {
+            continue;
+        }
+        else if( view_type == VIEWTYPE_SHIELDS && item->getType() != ITEMTYPE_SHIELD ) {
+            continue;
+        }
+        else if( view_type == VIEWTYPE_ARMOUR && item->getType() != ITEMTYPE_ARMOUR ) {
+            continue;
+        }
+        else if( view_type == VIEWTYPE_AMMO && item->getType() != ITEMTYPE_AMMO ) {
+            continue;
+        }
+        else if( view_type == VIEWTYPE_MAGIC && !item->isMagical() ) {
+            continue;
+        }
+        QString item_str = this->getItemString(item);
+        list->addItem( item_str );
+        list_items.push_back(item);
+    }
+}
+
+void ItemsWindow::changeView(ViewType view_type) {
+    if( this->view_type != view_type ) {
+        this->view_type = view_type;
+        this->refreshList();
+    }
+}
+
+void ItemsWindow::clickedViewAll() {
+    this->changeView(VIEWTYPE_ALL);
+}
+
+void ItemsWindow::clickedViewWeapons() {
+    this->changeView(VIEWTYPE_WEAPONS);
+}
+
+
+void ItemsWindow::clickedViewShields() {
+    this->changeView(VIEWTYPE_SHIELDS);
+}
+
+void ItemsWindow::clickedViewArmour() {
+    this->changeView(VIEWTYPE_ARMOUR);
+}
+
+void ItemsWindow::clickedViewAmmo() {
+    this->changeView(VIEWTYPE_AMMO);
+}
+
+void ItemsWindow::clickedViewMagic() {
+    this->changeView(VIEWTYPE_MAGIC);
 }
 
 QString ItemsWindow::getItemString(const Item *item) const {
@@ -633,7 +723,7 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
 
 void ItemsWindow::setWeightLabel() {
     Character *player = this->playing_gamestate->getPlayer();
-    int weight = player->getItemsWeight();
+    int weight = player->calculateItemsWeight();
     this->weightLabel->setText("Weight: " + QString::number(weight));
 }
 
@@ -756,7 +846,7 @@ void ItemsWindow::clickedUseItem() {
     }
 }
 
-void ItemsWindow::itemIsDeleted(int index) {
+void ItemsWindow::itemIsDeleted(size_t index) {
     QListWidgetItem *list_item = list->takeItem(index);
     delete list_item;
     list_items.erase(list_items.begin() + index);
@@ -902,6 +992,7 @@ PlayingGamestate::PlayingGamestate() :
     this->addStandardItem( item = new Item("Potion of Healing", "potion_red", 1) );
     item->setUse(ITEMUSE_POTION_HEALING);
     item->setRating(1);
+    item->setMagical(true);
 
     this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
     this->addStandardItem( new Currency("Gold", "gold"));
@@ -910,9 +1001,14 @@ PlayingGamestate::PlayingGamestate() :
 
     {
         QPixmap containers = game_g->loadImage(":/gfx/textures/scenery/containers.png");
-        this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
+        /*this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
+        this->scenery_opened_images["chest"] = containers.copy(0, 64, 64, 64);*/
+        this->scenery_images["chest"] = containers.copy(6, 2, 52, 52);
+        this->scenery_opened_images["chest"] = containers.copy(6, 66, 52, 52);
         this->scenery_images["barrel"] = containers.copy(64, 0, 64, 64);
+        this->scenery_opened_images["barrel"] = containers.copy(64, 64, 64, 64);
         this->scenery_images["crate"] = containers.copy(128, 0, 64, 64);
+        this->scenery_opened_images["crate"] = containers.copy(128, 64, 64, 64);
     }
 
     gui_overlay->setProgress(20);
@@ -962,7 +1058,9 @@ PlayingGamestate::PlayingGamestate() :
     location->addItem( this->cloneStandardItem("Potion of Healing"), 3.0f, 4.0f );
 
     Scenery *scenery = NULL;
-    location->addScenery( scenery = new Scenery("Chest", "chest"), 1.0f, 2.0f );
+    location->addScenery( scenery = new Scenery("Chest", "chest"), 2.0f, 2.0f );
+    scenery->setBlocking(true);
+    scenery->setSize(0.8f, 0.8f);
     scenery->addItem( this->cloneStandardItem("Potion of Healing") );
     scenery->addItem( this->cloneStandardItem("Longbow") );
 
@@ -999,8 +1097,9 @@ PlayingGamestate::PlayingGamestate() :
         location->addBoundary(boundary);
     }
     location->createBoundariesForScenery();
+    location->calculateDistanceGraph();
 
-    location->addCharacter(player, 2.0f, 2.0f);
+    location->addCharacter(player, 3.0f, 2.0f);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
 
@@ -1016,8 +1115,7 @@ PlayingGamestate::PlayingGamestate() :
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
     location->calculateSize(&location_width, &location_height);
-    //location_height += offset_y;
-    scene->setSceneRect(0, -offset_y, location_width, location_height);
+    scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
     //int pixels_per_unit = 32;
     view->scale(pixels_per_unit, pixels_per_unit);
@@ -1048,12 +1146,31 @@ PlayingGamestate::PlayingGamestate() :
             scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
         }
     }
-    {
+    /*{
         vector<Vector2D> path_way_points = location->calculatePathWayPoints();
         for(vector<Vector2D>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
             Vector2D path_way_point = *iter;
             const float radius = 0.05f;
             scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
+        }
+    }*/
+    {
+        const Graph *distance_graph = location->getDistanceGraph();
+        for(size_t i=0;i<distance_graph->getNVertices();i++) {
+            const GraphVertex *vertex = distance_graph->getVertex(i);
+            Vector2D path_way_point = vertex->getPos();
+            const float radius = 0.05f;
+            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
+            // n.b., draws edges twice, but doesn't matter for debug purposes...
+            for(size_t j=0;j<vertex->getNNeighbours();j++) {
+                const GraphVertex *o_vertex = vertex->getNeighbour(distance_graph, j);
+                Vector2D o_path_way_point = o_vertex->getPos();
+                float x1 = path_way_point.x;
+                float y1 = path_way_point.y;
+                float x2 = o_path_way_point.x;
+                float y2 = o_path_way_point.y;
+                scene->addLine(x1, y1, x2, y2, wall_pen);
+            }
         }
     }
 
@@ -1217,17 +1334,13 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
     if( this->location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         scenery->setUserGfxData(object);
-        map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName().c_str());
-        if( image_iter == this->scenery_images.end() ) {
-            LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
-            LOG("    image name: %s\n", scenery->getImageName().c_str());
-            throw string("Failed to find scenery's image");
-        }
-        object->setPixmap( image_iter->second );
+        this->locationUpdateScenery(scenery);
         scene->addItem(object);
         object->setPos(scenery->getX(), scenery->getY());
         object->setZValue(object->pos().y());
-        float scenery_scale = scenery_width / object->pixmap().width();
+        //float scenery_scale = scenery_width / object->pixmap().width();
+        // n.b., aspect-ratio of scenery should match that of the corresponding image for this scenery!
+        float scenery_scale = scenery->getWidth() / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*scenery_scale, -0.5f*object->pixmap().height()*scenery_scale);
         object->setScale(scenery_scale);
     }
@@ -1239,6 +1352,31 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
+    }
+}
+
+void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
+    QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+    if( object != NULL ) {
+        bool done = false;
+        if( scenery->isOpened() ) {
+            map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName().c_str());
+            if( image_iter != this->scenery_opened_images.end() ) {
+                done = true;
+                object->setPixmap( image_iter->second );
+            }
+        }
+        if( !done ) {
+            map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName().c_str());
+            if( image_iter == this->scenery_images.end() ) {
+                LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
+                LOG("    image name: %s\n", scenery->getImageName().c_str());
+                throw string("Failed to find scenery's image");
+            }
+            done = true;
+            object->setPixmap( image_iter->second );
+        }
+        object->update();
     }
 }
 
@@ -1315,11 +1453,13 @@ void PlayingGamestate::clickedOptions() {
     subwindow->setLayout(layout);
 
     QPushButton *quitButton = new QPushButton("Quit game");
+    quitButton->setFont(game_g->getFontBig());
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 
     QPushButton *closeButton = new QPushButton("Back to game");
+    closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
@@ -1439,7 +1579,7 @@ void PlayingGamestate::characterTurn(const Character *character, void *user_data
     float angle = atan2(dir.y, dir.x);
     if( angle < 0.0f )
         angle += (float)(2.0*M_PI);
-    angle /= 2.0*M_PI;
+    angle /= (float)(2.0*M_PI);
     float turn = angle*((int)N_DIRECTIONS) + 0.5f;
     int turn_i = (int)turn;
     /*qDebug("angle %f", angle);
@@ -1502,7 +1642,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             if( character == player )
                 continue;
             float dist = (dest - character->getPos()).magnitude();
-            if( dist <= character->getRadius() ) {
+            if( dist <= npc_radius_c ) {
                 if( target_npc == NULL || dist < min_dist ) {
                     done = true;
                     target_npc = character;
@@ -1519,7 +1659,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Item *item = *iter;
                 float dist_from_click = (dest - item->getPos()).magnitude();
                 float dist_from_player = (player->getPos() - item->getPos()).magnitude();
-                if( dist_from_click <= 0.5f && dist_from_player <= player->getRadius() ) {
+                if( dist_from_click <= 0.5f && dist_from_player <= npc_radius_c ) {
                     if( picked_item == NULL || dist_from_click < min_dist ) {
                         done = true;
                         picked_item = item;
@@ -1545,7 +1685,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
                 Scenery *scenery = *iter;
                 Vector2D scenery_pos = scenery->getPos();
-                float scenery_height = scenery_width;
+                float scenery_width = scenery->getWidth();
+                float scenery_height = scenery->getHeight();
                 if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
                     dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {
                     // clicked on this scenery
@@ -1553,7 +1694,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
                     float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
                     float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;
-                    if( player_dist <= player->getRadius() + 0.5f ) {
+                    if( player_dist <= npc_radius_c + 0.5f ) {
                         if( selected_scenery == NULL ) {
                             done = true;
                             selected_scenery = scenery;
@@ -1569,20 +1710,20 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     location->addItem(item, player->getX(), player->getY());
                 }
                 selected_scenery->eraseAllItems();
+                selected_scenery->setOpened(true);
                 this->addTextEffect("Found some items!", player->getPos(), 2000);
             }
         }
 
         if( dest != player->getPos() ) {
-            Vector2D hit_pos;
-            bool hit = location->intersectSweptSquareWithBoundaries(player, &hit_pos, player->getPos(), dest, player->getRadius());
+            /*Vector2D hit_pos;
+            bool hit = location->intersectSweptSquareWithBoundariesAndNPCs(player, &hit_pos, player->getPos(), dest, npc_radius_c);
             if( hit ) {
                 LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
                 dest = hit_pos;
-            }
+            }*/
             player->setDestination(dest.x, dest.y);
         }
-
     }
 }
 
@@ -1670,6 +1811,16 @@ Game::Game() {
 
 void Game::run() {
     screen = new Screen();
+
+    // setup fonts
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+    this->font_std = window->font();
+    this->font_big = window->font();
+#else
+    this->font_std = window->font();
+    this->font_big = QFont("Verdana", 48, QFont::Bold);
+#endif
 
     gamestate = new OptionsGamestate();
 
