@@ -86,12 +86,18 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         throw string("is_hitting is true, but no target_npc");
     }
     if( target_npc != NULL ) {
+        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
+        float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+        bool can_hit = false;
+        if( is_ranged ) {
+            can_hit = true;
+        }
+        else {
+            can_hit = dist <= hit_range_c;
+        }
         if( elapsed_ms > time_last_action_ms + 400 && is_hitting ) {
             this->setStateIdle();
-
-            bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
-            float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-            if( is_ranged || dist <= hit_range_c ) {
+            if( can_hit ) {
                 LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
                 ai_try_moving = false; // no point trying to move, just wait to hit again
                 if( !target_npc->is_dead ) {
@@ -112,9 +118,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             }
         }
         else if( !is_hitting ) {
-            bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
-            float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-            if( is_ranged || dist <= hit_range_c ) {
+            if( can_hit ) {
                 ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
                 if( elapsed_ms > time_last_action_ms + 1000 ) {
                     // take a swing!
