@@ -85,80 +85,81 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     if( is_hitting && target_npc == NULL ) {
         throw string("is_hitting is true, but no target_npc");
     }
-    if( elapsed_ms > time_last_action_ms + 400 && target_npc != NULL && is_hitting ) {
-        this->setStateIdle();
+    if( target_npc != NULL ) {
+        if( elapsed_ms > time_last_action_ms + 400 && is_hitting ) {
+            this->setStateIdle();
 
-        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
-        float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        if( is_ranged || dist <= hit_range_c ) {
-            LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
-            ai_try_moving = false; // no point trying to move, just wait to hit again
-            if( !target_npc->is_dead ) {
-                //target_npc->changeHealth(playing_gamestate, -1);
-                target_npc->decreaseHealth(playing_gamestate, 1);
-                string text;
-                int r = rand() % 4;
-                if( r == 0 )
-                    text = "Argh!";
-                else if( r == 1 )
-                    text = "Ow!";
-                else if( r == 2 )
-                    text = "Ouch!";
-                else
-                    text = "Eek!";
-                playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+            bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
+            float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+            if( is_ranged || dist <= hit_range_c ) {
+                LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
+                ai_try_moving = false; // no point trying to move, just wait to hit again
+                if( !target_npc->is_dead ) {
+                    //target_npc->changeHealth(playing_gamestate, -1);
+                    target_npc->decreaseHealth(playing_gamestate, 1);
+                    string text;
+                    int r = rand() % 4;
+                    if( r == 0 )
+                        text = "Argh!";
+                    else if( r == 1 )
+                        text = "Ow!";
+                    else if( r == 2 )
+                        text = "Ouch!";
+                    else
+                        text = "Eek!";
+                    playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+                }
             }
         }
-    }
-    else if( !is_hitting && target_npc != NULL ) {
-    //else if( !is_hitting && target_npc != NULL ) {
-        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
-        float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        if( is_ranged || dist <= hit_range_c ) {
-            ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
-            if( elapsed_ms > time_last_action_ms + 1000 ) {
-                // take a swing!
-                bool can_hit = true;
-                Ammo *ammo = NULL;
-                string ammo_key;
-                if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
-                    ammo_key = this->getCurrentWeapon()->getAmmoKey();
-                    Item *item = this->findItem(ammo_key);
-                    if( item == NULL ) {
-                        can_hit = false;
+        else if( !is_hitting ) {
+            bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
+            float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+            if( is_ranged || dist <= hit_range_c ) {
+                ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
+                if( elapsed_ms > time_last_action_ms + 1000 ) {
+                    // take a swing!
+                    bool can_hit = true;
+                    Ammo *ammo = NULL;
+                    string ammo_key;
+                    if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                        ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                        Item *item = this->findItem(ammo_key);
+                        if( item == NULL ) {
+                            can_hit = false;
+                        }
+                        else if( item->getType() != ITEMTYPE_AMMO ) {
+                            LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                            throw string("required ammo type is not ammo");
+                        }
+                        else {
+                            ammo = static_cast<Ammo *>(item);
+                        }
                     }
-                    else if( item->getType() != ITEMTYPE_AMMO ) {
-                        LOG("required ammo type %s is not ammo\n", item->getName().c_str());
-                        throw string("required ammo type is not ammo");
-                    }
-                    else {
-                        ammo = static_cast<Ammo *>(item);
-                    }
-                }
-                if( can_hit ) {
-                    if( ammo != NULL ) {
-                        // ammo will be deleted if used up!
-                        if( this->useAmmo(ammo) ) {
-                            ammo = NULL; // just to be safe, as pointer now deleted
-                            if( this->findItem(ammo_key) == NULL ) {
-                                // really has used up all available ammo
-                                if( this == playing_gamestate->getPlayer() ) {
-                                    playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                    if( can_hit ) {
+                        if( ammo != NULL ) {
+                            // ammo will be deleted if used up!
+                            if( this->useAmmo(ammo) ) {
+                                ammo = NULL; // just to be safe, as pointer now deleted
+                                if( this->findItem(ammo_key) == NULL ) {
+                                    // really has used up all available ammo
+                                    if( this == playing_gamestate->getPlayer() ) {
+                                        playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                    }
                                 }
                             }
                         }
-                    }
-                    is_hitting = true;
-                    //has_destination = false;
-                    has_path = false;
-                    time_last_action_ms = elapsed_ms;
-                    if( this->listener != NULL ) {
-                        string anim = is_ranged ? "ranged" : "attack";
-                        this->listener->characterSetAnimation(this, this->listener_data, anim);
-                        Vector2D dir = target_npc->getPos() - this->getPos();
-                        if( dist > 0.0f ) {
-                            dir.normalise();
-                            this->listener->characterTurn(this, this->listener_data, dir);
+                        is_hitting = true;
+                        //has_destination = false;
+                        has_path = false;
+                        time_last_action_ms = elapsed_ms;
+                        if( this->listener != NULL ) {
+                            string anim = is_ranged ? "ranged" : "attack";
+                            this->listener->characterSetAnimation(this, this->listener_data, anim);
+                            Vector2D dir = target_npc->getPos() - this->getPos();
+                            if( dist > 0.0f ) {
+                                dir.normalise();
+                                this->listener->characterTurn(this, this->listener_data, dir);
+                            }
                         }
                     }
                 }
