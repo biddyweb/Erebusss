@@ -90,7 +90,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
         bool can_hit = false;
         if( is_ranged ) {
-            can_hit = true;
+            //can_hit = true;
+            // check line of sight
+            Vector2D hit_pos;
+            if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, NULL) ) {
+                can_hit = true;
+            }
         }
         else {
             can_hit = dist <= hit_range_c;
