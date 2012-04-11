@@ -1475,7 +1475,17 @@ void PlayingGamestate::clickedRest() {
         return;
     }
     if( game_g->askQuestionWindow("Rest", "Rest until fully healed?") ) {
+        int health_restore_percent = 100 - this->player->getHealthPercent();
+        int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
+        if( time == 0 ) {
+            time = 1;
+        }
         this->player->restoreHealth();
+        stringstream str;
+        str << "Rested for " << time << " hour";
+        if( time > 1 )
+            str << "s";
+        this->addTextEffect(str.str(), player->getPos(), 2000);
     }
 }
 
@@ -1733,6 +1743,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 dest = hit_pos;
             }*/
             player->setDestination(dest.x, dest.y, ignore_scenery);
+            if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
+                this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+            }
         }
     }
 }
