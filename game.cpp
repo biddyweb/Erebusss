@@ -1679,6 +1679,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
         }
 
+        Scenery *ignore_scenery = NULL;
         if( !done ) {
             // search for clicking on a scenery
             Scenery *selected_scenery = NULL;
@@ -1687,31 +1688,40 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Vector2D scenery_pos = scenery->getPos();
                 float scenery_width = scenery->getWidth();
                 float scenery_height = scenery->getHeight();
-                if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
-                    dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {
-                    // clicked on this scenery
-                    Vector2D player_pos = player->getPos();
-                    float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
-                    float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
-                    float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;
-                    if( player_dist <= npc_radius_c + 0.5f ) {
-                        if( selected_scenery == NULL ) {
-                            done = true;
-                            selected_scenery = scenery;
-                            min_dist = 0.0f;
+                if( dest.x >= scenery_pos.x - 0.5f * scenery_width - npc_radius_c && dest.x <= scenery_pos.x + 0.5f * scenery_width + npc_radius_c &&
+                    dest.y >= scenery_pos.y - 0.5f * scenery_height - npc_radius_c && dest.y <= scenery_pos.y + 0.5f * scenery_height + npc_radius_c ) {
+                    // clicked on or near this scenery
+                    ignore_scenery = scenery;
+                    if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
+                        dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {
+                        // clicked on this scenery
+                        Vector2D player_pos = player->getPos();
+                        float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
+                        float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
+                        float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;
+                        if( player_dist <= npc_radius_c + 0.5f ) {
+                            if( selected_scenery == NULL ) {
+                                done = true;
+                                selected_scenery = scenery;
+                                min_dist = 0.0f;
+                            }
                         }
                     }
                 }
             }
 
             if( selected_scenery != NULL ) {
-                for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
-                    Item *item = *iter;
-                    location->addItem(item, player->getX(), player->getY());
+                if( selected_scenery->getNItems() > 0 ) {
+                    for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
+                        Item *item = *iter;
+                        location->addItem(item, player->getX(), player->getY());
+                    }
+                    selected_scenery->eraseAllItems();
+                    this->addTextEffect("Found some items!", player->getPos(), 2000);
                 }
-                selected_scenery->eraseAllItems();
-                selected_scenery->setOpened(true);
-                this->addTextEffect("Found some items!", player->getPos(), 2000);
+                if( !selected_scenery->isOpened() ) {
+                    selected_scenery->setOpened(true);
+                }
             }
         }
 
@@ -1722,7 +1732,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
                 dest = hit_pos;
             }*/
-            player->setDestination(dest.x, dest.y);
+            player->setDestination(dest.x, dest.y, ignore_scenery);
         }
     }
 }

@@ -165,9 +165,10 @@ public:
 class Polygon2D {
 protected:
     vector<Vector2D> points; // should be stored anti-clockwise
+    void *source;
 
 public:
-    Polygon2D() {
+    Polygon2D() : source(NULL) {
     }
 
     Vector2D getPoint(size_t i) const {
@@ -178,6 +179,12 @@ public:
     }
     void addPoint(Vector2D point) {
         this->points.push_back(point);
+    }
+    void setSource(void *source) {
+        this->source = source;
+    }
+    void *getSource() const {
+        return this->source;
     }
 };
 

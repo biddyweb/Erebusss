@@ -179,7 +179,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     dest = hit_pos;
                 }*/
                 //qDebug("move to player, dist %f", dist);
-                this->setDestination(dest.x, dest.y);
+                this->setDestination(dest.x, dest.y, NULL);
                 done_target = true;
             }
         }
@@ -442,7 +442,7 @@ int Character::calculateItemsWeight() const {
     return weight;
 }
 
-void Character::setDestination(float xdest, float ydest) {
+void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
     LOG("Character::setDestination(%f, %f) for %s\n", xdest, ydest, this->getName().c_str());
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
@@ -451,12 +451,12 @@ void Character::setDestination(float xdest, float ydest) {
 
     Vector2D dest(xdest, ydest);
 
+    vector<Vector2D> new_path;
+
     Vector2D hit_pos;
-    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, dest, npc_radius_c) ) {
+    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, dest, npc_radius_c, ignore_scenery) ) {
         // easy
-        vector<Vector2D> new_path;
         new_path.push_back(dest);
-        this->setPath(new_path);
     }
     else {
         LOG("    calculate path\n");
@@ -484,7 +484,7 @@ void Character::setDestination(float xdest, float ydest) {
                     hit = false;
                 }
                 else {
-                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c);
+                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, j==end_index ? ignore_scenery : NULL);
                 }
                 if( !hit ) {
                     v_A->addNeighbour(j, dist);
@@ -499,15 +499,26 @@ void Character::setDestination(float xdest, float ydest) {
             LOG("    can't reach destination (or already at it)\n");
         }
         else {
-            vector<Vector2D> new_path;
             for(vector<GraphVertex *>::const_iterator iter = shortest_path.begin(); iter != shortest_path.end(); ++iter) {
                 const GraphVertex *vertex = *iter;
                 new_path.push_back(vertex->getPos());
             }
-            this->setPath(new_path);
         }
 
         delete graph;
+    }
+
+    if( new_path.size() > 0 ) {
+        if( ignore_scenery != NULL ) {
+            Vector2D p0 = this->pos;
+            if( new_path.size() >= 2 ) {
+                p0 = new_path.at( new_path.size() - 2 );
+            }
+            if( location->intersectSweptSquareWithBoundaries(&hit_pos, p0, dest, npc_radius_c, NULL) ) {
+                new_path[ new_path.size() - 1 ] = hit_pos;
+            }
+        }
+        this->setPath(new_path);
     }
 
 }

@@ -108,6 +108,9 @@ public:
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
     }
+    int getNItems() const {
+        return this->items.size();
+    }
     void setOpened(bool opened);
     bool isOpened() const {
         return this->opened;
@@ -140,7 +143,7 @@ class Location {
     set<Scenery *> scenerys;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax);
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery);
 
     vector<Vector2D> calculatePathWayPoints() const;
 public:
@@ -228,7 +231,7 @@ public:
     }
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width);
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery);
     bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width);
 
     void calculateDistanceGraph();

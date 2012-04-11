@@ -154,6 +154,7 @@ void Location::createBoundariesForScenery() {
             continue;
         }
         Polygon2D boundary;
+        boundary.setSource(scenery);
         /*Vector2D pos = scenery->getPos();
         // clockwise, as "inside" should be on the left
         boundary.addPoint(pos);
@@ -310,9 +311,12 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery) {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
+        if( ignore_scenery != NULL && boundary->getSource() == ignore_scenery ) {
+            continue;
+        }
         for(size_t j=0;j<boundary->getNPoints() && !(*done);j++) {
             Vector2D p0 = boundary->getPoint(j);
             Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
@@ -321,7 +325,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width) {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery) {
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -344,7 +348,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D st
     //float ymax = dv_length + width;
     float ymax = dv_length;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, ignore_scenery);
 
     if( hit ) {
         *hit_pos = start + dv * hit_dist;
@@ -374,7 +378,7 @@ bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *charac
     float ymin = 0.0f;
     float ymax = dv_length + width;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, NULL);
 
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !done; ++iter) {
         const Character *npc = *iter;
@@ -491,7 +495,7 @@ void Location::calculateDistanceGraph() {
                 hit = false;
             }
             else {
-                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c);
+                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, NULL);
             }
             if( !hit ) {
                 v_A->addNeighbour(j, dist);

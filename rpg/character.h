@@ -19,6 +19,7 @@ class Shield;
 class Armour;
 class Ammo;
 class Location;
+class Scenery;
 
 const float npc_visibility_c = 10.0f;
 const float npc_radius_c = 0.25f;
@@ -130,7 +131,7 @@ public:
             this->listener->characterSetAnimation(this, this->listener_data, "run");
         }
     }
-    void setDestination(float xdest, float ydest);
+    void setDestination(float xdest, float ydest, const Scenery *ignore_scenery);
     bool update(PlayingGamestate *playing_gamestate);
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {
