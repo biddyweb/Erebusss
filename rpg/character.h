@@ -56,8 +56,11 @@ class Character {
     bool is_hitting;
 
     // rpg data
+    int fighting_prowess;
+    int strength;
     int health;
     int max_health;
+
     set<Item *> items;
     Weapon *current_weapon;
     Shield *current_shield;
@@ -218,8 +221,6 @@ public:
     }
     void addGold(int change);
     int calculateItemsWeight() const;
-    int getCanCarryWeight() const {
-        return 400;
-    }
+    int getCanCarryWeight() const;
     bool canMove() const;
 };

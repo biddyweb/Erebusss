@@ -14,7 +14,7 @@ Character::Character(string name, string animation_name, bool is_ai) :
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), is_hitting(false),
-    health(0), max_health(0),
+    fighting_prowess(0), strength(0), health(0), max_health(0),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
 {
 
@@ -531,6 +531,11 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
         this->setPath(new_path);
     }
 
+}
+
+int Character::getCanCarryWeight() const {
+    return 400;
+    //return 10;
 }
 
 bool Character::canMove() const {
