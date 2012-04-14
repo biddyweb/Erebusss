@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<items>
+
+<weapon name="Long Sword" image_name="longsword" weight="14"
+    animation_name="longsword"/>
+<weapon name="Longbow" image_name="longbow" weight="5"
+    animation_name="longbow"
+    two_handed="true" ranged="true" ammo="Arrows"/>
+
+<shield name="Shield" image_name="shield" weight="36"
+    animation_name="shield"/>
+
+<armour name="Leather Armour" image_name="leather_armour" weight="100"
+    rating="2"/>
+
+<ammo name="Arrows" image_name="arrow" projectile_image_name="arrow"
+    amount="20"/>
+
+<item name="Potion of Healing" image_name="potion_red" weight="1"
+    rating="2" magical="true" use="ITEMUSE_POTION_HEALING"/>
+
+<currency name="Gold" image_name="gold"/>
+
+</items>
