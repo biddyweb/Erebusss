@@ -188,14 +188,16 @@ class MainGraphicsView : public QGraphicsView {
     int mouse_down_x, mouse_down_y;
     //QGraphicsProxyWidget *gui_overlay_item;
     GUIOverlay *gui_overlay;
+    float c_scale;
 
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void wheelEvent(QWheelEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
 
 public:
     MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
-        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL)
+        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
     {
     }
     virtual ~MainGraphicsView() {
@@ -205,6 +207,7 @@ public:
         //this->gui_overlay_item = gui_overlay_item;
         this->gui_overlay = gui_overlay;
     }
+    void setScale(float c_scale);
 };
 
 class GUIOverlay : public QWidget {

@@ -363,6 +363,20 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
     QGraphicsView::mouseReleaseEvent(event);
 }
 
+void MainGraphicsView::wheelEvent(QWheelEvent *event) {
+    const float factor_c = 1.1f;
+    if( event->delta() > 0 ) {
+        float n_scale = c_scale * factor_c;
+        n_scale = std::min(n_scale, 400.0f);
+        this->setScale(n_scale);
+    }
+    else if( event->delta() < 0 ) {
+        float n_scale = c_scale / factor_c;
+        n_scale = std::max(n_scale, 10.0f);
+        this->setScale(n_scale);
+    }
+}
+
 void MainGraphicsView::resizeEvent(QResizeEvent *event) {
     LOG("MainGraphicsView resized to: %d, %d\n", event->size().width(), event->size().height());
     if( this->gui_overlay != NULL ) {
@@ -372,6 +386,13 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
         //qDebug("### %d, %d", scene()->sceneRect().x(), scene()->sceneRect().y());
         //this->gui_overlay_item->setPos( this->scene()->sceneRect().topLeft() );
     }
+}
+
+void MainGraphicsView::setScale(float c_scale) {
+    LOG("MainGraphicsView::setScale(%f)\n", c_scale);
+    this->c_scale = c_scale;
+    this->resetTransform();
+    this->scale(c_scale, c_scale);
 }
 
 GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
@@ -1254,7 +1275,8 @@ PlayingGamestate::PlayingGamestate() :
     scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
     //int pixels_per_unit = 32;
-    view->scale(pixels_per_unit, pixels_per_unit);
+    //view->scale(pixels_per_unit, pixels_per_unit);
+    view->setScale(pixels_per_unit);
 
     LOG("load floor image\n");
     QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
