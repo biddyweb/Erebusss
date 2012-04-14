@@ -28,14 +28,16 @@ SOURCES += main.cpp mainwindow.cpp \
     rpg/location.cpp \
     rpg/character.cpp \
     rpg/utils.cpp \
-    rpg/item.cpp
+    rpg/item.cpp \
+    qt_utils.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
     rpg/location.h \
     rpg/character.h \
     rpg/utils.h \
-    rpg/item.h
+    rpg/item.h \
+    qt_utils.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
@@ -44,7 +46,9 @@ qtcAddDeployment()
 
 OTHER_FILES += \
     _docs/todo.txt \
-    _docs/design.odt
+    _docs/design.odt \
+    data/items.xml \
+    data/item_images.xml
 
 RESOURCES += \
     erebus.qrc
