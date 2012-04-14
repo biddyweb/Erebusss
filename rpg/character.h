@@ -125,15 +125,7 @@ public:
             this->listener->characterSetAnimation(this, this->listener_data, "run");
         }
     }*/
-    void setPath(vector<Vector2D> &path) {
-        bool old_has_path = this->has_path;
-        this->has_path = true;
-        this->path = path;
-        this->is_hitting = false;
-        if( this->listener != NULL && !old_has_path ) {
-            this->listener->characterSetAnimation(this, this->listener_data, "run");
-        }
-    }
+    void setPath(vector<Vector2D> &path);
     void setDestination(float xdest, float ydest, const Scenery *ignore_scenery);
     bool update(PlayingGamestate *playing_gamestate);
     void setTargetNPC(Character *target_npc) {
@@ -170,6 +162,9 @@ public:
         }
         this->health = health;
     }
+    int getHealth() const {
+        return this->health;
+    }
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }
@@ -203,6 +198,7 @@ public:
     void wearArmour(Armour *item);
     void addItem(Item *item);
     void pickupItem(Item *item);
+    void takeItem(Item *item);
     void dropItem(Item *item);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();

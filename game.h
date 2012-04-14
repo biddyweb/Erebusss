@@ -47,7 +47,7 @@ public:
 
 protected:
     AnimationType animation_type;
-    int n_frames;
+    size_t n_frames;
     //QPixmap *pixmaps; // array of length N_DIRECTIONS * n_frames
     vector<QPixmap> pixmaps; // vector of length N_DIRECTIONS * n_frames
     /*QRectF bounding_rect;
@@ -55,16 +55,16 @@ protected:
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);*/
 public:
-    AnimationSet(AnimationType animation_type, int n_frames, vector<QPixmap> pixmaps); // pixmaps array of length N_DIRECTIONS * n_frames
+    AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length N_DIRECTIONS * n_frames
     virtual ~AnimationSet();
 
-    int getNFrames() const {
+    size_t getNFrames() const {
         return this->n_frames;
     }
     //QPixmap *getFrames(Direction c_direction);
-    const QPixmap &getFrame(Direction c_direction, int c_frame) const;
+    const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(QPixmap image, AnimationType animation_type, int x_offset, int n_frames);
+    static AnimationSet *create(QPixmap image, AnimationType animation_type, int x_offset, size_t n_frames);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -74,10 +74,10 @@ class AnimationLayerDefinition {
     friend class AnimationLayer;
     string name;
     int position;
-    int n_frames;
+    size_t n_frames;
     AnimationSet::AnimationType animation_type;
 public:
-    AnimationLayerDefinition(string name, int position, int n_frames, AnimationSet::AnimationType animation_type) :
+    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type) :
         name(name), position(position), n_frames(n_frames), animation_type(animation_type) {
     }
 };
@@ -114,7 +114,7 @@ class AnimatedObject : public QGraphicsItem {
     string c_animation_name;
     vector<const AnimationSet *> c_animation_sets;
     Direction c_direction;
-    int c_frame;
+    size_t c_frame;
     int animation_time_start_ms;
 
     virtual void advance(int phase);

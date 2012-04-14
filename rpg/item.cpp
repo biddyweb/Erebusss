@@ -7,7 +7,7 @@ using std::stringstream;
 
 Item::Item(string name, string image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), weight(weight),
-    item_use(ITEMUSE_NONE), rating(1), is_magical(false)
+    /*item_use(ITEMUSE_NONE), */rating(1), is_magical(false)
 {
 }
 
@@ -18,8 +18,16 @@ Item *Item::clone() const {
     return new Item(*this);
 }
 
+bool Item::canUse() const {
+    //return item_use != ITEMUSE_NONE;
+    return item_use.length() > 0;
+}
+
 string Item::getUseVerb() const {
-    if( this->item_use == ITEMUSE_POTION_HEALING ) {
+    /*if( this->item_use == ITEMUSE_POTION_HEALING ) {
+        return "Drink";
+    }*/
+    if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
         return "Drink";
     }
     LOG("Item::getUseVerb() unknown item_use: %d\n", this->item_use);
@@ -35,9 +43,12 @@ bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
         throw string("tried to use item that can't be used");
     }
 
-    if( this->item_use == ITEMUSE_POTION_HEALING ) {
-        LOG("Character: %s drinks potion of healing\n", character->getName().c_str());
-        character->increaseHealth( this->rating );
+    //if( this->item_use == ITEMUSE_POTION_HEALING ) {
+    if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
+        int amount = rollDice(this->rating, 6, 0);
+        LOG("Character: %s drinks potion of healing, heal %d\n", character->getName().c_str(), amount);
+        character->increaseHealth( amount );
+        LOG("    health is now: %d\n", character->getHealth());
         playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
         return true;
     }
@@ -68,8 +79,9 @@ Shield *Shield::clone() const {
 }
 
 Armour::Armour(string name, string image_name, int weight, int rating) :
-    Item(name, image_name, weight), rating(rating)
+    Item(name, image_name, weight)
 {
+    this->rating = rating;
 }
 
 Armour *Armour::clone() const {

@@ -17,10 +17,10 @@ enum ItemType {
     ITEMTYPE_CURRENCY = 5
 };
 
-enum ItemUse {
+/*enum ItemUse {
     ITEMUSE_NONE = 0,
     ITEMUSE_POTION_HEALING = 1
-};
+};*/
 
 class Item {
 protected:
@@ -30,7 +30,8 @@ protected:
     void *user_data_gfx;
     int weight; // in multiples of 100g
 
-    ItemUse item_use;
+    //ItemUse item_use;
+    string item_use;
     int rating;
     bool is_magical;
 public:
@@ -83,12 +84,13 @@ public:
     int getWeight() const {
         return this->weight;
     }
-    bool canUse() const {
-        return item_use != ITEMUSE_NONE;
-    }
+    bool canUse() const;
     string getUseVerb() const;
     bool use(PlayingGamestate *playing_gamestate, Character *character);
-    void setUse(ItemUse item_use) {
+    /*void setUse(ItemUse item_use) {
+        this->item_use = item_use;
+    }*/
+    void setUse(string item_use) {
         this->item_use = item_use;
     }
     void setRating(int rating) {
@@ -164,7 +166,7 @@ public:
 };
 
 class Armour : public Item {
-    int rating;
+    //int rating;
 public:
     Armour(string name, string image_name, int weight, int rating);
     virtual ~Armour() {

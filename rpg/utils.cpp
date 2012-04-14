@@ -112,3 +112,13 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
     LOG("    calculated shortest path, length: %d\n", path.size());
     return path;
 }
+
+int rollDice(int X, int Y, int Z) {
+    // X DY + Z
+    int value = Z;
+    for(int i=0;i<X;i++) {
+        int roll = (rand() % Y) + 1;
+        value += roll;
+    }
+    return value;
+}

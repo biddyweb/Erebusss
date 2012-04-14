@@ -3,11 +3,14 @@
 
 #include "game.h"
 #include "qt_screen.h"
+#include "qt_utils.h"
 
 #include <ctime>
 
 #include <sstream>
 using std::stringstream;
+
+#include <QXmlStreamReader>
 
 Game *game_g = NULL;
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
@@ -24,7 +27,7 @@ const float font_scale = 1.0f/64.0f;
 
 //const int scene_item_character_key_c = 0;
 
-AnimationSet::AnimationSet(AnimationType animation_type, int n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
+AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
     if( pixmaps.size() != N_DIRECTIONS * n_frames ) {
         LOG("AnimationSet error: pixmaps size %d, n_frames %d, N_DIRECTIONS %d\n", pixmaps.size(), n_frames, N_DIRECTIONS);
         throw string("AnimationSet has incorrect pixmaps size");
@@ -49,7 +52,7 @@ AnimationSet::~AnimationSet() {
     return &this->pixmaps[((int)c_direction)*n_frames];
 }*/
 
-const QPixmap &AnimationSet::getFrame(Direction c_direction, int c_frame) const {
+const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) const {
     //qDebug("animation type: %d", this->animation_type);
     switch( this->animation_type ) {
     case ANIMATIONTYPE_BOUNCE:
@@ -76,10 +79,10 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, int c_frame) const 
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, int x_offset, int n_frames) {
+AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, int x_offset, size_t n_frames) {
     vector<QPixmap> frames;
     for(int i=0;i<N_DIRECTIONS;i++) {
-        for(int j=0;j<n_frames;j++) {
+        for(size_t j=0;j<n_frames;j++) {
             //frames.push_back( game_g->loadImage(filename, true, 64*(x_offset+j), 64*i, 64, 64) );
             frames.push_back( image.copy(64*(x_offset+j), 64*i, 64, 64));
         }
@@ -129,46 +132,13 @@ AnimatedObject::~AnimatedObject() {
     //this->setPixmap(NULL); // just in case of ownership issues??
 }
 
-#if 0
-void AnimatedObject::setFrame(int c_frame) {
-    //this->c_frame = c_frame;
-    //qDebug("set frame %d", c_frame);
-    //this->setPixmap(this->pixmaps[((int)c_direction)*n_frames + c_frame]);
-    /*if( this->c_animation_set != NULL ) {
-        const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
-        this->setPixmap(pixmap);
-    }
-    else {
-        this->setPixmap(NULL);
-    }*/
-    /*if( this->c_animation_sets.size() > 0 ) {
-        for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
-            const AnimationSet *c_animation_set = *iter;
-            const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
-            this->setPixmap(pixmap);
-            break;
-        }
-    }
-    else {
-        this->setPixmap(NULL);
-    }*/
-}
-#endif
-
-/*void AnimationSet::update() {
-    int next_frame = (c_frame + 1) % n_frames;
-    this->setFrame(next_frame);
-}*/
-
 void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
         int ms_per_frame = 100;
         //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
         int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
-        /*int c_frame = ( time_elapsed_ms / ms_per_frame );
-        this->setFrame(c_frame);*/
-        int n_frame = ( time_elapsed_ms / ms_per_frame );
+        size_t n_frame = ( time_elapsed_ms / ms_per_frame );
         if( n_frame != c_frame ) {
             c_frame = n_frame;
             this->update();
@@ -841,6 +811,7 @@ void ItemsWindow::clickedUseItem() {
     Character *player = this->playing_gamestate->getPlayer();
     if( item->use(this->playing_gamestate, player) ) {
         // item is deleted
+        player->takeItem(item);
         item = NULL;
         this->itemIsDeleted(index);
     }
@@ -964,38 +935,203 @@ PlayingGamestate::PlayingGamestate() :
     qApp->processEvents();
 
     // create RPG data
+
+    LOG("load item images\n");
+    {
+        QFile file(":/data/item_images.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                if( reader.name() == "item_image" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    if( name_s.length() == 0 )
+                        throw string("item_image element has no name attribute or is zero length");
+                    QStringRef filename_s = reader.attributes().value("filename");
+                    if( filename_s.length() == 0 )
+                        throw string("item_image element has no filename attribute or is zero length");
+                    QString filename = ":/" + filename_s.toString();
+                    LOG("load image: %s : %s\n", name_s.toString().toStdString().c_str(), filename.toStdString().c_str());
+                    bool clip = false;
+                    int xpos = 0, ypos = 0, width = 0, height = 0;
+                    QStringRef xpos_s = reader.attributes().value("xpos");
+                    QStringRef ypos_s = reader.attributes().value("ypos");
+                    QStringRef width_s = reader.attributes().value("width");
+                    QStringRef height_s = reader.attributes().value("height");
+                    if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
+                        clip = true;
+                        /*bool ok = true;
+                        xpos = xpos_s.toString().toInt(&ok);
+                        if( !ok ) {
+                            LOG("failed to parse xpos: %s\n", xpos_s.toString().toStdString().c_str());
+                            throw string("failed to parse xpos");
+                        }
+                        ypos = ypos_s.toString().toInt(&ok);
+                        if( !ok ) {
+                            LOG("failed to parse ypos: %s\n", ypos_s.toString().toStdString().c_str());
+                            throw string("failed to parse ypos");
+                        }
+                        width = width_s.toString().toInt(&ok);
+                        if( !ok ) {
+                            LOG("failed to parse width: %s\n", width_s.toString().toStdString().c_str());
+                            throw string("failed to parse width");
+                        }
+                        height = height_s.toString().toInt(&ok);
+                        if( !ok ) {
+                            LOG("failed to parse height: %s\n", height_s.toString().toStdString().c_str());
+                            throw string("failed to parse height");
+                        }*/
+                        xpos = parseInt(xpos_s.toString());
+                        ypos = parseInt(ypos_s.toString());
+                        width = parseInt(width_s.toString());
+                        height = parseInt(height_s.toString());
+                        LOG("    clip to: %d, %d, %d, %d\n", xpos, ypos, width, height);
+                    }
+                    this->item_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error reading item_images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading xml file");
+        }
+    }
+
     LOG("create RPG data\n");
+    {
+        QFile file(":/data/items.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                /*qDebug("read xml: %s", reader.name().toString().toStdString().c_str());
+                qDebug("    type: %d", reader.tokenType());
+                qDebug("    n attributes: %d", reader.attributes().size());*/
+                if( reader.name() == "item" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef weight_s = reader.attributes().value("weight");
+                    QStringRef rating_s = reader.attributes().value("rating");
+                    QStringRef magical_s = reader.attributes().value("magical");
+                    QStringRef use_s = reader.attributes().value("use");
+                    int weight = parseInt(weight_s.toString());
+                    int rating = parseInt(rating_s.toString());
+                    bool magical = parseBool(magical_s.toString(), true);
+                    Item *item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
+                    item->setRating(rating);
+                    item->setMagical(magical);
+                    if( use_s.length() > 0 ) {
+                        item->setUse(use_s.toString().toStdString());
+                    }
+                    this->addStandardItem( item );
+                }
+                else if( reader.name() == "weapon" ) {
+                    //qDebug("    weapon:");
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef weight_s = reader.attributes().value("weight");
+                    QStringRef animation_name_s = reader.attributes().value("animation_name");
+                    QStringRef two_handed_s = reader.attributes().value("two_handed");
+                    QStringRef ranged_s = reader.attributes().value("ranged");
+                    QStringRef ammo_s = reader.attributes().value("ammo");
+                    /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
+                    qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
+                    qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
+                    qDebug("    weight: %s", weight_s.toString().toStdString().c_str());
+                    qDebug("    two_handed_s: %s", two_handed_s.toString().toStdString().c_str());
+                    qDebug("    ranged_s: %s", ranged_s.toString().toStdString().c_str());
+                    qDebug("    ammo_s: %s", ammo_s.toString().toStdString().c_str());*/
+                    int weight = parseInt(weight_s.toString());
+                    bool two_handed = parseBool(two_handed_s.toString(), true);
+                    bool ranged = parseBool(ranged_s.toString(), true);
+                    Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
+                    weapon->setTwoHanded(two_handed);
+                    weapon->setRanged(ranged);
+                    if( ammo_s.length() > 0 ) {
+                        weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
+                    }
+                    this->addStandardItem( weapon );
+                }
+                else if( reader.name() == "shield" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef weight_s = reader.attributes().value("weight");
+                    QStringRef animation_name_s = reader.attributes().value("animation_name");
+                    int weight = parseInt(weight_s.toString());
+                    Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
+                    this->addStandardItem( shield );
+                }
+                else if( reader.name() == "armour" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef weight_s = reader.attributes().value("weight");
+                    QStringRef rating_s = reader.attributes().value("rating");
+                    int weight = parseInt(weight_s.toString());
+                    int rating = parseInt(rating_s.toString());
+                    Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
+                    this->addStandardItem( armour );
+                }
+                else if( reader.name() == "ammo" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
+                    QStringRef amount_s = reader.attributes().value("amount");
+                    int amount = parseInt(amount_s.toString());
+                    Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), amount);
+                    this->addStandardItem( ammo );
+                }
+                else if( reader.name() == "currency" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    Currency *currency = new Currency(name_s.toString().toStdString(), image_name_s.toString().toStdString());
+                    this->addStandardItem( currency );
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error reading items.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading xml file");
+        }
+    }
 
-    Item *item = NULL;
-    Weapon *weapon = NULL;
+    /*Item *item = NULL;
+    Weapon *weapon = NULL;*/
 
-    this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
-    this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
+    //this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
+    //this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
 
-    this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
-    this->addStandardItem( weapon = new Weapon("Longbow", "longbow", 5, "longbow") );
+    //this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
+    /*this->addStandardItem( weapon = new Weapon("Longbow", "longbow", 5, "longbow") );
     weapon->setTwoHanded(true);
     weapon->setRanged(true);
-    weapon->setRequiresAmmo(true, "Arrows");
+    weapon->setRequiresAmmo(true, "Arrows");*/
 
-    this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
-    this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
+    //this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
+    //this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
 
-    this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
-    this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
+    //this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
+    //this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
 
-    this->item_images["arrow"] = game_g->loadImage(":/gfx/textures/items/arrow.png", true, 0, 16, 64, 32);
-    this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
-    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 3) );
+    //this->item_images["arrow"] = game_g->loadImage(":/gfx/textures/items/arrow.png", true, 0, 16, 64, 32);
+    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
 
-    this->item_images["potion_red"] = game_g->loadImage(":/gfx/textures/items/potion_red.png");
-    this->addStandardItem( item = new Item("Potion of Healing", "potion_red", 1) );
-    item->setUse(ITEMUSE_POTION_HEALING);
+    //this->item_images["potion_red"] = game_g->loadImage(":/gfx/textures/items/potion_red.png");
+    /*this->addStandardItem( item = new Item("Potion of Healing", "potion_red", 1) );
+    //item->setUse(ITEMUSE_POTION_HEALING);
+    item->setUse("ITEMUSE_POTION_HEALING");
     item->setRating(1);
-    item->setMagical(true);
+    item->setMagical(true);*/
 
-    this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
-    this->addStandardItem( new Currency("Gold", "gold"));
+    //this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
+    //this->addStandardItem( new Currency("Gold", "gold"));
 
     gui_overlay->setProgress(10);
 
@@ -1882,9 +2018,9 @@ void Game::update() {
                 gamestate = NULL;
             }
             delete message;
-            stringstream message;
-            message << "Failed to load game data:\n" << error;
-            game_g->showErrorWindow(message.str().c_str());
+            stringstream str;
+            str << "Failed to load game data:\n" << error;
+            game_g->showErrorWindow(str.str().c_str());
             qApp->quit();
         }
         delete message;
@@ -1947,12 +2083,20 @@ QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int
 }
 
 void Game::showErrorWindow(const char *message) {
+    LOG("Game::showErrorWindow: %s\n", message);
     this->getScreen()->enableUpdateTimer(false);
+    /*LOG("1\n");
+    LOG("screen: %d\n", this->getScreen());
+    LOG("mainWindow: %d\n", this->getScreen()->getMainWindow());
+    LOG("2\n");*/
     QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message);
+    //QMessageBox::critical(NULL, "Error", "Test");
+    //LOG("3\n");
     this->getScreen()->enableUpdateTimer(true);
 }
 
 void Game::showInfoWindow(const char *title, const char *message) {
+    LOG("Game::showInfoWindow: %s\n", message);
     this->getScreen()->enableUpdateTimer(false);
     QMessageBox::information(this->getScreen()->getMainWindow(), title, message);
     this->getScreen()->enableUpdateTimer(true);

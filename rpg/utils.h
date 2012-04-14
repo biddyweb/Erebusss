@@ -274,3 +274,5 @@ public:
     Graph *clone() const;
     vector<GraphVertex *> shortestPath(size_t start, size_t end);
 };
+
+int rollDice(int X, int Y, int Z);

@@ -90,10 +90,16 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
         bool can_hit = false;
         if( is_ranged ) {
-            //can_hit = true;
             // check line of sight
             Vector2D hit_pos;
-            if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, NULL) ) {
+            if( location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, NULL) ) {
+                /*LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
+                LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
+                LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
+                LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);*/
+                can_hit = false;
+            }
+            else {
                 can_hit = true;
             }
         }
@@ -134,7 +140,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         ammo_key = this->getCurrentWeapon()->getAmmoKey();
                         Item *item = this->findItem(ammo_key);
                         if( item == NULL ) {
+                            // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
+                            LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
                             can_hit = false;
+                            this->armWeapon(NULL); // disarm it
                         }
                         else if( item->getType() != ITEMTYPE_AMMO ) {
                             LOG("required ammo type %s is not ammo\n", item->getName().c_str());
@@ -152,7 +162,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 if( this->findItem(ammo_key) == NULL ) {
                                     // really has used up all available ammo
                                     if( this == playing_gamestate->getPlayer() ) {
+                                        LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
                                         playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                        this->armWeapon(NULL); // disarm it
                                     }
                                 }
                             }
@@ -409,7 +421,7 @@ void Character::pickupItem(Item *item) {
     this->addItem(item);
 }
 
-void Character::dropItem(Item *item) {
+void Character::takeItem(Item *item) {
     this->items.erase(item);
     bool graphics_changed = false;
     if( this->current_weapon == item ) {
@@ -424,14 +436,19 @@ void Character::dropItem(Item *item) {
         this->current_armour = NULL;
         //graphics_changed = true;
     }
+
+    if( this->listener != NULL && graphics_changed ) {
+        this->listener->characterUpdateGraphics(this, this->listener_data);
+    }
+}
+
+void Character::dropItem(Item *item) {
+    this->takeItem(item);
     if( location != NULL ) {
         location->addItem(item, this->pos.x, this->pos.y);
     }
     else {
         delete item;
-    }
-    if( this->listener != NULL && graphics_changed ) {
-        this->listener->characterUpdateGraphics(this, this->listener_data);
     }
 }
 
@@ -450,6 +467,17 @@ int Character::calculateItemsWeight() const {
         weight += item->getWeight();
     }
     return weight;
+}
+
+void Character::setPath(vector<Vector2D> &path) {
+    LOG("Character::setPath() for %s\n", this->getName().c_str());
+    bool old_has_path = this->has_path;
+    this->has_path = true;
+    this->path = path;
+    this->is_hitting = false;
+    if( this->listener != NULL && !old_has_path ) {
+        this->listener->characterSetAnimation(this, this->listener_data, "run");
+    }
 }
 
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
