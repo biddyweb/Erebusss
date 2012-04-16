@@ -257,7 +257,7 @@ public:
     Graph() {
     }
 
-    size_t addVertex(GraphVertex &vertex) {
+    size_t addVertex(const GraphVertex &vertex) {
         vertices.push_back(vertex);
         return (vertices.size()-1);
     }
@@ -276,3 +276,5 @@ public:
 };
 
 int rollDice(int X, int Y, int Z);
+
+float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);

@@ -21,7 +21,7 @@ const int versionMinor = 1;
 
 const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 //const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
-const float item_width = 1.0f;
+const float item_width = 0.5f;
 //const float scenery_width = item_width;
 const float font_scale = 1.0f/64.0f;
 
@@ -32,25 +32,10 @@ AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector
         LOG("AnimationSet error: pixmaps size %d, n_frames %d, N_DIRECTIONS %d\n", pixmaps.size(), n_frames, N_DIRECTIONS);
         throw string("AnimationSet has incorrect pixmaps size");
     }
-    /*this->pixmaps = new QPixmap[N_DIRECTIONS * n_frames];
-    for(int i=0;i<N_DIRECTIONS * n_frames;i++) {
-        this->pixmaps[i] = pixmaps[i];
-    }*/
-
-    /*this->bounding_rect.x = 0.0f;
-    this->bounding_rect.y = 0.0f;
-    this->bounding_rect.x = 0.0f;
-    this->bounding_rect.x = 0.0f;*/
-    //this->setFrame(0);
 }
 
 AnimationSet::~AnimationSet() {
-    //delete this->pixmaps;
 }
-
-/*QPixmap *AnimationSet::getFrames(Direction c_direction) {
-    return &this->pixmaps[((int)c_direction)*n_frames];
-}*/
 
 const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) const {
     //qDebug("animation type: %d", this->animation_type);
@@ -91,22 +76,6 @@ AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, 
     return animation_set;
 }
 
-/*AnimationLayer *AnimationLayer::create(const char *filename) {
-    AnimationLayer *layer = new AnimationLayer();
-    QPixmap image = game_g->loadImage(filename);
-    {
-        AnimationSet *animation_set_idle = AnimationSet::create(image, 0, 4);
-        layer->addAnimationSet("", animation_set_idle);
-        AnimationSet *animation_set_run = AnimationSet::create(image, 4, 8);
-        layer->addAnimationSet("run", animation_set_run);
-        AnimationSet *animation_set_attack = AnimationSet::create(image, 12, 4);
-        layer->addAnimationSet("attack", animation_set_attack);
-        AnimationSet *animation_set_death = AnimationSet::create(image, 18, 6);
-        layer->addAnimationSet("death", animation_set_death);
-    }
-    return layer;
-}*/
-
 AnimationLayer *AnimationLayer::create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
     AnimationLayer *layer = new AnimationLayer();
     QPixmap image = game_g->loadImage(filename);
@@ -121,7 +90,6 @@ AnimationLayer *AnimationLayer::create(const char *filename, const vector<Animat
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
     set_c_animation_name(false), c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0)
 {
-    //this->setFrame(0);
     for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
         const AnimationSet *c_animation_set = *iter;
         delete c_animation_set;
@@ -129,7 +97,6 @@ AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL
 }
 
 AnimatedObject::~AnimatedObject() {
-    //this->setPixmap(NULL); // just in case of ownership issues??
 }
 
 void AnimatedObject::advance(int phase) {
@@ -167,12 +134,6 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     }
 }
 
-/*void AnimatedObject::setAnimationLayer(AnimationLayer *animation_layer) {
-    this->animation_layer = animation_layer;
-    this->c_animation_set = animation_layer->getAnimationSet("");
-    this->setFrame(0);
-}*/
-
 void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
     this->animation_layers.push_back(animation_layer);
     const AnimationSet *c_animation_set = animation_layer->getAnimationSet("");
@@ -187,12 +148,6 @@ void AnimatedObject::clearAnimationLayers() {
 }
 
 void AnimatedObject::setAnimationSet(string name) {
-    /*const AnimationSet *new_animation_set = animation_layer->getAnimationSet(name);
-    if( new_animation_set != c_animation_set ) {
-        c_animation_set = new_animation_set;
-        animation_time_start_ms = 0;
-        this->setFrame(0);
-    }*/
     if( !this->set_c_animation_name || this->c_animation_name != name ) {
         //qDebug("set animation set: %s", name.c_str());
         this->c_animation_sets.clear();
@@ -227,8 +182,8 @@ void AnimatedObject::setDirection(Direction c_direction) {
     }
 }
 
-TextEffect::TextEffect(const QString &text, int duration_ms) :
-    QGraphicsTextItem(text), time_expire(0) {
+TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms) :
+    QGraphicsTextItem(text), time_expire(0), view(view) {
     this->setDefaultTextColor(Qt::white);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
 }
@@ -236,7 +191,7 @@ TextEffect::TextEffect(const QString &text, int duration_ms) :
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
         if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
-            this->scene()->removeItem(this);
+            this->view->removeTextEffect(this);
             this->deleteLater();
         }
     }
@@ -288,7 +243,7 @@ OptionsGamestate::OptionsGamestate()
     //this->initButton(prevButton);
 
 #ifndef Q_OS_ANDROID
-    // applications don't quite on Android.
+    // applications don't quit on Android.
     QPushButton *quitButton = new QPushButton("Quit game");
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
@@ -332,6 +287,23 @@ void OptionsGamestate::clickedQuit() {
     this->quitGame();
 }
 
+bool MainGraphicsView::event(QEvent *event) {
+    qDebug("MainGraphicsView::event\n");
+
+    if( event->type() == QEvent::Gesture ) {
+        LOG("MainGraphicsView received gesture\n");
+        throw string("received gesture");
+        QGestureEvent *gesture = static_cast<QGestureEvent*>(event);
+        QPinchGesture *pinch = static_cast<QPinchGesture *>(gesture->gesture(Qt::PinchGesture));
+        if( pinch != NULL ) {
+            LOG("    zoom\n");
+            LOG("    scale factor %f\n", pinch->scaleFactor());
+            return true;
+        }
+    }
+    return QGraphicsView::event(event);
+}
+
 void MainGraphicsView::mousePressEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mousePressEvent");
     if( event->button() == Qt::LeftButton ) {
@@ -364,7 +336,7 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void MainGraphicsView::wheelEvent(QWheelEvent *event) {
-    const float factor_c = 1.1f;
+    /*const float factor_c = 1.1f;
     if( event->delta() > 0 ) {
         float n_scale = c_scale * factor_c;
         n_scale = std::min(n_scale, 400.0f);
@@ -374,7 +346,7 @@ void MainGraphicsView::wheelEvent(QWheelEvent *event) {
         float n_scale = c_scale / factor_c;
         n_scale = std::max(n_scale, 10.0f);
         this->setScale(n_scale);
-    }
+    }*/
 }
 
 void MainGraphicsView::resizeEvent(QResizeEvent *event) {
@@ -393,6 +365,44 @@ void MainGraphicsView::setScale(float c_scale) {
     this->c_scale = c_scale;
     this->resetTransform();
     this->scale(c_scale, c_scale);
+}
+
+void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
+    // check to modify text position
+    float text_effect_w = text_effect->boundingRect().width() * font_scale;
+    float text_effect_h = text_effect->boundingRect().height() * font_scale;
+    /*qDebug("add text effect");
+    qDebug("    at %f, %f", text_effect->x(), text_effect->y());
+    qDebug("    rect %f, %f : %f, %f", text_effect->boundingRect().left(), text_effect->boundingRect().top(), text_effect->boundingRect().right(), text_effect->boundingRect().bottom());
+    qDebug("    size %f x %f", text_effect_w, text_effect_h);*/
+    for(set<TextEffect *>::const_iterator iter = text_effects.begin(); iter != text_effects.end(); ++iter) {
+        const TextEffect *te = *iter;
+        float te_w = te->boundingRect().width() * font_scale;
+        float te_h = te->boundingRect().height() * font_scale;
+        /*if( text_effect->boundingRect().right() >= te->boundingRect().left() &&
+            text_effect->boundingRect().left() <= te->boundingRect().right() &&
+            text_effect->boundingRect().bottom() >= te->boundingRect().top() &&
+            text_effect->boundingRect().top() <= te->boundingRect().bottom() ) {*/
+        if( text_effect->x() + text_effect_w >= te->x() &&
+            text_effect->x() <= te->x() + te_w &&
+            text_effect->y() + text_effect_h >= te->y() &&
+            text_effect->y() <= te->y() + te_h ) {
+            //qDebug("    shift text effect by %f", te->boundingRect().bottom() - text_effect->y() );
+            /*qDebug("    shift text effect by %f", te->y() + te_h - text_effect->y() );
+            qDebug("    te at %f, %f", te->x(), te->y());
+            qDebug("    rect %f, %f : %f, %f", te->boundingRect().left(), te->boundingRect().top(), te->boundingRect().right(), te->boundingRect().bottom());
+            qDebug("    size %f x %f", te_w, te_h);*/
+            //text_effect->setPos( text_effect->x(), te->boundingRect().bottom() );
+            text_effect->setPos( text_effect->x(), te->y() + te_h );
+        }
+    }
+    this->scene()->addItem(text_effect);
+    text_effects.insert(text_effect);
+}
+
+void MainGraphicsView::removeTextEffect(TextEffect *text_effect) {
+    this->scene()->removeItem(text_effect);
+    text_effects.erase(text_effect);
 }
 
 GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
@@ -472,6 +482,8 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     /*QFont font = game_g->getScreen()->getMainWindow()->font();
     font.setPointSize( font.pointSize() + 6 );
     this->setFont(font);*/
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
@@ -863,16 +875,19 @@ PlayingGamestate::PlayingGamestate() :
     // create UI
     LOG("create UI\n");
     MainWindow *window = game_g->getScreen()->getMainWindow();
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+/*#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 #else
     window->setFont(qApp->font());
-#endif
+#endif*/
+    QFont font = game_g->getFontStd();
+    window->setFont(font);
 
     scene = new QGraphicsScene(window);
     //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
     //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     //view = new QGraphicsView(scene, window);
     view = new MainGraphicsView(this, scene, window);
+    view->grabGesture(Qt::PinchGesture);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setBackgroundBrush(QBrush(Qt::black));
@@ -1470,11 +1485,15 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         }
         object->setPixmap( image_iter->second );
         scene->addItem(object);
+        {
+            // debug
+            QPen pen(Qt::red);
+            scene->addEllipse(item->getX() - 0.5f*item_width, item->getY() - 0.5f*item_width, item_width, item_width, pen);
+            //scene->addEllipse(item->getX() - 0.05f, item->getY() - 0.05f, 0.1f, 0.1f, pen);
+        }
         object->setPos(item->getX(), item->getY());
-        //object->setTransformOriginPoint(-32.0f*item_scale, -16.0f*item_scale);
         float item_scale = item_width / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
-        //object->setTransformOriginPoint(-0.5f*item_width, -0.5f*(object->pixmap().height()*item_width)/(float)object->pixmap().width());
         object->setScale(item_scale);
     }
 }
@@ -1714,14 +1733,6 @@ void PlayingGamestate::update() {
             game_g->pushMessage(game_message);
         }
     }
-
-    // update the view
-    /*for(set<QGraphicsItem *>::iterator iter = this->graphicsitems_characters.begin(); iter != this->graphicsitems_characters.end(); ++iter) {
-        QGraphicsItem *item = *iter;
-        //const Character *character = qgraphicsitem_cast<const Character *>(item->data(scene_item_character_key_c));
-        const Character *character = static_cast<const Character *>(item->data(scene_item_character_key_c).value<void *>());
-        //qDebug("character at: %f, %f", character->getX(), character->getY());
-    }*/
 }
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
@@ -1801,6 +1812,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         Vector2D dest(scene_x, scene_y);
 
         bool done = false;
+        //const float click_tol_c = 0.0f;
+        //const float click_tol_c = 0.5f;
+        const float click_tol_npc_c = 0.25f;
+        const float click_tol_items_c = 0.0f;
+        const float click_tol_scenery_c = 0.0f;
 
         // search for clicking on an NPC
         float min_dist = 0.0f;
@@ -1809,12 +1825,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             Character *character = *iter;
             if( character == player )
                 continue;
-            float dist = (dest - character->getPos()).magnitude();
-            if( dist <= npc_radius_c ) {
-                if( target_npc == NULL || dist < min_dist ) {
+            float dist_from_click = (dest - character->getPos()).magnitude();
+            if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
+                if( target_npc == NULL || dist_from_click < min_dist ) {
                     done = true;
                     target_npc = character;
-                    min_dist = dist;
+                    min_dist = dist_from_click;
                 }
             }
         }
@@ -1827,7 +1843,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Item *item = *iter;
                 float dist_from_click = (dest - item->getPos()).magnitude();
                 float dist_from_player = (player->getPos() - item->getPos()).magnitude();
-                if( dist_from_click <= 0.5f && dist_from_player <= npc_radius_c ) {
+                if( dist_from_click <= item_width + click_tol_items_c && dist_from_player <= npc_radius_c + 0.5f*item_width ) {
                     if( picked_item == NULL || dist_from_click < min_dist ) {
                         done = true;
                         picked_item = item;
@@ -1836,13 +1852,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
             if( picked_item != NULL ) {
-                /*TextEffect *text_effect = new TextEffect(picked_item->getName().c_str(), 2000);
-                text_effect->setPos( player->getPos().x - 0.5*font_scale*text_effect->boundingRect().width(), player->getPos().y - 1.0f );
-                text_effect->setScale(font_scale);
-                text_effect->setZValue(text_effect->pos().y() + 1.0f);
-                scene->addItem(text_effect);*/
                 this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
-
                 player->pickupItem(picked_item);
             }
         }
@@ -1856,23 +1866,30 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Vector2D scenery_pos = scenery->getPos();
                 float scenery_width = scenery->getWidth();
                 float scenery_height = scenery->getHeight();
-                if( dest.x >= scenery_pos.x - 0.5f * scenery_width - npc_radius_c && dest.x <= scenery_pos.x + 0.5f * scenery_width + npc_radius_c &&
-                    dest.y >= scenery_pos.y - 0.5f * scenery_height - npc_radius_c && dest.y <= scenery_pos.y + 0.5f * scenery_height + npc_radius_c ) {
+                float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
+                LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
+                /*if( dest.x >= scenery_pos.x - 0.5f * scenery_width - npc_radius_c && dest.x <= scenery_pos.x + 0.5f * scenery_width + npc_radius_c &&
+                    dest.y >= scenery_pos.y - 0.5f * scenery_height - npc_radius_c && dest.y <= scenery_pos.y + 0.5f * scenery_height + npc_radius_c ) {*/
+                if( dist_from_click <= npc_radius_c ) {
                     // clicked on or near this scenery
                     ignore_scenery = scenery;
-                    if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
-                        dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {
-                        // clicked on this scenery
-                        Vector2D player_pos = player->getPos();
-                        float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
-                        float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
-                        float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;
-                        if( player_dist <= npc_radius_c + 0.5f ) {
-                            if( selected_scenery == NULL ) {
-                                done = true;
-                                selected_scenery = scenery;
-                                min_dist = 0.0f;
-                            }
+                }
+                /*if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
+                    dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {*/
+                if( dist_from_click <= click_tol_scenery_c ) {
+                    // clicked on this scenery
+                    /*Vector2D player_pos = player->getPos();
+                    float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
+                    float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
+                    float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;*/
+                    float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
+                    LOG("    player_dist : %f", player_dist);
+                    if( player_dist <= npc_radius_c + 0.5f ) {
+                        if( selected_scenery == NULL || dist_from_click < min_dist ) {
+                            LOG("    selected!\n");
+                            done = true;
+                            selected_scenery = scenery;
+                            min_dist = dist_from_click;
                         }
                     }
                 }
@@ -1914,14 +1931,11 @@ void PlayingGamestate::addWidget(QWidget *widget) {
 }
 
 void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms) {
-    TextEffect *text_effect = new TextEffect(text.c_str(), duration_ms);
+    TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms);
     text_effect->setPos( pos.x - 0.5*font_scale*text_effect->boundingRect().width(), pos.y - 1.0f );
-    /*QFont font = text_effect->font();
-    font.setPointSize(1);
-    text_effect->setFont(font);*/
     text_effect->setScale(font_scale);
     text_effect->setZValue(text_effect->pos().y() + 1.0f);
-    scene->addItem(text_effect);
+    view->addTextEffect(text_effect);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
@@ -1985,6 +1999,8 @@ Game::Game() {
     LOG("Platform: MacOS X\n");
 #elif defined(Q_OS_SYMBIAN)
     LOG("Platform: Symbian\n");
+#elif defined(Q_OS_ANDROID)
+    LOG("Platform: Android\n")
 #else
     LOG("Platform: UNKNOWN\n");
 #endif
@@ -1995,12 +2011,27 @@ void Game::run() {
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
-#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-    this->font_std = window->font();
-    this->font_big = window->font();
-#else
+#if defined(Q_OS_ANDROID)
+    // make work better on Android phones with crappy resolution
+    // these settings determined by experimenting with emulator...
+    int min_size = min(QApplication::desktop()->width(), QApplication::desktop()->height());
+    QFont new_font = window->font();
+    qDebug("current font size: %d", new_font.pointSize());
+    qDebug("min_size: %d", min_size);
+    if( min_size < 320 ) {
+        newFont.setPointSize(new_font.pointSize() - 6);
+    }
+    else if( min_size < 480 ) {
+        newFont.setPointSize(new_font.pointSize() - 4);
+    }
+    this->font_std = new_font;
+    this->font_big = new_font;
+#elif defined(_WIN32)
     this->font_std = window->font();
     this->font_big = QFont("Verdana", 48, QFont::Bold);
+#else
+    this->font_std = window->font();
+    this->font_big = window->font();
 #endif
 
     gamestate = new OptionsGamestate();

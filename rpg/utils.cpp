@@ -122,3 +122,23 @@ int rollDice(int X, int Y, int Z) {
     }
     return value;
 }
+
+float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos) {
+    float dist_x = 0.0f, dist_y = 0.0f;
+
+    if( pos.x < centre.x - 0.5f*width ) {
+        dist_x = centre.x - 0.5f*width - pos.x;
+    }
+    else if( pos.x > centre.x + 0.5f*width ) {
+        dist_x = pos.x - ( centre.x + 0.5f*width );
+    }
+
+    if( pos.y < centre.y - 0.5f*height ) {
+        dist_y = centre.y - 0.5f*height - pos.y;
+    }
+    else if( pos.y > centre.y + 0.5f*height ) {
+        dist_y = pos.y - ( centre.y + 0.5f*height );
+    }
+
+    return sqrt( dist_x*dist_x + dist_y*dist_y );
+}

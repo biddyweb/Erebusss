@@ -134,12 +134,15 @@ public:
     void setDirection(Direction c_direction);
 };
 
+class MainGraphicsView;
+
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
+    MainGraphicsView *view;
 
     virtual void advance(int phase);
 public:
-    TextEffect(const QString &text, int duration_ms);
+    TextEffect(MainGraphicsView *view, const QString &text, int duration_ms);
     virtual ~TextEffect() {
     }
 };
@@ -189,7 +192,9 @@ class MainGraphicsView : public QGraphicsView {
     //QGraphicsProxyWidget *gui_overlay_item;
     GUIOverlay *gui_overlay;
     float c_scale;
+    set<TextEffect *> text_effects;
 
+    virtual bool event(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
@@ -208,6 +213,8 @@ public:
         this->gui_overlay = gui_overlay;
     }
     void setScale(float c_scale);
+    void addTextEffect(TextEffect *text_effect);
+    void removeTextEffect(TextEffect *text_effect);
 };
 
 class GUIOverlay : public QWidget {
