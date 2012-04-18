@@ -12,9 +12,18 @@ using std::stringstream;
 
 #include <QXmlStreamReader>
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+const bool mobile_c = true;
+#else
+const bool mobile_c = false;
+#endif
+
 Game *game_g = NULL;
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
+
+const float MainGraphicsView::min_zoom_c = 10.0f;
+const float MainGraphicsView::max_zoom_c = 400.0f;
 
 const int versionMajor = 0;
 const int versionMinor = 1;
@@ -23,7 +32,7 @@ const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 //const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
 const float item_width = 0.5f;
 //const float scenery_width = item_width;
-const float font_scale = 1.0f/64.0f;
+//const float font_scale = 1.0f/64.0f;
 
 //const int scene_item_character_key_c = 0;
 
@@ -203,11 +212,6 @@ OptionsGamestate::OptionsGamestate()
     optionsGamestate = this;
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
-/*#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-#else
-    QFont font("Verdana", 48, QFont::Bold);
-    window->setFont(font);
-#endif*/
     QFont font = game_g->getFontBig();
     window->setFont(font);
 
@@ -287,17 +291,32 @@ void OptionsGamestate::clickedQuit() {
     this->quitGame();
 }
 
+void MainGraphicsView::zoom(bool in) {
+    qDebug("MainGraphicsView::zoom(%d)", in);
+    const float factor_c = 1.1f;
+    if( in ) {
+        float n_scale = c_scale * factor_c;
+        this->setScale(n_scale);
+    }
+    else {
+        float n_scale = c_scale / factor_c;
+        this->setScale(n_scale);
+    }
+}
+
 bool MainGraphicsView::event(QEvent *event) {
     qDebug("MainGraphicsView::event\n");
 
     if( event->type() == QEvent::Gesture ) {
         LOG("MainGraphicsView received gesture\n");
-        throw string("received gesture");
+        //throw string("received gesture");
         QGestureEvent *gesture = static_cast<QGestureEvent*>(event);
         QPinchGesture *pinch = static_cast<QPinchGesture *>(gesture->gesture(Qt::PinchGesture));
         if( pinch != NULL ) {
             LOG("    zoom\n");
             LOG("    scale factor %f\n", pinch->scaleFactor());
+            float n_scale = c_scale * pinch->scaleFactor();
+            this->setScale(n_scale);
             return true;
         }
     }
@@ -347,6 +366,15 @@ void MainGraphicsView::wheelEvent(QWheelEvent *event) {
         n_scale = std::max(n_scale, 10.0f);
         this->setScale(n_scale);
     }*/
+    if( !mobile_c ) {
+        // mobile UI needs to be done via multitouch instead
+        if( event->delta() > 0 ) {
+            this->zoom(true);
+        }
+        else if( event->delta() < 0 ) {
+            this->zoom(false);
+        }
+    }
 }
 
 void MainGraphicsView::resizeEvent(QResizeEvent *event) {
@@ -363,12 +391,15 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 void MainGraphicsView::setScale(float c_scale) {
     LOG("MainGraphicsView::setScale(%f)\n", c_scale);
     this->c_scale = c_scale;
+    this->c_scale = std::min(this->c_scale, max_zoom_c);
+    this->c_scale = std::max(this->c_scale, min_zoom_c);
     this->resetTransform();
-    this->scale(c_scale, c_scale);
+    this->scale(this->c_scale, this->c_scale);
 }
 
 void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
     // check to modify text position
+    float font_scale = 1.0f / this->c_scale;
     float text_effect_w = text_effect->boundingRect().width() * font_scale;
     float text_effect_h = text_effect->boundingRect().height() * font_scale;
     /*qDebug("add text effect");
@@ -416,38 +447,54 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     //this->move(0, 0);
     QPainter painter(this);
+    painter.setFont( game_g->getFontStd() );
     /*QBrush brush(QColor(255, 0, 0, 255));
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
     //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
     /*painter.setPen(Qt::green);
     painter.drawText(16, 16, "test blah blah blah 123");*/
     if( playing_gamestate->getPlayer() != NULL ) {
-        int bar_y = 32;
-        int text_y = bar_y - 4;
+        float bar_x = 16.0f/640.0f;
+        float bar_y = 32.0f/360.0f;
+        float text_y = bar_y - 4.0f/360.0f;
+        //int bar_y = 32;
+        //int text_y = bar_y - 4;
         const Character *player = playing_gamestate->getPlayer();
         painter.setPen(Qt::white);
-        painter.drawText(16, text_y, player->getName().c_str());
+        //painter.drawText(16.0f, text_y, player->getName().c_str());
+        painter.drawText(bar_x*width(), text_y*height(), player->getName().c_str());
         float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
-        this->drawBar(painter, 16, bar_y, 100, 16, fraction, Qt::darkGreen);
+        //this->drawBar(painter, 16, bar_y, 100, 16, fraction, Qt::darkGreen);
+        this->drawBar(painter, bar_x, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkGreen);
         if( player->getTargetNPC() != NULL ) {
             const Character *enemy = player->getTargetNPC();
             //qDebug("enemy: %d", enemy);
             //qDebug("name: %s", enemy->getName().c_str());
+            float bar_x2 = 132.0f/640.0f;
             painter.setPen(Qt::white);
-            painter.drawText(132, text_y, enemy->getName().c_str());
+            //painter.drawText(132, text_y, enemy->getName().c_str());
+            painter.drawText(bar_x2*width(), text_y*height(), enemy->getName().c_str());
             fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
-            this->drawBar(painter, 132, bar_y, 100, 16, fraction, Qt::darkRed);
+            //this->drawBar(painter, 132, bar_y, 100, 16, fraction, Qt::darkRed);
+            this->drawBar(painter, bar_x2, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkRed);
         }
     }
 
     if( this->display_progress ) {
-        const int x_off = 16;
+        /*const int x_off = 16;
         const int hgt = 64;
-        this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
+        this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);*/
+        const float x_off = 16.0f/640.0f;
+        const float hgt = 64.0f/360.0f;
+        this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
     }
 }
 
-void GUIOverlay::drawBar(QPainter &painter, int x, int y, int width, int height, float fraction, QColor color) {
+void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {
+    int x = fx * this->width();
+    int y = fy * this->height();
+    int width = fwidth * this->width();
+    int height = fheight * this->height();
     int x2 = x+1;
     int y2 = y+1;
     int width2 = width-2;
@@ -479,9 +526,6 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate->addWidget(this);
     Character *player = playing_gamestate->getPlayer();
 
-    /*QFont font = game_g->getScreen()->getMainWindow()->font();
-    font.setPointSize( font.pointSize() + 6 );
-    this->setFont(font);*/
     QFont font = game_g->getFontStd();
     this->setFont(font);
 
@@ -518,7 +562,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     }
 
     list = new QListWidget();
-    {
+    if( !mobile_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
         list->setFont(list_font);
@@ -543,11 +587,11 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         layout->addLayout(h_layout);
 
         QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
-        goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
+        //goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
         h_layout->addWidget(goldLabel);
 
         weightLabel = new QLabel(""); // label set in setWeightLabel()
-        weightLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        //weightLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(weightLabel);
         //this->setWeightLabel(weight);
         this->setWeightLabel();
@@ -875,10 +919,6 @@ PlayingGamestate::PlayingGamestate() :
     // create UI
     LOG("create UI\n");
     MainWindow *window = game_g->getScreen()->getMainWindow();
-/*#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-#else
-    window->setFont(qApp->font());
-#endif*/
     QFont font = game_g->getFontStd();
     window->setFont(font);
 
@@ -1281,7 +1321,6 @@ PlayingGamestate::PlayingGamestate() :
     // set up the view on the RPG world
 
     int pixels_per_unit = 64;
-    //int pixels_per_unit = 32;
     float scale = 1.0f/(float)pixels_per_unit;
     //scene->setSceneRect(0, 0, location->getWidth(), location->getHeight());
     const float offset_y = 0.5f;
@@ -1291,7 +1330,14 @@ PlayingGamestate::PlayingGamestate() :
     //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
     //int pixels_per_unit = 32;
     //view->scale(pixels_per_unit, pixels_per_unit);
-    view->setScale(pixels_per_unit);
+    //view->setScale(pixels_per_unit);
+    {
+        const float desired_width_c = 10.0f;
+        float initial_scale = window->width() / desired_width_c;
+        LOG("width: %d\n", window->width());
+        LOG("initial_scale: %f\n", initial_scale);
+        view->setScale(initial_scale);
+    }
 
     LOG("load floor image\n");
     QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
@@ -1320,14 +1366,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
     /*{
-        vector<Vector2D> path_way_points = location->calculatePathWayPoints();
-        for(vector<Vector2D>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
-            Vector2D path_way_point = *iter;
-            const float radius = 0.05f;
-            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
-        }
-    }*/
-    {
+        // DEBUG
         const Graph *distance_graph = location->getDistanceGraph();
         for(size_t i=0;i<distance_graph->getNVertices();i++) {
             const GraphVertex *vertex = distance_graph->getVertex(i);
@@ -1345,7 +1384,7 @@ PlayingGamestate::PlayingGamestate() :
                 scene->addLine(x1, y1, x2, y2, wall_pen);
             }
         }
-    }
+    }*/
 
     gui_overlay->setProgress(40);
     qApp->processEvents();
@@ -1485,12 +1524,12 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         }
         object->setPixmap( image_iter->second );
         scene->addItem(object);
-        {
-            // debug
+        /*{
+            // DEBUG
             QPen pen(Qt::red);
             scene->addEllipse(item->getX() - 0.5f*item_width, item->getY() - 0.5f*item_width, item_width, item_width, pen);
             //scene->addEllipse(item->getX() - 0.05f, item->getY() - 0.05f, 0.1f, 0.1f, pen);
-        }
+        }*/
         object->setPos(item->getX(), item->getY());
         float item_scale = item_width / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
@@ -1932,6 +1971,7 @@ void PlayingGamestate::addWidget(QWidget *widget) {
 
 void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms) {
     TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms);
+    float font_scale = 1.0f/view->getScale();
     text_effect->setPos( pos.x - 0.5*font_scale*text_effect->boundingRect().width(), pos.y - 1.0f );
     text_effect->setScale(font_scale);
     text_effect->setZValue(text_effect->pos().y() + 1.0f);
@@ -2011,28 +2051,32 @@ void Game::run() {
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
+    if( mobile_c ) {
 #if defined(Q_OS_ANDROID)
-    // make work better on Android phones with crappy resolution
-    // these settings determined by experimenting with emulator...
-    int min_size = min(QApplication::desktop()->width(), QApplication::desktop()->height());
     QFont new_font = window->font();
-    qDebug("current font size: %d", new_font.pointSize());
-    qDebug("min_size: %d", min_size);
-    if( min_size < 320 ) {
-        newFont.setPointSize(new_font.pointSize() - 6);
-    }
-    else if( min_size < 480 ) {
-        newFont.setPointSize(new_font.pointSize() - 4);
-    }
-    this->font_std = new_font;
-    this->font_big = new_font;
-#elif defined(_WIN32)
-    this->font_std = window->font();
-    this->font_big = QFont("Verdana", 48, QFont::Bold);
+        /*
+        // make work better on Android phones with crappy resolution
+        // these settings determined by experimenting with emulator...
+        int min_size = min(QApplication::desktop()->width(), QApplication::desktop()->height());
+        qDebug("current font size: %d", new_font.pointSize());
+        qDebug("min_size: %d", min_size);
+        if( min_size < 320 ) {
+            newFont.setPointSize(new_font.pointSize() - 6);
+        }
+        else if( min_size < 480 ) {
+            newFont.setPointSize(new_font.pointSize() - 4);
+        }*/
+        this->font_std = new_font;
+        this->font_big = new_font;
 #else
-    this->font_std = window->font();
-    this->font_big = window->font();
+        this->font_std = window->font();
+        this->font_big = window->font();
 #endif
+    }
+    else {
+        this->font_std = window->font();
+        this->font_big = QFont("Verdana", 48, QFont::Bold);
+    }
 
     gamestate = new OptionsGamestate();
 

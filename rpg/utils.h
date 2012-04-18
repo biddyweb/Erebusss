@@ -15,7 +15,7 @@ public:
 
     Vector2D() : x(0.0f), y(0.0f) {
     }
-    Vector2D(const Vector2D *v) : x(v->x), y(v->y) {
+    Vector2D(const Vector2D &v) : x(v.x), y(v.y) {
     }
     Vector2D(const float x,const float y) : x(x), y(y) {
     }
@@ -30,18 +30,18 @@ public:
     const float &operator[] (const int i) const {
         return *((&x) + i);
     }
-    const bool operator== (const Vector2D& v) const {
+    bool operator== (const Vector2D& v) const {
         return (v.x==x && v.y==y);
     }
-    const bool operator!= (const Vector2D& v) const {
+    bool operator!= (const Vector2D& v) const {
         return !(v.x==x && v.y==y);
         //return !(v == *this);
     }
-    /*const*/ Vector2D operator+ () const {
+    Vector2D operator+ () const {
         return Vector2D(x,y);
         //return (*this);
     }
-    /*const*/ Vector2D operator- () const {
+    Vector2D operator- () const {
         return Vector2D(-x,-y);
     }
     const Vector2D& operator= (const Vector2D& v) {
@@ -70,19 +70,19 @@ public:
         y *= r;
         return *this;
     }
-    /*const*/ Vector2D operator+ (const Vector2D& v) const {
+    Vector2D operator+ (const Vector2D& v) const {
         return Vector2D(x + v.x, y + v.y);
     }
-    /*const*/ Vector2D operator- (const Vector2D& v) const {
+    Vector2D operator- (const Vector2D& v) const {
         return Vector2D(x - v.x, y - v.y);
     }
-    /*const*/ Vector2D operator* (const float& s) const {
+    Vector2D operator* (const float& s) const {
         return Vector2D(x*s,y*s);
     }
     /*friend inline const Vector3D operator* (const float& s,const Vector3D& v) {
     return v * s;
     }*/
-    /*const*/ Vector2D operator/ (float s) const {
+    Vector2D operator/ (float s) const {
         s = 1/s;
         return Vector2D(s*x,s*y);
     }
@@ -99,13 +99,13 @@ public:
         this->x+=tx;
         this->y+=ty;
     }
-    void add(const Vector2D *v) {
-        this->x+=v->x;
-        this->y+=v->y;
+    void add(const Vector2D &v) {
+        this->x+=v.x;
+        this->y+=v.y;
     }
-    void subtract(const Vector2D *v) {
-        this->x-=v->x;
-        this->y-=v->y;
+    void subtract(const Vector2D &v) {
+        this->x-=v.x;
+        this->y-=v.y;
     }
     const float square() const {
         return (x*x + y*y);
@@ -113,16 +113,16 @@ public:
     const float magnitude() const {
         return sqrt( x*x + y*y );
     }
-    /*const float magnitudeChebyshev() const {
+    /*float magnitudeChebyshev() const {
         double dist_x = abs(x);
         double dist_y = abs(y);
         double max_dist = dist_x > dist_y ? dist_x : dist_y;
         return max_dist;
     }*/
-    const float dot(const Vector2D *v) const {
-        return ( x * v->x + y * v->y);
+    float dot(const Vector2D &v) const {
+        return ( x * v.x + y * v.y);
     }
-    const float operator%(const Vector2D& v) const {
+    float operator%(const Vector2D& v) const {
         return ( x * v.x + y * v.y);
     }
     void normalise() {
@@ -132,7 +132,7 @@ public:
         x = x/mag;
         y = y/mag;
     }
-    /*const*/ Vector2D unit() const {
+    Vector2D unit() const {
         float mag = magnitude();
         return Vector2D(x / mag, y / mag);
         //return (*this) / magnitude();
@@ -144,8 +144,8 @@ public:
         float mag = magnitude();
         return mag <= tol;
     }
-    bool isEqual(const Vector2D *that, float tol) const {
-        Vector2D diff = *this - *that;
+    bool isEqual(const Vector2D &that, float tol) const {
+        Vector2D diff = *this - that;
         float mag = diff.magnitude();
         return mag <= tol;
     }

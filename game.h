@@ -194,6 +194,11 @@ class MainGraphicsView : public QGraphicsView {
     float c_scale;
     set<TextEffect *> text_effects;
 
+    const static float min_zoom_c;
+    const static float max_zoom_c;
+
+    void zoom(bool in);
+
     virtual bool event(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
@@ -213,6 +218,9 @@ public:
         this->gui_overlay = gui_overlay;
     }
     void setScale(float c_scale);
+    float getScale() const {
+        return this->c_scale;
+    }
     void addTextEffect(TextEffect *text_effect);
     void removeTextEffect(TextEffect *text_effect);
 };
@@ -228,7 +236,7 @@ class GUIOverlay : public QWidget {
     bool display_progress;
     int  progress_percent;
 
-    void drawBar(QPainter &painter, int x, int y, int width, int height, float fraction, QColor color);
+    void drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color);
 public:
     GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view);
     virtual ~GUIOverlay() {
