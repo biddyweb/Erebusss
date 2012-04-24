@@ -501,7 +501,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
         const Graph *distance_graph = this->location->getDistanceGraph();
         Graph *graph = distance_graph->clone();
 
-        int n_old_vertices = graph->getNVertices();
+        size_t n_old_vertices = graph->getNVertices();
         GraphVertex start_vertex(this->pos, NULL);
         GraphVertex end_vertex(dest, NULL);
         size_t start_index = graph->addVertex(start_vertex);

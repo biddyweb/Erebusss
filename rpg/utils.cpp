@@ -69,7 +69,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
 
             float value = c_vertex->getValue();
             LOG("    check vertex at %f, %f value %f\n", c_vertex->getPos().x, c_vertex->getPos().y, c_vertex->getValue());
-            for(int i=0;i<c_vertex->getNNeighbours();i++) {
+            for(size_t i=0;i<c_vertex->getNNeighbours();i++) {
                 float dist = 0.0f;
                 GraphVertex *n_vertex = c_vertex->getNeighbour(this, &dist, i);
                 float n_value = value + dist;
