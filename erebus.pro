@@ -4,6 +4,9 @@
 # dir1.source = mydir
 DEPLOYMENTFOLDERS = # file1 dir1
 
+QT += webkit
+QT += xml
+
 symbian:TARGET.UID3 = 0xE11B6032
 
 VERSION = 1.0
