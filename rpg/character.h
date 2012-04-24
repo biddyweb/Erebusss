@@ -165,6 +165,9 @@ public:
     int getHealth() const {
         return this->health;
     }
+    int getMaxHealth() const {
+        return this->max_health;
+    }
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }

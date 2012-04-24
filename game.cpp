@@ -10,6 +10,7 @@
 #include <sstream>
 using std::stringstream;
 
+#include <QtWebKit/QWebView>
 #include <QXmlStreamReader>
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
@@ -23,7 +24,7 @@ OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
 const float MainGraphicsView::min_zoom_c = 10.0f;
-const float MainGraphicsView::max_zoom_c = 400.0f;
+const float MainGraphicsView::max_zoom_c = 200.0f;
 
 const int versionMajor = 0;
 const int versionMinor = 1;
@@ -291,6 +292,11 @@ void OptionsGamestate::clickedQuit() {
     this->quitGame();
 }
 
+MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
+    QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
+{
+}
+
 void MainGraphicsView::zoom(bool in) {
     qDebug("MainGraphicsView::zoom(%d)", in);
     const float factor_c = 1.1f;
@@ -305,9 +311,37 @@ void MainGraphicsView::zoom(bool in) {
 }
 
 bool MainGraphicsView::event(QEvent *event) {
-    qDebug("MainGraphicsView::event\n");
-
-    if( event->type() == QEvent::Gesture ) {
+    //qDebug("MainGraphicsView::event() type %d\n", event->type());
+    // multitouch done by touch events manually - gestures don't seem to work properly on my Android phone?
+    if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
+        QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
+        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+        if (touchPoints.count() == 2) {
+            // determine scale factor
+            const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
+            const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
+            /*float scale_factor =
+                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+                    / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();*/
+            float scale_factor =
+                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+                    / QLineF(touchPoint0.lastPos(), touchPoint1.lastPos()).length();
+            /*if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
+                // if one of the fingers is released, remember the current scale
+                // factor so that adding another finger later will continue zooming
+                // by adding new scale factor to the existing remembered value.
+                totalScaleFactor *= currentScaleFactor;
+                currentScaleFactor = 1;
+            }*/
+            /*setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
+                                            totalScaleFactor * currentScaleFactor));*/
+            float n_scale = c_scale *scale_factor;
+            LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
+            this->setScale(n_scale);
+        }
+        return true;
+    }
+    /*else if( event->type() == QEvent::Gesture ) {
         LOG("MainGraphicsView received gesture\n");
         //throw string("received gesture");
         QGestureEvent *gesture = static_cast<QGestureEvent*>(event);
@@ -319,7 +353,7 @@ bool MainGraphicsView::event(QEvent *event) {
             this->setScale(n_scale);
             return true;
         }
-    }
+    }*/
     return QGraphicsView::event(event);
 }
 
@@ -355,17 +389,6 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void MainGraphicsView::wheelEvent(QWheelEvent *event) {
-    /*const float factor_c = 1.1f;
-    if( event->delta() > 0 ) {
-        float n_scale = c_scale * factor_c;
-        n_scale = std::min(n_scale, 400.0f);
-        this->setScale(n_scale);
-    }
-    else if( event->delta() < 0 ) {
-        float n_scale = c_scale / factor_c;
-        n_scale = std::max(n_scale, 10.0f);
-        this->setScale(n_scale);
-    }*/
     if( !mobile_c ) {
         // mobile UI needs to be done via multitouch instead
         if( event->delta() > 0 ) {
@@ -517,16 +540,80 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);
 }*/
 
+StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
+    playing_gamestate(playing_gamestate)
+{
+    playing_gamestate->addWidget(this);
+
+    Character *player = playing_gamestate->getPlayer();
+
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    QString html ="<html><body>";
+
+    html += "<b>Name:</b> ";
+    html += player->getName().c_str();
+    html += "<br/>";
+
+    html += "<b>Health:</b> ";
+    if( player->getHealth() < player->getMaxHealth() ) {
+        html += "<font color=\"#ff0000\">";
+        html += QString::number(player->getHealth());
+        html += "</font>";
+    }
+    else {
+        html += QString::number(player->getHealth());
+    }
+    html += " / ";
+    html += QString::number(player->getMaxHealth());
+    html += "<br/>";
+
+    html += "</body></html>";
+
+    QWebView *label = new QWebView();
+    label->setHtml(html);
+    layout->addWidget(label);
+
+    QPushButton *closeButton = new QPushButton("Close");
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+}
+
+ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_y(0) {
+    this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+}
+
+void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
+    qDebug("ScrollingListWidget::mouseMoveEvent()");
+    //QListWidget::mouseMoveEvent(event); // don't want to select items whilst dragging
+    QScrollBar *scroll =  this->verticalScrollBar();
+    scroll->setValue(scroll->value() - event->y() + saved_y);
+    saved_y = event->y();
+}
+
+void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
+    qDebug("ScrollingListWidget::mousePressEvent()");
+    QListWidget::mousePressEvent(event);
+    saved_y = event->y();
+}
+
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL),
     dropButton(NULL), armButton(NULL), wearButton(NULL), useButton(NULL),
     view_type(VIEWTYPE_ALL)
 {
-
     playing_gamestate->addWidget(this);
+
     Character *player = playing_gamestate->getPlayer();
 
     QFont font = game_g->getFontStd();
+#if defined(Q_WS_SIMULATOR)
+    font.setPointSize( font.pointSize() + 6 ); // test
+#endif
     this->setFont(font);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -561,7 +648,8 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
     }
 
-    list = new QListWidget();
+    //list = new QListWidget();
+    list = new ScrollingListWidget();
     if( !mobile_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
@@ -927,12 +1015,13 @@ PlayingGamestate::PlayingGamestate() :
     //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     //view = new QGraphicsView(scene, window);
     view = new MainGraphicsView(this, scene, window);
-    view->grabGesture(Qt::PinchGesture);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setBackgroundBrush(QBrush(Qt::black));
     view->setFrameStyle(QFrame::NoFrame);
     view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
+    //view->grabGesture(Qt::PinchGesture);
+    view->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setDragMode(QGraphicsView::ScrollHandDrag);
     view->setCacheMode(QGraphicsView::CacheBackground);
 
@@ -958,6 +1047,7 @@ PlayingGamestate::PlayingGamestate() :
         QPushButton *statsButton = new QPushButton("Stats");
         statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
         v_layout->addWidget(statsButton);
 
         QPushButton *itemsButton = new QPushButton("Items");
@@ -1596,6 +1686,14 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     }
 }
 
+void PlayingGamestate::clickedStats() {
+    LOG("clickedStats()\n");
+    this->clickedCloseSubwindow();
+
+    subwindow = new StatsWindow(this);
+    game_g->getScreen()->setPaused(true);
+}
+
 void PlayingGamestate::clickedItems() {
     LOG("clickedItems()\n");
     this->clickedCloseSubwindow();
@@ -1972,7 +2070,22 @@ void PlayingGamestate::addWidget(QWidget *widget) {
 void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms) {
     TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms);
     float font_scale = 1.0f/view->getScale();
-    text_effect->setPos( pos.x - 0.5*font_scale*text_effect->boundingRect().width(), pos.y - 1.0f );
+    float text_effect_width = font_scale*text_effect->boundingRect().width();
+    Vector2D text_effect_pos = pos;
+    text_effect_pos.x -= 0.5*text_effect_width;
+    text_effect_pos.y -= 0.5f;
+    QPointF view_topleft = view->mapToScene(0, 0);
+    QPointF view_topright = view->mapToScene(view->width()-1, 0);
+    /*qDebug("view width: %d", view->width());
+    qDebug("left: %f right: %f", view_topleft.x(), view_topright.x());
+    qDebug("text_effect_pos.x: %f text_effect_width: %f", text_effect_pos.x, text_effect_width);*/
+    if( text_effect_pos.x < view_topleft.x() ) {
+        text_effect_pos.x = std::min(pos.x, (float)view_topleft.x());
+    }
+    else if( text_effect_pos.x + text_effect_width > view_topright.x() ) {
+        text_effect_pos.x = std::max(pos.x, (float)view_topright.x()) - text_effect_width;
+    }
+    text_effect->setPos( text_effect_pos.x, text_effect_pos.y );
     text_effect->setScale(font_scale);
     text_effect->setZValue(text_effect->pos().y() + 1.0f);
     view->addTextEffect(text_effect);

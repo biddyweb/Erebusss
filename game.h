@@ -206,10 +206,7 @@ class MainGraphicsView : public QGraphicsView {
     virtual void resizeEvent(QResizeEvent *event);
 
 public:
-    MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
-        QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
-    {
-    }
+    MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent);
     virtual ~MainGraphicsView() {
     }
 
@@ -275,6 +272,32 @@ public:
     virtual ~StatusBar() {
     }
 };*/
+
+class StatsWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+
+private slots:
+
+public:
+    StatsWindow(PlayingGamestate *playing_gamestate);
+    virtual ~StatsWindow() {
+    }
+};
+
+class ScrollingListWidget : public QListWidget {
+    Q_OBJECT
+
+    int saved_y;
+
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+public:
+    ScrollingListWidget();
+    virtual ~ScrollingListWidget() {
+    }
+};
 
 class ItemsWindow : public QWidget {
 //class ItemsWindow : public QMainWindow {
@@ -359,6 +382,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> scenery_opened_images;
 
 private slots:
+    void clickedStats();
     void clickedItems();
     void clickedOptions();
     void clickedRest();
