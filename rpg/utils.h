@@ -107,10 +107,10 @@ public:
         this->x-=v.x;
         this->y-=v.y;
     }
-    const float square() const {
+    float square() const {
         return (x*x + y*y);
     }
-    const float magnitude() const {
+    float magnitude() const {
         return sqrt( x*x + y*y );
     }
     /*float magnitudeChebyshev() const {
