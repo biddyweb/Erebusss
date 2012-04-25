@@ -1130,27 +1130,6 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef height_s = reader.attributes().value("height");
                     if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
                         clip = true;
-                        /*bool ok = true;
-                        xpos = xpos_s.toString().toInt(&ok);
-                        if( !ok ) {
-                            LOG("failed to parse xpos: %s\n", xpos_s.toString().toStdString().c_str());
-                            throw string("failed to parse xpos");
-                        }
-                        ypos = ypos_s.toString().toInt(&ok);
-                        if( !ok ) {
-                            LOG("failed to parse ypos: %s\n", ypos_s.toString().toStdString().c_str());
-                            throw string("failed to parse ypos");
-                        }
-                        width = width_s.toString().toInt(&ok);
-                        if( !ok ) {
-                            LOG("failed to parse width: %s\n", width_s.toString().toStdString().c_str());
-                            throw string("failed to parse width");
-                        }
-                        height = height_s.toString().toInt(&ok);
-                        if( !ok ) {
-                            LOG("failed to parse height: %s\n", height_s.toString().toStdString().c_str());
-                            throw string("failed to parse height");
-                        }*/
                         xpos = parseInt(xpos_s.toString());
                         ypos = parseInt(ypos_s.toString());
                         width = parseInt(width_s.toString());
@@ -1267,37 +1246,6 @@ PlayingGamestate::PlayingGamestate() :
             throw string("error reading xml file");
         }
     }
-
-    /*Item *item = NULL;
-    Weapon *weapon = NULL;*/
-
-    //this->item_images["longsword"] = game_g->loadImage(":/gfx/textures/items/longsword.png");
-    //this->addStandardItem( new Weapon("Long Sword", "longsword", 14, "longsword") );
-
-    //this->item_images["longbow"] = game_g->loadImage(":/gfx/textures/items/longbow.png");
-    /*this->addStandardItem( weapon = new Weapon("Longbow", "longbow", 5, "longbow") );
-    weapon->setTwoHanded(true);
-    weapon->setRanged(true);
-    weapon->setRequiresAmmo(true, "Arrows");*/
-
-    //this->item_images["shield"] = game_g->loadImage(":/gfx/textures/items/shield.png");
-    //this->addStandardItem( new Shield("Shield", "shield", 36, "shield") );
-
-    //this->item_images["leather_armour"] = game_g->loadImage(":/gfx/textures/items/leather_armor.png");
-    //this->addStandardItem( new Armour("Leather Armour", "leather_armour", 100, 2));
-
-    //this->item_images["arrow"] = game_g->loadImage(":/gfx/textures/items/arrow.png", true, 0, 16, 64, 32);
-    //this->addStandardItem( new Ammo("Arrows", "arrow", "arrow", 20) );
-
-    //this->item_images["potion_red"] = game_g->loadImage(":/gfx/textures/items/potion_red.png");
-    /*this->addStandardItem( item = new Item("Potion of Healing", "potion_red", 1) );
-    //item->setUse(ITEMUSE_POTION_HEALING);
-    item->setUse("ITEMUSE_POTION_HEALING");
-    item->setRating(1);
-    item->setMagical(true);*/
-
-    //this->item_images["gold"] = game_g->loadImage(":/gfx/textures/items/gold.png");
-    //this->addStandardItem( new Currency("Gold", "gold"));
 
     gui_overlay->setProgress(10);
 
@@ -1416,7 +1364,9 @@ PlayingGamestate::PlayingGamestate() :
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
     location->calculateSize(&location_width, &location_height);
-    scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
+    const float extra_offset_c = 5.0f; // so we can still scroll slightly past the boundary, and also that multitouch works beyond the boundary
+    //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
+    scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
     //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
     //int pixels_per_unit = 32;
     //view->scale(pixels_per_unit, pixels_per_unit);
