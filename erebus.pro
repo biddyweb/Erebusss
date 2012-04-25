@@ -64,7 +64,7 @@ OTHER_FILES += \
     _docs/todo.txt \
     _docs/design.odt \
     data/items.xml \
-    data/item_images.xml \
+    data/images.xml \
     android/AndroidManifest.xml \
     android/res/drawable/icon.png \
     android/res/drawable/logo.png \

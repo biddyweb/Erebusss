@@ -130,6 +130,7 @@ QRectF AnimatedObject::boundingRect() const {
 }
 
 void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+
     //qDebug("paint");
 
     /*int ms_per_frame = 100;
@@ -1102,9 +1103,9 @@ PlayingGamestate::PlayingGamestate() :
 
     // create RPG data
 
-    LOG("load item images\n");
+    LOG("load images\n");
     {
-        QFile file(":/data/item_images.xml");
+        QFile file(":/data/images.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open xml file");
         }
@@ -1113,14 +1114,18 @@ PlayingGamestate::PlayingGamestate() :
             reader.readNext();
             if( reader.isStartElement() )
             {
-                if( reader.name() == "item_image" ) {
+                if( reader.name() == "image" ) {
+                    QStringRef type_s = reader.attributes().value("type");
+                    if( type_s.length() == 0 )
+                        throw string("image element has no type attribute or is zero length");
                     QStringRef name_s = reader.attributes().value("name");
                     if( name_s.length() == 0 )
-                        throw string("item_image element has no name attribute or is zero length");
+                        throw string("image element has no name attribute or is zero length");
                     QStringRef filename_s = reader.attributes().value("filename");
                     if( filename_s.length() == 0 )
-                        throw string("item_image element has no filename attribute or is zero length");
+                        throw string("image element has no filename attribute or is zero length");
                     QString filename = ":/" + filename_s.toString();
+                    LOG("image element type: %s\n", type_s.toString().toStdString().c_str());
                     LOG("load image: %s : %s\n", name_s.toString().toStdString().c_str(), filename.toStdString().c_str());
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0;
@@ -1136,12 +1141,17 @@ PlayingGamestate::PlayingGamestate() :
                         height = parseInt(height_s.toString());
                         LOG("    clip to: %d, %d, %d, %d\n", xpos, ypos, width, height);
                     }
-                    this->item_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                    if( type_s == "item") {
+                        this->item_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                    }
+                    else {
+                        throw string("image element has unknown type attribute");
+                    }
                 }
             }
         }
         if( reader.hasError() ) {
-            LOG("error reading item_images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            LOG("error reading images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
             throw string("error reading xml file");
         }
     }
@@ -1249,16 +1259,24 @@ PlayingGamestate::PlayingGamestate() :
 
     gui_overlay->setProgress(10);
 
-    {
+    /*{
         QPixmap containers = game_g->loadImage(":/gfx/textures/scenery/containers.png");
-        /*this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
-        this->scenery_opened_images["chest"] = containers.copy(0, 64, 64, 64);*/
+        //this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
+        //this->scenery_opened_images["chest"] = containers.copy(0, 64, 64, 64);
         this->scenery_images["chest"] = containers.copy(6, 2, 52, 52);
         this->scenery_opened_images["chest"] = containers.copy(6, 66, 52, 52);
         this->scenery_images["barrel"] = containers.copy(64, 0, 64, 64);
         this->scenery_opened_images["barrel"] = containers.copy(64, 64, 64, 64);
         this->scenery_images["crate"] = containers.copy(128, 0, 64, 64);
         this->scenery_opened_images["crate"] = containers.copy(128, 64, 64, 64);
+    }*/
+    {
+        this->scenery_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest.png", true, 6, 2, 52, 52);
+        this->scenery_opened_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest_opened.png", true, 6, 2, 52, 52);
+        this->scenery_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel.png");
+        this->scenery_opened_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel_opened.png");
+        this->scenery_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate.png");
+        this->scenery_opened_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate_opened.png");
     }
 
     gui_overlay->setProgress(20);

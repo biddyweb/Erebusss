@@ -14,8 +14,13 @@
         <file>gfx/textures/items/longbow.png</file>
         <file>gfx/textures/items/arrow.png</file>
         <file>gfx/textures/items/potion_red.png</file>
-        <file>gfx/textures/scenery/containers.png</file>
         <file>data/items.xml</file>
-        <file>data/item_images.xml</file>
+        <file>data/images.xml</file>
+        <file>gfx/textures/scenery/barrel.png</file>
+        <file>gfx/textures/scenery/barrel_opened.png</file>
+        <file>gfx/textures/scenery/chest.png</file>
+        <file>gfx/textures/scenery/chest_opened.png</file>
+        <file>gfx/textures/scenery/crate.png</file>
+        <file>gfx/textures/scenery/crate_opened.png</file>
     </qresource>
 </RCC>
