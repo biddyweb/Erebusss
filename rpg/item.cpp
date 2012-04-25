@@ -30,7 +30,8 @@ string Item::getUseVerb() const {
     if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
         return "Drink";
     }
-    LOG("Item::getUseVerb() unknown item_use: %d\n", this->item_use);
+    //LOG("Item::getUseVerb() unknown item_use: %d\n", this->item_use);
+    LOG("Item::getUseVerb() unknown item_use: %s\n", this->item_use.c_str());
     throw string("Unknown ItemUse type");
     return "";
 }
@@ -53,7 +54,8 @@ bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
         return true;
     }
     else {
-        LOG("Item::use() unknown item_use: %d\n", this->item_use);
+        //LOG("Item::use() unknown item_use: %d\n", this->item_use);
+        LOG("Item::use() unknown item_use: %s\n", this->item_use.c_str());
         throw string("Unknown ItemUse type");
     }
     return false;
