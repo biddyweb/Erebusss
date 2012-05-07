@@ -39,6 +39,7 @@ void Screen::update() {
         this->game_time_frame_ms = std::min(this->game_time_frame_ms, 1000);
         this->game_time_total_ms += this->game_time_frame_ms;
         this->saved_elapsed_time_ms = new_elapsed_time_ms;
+        //qDebug("Update: frame time: %d", this->game_time_frame_ms);
     }
 
     game_g->update();

@@ -518,6 +518,13 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         const float hgt = 64.0f/360.0f;
         this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
     }
+
+    /*{
+        // DEBUG ONLY
+        painter.setPen(Qt::red);
+        float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
+        painter.drawText(8, height() - 16, QString::number(fps));
+    }*/
 }
 
 void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {
