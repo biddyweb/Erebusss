@@ -11,4 +11,15 @@
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
+<image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"
+    filename_opened="gfx/textures/scenery/chest_opened.png"
+    xpos="6" ypos="2" width="52" height="52"
+    />
+<image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png"
+    filename_opened="gfx/textures/scenery/barrel_opened.png"
+    />
+<image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png"
+    filename_opened="gfx/textures/scenery/crate_opened.png"
+    />
+
 </images>

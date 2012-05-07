@@ -105,7 +105,8 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             }
         }
         // reverse path
-        for(vector<GraphVertex *>::const_reverse_iterator iter = path_backwards.rbegin();iter != path_backwards.rend(); ++iter) {
+        // n.b., using const_reverse_iterator doesn't compile on Symbian for some reason?
+        for(vector<GraphVertex *>::reverse_iterator iter = path_backwards.rbegin();iter != path_backwards.rend(); ++iter) {
             path.push_back( *iter );
         }
     }

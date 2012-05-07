@@ -6,6 +6,25 @@
 
 #include <cmath>
 
+CharacterTemplate::CharacterTemplate(string animation_name, int health_min, int health_max, int gold_min, int gold_max) :
+    animation_name(animation_name), health_min(health_min), health_max(health_max), gold_min(gold_min), gold_max(gold_max)
+{
+}
+
+int CharacterTemplate::getHealth() const {
+    if( health_min == health_max )
+        return health_min;
+    int r = rand() % (health_max - health_min + 1);
+    return health_min + r;
+}
+
+int CharacterTemplate::getGold() const {
+    if( gold_min == gold_max )
+        return gold_min;
+    int r = rand() % (gold_max - gold_min + 1);
+    return gold_min + r;
+}
+
 Character::Character(string name, string animation_name, bool is_ai) :
     name(name), animation_name(animation_name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
@@ -18,6 +37,22 @@ Character::Character(string name, string animation_name, bool is_ai) :
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
 {
 
+}
+
+Character::Character(string name, bool is_ai, const CharacterTemplate &character_template) :
+    name(name), //animation_name(animation_name),
+    is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
+    location(NULL), is_dead(false), time_of_death_ms(0),
+    listener(NULL), listener_data(NULL),
+    //has_destination(false),
+    has_path(false),
+    target_npc(NULL), time_last_action_ms(0), is_hitting(false),
+    fighting_prowess(0), strength(0), health(0), max_health(0),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
+{
+    this->animation_name = character_template.getAnimationName();
+    this->initialiseHealth( character_template.getHealth() );
+    this->gold = character_template.getGold();
 }
 
 Character::~Character() {

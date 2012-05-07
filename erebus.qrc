@@ -22,5 +22,6 @@
         <file>gfx/textures/scenery/chest_opened.png</file>
         <file>gfx/textures/scenery/crate.png</file>
         <file>gfx/textures/scenery/crate_opened.png</file>
+        <file>data/npcs.xml</file>
     </qresource>
 </RCC>

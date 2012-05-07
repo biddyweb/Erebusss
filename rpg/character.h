@@ -33,6 +33,20 @@ public:
     virtual void characterDeath(Character *character, void *user_data)=0;
 };
 
+class CharacterTemplate {
+    int health_min, health_max;
+    int gold_min, gold_max;
+    string animation_name;
+public:
+    CharacterTemplate(string animation_name, int health_min, int health_max, int gold_min, int gold_max);
+
+    int getHealth() const;
+    int getGold() const;
+    string getAnimationName() const {
+        return this->animation_name;
+    }
+};
+
 class Character {
     // basic info
     string name;
@@ -74,6 +88,7 @@ class Character {
 
 public:
     Character(string name, string animation_name, bool is_ai);
+    Character(string name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
     void setPos(float xpos, float ypos) {

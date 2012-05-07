@@ -27,13 +27,16 @@ string Item::getUseVerb() const {
     /*if( this->item_use == ITEMUSE_POTION_HEALING ) {
         return "Drink";
     }*/
-    if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
+    /*if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
         return "Drink";
     }
     //LOG("Item::getUseVerb() unknown item_use: %d\n", this->item_use);
     LOG("Item::getUseVerb() unknown item_use: %s\n", this->item_use.c_str());
     throw string("Unknown ItemUse type");
-    return "";
+    return "";*/
+    if( item_use_verb.length() == 0 )
+        return "Use";
+    return item_use_verb;
 }
 
 bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {

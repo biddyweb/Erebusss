@@ -17,7 +17,7 @@
     amount="20"/>
 
 <item name="Potion of Healing" image_name="potion_red" weight="1"
-    rating="2" magical="true" use="ITEMUSE_POTION_HEALING"/>
+    rating="2" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink"/>
 
 <currency name="Gold" image_name="gold"/>
 

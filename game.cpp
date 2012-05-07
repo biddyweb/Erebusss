@@ -224,7 +224,8 @@ OptionsGamestate::OptionsGamestate()
     QVBoxLayout *layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
 
-    QLabel *titleLabel = new QLabel("erebus");
+    //QLabel *titleLabel = new QLabel("erebus");
+    QLabel *titleLabel = new QLabel("");
     titleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed for fix layout problem on Qt Simulator at least, when returning to the options gamestate after playing the game
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setStyleSheet("QLabel { color : red; }");
@@ -375,8 +376,13 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
         int m_y = event->y();
         int xdist = abs(this->mouse_down_x - m_x);
         int ydist = abs(this->mouse_down_y - m_y);
+        // On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
+        // Needs to be higher on Symbian, at least for Nokia 5800, as touching the display seems to cause it to move so much more easily.
+#if defined(Q_OS_SYMBIAN)
+        const int drag_tol_c = 24;
+#else
         const int drag_tol_c = 16;
-        // on a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
+#endif
         //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
         if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
             QPointF m_scene = this->mapToScene(m_x, m_y);
@@ -612,9 +618,6 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     Character *player = playing_gamestate->getPlayer();
 
     QFont font = game_g->getFontStd();
-#if defined(Q_WS_SIMULATOR)
-    font.setPointSize( font.pointSize() + 6 ); // test
-#endif
     this->setFont(font);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -1090,13 +1093,47 @@ PlayingGamestate::PlayingGamestate() :
         v_layout->addWidget(optionsButton);
     }
 
-    layout->addWidget(view);
+    //layout->addWidget(view);
+    {
+        QVBoxLayout *v_layout = new QVBoxLayout();
+        layout->addLayout(v_layout);
+
+        v_layout->addWidget(view);
+
+        {
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            v_layout->addLayout(h_layout);
+
+            QPushButton *zoomoutButton = new QPushButton("-");
+            connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
+            h_layout->addWidget(zoomoutButton);
+
+            QPushButton *zoominButton = new QPushButton("+");
+            connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
+            h_layout->addWidget(zoominButton);
+        }
+    }
 
     view->showFullScreen();
 
     gui_overlay = new GUIOverlay(this, view);
     gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
     view->setGUIOverlay(gui_overlay);
+
+    /*QVBoxLayout *view_layout = new QVBoxLayout(view);
+    view_layout->addSpacing(1);
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        view_layout->addLayout(h_layout);
+
+        //QPushButton *zoomoutButton = new QPushButton("-", view);
+        QPushButton *zoomoutButton = new QPushButton("-");
+        h_layout->addWidget(zoomoutButton);
+        //zoomoutButton->move(view->width() - zoomoutButton->width() - 8, 32);
+
+        h_layout->addSpacing(1);
+
+    }*/
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -1144,6 +1181,15 @@ PlayingGamestate::PlayingGamestate() :
                     if( type_s == "item") {
                         this->item_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
                     }
+                    else if( type_s == "scenery" ) {
+                        this->scenery_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                        QStringRef filename_opened_s = reader.attributes().value("filename_opened");
+                        if( filename_opened_s.length() != 0 ) {
+                            QString filename_opened = ":/" + filename_opened_s.toString();
+                            LOG("load opened image: %s\n", filename_opened.toStdString().c_str());
+                            this->scenery_opened_images[name_s.toString().toStdString()] = game_g->loadImage(filename_opened.toStdString().c_str(), clip, xpos, ypos, width, height);
+                        }
+                    }
                     else {
                         throw string("image element has unknown type attribute");
                     }
@@ -1156,7 +1202,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
 
-    LOG("create RPG data\n");
+    LOG("load items\n");
     {
         QFile file(":/data/items.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
@@ -1177,6 +1223,7 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef rating_s = reader.attributes().value("rating");
                     QStringRef magical_s = reader.attributes().value("magical");
                     QStringRef use_s = reader.attributes().value("use");
+                    QStringRef use_verb_s = reader.attributes().value("use_verb");
                     int weight = parseInt(weight_s.toString());
                     int rating = parseInt(rating_s.toString());
                     bool magical = parseBool(magical_s.toString(), true);
@@ -1184,7 +1231,7 @@ PlayingGamestate::PlayingGamestate() :
                     item->setRating(rating);
                     item->setMagical(magical);
                     if( use_s.length() > 0 ) {
-                        item->setUse(use_s.toString().toStdString());
+                        item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
                     }
                     this->addStandardItem( item );
                 }
@@ -1270,14 +1317,14 @@ PlayingGamestate::PlayingGamestate() :
         this->scenery_images["crate"] = containers.copy(128, 0, 64, 64);
         this->scenery_opened_images["crate"] = containers.copy(128, 64, 64, 64);
     }*/
-    {
+    /*{
         this->scenery_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest.png", true, 6, 2, 52, 52);
         this->scenery_opened_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest_opened.png", true, 6, 2, 52, 52);
         this->scenery_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel.png");
         this->scenery_opened_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel_opened.png");
         this->scenery_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate.png");
         this->scenery_opened_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate_opened.png");
-    }
+    }*/
 
     gui_overlay->setProgress(20);
     qApp->processEvents();
@@ -1291,12 +1338,60 @@ PlayingGamestate::PlayingGamestate() :
     player->addItem( this->cloneStandardItem("Leather Armour") );
     player->addItem( this->cloneStandardItem("Arrows") );
 
+    LOG("load NPCs\n");
+    {
+        QFile file(":/data/npcs.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                if( reader.name() == "npc" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    LOG("found npc template: %s\n", name_s.toString().toStdString().c_str());
+                    QStringRef animation_name_s = reader.attributes().value("animation_name");
+                    QStringRef health_min_s = reader.attributes().value("health_min");
+                    int health_min = parseInt(health_min_s.toString());
+                    QStringRef health_max_s = reader.attributes().value("health_max");
+                    int health_max = parseInt(health_max_s.toString());
+                    QStringRef gold_min_s = reader.attributes().value("gold_min");
+                    int gold_min = parseInt(gold_min_s.toString());
+                    QStringRef gold_max_s = reader.attributes().value("gold_max");
+                    int gold_max = parseInt(gold_max_s.toString());
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), health_min, health_max, gold_min, gold_max);
+                    this->character_templates[ name_s.toString().toStdString() ] = character_template;
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading xml file");
+        }
+    }
+
     // create RPG world
     LOG("create RPG world\n");
 
     location = new Location();
 
+    /*{
+        CharacterTemplate *character_template = new CharacterTemplate(5, 8, 5, 8);
+        this->character_templates["goblin"] = character_template;
+    }*/
     {
+        CharacterTemplate *character_template = this->character_templates["Goblin"];
+        if( character_template == NULL ) {
+            throw string("can't find character_template goblin");
+        }
+        Character *enemy = new Character("Goblin", true, *character_template);
+        location->addCharacter(enemy, 4.0f, 4.0f);
+        enemy = new Character("Goblin", true, *character_template);
+        location->addCharacter(enemy, 16.0f, 14.0f);
+    }
+    /*{
         Character *enemy = new Character("Goblin", "goblin", true);
         enemy->initialiseHealth(5);
         enemy->addGold(8);
@@ -1309,6 +1404,8 @@ PlayingGamestate::PlayingGamestate() :
         enemy->initialiseHealth(6);
         enemy->addGold(9);
         location->addCharacter(enemy, 16.0f, 14.0f);
+    }*/
+    {
     }
 
     //location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
@@ -1368,6 +1465,7 @@ PlayingGamestate::PlayingGamestate() :
     location->calculateDistanceGraph();
 
     location->addCharacter(player, 3.0f, 2.0f);
+    view->centerOn(player->getPos().x, player->getPos().y);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
 
@@ -1532,7 +1630,7 @@ PlayingGamestate::PlayingGamestate() :
         text_effect->setPos( player->getPos().x, player->getPos().y );
         scene->addItem(text_effect);
     }*/
-    this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
+    //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
     gui_overlay->unsetProgress();
     qApp->processEvents();
@@ -1563,6 +1661,11 @@ PlayingGamestate::~PlayingGamestate() {
         LOG("about to delete standard item: %d\n", item);
         LOG("    name: %s\n", item->getName().c_str());
         delete item;
+    }
+    for(map<string, CharacterTemplate *>::iterator iter = this->character_templates.begin(); iter != this->character_templates.end(); ++iter) {
+        CharacterTemplate *character_template = iter->second;
+        LOG("about to delete character template: %d\n", character_template);
+        delete character_template;
     }
     LOG("done\n");
 }

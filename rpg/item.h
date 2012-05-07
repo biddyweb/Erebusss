@@ -32,6 +32,7 @@ protected:
 
     //ItemUse item_use;
     string item_use;
+    string item_use_verb;
     int rating;
     bool is_magical;
 public:
@@ -90,8 +91,9 @@ public:
     /*void setUse(ItemUse item_use) {
         this->item_use = item_use;
     }*/
-    void setUse(string item_use) {
+    void setUse(string item_use, string item_use_verb) {
         this->item_use = item_use;
+        this->item_use_verb = item_use_verb;
     }
     void setRating(int rating) {
         this->rating = rating;

@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<npcs>
+
+<npc name="Goblin" animation_name="goblin"
+    health_min="5" health_max = "8" gold_min="5" gold_max="8"
+/>
+
+</npcs>

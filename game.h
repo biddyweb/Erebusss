@@ -23,6 +23,7 @@ class PlayingGamestate;
 class Location;
 class Item;
 class Currency;
+class CharacterTemplate;
 
 enum Direction {
     DIRECTION_W = 0,
@@ -187,6 +188,8 @@ public:
 class GUIOverlay;
 
 class MainGraphicsView : public QGraphicsView {
+    Q_OBJECT
+
     PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
     //QGraphicsProxyWidget *gui_overlay_item;
@@ -220,6 +223,14 @@ public:
     }
     void addTextEffect(TextEffect *text_effect);
     void removeTextEffect(TextEffect *text_effect);
+
+public slots:
+    void zoomOut() {
+        this->zoom(false);
+    }
+    void zoomIn() {
+        this->zoom(true);
+    }
 };
 
 class GUIOverlay : public QWidget {
@@ -380,6 +391,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> item_images;
     map<string, QPixmap> scenery_images;
     map<string, QPixmap> scenery_opened_images;
+    map<string, CharacterTemplate *> character_templates;
 
 private slots:
     void clickedStats();
