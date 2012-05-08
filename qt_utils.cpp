@@ -14,6 +14,19 @@ int parseInt(const QString &str, bool allow_empty) {
     return value;
 }
 
+float parseFloat(const QString &str, bool allow_empty) {
+    if( str.length() == 0 && allow_empty ) {
+        return 0.0f;
+    }
+    bool ok = true;
+    float value = str.toFloat(&ok);
+    if( !ok ) {
+        LOG("failed to parse string to float: %s\n", str.toStdString().c_str());
+        throw string("failed to parse string to float");
+    }
+    return value;
+}
+
 bool parseBool(const QString &str, bool allow_empty) {
     if( str.length() == 0 && allow_empty ) {
         return false;
