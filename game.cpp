@@ -1388,7 +1388,7 @@ PlayingGamestate::PlayingGamestate() :
         CharacterTemplate *character_template = new CharacterTemplate(5, 8, 5, 8);
         this->character_templates["goblin"] = character_template;
     }*/
-    {
+    /*{
         CharacterTemplate *character_template = this->character_templates["Goblin"];
         if( character_template == NULL ) {
             throw string("can't find character_template goblin");
@@ -1397,7 +1397,7 @@ PlayingGamestate::PlayingGamestate() :
         location->addCharacter(enemy, 4.0f, 4.0f);
         enemy = new Character("Goblin", true, *character_template);
         location->addCharacter(enemy, 16.0f, 14.0f);
-    }
+    }*/
     /*{
         Character *enemy = new Character("Goblin", "goblin", true);
         enemy->initialiseHealth(5);
@@ -1412,31 +1412,201 @@ PlayingGamestate::PlayingGamestate() :
         enemy->addGold(9);
         location->addCharacter(enemy, 16.0f, 14.0f);
     }*/
-    {
-    }
 
     //location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
-    location->addItem( this->cloneStandardItem("Longbow"), 4.0f, 4.0f );
+    /*location->addItem( this->cloneStandardItem("Longbow"), 4.0f, 4.0f );
     location->addItem( this->cloneStandardItem("Shield"), 4.0f, 3.0f );
     location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
-    /*{
-        Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
-        LOG("gold location item: %d\n", item);
-        item->setValue(5);
-        location->addItem(item, 1.0f, 1.0f);
-    }*/
     location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
     location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
-    location->addItem( this->cloneStandardItem("Potion of Healing"), 3.0f, 4.0f );
+    location->addItem( this->cloneStandardItem("Potion of Healing"), 3.0f, 4.0f );*/
 
-    Scenery *scenery = NULL;
+    /*Scenery *scenery = NULL;
     location->addScenery( scenery = new Scenery("Chest", "chest"), 2.0f, 2.0f );
     scenery->setBlocking(true);
     scenery->setSize(0.8f, 0.8f);
     scenery->addItem( this->cloneStandardItem("Potion of Healing") );
-    scenery->addItem( this->cloneStandardItem("Longbow") );
+    scenery->addItem( this->cloneStandardItem("Longbow") );*/
 
-    FloorRegion *floor_regions = NULL;
+    LOG("load quest");
+    {
+        bool done_player_start = false;
+        enum QuestXMLType {
+            QUEST_XML_TYPE_NONE = 0,
+            QUEST_XML_TYPE_BOUNDARY = 1,
+            QUEST_XML_TYPE_SCENERY = 2
+        };
+        QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
+        Polygon2D boundary;
+        Scenery *scenery = NULL;
+        QFile file(":/data/quest.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
+                if( reader.name() == "floorregion" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef rect_x_s = reader.attributes().value("rect_x");
+                    float rect_x = parseFloat(rect_x_s.toString());
+                    QStringRef rect_y_s = reader.attributes().value("rect_y");
+                    float rect_y = parseFloat(rect_y_s.toString());
+                    QStringRef rect_w_s = reader.attributes().value("rect_w");
+                    float rect_w = parseFloat(rect_w_s.toString());
+                    QStringRef rect_h_s = reader.attributes().value("rect_h");
+                    float rect_h = parseFloat(rect_h_s.toString());
+                    LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
+                    FloorRegion *floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
+                    location->addFloorRegion(floor_region);
+                }
+                else if( reader.name() == "boundary" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    questXMLType = QUEST_XML_TYPE_BOUNDARY;
+                    boundary = Polygon2D(); // reset
+                }
+                else if( reader.name() == "point" ) {
+                    if( questXMLType != QUEST_XML_TYPE_BOUNDARY ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef point_x_s = reader.attributes().value("x");
+                    float point_x = parseFloat(point_x_s.toString());
+                    QStringRef point_y_s = reader.attributes().value("y");
+                    float point_y = parseFloat(point_y_s.toString());
+                    LOG("found boundary point: %f, %f\n", point_x, point_y);
+                    boundary.addPoint(Vector2D(point_x, point_y));
+                }
+                else if( reader.name() == "player_start" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    location->addCharacter(player, pos_x, pos_y);
+                    done_player_start = true;
+                }
+                else if( reader.name() == "npc" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef template_s = reader.attributes().value("template");
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
+                    if( character_template == NULL ) {
+                        LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
+                        throw string("can't find character template");
+                    }
+                    Character *npc = new Character(name_s.toString().toStdString(), true, *character_template);
+                    location->addCharacter(npc, pos_x, pos_y);
+                }
+                else if( reader.name() == "item" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef template_s = reader.attributes().value("template");
+                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
+                    if( item == NULL ) {
+                        LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
+                        throw string("can't find item");
+                    }
+                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
+                        scenery->addItem(item);
+                    }
+                    else {
+                        QStringRef pos_x_s = reader.attributes().value("x");
+                        float pos_x = parseFloat(pos_x_s.toString());
+                        QStringRef pos_y_s = reader.attributes().value("y");
+                        float pos_y = parseFloat(pos_y_s.toString());
+                        location->addItem(item, pos_x, pos_y);
+                    }
+                }
+                else if( reader.name() == "gold" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef amount_s = reader.attributes().value("amount");
+                    int amount = parseInt(amount_s.toString());
+                    Item *item = this->cloneGoldItem(amount);
+                    if( item == NULL ) {
+                        LOG("can't find gold item\n");
+                        throw string("can't find gold item");
+                    }
+                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
+                        scenery->addItem(item);
+                    }
+                    else {
+                        QStringRef pos_x_s = reader.attributes().value("x");
+                        float pos_x = parseFloat(pos_x_s.toString());
+                        QStringRef pos_y_s = reader.attributes().value("y");
+                        float pos_y = parseFloat(pos_y_s.toString());
+                        location->addItem(item, pos_x, pos_y);
+                    }
+                }
+                else if( reader.name() == "scenery" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    QStringRef blocking_s = reader.attributes().value("blocking");
+                    bool blocking = parseBool(blocking_s.toString());
+                    QStringRef size_w_s = reader.attributes().value("w");
+                    float size_w = parseFloat(size_w_s.toString());
+                    QStringRef size_h_s = reader.attributes().value("h");
+                    float size_h = parseFloat(size_h_s.toString());
+
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString());
+                    location->addScenery(scenery, pos_x, pos_y);
+                    scenery->setBlocking(blocking);
+                    scenery->setSize(size_w, size_h);
+                    questXMLType = QUEST_XML_TYPE_SCENERY;
+                }
+            }
+            else if( reader.isEndElement() ) {
+                LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
+                if( reader.name() == "boundary" ) {
+                    if( questXMLType != QUEST_XML_TYPE_BOUNDARY ) {
+                        throw string("unexpected quest xml");
+                    }
+                    location->addBoundary(boundary);
+                    questXMLType = QUEST_XML_TYPE_NONE;
+                }
+                else if( reader.name() == "scenery" ) {
+                    if( questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                        throw string("unexpected quest xml");
+                    }
+                    scenery = NULL;
+                    questXMLType = QUEST_XML_TYPE_NONE;
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error reading quest.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading xml file");
+        }
+        else if( !done_player_start ) {
+            LOG("quest.xml didn't define player_start\n");
+            throw string("quest.xml didn't define player_start");
+        }
+    }
+    /*FloorRegion *floor_regions = NULL;
     floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
     location->addFloorRegion(floor_regions);
     floor_regions = FloorRegion::createRectangle(5.0f, 2.0f, 5.0f, 1.0f);
@@ -1446,9 +1616,9 @@ PlayingGamestate::PlayingGamestate() :
     floor_regions = FloorRegion::createRectangle(10.0f, 7.0f, 10.0f, 10.0f);
     location->addFloorRegion(floor_regions);
     floor_regions = FloorRegion::createRectangle(20.0f, 9.0f, 5.0f, 2.0f);
-    location->addFloorRegion(floor_regions);
+    location->addFloorRegion(floor_regions);*/
 
-    {
+    /*{
         Polygon2D boundary;
         boundary.addPoint(Vector2D(0.0f, 0.0f));
         boundary.addPoint(Vector2D(0.0f, 5.0f));
@@ -1467,11 +1637,12 @@ PlayingGamestate::PlayingGamestate() :
         boundary.addPoint(Vector2D(5.0f, 2.0f));
         boundary.addPoint(Vector2D(5.0f, 0.0f));
         location->addBoundary(boundary);
-    }
+    }*/
+
     location->createBoundariesForScenery();
     location->calculateDistanceGraph();
 
-    location->addCharacter(player, 3.0f, 2.0f);
+    //location->addCharacter(player, 3.0f, 2.0f);
     view->centerOn(player->getPos().x, player->getPos().y);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
