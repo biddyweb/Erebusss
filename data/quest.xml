@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<quest>
+
+<floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
+<floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
+<floorregion rect_x="10.0" rect_y="2.0" rect_w="1.0" rect_h="5.0" />
+<floorregion rect_x="10.0" rect_y="7.0" rect_w="10.0" rect_h="10.0" />
+<floorregion rect_x="20.0" rect_y="9.0" rect_w="5.0" rect_h="2.0" />
+
+<boundary>
+    <point x="0.0" y="0.0" />
+    <point x="0.0" y="5.0" />
+    <point x="5.0" y="5.0" />
+    <point x="5.0" y="3.0" />
+    <point x="10.0" y="3.0" />
+    <point x="10.0" y="17.0" />
+    <point x="20.0" y="17.0" />
+    <point x="20.0" y="11.0" />
+    <point x="25.0" y="11.0" />
+    <point x="25.0" y="9.0" />
+    <point x="20.0" y="9.0" />
+    <point x="20.0" y="7.0" />
+    <point x="11.0" y="7.0" />
+    <point x="11.0" y="2.0" />
+    <point x="5.0" y="2.0" />
+    <point x="5.0" y="0.0" />
+</boundary>
+
+<player_start x="3.0" y="2.0"/>
+
+<npc name="Goblin" template="Goblin" x="4.0" y="4.0"/>
+<npc name="Goblin" template="Goblin" x="16.0" y="14.0"/>
+
+<item template="Longbow" x="4.0" y="4.0"/>
+<item template="Shield" x="4.0" y="3.0"/>
+<item template="Leather Armour" x="2.0" y="4.0"/>
+<gold amount="5" x="1.0" y="1.0"/>
+<item template="Arrows" x="2.0" y="1.0"/>
+<item template="Potion of Healing" x="3.0" y="4.0"/>
+
+<scenery name="Chest" image_name="chest" x="2.0" y="2.0" w="0.8" h="0.8" blocking="true">
+    <item template="Potion of Healing"/>
+    <item template="Longbow"/>
+</scenery>
+
+</quest>

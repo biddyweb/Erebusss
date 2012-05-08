@@ -98,7 +98,8 @@ OTHER_FILES += \
     android/src/org/kde/necessitas/origo/QtActivity.java \
     android/src/org/kde/necessitas/origo/QtApplication.java \
     android/version.xml \
-    data/npcs.xml
+    data/npcs.xml \
+    data/quest.xml
 
 RESOURCES += \
     erebus.qrc
