@@ -156,9 +156,7 @@ public:
     float getHeight() const {
         return this->height;
     }*/
-    void addFloorRegion(FloorRegion *floorRegion) {
-        this->floor_regions.push_back(floorRegion);
-    }
+    void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
         return this->floor_regions.at(i);
     }
@@ -216,7 +214,6 @@ public:
     void addScenery(Scenery *scenery, float xpos, float ypos);
     //void removeScenery(Scenery *scenery);
     void updateScenery(Scenery *scenery);
-    void createBoundariesForScenery();
     set<Scenery *>::iterator scenerysBegin() {
         return this->scenerys.begin();
     }
@@ -229,6 +226,9 @@ public:
     set<Scenery *>::const_iterator scenerysEnd() const {
         return this->scenerys.end();
     }
+
+    //void createBoundariesForRegions();
+    void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery);

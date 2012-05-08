@@ -69,6 +69,10 @@ Location::~Location() {
     }
 }
 
+void Location::addFloorRegion(FloorRegion *floorRegion) {
+    this->floor_regions.push_back(floorRegion);
+}
+
 void Location::calculateSize(float *w, float *h) const {
     *w = 0.0f;
     *h = 0.0f;
@@ -146,8 +150,12 @@ void Location::updateScenery(Scenery *scenery) {
     }
 }
 
+/*void Location::createBoundariesForRegions() {
+    LOG("Location::createBoundariesForRegions()\n");
+}*/
+
 void Location::createBoundariesForScenery() {
-    LOG("createBoundariesForScenery()\n");
+    LOG("Location::createBoundariesForScenery()\n");
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
         Scenery *scenery = *iter;
         if( !scenery->isBlocking() ) {
