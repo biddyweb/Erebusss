@@ -1314,26 +1314,6 @@ PlayingGamestate::PlayingGamestate() :
 
     gui_overlay->setProgress(10);
 
-    /*{
-        QPixmap containers = game_g->loadImage(":/gfx/textures/scenery/containers.png");
-        //this->scenery_images["chest"] = containers.copy(0, 0, 64, 64);
-        //this->scenery_opened_images["chest"] = containers.copy(0, 64, 64, 64);
-        this->scenery_images["chest"] = containers.copy(6, 2, 52, 52);
-        this->scenery_opened_images["chest"] = containers.copy(6, 66, 52, 52);
-        this->scenery_images["barrel"] = containers.copy(64, 0, 64, 64);
-        this->scenery_opened_images["barrel"] = containers.copy(64, 64, 64, 64);
-        this->scenery_images["crate"] = containers.copy(128, 0, 64, 64);
-        this->scenery_opened_images["crate"] = containers.copy(128, 64, 64, 64);
-    }*/
-    /*{
-        this->scenery_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest.png", true, 6, 2, 52, 52);
-        this->scenery_opened_images["chest"] = game_g->loadImage(":/gfx/textures/scenery/chest_opened.png", true, 6, 2, 52, 52);
-        this->scenery_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel.png");
-        this->scenery_opened_images["barrel"] = game_g->loadImage(":/gfx/textures/scenery/barrel_opened.png");
-        this->scenery_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate.png");
-        this->scenery_opened_images["crate"] = game_g->loadImage(":/gfx/textures/scenery/crate_opened.png");
-    }*/
-
     gui_overlay->setProgress(20);
     qApp->processEvents();
 
@@ -1385,51 +1365,6 @@ PlayingGamestate::PlayingGamestate() :
 
     location = new Location();
 
-    /*{
-        CharacterTemplate *character_template = new CharacterTemplate(5, 8, 5, 8);
-        this->character_templates["goblin"] = character_template;
-    }*/
-    /*{
-        CharacterTemplate *character_template = this->character_templates["Goblin"];
-        if( character_template == NULL ) {
-            throw string("can't find character_template goblin");
-        }
-        Character *enemy = new Character("Goblin", true, *character_template);
-        location->addCharacter(enemy, 4.0f, 4.0f);
-        enemy = new Character("Goblin", true, *character_template);
-        location->addCharacter(enemy, 16.0f, 14.0f);
-    }*/
-    /*{
-        Character *enemy = new Character("Goblin", "goblin", true);
-        enemy->initialiseHealth(5);
-        enemy->addGold(8);
-        //enemy->setHostile(false); // test
-        //enemy->addItem( this->cloneStandardItem("Leather Armour") ); // test
-        location->addCharacter(enemy, 4.0f, 4.0f);
-    }
-    {
-        Character *enemy = new Character("Goblin", "goblin", true);
-        enemy->initialiseHealth(6);
-        enemy->addGold(9);
-        location->addCharacter(enemy, 16.0f, 14.0f);
-    }*/
-
-    //location->addItem( this->cloneStandardItem("Long Sword"), 4.0f, 4.0f );
-    /*location->addItem( this->cloneStandardItem("Longbow"), 4.0f, 4.0f );
-    location->addItem( this->cloneStandardItem("Shield"), 4.0f, 3.0f );
-    location->addItem( this->cloneStandardItem("Leather Armour"), 2.0f, 4.0f );
-    location->addItem( this->cloneGoldItem(5), 1.0f, 1.0f );
-    location->addItem( this->cloneStandardItem("Arrows"), 2.0f, 1.0f );
-    location->addItem( this->cloneStandardItem("Potion of Healing"), 3.0f, 4.0f );*/
-
-    /*Scenery *scenery = NULL;
-    location->addScenery( scenery = new Scenery("Chest", "chest"), 2.0f, 2.0f );
-    scenery->setBlocking(true);
-    scenery->setSize(0.8f, 0.8f);
-    scenery->addItem( this->cloneStandardItem("Potion of Healing") );
-    scenery->addItem( this->cloneStandardItem("Longbow") );*/
-
-    LOG("load quest");
     {
         bool done_player_start = false;
         enum QuestXMLType {
@@ -1623,43 +1558,10 @@ PlayingGamestate::PlayingGamestate() :
             throw string("quest.xml didn't define player_start");
         }
     }
-    /*FloorRegion *floor_regions = NULL;
-    floor_regions = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
-    location->addFloorRegion(floor_regions);
-    floor_regions = FloorRegion::createRectangle(5.0f, 2.0f, 5.0f, 1.0f);
-    location->addFloorRegion(floor_regions);
-    floor_regions = FloorRegion::createRectangle(10.0f, 2.0f, 1.0f, 5.0f);
-    location->addFloorRegion(floor_regions);
-    floor_regions = FloorRegion::createRectangle(10.0f, 7.0f, 10.0f, 10.0f);
-    location->addFloorRegion(floor_regions);
-    floor_regions = FloorRegion::createRectangle(20.0f, 9.0f, 5.0f, 2.0f);
-    location->addFloorRegion(floor_regions);*/
-
-    /*{
-        Polygon2D boundary;
-        boundary.addPoint(Vector2D(0.0f, 0.0f));
-        boundary.addPoint(Vector2D(0.0f, 5.0f));
-        boundary.addPoint(Vector2D(5.0f, 5.0f));
-        boundary.addPoint(Vector2D(5.0f, 3.0f));
-        boundary.addPoint(Vector2D(10.0f, 3.0f));
-        boundary.addPoint(Vector2D(10.0f, 17.0f));
-        boundary.addPoint(Vector2D(20.0f, 17.0f));
-        boundary.addPoint(Vector2D(20.0f, 11.0f));
-        boundary.addPoint(Vector2D(25.0f, 11.0f));
-        boundary.addPoint(Vector2D(25.0f, 9.0f));
-        boundary.addPoint(Vector2D(20.0f, 9.0f));
-        boundary.addPoint(Vector2D(20.0f, 7.0f));
-        boundary.addPoint(Vector2D(11.0f, 7.0f));
-        boundary.addPoint(Vector2D(11.0f, 2.0f));
-        boundary.addPoint(Vector2D(5.0f, 2.0f));
-        boundary.addPoint(Vector2D(5.0f, 0.0f));
-        location->addBoundary(boundary);
-    }*/
 
     location->createBoundariesForScenery();
     location->calculateDistanceGraph();
 
-    //location->addCharacter(player, 3.0f, 2.0f);
     view->centerOn(player->getPos().x, player->getPos().y);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
@@ -1812,16 +1714,6 @@ PlayingGamestate::PlayingGamestate() :
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
         AnimatedObject *object = new AnimatedObject();
-        /*if( character == player ) {
-            object->addAnimationLayer( this->animation_layers["clothes"] );
-            object->addAnimationLayer( this->animation_layers["head"] );
-            if( character->getCurrentWeapon() != NULL ) {
-                object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationFilename().c_str() ] );
-            }
-        }
-        else {
-            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
-        }*/
         this->characterUpdateGraphics(character, object);
         scene->addItem(object);
         object->setPos(character->getX(), character->getY());
