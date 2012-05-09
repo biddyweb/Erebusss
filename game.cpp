@@ -88,12 +88,15 @@ AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, 
 
 AnimationLayer *AnimationLayer::create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
     AnimationLayer *layer = new AnimationLayer();
+    LOG("AnimationLayer::create: %s\n", filename);
     QPixmap image = game_g->loadImage(filename);
+    LOG("    loaded image\n");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
         AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, animation_layer_definition.position, animation_layer_definition.n_frames);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
+    LOG("    done\n");
     return layer;
 }
 
@@ -1198,6 +1201,42 @@ PlayingGamestate::PlayingGamestate() :
                             this->scenery_opened_images[name_s.toString().toStdString()] = game_g->loadImage(filename_opened.toStdString().c_str(), clip, xpos, ypos, width, height);
                         }
                     }
+                    else if( type_s == "npc" ) {
+                        QString name = name_s.toString(); // need to take copy of string reference
+                        vector<AnimationLayerDefinition> animation_layer_definition;
+                        while( !reader.atEnd() && !reader.hasError() && !(reader.isEndElement() && reader.name() == "image") ) {
+                            reader.readNext();
+                            if( reader.isStartElement() )
+                            {
+                                if( reader.name() == "animation" ) {
+                                    QStringRef sub_name_s = reader.attributes().value("name");
+                                    QStringRef sub_start_s = reader.attributes().value("start");
+                                    QStringRef sub_length_s = reader.attributes().value("length");
+                                    QStringRef sub_type_s = reader.attributes().value("type");
+                                    int sub_start = parseInt(sub_start_s.toString());
+                                    int sub_length = parseInt(sub_length_s.toString());
+                                    AnimationSet::AnimationType animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
+                                    if( sub_type_s == "single" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
+                                    }
+                                    else if( sub_type_s == "loop" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_LOOP;
+                                    }
+                                    else if( sub_type_s == "bounce" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_BOUNCE;
+                                    }
+                                    else {
+                                        throw string("unknown animation type");
+                                    }
+                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
+                                }
+                                else {
+                                    throw string("unknown xml tag within npc section");
+                                }
+                            }
+                        }
+                        this->animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString().c_str(), animation_layer_definition);
+                    }
                     else {
                         throw string("image element has unknown type attribute");
                     }
@@ -1673,7 +1712,7 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(70);
     qApp->processEvents();
 
-    LOG("load goblin image\n");
+    /*LOG("load goblin image\n");
     //AnimationLayer *goblin_layer = AnimationLayer::create(":/gfx/textures/goblin.png");
     vector<AnimationLayerDefinition> goblin_animation_layer_definition;
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
@@ -1693,7 +1732,7 @@ PlayingGamestate::PlayingGamestate() :
     orc_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     orc_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     orc_animation_layer_definition.push_back( AnimationLayerDefinition("death", 20, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    this->animation_layers["orc"] = AnimationLayer::create(":/gfx/textures/npcs/orc_regular_0.png", orc_animation_layer_definition);
+    this->animation_layers["orc"] = AnimationLayer::create(":/gfx/textures/npcs/orc_regular_0.png", orc_animation_layer_definition);*/
 
     gui_overlay->setProgress(80);
     qApp->processEvents();
