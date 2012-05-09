@@ -197,6 +197,7 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     QGraphicsTextItem(text), time_expire(0), view(view) {
     this->setDefaultTextColor(Qt::white);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
+    this->setFont(game_g->getFontStd());
 }
 
 void TextEffect::advance(int phase) {
@@ -2464,7 +2465,8 @@ void Game::run() {
 #endif
     }
     else {
-        this->font_std = window->font();
+        //this->font_std = window->font();
+        this->font_std = QFont("Verdana", 16);
         this->font_big = QFont("Verdana", 48, QFont::Bold);
     }
 
