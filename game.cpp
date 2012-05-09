@@ -1434,11 +1434,13 @@ PlayingGamestate::PlayingGamestate() :
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
             QUEST_XML_TYPE_BOUNDARY = 1,
-            QUEST_XML_TYPE_SCENERY = 2
+            QUEST_XML_TYPE_SCENERY = 2,
+            QUEST_XML_TYPE_NPC = 3
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         Polygon2D boundary;
         Scenery *scenery = NULL;
+        Character *npc = NULL;
         QFile file(":/data/quest.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open xml file");
@@ -1509,11 +1511,12 @@ PlayingGamestate::PlayingGamestate() :
                         LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
                         throw string("can't find character template");
                     }
-                    Character *npc = new Character(name_s.toString().toStdString(), true, *character_template);
+                    npc = new Character(name_s.toString().toStdString(), true, *character_template);
                     location->addCharacter(npc, pos_x, pos_y);
+                    questXMLType = QUEST_XML_TYPE_NPC;
                 }
                 else if( reader.name() == "item" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
                         throw string("unexpected quest xml");
                     }
                     QStringRef template_s = reader.attributes().value("template");
@@ -1525,6 +1528,9 @@ PlayingGamestate::PlayingGamestate() :
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                         scenery->addItem(item);
                     }
+                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
+                        npc->addItem(item);
+                    }
                     else {
                         QStringRef pos_x_s = reader.attributes().value("x");
                         float pos_x = parseFloat(pos_x_s.toString());
@@ -1534,7 +1540,7 @@ PlayingGamestate::PlayingGamestate() :
                     }
                 }
                 else if( reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
                         throw string("unexpected quest xml");
                     }
                     QStringRef amount_s = reader.attributes().value("amount");
@@ -1546,6 +1552,9 @@ PlayingGamestate::PlayingGamestate() :
                     }
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                         scenery->addItem(item);
+                    }
+                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
+                        npc->addItem(item);
                     }
                     else {
                         QStringRef pos_x_s = reader.attributes().value("x");
@@ -1586,6 +1595,13 @@ PlayingGamestate::PlayingGamestate() :
                         throw string("unexpected quest xml");
                     }
                     location->addBoundary(boundary);
+                    questXMLType = QUEST_XML_TYPE_NONE;
+                }
+                else if( reader.name() == "npc" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        throw string("unexpected quest xml");
+                    }
+                    npc = NULL;
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
                 else if( reader.name() == "scenery" ) {
@@ -1762,7 +1778,19 @@ PlayingGamestate::PlayingGamestate() :
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 20, 3, AnimationSet::ANIMATIONTYPE_SINGLE) );
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 24, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/goblin.png", goblin_animation_layer_definition);
+    this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/npcs/goblin.png", goblin_animation_layer_definition);
+
+    gui_overlay->setProgress(75);
+    qApp->processEvents();
+
+    LOG("load orc image\n");
+    vector<AnimationLayerDefinition> orc_animation_layer_definition;
+    orc_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    orc_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    orc_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    orc_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    orc_animation_layer_definition.push_back( AnimationLayerDefinition("death", 20, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    this->animation_layers["orc"] = AnimationLayer::create(":/gfx/textures/npcs/orc_regular_0.png", orc_animation_layer_definition);
 
     gui_overlay->setProgress(80);
     qApp->processEvents();

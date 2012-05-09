@@ -3,7 +3,6 @@
         <file>gfx/textures/floor_paved.png</file>
         <file>gfx/textures/isometric_hero/clothes.png</file>
         <file>gfx/textures/isometric_hero/male_head1.png</file>
-        <file>gfx/textures/goblin.png</file>
         <file>gfx/textures/isometric_hero/longsword.png</file>
         <file>gfx/textures/items/longsword.png</file>
         <file>gfx/textures/items/leather_armor.png</file>
@@ -24,5 +23,7 @@
         <file>gfx/textures/scenery/crate_opened.png</file>
         <file>data/npcs.xml</file>
         <file>data/quest.xml</file>
+        <file>gfx/textures/npcs/goblin.png</file>
+        <file>gfx/textures/npcs/orc_regular_0.png</file>
     </qresource>
 </RCC>

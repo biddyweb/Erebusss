@@ -29,7 +29,10 @@
 <player_start x="3.0" y="2.0"/>
 
 <npc name="Goblin" template="Goblin" x="4.0" y="4.0"/>
-<npc name="Goblin" template="Goblin" x="16.0" y="14.0"/>
+<!--<npc name="Goblin" template="Goblin" x="16.0" y="14.0"/>-->
+<npc name="Orc" template="Orc" x="16.0" y="14.0">
+    <item template="Potion of Healing"/>
+</npc>
 
 <item template="Longbow" x="4.0" y="4.0"/>
 <item template="Shield" x="4.0" y="3.0"/>
