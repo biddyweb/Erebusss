@@ -174,7 +174,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
                         ammo_key = this->getCurrentWeapon()->getAmmoKey();
                         Item *item = this->findItem(ammo_key);
-                        if( item == NULL ) {
+                        if( item == NULL && this == playing_gamestate->getPlayer() ) {
                             // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
                             LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
                             playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
@@ -194,7 +194,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             // ammo will be deleted if used up!
                             if( this->useAmmo(ammo) ) {
                                 ammo = NULL; // just to be safe, as pointer now deleted
-                                if( this->findItem(ammo_key) == NULL ) {
+                                if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
                                     // really has used up all available ammo
                                     if( this == playing_gamestate->getPlayer() ) {
                                         LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
