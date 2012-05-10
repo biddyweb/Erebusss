@@ -241,3 +241,19 @@ public:
 
     //void precalculate();
 };
+
+class Quest {
+    vector<Location *> locations;
+    string info;
+public:
+    Quest();
+    ~Quest();
+
+    void addLocation(Location *location);
+    void setInfo(string info) {
+        this->info = info;
+    }
+    const char *getInfo() const {
+        return this->info.c_str();
+    }
+};

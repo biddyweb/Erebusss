@@ -573,3 +573,17 @@ void Location::precalculate() {
     }*/
 }
 #endif
+
+Quest::Quest() {
+}
+
+Quest::~Quest() {
+    for(vector<Location *>::iterator iter = this->locations.begin(); iter != this->locations.end(); ++iter) {
+        Location *location = *iter;
+        delete location;
+    }
+}
+
+void Quest::addLocation(Location *location) {
+    this->locations.push_back(location);
+}

@@ -1012,7 +1012,7 @@ void ItemsWindow::itemIsDeleted(size_t index) {
 
 PlayingGamestate::PlayingGamestate() :
     scene(NULL), view(NULL), gui_overlay(NULL), /*mainwindow(NULL),*/ subwindow(NULL), main_stacked_widget(NULL),
-    player(NULL), location(NULL)
+    player(NULL), c_location(NULL), quest(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -1402,7 +1402,9 @@ PlayingGamestate::PlayingGamestate() :
     // create RPG world
     LOG("create RPG world\n");
 
-    location = new Location();
+    this->quest = new Quest();
+    Location *location = new Location();
+    this->quest->addLocation(location);
 
     {
         bool done_player_start = false;
@@ -1426,7 +1428,12 @@ PlayingGamestate::PlayingGamestate() :
             if( reader.isStartElement() )
             {
                 LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
-                if( reader.name() == "floorregion" ) {
+                if( reader.name() == "info" ) {
+                    QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    LOG("quest info: %s\n", info.toStdString().c_str());
+                    quest->setInfo(info.toStdString());
+                }
+                else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         throw string("unexpected quest xml");
                     }
@@ -1604,6 +1611,7 @@ PlayingGamestate::PlayingGamestate() :
     view->centerOn(player->getPos().x, player->getPos().y);
 
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    this->c_location = location;
 
     gui_overlay->setProgress(30);
     qApp->processEvents();
@@ -1612,7 +1620,6 @@ PlayingGamestate::PlayingGamestate() :
 
     int pixels_per_unit = 64;
     float scale = 1.0f/(float)pixels_per_unit;
-    //scene->setSceneRect(0, 0, location->getWidth(), location->getHeight());
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
     location->calculateSize(&location_width, &location_height);
@@ -1773,6 +1780,10 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->unsetProgress();
     qApp->processEvents();
 
+    if( quest->getInfo() != '\0' ) {
+        game_g->showInfoWindow("Quest", quest->getInfo());
+    }
+
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
     //this->paused = false;
@@ -1789,6 +1800,10 @@ PlayingGamestate::~PlayingGamestate() {
     window->setCentralWidget(NULL);
 
     playingGamestate = NULL;
+
+    delete quest;
+    quest = NULL;
+    c_location = NULL;
 
     for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
         AnimationLayer *animation_layer = (*iter).second;
@@ -1809,7 +1824,7 @@ PlayingGamestate::~PlayingGamestate() {
 }
 
 void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
-    if( this->location == location ) {
+    if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
         //object->setPixmap( item->getImage()->getPixmap() );
@@ -1837,7 +1852,7 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
 }
 
 void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) {
-    if( this->location == location ) {
+    if( this->c_location == location ) {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
         item->setUserGfxData(NULL);
         scene->removeItem(object);
@@ -1846,7 +1861,7 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
 }
 
 void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
-    if( this->location == location ) {
+    if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         scenery->setUserGfxData(object);
         this->locationUpdateScenery(scenery);
@@ -1862,7 +1877,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
 }
 
 void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
-    if( this->location == location ) {
+    if( this->c_location == location ) {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
@@ -1993,7 +2008,7 @@ void PlayingGamestate::clickedOptions() {
 
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
-    if( location->hasEnemies(this) ) {
+    if( c_location->hasEnemies(this) ) {
         game_g->showInfoWindow("Rest", "You cannot rest here - enemies are nearby");
         return;
     }
@@ -2051,7 +2066,7 @@ void PlayingGamestate::update() {
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 
     vector< set<Character *>::iterator > delete_characters;
-    for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         if( character->update(this) ) {
             LOG("character is about to die: %s\n", character->getName().c_str());
@@ -2062,9 +2077,9 @@ void PlayingGamestate::update() {
         set<Character *>::iterator iter = *iter2;
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
-        location->removeCharacter(character);
+        c_location->removeCharacter(character);
 
-        for(set<Character *>::iterator iter3 = location->charactersBegin(); iter3 != location->charactersEnd(); ++iter3) {
+        for(set<Character *>::iterator iter3 = c_location->charactersBegin(); iter3 != c_location->charactersEnd(); ++iter3) {
             Character *ch = *iter3;
             if( ch->getTargetNPC() == character ) {
                 ch->setTargetNPC(NULL);
@@ -2167,7 +2182,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         // search for clicking on an NPC
         float min_dist = 0.0f;
         Character *target_npc = NULL;
-        for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+        for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
             Character *character = *iter;
             if( character == player )
                 continue;
@@ -2185,7 +2200,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         if( !done ) {
             // search for clicking on an item
             Item *picked_item = NULL;
-            for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
+            for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
                 Item *item = *iter;
                 float dist_from_click = (dest - item->getPos()).magnitude();
                 float dist_from_player = (player->getPos() - item->getPos()).magnitude();
@@ -2207,7 +2222,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         if( !done ) {
             // search for clicking on a scenery
             Scenery *selected_scenery = NULL;
-            for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
+            for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
                 Scenery *scenery = *iter;
                 Vector2D scenery_pos = scenery->getPos();
                 float scenery_width = scenery->getWidth();
@@ -2245,7 +2260,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 if( selected_scenery->getNItems() > 0 ) {
                     for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
                         Item *item = *iter;
-                        location->addItem(item, player->getX(), player->getY());
+                        c_location->addItem(item, player->getX(), player->getY());
                     }
                     selected_scenery->eraseAllItems();
                     this->addTextEffect("Found some items!", player->getPos(), 2000);

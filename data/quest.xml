@@ -1,6 +1,63 @@
 <?xml version="1.0" ?>
 <quest>
 
+<info>The nearby caves to your village have become infested with Goblins. Kill
+these vermin, and you will be rewarded with 100 gold pieces!
+</info>
+
+<floorregion rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
+<floorregion rect_x="5.0" rect_y="4.0" rect_w="1.0" rect_h="6.0" />
+<floorregion rect_x="6.0" rect_y="4.0" rect_w="5.0" rect_h="1.0" />
+<floorregion rect_x="11.0" rect_y="1.0" rect_w="5.0" rect_h="5.0" />
+<floorregion rect_x="16.0" rect_y="3.0" rect_w="6.0" rect_h="1.0" />
+<floorregion rect_x="21.0" rect_y="4.0" rect_w="1.0" rect_h="12.0" />
+<floorregion rect_x="5.0" rect_y="11.0" rect_w="1.0" rect_h="4.0" />
+<floorregion rect_x="11.0" rect_y="11.0" rect_w="1.0" rect_h="4.0" />
+<floorregion rect_x="5.0" rect_y="15.0" rect_w="16.0" rect_h="1.0" />
+
+<player_start x="1.0" y="10.5"/>
+
+<boundary>
+    <point x="0.0" y="10.0" />
+    <point x="0.0" y="11.0" />
+    <point x="5.0" y="11.0" />
+    <point x="5.0" y="16.0" />
+    <point x="22.0" y="16.0" />
+    <point x="22.0" y="3.0" />
+    <point x="16.0" y="3.0" />
+    <point x="16.0" y="1.0" />
+    <point x="11.0" y="1.0" />
+    <point x="11.0" y="4.0" />
+    <point x="5.0" y="4.0" />
+    <point x="5.0" y="10.0" />
+</boundary>
+
+<boundary>
+    <point x="6.0" y="11.0" />
+    <point x="11.0" y="11.0" />
+    <point x="11.0" y="15.0" />
+    <point x="6.0" y="15.0" />
+</boundary>
+
+<boundary>
+    <point x="6.0" y="10.0" />
+    <point x="6.0" y="5.0" />
+    <point x="11.0" y="5.0" />
+    <point x="11.0" y="6.0" />
+    <point x="16.0" y="6.0" />
+    <point x="16.0" y="4.0" />
+    <point x="21.0" y="4.0" />
+    <point x="21.0" y="15.0" />
+    <point x="12.0" y="15.0" />
+    <point x="12.0" y="10.0" />
+</boundary>
+
+<npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
+<npc name="Goblin" template="Goblin" x="15.0" y="2.0"/><!-- Should be Goblin Archer!-->
+<npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
+<npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
+
+<!--
 <floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
 <floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
 <floorregion rect_x="10.0" rect_y="2.0" rect_w="1.0" rect_h="5.0" />
@@ -29,7 +86,6 @@
 <player_start x="3.0" y="2.0"/>
 
 <npc name="Goblin" template="Goblin" x="4.0" y="4.0"/>
-<!--<npc name="Goblin" template="Goblin" x="16.0" y="14.0"/>-->
 <npc name="Orc" template="Orc" x="16.0" y="14.0">
     <item template="Potion of Healing"/>
 </npc>
@@ -45,5 +101,6 @@
     <item template="Potion of Healing"/>
     <item template="Longbow"/>
 </scenery>
+-->
 
 </quest>

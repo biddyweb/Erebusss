@@ -20,6 +20,7 @@ using std::string;
 
 class Screen;
 class PlayingGamestate;
+class Quest;
 class Location;
 class Item;
 class Currency;
@@ -380,7 +381,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     Character *player;
 
-    Location *location;
+    Location *c_location;
+    Quest *quest;
 
     // character items in the view
     set<QGraphicsItem *> graphicsitems_characters;
@@ -432,12 +434,12 @@ public:
     const Character *getPlayer() const {
         return this->player;
     }
-    Location *getLocation() {
+    /*Location *getLocation() {
         return this->location;
     }
     const Location *getLocation() const {
         return this->location;
-    }
+    }*/
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(string name) const;
