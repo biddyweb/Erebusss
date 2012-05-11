@@ -5,6 +5,13 @@
 these vermin, and you will be rewarded with 100 gold pieces!
 </info>
 
+<!--
+<floorregion rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0" />
+<floorregion rect_x="4.0" rect_y="1.0" rect_w="4.0" rect_h="2.0" />
+
+<player_start x="2.0" y="2.0"/>
+-->
+
 <floorregion rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
 <floorregion rect_x="5.0" rect_y="4.0" rect_w="1.0" rect_h="6.0" />
 <floorregion rect_x="6.0" rect_y="4.0" rect_w="5.0" rect_h="1.0" />
@@ -17,6 +24,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <player_start x="1.0" y="10.5"/>
 
+<!--
 <boundary>
     <point x="0.0" y="10.0" />
     <point x="0.0" y="11.0" />
@@ -51,6 +59,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <point x="12.0" y="15.0" />
     <point x="12.0" y="10.0" />
 </boundary>
+-->
 
 <npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
 <npc name="Goblin" template="Goblin" x="15.0" y="2.0"/>

@@ -4,6 +4,56 @@
 #include <queue>
 using std::priority_queue;
 
+/* Drops the vector onto a line of direction 'n' that passes through 'o'.
+* 'n' must be normalised.
+* Formula: nv = ((v - o) DOT n) n + o
+*/
+void Vector2D::dropOnLine(const Vector2D &o, const Vector2D &n) {
+    this->subtract(o);
+    float dot = this->x * n.x + this->y * n.y;
+    this->x = dot * n.x;
+    this->y = dot * n.y;
+    this->add(o);
+}
+
+void Vector2D::parallelComp(const Vector2D &n) {
+    Vector2D zero(0.0f, 0.0f);
+    this->dropOnLine(zero, n);
+}
+
+void Vector2D::perpComp(const Vector2D &n) {
+    Vector2D zero(0.0f, 0.0f);
+    Vector2D v = *this;
+    v.dropOnLine(zero, n);
+    this->subtract(v);
+}
+
+float Vector2D::distFromLine(const Vector2D &o, const Vector2D &n) const {
+    Vector2D nv(this->x, this->y);
+    nv.dropOnLine(o, n);
+    nv.subtract(*this);
+    float dist = sqrt( nv.square() );
+    return dist;
+}
+
+float Vector2D::distFromLineSq(const Vector2D &o, const Vector2D &n) const {
+    Vector2D nv(this->x, this->y);
+    nv.dropOnLine(o, n);
+    nv.subtract(*this);
+    float dist = nv.square();
+    return dist;
+}
+
+void Polygon2D::insertPoint(int indx, Vector2D point) {
+    if( indx <= 0 || indx > points.size() ) {
+        LOG("Polygon2D::insertPoint invalid indx %d\n", indx);
+        throw string("Polygon2D::insertPoint invalid indx");
+    }
+    LOG("insert point at %d: %f, %f\n", indx, point.x, point.y);
+    this->points.insert( this->points.begin() + indx, point );
+    LOG("    done\n");
+}
+
 GraphVertex *GraphVertex::getNeighbour(Graph *graph, float *distance, size_t i) const {
     *distance = distances.at(i);
     size_t id = neighbour_ids.at(i);

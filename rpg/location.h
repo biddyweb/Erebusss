@@ -118,25 +118,49 @@ public:
 };
 
 class FloorRegion : public Polygon2D {
+public:
+    enum EdgeType {
+        EDGETYPE_INTERNAL = 0,
+        EDGETYPE_EXTERNAL = 1
+    };
 protected:
+    vector<EdgeType> edge_types; // should match points array of Polygon2D; gives the type of the edge following the i-th point
+    vector<int> temp_marks; // should match points array
+
     FloorRegion() : Polygon2D() {
     }
 
 public:
+    virtual void addPoint(Vector2D point) {
+        Polygon2D::addPoint(point);
+        this->edge_types.push_back(EDGETYPE_EXTERNAL);
+        this->temp_marks.push_back(0);
+    }
+    virtual void insertPoint(int indx, Vector2D point);
+    void setEdgeType(int indx, EdgeType edge_type) {
+        this->edge_types.at(indx) = edge_type;
+    }
+    EdgeType getEdgeType(int indx) const {
+        return this->edge_types.at(indx);
+    }
+    void setTempMark(int indx, int value) {
+        this->temp_marks.at(indx) = value;
+    }
+    int getTempMark(int indx) const {
+        return this->temp_marks.at(indx);
+    }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);
 };
 
 class Location {
-    /*float width;
-    float height;*/
     LocationListener *listener;
     void *listener_data;
 
     Graph *distance_graph;
 
     vector<FloorRegion *> floor_regions;
-    vector<Polygon2D> boundaries; // first boundary is always the outside one
+    vector<Polygon2D> boundaries;
 
     set<Character *> characters;
     set<Item *> items;
@@ -150,12 +174,6 @@ public:
     Location();
     ~Location();
 
-    /*float getWidth() const {
-        return this->width;
-    }
-    float getHeight() const {
-        return this->height;
-    }*/
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
         return this->floor_regions.at(i);
@@ -227,7 +245,7 @@ public:
         return this->scenerys.end();
     }
 
-    //void createBoundariesForRegions();
+    void createBoundariesForRegions();
     void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;

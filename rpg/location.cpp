@@ -32,12 +32,19 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
+void FloorRegion::insertPoint(int indx, Vector2D point) {
+    Polygon2D::insertPoint(indx, point);
+    EdgeType edge_type = edge_types.at(indx-1);
+    this->edge_types.insert( this->edge_types.begin() + indx, edge_type );
+    this->temp_marks.insert( this->temp_marks.begin() + indx, 0 );
+}
+
 FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     FloorRegion *floor_regions = new FloorRegion();
-    floor_regions->points.push_back(Vector2D(x, y));
-    floor_regions->points.push_back(Vector2D(x, y+h));
-    floor_regions->points.push_back(Vector2D(x+w, y+h));
-    floor_regions->points.push_back(Vector2D(x+w, y));
+    floor_regions->addPoint(Vector2D(x, y));
+    floor_regions->addPoint(Vector2D(x, y+h));
+    floor_regions->addPoint(Vector2D(x+w, y+h));
+    floor_regions->addPoint(Vector2D(x+w, y));
     return floor_regions;
 }
 
@@ -150,9 +157,159 @@ void Location::updateScenery(Scenery *scenery) {
     }
 }
 
-/*void Location::createBoundariesForRegions() {
+void Location::createBoundariesForRegions() {
     LOG("Location::createBoundariesForRegions()\n");
-}*/
+    float eps = 1.0e-5;
+    // imprint coi vertices
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D p0 = floor_region->getPoint(j);
+            Vector2D p1 = floor_region->getPoint((j+1) % floor_region->getNPoints());
+            LOG("check edge %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            dp /= dp_length;
+            for(vector<FloorRegion *>::const_iterator iter2 = floor_regions.begin(); iter2 != floor_regions.end(); ++iter2) {
+                const FloorRegion *floor_region2 = *iter2;
+                if( floor_region == floor_region2 ) {
+                    continue;
+                }
+                for(size_t j2=0;j2<floor_region2->getNPoints();j2++) {
+                    Vector2D p = floor_region2->getPoint(j2);
+                    Vector2D imp_p = p;
+                    imp_p.dropOnLine(p0, dp);
+                    float dist_p = (imp_p - p).magnitude();
+                    //LOG("    %f, %f is dist: %f\n", p.x, p.y, dist_p);
+                    if( dist_p <= eps ) {
+                        float dot = ( p - p0 ) % dp;
+                        if( dot >= eps && dot <= dp_length - eps ) {
+                            // imprint coi vertex
+                            LOG("imprint between %f, %f to %f, %f at: %f, %f\n", p0.x, p0.y, p1.x, p1.y, imp_p.x, imp_p.y);
+                            floor_region->insertPoint(j+1, imp_p);
+                            p1 = imp_p;
+                            dp_length = dot;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    LOG("calculate which boundary edges are internal\n");
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D p0 = floor_region->getPoint(j);
+            Vector2D p1 = floor_region->getPoint((j+1) % floor_region->getNPoints());
+            LOG("check if edge is internal: %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            dp /= dp_length;
+            bool done = false; // only one other edge should be internal!
+            for(vector<FloorRegion *>::const_iterator iter2 = floor_regions.begin(); iter2 != floor_regions.end() && !done; ++iter2) {
+                FloorRegion *floor_region2 = *iter2;
+                if( floor_region == floor_region2 ) {
+                    continue;
+                }
+                for(size_t j2=0;j2<floor_region2->getNPoints() && !done;j2++) {
+                    Vector2D p2 = floor_region2->getPoint(j2);
+                    Vector2D p3 = floor_region2->getPoint((j2+1) % floor_region2->getNPoints());
+                    // we only need to test for opposed, due to the way floor_region polygons should be ordered
+                    float dist0 = (p0 - p3).magnitude();
+                    float dist1 = (p1 - p2).magnitude();
+                    //LOG("    compare to: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
+                    //LOG("    dists: %f, %f", dist0, dist1);
+                    if( dist0 <= eps && dist1 <= eps ) {
+                        LOG("edge is internal with: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
+                        floor_region->setEdgeType(j, FloorRegion::EDGETYPE_INTERNAL);
+                        floor_region2->setEdgeType(j2, FloorRegion::EDGETYPE_INTERNAL);
+                    }
+                }
+            }
+        }
+    }
+
+    LOG("find boundaries\n");
+    for(;;) {
+        LOG("find an unmarked edge\n");
+        FloorRegion *c_floor_region = NULL;
+        int c_indx = -1;
+        for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && c_floor_region==NULL; ++iter) {
+            FloorRegion *floor_region = *iter;
+            for(size_t j=0;j<floor_region->getNPoints() && c_floor_region==NULL;j++) {
+                if( floor_region->getTempMark(j) == 0 && floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_EXTERNAL ) {
+                    c_floor_region = floor_region;
+                    c_indx = j;
+                }
+            }
+        }
+        if( c_floor_region == NULL ) {
+            LOG("all done\n");
+            break;
+        }
+        FloorRegion *start_floor_region = c_floor_region;
+        int start_indx = c_indx;
+        Polygon2D boundary;
+        // first point actually added as last point at end
+        for(;;) {
+            int n_indx = (c_indx+1) % c_floor_region->getNPoints();
+            Vector2D back_pvec = c_floor_region->getPoint( c_indx );
+            Vector2D pvec = c_floor_region->getPoint( n_indx );
+            LOG("on edge %f, %f to %f, %f\n", back_pvec.x, back_pvec.y, pvec.x, pvec.y);
+            if( c_floor_region->getTempMark(c_indx) != 0 ) {
+                LOG("moved onto boundary already marked: %d, %d\n", c_floor_region, c_indx);
+                throw string("moved onto boundary already marked");
+            }
+            boundary.addPoint(pvec);
+            c_floor_region->setTempMark(c_indx, 1);
+            if( c_floor_region == start_floor_region && n_indx == start_indx ) {
+                break;
+            }
+            LOG("move on to next edge\n");
+            if( c_floor_region->getEdgeType(n_indx) == FloorRegion::EDGETYPE_EXTERNAL ) {
+                c_indx = n_indx;
+            }
+            else {
+                LOG("need to find a new boundary\n");
+                bool found = false;
+                for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && !found; ++iter) {
+                    FloorRegion *floor_region = *iter;
+                    for(size_t j=0;j<floor_region->getNPoints() && !found;j++) {
+                        if( floor_region->getTempMark(j) == 0 && floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_EXTERNAL ) {
+                            // we only need to check the first pvec, as we want the edge that leaves this point
+                            Vector2D o_pvec = floor_region->getPoint(j);
+                            float dist = (pvec - o_pvec).magnitude();
+                            if( dist <= eps ) {
+                                c_floor_region = floor_region;
+                                c_indx = j;
+                                found = true;
+                            }
+                        }
+                    }
+                }
+                if( !found ) {
+                    LOG("can't find new boundary\n");
+                    break;
+                }
+            }
+        }
+        this->addBoundary(boundary);
+    }
+    LOG("reset temp marks\n");
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            floor_region->setTempMark(j, 0);
+        }
+    }
+}
 
 void Location::createBoundariesForScenery() {
     LOG("Location::createBoundariesForScenery()\n");
@@ -281,7 +438,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
             iy -= width;
             iy = max(iy, 0.0f);
             if( iy > ymax ) {
-                qDebug("intersection is beyond end of swept box");
+                LOG("intersection is beyond end of swept box\n");
                 throw string("intersection is beyond end of swept box");
             }
             if( !(*hit) || iy < *hit_dist ) {

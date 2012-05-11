@@ -1410,7 +1410,7 @@ PlayingGamestate::PlayingGamestate() :
         bool done_player_start = false;
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
-            QUEST_XML_TYPE_BOUNDARY = 1,
+            //QUEST_XML_TYPE_BOUNDARY = 1,
             QUEST_XML_TYPE_SCENERY = 2,
             QUEST_XML_TYPE_NPC = 3
         };
@@ -1449,7 +1449,7 @@ PlayingGamestate::PlayingGamestate() :
                     FloorRegion *floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
                     location->addFloorRegion(floor_region);
                 }
-                else if( reader.name() == "boundary" ) {
+                /*else if( reader.name() == "boundary" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         throw string("unexpected quest xml");
                     }
@@ -1466,7 +1466,7 @@ PlayingGamestate::PlayingGamestate() :
                     float point_y = parseFloat(point_y_s.toString());
                     LOG("found boundary point: %f, %f\n", point_x, point_y);
                     boundary.addPoint(Vector2D(point_x, point_y));
-                }
+                }*/
                 else if( reader.name() == "player_start" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         throw string("unexpected quest xml");
@@ -1572,14 +1572,14 @@ PlayingGamestate::PlayingGamestate() :
             }
             else if( reader.isEndElement() ) {
                 LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
-                if( reader.name() == "boundary" ) {
+                /*if( reader.name() == "boundary" ) {
                     if( questXMLType != QUEST_XML_TYPE_BOUNDARY ) {
                         throw string("unexpected quest xml");
                     }
                     location->addBoundary(boundary);
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
-                else if( reader.name() == "npc" ) {
+                else */if( reader.name() == "npc" ) {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
                         throw string("unexpected quest xml");
                     }
@@ -1605,6 +1605,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
 
+    location->createBoundariesForRegions();
     location->createBoundariesForScenery();
     location->calculateDistanceGraph();
 

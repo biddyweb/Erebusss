@@ -152,6 +152,12 @@ public:
     Vector2D perpendicularYToX() const {
         return Vector2D(y, -x);
     }
+
+    void dropOnLine(const Vector2D &o, const Vector2D &n);
+    void parallelComp(const Vector2D &n);
+    void perpComp(const Vector2D &n);
+    float distFromLine(const Vector2D &o, const Vector2D &n) const;
+    float distFromLineSq(const Vector2D &o, const Vector2D &n) const;
 };
 
 class LineSeg {
@@ -177,9 +183,10 @@ public:
     size_t getNPoints() const {
         return points.size();
     }
-    void addPoint(Vector2D point) {
+    virtual void addPoint(Vector2D point) {
         this->points.push_back(point);
     }
+    virtual void insertPoint(int indx, Vector2D point);
     void setSource(void *source) {
         this->source = source;
     }
