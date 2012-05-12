@@ -94,7 +94,7 @@ public:
 };
 
 vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
-    LOG("Graph::shortestPath(%d, %d)\n", start, end);
+    //LOG("Graph::shortestPath(%d, %d)\n", start, end);
     for(vector<GraphVertex>::iterator iter = vertices.begin(); iter != vertices.end(); ++iter) {
         GraphVertex *vertex = &*iter;
         vertex->initPathFinding();
@@ -118,7 +118,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             c_vertex->setVisited();
 
             float value = c_vertex->getValue();
-            LOG("    check vertex at %f, %f value %f\n", c_vertex->getPos().x, c_vertex->getPos().y, c_vertex->getValue());
+            //LOG("    check vertex at %f, %f value %f\n", c_vertex->getPos().x, c_vertex->getPos().y, c_vertex->getValue());
             for(size_t i=0;i<c_vertex->getNNeighbours();i++) {
                 float dist = 0.0f;
                 GraphVertex *n_vertex = c_vertex->getNeighbour(this, &dist, i);
@@ -160,7 +160,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             path.push_back( *iter );
         }
     }
-    LOG("    calculated shortest path, length: %d\n", path.size());
+    //LOG("    calculated shortest path, length: %d\n", path.size());
     return path;
 }
 
