@@ -22,6 +22,22 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <floorregion rect_x="11.0" rect_y="11.0" rect_w="1.0" rect_h="4.0" />
 <floorregion rect_x="5.0" rect_y="15.0" rect_w="16.0" rect_h="1.0" />
 
+    <floorregion rect_x="6.0" rect_y="7.6" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="6.5" rect_y="6.5" rect_w="2.5" rect_h="3.0" />
+
+    <floorregion rect_x="12.0" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="12.5" rect_y="11.5" rect_w="2.0" rect_h="3.0" />
+    <floorregion rect_x="14.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="15.0" rect_y="11.5" rect_w="2.5" rect_h="3.0" />
+    <floorregion rect_x="17.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="18.0" rect_y="11.5" rect_w="2.5" rect_h="3.0" />
+    <floorregion rect_x="19.5" rect_y="14.5" rect_w="0.8" rect_h="0.5" />
+    <floorregion rect_x="19.5" rect_y="11.0" rect_w="0.8" rect_h="0.5" />
+<floorregion rect_x="15.0" rect_y="7.0" rect_w="5.5" rect_h="4.0" />
+
+    <floorregion rect_x="12.0" rect_y="10.1" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="12.5" rect_y="7.0" rect_w="2.0" rect_h="4.0" />
+
 <player_start x="1.0" y="10.5"/>
 
 <!--
