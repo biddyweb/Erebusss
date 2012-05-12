@@ -6,6 +6,10 @@
 
 #include <cmath>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 CharacterTemplate::CharacterTemplate(string animation_name, int health_min, int health_max, int gold_min, int gold_max) :
     animation_name(animation_name), health_min(health_min), health_max(health_max), gold_min(gold_min), gold_max(gold_max)
 {
@@ -82,10 +86,8 @@ bool Character::useAmmo(Ammo *ammo) {
     // n.b., must be an item owned by Character!
     bool used_up = false;
     int amount = ammo->getAmount();
-    if( amount <= 0 ) {
-        LOG("ammo is already non-positive: %d\n", amount);
-        throw string("ammo amount not greater than 0");
-    }
+
+    ASSERT_LOGGER( amount > 0 );
     amount--;
     if( amount > 0 ) {
         ammo->setAmount(amount);
@@ -117,9 +119,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     float hit_range_c = target_npc == NULL ? 0.0f : sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
     bool ai_try_moving = true;
 
-    if( is_hitting && target_npc == NULL ) {
+    /*if( is_hitting && target_npc == NULL ) {
         throw string("is_hitting is true, but no target_npc");
-    }
+    }*/
+    ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
     if( target_npc != NULL ) {
         bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
         float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
@@ -181,11 +184,15 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             can_hit = false;
                             this->armWeapon(NULL); // disarm it
                         }
-                        else if( item->getType() != ITEMTYPE_AMMO ) {
+                        /*else if( item->getType() != ITEMTYPE_AMMO ) {
                             LOG("required ammo type %s is not ammo\n", item->getName().c_str());
                             throw string("required ammo type is not ammo");
-                        }
+                        }*/
                         else {
+                            if( item->getType() != ITEMTYPE_AMMO ) {
+                                LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                                ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
+                            }
                             ammo = static_cast<Ammo *>(item);
                         }
                     }
@@ -253,7 +260,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         //Vector2D diff = this->dest - this->pos;
         if( this->path.size() == 0 ) {
             LOG("Character %s has path, but empty path vector\n", this->getName().c_str());
-            throw string("Character has path, but empty path vector");
+            ASSERT_LOGGER( this->path.size() != 0 );
         }
         if( !this->canMove() ) {
             // can't move!
@@ -338,10 +345,11 @@ void Character::setStateIdle() {
 int Character::increaseHealth(int increase) {
     if( this->is_dead ) {
         LOG("tried to increaseHealth of %s by %d - already dead!\n", this->getName().c_str(), increase);
-        throw string("can't increase health of dead character");
+        ASSERT_LOGGER( !this->is_dead );
     }
     else if( increase <= 0 ) {
         LOG("increaseHealth: received non-positive increase: %d\n", increase);
+        ASSERT_LOGGER( increase > 0 );
     }
     this->health += increase;
     if( health > max_health )
@@ -352,10 +360,11 @@ int Character::increaseHealth(int increase) {
 int Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease) {
     if( this->is_dead ) {
         LOG("tried to decreaseHealth of %s by %d - already dead!\n", this->getName().c_str(), decrease);
-        throw string("can't decrease health of dead character");
+        ASSERT_LOGGER( !this->is_dead );
     }
     else if( decrease <= 0 ) {
         LOG("decreaseHealth: received non-positive decrease: %d\n", decrease);
+        ASSERT_LOGGER( decrease > 0 );
     }
     this->health -= decrease;
     if( health <= 0 ) {
@@ -491,7 +500,7 @@ void Character::addGold(int change) {
     this->gold += change;
     if( this->gold < 0 ) {
         LOG("Character::addGold(), removed %d, leaves %d\n", change, this->gold);
-        throw string("removed too much gold from character");
+        ASSERT_LOGGER( gold >= 0 );
     }
 }
 
@@ -519,7 +528,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
     LOG("Character::setDestination(%f, %f) for %s\n", xdest, ydest, this->getName().c_str());
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
-        throw string("can't set destination for character with NULL location");
+        ASSERT_LOGGER( location != NULL );
     }
 
     Vector2D dest(xdest, ydest);
