@@ -166,7 +166,7 @@ void Location::createBoundariesForRegions() {
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             Vector2D p0 = floor_region->getPoint(j);
             Vector2D p1 = floor_region->getPoint((j+1) % floor_region->getNPoints());
-            LOG("check edge %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
+            //LOG("check edge %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
             Vector2D dp = p1 - p0;
             float dp_length = dp.magnitude();
             if( dp_length == 0.0f ) {
@@ -188,7 +188,7 @@ void Location::createBoundariesForRegions() {
                         float dot = ( p - p0 ) % dp;
                         if( dot >= eps && dot <= dp_length - eps ) {
                             // imprint coi vertex
-                            LOG("imprint between %f, %f to %f, %f at: %f, %f\n", p0.x, p0.y, p1.x, p1.y, imp_p.x, imp_p.y);
+                            //LOG("imprint between %f, %f to %f, %f at: %f, %f\n", p0.x, p0.y, p1.x, p1.y, imp_p.x, imp_p.y);
                             floor_region->insertPoint(j+1, imp_p);
                             p1 = imp_p;
                             dp_length = dot;
@@ -205,7 +205,7 @@ void Location::createBoundariesForRegions() {
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             Vector2D p0 = floor_region->getPoint(j);
             Vector2D p1 = floor_region->getPoint((j+1) % floor_region->getNPoints());
-            LOG("check if edge is internal: %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
+            //LOG("check if edge is internal: %f, %f to %f, %f\n", p0.x, p0.y, p1.x, p1.y);
             Vector2D dp = p1 - p0;
             float dp_length = dp.magnitude();
             if( dp_length == 0.0f ) {
@@ -227,7 +227,7 @@ void Location::createBoundariesForRegions() {
                     //LOG("    compare to: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
                     //LOG("    dists: %f, %f", dist0, dist1);
                     if( dist0 <= eps && dist1 <= eps ) {
-                        LOG("edge is internal with: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
+                        //LOG("edge is internal with: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
                         floor_region->setEdgeType(j, FloorRegion::EDGETYPE_INTERNAL);
                         floor_region2->setEdgeType(j2, FloorRegion::EDGETYPE_INTERNAL);
                     }
@@ -238,7 +238,7 @@ void Location::createBoundariesForRegions() {
 
     LOG("find boundaries\n");
     for(;;) {
-        LOG("find an unmarked edge\n");
+        //LOG("find an unmarked edge\n");
         FloorRegion *c_floor_region = NULL;
         int c_indx = -1;
         for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && c_floor_region==NULL; ++iter) {
@@ -251,7 +251,7 @@ void Location::createBoundariesForRegions() {
             }
         }
         if( c_floor_region == NULL ) {
-            LOG("all done\n");
+            //LOG("all done\n");
             break;
         }
         FloorRegion *start_floor_region = c_floor_region;
@@ -262,7 +262,7 @@ void Location::createBoundariesForRegions() {
             int n_indx = (c_indx+1) % c_floor_region->getNPoints();
             Vector2D back_pvec = c_floor_region->getPoint( c_indx );
             Vector2D pvec = c_floor_region->getPoint( n_indx );
-            LOG("on edge %f, %f to %f, %f\n", back_pvec.x, back_pvec.y, pvec.x, pvec.y);
+            //LOG("on edge %f, %f to %f, %f\n", back_pvec.x, back_pvec.y, pvec.x, pvec.y);
             if( c_floor_region->getTempMark(c_indx) != 0 ) {
                 LOG("moved onto boundary already marked: %d, %d\n", c_floor_region, c_indx);
                 throw string("moved onto boundary already marked");
@@ -272,12 +272,12 @@ void Location::createBoundariesForRegions() {
             if( c_floor_region == start_floor_region && n_indx == start_indx ) {
                 break;
             }
-            LOG("move on to next edge\n");
+            //LOG("move on to next edge\n");
             if( c_floor_region->getEdgeType(n_indx) == FloorRegion::EDGETYPE_EXTERNAL ) {
                 c_indx = n_indx;
             }
             else {
-                LOG("need to find a new boundary\n");
+                //LOG("need to find a new boundary\n");
                 bool found = false;
                 for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && !found; ++iter) {
                     FloorRegion *floor_region = *iter;
@@ -295,7 +295,7 @@ void Location::createBoundariesForRegions() {
                     }
                 }
                 if( !found ) {
-                    LOG("can't find new boundary\n");
+                    //LOG("can't find new boundary\n");
                     break;
                 }
             }

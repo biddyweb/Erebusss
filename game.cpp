@@ -1427,7 +1427,7 @@ PlayingGamestate::PlayingGamestate() :
             reader.readNext();
             if( reader.isStartElement() )
             {
-                LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
+                //LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
                 if( reader.name() == "info" ) {
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     LOG("quest info: %s\n", info.toStdString().c_str());
@@ -1445,7 +1445,7 @@ PlayingGamestate::PlayingGamestate() :
                     float rect_w = parseFloat(rect_w_s.toString());
                     QStringRef rect_h_s = reader.attributes().value("rect_h");
                     float rect_h = parseFloat(rect_h_s.toString());
-                    LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
+                    //LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
                     FloorRegion *floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
                     location->addFloorRegion(floor_region);
                 }
@@ -1571,7 +1571,7 @@ PlayingGamestate::PlayingGamestate() :
                 }
             }
             else if( reader.isEndElement() ) {
-                LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
+                //LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
                 /*if( reader.name() == "boundary" ) {
                     if( questXMLType != QUEST_XML_TYPE_BOUNDARY ) {
                         throw string("unexpected quest xml");

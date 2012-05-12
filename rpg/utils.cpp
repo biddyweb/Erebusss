@@ -53,9 +53,8 @@ void Polygon2D::insertPoint(size_t indx, Vector2D point) {
         LOG("Polygon2D::insertPoint invalid indx %d\n", indx);
         throw string("Polygon2D::insertPoint invalid indx");
     }
-    LOG("insert point at %d: %f, %f\n", indx, point.x, point.y);
+    //LOG("insert point at %d: %f, %f\n", indx, point.x, point.y);
     this->points.insert( this->points.begin() + indx, point );
-    LOG("    done\n");
 }
 
 GraphVertex *GraphVertex::getNeighbour(Graph *graph, float *distance, size_t i) const {
@@ -126,7 +125,7 @@ public:
 };
 
 vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
-    LOG("Graph::shortestPath(%d, %d)\n", start, end);
+    //LOG("Graph::shortestPath(%d, %d)\n", start, end);
     //LOG("graph has %d vertices\n", vertices.size());
     for(vector<GraphVertex>::iterator iter = vertices.begin(); iter != vertices.end(); ++iter) {
         GraphVertex *vertex = &*iter;
@@ -142,7 +141,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
     GraphVertex *end_vertex = this->getVertex(end);
     bool found_dest = false;
 
-    LOG("start algorithm\n");
+    //LOG("start algorithm\n");
     while( !queue.empty() && !found_dest ) {
         // find current cheapest
         //LOG("start loop, queue size %d\n", queue.size());
@@ -186,7 +185,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
         }
     }
 
-    LOG("found_dest: %d\n", found_dest);
+    //LOG("found_dest: %d\n", found_dest);
     vector<GraphVertex *> path;
     if( found_dest ) {
         // n.b., don't include start_vertex in path
@@ -206,7 +205,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             path.push_back( *iter );
         }
     }
-    LOG("    calculated shortest path, length: %d\n", path.size());
+    //LOG("    calculated shortest path, length: %d\n", path.size());
     return path;
 }
 

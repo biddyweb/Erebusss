@@ -514,7 +514,7 @@ int Character::calculateItemsWeight() const {
 }
 
 void Character::setPath(vector<Vector2D> &path) {
-    LOG("Character::setPath() for %s\n", this->getName().c_str());
+    //LOG("Character::setPath() for %s\n", this->getName().c_str());
     bool old_has_path = this->has_path;
     this->has_path = true;
     this->path = path;
@@ -525,7 +525,7 @@ void Character::setPath(vector<Vector2D> &path) {
 }
 
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
-    LOG("Character::setDestination(%f, %f) for %s\n", xdest, ydest, this->getName().c_str());
+    //LOG("Character::setDestination(%f, %f) for %s\n", xdest, ydest, this->getName().c_str());
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
         ASSERT_LOGGER( location != NULL );
@@ -541,7 +541,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
         new_path.push_back(dest);
     }
     else {
-        LOG("    calculate path\n");
+        //LOG("    calculate path\n");
         const Graph *distance_graph = this->location->getDistanceGraph();
         Graph *graph = distance_graph->clone();
 
