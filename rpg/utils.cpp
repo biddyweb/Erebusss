@@ -4,6 +4,10 @@
 #include <queue>
 using std::priority_queue;
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 /* Drops the vector onto a line of direction 'n' that passes through 'o'.
 * 'n' must be normalised.
 * Formula: nv = ((v - o) DOT n) n + o
@@ -44,8 +48,8 @@ float Vector2D::distFromLineSq(const Vector2D &o, const Vector2D &n) const {
     return dist;
 }
 
-void Polygon2D::insertPoint(int indx, Vector2D point) {
-    if( indx <= 0 || indx > points.size() ) {
+void Polygon2D::insertPoint(size_t indx, Vector2D point) {
+    if( indx == 0 || indx > points.size() ) {
         LOG("Polygon2D::insertPoint invalid indx %d\n", indx);
         throw string("Polygon2D::insertPoint invalid indx");
     }
@@ -85,32 +89,65 @@ Graph *Graph::clone() const {
     return copy;
 }
 
+class GraphDistance {
+    GraphVertex *vertex;
+    float distance;
+public:
+    /** We need to store the distance separately, as although we update the
+      * value in vertex, priority_queue doesn't allow us to make the sorting
+      * order depend on something that can then change.
+      */
+    GraphDistance(GraphVertex *vertex) : vertex(vertex), distance(vertex->getValue()) {
+    }
+    float getDistance() const {
+        return distance;
+    }
+    GraphVertex *getVertex() const {
+        return vertex;
+    }
+};
+
 class DistanceComparison {
 public:
-    bool operator() (const GraphVertex *lhs, const GraphVertex *rhs) const {
+    bool operator() (const GraphDistance &lhs, const GraphDistance &rhs) const {
         // return iff rhs < lhs
-        return rhs->getValue() < lhs->getValue();
+        //LOG("compare distances %d ( %f ) vs %d ( %f )\n", lhs, lhs->getValue(), rhs, rhs->getValue());
+        float l_dist = lhs.getDistance();
+        float r_dist = rhs.getDistance();
+        if( l_dist == r_dist ) {
+            // need to have some way to sort consistently!
+            return rhs.getVertex() < lhs.getVertex();
+        }
+        //return r_dist < l_dist;
+        bool res = r_dist < l_dist;
+        //LOG("    return %d\n", res);
+        return res;
     }
 };
 
 vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
-    //LOG("Graph::shortestPath(%d, %d)\n", start, end);
+    LOG("Graph::shortestPath(%d, %d)\n", start, end);
+    //LOG("graph has %d vertices\n", vertices.size());
     for(vector<GraphVertex>::iterator iter = vertices.begin(); iter != vertices.end(); ++iter) {
         GraphVertex *vertex = &*iter;
         vertex->initPathFinding();
     }
 
-    priority_queue<GraphVertex *, vector<GraphVertex *>, DistanceComparison> queue;
+    priority_queue<GraphDistance, vector<GraphDistance>, DistanceComparison> queue;
     GraphVertex *start_vertex = this->getVertex(start);
     start_vertex->setValue(0.0f, NULL);
-    queue.push(start_vertex);
+    GraphDistance start_distance(start_vertex);
+    queue.push(start_distance);
 
     GraphVertex *end_vertex = this->getVertex(end);
     bool found_dest = false;
 
+    LOG("start algorithm\n");
     while( !queue.empty() && !found_dest ) {
         // find current cheapest
-        GraphVertex *c_vertex = queue.top();
+        //LOG("start loop, queue size %d\n", queue.size());
+        const GraphDistance &c_distance = queue.top();
+        GraphVertex *c_vertex = c_distance.getVertex();
         queue.pop();
 
         // check that we've got the "cheapest" version
@@ -118,29 +155,38 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             c_vertex->setVisited();
 
             float value = c_vertex->getValue();
-            //LOG("    check vertex at %f, %f value %f\n", c_vertex->getPos().x, c_vertex->getPos().y, c_vertex->getValue());
+            //LOG("    check vertex at %f, %f value %f %d neighbours\n", c_vertex->getPos().x, c_vertex->getPos().y, c_vertex->getValue(), c_vertex->getNNeighbours());
             for(size_t i=0;i<c_vertex->getNNeighbours();i++) {
+                //LOG("    i = %d\n", i);
                 float dist = 0.0f;
                 GraphVertex *n_vertex = c_vertex->getNeighbour(this, &dist, i);
+                //LOG("    neighbouring vertex at %f, %f value %f dist %f\n", n_vertex->getPos().x, n_vertex->getPos().y, n_vertex->getValue(), dist);
                 float n_value = value + dist;
                 bool changed = false;
                 if( n_vertex->getValue() < 0.0f || n_value < n_vertex->getValue() ) {
+                    //LOG("    shorter dist: %f\n", n_value);
                     n_vertex->setValue(n_value, c_vertex);
                     changed = true;
                 }
                 if( changed ) {
                     // update with cheaper version
-                    queue.push(n_vertex);
+                    //LOG("    push %d, value %f, current size: %d\n", n_vertex, n_vertex->getValue(), queue.size());
+                    GraphDistance n_distance(n_vertex);
+                    queue.push(n_distance);
+                    //LOG("    pushed ok\n");
                 }
             }
+            //LOG("    done\n");
 
             if( c_vertex == end_vertex ) {
                 // reached destination
+                //LOG("reached destination\n");
                 found_dest = true;
             }
         }
     }
 
+    LOG("found_dest: %d\n", found_dest);
     vector<GraphVertex *> path;
     if( found_dest ) {
         // n.b., don't include start_vertex in path
@@ -160,7 +206,7 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
             path.push_back( *iter );
         }
     }
-    //LOG("    calculated shortest path, length: %d\n", path.size());
+    LOG("    calculated shortest path, length: %d\n", path.size());
     return path;
 }
 

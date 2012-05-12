@@ -186,7 +186,7 @@ public:
     virtual void addPoint(Vector2D point) {
         this->points.push_back(point);
     }
-    virtual void insertPoint(int indx, Vector2D point);
+    virtual void insertPoint(size_t indx, Vector2D point);
     void setSource(void *source) {
         this->source = source;
     }
