@@ -2288,12 +2288,16 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
             if( selected_scenery != NULL ) {
                 if( selected_scenery->getNItems() > 0 ) {
+                    bool all_gold = true;
                     for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
                         Item *item = *iter;
+                        if( item->getType() != ITEMTYPE_CURRENCY ) {
+                            all_gold = false;
+                        }
                         c_location->addItem(item, player->getX(), player->getY());
                     }
                     selected_scenery->eraseAllItems();
-                    this->addTextEffect("Found some items!", player->getPos(), 2000);
+                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
                 }
                 if( !selected_scenery->isOpened() ) {
                     selected_scenery->setOpened(true);
