@@ -109,6 +109,7 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !has_enemies; ++iter) {
         const Character *character = *iter;
         if( character->isHostile() ) {
+            // n.b., we don't use the visibility test - so it isn't sufficient to just be out of sight, but we also need to be a sufficient distance
             float dist = (character->getPos() - playing_gamestate->getPlayer()->getPos()).magnitude();
             if( dist <= npc_visibility_c ) {
                 has_enemies = true;
