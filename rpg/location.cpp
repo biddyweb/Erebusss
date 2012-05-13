@@ -344,7 +344,7 @@ void Location::createBoundariesForScenery() {
     LOG("    done\n");
 }
 
-void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) {
+void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const {
     Vector2D saved_p0 = p0; // for debugging
     Vector2D saved_p1 = p1;
     // transform into the space of the swept square
@@ -477,7 +477,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery) {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery) const {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
         if( ignore_scenery != NULL && boundary->getSource() == ignore_scenery ) {
@@ -491,7 +491,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery) {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery) const {
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -522,7 +522,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D st
     return hit;
 }
 
-bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) {
+bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -593,8 +593,12 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
     return hit;
 }
 
+/*bool Location::pointInside(Vector2D point) const {
+    // tests whether a point is within the valid location region
+}*/
+
 vector<Vector2D> Location::calculatePathWayPoints() const {
-    qDebug("Location::calculatePathWayPoints");
+    LOG("Location::calculatePathWayPoints");
     vector<Vector2D> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
@@ -624,7 +628,12 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
                 //const float offset = npc_radius_c/ratio;
                 const float offset = npc_radius_c/ratio + E_TOL_LINEAR;
                 Vector2D path_way_point = point + inwards * offset;
-                path_way_points.push_back( path_way_point );
+
+                // test we get get to the way point
+                Vector2D hit_pos;
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, point, path_way_point, 0.0f, NULL) ) {
+                    path_way_points.push_back( path_way_point );
+                }
             }
         }
     }
