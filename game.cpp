@@ -1656,16 +1656,19 @@ PlayingGamestate::PlayingGamestate() :
         //QBrush floor_brush(Qt::white);
         scene->addPolygon(polygon, Qt::NoPen, floor_brush);
     }
-    QPen wall_pen(Qt::red);
-    for(size_t i=0;i<location->getNBoundaries();i++) {
-        const Polygon2D *boundary = location->getBoundary(i);
-        for(size_t j=0;j<boundary->getNPoints();j++) {
-            Vector2D p0 = boundary->getPoint(j);
-            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-            //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
-            scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+    /*{
+        // DEBUG
+        QPen wall_pen(Qt::red);
+        for(size_t i=0;i<location->getNBoundaries();i++) {
+            const Polygon2D *boundary = location->getBoundary(i);
+            for(size_t j=0;j<boundary->getNPoints();j++) {
+                Vector2D p0 = boundary->getPoint(j);
+                Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+                //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
+                scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+            }
         }
-    }
+    }*/
     /*{
         // DEBUG
         const Graph *distance_graph = location->getDistanceGraph();
