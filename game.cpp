@@ -1657,7 +1657,7 @@ PlayingGamestate::PlayingGamestate() :
         scene->addPolygon(polygon, Qt::NoPen, floor_brush);
     }
     /*{
-        // DEBUG
+        // DEBUG ONLY
         QPen wall_pen(Qt::red);
         for(size_t i=0;i<location->getNBoundaries();i++) {
             const Polygon2D *boundary = location->getBoundary(i);
@@ -1670,7 +1670,8 @@ PlayingGamestate::PlayingGamestate() :
         }
     }*/
     /*{
-        // DEBUG
+        // DEBUG ONLY
+        QPen wall_pen(Qt::red);
         const Graph *distance_graph = location->getDistanceGraph();
         for(size_t i=0;i<distance_graph->getNVertices();i++) {
             const GraphVertex *vertex = distance_graph->getVertex(i);
@@ -1786,7 +1787,8 @@ PlayingGamestate::PlayingGamestate() :
     qApp->processEvents();
 
     if( quest->getInfo() != '\0' ) {
-        game_g->showInfoWindow("Quest", quest->getInfo());
+        // disabled for now due to window too large on Android bug
+        //game_g->showInfoWindow("Quest", quest->getInfo());
     }
 
     game_g->getScreen()->setPaused(false);
