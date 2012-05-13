@@ -266,7 +266,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             this->setTargetNPC(NULL);
             //this->has_destination = false;
             //this->has_path = false;
-            this->setStateIdle();
+            if( this->has_path ) {
+                this->setStateIdle();
+            }
         }
     }
 
