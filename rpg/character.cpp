@@ -140,6 +140,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         if( hit_state == HITSTATE_HAS_HIT || hit_state == HITSTATE_IS_NOT_HITTING ) {
             bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
             float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+            /* We could use the is_visible flag, but for future use we might want
+               to cater for Enemy NPCs shooting friendly NPCs.
+               This shouldn't be a performance issue, as this code is only
+               executed when firing/hitting, and not every frame.
+            */
             bool can_hit = false;
             if( is_ranged ) {
                 if( dist <= npc_visibility_c ) {
@@ -149,10 +154,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         can_hit = true;
                     }
                     else {
-                        /*LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
-                        LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
-                        LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
-                        LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);*/
+                        //LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
+                        //LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
+                        //LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
+                        //LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
                     }
                 }
             }
@@ -249,7 +254,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     if( is_ai && !is_hitting && ai_try_moving ) {
         bool done_target = false;
         if( is_hostile && playing_gamestate->getPlayer() != NULL ) {
-            double dist = (playing_gamestate->getPlayer()->getPos() - this->getPos() ).magnitude();
+            /*double dist = (playing_gamestate->getPlayer()->getPos() - this->getPos() ).magnitude();
             if( dist <= npc_visibility_c ) {
                 // check line of sight
                 Vector2D hit_pos;
@@ -259,6 +264,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     this->setDestination(dest.x, dest.y, NULL);
                     done_target = true;
                 }
+            }*/
+            if( this->is_visible ) {
+                this->setTargetNPC( playing_gamestate->getPlayer() );
+                Vector2D dest = playing_gamestate->getPlayer()->getPos();
+                this->setDestination(dest.x, dest.y, NULL);
+                done_target = true;
             }
         }
 

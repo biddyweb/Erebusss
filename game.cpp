@@ -176,6 +176,7 @@ void AnimatedObject::setAnimationSet(string name) {
         }
     }
     else {
+        // useful as a warning, in case we didn't intend to do this
         qDebug("reset animation set: %s", name.c_str());
     }
 
@@ -2063,6 +2064,29 @@ void PlayingGamestate::update() {
         return;
     }
 
+    // test for fog of war
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        if( character != this->player ) {
+            bool is_visible = false;
+            float dist = ( character->getPos() - player->getPos() ).magnitude();
+            if( dist <= hit_range_c ) {
+                // assume always visible
+                is_visible = true;
+            }
+            else if( dist <= npc_visibility_c ) {
+                // check line of sight
+                Vector2D hit_pos;
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, NULL) ) {
+                    is_visible = true;
+                }
+            }
+            character->setVisible(is_visible);
+            AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
+            object->setVisible(is_visible);
+        }
+    }
+
     scene->advance();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 
@@ -2186,6 +2210,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
             Character *character = *iter;
             if( character == player )
+                continue;
+            if( !character->isVisible() )
                 continue;
             float dist_from_click = (dest - character->getPos()).magnitude();
             if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {

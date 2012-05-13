@@ -67,11 +67,12 @@ class Character {
 
     // game data
     Location *location;
+    CharacterListener *listener;
+    void *listener_data;
     bool is_dead;
     int time_of_death_ms;
     Vector2D pos;
-    CharacterListener *listener;
-    void *listener_data;
+    bool is_visible; // for NPCs: whether player and NPC can see each other
     /*bool has_destination;
     Vector2D dest;*/
     bool has_path;
@@ -126,6 +127,13 @@ public:
     void setLocation(Location *location) {
         this->location = location;
     }
+    void setListener(CharacterListener *listener, void *listener_data) {
+        this->listener = listener;
+        this->listener_data = listener_data;
+    }
+    void *getListenerData() {
+        return this->listener_data;
+    }
     bool isAI() const {
         return this->is_ai;
     }
@@ -138,9 +146,11 @@ public:
     bool isDead() const {
         return this->is_dead;
     }
-    void setListener(CharacterListener *listener, void *listener_data) {
-        this->listener = listener;
-        this->listener_data = listener_data;
+    void setVisible(bool is_visible) {
+        this->is_visible = is_visible;
+    }
+    bool isVisible() const {
+        return this->is_visible;
     }
     /*void setDestination(float xdest, float ydest) {
         bool old_has_destination = this->has_destination;
