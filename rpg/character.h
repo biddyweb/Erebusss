@@ -21,7 +21,18 @@ class Ammo;
 class Location;
 class Scenery;
 
+/** The visibility range - how far the player and NPCs can see. This should be
+  * used for every possible action, such as ranged attacks, spells. For NPCs
+  * further away than this, we don't need to do any AI.
+  * If ever we make it so that different characters can have different ranges,
+  * then the AI should be based on whatever is the maximum (if an NPC can see
+  * the player, then clearly they should be able to do things such as fire
+  * weapons; if the player can see the NPC, then the NPC should still be able
+  * to react to being attacked from a distance, also if we have things like
+  * scriptable movement, we want to be able to see the NPC moving).
+  */
 const float npc_visibility_c = 10.0f;
+
 const float npc_radius_c = 0.25f;
 
 class CharacterListener {
