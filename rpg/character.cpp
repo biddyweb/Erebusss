@@ -607,7 +607,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
         vector<GraphVertex *> shortest_path = graph->shortestPath(start_index, end_index);
         if( shortest_path.size() == 0 ) {
             // can't reach destination (or already at it)
-            LOG("    can't reach destination (or already at it)\n");
+            //LOG("    can't reach destination (or already at it)\n");
         }
         else {
             for(vector<GraphVertex *>::const_iterator iter = shortest_path.begin(); iter != shortest_path.end(); ++iter) {
@@ -620,6 +620,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
     }
 
     if( new_path.size() > 0 ) {
+        //LOG("set path\n");
         if( ignore_scenery != NULL ) {
             Vector2D p0 = this->pos;
             if( new_path.size() >= 2 ) {
