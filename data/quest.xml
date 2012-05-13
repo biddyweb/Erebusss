@@ -90,12 +90,12 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="16.5" y="10.0"/>
 <npc name="Goblin" template="Goblin" x="19.5" y="9.5"/>
 
-<scenery name="Chest" image_name="chest" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>
     <item template="Arrows"/>
 </scenery>
 
-<scenery name="Chest" image_name="chest" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
 
