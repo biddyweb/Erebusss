@@ -509,9 +509,9 @@ public:
     QPixmap loadImage(const char *filename) const {
         return loadImage(filename, false, 0, 0, 0, 0);
     }
-    void showErrorWindow(const char *message);
-    void showInfoWindow(const char *title, const char *message);
-    bool askQuestionWindow(const char *title, const char *message);
+    void showErrorDialog(const char *message);
+    void showInfoDialog(const char *title, const char *message);
+    bool askQuestionDialog(const char *title, const char *message);
 };
 
 extern Game *game_g;

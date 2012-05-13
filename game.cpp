@@ -1147,6 +1147,7 @@ PlayingGamestate::PlayingGamestate() :
 
     }*/
 
+    window->setEnabled(false);
     gui_overlay->setProgress(0);
     qApp->processEvents();
 
@@ -1250,6 +1251,9 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
 
+    gui_overlay->setProgress(20);
+    qApp->processEvents();
+
     LOG("load items\n");
     {
         QFile file(":/data/items.xml");
@@ -1352,9 +1356,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }
 
-    gui_overlay->setProgress(10);
-
-    gui_overlay->setProgress(20);
+    gui_overlay->setProgress(30);
     qApp->processEvents();
 
     this->player = new Character("Player", "", false);
@@ -1399,6 +1401,9 @@ PlayingGamestate::PlayingGamestate() :
             throw string("error reading xml file");
         }
     }
+
+    gui_overlay->setProgress(40);
+    qApp->processEvents();
 
     // create RPG world
     LOG("create RPG world\n");
@@ -1605,6 +1610,10 @@ PlayingGamestate::PlayingGamestate() :
             throw string("quest.xml didn't define player_start");
         }
     }
+    //throw string("failed"); // TEST
+
+    gui_overlay->setProgress(50);
+    qApp->processEvents();
 
     location->createBoundariesForRegions();
     location->createBoundariesForScenery();
@@ -1615,7 +1624,7 @@ PlayingGamestate::PlayingGamestate() :
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
     this->c_location = location;
 
-    gui_overlay->setProgress(30);
+    gui_overlay->setProgress(60);
     qApp->processEvents();
 
     // set up the view on the RPG world
@@ -1691,7 +1700,7 @@ PlayingGamestate::PlayingGamestate() :
         }
     }*/
 
-    gui_overlay->setProgress(40);
+    gui_overlay->setProgress(70);
     qApp->processEvents();
 
     LOG("create animation frames\n");
@@ -1707,22 +1716,18 @@ PlayingGamestate::PlayingGamestate() :
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
     this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
     LOG("time to load: %d\n", clock() - time_s);
-    gui_overlay->setProgress(50);
-    qApp->processEvents();
     /*LOG("head layer\n");
     string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
     AnimationLayer *head_layer = new AnimationLayer();*/
     //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
     this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
-    gui_overlay->setProgress(60);
-    qApp->processEvents();
     LOG("longsword layer\n");
     this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
     LOG("longbow layer\n");
     this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition);
     LOG("shield layer\n");
     this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
-    gui_overlay->setProgress(70);
+    gui_overlay->setProgress(80);
     qApp->processEvents();
 
     /*LOG("load goblin image\n");
@@ -1747,7 +1752,7 @@ PlayingGamestate::PlayingGamestate() :
     orc_animation_layer_definition.push_back( AnimationLayerDefinition("death", 20, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     this->animation_layers["orc"] = AnimationLayer::create(":/gfx/textures/npcs/orc_regular_0.png", orc_animation_layer_definition);*/
 
-    gui_overlay->setProgress(80);
+    gui_overlay->setProgress(90);
     qApp->processEvents();
 
     LOG("add graphics items\n");
@@ -1760,7 +1765,7 @@ PlayingGamestate::PlayingGamestate() :
         this->locationAddScenery(location, scenery);
     }
 
-    gui_overlay->setProgress(90);
+    gui_overlay->setProgress(95);
     qApp->processEvents();
 
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
@@ -1788,9 +1793,10 @@ PlayingGamestate::PlayingGamestate() :
 
     if( quest->getInfo() != '\0' ) {
         // disabled for now due to window too large on Android bug
-        //game_g->showInfoWindow("Quest", quest->getInfo());
+        //game_g->showInfoDialog("Quest", quest->getInfo());
     }
 
+    window->setEnabled(true);
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
     //this->paused = false;
@@ -2016,10 +2022,10 @@ void PlayingGamestate::clickedOptions() {
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
     if( c_location->hasEnemies(this) ) {
-        game_g->showInfoWindow("Rest", "You cannot rest here - enemies are nearby");
+        game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby");
         return;
     }
-    if( game_g->askQuestionWindow("Rest", "Rest until fully healed?") ) {
+    if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
         int health_restore_percent = 100 - this->player->getHealthPercent();
         int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
         if( time == 0 ) {
@@ -2056,7 +2062,7 @@ void PlayingGamestate::clickedCloseSubwindow() {
 void PlayingGamestate::quitGame() {
     //qApp->quit();
 
-    if( game_g->askQuestionWindow("Quit", "Are you sure you wish to quit?") ) {
+    if( game_g->askQuestionDialog("Quit", "Are you sure you wish to quit?") ) {
         GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
         game_g->pushMessage(game_message);
     }
@@ -2119,7 +2125,7 @@ void PlayingGamestate::update() {
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             this->player = NULL;
-            game_g->showInfoWindow("Game over", "You have died!");
+            game_g->showInfoDialog("Game over", "You have died!");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
@@ -2478,6 +2484,7 @@ void Game::update() {
         catch(string &error) {
             LOG("exception creating new gamestate: %s\n", error.c_str());
             this->getScreen()->getMainWindow()->unsetCursor();
+            this->getScreen()->getMainWindow()->setEnabled(true);
             if( gamestate != NULL ) {
                 delete gamestate;
                 gamestate = NULL;
@@ -2485,7 +2492,7 @@ void Game::update() {
             delete message;
             stringstream str;
             str << "Failed to load game data:\n" << error;
-            game_g->showErrorWindow(str.str().c_str());
+            game_g->showErrorDialog(str.str().c_str());
             qApp->quit();
         }
         delete message;
@@ -2547,33 +2554,28 @@ QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int
     return pixmap;
 }
 
-void Game::showErrorWindow(const char *message) {
-    LOG("Game::showErrorWindow: %s\n", message);
+void Game::showErrorDialog(const char *message) {
+    LOG("Game::showErrorDialog: %s\n", message);
+    //LOG("1\n");
     this->getScreen()->enableUpdateTimer(false);
-    /*LOG("1\n");
-    LOG("screen: %d\n", this->getScreen());
-    LOG("mainWindow: %d\n", this->getScreen()->getMainWindow());
-    LOG("2\n");*/
+    //LOG("2\n");
     QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message);
-    //QMessageBox::critical(NULL, "Error", "Test");
     //LOG("3\n");
     this->getScreen()->enableUpdateTimer(true);
+    //LOG("4\n");
 }
 
-void Game::showInfoWindow(const char *title, const char *message) {
-    LOG("Game::showInfoWindow: %s\n", message);
+void Game::showInfoDialog(const char *title, const char *message) {
+    LOG("Game::showInfoDialog: %s\n", message);
     this->getScreen()->enableUpdateTimer(false);
     QMessageBox::information(this->getScreen()->getMainWindow(), title, message);
     this->getScreen()->enableUpdateTimer(true);
 }
 
-bool Game::askQuestionWindow(const char *title, const char *message) {
+bool Game::askQuestionDialog(const char *title, const char *message) {
     LOG("Game::askQuestionWindow: %s\n", message);
-    //this->getScreen()->getMainWindow()->blockSignals(true);
     this->getScreen()->enableUpdateTimer(false);
-    //int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
     int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
-    //this->getScreen()->getMainWindow()->blockSignals(false);
     this->getScreen()->enableUpdateTimer(true);
     LOG("    answer is %d\n", res);
     return res == QMessageBox::Yes;
