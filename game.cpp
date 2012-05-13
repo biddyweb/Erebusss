@@ -2308,12 +2308,6 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         }
 
         if( dest != player->getPos() ) {
-            /*Vector2D hit_pos;
-            bool hit = location->intersectSweptSquareWithBoundariesAndNPCs(player, &hit_pos, player->getPos(), dest, npc_radius_c);
-            if( hit ) {
-                LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
-                dest = hit_pos;
-            }*/
             player->setDestination(dest.x, dest.y, ignore_scenery);
             if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
                 this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
