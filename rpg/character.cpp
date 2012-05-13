@@ -553,7 +553,7 @@ void Character::setPath(vector<Vector2D> &path) {
 }
 
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
-    //LOG("Character::setDestination(%f, %f) for %s\n", xdest, ydest, this->getName().c_str());
+    //LOG("Character::setDestination(%f, %f) for %s , currently at %f, %f\n", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
         ASSERT_LOGGER( location != NULL );
@@ -566,6 +566,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
     Vector2D hit_pos;
     if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, dest, npc_radius_c, ignore_scenery) ) {
         // easy
+        //LOG("easy\n");
         new_path.push_back(dest);
     }
     else {
