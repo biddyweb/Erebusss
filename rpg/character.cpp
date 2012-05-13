@@ -116,7 +116,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         return false;
     }
 
-    float hit_range_c = target_npc == NULL ? 0.0f : sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
+    //float hit_range_c = target_npc == NULL ? 0.0f : sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
     bool ai_try_moving = true;
 
     /*if( is_hitting && target_npc == NULL ) {
@@ -124,105 +124,120 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }*/
     ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
     if( target_npc != NULL ) {
-        bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
-        float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-        bool can_hit = false;
-        if( is_ranged ) {
-            if( dist <= npc_visibility_c ) {
-                // check line of sight
-                Vector2D hit_pos;
-                if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, NULL) ) {
-                    can_hit = true;
-                }
-                else {
-                    /*LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
-                    LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
-                    LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
-                    LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);*/
-                }
-            }
-        }
-        else {
-            can_hit = dist <= hit_range_c;
-        }
+        enum HitState {
+            HITSTATE_HAS_HIT = 0,
+            HITSTATE_IS_HITTING = 1,
+            HITSTATE_IS_NOT_HITTING = 2
+        };
+        HitState hit_state = HITSTATE_IS_NOT_HITTING;
         if( elapsed_ms > time_last_action_ms + 400 && is_hitting ) {
-            this->setStateIdle();
-            if( can_hit ) {
-                LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
-                ai_try_moving = false; // no point trying to move, just wait to hit again
-                if( !target_npc->is_dead ) {
-                    //target_npc->changeHealth(playing_gamestate, -1);
-                    target_npc->decreaseHealth(playing_gamestate, 1);
-                    string text;
-                    int r = rand() % 4;
-                    if( r == 0 )
-                        text = "Argh!";
-                    else if( r == 1 )
-                        text = "Ow!";
-                    else if( r == 2 )
-                        text = "Ouch!";
-                    else
-                        text = "Eek!";
-                    playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+            hit_state = HITSTATE_HAS_HIT;
+        }
+        else if( is_hitting ) {
+            hit_state = HITSTATE_IS_HITTING;
+        }
+
+        if( hit_state == HITSTATE_HAS_HIT || hit_state == HITSTATE_IS_NOT_HITTING ) {
+            bool is_ranged = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged();
+            float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
+            bool can_hit = false;
+            if( is_ranged ) {
+                if( dist <= npc_visibility_c ) {
+                    // check line of sight
+                    Vector2D hit_pos;
+                    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, NULL) ) {
+                        can_hit = true;
+                    }
+                    else {
+                        /*LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
+                        LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
+                        LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
+                        LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);*/
+                    }
                 }
             }
-        }
-        else if( !is_hitting ) {
-            if( can_hit ) {
-                ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
-                if( elapsed_ms > time_last_action_ms + 1000 ) {
-                    // take a swing!
-                    bool can_hit = true;
-                    Ammo *ammo = NULL;
-                    string ammo_key;
-                    if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
-                        ammo_key = this->getCurrentWeapon()->getAmmoKey();
-                        Item *item = this->findItem(ammo_key);
-                        if( item == NULL && this == playing_gamestate->getPlayer() ) {
-                            // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
-                            LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
-                            can_hit = false;
-                            this->armWeapon(NULL); // disarm it
-                        }
-                        /*else if( item->getType() != ITEMTYPE_AMMO ) {
-                            LOG("required ammo type %s is not ammo\n", item->getName().c_str());
-                            throw string("required ammo type is not ammo");
-                        }*/
-                        else {
-                            if( item->getType() != ITEMTYPE_AMMO ) {
-                                LOG("required ammo type %s is not ammo\n", item->getName().c_str());
-                                ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
-                            }
-                            ammo = static_cast<Ammo *>(item);
-                        }
+            else {
+                can_hit = dist <= hit_range_c;
+            }
+            if( hit_state == HITSTATE_HAS_HIT ) {
+                this->setStateIdle();
+                if( can_hit ) {
+                    LOG("character %s hit %s\n", this->getName().c_str(), target_npc->getName().c_str());
+                    ai_try_moving = false; // no point trying to move, just wait to hit again
+                    if( !target_npc->is_dead ) {
+                        //target_npc->changeHealth(playing_gamestate, -1);
+                        target_npc->decreaseHealth(playing_gamestate, 1);
+                        string text;
+                        int r = rand() % 4;
+                        if( r == 0 )
+                            text = "Argh!";
+                        else if( r == 1 )
+                            text = "Ow!";
+                        else if( r == 2 )
+                            text = "Ouch!";
+                        else
+                            text = "Eek!";
+                        playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
                     }
-                    if( can_hit ) {
-                        if( ammo != NULL ) {
-                            // ammo will be deleted if used up!
-                            if( this->useAmmo(ammo) ) {
-                                ammo = NULL; // just to be safe, as pointer now deleted
-                                if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
-                                    // really has used up all available ammo
-                                    if( this == playing_gamestate->getPlayer() ) {
-                                        LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                                        playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
-                                        this->armWeapon(NULL); // disarm it
+                }
+            }
+            else if( hit_state == HITSTATE_IS_NOT_HITTING ) {
+                if( can_hit ) {
+                    ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
+                    if( elapsed_ms > time_last_action_ms + 1000 ) {
+                        // take a swing!
+                        bool can_hit = true;
+                        Ammo *ammo = NULL;
+                        string ammo_key;
+                        if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                            ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                            Item *item = this->findItem(ammo_key);
+                            if( item == NULL && this == playing_gamestate->getPlayer() ) {
+                                // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
+                                LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                                playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                can_hit = false;
+                                this->armWeapon(NULL); // disarm it
+                            }
+                            /*else if( item->getType() != ITEMTYPE_AMMO ) {
+                                LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                                throw string("required ammo type is not ammo");
+                            }*/
+                            else {
+                                if( item->getType() != ITEMTYPE_AMMO ) {
+                                    LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                                    ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
+                                }
+                                ammo = static_cast<Ammo *>(item);
+                            }
+                        }
+                        if( can_hit ) {
+                            if( ammo != NULL ) {
+                                // ammo will be deleted if used up!
+                                if( this->useAmmo(ammo) ) {
+                                    ammo = NULL; // just to be safe, as pointer now deleted
+                                    if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
+                                        // really has used up all available ammo
+                                        if( this == playing_gamestate->getPlayer() ) {
+                                            LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                            this->armWeapon(NULL); // disarm it
+                                        }
                                     }
                                 }
                             }
-                        }
-                        is_hitting = true;
-                        //has_destination = false;
-                        has_path = false;
-                        time_last_action_ms = elapsed_ms;
-                        if( this->listener != NULL ) {
-                            string anim = is_ranged ? "ranged" : "attack";
-                            this->listener->characterSetAnimation(this, this->listener_data, anim);
-                            Vector2D dir = target_npc->getPos() - this->getPos();
-                            if( dist > 0.0f ) {
-                                dir.normalise();
-                                this->listener->characterTurn(this, this->listener_data, dir);
+                            is_hitting = true;
+                            //has_destination = false;
+                            has_path = false;
+                            time_last_action_ms = elapsed_ms;
+                            if( this->listener != NULL ) {
+                                string anim = is_ranged ? "ranged" : "attack";
+                                this->listener->characterSetAnimation(this, this->listener_data, anim);
+                                Vector2D dir = target_npc->getPos() - this->getPos();
+                                if( dist > 0.0f ) {
+                                    dir.normalise();
+                                    this->listener->characterTurn(this, this->listener_data, dir);
+                                }
                             }
                         }
                     }

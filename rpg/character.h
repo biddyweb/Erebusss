@@ -32,8 +32,8 @@ class Scenery;
   * scriptable movement, we want to be able to see the NPC moving).
   */
 const float npc_visibility_c = 10.0f;
-
 const float npc_radius_c = 0.25f;
+const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
 
 class CharacterListener {
 public:
