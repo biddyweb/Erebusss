@@ -236,23 +236,22 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         if( is_hostile && playing_gamestate->getPlayer() != NULL ) {
             double dist = (playing_gamestate->getPlayer()->getPos() - this->getPos() ).magnitude();
             if( dist <= npc_visibility_c ) {
-                this->setTargetNPC( playing_gamestate->getPlayer() );
-                Vector2D dest = playing_gamestate->getPlayer()->getPos();
-                /*Vector2D hit_pos;
-                bool hit = location->intersectSweptSquareWithBoundariesAndNPCs(this, &hit_pos, this->getPos(), dest, npc_radius_c);
-                if( hit ) {
-                    dest = hit_pos;
-                }*/
-                //qDebug("move to player, dist %f", dist);
-                this->setDestination(dest.x, dest.y, NULL);
-                done_target = true;
+                // check line of sight
+                Vector2D hit_pos;
+                if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, playing_gamestate->getPlayer()->getPos(), 0.0f, NULL) ) {
+                    this->setTargetNPC( playing_gamestate->getPlayer() );
+                    Vector2D dest = playing_gamestate->getPlayer()->getPos();
+                    this->setDestination(dest.x, dest.y, NULL);
+                    done_target = true;
+                }
             }
         }
 
         if( !done_target ) {
             this->setTargetNPC(NULL);
             //this->has_destination = false;
-            this->has_path = false;
+            //this->has_path = false;
+            this->setStateIdle();
         }
     }
 
