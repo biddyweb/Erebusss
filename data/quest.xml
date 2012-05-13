@@ -82,6 +82,29 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
 <npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
+<npc name="Goblin" template="Goblin" x="8.0" y="8.0"/>
+
+<npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
+
+<npc name="Orc" template="Orc" x="16.0" y="8.0">
+    <item template="Potion of Healing"/>
+</npc>
+<npc name="Goblin" template="Goblin" x="16.5" y="10.0"/>
+<npc name="Goblin" template="Goblin" x="19.5" y="9.5"/>
+
+<scenery name="Chest" image_name="chest" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
+    <gold amount="20"/>
+    <item template="Arrows"/>
+</scenery>
+
+<scenery name="Chest" image_name="chest" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
+    <gold amount="25"/>
+</scenery>
+
+<scenery name="Chest" image_name="chest" x="19.0" y="7.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="100"/>
+</scenery>
+
 <!--
 <floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
 <floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
