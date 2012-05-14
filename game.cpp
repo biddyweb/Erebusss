@@ -1791,16 +1791,21 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->unsetProgress();
     qApp->processEvents();
 
-    if( quest->getInfo() != '\0' ) {
-        // disabled for now due to window too large on Android bug
-        //game_g->showInfoDialog("Quest", quest->getInfo());
-    }
-
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
-    //this->paused = false;
-    //this->saved_elapsed_time_ms = game_g->getScreen()->getElapsedMS();
+
+    if( quest->getInfo() != '\0' ) {
+        // disabled for now due to window too large on Android bug
+        //game_g->showInfoDialog("Quest", quest->getInfo());
+        stringstream str;
+        str << "<html><body>";
+        str << "<h1>Quest</h1>";
+        str << "<p>" << quest->getInfo() << "</p>";
+        str << "</body></html>";
+        this->showInfoWindow(str.str().c_str());
+    }
+
     LOG("View is transformed? %d\n", view->isTransformed());
     LOG("done\n");
 }
@@ -2043,6 +2048,29 @@ void PlayingGamestate::clickedRest() {
 void PlayingGamestate::clickedQuit() {
     LOG("clickedQuit()\n");
     this->quitGame();
+}
+
+void PlayingGamestate::showInfoWindow(const char *html) {
+    LOG("showInfoWindow()\n");
+    this->clickedCloseSubwindow();
+
+    subwindow = new QWidget();
+    this->main_stacked_widget->addWidget(subwindow);
+    this->main_stacked_widget->setCurrentWidget(subwindow);
+    game_g->getScreen()->setPaused(true);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    subwindow->setLayout(layout);
+
+    QWebView *label = new QWebView();
+    label->setHtml(html);
+    layout->addWidget(label);
+
+    QPushButton *closeButton = new QPushButton("Close");
+    closeButton->setFont(game_g->getFontBig());
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
 }
 
 void PlayingGamestate::clickedCloseSubwindow() {

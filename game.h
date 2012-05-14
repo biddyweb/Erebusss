@@ -395,6 +395,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> scenery_opened_images;
     map<string, CharacterTemplate *> character_templates;
 
+    void showInfoWindow(const char *html);
+
 private slots:
     void clickedStats();
     void clickedItems();
