@@ -18,6 +18,9 @@ using std::pair;
 #include <string>
 using std::string;
 
+#include <sstream>
+using std::stringstream;
+
 class Screen;
 class PlayingGamestate;
 class Quest;
@@ -380,6 +383,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     //vector<Item *> list_items;
 
     Character *player;
+    stringstream journal_ss;
 
     Location *c_location;
     Quest *quest;
@@ -400,6 +404,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 private slots:
     void clickedStats();
     void clickedItems();
+    void clickedJournal();
     void clickedOptions();
     void clickedRest();
     void clickedQuit();

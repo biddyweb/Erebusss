@@ -7,9 +7,6 @@
 
 #include <ctime>
 
-#include <sstream>
-using std::stringstream;
-
 #include <QtWebKit/QWebView>
 #include <QXmlStreamReader>
 
@@ -1080,6 +1077,7 @@ PlayingGamestate::PlayingGamestate() :
         QPushButton *journalButton = new QPushButton("Journal");
         journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
         v_layout->addWidget(journalButton);
 
         /*QPushButton *quitButton = new QPushButton("Quit");
@@ -1804,6 +1802,9 @@ PlayingGamestate::PlayingGamestate() :
         str << "<p>" << quest->getInfo() << "</p>";
         str << "</body></html>";
         this->showInfoWindow(str.str().c_str());
+
+        this->journal_ss << "<p><b>Quest Details</b></p>";
+        this->journal_ss << "<p>" << quest->getInfo() << "</p>";
     }
 
     LOG("View is transformed? %d\n", view->isTransformed());
@@ -1991,6 +1992,16 @@ void PlayingGamestate::clickedItems() {
     game_g->getScreen()->getMainWindow()->update();*/
     //this->main_stacked_widget->addWidget(subwindow);
     //this->main_stacked_widget->setCurrentWidget(subwindow);
+}
+
+void PlayingGamestate::clickedJournal() {
+    LOG("clickedJournal()\n");
+    stringstream str;
+    str << "<html><body>";
+    str << "<h1>Journal</h1>";
+    str << this->journal_ss.str();
+    str << "</body></html>";
+    this->showInfoWindow(str.str().c_str());
 }
 
 void PlayingGamestate::clickedOptions() {
