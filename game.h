@@ -428,7 +428,7 @@ public:
     virtual void locationRemoveItem(const Location *location, Item *item);
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery);
-    virtual void locationRemoveScenery(const Location *location, Scenery *scenery);
+    //virtual void locationRemoveScenery(const Location *location, Scenery *scenery);
     virtual void locationUpdateScenery(Scenery *scenery);
 
     void clickedMainView(float scene_x, float scene_y);

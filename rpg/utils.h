@@ -152,6 +152,10 @@ public:
     Vector2D perpendicularYToX() const {
         return Vector2D(y, -x);
     }
+    float getSinAngle(const Vector2D &o) const {
+        // returns sin of the signed angle between this and o; effetively a 2D cross product
+        return ( this->x * o.y - this->y * o.x );
+    }
 
     void dropOnLine(const Vector2D &o, const Vector2D &n);
     void parallelComp(const Vector2D &n);
@@ -171,10 +175,11 @@ public:
 class Polygon2D {
 protected:
     vector<Vector2D> points; // should be stored anti-clockwise
+    int source_type;
     void *source;
 
 public:
-    Polygon2D() : source(NULL) {
+    Polygon2D() : source_type(0), source(NULL) {
     }
 
     Vector2D getPoint(size_t i) const {
@@ -193,6 +198,14 @@ public:
     void *getSource() const {
         return this->source;
     }
+    void setSourceType(int source_type) {
+        this->source_type = source_type;
+    }
+    int getSourceType() const {
+        return this->source_type;
+    }
+
+    bool pointInsideConvex(Vector2D pvec) const;
 };
 
 class Graph;

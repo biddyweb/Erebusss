@@ -32,7 +32,7 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
-void FloorRegion::insertPoint(int indx, Vector2D point) {
+void FloorRegion::insertPoint(size_t indx, Vector2D point) {
     Polygon2D::insertPoint(indx, point);
     EdgeType edge_type = edge_types.at(indx-1);
     this->edge_types.insert( this->edge_types.begin() + indx, edge_type );
@@ -93,6 +93,17 @@ void Location::calculateSize(float *w, float *h) const {
     }
 }
 
+FloorRegion *Location::findFloorRegionAt(Vector2D pos) {
+    FloorRegion *result = NULL;
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && result==NULL; ++iter) {
+        FloorRegion *floor_region = *iter;
+        if( floor_region->pointInsideConvex(pos) ) {
+            result = floor_region;
+        }
+    }
+    return result;
+}
+
 void Location::addCharacter(Character *character, float xpos, float ypos) {
     character->setLocation(this);
     character->setPos(xpos, ypos);
@@ -138,6 +149,19 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
     scenery->setLocation(this);
     scenery->setPos(xpos, ypos);
     this->scenerys.insert(scenery);
+
+    FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
+    if( floor_region == NULL ) {
+        LOG("failed to find floor region for scenery at %f, %f\n", scenery->getX(), scenery->getY());
+        throw string("failed to find floor region for scenery");
+    }
+    /*LOG("scenery at %f, %f added to floor region:\n", scenery->getX(), scenery->getY());
+    for(size_t i=0;i<floor_region->getNPoints();i++) {
+        Vector2D p = floor_region->getPoint(i);
+        LOG("    %d: %f, %f\n", i, p.x, p.y);
+    }*/
+    floor_region->addScenery(scenery);
+
     if( this->listener != NULL ) {
         this->listener->locationAddScenery(this, scenery);
     }
@@ -320,6 +344,7 @@ void Location::createBoundariesForScenery() {
             continue;
         }
         Polygon2D boundary;
+        boundary.setSourceType((int)SOURCETYPE_SCENERY);
         boundary.setSource(scenery);
         /*Vector2D pos = scenery->getPos();
         // clockwise, as "inside" should be on the left
@@ -438,8 +463,8 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
             float iy = min(i0.y, i1.y);
             iy -= width;
             iy = max(iy, 0.0f);
-            if( iy > ymax ) {
-                LOG("intersection is beyond end of swept box\n");
+            if( iy > ymax + E_TOL_LINEAR ) {
+                LOG("intersection is beyond end of swept box: %f, %f\n", iy, ymax);
                 throw string("intersection is beyond end of swept box");
             }
             if( !(*hit) || iy < *hit_dist ) {
@@ -477,10 +502,13 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery) const {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
-        if( ignore_scenery != NULL && boundary->getSource() == ignore_scenery ) {
+        if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
+            continue;
+        }
+        if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
             continue;
         }
         for(size_t j=0;j<boundary->getNPoints() && !(*done);j++) {
@@ -491,7 +519,8 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery) const {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const {
+    //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -514,7 +543,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D st
     //float ymax = dv_length + width;
     float ymax = dv_length;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, ignore_scenery);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, ignore_all_scenery, ignore_one_scenery);
 
     if( hit ) {
         *hit_pos = start + dv * hit_dist;
@@ -522,7 +551,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D st
     return hit;
 }
 
-bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {
+/*bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -544,7 +573,7 @@ bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *charac
     float ymin = 0.0f;
     float ymax = dv_length + width;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, NULL);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, false, NULL);
 
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !done; ++iter) {
         const Character *npc = *iter;
@@ -573,7 +602,7 @@ bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *charac
         *hit_pos = start + dv * hit_dist;
     }
     return hit;
-}
+}*/
 
 bool Location::collideWithTransient(const Character *character, Vector2D pos) const {
     // does collision detection with entities like NPCs, that do not have boundaries due to not having a permanent position (and hence can't be avoided in pathfinding)
@@ -631,7 +660,7 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
 
                 // test we get get to the way point
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, point, path_way_point, 0.0f, NULL) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, point, path_way_point, 0.0f, false, NULL) ) {
                     path_way_points.push_back( path_way_point );
                 }
             }
@@ -670,7 +699,7 @@ void Location::calculateDistanceGraph() {
                 hit = false;
             }
             else {
-                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, NULL);
+                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, false, NULL);
             }
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
@@ -680,66 +709,42 @@ void Location::calculateDistanceGraph() {
     }
 }
 
-#if 0
-void Location::precalculate() {
-    /*boundaries.clear();
-
-    vector<LineSeg> walls;
-    for(vector<FloorRegion *>::const_iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
-        const FloorRegion *floor_region = *iter;
-        for(size_t j=0;j<floor_region->getNPoints();j++) {
-            Vector2D p0 = floor_region->getPoint(j);
-            Vector2D p1 = floor_region->getPoint( (j+1) % floor_region->getNPoints() );
-            LineSeg line_seg(p0, p1);
-            Vector2D dir = p1 - p0;
-            // TODO: error if zero
-            float length = dir.magnitude();
-            dir /= length;
-
-            // look for existing coi wall
-            bool found_coi = false;
-            for(size_t k=0;k<walls.size();k++) {
-                LineSeg this_line_seg = walls.at(k);
-                Vector2D this_dir = this_line_seg.end - this_line_seg.start;
-                // TODO: error if zero
-                // TODO: look for crossing intersections too - means error
-                this_dir.normalise();
-                float cos_angle = fabs(this_dir % dir);
-                if( cos_angle > 1.0f - 1.0e-5f ) {
-                    float d0 = (this_line_seg.start - p0).magnitude();
-                    float d1 = (this_line_seg.end - p0).magnitude();
-                    if( d1 < d0 ) {
-                        swap(d0, d1);
-                        swap(this_line_seg.start, this_line_seg.end);
-                    }
-                    if( d1 < 0.0f || d0 > length ) {
-                        // doesn't intersect
-                    }
-                    else {
-                        found_coi = true;
-                        walls.erase(walls.begin() + k);
-                        k--;
-
-                        if( d0 < 0.0f || d1 > length ) {
-                            // TODO:
-                        }
-                        else if( d0 == 0.0f && d1 == length ) {
-                            // fully coi, wall entirely removed
-                        }
-                        else if( d0 == 0.0f ) {
-                            //LineSeg remaining_wall()
-                        }
-                    }
-                }
-            }
-
-            if( !found_coi ) {
-                walls.push_back(line_seg);
+void Location::initVisibility(Vector2D pos) {
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
+            Vector2D point = floor_region->getPoint(j);
+            // test we get get to the way point
+            Vector2D hit_pos;
+            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, true, NULL) ) {
+                floor_region->setVisible(true);
             }
         }
-    }*/
+    }
 }
-#endif
+
+vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
+    //LOG("Location::updateVisibility for %f, %f\n", pos.x, pos.y);
+    vector<FloorRegion *> update_floor_regions;
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
+            Vector2D point = floor_region->getPoint(j);
+            int p_j = j==0 ? floor_region->getNPoints()-1 : j-1;
+            // now only need to check for points on internal edges
+            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL || floor_region->getEdgeType(p_j) == FloorRegion::EDGETYPE_INTERNAL )
+            {
+                // test we get get to the way point
+                Vector2D hit_pos;
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, true, NULL) ) {
+                    floor_region->setVisible(true);
+                    update_floor_regions.push_back(floor_region);
+                }
+            }
+        }
+    }
+    return update_floor_regions;
+}
 
 Quest::Quest() {
 }

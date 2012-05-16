@@ -15,13 +15,16 @@ class Scenery;
 class Location;
 class PlayingGamestate;
 
+// source types for boundaries
+const int SOURCETYPE_SCENERY = 1;
+
 class LocationListener {
 public:
     virtual void locationAddItem(const Location *location, Item *item)=0;
     virtual void locationRemoveItem(const Location *location, Item *item)=0;
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
-    virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
+    //virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
     virtual void locationUpdateScenery(Scenery *scenery)=0;
 };
 
@@ -124,10 +127,14 @@ public:
         EDGETYPE_EXTERNAL = 1
     };
 protected:
+    bool is_visible;
     vector<EdgeType> edge_types; // should match points array of Polygon2D; gives the type of the edge following the i-th point
     vector<int> temp_marks; // should match points array
+    void *user_data_gfx;
 
-    FloorRegion() : Polygon2D() {
+    set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing
+
+    FloorRegion() : Polygon2D(), is_visible(false) {
     }
 
 public:
@@ -136,18 +143,46 @@ public:
         this->edge_types.push_back(EDGETYPE_EXTERNAL);
         this->temp_marks.push_back(0);
     }
-    virtual void insertPoint(int indx, Vector2D point);
-    void setEdgeType(int indx, EdgeType edge_type) {
+    virtual void insertPoint(size_t indx, Vector2D point);
+    void setEdgeType(size_t indx, EdgeType edge_type) {
         this->edge_types.at(indx) = edge_type;
     }
-    EdgeType getEdgeType(int indx) const {
+    EdgeType getEdgeType(size_t indx) const {
         return this->edge_types.at(indx);
     }
-    void setTempMark(int indx, int value) {
+    void setTempMark(size_t indx, int value) {
         this->temp_marks.at(indx) = value;
     }
-    int getTempMark(int indx) const {
+    int getTempMark(size_t indx) const {
         return this->temp_marks.at(indx);
+    }
+    void setVisible(bool is_visible) {
+        this->is_visible = is_visible;
+    }
+    bool isVisible() const {
+        return this->is_visible;
+    }
+    void setUserGfxData(void *user_data_gfx) {
+        this->user_data_gfx = user_data_gfx;
+    }
+    void *getUserGfxData() {
+        return this->user_data_gfx;
+    }
+
+    set<Scenery *>::iterator scenerysBegin() {
+        return this->scenerys.begin();
+    }
+    set<Scenery *>::const_iterator scenerysBegin() const {
+        return this->scenerys.begin();
+    }
+    set<Scenery *>::iterator scenerysEnd() {
+        return this->scenerys.end();
+    }
+    set<Scenery *>::const_iterator scenerysEnd() const {
+        return this->scenerys.end();
+    }
+    void addScenery(Scenery *scenery) {
+        this->scenerys.insert(scenery);
     }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);
@@ -167,7 +202,7 @@ class Location {
     set<Scenery *> scenerys;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, const Scenery *ignore_scenery) const;
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const;
 
     vector<Vector2D> calculatePathWayPoints() const;
 public:
@@ -185,6 +220,7 @@ public:
         return this->floor_regions.size();
     }
     void calculateSize(float *w, float *h) const;
+    FloorRegion *findFloorRegionAt(Vector2D pos);
 
     void addBoundary(Polygon2D boundary) {
         this->boundaries.push_back(boundary);
@@ -249,15 +285,16 @@ public:
     void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, const Scenery *ignore_scenery) const;
-    bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const;
+    //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
 
     void calculateDistanceGraph();
     const Graph *getDistanceGraph() const {
         return this->distance_graph;
     }
 
-    //void precalculate();
+    void initVisibility(Vector2D pos);
+    vector<FloorRegion *> updateVisibility(Vector2D pos);
 };
 
 class Quest {

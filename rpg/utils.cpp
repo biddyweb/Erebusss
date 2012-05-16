@@ -57,6 +57,37 @@ void Polygon2D::insertPoint(size_t indx, Vector2D point) {
     this->points.insert( this->points.begin() + indx, point );
 }
 
+bool Polygon2D::pointInsideConvex(Vector2D pvec) const {
+    int sign = 0;
+    for(size_t j=0;j<this->getNPoints();j++) {
+        int p_j = j==0 ? this->getNPoints()-1 : j-1;
+        Vector2D p0 = this->getPoint(p_j);
+        Vector2D p1 = this->getPoint(j);
+        Vector2D dp = p1 - p0;
+        float dp_length = dp.magnitude();
+        if( dp_length == 0 ) {
+            continue;
+        }
+        dp /= dp_length;
+        Vector2D dq = pvec - p0;
+        float dq_length = dq.magnitude();
+        if( dq_length == 0.0f ) {
+            continue;
+        }
+        dq /= dq_length;
+        float sin_angle = dq.getSinAngle(dp);
+        if( sin_angle == 0.0f ) {
+            continue;
+        }
+        int this_sign = (sin_angle > 0.0f) ? 1 : -1;
+        if( sign == 0 )
+            sign = this_sign;
+        else if( this_sign != sign )
+            return false;
+    }
+    return true;
+}
+
 GraphVertex *GraphVertex::getNeighbour(Graph *graph, float *distance, size_t i) const {
     *distance = distances.at(i);
     size_t id = neighbour_ids.at(i);

@@ -1650,9 +1650,10 @@ PlayingGamestate::PlayingGamestate() :
     LOG("load floor image\n");
     QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
     QBrush floor_brush(floor_image);
+    QBrush wall_brush(QColor(150, 75, 0));
     floor_brush.setTransform(QTransform::fromScale(scale, scale));
     for(size_t i=0;i<location->getNFloorRegions();i++) {
-        const FloorRegion *floor_region = location->getFloorRegion(i);
+        FloorRegion *floor_region = location->getFloorRegion(i);
         QPolygonF polygon;
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             Vector2D point = floor_region->getPoint(j);
@@ -1661,7 +1662,34 @@ PlayingGamestate::PlayingGamestate() :
             polygon.push_back(qpoint);
         }
         //QBrush floor_brush(Qt::white);
-        scene->addPolygon(polygon, Qt::NoPen, floor_brush);
+        QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
+        floor_region->setUserGfxData(item);
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
+                continue;
+            }
+            size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
+            Vector2D p0 = floor_region->getPoint(j);
+            Vector2D p1 = floor_region->getPoint(n_j);
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            dp /= dp_length;
+            Vector2D normal_into_wall = - dp.perpendicularYToX();
+            QPolygonF wall_polygon;
+            float wall_dist = 0.1f;
+            wall_polygon.push_back(QPointF(p0.x, p0.y));
+            wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
+            wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
+            wall_polygon.push_back(QPointF(p1.x, p1.y));
+            QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
+            wall_item->setPen(Qt::NoPen);
+            wall_item->setBrush(wall_brush);
+            scene->addItem(wall_item);
+            //scene->addPolygon(wall_polygon, Qt::NoPen, wall_brush);
+        }
     }
     /*{
         // DEBUG ONLY
@@ -1786,6 +1814,20 @@ PlayingGamestate::PlayingGamestate() :
     }*/
     //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
+    location->initVisibility(player->getPos());
+    for(size_t i=0;i<location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = location->getFloorRegion(i);
+        QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+        item->setVisible( floor_region->isVisible() );
+        for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
+            Scenery *scenery = *iter;
+            QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+            if( item2 != NULL ) {
+                item2->setVisible( floor_region->isVisible() );
+            }
+        }
+    }
+
     gui_overlay->unsetProgress();
     qApp->processEvents();
 
@@ -1895,14 +1937,14 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
     }
 }
 
-void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
+/*void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
     }
-}
+}*/
 
 void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
@@ -2127,7 +2169,7 @@ void PlayingGamestate::update() {
             else if( dist <= npc_visibility_c ) {
                 // check line of sight
                 Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, NULL) ) {
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, true, NULL) ) {
                     is_visible = true;
                 }
             }
@@ -2219,6 +2261,21 @@ void PlayingGamestate::characterMoved(const Character *character, void *user_dat
         QPointF dir = new_pos - old_pos;
         Vector2D vdir(dir.x(), dir.y());
         this->characterTurn(character, user_data, vdir);
+    }
+    if( character == this->player ) {
+        vector<FloorRegion *> update_regions = this->c_location->updateVisibility(player->getPos());
+        for(vector<FloorRegion *>::iterator iter = update_regions.begin(); iter != update_regions.end(); ++iter) {
+            FloorRegion *floor_region = *iter;
+            QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+            item->setVisible( floor_region->isVisible() );
+            for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
+                Scenery *scenery = *iter;
+                QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+                if( item2 != NULL ) {
+                    item2->setVisible( floor_region->isVisible() );
+                }
+            }
+        }
     }
 }
 
