@@ -1275,7 +1275,9 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef use_s = reader.attributes().value("use");
                     QStringRef use_verb_s = reader.attributes().value("use_verb");
                     int weight = parseInt(weight_s.toString());
-                    int rating = parseInt(rating_s.toString());
+                    int rating = parseInt(rating_s.toString(), true);
+                    if( rating == 0 )
+                        rating = 1; // so the default of 0 defaults instead to 1
                     bool magical = parseBool(magical_s.toString(), true);
                     Item *item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
                     item->setRating(rating);

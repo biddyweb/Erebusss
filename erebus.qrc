@@ -25,5 +25,7 @@
         <file>data/quest.xml</file>
         <file>gfx/textures/npcs/goblin.png</file>
         <file>gfx/textures/npcs/orc_regular_0.png</file>
+        <file>gfx/textures/items/gem_red.png</file>
+        <file>gfx/textures/items/ring_gold.png</file>
     </qresource>
 </RCC>

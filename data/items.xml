@@ -16,8 +16,12 @@
 <ammo name="Arrows" image_name="arrow" projectile_image_name="arrow"
     amount="20"/>
 
+<item name="Gold Ring" image_name="ring_gold" weight="0"/>
+
 <item name="Potion of Healing" image_name="potion_red" weight="1"
     rating="2" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink"/>
+
+<item name="Red Gem" image_name="gem_red" weight="1"/>
 
 <currency name="Gold" image_name="gold"/>
 

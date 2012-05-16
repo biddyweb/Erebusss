@@ -8,7 +8,11 @@
 <image type="item" name="arrow" filename="gfx/textures/items/arrow.png"
     xpos="0" ypos="16" width="64" height="32"
     />
+
+<image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
+<image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
+
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
 <image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"

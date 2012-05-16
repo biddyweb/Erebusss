@@ -82,7 +82,9 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
 <npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
-<npc name="Goblin" template="Goblin" x="8.0" y="8.0"/>
+<npc name="Goblin" template="Goblin" x="8.0" y="8.0">
+    <item template="Red Gem"/>
+</npc>
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
@@ -102,6 +104,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <scenery name="Chest" image_name="chest" x="19.0" y="7.5" w="0.8" h="0.8" blocking="true">
     <gold amount="100"/>
     <item template="Potion of Healing"/>
+    <item template="Gold Ring" x="2.0" y="10.5"/>
 </scenery>
 
 <!--
