@@ -594,7 +594,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     label->setHtml(html);
     layout->addWidget(label);
 
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *closeButton = new QPushButton("Continue");
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
@@ -720,7 +720,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
     }
 
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *closeButton = new QPushButton("Continue");
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 
@@ -1987,55 +1987,6 @@ void PlayingGamestate::clickedItems() {
 
     subwindow = new ItemsWindow(this);
     game_g->getScreen()->setPaused(true);
-
-    /*
-    //subwindow = new QWidget(this->view);
-    subwindow = new QWidget();
-    //subwindow = new QWidget(game_g->getScreen()->getMainWindow());
-    //game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
-
-    QVBoxLayout *layout = new QVBoxLayout();
-    subwindow->setLayout(layout);
-
-    list = new QListWidget();
-    layout->addWidget(list);
-    list->setSelectionMode(QAbstractItemView::SingleSelection);
-    QFont font = game_g->getScreen()->getMainWindow()->font();
-    font.setPointSize( font.pointSize() + 6 );
-    list->setFont(font);
-
-    list_items.clear();
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        QString item_str = item->getName().c_str();
-        if( player->getCurrentWeapon() == item ) {
-            item_str += " [Current Weapon]";
-        }
-        list->addItem( item_str );
-        list_items.push_back(item);
-    }
-
-    {
-        QVBoxLayout *h_layout = new QVBoxLayout();
-        layout->addLayout(h_layout);
-
-        QPushButton *dropButton = new QPushButton("Drop Item");
-        layout->addWidget(dropButton);
-        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
-    }
-
-    QPushButton *closeButton = new QPushButton("Close");
-    layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
-    */
-
-    //subwindow->showFullScreen();
-    //game_g->getScreen()->getMainWindow()->hide();
-    /*mainwindow->setParent(NULL); // stop it being deleted!
-    game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
-    game_g->getScreen()->getMainWindow()->update();*/
-    //this->main_stacked_widget->addWidget(subwindow);
-    //this->main_stacked_widget->setCurrentWidget(subwindow);
 }
 
 void PlayingGamestate::clickedJournal() {
@@ -2121,7 +2072,7 @@ void PlayingGamestate::showInfoWindow(const char *html) {
     label->setHtml(html);
     layout->addWidget(label);
 
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *closeButton = new QPushButton("Continue");
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
