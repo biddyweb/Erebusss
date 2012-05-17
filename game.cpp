@@ -671,14 +671,6 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    /*int weight = 0;
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        weight += item->getWeight();
-        QString item_str = this->getItemString(item);
-        list->addItem( item_str );
-        list_items.push_back(item);
-    }*/
     this->refreshList();
 
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
@@ -754,7 +746,11 @@ void ItemsWindow::refreshList() {
             continue;
         }
         QString item_str = this->getItemString(item);
-        list->addItem( item_str );
+        //list->addItem( item_str );
+        QListWidgetItem *list_item = new QListWidgetItem(item_str);
+        QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+        list_item->setIcon(icon);
+        list->addItem(list_item);
         list_items.push_back(item);
     }
 }
@@ -1689,8 +1685,6 @@ PlayingGamestate::PlayingGamestate() :
             QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
             wall_item->setPen(Qt::NoPen);
             wall_item->setBrush(wall_brush);
-            scene->addItem(wall_item);
-            //scene->addPolygon(wall_polygon, Qt::NoPen, wall_brush);
         }
     }
     /*{
@@ -1893,13 +1887,14 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         //object->setPixmap( item->getImage()->getPixmap() );
         //object->setPixmap( this->item_images[item->getName().c_str()] );
         //object->setPixmap( this->item_images[item->getImageName().c_str()] );
-        map<string, QPixmap>::iterator image_iter = this->item_images.find(item->getImageName().c_str());
+        /*map<string, QPixmap>::iterator image_iter = this->item_images.find(item->getImageName().c_str());
         if( image_iter == this->item_images.end() ) {
             LOG("failed to find image for item: %s\n", item->getName().c_str());
             LOG("    image name: %s\n", item->getImageName().c_str());
             throw string("Failed to find item's image");
         }
-        object->setPixmap( image_iter->second );
+        object->setPixmap( image_iter->second );*/
+        object->setPixmap( this->getItemImage( item->getImageName() ) );
         scene->addItem(object);
         /*{
             // DEBUG
@@ -2418,6 +2413,16 @@ Currency *PlayingGamestate::cloneGoldItem(int value) const {
     Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
     item->setValue(value);
     return item;
+}
+
+QPixmap &PlayingGamestate::getItemImage(string name) {
+    map<string, QPixmap>::iterator image_iter = this->item_images.find(name.c_str());
+    if( image_iter == this->item_images.end() ) {
+        LOG("failed to find image for item: %s\n", name.c_str());
+        LOG("    image name: %s\n", name.c_str());
+        throw string("Failed to find item's image");
+    }
+    return image_iter->second;
 }
 
 Game::Game() {

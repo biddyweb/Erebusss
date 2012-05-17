@@ -451,6 +451,8 @@ public:
     void addStandardItem(Item *item);
     Item *cloneStandardItem(string name) const;
     Currency *cloneGoldItem(int value) const;
+
+    QPixmap &getItemImage(string name);
 };
 
 // used for passing messages
