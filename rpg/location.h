@@ -37,6 +37,8 @@ protected:
     void *user_data_gfx;
 
     bool is_blocking;
+    bool blocks_visibility;
+    bool is_door;
     float width, height;
 
     bool opened;
@@ -75,12 +77,20 @@ public:
         return this->user_data_gfx;
     }
 
-    void setBlocking(bool is_blocking) {
-        this->is_blocking = is_blocking;
-    }
+    void setBlocking(bool is_blocking, bool blocks_visibility);
     bool isBlocking() const {
         return this->is_blocking;
     }
+    bool blocksVisibility() const {
+        return this->blocks_visibility;
+    }
+    void setDoor(bool is_door) {
+        this->is_door = is_door;
+    }
+    bool isDoor() const {
+        return this->is_door;
+    }
+
     float getWidth() const {
         return this->width;
     }
@@ -189,6 +199,13 @@ public:
 };
 
 class Location {
+public:
+    enum IntersectType {
+        INTERSECTTYPE_MOVE = 0, // include scenery that is blocking
+        INTERSECTTYPE_VISIBILITY = 1 // include scenery that blocks visibility
+    };
+
+protected:
     LocationListener *listener;
     void *listener_data;
 
@@ -202,7 +219,7 @@ class Location {
     set<Scenery *> scenerys;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const;
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
 
     vector<Vector2D> calculatePathWayPoints() const;
 public:
@@ -285,7 +302,7 @@ public:
     void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
     //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
 
     void calculateDistanceGraph();

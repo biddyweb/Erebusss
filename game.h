@@ -69,7 +69,7 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int x_offset, size_t n_frames);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int size, int x_offset, size_t n_frames);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -89,8 +89,9 @@ public:
 
 class AnimationLayer {
     map<string, const AnimationSet *> animation_sets;
+    int size; // size of each frame image in pixels
 public:
-    AnimationLayer() {
+    AnimationLayer(int size) : size(size) {
     }
     ~AnimationLayer() {
     }
@@ -105,6 +106,9 @@ public:
         if( iter == this->animation_sets.end() )
             return NULL;
         return iter->second;
+    }
+    int getSize() const {
+        return this->size;
     }
 
     static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
@@ -138,6 +142,7 @@ public:
     void clearAnimationLayers();
     void setAnimationSet(string name);
     void setDirection(Direction c_direction);
+    int getSize() const;
 };
 
 class MainGraphicsView;

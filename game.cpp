@@ -10,6 +10,10 @@
 #include <QtWebKit/QWebView>
 #include <QXmlStreamReader>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 const bool mobile_c = true;
 #else
@@ -26,7 +30,7 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 const int versionMajor = 0;
 const int versionMinor = 1;
 
-const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
+//const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 //const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
 const float item_width = 0.5f;
 //const float scenery_width = item_width;
@@ -71,12 +75,11 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int x_offset, size_t n_frames) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int size, int x_offset, size_t n_frames) {
     vector<QPixmap> frames;
     for(int i=0;i<N_DIRECTIONS;i++) {
         for(size_t j=0;j<n_frames;j++) {
-            //frames.push_back( game_g->loadImage(filename, true, 64*(x_offset+j), 64*i, 64, 64) );
-            frames.push_back( image.copy(64*(x_offset+j), 64*i, 64, 64));
+            frames.push_back( image.copy(size*(x_offset+j), size*i, size, size));
         }
     }
     AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
@@ -84,13 +87,16 @@ AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation
 }
 
 AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
-    AnimationLayer *layer = new AnimationLayer();
+    if( image.height() % N_DIRECTIONS != 0 ) {
+        throw string("image height is not multiple of 8");
+    }
+    AnimationLayer *layer = new AnimationLayer(image.height() / N_DIRECTIONS);
     /*LOG("AnimationLayer::create: %s\n", filename);
     QPixmap image = game_g->loadImage(filename);*/
     LOG("    loaded image\n");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
-        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, animation_layer_definition.position, animation_layer_definition.n_frames);
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, layer->size, animation_layer_definition.position, animation_layer_definition.n_frames);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
     LOG("    done\n");
@@ -197,6 +203,12 @@ void AnimatedObject::setDirection(Direction c_direction) {
         //this->setFrame(0);
         this->update();
     }
+}
+
+int AnimatedObject::getSize() const {
+    ASSERT_LOGGER( this->animation_layers.size() > 0 );
+    const AnimationLayer *animation_layer = this->animation_layers.at(0);
+    return animation_layer->getSize();
 }
 
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms) :
@@ -1588,6 +1600,10 @@ PlayingGamestate::PlayingGamestate() :
                     float pos_y = parseFloat(pos_y_s.toString());
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString());
+                    QStringRef block_visibility_s = reader.attributes().value("block_visibility");
+                    bool block_visibility = parseBool(block_visibility_s.toString(), true);
+                    QStringRef door_s = reader.attributes().value("door");
+                    bool door = parseBool(door_s.toString(), true);
                     QStringRef size_w_s = reader.attributes().value("w");
                     float size_w = parseFloat(size_w_s.toString());
                     QStringRef size_h_s = reader.attributes().value("h");
@@ -1595,7 +1611,8 @@ PlayingGamestate::PlayingGamestate() :
 
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString());
                     location->addScenery(scenery, pos_x, pos_y);
-                    scenery->setBlocking(blocking);
+                    scenery->setBlocking(blocking, block_visibility);
+                    scenery->setDoor(door);
                     scenery->setSize(size_w, size_h);
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
@@ -1824,8 +1841,11 @@ PlayingGamestate::PlayingGamestate() :
         this->characterUpdateGraphics(character, object);
         scene->addItem(object);
         object->setPos(character->getX(), character->getY());
-        object->setTransformOriginPoint(-32.0f*player_scale, -46.0f*player_scale);
-        object->setScale(player_scale);
+        int character_size = object->getSize();
+        float character_scale = 2.0f / (float)character_size;
+        //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
+        object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
+        object->setScale(character_scale);
 
         character->setListener(this, object);
         //item->setAnimationSet("attack"); // test
@@ -2162,7 +2182,7 @@ void PlayingGamestate::update() {
             else if( dist <= npc_visibility_c ) {
                 // check line of sight
                 Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, true, NULL) ) {
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
                     is_visible = true;
                 }
             }
@@ -2399,7 +2419,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 if( !selected_scenery->isOpened() ) {
                     selected_scenery->setOpened(true);
                 }
+                if( selected_scenery->isDoor() ) {
+                    LOG("clicked on a door\n");
+                }
             }
+
         }
 
         if( dest != player->getPos() ) {
@@ -2577,7 +2601,7 @@ void Game::update() {
                 gamestate = new OptionsGamestate();
                 break;
             default:
-                Q_ASSERT(false);
+                ASSERT_LOGGER(false);
             }
         }
         catch(string &error) {

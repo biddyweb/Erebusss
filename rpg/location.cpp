@@ -12,9 +12,17 @@ using std::swap;
 
 Scenery::Scenery(string name, string image_name) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
-    is_blocking(false), width(1.0f), height(1.0f),
+    is_blocking(false), blocks_visibility(false), is_door(false), width(1.0f), height(1.0f),
     opened(false)
 {
+}
+
+void Scenery::setBlocking(bool is_blocking, bool blocks_visibility) {
+    this->is_blocking = is_blocking;
+    this->blocks_visibility = blocks_visibility;
+    if( !this->is_blocking && this->blocks_visibility ) {
+        throw string("scenery that blocks movement, but not visibility, is not supported");
+    }
 }
 
 void Scenery::addItem(Item *item) {
@@ -502,11 +510,20 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
-        if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
+        /*if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
             continue;
+        }*/
+        if( boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
+            const Scenery *scenery = static_cast<const Scenery *>(boundary->getSource());
+            if( intersect_type == INTERSECTTYPE_MOVE && !scenery->isBlocking() ) {
+                continue;
+            }
+            else if( intersect_type == INTERSECTTYPE_VISIBILITY && !scenery->blocksVisibility() ) {
+                continue;
+            }
         }
         if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
             continue;
@@ -519,7 +536,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, bool ignore_all_scenery, const Scenery *ignore_one_scenery) const {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
     //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
     bool done = false;
     bool hit = false;
@@ -543,7 +560,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D st
     //float ymax = dv_length + width;
     float ymax = dv_length;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, ignore_all_scenery, ignore_one_scenery);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, intersect_type, ignore_one_scenery);
 
     if( hit ) {
         *hit_pos = start + dv * hit_dist;
@@ -660,7 +677,7 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
 
                 // test we get get to the way point
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, point, path_way_point, 0.0f, false, NULL) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, point, path_way_point, 0.0f, Location::INTERSECTTYPE_MOVE, NULL) ) {
                     path_way_points.push_back( path_way_point );
                 }
             }
@@ -699,7 +716,7 @@ void Location::calculateDistanceGraph() {
                 hit = false;
             }
             else {
-                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, false, NULL);
+                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL);
             }
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
@@ -716,7 +733,7 @@ void Location::initVisibility(Vector2D pos) {
             Vector2D point = floor_region->getPoint(j);
             // test we get get to the way point
             Vector2D hit_pos;
-            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, true, NULL) ) {
+            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, INTERSECTTYPE_VISIBILITY, NULL) ) {
                 floor_region->setVisible(true);
             }
         }
@@ -736,7 +753,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
             {
                 // test we get get to the way point
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, true, NULL) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, pos, point, 0.0f, INTERSECTTYPE_VISIBILITY, NULL) ) {
                     floor_region->setVisible(true);
                     update_floor_regions.push_back(floor_region);
                 }

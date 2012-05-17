@@ -150,7 +150,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 if( dist <= npc_visibility_c ) {
                     // check line of sight
                     Vector2D hit_pos;
-                    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, true, NULL) ) {
+                    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, target_npc->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
                         can_hit = true;
                     }
                     else {
@@ -553,7 +553,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
     vector<Vector2D> new_path;
 
     Vector2D hit_pos;
-    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, dest, npc_radius_c, false, ignore_scenery) ) {
+    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, this->pos, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery) ) {
         // easy
         //LOG("easy\n");
         new_path.push_back(dest);
@@ -584,7 +584,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
                     hit = false;
                 }
                 else {
-                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, false, j==end_index ? ignore_scenery : NULL);
+                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL);
                 }
                 if( !hit ) {
                     v_A->addNeighbour(j, dist);
@@ -615,7 +615,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
             if( new_path.size() >= 2 ) {
                 p0 = new_path.at( new_path.size() - 2 );
             }
-            if( location->intersectSweptSquareWithBoundaries(&hit_pos, p0, dest, npc_radius_c, false, NULL) ) {
+            if( location->intersectSweptSquareWithBoundaries(&hit_pos, p0, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL) ) {
                 new_path[ new_path.size() - 1 ] = hit_pos;
             }
         }
