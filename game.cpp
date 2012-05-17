@@ -71,7 +71,7 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, int x_offset, size_t n_frames) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int x_offset, size_t n_frames) {
     vector<QPixmap> frames;
     for(int i=0;i<N_DIRECTIONS;i++) {
         for(size_t j=0;j<n_frames;j++) {
@@ -83,7 +83,7 @@ AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, 
     return animation_set;
 }
 
-AnimationLayer *AnimationLayer::create(QPixmap image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
     AnimationLayer *layer = new AnimationLayer();
     /*LOG("AnimationLayer::create: %s\n", filename);
     QPixmap image = game_g->loadImage(filename);*/
@@ -1197,6 +1197,20 @@ PlayingGamestate::PlayingGamestate() :
                         }
                         pixmap = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
                     }
+                    else if( imagetype_s == "solid" ) {
+                        QStringRef red_s = reader.attributes().value("red");
+                        QStringRef green_s = reader.attributes().value("green");
+                        QStringRef blue_s = reader.attributes().value("blue");
+                        int red = parseInt(red_s.toString());
+                        int green = parseInt(green_s.toString());
+                        int blue = parseInt(blue_s.toString());
+                        pixmap = QPixmap(16, 16);
+                        pixmap.fill(QColor(red, green, blue));
+                    }
+                    else {
+                        LOG("unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
+                        throw string("unknown imagetype");
+                    }
                     if( type_s == "item") {
                         this->item_images[name_s.toString().toStdString()] = pixmap;
                     }
@@ -1940,11 +1954,28 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         scene->addItem(object);
         object->setPos(scenery->getX(), scenery->getY());
         object->setZValue(object->pos().y());
+        /*
         //float scenery_scale = scenery_width / object->pixmap().width();
         // n.b., aspect-ratio of scenery should match that of the corresponding image for this scenery!
         float scenery_scale = scenery->getWidth() / object->pixmap().width();
-        object->setTransformOriginPoint(-0.5f*object->pixmap().width()*scenery_scale, -0.5f*object->pixmap().height()*scenery_scale);
-        object->setScale(scenery_scale);
+        //object->setTransformOriginPoint(-0.5f*object->pixmap().width()*scenery_scale, -0.5f*object->pixmap().height()*scenery_scale);
+        //object->setScale(scenery_scale);
+        //QTransform transform = QTransform::fromScale(scenery_scale, scenery_scale);
+        float centre_x = 0.5f*object->pixmap().width();
+        float centre_y = 0.5f*object->pixmap().height();
+        QTransform transform;
+        transform = transform.scale(scenery_scale, scenery_scale);
+        transform = transform.translate(-centre_x, -centre_y);
+        object->setTransform(transform);
+        */
+        float scenery_scale_w = scenery->getWidth() / object->pixmap().width();
+        float scenery_scale_h = scenery->getHeight() / object->pixmap().height();
+        float centre_x = 0.5f*object->pixmap().width();
+        float centre_y = 0.5f*object->pixmap().height();
+        QTransform transform;
+        transform = transform.scale(scenery_scale_w, scenery_scale_h);
+        transform = transform.translate(-centre_x, -centre_y);
+        object->setTransform(transform);
     }
 }
 

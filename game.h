@@ -69,7 +69,7 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(QPixmap image, AnimationType animation_type, int x_offset, size_t n_frames);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int x_offset, size_t n_frames);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -107,7 +107,7 @@ public:
         return iter->second;
     }
 
-    static AnimationLayer *create(QPixmap image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
     static AnimationLayer *create(string filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
 };
 
