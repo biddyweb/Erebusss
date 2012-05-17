@@ -83,10 +83,10 @@ AnimationSet *AnimationSet::create(QPixmap image, AnimationType animation_type, 
     return animation_set;
 }
 
-AnimationLayer *AnimationLayer::create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+AnimationLayer *AnimationLayer::create(QPixmap image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
     AnimationLayer *layer = new AnimationLayer();
-    LOG("AnimationLayer::create: %s\n", filename);
-    QPixmap image = game_g->loadImage(filename);
+    /*LOG("AnimationLayer::create: %s\n", filename);
+    QPixmap image = game_g->loadImage(filename);*/
     LOG("    loaded image\n");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
@@ -95,6 +95,11 @@ AnimationLayer *AnimationLayer::create(const char *filename, const vector<Animat
     }
     LOG("    done\n");
     return layer;
+}
+
+AnimationLayer *AnimationLayer::create(string filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+    QPixmap image = game_g->loadImage(filename.c_str());
+    return create(image, animation_layer_definitions);
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
@@ -1165,33 +1170,41 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef name_s = reader.attributes().value("name");
                     if( name_s.length() == 0 )
                         throw string("image element has no name attribute or is zero length");
-                    QStringRef filename_s = reader.attributes().value("filename");
-                    if( filename_s.length() == 0 )
-                        throw string("image element has no filename attribute or is zero length");
-                    QString filename = ":/" + filename_s.toString();
                     LOG("image element type: %s\n", type_s.toString().toStdString().c_str());
-                    LOG("load image: %s : %s\n", name_s.toString().toStdString().c_str(), filename.toStdString().c_str());
+                    LOG("create image: %s\n", name_s.toString().toStdString().c_str());
+                    QStringRef imagetype_s = reader.attributes().value("imagetype");
+                    QPixmap pixmap;
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0;
-                    QStringRef xpos_s = reader.attributes().value("xpos");
-                    QStringRef ypos_s = reader.attributes().value("ypos");
-                    QStringRef width_s = reader.attributes().value("width");
-                    QStringRef height_s = reader.attributes().value("height");
-                    if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
-                        clip = true;
-                        xpos = parseInt(xpos_s.toString());
-                        ypos = parseInt(ypos_s.toString());
-                        width = parseInt(width_s.toString());
-                        height = parseInt(height_s.toString());
-                        LOG("    clip to: %d, %d, %d, %d\n", xpos, ypos, width, height);
+                    if( imagetype_s.length() == 0 ) {
+                        // load file
+                        QStringRef filename_s = reader.attributes().value("filename");
+                        if( filename_s.length() == 0 )
+                            throw string("image element has no filename attribute or is zero length");
+                        QString filename = ":/" + filename_s.toString();
+                        LOG("    filename: %s\n", filename.toStdString().c_str());
+                        QStringRef xpos_s = reader.attributes().value("xpos");
+                        QStringRef ypos_s = reader.attributes().value("ypos");
+                        QStringRef width_s = reader.attributes().value("width");
+                        QStringRef height_s = reader.attributes().value("height");
+                        if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
+                            clip = true;
+                            xpos = parseInt(xpos_s.toString());
+                            ypos = parseInt(ypos_s.toString());
+                            width = parseInt(width_s.toString());
+                            height = parseInt(height_s.toString());
+                            LOG("    clip to: %d, %d, %d, %d\n", xpos, ypos, width, height);
+                        }
+                        pixmap = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
                     }
                     if( type_s == "item") {
-                        this->item_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                        this->item_images[name_s.toString().toStdString()] = pixmap;
                     }
                     else if( type_s == "scenery" ) {
-                        this->scenery_images[name_s.toString().toStdString()] = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
+                        this->scenery_images[name_s.toString().toStdString()] = pixmap;
                         QStringRef filename_opened_s = reader.attributes().value("filename_opened");
-                        if( filename_opened_s.length() != 0 ) {
+                        if( imagetype_s.length() == 0 && filename_opened_s.length() != 0 ) {
+                            // n.b., opened image can only be specified for loading images
                             QString filename_opened = ":/" + filename_opened_s.toString();
                             LOG("load opened image: %s\n", filename_opened.toStdString().c_str());
                             this->scenery_opened_images[name_s.toString().toStdString()] = game_g->loadImage(filename_opened.toStdString().c_str(), clip, xpos, ypos, width, height);
@@ -1231,7 +1244,8 @@ PlayingGamestate::PlayingGamestate() :
                                 }
                             }
                         }
-                        this->animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString().c_str(), animation_layer_definition);
+                        //this->animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString().c_str(), animation_layer_definition);
+                        this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition);
                     }
                     else {
                         throw string("image element has unknown type attribute");

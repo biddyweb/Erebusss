@@ -107,7 +107,8 @@ public:
         return iter->second;
     }
 
-    static AnimationLayer *create(const char *filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+    static AnimationLayer *create(QPixmap image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+    static AnimationLayer *create(string filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
 };
 
 //class AnimatedObject : public QGraphicsPixmapItem {
