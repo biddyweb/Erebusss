@@ -24,7 +24,7 @@ public:
     virtual void locationRemoveItem(const Location *location, Item *item)=0;
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
-    //virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
+    virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
     virtual void locationUpdateScenery(Scenery *scenery)=0;
 };
 
@@ -194,6 +194,9 @@ public:
     void addScenery(Scenery *scenery) {
         this->scenerys.insert(scenery);
     }
+    void removeScenery(Scenery *scenery) {
+        this->scenerys.erase(scenery);
+    }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);
 };
@@ -218,8 +221,8 @@ protected:
     set<Item *> items;
     set<Scenery *> scenerys;
 
-    void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
+    void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
 
     vector<Vector2D> calculatePathWayPoints() const;
 public:
@@ -283,7 +286,7 @@ public:
         return this->items.end();
     }
     void addScenery(Scenery *scenery, float xpos, float ypos);
-    //void removeScenery(Scenery *scenery);
+    void removeScenery(Scenery *scenery);
     void updateScenery(Scenery *scenery);
     set<Scenery *>::iterator scenerysBegin() {
         return this->scenerys.begin();
@@ -302,7 +305,7 @@ public:
     void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
     //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
 
     void calculateDistanceGraph();

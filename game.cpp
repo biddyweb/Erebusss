@@ -1999,14 +1999,14 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
     }
 }
 
-/*void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
+void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
     }
-}*/
+}
 
 void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
@@ -2182,7 +2182,7 @@ void PlayingGamestate::update() {
             else if( dist <= npc_visibility_c ) {
                 // check line of sight
                 Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
                     is_visible = true;
                 }
             }
@@ -2421,6 +2421,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
                 if( selected_scenery->isDoor() ) {
                     LOG("clicked on a door\n");
+                    c_location->removeScenery(selected_scenery);
+                    delete selected_scenery;
+                    selected_scenery = NULL;
                 }
             }
 

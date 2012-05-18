@@ -107,6 +107,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <item template="Gold Ring" x="2.0" y="10.5"/>
 </scenery>
 
+<scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+
 <!--
 <floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
 <floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
