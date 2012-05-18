@@ -31,8 +31,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <floorregion rect_x="15.0" rect_y="11.5" rect_w="2.5" rect_h="3.0" />
     <floorregion rect_x="17.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
 <floorregion rect_x="18.0" rect_y="11.5" rect_w="2.5" rect_h="3.0" />
-    <floorregion rect_x="19.5" rect_y="14.5" rect_w="0.8" rect_h="0.5" />
-    <floorregion rect_x="19.5" rect_y="11.0" rect_w="0.8" rect_h="0.5" />
+    <floorregion rect_x="19.6" rect_y="14.5" rect_w="0.8" rect_h="0.5" />
+    <floorregion rect_x="19.6" rect_y="11.0" rect_w="0.8" rect_h="0.5" />
 <floorregion rect_x="15.0" rect_y="7.0" rect_w="5.5" rect_h="4.0" />
 
     <floorregion rect_x="12.0" rect_y="10.1" rect_w="0.5" rect_h="0.8" />
@@ -92,6 +92,13 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="16.5" y="10.0"/>
 <npc name="Goblin" template="Goblin" x="19.5" y="9.5"/>
 
+<scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="14.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="17.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="20.0" y="11.25" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
+
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>
     <item template="Arrows"/>
@@ -106,8 +113,6 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <item template="Potion of Healing"/>
     <item template="Gold Ring" x="2.0" y="10.5"/>
 </scenery>
-
-<scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 
 <!--
 <floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
