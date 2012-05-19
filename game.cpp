@@ -685,6 +685,12 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         list_font.setPointSize( list_font.pointSize() + 8 );
         list->setFont(list_font);
     }
+    {
+        QFontMetrics fm(list->font());
+        int icon_size = fm.height();
+        list->setIconSize(QSize(icon_size, icon_size));
+        LOG("icon size now %f, %f\n", list->iconSize().width(), list->iconSize().height());
+    }
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -1693,8 +1699,13 @@ PlayingGamestate::PlayingGamestate() :
     LOG("load floor image\n");
     QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
     QBrush floor_brush(floor_image);
-    QBrush wall_brush(QColor(150, 75, 0));
     floor_brush.setTransform(QTransform::fromScale(scale, scale));
+
+    //QBrush wall_brush(QColor(150, 75, 0));
+    LOG("load wall image\n");
+    QPixmap wall_image = game_g->loadImage(":/gfx/textures/wall.png");
+    QBrush wall_brush(wall_image);
+    wall_brush.setTransform(QTransform::fromScale(scale, scale));
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
         QPolygonF polygon;
@@ -2005,6 +2016,10 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
+
+        if( scenery->blocksVisibility() ) {
+            this->updateVisibility(player->getPos());
+        }
     }
 }
 
@@ -2276,19 +2291,7 @@ void PlayingGamestate::characterMoved(const Character *character, void *user_dat
         this->characterTurn(character, user_data, vdir);
     }
     if( character == this->player ) {
-        vector<FloorRegion *> update_regions = this->c_location->updateVisibility(player->getPos());
-        for(vector<FloorRegion *>::iterator iter = update_regions.begin(); iter != update_regions.end(); ++iter) {
-            FloorRegion *floor_region = *iter;
-            QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
-            item->setVisible( floor_region->isVisible() );
-            for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
-                Scenery *scenery = *iter;
-                QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-                if( item2 != NULL ) {
-                    item2->setVisible( floor_region->isVisible() );
-                }
-            }
-        }
+        this->updateVisibility(player->getPos());
     }
 }
 
@@ -2438,6 +2441,22 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     }
 }
 
+void PlayingGamestate::updateVisibility(Vector2D pos) {
+    vector<FloorRegion *> update_regions = this->c_location->updateVisibility(pos);
+    for(vector<FloorRegion *>::iterator iter = update_regions.begin(); iter != update_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+        item->setVisible( floor_region->isVisible() );
+        for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
+            Scenery *scenery = *iter;
+            QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+            if( item2 != NULL ) {
+                item2->setVisible( floor_region->isVisible() );
+            }
+        }
+    }
+}
+
 void PlayingGamestate::addWidget(QWidget *widget) {
     this->main_stacked_widget->addWidget(widget);
     this->main_stacked_widget->setCurrentWidget(widget);
@@ -2463,7 +2482,8 @@ void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms)
     }
     text_effect->setPos( text_effect_pos.x, text_effect_pos.y );
     text_effect->setScale(font_scale);
-    text_effect->setZValue(text_effect->pos().y() + 1.0f);
+    //text_effect->setZValue(text_effect->pos().y() + 1.0f);
+    text_effect->setZValue(text_effect->pos().y() + 1000.0f);
     view->addTextEffect(text_effect);
 }
 

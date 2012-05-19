@@ -406,6 +406,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, CharacterTemplate *> character_templates;
 
     void showInfoWindow(const char *html);
+    void updateVisibility(Vector2D pos);
 
 private slots:
     void clickedStats();
