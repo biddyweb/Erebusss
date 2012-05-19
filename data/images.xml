@@ -25,7 +25,8 @@
 <image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png"
     filename_opened="gfx/textures/scenery/crate_opened.png"
     />
-<image type="scenery" name="door_wood" imagetype="solid" red="120" green="60" blue="0"/>
+<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>
+<!--<image type="scenery" name="door_wood" filename="gfx/textures/door_wood.png"/>-->
 
 <image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png">
     <animation name="" start="0" length="4" type="bounce"/>
