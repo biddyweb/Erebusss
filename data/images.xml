@@ -25,7 +25,8 @@
 <image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png"
     filename_opened="gfx/textures/scenery/crate_opened.png"
     />
-<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>
+<!--<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>-->
+<image type="scenery" name="door_wood" imagetype="perlin" max_red="150" max_green="75" max_blue="0" min_red="40" min_green="20" min_blue="0"/>
 <!--<image type="scenery" name="door_wood" filename="gfx/textures/door_wood.png"/>-->
 
 <image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png">
