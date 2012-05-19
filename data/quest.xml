@@ -112,6 +112,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <item template="Gold Ring" x="2.0" y="10.5"/>
 </scenery>
 
+<trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>
+
 <!--
 <floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
 <floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
