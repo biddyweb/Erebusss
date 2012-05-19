@@ -42,6 +42,18 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
+Trap::Trap(string type, float width, float height) : type(type), width(width), height(height) {
+}
+
+bool Trap::isSetOff(const Character *character) {
+    Vector2D ch_pos = character->getPos();
+    if( ch_pos.x >= this->pos.x && ch_pos.x <= this->pos.x + this->width &&
+            ch_pos.y >= this->pos.y && ch_pos.y <= this->pos.y + this->height ) {
+        return true;
+    }
+    return false;
+}
+
 void FloorRegion::insertPoint(size_t indx, Vector2D point) {
     Polygon2D::insertPoint(indx, point);
     EdgeType edge_type = edge_types.at(indx-1);
@@ -216,6 +228,17 @@ void Location::updateScenery(Scenery *scenery) {
     if( this->listener != NULL ) {
         this->listener->locationUpdateScenery(scenery);
     }
+}
+
+void Location::addTrap(Trap *trap, float xpos, float ypos) {
+    //trap->setLocation(this);
+    trap->setPos(xpos, ypos);
+    this->traps.insert(trap);
+}
+
+void Location::removeTrap(Trap *trap) {
+    //trap->setLocation(NULL);
+    this->traps.erase(trap);
 }
 
 void Location::createBoundariesForRegions() {

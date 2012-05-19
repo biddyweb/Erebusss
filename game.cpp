@@ -216,6 +216,18 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setDefaultTextColor(Qt::white);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
     this->setFont(game_g->getFontStd());
+
+    {
+        // centre alignment - see http://www.cesarbs.org/blog/2011/05/30/aligning-text-in-qgraphicstextitem/
+        this->setTextWidth(this->boundingRect().width());
+        QTextBlockFormat format;
+        format.setAlignment(Qt::AlignCenter);
+        QTextCursor cursor = this->textCursor();
+        cursor.select(QTextCursor::Document);
+        cursor.mergeBlockFormat(format);
+        cursor.clearSelection();
+        this->setTextCursor(cursor);
+    }
 }
 
 void TextEffect::advance(int phase) {
@@ -1638,6 +1650,23 @@ PlayingGamestate::PlayingGamestate() :
                     scenery->setSize(size_w, size_h);
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
+                else if( reader.name() == "trap" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    QStringRef size_w_s = reader.attributes().value("w");
+                    float size_w = parseFloat(size_w_s.toString());
+                    QStringRef size_h_s = reader.attributes().value("h");
+                    float size_h = parseFloat(size_h_s.toString());
+
+                    Trap *trap = new Trap(name_s.toString().toStdString(), size_w, size_h);
+                    location->addTrap(trap, pos_x, pos_y);
+                }
             }
             else if( reader.isEndElement() ) {
                 //LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
@@ -2226,16 +2255,19 @@ void PlayingGamestate::update() {
     scene->advance();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 
-    vector< set<Character *>::iterator > delete_characters;
+    //vector< set<Character *>::iterator > delete_characters;
+    vector<Character *> delete_characters;
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         if( character->update(this) ) {
             LOG("character is about to die: %s\n", character->getName().c_str());
-            delete_characters.push_back(iter);
+            //delete_characters.push_back(iter);
+            delete_characters.push_back(character);
         }
     }
-    for(vector< set<Character *>::iterator >::iterator iter2 = delete_characters.begin(); iter2 != delete_characters.end(); ++iter2) {
-        set<Character *>::iterator iter = *iter2;
+    /*for(vector< set<Character *>::iterator >::iterator iter2 = delete_characters.begin(); iter2 != delete_characters.end(); ++iter2) {
+        set<Character *>::iterator iter = *iter2;*/
+    for(vector<Character *>::iterator iter = delete_characters.begin(); iter != delete_characters.end(); ++iter) {
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
         c_location->removeCharacter(character);
@@ -2291,7 +2323,7 @@ void PlayingGamestate::characterTurn(const Character *character, void *user_data
     object->setDirection(direction);
 }
 
-void PlayingGamestate::characterMoved(const Character *character, void *user_data) {
+void PlayingGamestate::characterMoved(Character *character, void *user_data) {
     //QGraphicsItem *item = static_cast<QGraphicsItem *>(user_data);
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     QPointF old_pos = object->pos();
@@ -2307,7 +2339,29 @@ void PlayingGamestate::characterMoved(const Character *character, void *user_dat
         this->characterTurn(character, user_data, vdir);
     }
     if( character == this->player ) {
-        this->updateVisibility(player->getPos());
+        // handle traps
+        vector<Trap *> delete_traps;
+        for(set<Trap *>::iterator iter = this->c_location->trapsBegin(); iter != this->c_location->trapsEnd(); ++iter) {
+            Trap *trap = *iter;
+            if( trap->isSetOff(character) ) {
+                LOG("character: %s has set of trap at %f, %f\n", character->getName().c_str(), trap->getX(), trap->getY());
+                delete_traps.push_back(trap);
+                int damage = rollDice(3, 6, 0);
+                character->decreaseHealth(this, damage);
+                this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
+                if( character->isDead() ) {
+                    break;
+                }
+            }
+        }
+        for(vector<Trap *>::iterator iter = delete_traps.begin(); iter != delete_traps.end(); ++iter) {
+            Trap *trap = *iter;
+            c_location->removeTrap(trap);
+        }
+
+        if( !character->isDead() ) {
+            this->updateVisibility(character->getPos());
+        }
     }
 }
 

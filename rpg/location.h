@@ -33,7 +33,7 @@ protected:
     Location *location;
     string name;
     string image_name;
-    Vector2D pos; // pos in Location
+    Vector2D pos; // pos in Location (for centre)
     void *user_data_gfx;
 
     bool is_blocking;
@@ -130,6 +130,48 @@ public:
     }
 };
 
+class Trap {
+protected:
+    //Location *location;
+    string type;
+    Vector2D pos; // pos in Location (for top-left)
+    float width, height;
+
+public:
+    Trap(string type, float width, float height);
+    virtual ~Trap() {
+    }
+
+    /*void setLocation(Location *location) {
+        this->location = location;
+    }*/
+    void setPos(float xpos, float ypos) {
+        this->pos.set(xpos, ypos);
+    }
+    float getX() const {
+        return this->pos.x;
+    }
+    float getY() const {
+        return this->pos.y;
+    }
+    Vector2D getPos() const {
+        return this->pos;
+    }
+    float getWidth() const {
+        return this->width;
+    }
+    float getHeight() const {
+        return this->height;
+    }
+    /*void setSize(float width, float height) {
+        // n.b., aspect-ratio should match that of the corresponding image for this scenery!
+        this->width = width;
+        this->height = height;
+    }*/
+
+    bool isSetOff(const Character *character);
+};
+
 class FloorRegion : public Polygon2D {
 public:
     enum EdgeType {
@@ -220,6 +262,7 @@ protected:
     set<Character *> characters;
     set<Item *> items;
     set<Scenery *> scenerys;
+    set<Trap *> traps;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
     void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
@@ -256,6 +299,7 @@ public:
         this->listener = listener;
         this->listener_data = listener_data;
     }
+
     void addCharacter(Character *character, float xpos, float ypos);
     void removeCharacter(Character *character);
     set<Character *>::iterator charactersBegin() {
@@ -271,6 +315,7 @@ public:
         return this->characters.end();
     }
     bool hasEnemies(const PlayingGamestate *playing_gamstate) const;
+
     void addItem(Item *item, float xpos, float ypos);
     void removeItem(Item *item);
     set<Item *>::iterator itemsBegin() {
@@ -285,6 +330,7 @@ public:
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
     }
+
     void addScenery(Scenery *scenery, float xpos, float ypos);
     void removeScenery(Scenery *scenery);
     void updateScenery(Scenery *scenery);
@@ -299,6 +345,21 @@ public:
     }
     set<Scenery *>::const_iterator scenerysEnd() const {
         return this->scenerys.end();
+    }
+
+    void addTrap(Trap *trap, float xpos, float ypos);
+    void removeTrap(Trap *trap);
+    set<Trap *>::iterator trapsBegin() {
+        return this->traps.begin();
+    }
+    set<Trap *>::const_iterator trapsBegin() const {
+        return this->traps.begin();
+    }
+    set<Trap *>::iterator trapsEnd() {
+        return this->traps.end();
+    }
+    set<Trap *>::const_iterator trapsEnd() const {
+        return this->traps.end();
     }
 
     void createBoundariesForRegions();
