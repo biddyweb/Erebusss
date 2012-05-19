@@ -298,3 +298,5 @@ public:
 int rollDice(int X, int Y, int Z);
 
 float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);
+
+float perlin_noise2(float vec[2]);
