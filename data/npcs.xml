@@ -5,7 +5,7 @@
     health_min="5" health_max = "8" gold_min="5" gold_max="8"
 />
 
-<npc name="Goblin Chieftain" animation_name="goblin_chieftain"
+<npc name="Goblin Champion" animation_name="goblin_champion"
     health_min="7" health_max = "8" gold_min="6" gold_max="10"
 />
 

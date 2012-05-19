@@ -27,7 +27,7 @@
         <file>gfx/textures/npcs/orc_regular_0.png</file>
         <file>gfx/textures/items/gem_red.png</file>
         <file>gfx/textures/items/ring_gold.png</file>
-        <file>gfx/textures/npcs/goblin_chieftain.png</file>
         <file>gfx/textures/wall.png</file>
+        <file>gfx/textures/npcs/goblin_champion.png</file>
     </qresource>
 </RCC>
