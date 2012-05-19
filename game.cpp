@@ -1188,9 +1188,8 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef name_s = reader.attributes().value("name");
                     if( name_s.length() == 0 )
                         throw string("image element has no name attribute or is zero length");
-                    LOG("image element type: %s\n", type_s.toString().toStdString().c_str());
-                    LOG("create image: %s\n", name_s.toString().toStdString().c_str());
                     QStringRef imagetype_s = reader.attributes().value("imagetype");
+                    LOG("image element type: %s name: %s imagetype: %s\n", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
                     QPixmap pixmap;
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0;
@@ -1224,6 +1223,23 @@ PlayingGamestate::PlayingGamestate() :
                         int blue = parseInt(blue_s.toString());
                         pixmap = QPixmap(16, 16);
                         pixmap.fill(QColor(red, green, blue));
+                    }
+                    else if( imagetype_s == "perlin" ) {
+                        QStringRef max_red_s = reader.attributes().value("max_red");
+                        QStringRef max_green_s = reader.attributes().value("max_green");
+                        QStringRef max_blue_s = reader.attributes().value("max_blue");
+                        QStringRef min_red_s = reader.attributes().value("min_red");
+                        QStringRef min_green_s = reader.attributes().value("min_green");
+                        QStringRef min_blue_s = reader.attributes().value("min_blue");
+                        unsigned char filter_max[3] = {255, 255, 255};
+                        unsigned char filter_min[3] = {255, 255, 255};
+                        filter_max[0] = parseInt(max_red_s.toString());
+                        filter_max[1] = parseInt(max_green_s.toString());
+                        filter_max[2] = parseInt(max_blue_s.toString());
+                        filter_min[0] = parseInt(min_red_s.toString());
+                        filter_min[1] = parseInt(min_green_s.toString());
+                        filter_min[2] = parseInt(min_blue_s.toString());
+                        pixmap = createNoise(64, 64, 4.0f, 4.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
                     }
                     else {
                         LOG("unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
