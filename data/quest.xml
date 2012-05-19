@@ -89,8 +89,6 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
 <npc name="Orc" template="Orc" x="16.0" y="8.0"/>
-<npc name="Goblin" template="Goblin" x="16.5" y="10.0"/>
-<npc name="Goblin" template="Goblin" x="19.5" y="9.5"/>
 
 <scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
