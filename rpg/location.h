@@ -164,11 +164,6 @@ public:
     float getHeight() const {
         return this->height;
     }
-    /*void setSize(float width, float height) {
-        // n.b., aspect-ratio should match that of the corresponding image for this scenery!
-        this->width = width;
-        this->height = height;
-    }*/
 
     bool isSetOff(const Character *character);
 };
