@@ -1475,6 +1475,34 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(40);
     qApp->processEvents();
 
+    LOG("create animation frames\n");
+    LOG("load player image\n");
+    vector<AnimationLayerDefinition> player_animation_layer_definition;
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    LOG("clothes layer\n");
+    int time_s = clock();
+    //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
+    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
+    LOG("time to load: %d\n", clock() - time_s);
+    /*LOG("head layer\n");
+    string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
+    AnimationLayer *head_layer = new AnimationLayer();*/
+    //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
+    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
+    LOG("longsword layer\n");
+    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
+    LOG("longbow layer\n");
+    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition);
+    LOG("shield layer\n");
+    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
+
+    gui_overlay->setProgress(60);
+    qApp->processEvents();
+
     // create RPG world
     LOG("create RPG world\n");
 
@@ -1704,7 +1732,7 @@ PlayingGamestate::PlayingGamestate() :
     }
     //throw string("failed"); // TEST
 
-    gui_overlay->setProgress(50);
+    gui_overlay->setProgress(70);
     qApp->processEvents();
 
     location->createBoundariesForRegions();
@@ -1716,7 +1744,7 @@ PlayingGamestate::PlayingGamestate() :
     location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
     this->c_location = location;
 
-    gui_overlay->setProgress(60);
+    gui_overlay->setProgress(80);
     qApp->processEvents();
 
     // set up the view on the RPG world
@@ -1822,58 +1850,6 @@ PlayingGamestate::PlayingGamestate() :
             }
         }
     }*/
-
-    gui_overlay->setProgress(70);
-    qApp->processEvents();
-
-    LOG("create animation frames\n");
-    LOG("load player image\n");
-    vector<AnimationLayerDefinition> player_animation_layer_definition;
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    LOG("clothes layer\n");
-    int time_s = clock();
-    //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
-    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition);
-    LOG("time to load: %d\n", clock() - time_s);
-    /*LOG("head layer\n");
-    string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
-    AnimationLayer *head_layer = new AnimationLayer();*/
-    //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
-    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition);
-    LOG("longsword layer\n");
-    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition);
-    LOG("longbow layer\n");
-    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition);
-    LOG("shield layer\n");
-    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition);
-    gui_overlay->setProgress(80);
-    qApp->processEvents();
-
-    /*LOG("load goblin image\n");
-    //AnimationLayer *goblin_layer = AnimationLayer::create(":/gfx/textures/goblin.png");
-    vector<AnimationLayerDefinition> goblin_animation_layer_definition;
-    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 20, 3, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 24, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    goblin_animation_layer_definition.push_back( AnimationLayerDefinition("death", 34, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    this->animation_layers["goblin"] = AnimationLayer::create(":/gfx/textures/npcs/goblin.png", goblin_animation_layer_definition);
-
-    gui_overlay->setProgress(75);
-    qApp->processEvents();
-
-    LOG("load orc image\n");
-    vector<AnimationLayerDefinition> orc_animation_layer_definition;
-    orc_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-    orc_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-    orc_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    orc_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    orc_animation_layer_definition.push_back( AnimationLayerDefinition("death", 20, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    this->animation_layers["orc"] = AnimationLayer::create(":/gfx/textures/npcs/orc_regular_0.png", orc_animation_layer_definition);*/
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
