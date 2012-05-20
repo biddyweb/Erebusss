@@ -382,11 +382,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MainGraphicsView *view;
     GUIOverlay *gui_overlay;
 
-    //QWidget *mainwindow;
     QWidget *subwindow;
     QStackedWidget *main_stacked_widget;
-    //QListWidget *list;
-    //vector<Item *> list_items;
 
     Character *player;
     stringstream journal_ss;
