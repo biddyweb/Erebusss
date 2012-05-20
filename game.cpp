@@ -1053,6 +1053,40 @@ void ItemsWindow::itemIsDeleted(size_t index) {
     this->setWeightLabel();
 }
 
+TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items) :
+    playing_gamestate(playing_gamestate), list(NULL), items(items)
+{
+    playing_gamestate->addWidget(this);
+
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    QWebView *label = new QWebView();
+    QString html = "<html><body><p>What would you like to buy?</p></body></html>";
+    label->setHtml(html);
+    layout->addWidget(label);
+
+    QListWidget *list = new ScrollingListWidget();
+    layout->addWidget(list);
+    for(vector<const Item *>::const_iterator iter = items.begin(); iter != items.end(); ++iter) {
+        const Item *item = *iter;
+        QString item_str = item->getName().c_str();
+        QListWidgetItem *list_item = new QListWidgetItem(item_str);
+        QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+        list_item->setIcon(icon);
+        list->addItem(list_item);
+    }
+
+    QPushButton *closeButton = new QPushButton("Finish Trading");
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+}
+
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate)
 {
@@ -1096,8 +1130,27 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
 
+void CampaignWindow::clickedArmourer() {
+    LOG("CampaignWindow::clickedArmourer()\n");
+
+    vector<const Item *> items;
+
+}
+
+void CampaignWindow::clickedGeneralStores() {
+    LOG("CampaignWindow::clickedGeneralStores()\n");
+}
+
+void CampaignWindow::clickedMagicShop() {
+    LOG("CampaignWindow::clickedMagicShop()\n");
+}
+
+void CampaignWindow::clickedTraining() {
+    LOG("CampaignWindow::clickedTraining()\n");
+}
+
 PlayingGamestate::PlayingGamestate() :
-    scene(NULL), view(NULL), gui_overlay(NULL), /*mainwindow(NULL),*/ subwindow(NULL), main_stacked_widget(NULL),
+    scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
     player(NULL), c_location(NULL), quest(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -2137,7 +2190,7 @@ void PlayingGamestate::clickedStats() {
     LOG("clickedStats()\n");
     this->clickedCloseSubwindow();
 
-    subwindow = new StatsWindow(this);
+    new StatsWindow(this);
     game_g->getScreen()->setPaused(true);
 }
 
@@ -2145,7 +2198,7 @@ void PlayingGamestate::clickedItems() {
     LOG("clickedItems()\n");
     this->clickedCloseSubwindow();
 
-    subwindow = new ItemsWindow(this);
+    new ItemsWindow(this);
     game_g->getScreen()->setPaused(true);
 }
 
@@ -2165,12 +2218,7 @@ void PlayingGamestate::clickedOptions() {
 
     game_g->getScreen()->setPaused(true);
 
-    subwindow = new QWidget();
-    //subwindow = new QWidget( game_g->getScreen()->getMainWindow() );
-    //mainwindow->setParent(NULL); // stop it being deleted!
-    //game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
-    /*this->main_stacked_widget->addWidget(subwindow);
-    this->main_stacked_widget->setCurrentWidget(subwindow);*/
+    QWidget *subwindow = new QWidget();
     this->addWidget(subwindow);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -2224,9 +2272,7 @@ void PlayingGamestate::showInfoWindow(const char *html) {
 
     game_g->getScreen()->setPaused(true);
 
-    subwindow = new QWidget();
-    /*this->main_stacked_widget->addWidget(subwindow);
-    this->main_stacked_widget->setCurrentWidget(subwindow);*/
+    QWidget *subwindow = new QWidget();
     this->addWidget(subwindow);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -2245,15 +2291,14 @@ void PlayingGamestate::showInfoWindow(const char *html) {
 
 void PlayingGamestate::clickedCloseSubwindow() {
     LOG("clickedCloseSubwindow\n");
-    if( subwindow != NULL ) {
-        //game_g->getScreen()->getMainWindow()->setCentralWidget(mainwindow);
-        //game_g->getScreen()->getMainWindow()->show();
-        this->main_stacked_widget->setCurrentIndex(0);
-        game_g->getScreen()->setPaused(false);
-        //subwindow->close();
-        //delete subwindow;
+    int n_stacked_widgets = this->main_stacked_widget->count();
+    if( n_stacked_widgets > 1 ) {
+        QWidget *subwindow = this->main_stacked_widget->widget(n_stacked_widgets-1);
+        this->main_stacked_widget->removeWidget(subwindow);
         subwindow->deleteLater();
-        subwindow = NULL;
+        if( n_stacked_widgets == 2 ) {
+            game_g->getScreen()->setPaused(false);
+        }
     }
 }
 
@@ -2549,7 +2594,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     LOG("clicked on an exit");
                     // exit
                     this->clickedCloseSubwindow(); // just in case
-                    subwindow = new CampaignWindow(this);
+                    new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
                 }
             }

@@ -374,12 +374,31 @@ public:
     }
 };
 
+class TradeWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+    QListWidget *list;
+    const vector<const Item *> &items;
+
+private slots:
+
+public:
+    TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items);
+    virtual ~TradeWindow() {
+    }
+};
+
 class CampaignWindow : public QWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
 
 private slots:
+    void clickedArmourer();
+    void clickedGeneralStores();
+    void clickedMagicShop();
+    void clickedTraining();
 
 public:
     CampaignWindow(PlayingGamestate *playing_gamestate);
@@ -396,7 +415,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MainGraphicsView *view;
     GUIOverlay *gui_overlay;
 
-    QWidget *subwindow;
     QStackedWidget *main_stacked_widget;
 
     Character *player;
