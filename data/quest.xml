@@ -5,13 +5,6 @@
 these vermin, and you will be rewarded with 100 gold pieces!
 </info>
 
-<!--
-<floorregion rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0" />
-<floorregion rect_x="4.0" rect_y="1.0" rect_w="4.0" rect_h="2.0" />
-
-<player_start x="2.0" y="2.0"/>
--->
-
 <floorregion rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
 <floorregion rect_x="5.0" rect_y="4.0" rect_w="1.0" rect_h="6.0" />
 <floorregion rect_x="6.0" rect_y="4.0" rect_w="5.0" rect_h="1.0" />
@@ -40,43 +33,6 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <player_start x="1.0" y="10.5"/>
 
-<!--
-<boundary>
-    <point x="0.0" y="10.0" />
-    <point x="0.0" y="11.0" />
-    <point x="5.0" y="11.0" />
-    <point x="5.0" y="16.0" />
-    <point x="22.0" y="16.0" />
-    <point x="22.0" y="3.0" />
-    <point x="16.0" y="3.0" />
-    <point x="16.0" y="1.0" />
-    <point x="11.0" y="1.0" />
-    <point x="11.0" y="4.0" />
-    <point x="5.0" y="4.0" />
-    <point x="5.0" y="10.0" />
-</boundary>
-
-<boundary>
-    <point x="6.0" y="11.0" />
-    <point x="11.0" y="11.0" />
-    <point x="11.0" y="15.0" />
-    <point x="6.0" y="15.0" />
-</boundary>
-
-<boundary>
-    <point x="6.0" y="10.0" />
-    <point x="6.0" y="5.0" />
-    <point x="11.0" y="5.0" />
-    <point x="11.0" y="6.0" />
-    <point x="16.0" y="6.0" />
-    <point x="16.0" y="4.0" />
-    <point x="21.0" y="4.0" />
-    <point x="21.0" y="15.0" />
-    <point x="12.0" y="15.0" />
-    <point x="12.0" y="10.0" />
-</boundary>
--->
-
 <npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
 <npc name="Goblin" template="Goblin" x="15.0" y="2.0"/>
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
@@ -89,6 +45,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
 <npc name="Orc" template="Orc" x="16.0" y="8.0"/>
+
+<scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
 
 <scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
@@ -113,51 +71,5 @@ these vermin, and you will be rewarded with 100 gold pieces!
 </scenery>
 
 <trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>
-
-<!--
-<floorregion rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
-<floorregion rect_x="5.0" rect_y="2.0" rect_w="5.0" rect_h="1.0" />
-<floorregion rect_x="10.0" rect_y="2.0" rect_w="1.0" rect_h="5.0" />
-<floorregion rect_x="10.0" rect_y="7.0" rect_w="10.0" rect_h="10.0" />
-<floorregion rect_x="20.0" rect_y="9.0" rect_w="5.0" rect_h="2.0" />
-
-<boundary>
-    <point x="0.0" y="0.0" />
-    <point x="0.0" y="5.0" />
-    <point x="5.0" y="5.0" />
-    <point x="5.0" y="3.0" />
-    <point x="10.0" y="3.0" />
-    <point x="10.0" y="17.0" />
-    <point x="20.0" y="17.0" />
-    <point x="20.0" y="11.0" />
-    <point x="25.0" y="11.0" />
-    <point x="25.0" y="9.0" />
-    <point x="20.0" y="9.0" />
-    <point x="20.0" y="7.0" />
-    <point x="11.0" y="7.0" />
-    <point x="11.0" y="2.0" />
-    <point x="5.0" y="2.0" />
-    <point x="5.0" y="0.0" />
-</boundary>
-
-<player_start x="3.0" y="2.0"/>
-
-<npc name="Goblin" template="Goblin" x="4.0" y="4.0"/>
-<npc name="Orc" template="Orc" x="16.0" y="14.0">
-    <item template="Potion of Healing"/>
-</npc>
-
-<item template="Longbow" x="4.0" y="4.0"/>
-<item template="Shield" x="4.0" y="3.0"/>
-<item template="Leather Armour" x="2.0" y="4.0"/>
-<gold amount="5" x="1.0" y="1.0"/>
-<item template="Arrows" x="2.0" y="1.0"/>
-<item template="Potion of Healing" x="3.0" y="4.0"/>
-
-<scenery name="Chest" image_name="chest" x="2.0" y="2.0" w="0.8" h="0.8" blocking="true">
-    <item template="Potion of Healing"/>
-    <item template="Longbow"/>
-</scenery>
--->
 
 </quest>
