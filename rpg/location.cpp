@@ -243,7 +243,6 @@ void Location::removeTrap(Trap *trap) {
 
 void Location::createBoundariesForRegions() {
     LOG("Location::createBoundariesForRegions()\n");
-    float eps = 1.0e-5;
     // imprint coi vertices
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -268,9 +267,9 @@ void Location::createBoundariesForRegions() {
                     imp_p.dropOnLine(p0, dp);
                     float dist_p = (imp_p - p).magnitude();
                     //LOG("    %f, %f is dist: %f\n", p.x, p.y, dist_p);
-                    if( dist_p <= eps ) {
+                    if( dist_p <= E_TOL_LINEAR ) {
                         float dot = ( p - p0 ) % dp;
-                        if( dot >= eps && dot <= dp_length - eps ) {
+                        if( dot >= E_TOL_LINEAR && dot <= dp_length - E_TOL_LINEAR ) {
                             // imprint coi vertex
                             //LOG("imprint between %f, %f to %f, %f at: %f, %f\n", p0.x, p0.y, p1.x, p1.y, imp_p.x, imp_p.y);
                             floor_region->insertPoint(j+1, imp_p);
@@ -310,7 +309,7 @@ void Location::createBoundariesForRegions() {
                     float dist1 = (p1 - p2).magnitude();
                     //LOG("    compare to: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
                     //LOG("    dists: %f, %f", dist0, dist1);
-                    if( dist0 <= eps && dist1 <= eps ) {
+                    if( dist0 <= E_TOL_LINEAR && dist1 <= E_TOL_LINEAR ) {
                         //LOG("edge is internal with: %f, %f to %f, %f\n", p2.x, p2.y, p3.x, p3.y);
                         floor_region->setEdgeType(j, FloorRegion::EDGETYPE_INTERNAL);
                         floor_region2->setEdgeType(j2, FloorRegion::EDGETYPE_INTERNAL);
@@ -370,7 +369,7 @@ void Location::createBoundariesForRegions() {
                             // we only need to check the first pvec, as we want the edge that leaves this point
                             Vector2D o_pvec = floor_region->getPoint(j);
                             float dist = (pvec - o_pvec).magnitude();
-                            if( dist <= eps ) {
+                            if( dist <= E_TOL_LINEAR ) {
                                 c_floor_region = floor_region;
                                 c_indx = j;
                                 found = true;
