@@ -38,14 +38,14 @@ protected:
 
     bool is_blocking;
     bool blocks_visibility;
-    bool is_door;
+    bool is_door, is_exit;
     float width, height;
 
     bool opened;
     set<Item *> items;
 
 public:
-    Scenery(string name, string image_name);
+    Scenery(string name, string image_name, float width, float height);
     virtual ~Scenery() {
     }
 
@@ -90,17 +90,18 @@ public:
     bool isDoor() const {
         return this->is_door;
     }
+    void setExit(bool is_exit) {
+        this->is_exit = is_exit;
+    }
+    bool isExit() const {
+        return this->is_exit;
+    }
 
     float getWidth() const {
         return this->width;
     }
     float getHeight() const {
         return this->height;
-    }
-    void setSize(float width, float height) {
-        // n.b., aspect-ratio should match that of the corresponding image for this scenery!
-        this->width = width;
-        this->height = height;
     }
 
     void addItem(Item *item);

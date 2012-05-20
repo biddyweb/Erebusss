@@ -12,9 +12,9 @@ using std::swap;
 
 #include <ctime>
 
-Scenery::Scenery(string name, string image_name) :
+Scenery::Scenery(string name, string image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
-    is_blocking(false), blocks_visibility(false), is_door(false), width(1.0f), height(1.0f),
+    is_blocking(false), blocks_visibility(false), is_door(false), width(width), height(height),
     opened(false)
 {
 }
@@ -589,6 +589,8 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
 
 bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
     //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
+    if( width < E_TOL_LINEAR )
+        width = E_TOL_LINEAR;
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
