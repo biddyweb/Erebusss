@@ -14,6 +14,10 @@
 #include <cassert>
 #endif
 
+#ifdef _DEBUG
+//#define DEBUG_SHOW_PATH
+#endif
+
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 const bool mobile_c = true;
 #else
@@ -673,6 +677,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
 
+        QPushButton *viewAmmoButton = new QPushButton("Ammo");
+        h_layout->addWidget(viewAmmoButton);
+        connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
+
         QPushButton *viewShieldsButton = new QPushButton("Shields");
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
@@ -681,13 +689,13 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
 
-        QPushButton *viewAmmoButton = new QPushButton("Ammo");
-        h_layout->addWidget(viewAmmoButton);
-        connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
-
         QPushButton *viewMagicButton = new QPushButton("Magic");
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
+
+        QPushButton *viewMiscButton = new QPushButton("Misc");
+        h_layout->addWidget(viewMiscButton);
+        connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
     }
 
     //list = new QListWidget();
@@ -780,6 +788,9 @@ void ItemsWindow::refreshList() {
         else if( view_type == VIEWTYPE_MAGIC && !item->isMagical() ) {
             continue;
         }
+        else if( view_type == VIEWTYPE_MISC && item->getType() != ITEMTYPE_GENERAL || item->isMagical() ) {
+            continue;
+        }
         QString item_str = this->getItemString(item);
         //list->addItem( item_str );
         QListWidgetItem *list_item = new QListWidgetItem(item_str);
@@ -805,6 +816,9 @@ void ItemsWindow::clickedViewWeapons() {
     this->changeView(VIEWTYPE_WEAPONS);
 }
 
+void ItemsWindow::clickedViewAmmo() {
+    this->changeView(VIEWTYPE_AMMO);
+}
 
 void ItemsWindow::clickedViewShields() {
     this->changeView(VIEWTYPE_SHIELDS);
@@ -814,12 +828,12 @@ void ItemsWindow::clickedViewArmour() {
     this->changeView(VIEWTYPE_ARMOUR);
 }
 
-void ItemsWindow::clickedViewAmmo() {
-    this->changeView(VIEWTYPE_AMMO);
-}
-
 void ItemsWindow::clickedViewMagic() {
     this->changeView(VIEWTYPE_MAGIC);
+}
+
+void ItemsWindow::clickedViewMisc() {
+    this->changeView(VIEWTYPE_MISC);
 }
 
 QString ItemsWindow::getItemString(const Item *item) const {
@@ -1037,6 +1051,49 @@ void ItemsWindow::itemIsDeleted(size_t index) {
     }
 
     this->setWeightLabel();
+}
+
+CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
+    playing_gamestate(playing_gamestate)
+{
+    playing_gamestate->addWidget(this);
+
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    QWebView *label = new QWebView();
+    QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
+    label->setHtml(html);
+    layout->addWidget(label);
+
+    QPushButton *armourerButton = new QPushButton("Armourer");
+    armourerButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(armourerButton);
+    connect(armourerButton, SIGNAL(clicked()), this, SLOT(clickedArmourer()));
+
+    QPushButton *generalStoresButton = new QPushButton("General Stores");
+    generalStoresButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(generalStoresButton);
+    connect(generalStoresButton, SIGNAL(clicked()), this, SLOT(clickedGeneralStores()));
+
+    QPushButton *magicShopButton = new QPushButton("Magic Shop");
+    magicShopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(magicShopButton);
+    connect(magicShopButton, SIGNAL(clicked()), this, SLOT(clickedMagicShop()));
+
+    QPushButton *trainingButton = new QPushButton("Training");
+    trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(trainingButton);
+    connect(magicShopButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
+
+    QPushButton *closeButton = new QPushButton("Continue your Quest");
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
 
 PlayingGamestate::PlayingGamestate() :
@@ -1666,16 +1723,21 @@ PlayingGamestate::PlayingGamestate() :
                     bool block_visibility = parseBool(block_visibility_s.toString(), true);
                     QStringRef door_s = reader.attributes().value("door");
                     bool door = parseBool(door_s.toString(), true);
+                    QStringRef exit_s = reader.attributes().value("exit");
+                    bool exit = parseBool(exit_s.toString(), true);
                     QStringRef size_w_s = reader.attributes().value("w");
                     float size_w = parseFloat(size_w_s.toString());
                     QStringRef size_h_s = reader.attributes().value("h");
                     float size_h = parseFloat(size_h_s.toString());
 
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString());
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h);
                     location->addScenery(scenery, pos_x, pos_y);
                     scenery->setBlocking(blocking, block_visibility);
+                    if( door && exit ) {
+                        throw string("scenery can't be both a door and an exit");
+                    }
                     scenery->setDoor(door);
-                    scenery->setSize(size_w, size_h);
+                    scenery->setExit(exit);
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
                 else if( reader.name() == "trap" ) {
@@ -1816,7 +1878,8 @@ PlayingGamestate::PlayingGamestate() :
             wall_item->setBrush(wall_brush);
         }
     }
-    /*{
+#ifdef DEBUG_SHOW_PATH
+    {
         // DEBUG ONLY
         QPen wall_pen(Qt::red);
         for(size_t i=0;i<location->getNBoundaries();i++) {
@@ -1828,8 +1891,8 @@ PlayingGamestate::PlayingGamestate() :
                 scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
             }
         }
-    }*/
-    /*{
+    }
+    {
         // DEBUG ONLY
         QPen wall_pen(Qt::red);
         const Graph *distance_graph = location->getDistanceGraph();
@@ -1849,7 +1912,8 @@ PlayingGamestate::PlayingGamestate() :
                 scene->addLine(x1, y1, x2, y2, wall_pen);
             }
         }
-    }*/
+    }
+#endif
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
@@ -2099,13 +2163,15 @@ void PlayingGamestate::clickedOptions() {
     LOG("clickedOptions()\n");
     this->clickedCloseSubwindow();
 
+    game_g->getScreen()->setPaused(true);
+
     subwindow = new QWidget();
     //subwindow = new QWidget( game_g->getScreen()->getMainWindow() );
     //mainwindow->setParent(NULL); // stop it being deleted!
     //game_g->getScreen()->getMainWindow()->setCentralWidget(subwindow);
-    this->main_stacked_widget->addWidget(subwindow);
-    this->main_stacked_widget->setCurrentWidget(subwindow);
-    game_g->getScreen()->setPaused(true);
+    /*this->main_stacked_widget->addWidget(subwindow);
+    this->main_stacked_widget->setCurrentWidget(subwindow);*/
+    this->addWidget(subwindow);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -2156,10 +2222,12 @@ void PlayingGamestate::showInfoWindow(const char *html) {
     LOG("showInfoWindow()\n");
     this->clickedCloseSubwindow();
 
-    subwindow = new QWidget();
-    this->main_stacked_widget->addWidget(subwindow);
-    this->main_stacked_widget->setCurrentWidget(subwindow);
     game_g->getScreen()->setPaused(true);
+
+    subwindow = new QWidget();
+    /*this->main_stacked_widget->addWidget(subwindow);
+    this->main_stacked_widget->setCurrentWidget(subwindow);*/
+    this->addWidget(subwindow);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -2465,14 +2533,24 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     selected_scenery->eraseAllItems();
                     this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
                 }
+
                 if( !selected_scenery->isOpened() ) {
                     selected_scenery->setOpened(true);
                 }
+
                 if( selected_scenery->isDoor() ) {
                     LOG("clicked on a door\n");
+                    // close door
                     c_location->removeScenery(selected_scenery);
                     delete selected_scenery;
                     selected_scenery = NULL;
+                }
+                else if( selected_scenery->isExit() ) {
+                    LOG("clicked on an exit");
+                    // exit
+                    this->clickedCloseSubwindow(); // just in case
+                    subwindow = new CampaignWindow(this);
+                    game_g->getScreen()->setPaused(true);
                 }
             }
 

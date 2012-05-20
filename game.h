@@ -321,7 +321,6 @@ public:
 };
 
 class ItemsWindow : public QWidget {
-//class ItemsWindow : public QMainWindow {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -338,10 +337,11 @@ class ItemsWindow : public QWidget {
     enum ViewType {
         VIEWTYPE_ALL = 0,
         VIEWTYPE_WEAPONS = 1,
-        VIEWTYPE_SHIELDS = 2,
-        VIEWTYPE_ARMOUR = 3,
-        VIEWTYPE_AMMO = 4,
-        VIEWTYPE_MAGIC = 5
+        VIEWTYPE_AMMO = 2,
+        VIEWTYPE_SHIELDS = 3,
+        VIEWTYPE_ARMOUR = 4,
+        VIEWTYPE_MAGIC = 5,
+        VIEWTYPE_MISC = 6
     };
     ViewType view_type;
 
@@ -357,10 +357,11 @@ private slots:
 
     void clickedViewAll();
     void clickedViewWeapons();
+    void clickedViewAmmo();
     void clickedViewShields();
     void clickedViewArmour();
-    void clickedViewAmmo();
     void clickedViewMagic();
+    void clickedViewMisc();
 
     void clickedDropItem();
     void clickedArmWeapon();
@@ -370,6 +371,19 @@ private slots:
 public:
     ItemsWindow(PlayingGamestate *playing_gamestate);
     virtual ~ItemsWindow() {
+    }
+};
+
+class CampaignWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+
+private slots:
+
+public:
+    CampaignWindow(PlayingGamestate *playing_gamestate);
+    virtual ~CampaignWindow() {
     }
 };
 
