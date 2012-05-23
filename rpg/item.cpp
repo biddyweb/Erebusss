@@ -5,6 +5,10 @@
 #include <sstream>
 using std::stringstream;
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 Item::Item(string name, string image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), weight(weight),
     /*item_use(ITEMUSE_NONE), */rating(1), is_magical(false)
@@ -122,3 +126,30 @@ string Currency::getName() const {
     currency_name << value << " " << this->name;
     return currency_name.str();
 }
+
+Shop::Shop(string name) : name(name) {
+}
+
+Shop::~Shop() {
+    for(vector<const Item *>::const_iterator iter = items.begin(); iter != items.end(); ++iter) {
+        const Item *item = *iter;
+        delete item;
+    }
+}
+
+void Shop::addItem(const Item *item, int cost) {
+    this->items.push_back(item);
+    this->costs.push_back(cost);
+}
+
+/*size_t Shop::getNItems() const {
+    ASSERT_LOGGER( this->items.size() == this->costs.size() );
+    return this->items.size();
+}
+
+const Item *Shop::getItem(int *cost, size_t i) const {
+    ASSERT_LOGGER( this->items.size() == this->costs.size() );
+    ASSERT_LOGGER( i < this->items.size() );
+    *cost = this->costs.at(i);
+    return this->items.at(i);
+}*/

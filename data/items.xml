@@ -25,4 +25,21 @@
 
 <currency name="Gold" image_name="gold"/>
 
+<shop name="Armourer">
+    <purchase template="Long Sword" cost="25"/>
+    <purchase template="Longbow" cost="40"/>
+    <purchase template="Shield" cost="10"/>
+    <purchase template="Leather Armour" cost="25"/>
+    <purchase template="Arrows" cost="30"/>
+</shop>
+
+<shop name="Magic Shop">
+    <purchase template="Potion of Healing" cost="50"/>
+</shop>
+
+<shop name="General Stores">
+    <purchase template="Gold Ring" cost="10"/>
+    <purchase template="Red Gem" cost="50"/>
+</shop>
+
 </items>

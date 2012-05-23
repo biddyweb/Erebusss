@@ -230,3 +230,25 @@ public:
         this->value = value;
     }
 };
+
+class Shop {
+    string name;
+    vector<const Item *> items;
+    vector<int> costs;
+public:
+    Shop(string name);
+    ~Shop();
+
+    virtual string getName() const {
+        return this->name;
+    }
+    void addItem(const Item *item, int cost);
+    /*size_t getNItems() const;
+    const Item *getItem(int *cost, size_t i) const;*/
+    const vector<const Item *> &getItems() const {
+        return items;
+    }
+    const vector<int> &getCosts() const {
+        return costs;
+    }
+};

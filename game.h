@@ -27,6 +27,7 @@ class Quest;
 class Location;
 class Item;
 class Currency;
+class Shop;
 class CharacterTemplate;
 
 enum Direction {
@@ -378,13 +379,23 @@ class TradeWindow : public QWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
+
     QListWidget *list;
     const vector<const Item *> &items;
+    const vector<int> &costs;
+
+    QListWidget *player_list;
+    vector<Item *> player_items;
+    vector<int> player_costs;
+
+    void addPlayerItem(Item *item, int buy_cost);
 
 private slots:
+    void clickedBuy();
+    void clickedSell();
 
 public:
-    TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items);
+    TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs);
     virtual ~TradeWindow() {
     }
 };
@@ -395,9 +406,10 @@ class CampaignWindow : public QWidget {
     PlayingGamestate *playing_gamestate;
 
 private slots:
-    void clickedArmourer();
+    void clickedShop();
+    /*void clickedArmourer();
     void clickedGeneralStores();
-    void clickedMagicShop();
+    void clickedMagicShop();*/
     void clickedTraining();
 
 public:
@@ -433,6 +445,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> scenery_images;
     map<string, QPixmap> scenery_opened_images;
     map<string, CharacterTemplate *> character_templates;
+    vector<Shop *> shops;
 
     void showInfoWindow(const char *html);
     void updateVisibility(Vector2D pos);
@@ -487,6 +500,13 @@ public:
     void addStandardItem(Item *item);
     Item *cloneStandardItem(string name) const;
     Currency *cloneGoldItem(int value) const;
+
+    vector<Shop *>::const_iterator shopsBegin() const {
+        return shops.begin();
+    }
+    vector<Shop *>::const_iterator shopsEnd() const {
+        return shops.end();
+    }
 
     QPixmap &getItemImage(string name);
 };

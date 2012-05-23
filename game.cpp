@@ -788,7 +788,7 @@ void ItemsWindow::refreshList() {
         else if( view_type == VIEWTYPE_MAGIC && !item->isMagical() ) {
             continue;
         }
-        else if( view_type == VIEWTYPE_MISC && item->getType() != ITEMTYPE_GENERAL || item->isMagical() ) {
+        else if( view_type == VIEWTYPE_MISC && !( item->getType() != ITEMTYPE_GENERAL && item->isMagical() ) ) {
             continue;
         }
         QString item_str = this->getItemString(item);
@@ -1053,8 +1053,8 @@ void ItemsWindow::itemIsDeleted(size_t index) {
     this->setWeightLabel();
 }
 
-TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items) :
-    playing_gamestate(playing_gamestate), list(NULL), items(items)
+TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs) :
+    playing_gamestate(playing_gamestate), list(NULL), player_list(NULL), items(items), costs(costs)
 {
     playing_gamestate->addWidget(this);
 
@@ -1064,27 +1064,126 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    QWebView *label = new QWebView();
-    QString html = "<html><body><p>What would you like to buy?</p></body></html>";
-    label->setHtml(html);
+    QLabel *label = new QLabel("What would you like to buy?");
+    label->setWordWrap(true);
     layout->addWidget(label);
 
-    QListWidget *list = new ScrollingListWidget();
-    layout->addWidget(list);
-    for(vector<const Item *>::const_iterator iter = items.begin(); iter != items.end(); ++iter) {
-        const Item *item = *iter;
-        QString item_str = item->getName().c_str();
-        QListWidgetItem *list_item = new QListWidgetItem(item_str);
-        QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
-        list_item->setIcon(icon);
-        list->addItem(list_item);
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *sellLabel = new QLabel("Your items:");
+        h_layout->addWidget(sellLabel);
+
+        QLabel *buyLabel = new QLabel("Items to buy:");
+        h_layout->addWidget(buyLabel);
+    }
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        player_list = new ScrollingListWidget();
+        h_layout->addWidget(player_list);
+        Character *player = playing_gamestate->getPlayer();
+        for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+            Item *item = *iter;
+            int cost = 0;
+            for(size_t i=0;i<items.size();i++) {
+                const Item *item2 = items.at(i);
+                if( item->getName() == item2->getName() ) {
+                    cost = costs.at(i);
+                }
+            }
+            addPlayerItem(item, cost);
+        }
+
+        list = new ScrollingListWidget();
+        h_layout->addWidget(list);
+        for(size_t i=0;i<items.size();i++) {
+            const Item *item = items.at(i);
+            int cost = costs.at(i);
+            QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(cost) + QString(" gold)");
+            QListWidgetItem *list_item = new QListWidgetItem(item_str);
+            QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+            list_item->setIcon(icon);
+            list->addItem(list_item);
+        }
+    }
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *sellButton = new QPushButton("Sell");
+        h_layout->addWidget(sellButton);
+        connect(sellButton, SIGNAL(clicked()), this, SLOT(clickedSell()));
+
+        QPushButton *buyButton = new QPushButton("Buy");
+        h_layout->addWidget(buyButton);
+        connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
     }
 
     QPushButton *closeButton = new QPushButton("Finish Trading");
-    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+}
+
+void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
+    QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
+    QListWidgetItem *list_item = new QListWidgetItem(item_str);
+    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    list_item->setIcon(icon);
+    player_list->addItem(list_item);
+    player_items.push_back(item);
+    player_costs.push_back(buy_cost);
+}
+
+void TradeWindow::clickedBuy() {
+    LOG("TradeWindow::clickedBuy()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < items.size() );
+
+    const Item *selected_item = items.at(index);
+    int cost = costs.at(index);
+    Character *player = playing_gamestate->getPlayer();
+    if( player->getGold() >= cost ) {
+        LOG("player buys: %s\n", selected_item->getName());
+        player->addGold(-cost);
+        Item *item = playing_gamestate->cloneStandardItem(selected_item->getKey());
+        player->addItem(item);
+        this->addPlayerItem(item, cost);
+    }
+    else {
+        game_g->showInfoDialog("Trade", "You do not have enough money to purchase this item.");
+    }
+}
+
+void TradeWindow::clickedSell() {
+    LOG("TradeWindow::clickedSell()\n");
+
+    int index = player_list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < player_items.size() );
+
+    Item *selected_item = player_items.at(index);
+    int cost = player_costs.at(index);
+    Character *player = playing_gamestate->getPlayer();
+    player->addGold(cost);
+    player->takeItem(selected_item);
+    delete selected_item;
+    QListWidgetItem *list_item = player_list->takeItem(index);
+    delete list_item;
+    player_items.erase(player_items.begin() + index);
+    player_costs.erase(player_costs.begin() + index);
 }
 
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
@@ -1098,43 +1197,49 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    QWebView *label = new QWebView();
+    /*QWebView *label = new QWebView();
     QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
     label->setHtml(html);
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    layout->addWidget(label);*/
+    QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
+    label->setWordWrap(true);
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(label);
 
-    QPushButton *armourerButton = new QPushButton("Armourer");
-    armourerButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(armourerButton);
-    connect(armourerButton, SIGNAL(clicked()), this, SLOT(clickedArmourer()));
-
-    QPushButton *generalStoresButton = new QPushButton("General Stores");
-    generalStoresButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(generalStoresButton);
-    connect(generalStoresButton, SIGNAL(clicked()), this, SLOT(clickedGeneralStores()));
-
-    QPushButton *magicShopButton = new QPushButton("Magic Shop");
-    magicShopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(magicShopButton);
-    connect(magicShopButton, SIGNAL(clicked()), this, SLOT(clickedMagicShop()));
+    for(vector<Shop *>::const_iterator iter = playing_gamestate->shopsBegin(); iter != playing_gamestate->shopsEnd(); ++iter) {
+        const Shop *shop = *iter;
+        QPushButton *shopButton = new QPushButton(shop->getName().c_str());
+        QVariant variant = qVariantFromValue((void *)shop);
+        shopButton->setProperty("shop", variant);
+        //shopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(shopButton);
+        connect(shopButton, SIGNAL(clicked()), this, SLOT(clickedShop()));
+    }
 
     QPushButton *trainingButton = new QPushButton("Training");
-    trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(trainingButton);
-    connect(magicShopButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
+    connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
 
     QPushButton *closeButton = new QPushButton("Continue your Quest");
-    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
 
-void CampaignWindow::clickedArmourer() {
+void CampaignWindow::clickedShop() {
+    LOG("CampaignWindow::clickedShop()\n");
+    QObject *sender = this->sender();
+    ASSERT_LOGGER( sender != NULL );
+    const Shop *shop = static_cast<const Shop *>(sender->property("shop").value<void *>());
+    ASSERT_LOGGER( shop != NULL );
+    LOG("visit shop: %s\n", shop->getName().c_str());
+    new TradeWindow(playing_gamestate, shop->getItems(), shop->getCosts());
+}
+
+/*void CampaignWindow::clickedArmourer() {
     LOG("CampaignWindow::clickedArmourer()\n");
-
-    vector<const Item *> items;
-
 }
 
 void CampaignWindow::clickedGeneralStores() {
@@ -1143,7 +1248,7 @@ void CampaignWindow::clickedGeneralStores() {
 
 void CampaignWindow::clickedMagicShop() {
     LOG("CampaignWindow::clickedMagicShop()\n");
-}
+}*/
 
 void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
@@ -1438,6 +1543,12 @@ PlayingGamestate::PlayingGamestate() :
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open xml file");
         }
+        enum ItemsXMLType {
+            ITEMS_XML_TYPE_NONE = 0,
+            ITEMS_XML_TYPE_SHOP = 1
+        };
+        ItemsXMLType itemsXMLType = ITEMS_XML_TYPE_NONE;
+        Shop *shop = NULL;
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
             reader.readNext();
@@ -1447,6 +1558,9 @@ PlayingGamestate::PlayingGamestate() :
                 qDebug("    type: %d", reader.tokenType());
                 qDebug("    n attributes: %d", reader.attributes().size());*/
                 if( reader.name() == "item" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     QStringRef weight_s = reader.attributes().value("weight");
@@ -1469,6 +1583,9 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "weapon" ) {
                     //qDebug("    weapon:");
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     QStringRef weight_s = reader.attributes().value("weight");
@@ -1495,6 +1612,9 @@ PlayingGamestate::PlayingGamestate() :
                     this->addStandardItem( weapon );
                 }
                 else if( reader.name() == "shield" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     QStringRef weight_s = reader.attributes().value("weight");
@@ -1504,6 +1624,9 @@ PlayingGamestate::PlayingGamestate() :
                     this->addStandardItem( shield );
                 }
                 else if( reader.name() == "armour" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     QStringRef weight_s = reader.attributes().value("weight");
@@ -1514,6 +1637,9 @@ PlayingGamestate::PlayingGamestate() :
                     this->addStandardItem( armour );
                 }
                 else if( reader.name() == "ammo" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
@@ -1523,10 +1649,41 @@ PlayingGamestate::PlayingGamestate() :
                     this->addStandardItem( ammo );
                 }
                 else if( reader.name() == "currency" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     Currency *currency = new Currency(name_s.toString().toStdString(), image_name_s.toString().toStdString());
                     this->addStandardItem( currency );
+                }
+                else if( reader.name() == "shop" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        throw string("unexpected items xml");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    shop = new Shop(name_s.toString().toStdString());
+                    shops.push_back(shop);
+                    itemsXMLType = ITEMS_XML_TYPE_SHOP;
+                }
+                else if( reader.name() == "purchase" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
+                        throw string("unexpected items xml");
+                    }
+                    QStringRef template_s = reader.attributes().value("template");
+                    QStringRef cost_s = reader.attributes().value("cost");
+                    int cost = parseInt(cost_s.toString());
+                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
+                    shop->addItem(item, cost);
+                }
+            }
+            else if( reader.isEndElement() ) {
+                if( reader.name() == "shop" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
+                        throw string("unexpected items xml");
+                    }
+                    shop = NULL;
+                    itemsXMLType = ITEMS_XML_TYPE_NONE;
                 }
             }
         }
@@ -1643,6 +1800,9 @@ PlayingGamestate::PlayingGamestate() :
             {
                 //LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
                 if( reader.name() == "info" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        throw string("unexpected quest xml");
+                    }
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     LOG("quest info: %s\n", info.toStdString().c_str());
                     quest->setInfo(info.toStdString());
@@ -2074,6 +2234,10 @@ PlayingGamestate::~PlayingGamestate() {
         LOG("about to delete character template: %d\n", character_template);
         delete character_template;
     }
+    for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
+        Shop *shop = *iter;
+        delete shop;
+    }
     LOG("done\n");
 }
 
@@ -2243,7 +2407,7 @@ void PlayingGamestate::clickedOptions() {
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
     if( c_location->hasEnemies(this) ) {
-        game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby");
+        game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby.");
         return;
     }
     if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
