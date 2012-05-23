@@ -1130,6 +1130,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 }
 
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
+    buy_cost *= 0.5f;
     QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
     QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
@@ -1176,14 +1177,20 @@ void TradeWindow::clickedSell() {
 
     Item *selected_item = player_items.at(index);
     int cost = player_costs.at(index);
-    Character *player = playing_gamestate->getPlayer();
-    player->addGold(cost);
-    player->takeItem(selected_item);
-    delete selected_item;
-    QListWidgetItem *list_item = player_list->takeItem(index);
-    delete list_item;
-    player_items.erase(player_items.begin() + index);
-    player_costs.erase(player_costs.begin() + index);
+    if( cost > 0 ) {
+        LOG("player sells: %s\n", selected_item->getName());
+        Character *player = playing_gamestate->getPlayer();
+        player->addGold(cost);
+        player->takeItem(selected_item);
+        delete selected_item;
+        QListWidgetItem *list_item = player_list->takeItem(index);
+        delete list_item;
+        player_items.erase(player_items.begin() + index);
+        player_costs.erase(player_costs.begin() + index);
+    }
+    else {
+        game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
+    }
 }
 
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
