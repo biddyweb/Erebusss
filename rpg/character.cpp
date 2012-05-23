@@ -516,7 +516,7 @@ void Character::dropItem(Item *item) {
 void Character::addGold(int change) {
     this->gold += change;
     if( this->gold < 0 ) {
-        LOG("Character::addGold(), removed %d, leaves %d\n", change, this->gold);
+        LOG("Character::addGold(), removed %d, leaves %d\n", -change, this->gold);
         ASSERT_LOGGER( gold >= 0 );
     }
 }
