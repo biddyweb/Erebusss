@@ -5,6 +5,7 @@
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
 <image type="item" name="shield" filename="gfx/textures/items/shield.png"/>
 <image type="item" name="leather_armour" filename="gfx/textures/items/leather_armor.png"/>
+<image type="item" name="metal_armour" filename="gfx/textures/items/metal_armor.png"/>
 <image type="item" name="arrow" filename="gfx/textures/items/arrow.png"
     xpos="0" ypos="16" width="64" height="32"
     />

@@ -13,6 +13,12 @@
 <armour name="Leather Armour" image_name="leather_armour" weight="100"
     rating="2"/>
 
+<armour name="Chain Mail Armour" image_name="metal_armour" weight="200"
+    rating="4"/>
+
+<armour name="Plate Armour" image_name="metal_armour" weight="300"
+    rating="6"/>
+
 <ammo name="Arrows" image_name="arrow" projectile_image_name="arrow"
     amount="20"/>
 
@@ -30,6 +36,8 @@
     <purchase template="Longbow" cost="40"/>
     <purchase template="Shield" cost="10"/>
     <purchase template="Leather Armour" cost="25"/>
+    <purchase template="Chain Mail Armour" cost="50"/>
+    <purchase template="Plate Armour" cost="200"/>
     <purchase template="Arrows" cost="30"/>
 </shop>
 

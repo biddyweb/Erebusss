@@ -29,5 +29,6 @@
         <file>gfx/textures/items/ring_gold.png</file>
         <file>gfx/textures/wall.png</file>
         <file>gfx/textures/npcs/goblin_champion.png</file>
+        <file>gfx/textures/items/metal_armor.png</file>
     </qresource>
 </RCC>
