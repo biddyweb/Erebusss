@@ -588,8 +588,6 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
 
 bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
     //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
-    if( width < E_TOL_LINEAR )
-        width = E_TOL_LINEAR;
     bool done = false;
     bool hit = false;
     float hit_dist = 0.0f;
@@ -728,8 +726,9 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
                 Vector2D path_way_point = point + inwards * offset;
 
                 // test we get get to the way point
+                // important to use E_TOL_LINEAR for the width, otherwise can cause problems for scenery right next to the wall
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point, 0.0f, Location::INTERSECTTYPE_MOVE, NULL) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL) ) {
                     path_way_points.push_back( path_way_point );
                 }
             }
