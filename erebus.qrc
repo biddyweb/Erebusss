@@ -30,5 +30,7 @@
         <file>gfx/textures/wall.png</file>
         <file>gfx/textures/npcs/goblin_champion.png</file>
         <file>gfx/textures/items/metal_armor.png</file>
+        <file>gfx/textures/items/key.png</file>
+        <file>gfx/textures/items/skull.png</file>
     </qresource>
 </RCC>
