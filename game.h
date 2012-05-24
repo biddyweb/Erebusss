@@ -380,6 +380,8 @@ class TradeWindow : public QWidget {
 
     PlayingGamestate *playing_gamestate;
 
+    QLabel *goldLabel;
+
     QListWidget *list;
     const vector<const Item *> &items;
     const vector<int> &costs;
@@ -389,6 +391,7 @@ class TradeWindow : public QWidget {
     vector<int> player_costs;
 
     void addPlayerItem(Item *item, int buy_cost);
+    void updateGoldLabel();
 
 private slots:
     void clickedBuy();

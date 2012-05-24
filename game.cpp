@@ -36,7 +36,7 @@ const int versionMinor = 1;
 
 //const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
 //const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
-const float item_width = 0.5f;
+//const float item_width = 0.5f;
 //const float scenery_width = item_width;
 //const float font_scale = 1.0f/64.0f;
 
@@ -698,8 +698,8 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
     }
 
-    //list = new QListWidget();
     list = new ScrollingListWidget();
+    //list->setViewMode(QListView::IconMode);
     if( !mobile_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
@@ -708,6 +708,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     {
         QFontMetrics fm(list->font());
         int icon_size = fm.height();
+        //int icon_size = fm.width("LONGSWORD");
         list->setIconSize(QSize(icon_size, icon_size));
         LOG("icon size now %f, %f\n", list->iconSize().width(), list->iconSize().height());
     }
@@ -1064,6 +1065,8 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
+    Character *player = playing_gamestate->getPlayer();
+
     QLabel *label = new QLabel("What would you like to buy?");
     label->setWordWrap(true);
     layout->addWidget(label);
@@ -1085,7 +1088,6 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 
         player_list = new ScrollingListWidget();
         h_layout->addWidget(player_list);
-        Character *player = playing_gamestate->getPlayer();
         for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
             Item *item = *iter;
             int cost = 0;
@@ -1111,6 +1113,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         }
     }
 
+    goldLabel = new QLabel("");
+    layout->addWidget(goldLabel);
+    this->updateGoldLabel();
+
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
@@ -1127,6 +1133,11 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
     QPushButton *closeButton = new QPushButton("Finish Trading");
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+}
+
+void TradeWindow::updateGoldLabel() {
+    Character *player = playing_gamestate->getPlayer();
+    goldLabel->setText("Gold: " + QString::number( player->getGold() ));
 }
 
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
@@ -1156,6 +1167,7 @@ void TradeWindow::clickedBuy() {
     if( player->getGold() >= cost ) {
         LOG("player buys: %s\n", selected_item->getName());
         player->addGold(-cost);
+        this->updateGoldLabel();
         Item *item = playing_gamestate->cloneStandardItem(selected_item->getKey());
         player->addItem(item);
         this->addPlayerItem(item, cost);
@@ -1181,6 +1193,7 @@ void TradeWindow::clickedSell() {
         LOG("player sells: %s\n", selected_item->getName());
         Character *player = playing_gamestate->getPlayer();
         player->addGold(cost);
+        this->updateGoldLabel();
         player->takeItem(selected_item);
         delete selected_item;
         QListWidgetItem *list_item = player_list->takeItem(index);
@@ -1570,6 +1583,7 @@ PlayingGamestate::PlayingGamestate() :
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef icon_width_s = reader.attributes().value("icon_width");
                     QStringRef weight_s = reader.attributes().value("weight");
                     QStringRef rating_s = reader.attributes().value("rating");
                     QStringRef magical_s = reader.attributes().value("magical");
@@ -1581,6 +1595,11 @@ PlayingGamestate::PlayingGamestate() :
                         rating = 1; // so the default of 0 defaults instead to 1
                     bool magical = parseBool(magical_s.toString(), true);
                     Item *item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
+                    if( icon_width_s.length() > 0 ) {
+                        float icon_width = parseFloat(icon_width_s.toString());
+                        //LOG("icon_width: %f\n", icon_width);
+                        item->setIconWidth(icon_width);
+                    }
                     item->setRating(rating);
                     item->setMagical(magical);
                     if( use_s.length() > 0 ) {
@@ -2270,8 +2289,9 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
             scene->addEllipse(item->getX() - 0.5f*item_width, item->getY() - 0.5f*item_width, item_width, item_width, pen);
             //scene->addEllipse(item->getX() - 0.05f, item->getY() - 0.05f, 0.1f, 0.1f, pen);
         }*/
+        float icon_width = item->getIconWidth();
         object->setPos(item->getX(), item->getY());
-        float item_scale = item_width / object->pixmap().width();
+        float item_scale = icon_width / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
         object->setScale(item_scale);
     }
@@ -2682,9 +2702,10 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             Item *picked_item = NULL;
             for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
                 Item *item = *iter;
+                float icon_width = item->getIconWidth();
                 float dist_from_click = (dest - item->getPos()).magnitude();
                 float dist_from_player = (player->getPos() - item->getPos()).magnitude();
-                if( dist_from_click <= item_width + click_tol_items_c && dist_from_player <= npc_radius_c + 0.5f*item_width ) {
+                if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
                     if( picked_item == NULL || dist_from_click < min_dist ) {
                         done = true;
                         picked_item = item;

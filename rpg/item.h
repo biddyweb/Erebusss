@@ -28,6 +28,7 @@ protected:
     string image_name;
     Vector2D pos; // when stored in a Location
     void *user_data_gfx;
+    float icon_width; // width of icon when drawn on screen in metres
     int weight; // in multiples of 100g
 
     //ItemUse item_use;
@@ -78,6 +79,12 @@ public:
     }
     void *getUserGfxData() {
         return this->user_data_gfx;
+    }
+    void setIconWidth(float icon_width) {
+        this->icon_width = icon_width;
+    }
+    float getIconWidth() const {
+        return this->icon_width;
     }
     void setWeight(int weight) {
         this->weight = weight;
