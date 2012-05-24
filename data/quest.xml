@@ -55,6 +55,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="20.0" y="11.25" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
+<item template="Skull" x="8.5" y="7.0"/>
+
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>
     <item template="Arrows"/>
@@ -67,7 +69,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <scenery name="Chest" image_name="chest" x="19.0" y="7.5" w="0.8" h="0.8" blocking="true">
     <gold amount="100"/>
     <item template="Potion of Healing"/>
-    <item template="Gold Ring" x="2.0" y="10.5"/>
+    <item template="Gold Ring"/>
 </scenery>
 
 <trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>

@@ -11,7 +11,9 @@
     />
 
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
+<image type="item" name="key" filename="gfx/textures/items/key.png"/>
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
+<image type="item" name="skull" filename="gfx/textures/items/skull.png"/>
 <image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
