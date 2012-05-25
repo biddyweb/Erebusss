@@ -31,6 +31,9 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <floorregion rect_x="12.0" rect_y="10.1" rect_w="0.5" rect_h="0.8" />
 <floorregion rect_x="12.5" rect_y="7.0" rect_w="2.0" rect_h="4.0" />
 
+    <floorregion rect_x="10.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
+<floorregion rect_x="7.5" rect_y="11.5" rect_w="3.0" rect_h="3.0" />
+
 <player_start x="1.0" y="10.5"/>
 
 <npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
@@ -44,12 +47,16 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
-<npc name="Orc" template="Orc" x="16.0" y="8.0"/>
+<npc name="Orc" template="Orc" x="16.0" y="8.0">
+    <item template="Key"/>
+</npc>
 
 <scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
 
 <scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="10.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Key"/>
 <scenery name="Door" image_name="door_wood" x="14.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="17.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
@@ -70,6 +77,10 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <gold amount="100"/>
     <item template="Potion of Healing"/>
     <item template="Gold Ring"/>
+</scenery>
+
+<scenery name="Chest" image_name="chest" x="8.0" y="12.0" w="0.8" h="0.8" blocking="true">
+    <gold amount="50"/>
 </scenery>
 
 <trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>

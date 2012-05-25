@@ -29,7 +29,9 @@
 
 <item name="Red Gem" image_name="gem_red" icon_width="0.25" weight="1"/>
 
-<item name="Skull" image_name="skull" icon_width="0.25" weight="1"/>
+<item name="Skull" image_name="skull" icon_width="0.25" weight="10"/>
+
+<item name="Key" image_name="key" icon_width="0.25" weight="0"/>
 
 <currency name="Gold" image_name="gold"/>
 
