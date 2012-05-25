@@ -14,7 +14,7 @@ using std::swap;
 
 Scenery::Scenery(string name, string image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
-    is_blocking(false), blocks_visibility(false), is_door(false), width(width), height(height),
+    is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), width(width), height(height),
     opened(false)
 {
 }
@@ -155,6 +155,14 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
 void Location::addItem(Item *item, float xpos, float ypos) {
     item->setPos(xpos, ypos);
     this->items.insert(item);
+
+    FloorRegion *floor_region = this->findFloorRegionAt(item->getPos());
+    if( floor_region == NULL ) {
+        LOG("failed to find floor region for item at %f, %f\n", item->getX(), item->getY());
+        throw string("failed to find floor region for item");
+    }
+    floor_region->addItem(item);
+
     if( this->listener != NULL ) {
         this->listener->locationAddItem(this, item);
     }
@@ -162,6 +170,14 @@ void Location::addItem(Item *item, float xpos, float ypos) {
 
 void Location::removeItem(Item *item) {
     this->items.erase(item);
+
+    FloorRegion *floor_region = this->findFloorRegionAt(item->getPos());
+    if( floor_region == NULL ) {
+        LOG("failed to find floor region for item at %f, %f\n", item->getX(), item->getY());
+        throw string("failed to find floor region for item");
+    }
+    floor_region->removeItem(item);
+
     if( this->listener != NULL ) {
         this->listener->locationRemoveItem(this, item);
     }

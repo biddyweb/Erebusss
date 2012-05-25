@@ -39,6 +39,8 @@ protected:
     bool is_blocking;
     bool blocks_visibility;
     bool is_door, is_exit;
+    bool is_locked; // relevant only for some types, e.g., containers, doors
+    string unlock_item_name;
     float width, height;
 
     bool opened;
@@ -95,6 +97,18 @@ public:
     }
     bool isExit() const {
         return this->is_exit;
+    }
+    void setLocked(bool is_locked) {
+        this->is_locked = is_locked;
+    }
+    bool isLocked() const {
+        return this->is_locked;
+    }
+    void setUnlockItemName(string unlock_item_name) {
+        this->unlock_item_name = unlock_item_name;
+    }
+    string getUnlockItemName() const {
+        return this->unlock_item_name;
     }
 
     float getWidth() const {
@@ -181,6 +195,7 @@ protected:
     void *user_data_gfx;
 
     set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing
+    set<Item *> items; // stored here as well as the Location, for visibility testing
 
     FloorRegion() : Polygon2D(), is_visible(false) {
     }
@@ -234,6 +249,25 @@ public:
     }
     void removeScenery(Scenery *scenery) {
         this->scenerys.erase(scenery);
+    }
+
+    set<Item *>::iterator itemsBegin() {
+        return this->items.begin();
+    }
+    set<Item *>::const_iterator itemsBegin() const {
+        return this->items.begin();
+    }
+    set<Item *>::iterator itemsEnd() {
+        return this->items.end();
+    }
+    set<Item *>::const_iterator itemsEnd() const {
+        return this->items.end();
+    }
+    void addItem(Item *item) {
+        this->items.insert(item);
+    }
+    void removeItem(Item *item) {
+        this->items.erase(item);
     }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);

@@ -451,6 +451,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     vector<Shop *> shops;
 
     void showInfoWindow(const char *html);
+    void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
 
 private slots:

@@ -848,6 +848,9 @@ QString ItemsWindow::getItemString(const Item *item) const {
     else if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
         item_str += " [Current Armour]";
     }
+    if( item->getWeight() > 0 ) {
+        item_str += " (Weight " + QString::number(item->getWeight()) + ")";
+    }
     return item_str;
 }
 
@@ -1964,6 +1967,9 @@ PlayingGamestate::PlayingGamestate() :
                     bool door = parseBool(door_s.toString(), true);
                     QStringRef exit_s = reader.attributes().value("exit");
                     bool exit = parseBool(exit_s.toString(), true);
+                    QStringRef locked_s = reader.attributes().value("locked");
+                    bool locked = parseBool(locked_s.toString(), true);
+                    QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
                     QStringRef size_w_s = reader.attributes().value("w");
                     float size_w = parseFloat(size_w_s.toString());
                     QStringRef size_h_s = reader.attributes().value("h");
@@ -1977,6 +1983,10 @@ PlayingGamestate::PlayingGamestate() :
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
+                    scenery->setLocked(locked);
+                    if( unlock_item_name_s.length() > 0 ) {
+                        scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
+                    }
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
                 else if( reader.name() == "trap" ) {
@@ -2196,15 +2206,7 @@ PlayingGamestate::PlayingGamestate() :
     location->initVisibility(player->getPos());
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
-        QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
-        item->setVisible( floor_region->isVisible() );
-        for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
-            Scenery *scenery = *iter;
-            QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-            if( item2 != NULL ) {
-                item2->setVisible( floor_region->isVisible() );
-            }
-        }
+        this->updateVisibilityForFloorRegion(floor_region);
     }
 
     gui_overlay->unsetProgress();
@@ -2777,10 +2779,35 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
                 if( selected_scenery->isDoor() ) {
                     LOG("clicked on a door\n");
-                    // close door
-                    c_location->removeScenery(selected_scenery);
-                    delete selected_scenery;
-                    selected_scenery = NULL;
+                    bool is_locked = false;
+                    if( selected_scenery->isLocked() ) {
+                        // can we unlock it?
+                        is_locked = true;
+                        string unlock_item_name = selected_scenery->getUnlockItemName();
+                        if( unlock_item_name.length() > 0 ) {
+                            //LOG("search for %s\n", unlock_item_name.c_str());
+                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                                const Item *item = *iter;
+                                //LOG("    compare to: %s\n", item->getKey().c_str());
+                                if( item->getKey() == unlock_item_name ) {
+                                    is_locked = false;
+                                }
+                            }
+                        }
+                        if( is_locked ) {
+                            this->addTextEffect("The door is locked!", player->getPos(), 2000);
+                        }
+                        else {
+                            this->addTextEffect("You unlock the door.", player->getPos(), 2000);
+                            selected_scenery->setLocked(false); // we'll delete the door anyway below, but just to be safe...
+                        }
+                    }
+                    if( !is_locked ) {
+                        // open door
+                        c_location->removeScenery(selected_scenery);
+                        delete selected_scenery;
+                        selected_scenery = NULL;
+                    }
                 }
                 else if( selected_scenery->isExit() ) {
                     LOG("clicked on an exit");
@@ -2802,19 +2829,30 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     }
 }
 
+void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region) {
+    QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+    gfx_item->setVisible( floor_region->isVisible() );
+    for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
+        Scenery *scenery = *iter;
+        QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+        if( gfx_item2 != NULL ) {
+            gfx_item2->setVisible( floor_region->isVisible() );
+        }
+    }
+    for(set<Item *>::iterator iter = floor_region->itemsBegin(); iter != floor_region->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+        if( gfx_item2 != NULL ) {
+            gfx_item2->setVisible( floor_region->isVisible() );
+        }
+    }
+}
+
 void PlayingGamestate::updateVisibility(Vector2D pos) {
     vector<FloorRegion *> update_regions = this->c_location->updateVisibility(pos);
     for(vector<FloorRegion *>::iterator iter = update_regions.begin(); iter != update_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
-        QGraphicsPolygonItem *item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
-        item->setVisible( floor_region->isVisible() );
-        for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
-            Scenery *scenery = *iter;
-            QGraphicsPixmapItem *item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-            if( item2 != NULL ) {
-                item2->setVisible( floor_region->isVisible() );
-            }
-        }
+        updateVisibilityForFloorRegion(floor_region);
     }
 }
 
