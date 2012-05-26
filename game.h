@@ -311,6 +311,7 @@ public:
 class ScrollingListWidget : public QListWidget {
     Q_OBJECT
 
+    int saved_x;
     int saved_y;
 
     virtual void mouseMoveEvent(QMouseEvent *event);
@@ -548,6 +549,7 @@ class Game {
     string logfilename;
     string oldlogfilename;
 
+    QFont font_small;
     QFont font_std;
     QFont font_big;
 
@@ -565,6 +567,9 @@ public:
     }
     const Screen *getScreen() const {
         return this->screen;
+    }
+    QFont getFontSmall() const {
+        return this->font_small;
     }
     QFont getFontStd() const {
         return this->font_std;

@@ -632,21 +632,25 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
 
-ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_y(0) {
+ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
     qDebug("ScrollingListWidget::mouseMoveEvent()");
     //QListWidget::mouseMoveEvent(event); // don't want to select items whilst dragging
-    QScrollBar *scroll =  this->verticalScrollBar();
-    scroll->setValue(scroll->value() - event->y() + saved_y);
+    QScrollBar *scroll_x =  this->horizontalScrollBar();
+    scroll_x->setValue(scroll_x->value() - event->x() + saved_x);
+    saved_x = event->x();
+    QScrollBar *scroll_y =  this->verticalScrollBar();
+    scroll_y->setValue(scroll_y->value() - event->y() + saved_y);
     saved_y = event->y();
 }
 
 void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     qDebug("ScrollingListWidget::mousePressEvent()");
     QListWidget::mousePressEvent(event);
+    saved_x = event->x();
     saved_y = event->y();
 }
 
@@ -1090,6 +1094,16 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         layout->addLayout(h_layout);
 
         player_list = new ScrollingListWidget();
+        if( !mobile_c ) {
+            QFont list_font = player_list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            player_list->setFont(list_font);
+        }
+        {
+            QFontMetrics fm(player_list->font());
+            int icon_size = fm.height();
+            player_list->setIconSize(QSize(icon_size, icon_size));
+        }
         h_layout->addWidget(player_list);
         for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
             Item *item = *iter;
@@ -1104,6 +1118,16 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         }
 
         list = new ScrollingListWidget();
+        if( !mobile_c ) {
+            QFont list_font = list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            list->setFont(list_font);
+        }
+        {
+            QFontMetrics fm(list->font());
+            int icon_size = fm.height();
+            list->setIconSize(QSize(icon_size, icon_size));
+        }
         h_layout->addWidget(list);
         for(size_t i=0;i<items.size();i++) {
             const Item *item = items.at(i);
@@ -1168,14 +1192,16 @@ void TradeWindow::clickedBuy() {
     int cost = costs.at(index);
     Character *player = playing_gamestate->getPlayer();
     if( player->getGold() >= cost ) {
-        LOG("player buys: %s\n", selected_item->getName());
+        LOG("player buys: %s\n", selected_item->getName().c_str());
         player->addGold(-cost);
         this->updateGoldLabel();
         Item *item = playing_gamestate->cloneStandardItem(selected_item->getKey());
         player->addItem(item);
         this->addPlayerItem(item, cost);
+        list->setCurrentRow(-1);
     }
     else {
+        LOG("not enough money\n");
         game_g->showInfoDialog("Trade", "You do not have enough money to purchase this item.");
     }
 }
@@ -1193,7 +1219,7 @@ void TradeWindow::clickedSell() {
     Item *selected_item = player_items.at(index);
     int cost = player_costs.at(index);
     if( cost > 0 ) {
-        LOG("player sells: %s\n", selected_item->getName());
+        LOG("player sells: %s\n", selected_item->getName().c_str());
         Character *player = playing_gamestate->getPlayer();
         player->addGold(cost);
         this->updateGoldLabel();
@@ -1226,6 +1252,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     layout->addWidget(label);*/
     QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
+    label->setFont(game_g->getFontSmall());
     label->setWordWrap(true);
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(label);
@@ -1733,6 +1760,7 @@ PlayingGamestate::PlayingGamestate() :
     player->addItem( this->cloneStandardItem("Longbow") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
     player->addItem( this->cloneStandardItem("Arrows") );
+    player->addGold( rollDice(2, 6, 10) );
 
     LOG("load NPCs\n");
     {
@@ -3039,8 +3067,8 @@ void Game::run() {
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
     if( mobile_c ) {
+        QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
-    QFont new_font = window->font();
         /*
         // make work better on Android phones with crappy resolution
         // these settings determined by experimenting with emulator...
@@ -3053,15 +3081,19 @@ void Game::run() {
         else if( min_size < 480 ) {
             newFont.setPointSize(new_font.pointSize() - 4);
         }*/
+        this->font_small = QFont(new_font);
+        this->font_small.setPointSize(font_small.pointSize() - 4);
         this->font_std = new_font;
         this->font_big = new_font;
 #else
-        this->font_std = window->font();
-        this->font_big = window->font();
+        this->font_small = QFont(new_font);
+        this->font_small.setPointSize(font_small.pointSize() - 4);
+        this->font_std = new_font;
+        this->font_big = new_font;
 #endif
     }
     else {
-        //this->font_std = window->font();
+        this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
         this->font_big = QFont("Verdana", 48, QFont::Bold);
     }
