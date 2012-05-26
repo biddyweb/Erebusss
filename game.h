@@ -435,6 +435,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Character *player;
     stringstream journal_ss;
 
+    vector<QuestInfo> quest_list;
+    size_t c_quest_indx;
     Location *c_location;
     Quest *quest;
 

@@ -22,7 +22,6 @@
         <file>gfx/textures/scenery/crate.png</file>
         <file>gfx/textures/scenery/crate_opened.png</file>
         <file>data/npcs.xml</file>
-        <file>data/quest.xml</file>
         <file>gfx/textures/npcs/goblin.png</file>
         <file>gfx/textures/npcs/orc_regular_0.png</file>
         <file>gfx/textures/items/gem_red.png</file>
@@ -32,5 +31,7 @@
         <file>gfx/textures/items/metal_armor.png</file>
         <file>gfx/textures/items/key.png</file>
         <file>gfx/textures/items/skull.png</file>
+        <file>data/quest_kill_goblins.xml</file>
+        <file>data/quests.xml</file>
     </qresource>
 </RCC>

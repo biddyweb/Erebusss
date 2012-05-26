@@ -1279,7 +1279,7 @@ void CampaignWindow::clickedTraining() {
 
 PlayingGamestate::PlayingGamestate() :
     scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
-    player(NULL), c_location(NULL), quest(NULL)
+    player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -1802,6 +1802,37 @@ PlayingGamestate::PlayingGamestate() :
     // create RPG world
     LOG("create RPG world\n");
 
+    {
+        QFile file(":/data/quests.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                if( reader.name() == "quest" ) {
+                    QStringRef filename_s = reader.attributes().value("filename");
+                    LOG("found quest: %s\n", filename_s.toString().toStdString().c_str());
+                    if( filename_s.length() == 0 ) {
+                        throw string("quest doesn't have filename info");
+                    }
+                    QuestInfo quest_info(filename_s.toString().toStdString());
+                    this->quest_list.push_back(quest_info);
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading xml file");
+        }
+    }
+    if( this->quest_list.size() == 0 ) {
+        throw string("failed to find any quests");
+    }
+
+    const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
     this->quest = new Quest();
     Location *location = new Location();
     this->quest->addLocation(location);
@@ -1818,7 +1849,10 @@ PlayingGamestate::PlayingGamestate() :
         Polygon2D boundary;
         Scenery *scenery = NULL;
         Character *npc = NULL;
-        QFile file(":/data/quest.xml");
+        QString qt_filename = ":/" + QString(c_quest_info.getFilename().c_str());
+        LOG("load quest: %s\n", qt_filename.toStdString().c_str());
+        QFile file(qt_filename);
+        //QFile file(":/data/quest.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open xml file");
         }

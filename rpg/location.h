@@ -449,3 +449,13 @@ public:
     }
     bool testIfComplete();
 };
+
+class QuestInfo {
+    string filename;
+public:
+    QuestInfo(string filename);
+
+    string getFilename() const {
+        return filename;
+    }
+};

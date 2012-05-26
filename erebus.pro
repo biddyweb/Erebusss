@@ -99,7 +99,8 @@ OTHER_FILES += \
     android/src/org/kde/necessitas/origo/QtApplication.java \
     android/version.xml \
     data/npcs.xml \
-    data/quest.xml
+    data/quests.xml \
+    data/quest_kill_goblins.xml
 
 RESOURCES += \
     erebus.qrc

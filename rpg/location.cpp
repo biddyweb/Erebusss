@@ -896,3 +896,6 @@ bool Quest::testIfComplete() {
     }
     return false;
 }
+
+QuestInfo::QuestInfo(string filename) : filename(filename) {
+}
