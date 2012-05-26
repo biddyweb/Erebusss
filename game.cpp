@@ -1245,7 +1245,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(trainingButton);
     connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
 
-    QPushButton *closeButton = new QPushButton("Continue your Quest");
+    QPushButton *closeButton = new QPushButton(playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest");
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
@@ -1880,6 +1880,12 @@ PlayingGamestate::PlayingGamestate() :
                     float pos_y = parseFloat(pos_y_s.toString());
                     location->addCharacter(player, pos_x, pos_y);
                     done_player_start = true;
+                }
+                else if( reader.name() == "quest_objective" ) {
+                    QStringRef type_s = reader.attributes().value("type");
+                    QStringRef arg1_s = reader.attributes().value("arg1");
+                    QuestObjective *quest_objective = new QuestObjective(type_s.toString().toStdString(), arg1_s.toString().toStdString());
+                    this->quest->setQuestObjective(quest_objective);
                 }
                 else if( reader.name() == "npc" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -2569,6 +2575,11 @@ void PlayingGamestate::update() {
             game_g->pushMessage(game_message);
         }
     }
+    if( delete_characters.size() > 0 ) {
+        if( !this->quest->isCompleted() && this->quest->testIfComplete() ) {
+            game_g->showInfoDialog("Game over", "You have completed the quest! Now return to the dungeon exit.");
+        }
+    }
 }
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
@@ -2815,6 +2826,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     this->clickedCloseSubwindow(); // just in case
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
+                    this->player->restoreHealth();
                 }
             }
 

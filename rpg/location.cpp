@@ -12,6 +12,10 @@ using std::swap;
 
 #include <ctime>
 
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 Scenery::Scenery(string name, string image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), width(width), height(height),
@@ -837,10 +841,43 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     return update_floor_regions;
 }
 
-Quest::Quest() {
+QuestObjective::QuestObjective(string type, string arg1) : type(type), arg1(arg1) {
+}
+
+bool QuestObjective::testIfComplete(const Quest *quest) const {
+    bool complete = false;
+    if( type == "kill" ) {
+        if( arg1 == "all_hostile" ) {
+            complete = true;
+            for(vector<Location *>::const_iterator iter = quest->locationsBegin(); iter != quest->locationsEnd() && complete; ++iter) {
+                const Location *location = *iter;
+                for(set<Character *>::const_iterator iter2 = location->charactersBegin(); iter2 != location->charactersEnd() && complete; ++iter2) {
+                    const Character *character = *iter2;
+                    if( character->isHostile() && !character->isDead() ) {
+                        complete = false;
+                    }
+                }
+            }
+        }
+        else {
+            LOG("unknown arg1: %s\n", arg1.c_str());
+            ASSERT_LOGGER(false);
+        }
+    }
+    else {
+        LOG("unknown type: %s\n", type.c_str());
+        ASSERT_LOGGER(false);
+    }
+    return complete;
+}
+
+Quest::Quest() : quest_objective(NULL), is_completed(false) {
 }
 
 Quest::~Quest() {
+    if( quest_objective != NULL ) {
+        delete quest_objective;
+    }
     for(vector<Location *>::iterator iter = this->locations.begin(); iter != this->locations.end(); ++iter) {
         Location *location = *iter;
         delete location;
@@ -849,4 +886,13 @@ Quest::~Quest() {
 
 void Quest::addLocation(Location *location) {
     this->locations.push_back(location);
+}
+
+bool Quest::testIfComplete() {
+    ASSERT_LOGGER( !is_completed ); // if already complete, shouldn't be asking
+    if( quest_objective != NULL ) {
+        this->is_completed = quest_objective->testIfComplete(this);
+        return this->is_completed;
+    }
+    return false;
 }

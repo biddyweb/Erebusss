@@ -14,6 +14,7 @@ class Item;
 class Scenery;
 class Location;
 class PlayingGamestate;
+class Quest;
 
 // source types for boundaries
 const int SOURCETYPE_SCENERY = 1;
@@ -408,18 +409,43 @@ public:
     vector<FloorRegion *> updateVisibility(Vector2D pos);
 };
 
+class QuestObjective {
+    string type;
+    string arg1;
+public:
+    QuestObjective(string type, string arg1);
+
+    bool testIfComplete(const Quest *quest) const;
+};
+
 class Quest {
+    QuestObjective *quest_objective;
     vector<Location *> locations;
     string info;
+    bool is_completed;
 public:
     Quest();
     ~Quest();
 
     void addLocation(Location *location);
+    void setQuestObjective(QuestObjective *quest_objective) {
+        this->quest_objective = quest_objective;
+    }
     void setInfo(string info) {
         this->info = info;
     }
     const char *getInfo() const {
         return this->info.c_str();
     }
+    const vector<Location *>::const_iterator locationsBegin() const {
+        return this->locations.begin();
+    }
+    const vector<Location *>::const_iterator locationsEnd() const {
+        return this->locations.end();
+    }
+
+    bool isCompleted() const {
+        return this->is_completed;
+    }
+    bool testIfComplete();
 };

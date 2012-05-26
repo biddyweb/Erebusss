@@ -500,6 +500,9 @@ public:
     const Location *getLocation() const {
         return this->location;
     }*/
+    const Quest *getQuest() const {
+        return this->quest;
+    }
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(string name) const;

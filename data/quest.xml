@@ -85,4 +85,6 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>
 
+<quest_objective type="kill" arg1="all_hostile"/>
+
 </quest>
