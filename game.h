@@ -449,6 +449,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> item_images;
     map<string, QPixmap> scenery_images;
     map<string, QPixmap> scenery_opened_images;
+    map<string, QPixmap> builtin_images;
     map<string, CharacterTemplate *> character_templates;
     vector<Shop *> shops;
 
@@ -468,6 +469,8 @@ private slots:
 public:
     PlayingGamestate();
     virtual ~PlayingGamestate();
+
+    void loadQuest();
 
     virtual void quitGame();
     virtual void update();

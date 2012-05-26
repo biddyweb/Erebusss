@@ -1284,11 +1284,12 @@ PlayingGamestate::PlayingGamestate() :
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
 
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
 
     // create UI
     LOG("create UI\n");
-    MainWindow *window = game_g->getScreen()->getMainWindow();
     QFont font = game_g->getFontStd();
     window->setFont(font);
 
@@ -1414,7 +1415,6 @@ PlayingGamestate::PlayingGamestate() :
 
     }*/
 
-    window->setEnabled(false);
     gui_overlay->setProgress(0);
     qApp->processEvents();
 
@@ -1799,25 +1799,17 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
-    int pixels_per_unit = 64;
-    float scale = 1.0f/(float)pixels_per_unit;
-
     gui_overlay->setProgress(70);
     qApp->processEvents();
 
     LOG("load floor image\n");
-    QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
-    QBrush floor_brush(floor_image);
-    floor_brush.setTransform(QTransform::fromScale(scale, scale));
+    builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
 
     gui_overlay->setProgress(80);
     qApp->processEvents();
 
-    //QBrush wall_brush(QColor(150, 75, 0));
     LOG("load wall image\n");
-    QPixmap wall_image = game_g->loadImage(":/gfx/textures/wall.png");
-    QBrush wall_brush(wall_image);
-    wall_brush.setTransform(QTransform::fromScale(scale, scale));
+    builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
@@ -1856,8 +1848,51 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(100);
     qApp->processEvents();
 
-    // create RPG world
-    LOG("create RPG world\n");
+    window->setEnabled(true);
+    game_g->getScreen()->setPaused(false);
+}
+
+PlayingGamestate::~PlayingGamestate() {
+    LOG("PlayingGamestate::~PlayingGamestate()\n");
+    this->clickedCloseSubwindow();
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->centralWidget()->deleteLater();
+    window->setCentralWidget(NULL);
+
+    playingGamestate = NULL;
+
+    delete quest;
+    quest = NULL;
+    c_location = NULL;
+
+    for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+        AnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
+    }
+    for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
+        Item *item = iter->second;
+        LOG("about to delete standard item: %d\n", item);
+        LOG("    name: %s\n", item->getName().c_str());
+        delete item;
+    }
+    for(map<string, CharacterTemplate *>::iterator iter = this->character_templates.begin(); iter != this->character_templates.end(); ++iter) {
+        CharacterTemplate *character_template = iter->second;
+        LOG("about to delete character template: %d\n", character_template);
+        delete character_template;
+    }
+    for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
+        Shop *shop = *iter;
+        delete shop;
+    }
+    LOG("done\n");
+}
+
+void PlayingGamestate::loadQuest() {
+    LOG("PlayingGamestate::loadQuest()\n");
+
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->setEnabled(false);
+    game_g->getScreen()->setPaused(true);
 
     const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
     this->quest = new Quest();
@@ -2147,6 +2182,13 @@ PlayingGamestate::PlayingGamestate() :
         view->setScale(initial_scale);
     }
 
+    int pixels_per_unit = 64;
+    float scale = 1.0f/(float)pixels_per_unit;
+    QBrush floor_brush(builtin_images["floor"]);
+    floor_brush.setTransform(QTransform::fromScale(scale, scale));
+    QBrush wall_brush(builtin_images["wall"]);
+    wall_brush.setTransform(QTransform::fromScale(scale, scale));
+
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
         QPolygonF polygon;
@@ -2156,7 +2198,6 @@ PlayingGamestate::PlayingGamestate() :
             QPointF qpoint(point.x, point.y);
             polygon.push_back(qpoint);
         }
-        //QBrush floor_brush(Qt::white);
         QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
         floor_region->setUserGfxData(item);
         for(size_t j=0;j<floor_region->getNPoints();j++) {
@@ -2288,41 +2329,6 @@ PlayingGamestate::PlayingGamestate() :
     }
 
     LOG("View is transformed? %d\n", view->isTransformed());
-    LOG("done\n");
-}
-
-PlayingGamestate::~PlayingGamestate() {
-    LOG("PlayingGamestate::~PlayingGamestate()\n");
-    this->clickedCloseSubwindow();
-    MainWindow *window = game_g->getScreen()->getMainWindow();
-    window->centralWidget()->deleteLater();
-    window->setCentralWidget(NULL);
-
-    playingGamestate = NULL;
-
-    delete quest;
-    quest = NULL;
-    c_location = NULL;
-
-    for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
-        AnimationLayer *animation_layer = (*iter).second;
-        delete animation_layer;
-    }
-    for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
-        Item *item = iter->second;
-        LOG("about to delete standard item: %d\n", item);
-        LOG("    name: %s\n", item->getName().c_str());
-        delete item;
-    }
-    for(map<string, CharacterTemplate *>::iterator iter = this->character_templates.begin(); iter != this->character_templates.end(); ++iter) {
-        CharacterTemplate *character_template = iter->second;
-        LOG("about to delete character template: %d\n", character_template);
-        delete character_template;
-    }
-    for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
-        Shop *shop = *iter;
-        delete shop;
-    }
     LOG("done\n");
 }
 
@@ -3075,11 +3081,15 @@ void Game::update() {
         try {
             switch( message->getGameMessageType() ) {
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING:
+            {
                 delete gamestate;
                 gamestate = NULL;
-                gamestate = new PlayingGamestate();
+                PlayingGamestate *playing_gamestate = new PlayingGamestate();
+                gamestate = playing_gamestate;
+                playing_gamestate->loadQuest();
                 this->getScreen()->getMainWindow()->unsetCursor();
                 break;
+            }
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS:
                 delete gamestate;
                 gamestate = NULL;
