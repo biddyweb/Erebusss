@@ -26,7 +26,6 @@ copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
 
 copy %src%\game.h %dst%
-copy %src%\main.h %dst%
 copy %src%\mainwindow.h %dst%
 copy %src%\qt_screen.h %dst%
 copy %src%\qt_utils.h %dst%
