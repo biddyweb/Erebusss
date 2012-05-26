@@ -1799,8 +1799,30 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
-    // create RPG world
-    LOG("create RPG world\n");
+    int pixels_per_unit = 64;
+    float scale = 1.0f/(float)pixels_per_unit;
+
+    gui_overlay->setProgress(70);
+    qApp->processEvents();
+
+    LOG("load floor image\n");
+    QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
+    QBrush floor_brush(floor_image);
+    floor_brush.setTransform(QTransform::fromScale(scale, scale));
+
+    gui_overlay->setProgress(80);
+    qApp->processEvents();
+
+    //QBrush wall_brush(QColor(150, 75, 0));
+    LOG("load wall image\n");
+    QPixmap wall_image = game_g->loadImage(":/gfx/textures/wall.png");
+    QBrush wall_brush(wall_image);
+    wall_brush.setTransform(QTransform::fromScale(scale, scale));
+
+    gui_overlay->setProgress(90);
+    qApp->processEvents();
+
+    LOG("load quests\n");
 
     {
         QFile file(":/data/quests.xml");
@@ -1831,11 +1853,19 @@ PlayingGamestate::PlayingGamestate() :
     if( this->quest_list.size() == 0 ) {
         throw string("failed to find any quests");
     }
+    gui_overlay->setProgress(100);
+    qApp->processEvents();
+
+    // create RPG world
+    LOG("create RPG world\n");
 
     const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
     this->quest = new Quest();
     Location *location = new Location();
     this->quest->addLocation(location);
+
+    gui_overlay->setProgress(0);
+    qApp->processEvents();
 
     {
         bool done_player_start = false;
@@ -2081,9 +2111,8 @@ PlayingGamestate::PlayingGamestate() :
             throw string("quest.xml didn't define player_start");
         }
     }
-    //throw string("failed"); // TEST
 
-    gui_overlay->setProgress(70);
+    gui_overlay->setProgress(50);
     qApp->processEvents();
 
     location->createBoundariesForRegions();
@@ -2100,8 +2129,6 @@ PlayingGamestate::PlayingGamestate() :
 
     // set up the view on the RPG world
 
-    int pixels_per_unit = 64;
-    float scale = 1.0f/(float)pixels_per_unit;
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
     location->calculateSize(&location_width, &location_height);
@@ -2120,16 +2147,6 @@ PlayingGamestate::PlayingGamestate() :
         view->setScale(initial_scale);
     }
 
-    LOG("load floor image\n");
-    QPixmap floor_image = game_g->loadImage(":/gfx/textures/floor_paved.png");
-    QBrush floor_brush(floor_image);
-    floor_brush.setTransform(QTransform::fromScale(scale, scale));
-
-    //QBrush wall_brush(QColor(150, 75, 0));
-    LOG("load wall image\n");
-    QPixmap wall_image = game_g->loadImage(":/gfx/textures/wall.png");
-    QBrush wall_brush(wall_image);
-    wall_brush.setTransform(QTransform::fromScale(scale, scale));
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
         QPolygonF polygon;
