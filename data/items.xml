@@ -54,4 +54,9 @@
     <purchase template="Red Gem" cost="50"/>
 </shop>
 
+<player_default_items>
+    <player_default_item template="Long Sword"/>
+    <player_default_item template="Leather Armour"/>
+</player_default_items>
+
 </items>

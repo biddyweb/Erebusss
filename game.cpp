@@ -1447,6 +1447,11 @@ PlayingGamestate::PlayingGamestate() :
 
     // create RPG data
 
+    LOG("create player\n");
+    this->player = new Character("Player", "", false);
+    player->initialiseHealth(100);
+    player->addGold( rollDice(2, 6, 10) );
+
     LOG("load images\n");
     {
         QFile file(":/data/images.xml");
@@ -1606,7 +1611,8 @@ PlayingGamestate::PlayingGamestate() :
         }
         enum ItemsXMLType {
             ITEMS_XML_TYPE_NONE = 0,
-            ITEMS_XML_TYPE_SHOP = 1
+            ITEMS_XML_TYPE_SHOP = 1,
+            ITEMS_XML_TYPE_PLAYER_DEFAULT = 2
         };
         ItemsXMLType itemsXMLType = ITEMS_XML_TYPE_NONE;
         Shop *shop = NULL;
@@ -1747,9 +1753,33 @@ PlayingGamestate::PlayingGamestate() :
                     }
                     QStringRef template_s = reader.attributes().value("template");
                     QStringRef cost_s = reader.attributes().value("cost");
+                    if( template_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("purchase element has no template attribute");
+                    }
                     int cost = parseInt(cost_s.toString());
                     Item *item = this->cloneStandardItem(template_s.toString().toStdString());
                     shop->addItem(item, cost);
+                }
+                else if( reader.name() == "player_default_items" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: player_default_items element wasn't expected here");
+                    }
+                    itemsXMLType = ITEMS_XML_TYPE_PLAYER_DEFAULT;
+                }
+                else if( reader.name() == "player_default_item" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: player_default_item element wasn't expected here");
+                    }
+                    QStringRef template_s = reader.attributes().value("template");
+                    if( template_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("player_default_item element has no template attribute");
+                    }
+                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
+                    player->addItem(item);
                 }
             }
             else if( reader.isEndElement() ) {
@@ -1759,6 +1789,13 @@ PlayingGamestate::PlayingGamestate() :
                         throw string("unexpected items xml: shop end element wasn't expected here");
                     }
                     shop = NULL;
+                    itemsXMLType = ITEMS_XML_TYPE_NONE;
+                }
+                else if( reader.name() == "player_default_items" ) {
+                    if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: player_default_items end element wasn't expected here");
+                    }
                     itemsXMLType = ITEMS_XML_TYPE_NONE;
                 }
             }
@@ -1773,15 +1810,11 @@ PlayingGamestate::PlayingGamestate() :
     gui_overlay->setProgress(30);
     qApp->processEvents();
 
-    this->player = new Character("Player", "", false);
-    player->initialiseHealth(100);
-    //player->initialiseHealth(5); // test
-    player->addItem( this->cloneStandardItem("Long Sword") );
+    /*player->addItem( this->cloneStandardItem("Long Sword") );
     player->addItem( this->cloneStandardItem("Shield") );
     player->addItem( this->cloneStandardItem("Longbow") );
     player->addItem( this->cloneStandardItem("Leather Armour") );
-    player->addItem( this->cloneStandardItem("Arrows") );
-    player->addGold( rollDice(2, 6, 10) );
+    player->addItem( this->cloneStandardItem("Arrows") );*/
 
     LOG("load NPCs\n");
     {
