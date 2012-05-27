@@ -40,7 +40,7 @@ public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir)=0;
     virtual void characterMoved(Character *character, void *user_data)=0;
-    virtual void characterSetAnimation(const Character *character, void *user_data, string name)=0;
+    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name)=0;
     virtual void characterDeath(Character *character, void *user_data)=0;
 };
 
@@ -49,7 +49,7 @@ class CharacterTemplate {
     int gold_min, gold_max;
     string animation_name;
 public:
-    CharacterTemplate(string animation_name, int health_min, int health_max, int gold_min, int gold_max);
+    CharacterTemplate(const string &animation_name, int health_min, int health_max, int gold_min, int gold_max);
 
     int getHealth() const;
     int getGold() const;
@@ -95,12 +95,12 @@ class Character {
 
     void setStateIdle();
 
-    Item *findItem(string key);
+    Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
 
 public:
-    Character(string name, string animation_name, bool is_ai);
-    Character(string name, bool is_ai, const CharacterTemplate &character_template);
+    Character(const string &name, string animation_name, bool is_ai);
+    Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
     void setPos(float xpos, float ypos) {

@@ -48,7 +48,7 @@ protected:
     set<Item *> items;
 
 public:
-    Scenery(string name, string image_name, float width, float height);
+    Scenery(const string &name, const string &image_name, float width, float height);
     virtual ~Scenery() {
     }
 
@@ -105,7 +105,7 @@ public:
     bool isLocked() const {
         return this->is_locked;
     }
-    void setUnlockItemName(string unlock_item_name) {
+    void setUnlockItemName(const string &unlock_item_name) {
         this->unlock_item_name = unlock_item_name;
     }
     string getUnlockItemName() const {
@@ -154,7 +154,7 @@ protected:
     float width, height;
 
 public:
-    Trap(string type, float width, float height);
+    Trap(const string &type, float width, float height);
     virtual ~Trap() {
     }
 
@@ -413,7 +413,7 @@ class QuestObjective {
     string type;
     string arg1;
 public:
-    QuestObjective(string type, string arg1);
+    QuestObjective(const string &type, const string &arg1);
 
     bool testIfComplete(const Quest *quest) const;
 };
@@ -431,11 +431,11 @@ public:
     void setQuestObjective(QuestObjective *quest_objective) {
         this->quest_objective = quest_objective;
     }
-    void setInfo(string info) {
+    void setInfo(const string &info) {
         this->info = info;
     }
-    const char *getInfo() const {
-        return this->info.c_str();
+    string getInfo() const {
+        return this->info;
     }
     const vector<Location *>::const_iterator locationsBegin() const {
         return this->locations.begin();
@@ -453,7 +453,7 @@ public:
 class QuestInfo {
     string filename;
 public:
-    QuestInfo(string filename);
+    QuestInfo(const string &filename);
 
     string getFilename() const {
         return filename;

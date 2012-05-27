@@ -16,7 +16,7 @@ using std::swap;
 #include <cassert>
 #endif
 
-Scenery::Scenery(string name, string image_name, float width, float height) :
+Scenery::Scenery(const string &name, const string &image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), width(width), height(height),
     opened(false)
@@ -46,7 +46,7 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
-Trap::Trap(string type, float width, float height) : type(type), width(width), height(height) {
+Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height) {
 }
 
 bool Trap::isSetOff(const Character *character) {
@@ -841,7 +841,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     return update_floor_regions;
 }
 
-QuestObjective::QuestObjective(string type, string arg1) : type(type), arg1(arg1) {
+QuestObjective::QuestObjective(const string &type, const string &arg1) : type(type), arg1(arg1) {
 }
 
 bool QuestObjective::testIfComplete(const Quest *quest) const {
@@ -897,5 +897,5 @@ bool Quest::testIfComplete() {
     return false;
 }
 
-QuestInfo::QuestInfo(string filename) : filename(filename) {
+QuestInfo::QuestInfo(const string &filename) : filename(filename) {
 }

@@ -107,7 +107,7 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     return layer;
 }
 
-AnimationLayer *AnimationLayer::create(string filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
     QPixmap image = game_g->loadImage(filename.c_str());
     return create(image, animation_layer_definitions);
 }
@@ -173,7 +173,7 @@ void AnimatedObject::clearAnimationLayers() {
     this->c_animation_sets.clear();
 }
 
-void AnimatedObject::setAnimationSet(string name) {
+void AnimatedObject::setAnimationSet(const string &name) {
     if( !this->set_c_animation_name || this->c_animation_name != name ) {
         //qDebug("set animation set: %s", name.c_str());
         this->c_animation_sets.clear();
@@ -2342,15 +2342,13 @@ void PlayingGamestate::loadQuest() {
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
 
-    if( quest->getInfo() != '\0' ) {
-        // disabled for now due to window too large on Android bug
-        //game_g->showInfoDialog("Quest", quest->getInfo());
+    if( quest->getInfo().length() > 0 ) {
         stringstream str;
         str << "<html><body>";
         str << "<h1>Quest</h1>";
         str << "<p>" << quest->getInfo() << "</p>";
         str << "</body></html>";
-        this->showInfoWindow(str.str().c_str());
+        this->showInfoWindow(str.str());
 
         this->journal_ss << "<p><b>Quest Details</b></p>";
         this->journal_ss << "<p>" << quest->getInfo() << "</p>";
@@ -2493,7 +2491,7 @@ void PlayingGamestate::clickedJournal() {
     str << "<h1>Journal</h1>";
     str << this->journal_ss.str();
     str << "</body></html>";
-    this->showInfoWindow(str.str().c_str());
+    this->showInfoWindow(str.str());
 }
 
 void PlayingGamestate::clickedOptions() {
@@ -2550,7 +2548,7 @@ void PlayingGamestate::clickedQuit() {
     this->quitGame();
 }
 
-void PlayingGamestate::showInfoWindow(const char *html) {
+void PlayingGamestate::showInfoWindow(const string &html) {
     LOG("showInfoWindow()\n");
     this->clickedCloseSubwindow();
 
@@ -2563,7 +2561,7 @@ void PlayingGamestate::showInfoWindow(const char *html) {
     subwindow->setLayout(layout);
 
     QWebView *label = new QWebView();
-    label->setHtml(html);
+    label->setHtml(html.c_str());
     layout->addWidget(label);
 
     QPushButton *closeButton = new QPushButton("Continue");
@@ -2743,7 +2741,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
     }
 }
 
-void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, string name) {
+void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name) {
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     object->setAnimationSet(name);
 }
@@ -2958,7 +2956,7 @@ void PlayingGamestate::addWidget(QWidget *widget) {
     this->main_stacked_widget->setCurrentWidget(widget);
 }
 
-void PlayingGamestate::addTextEffect(string text, Vector2D pos, int duration_ms) {
+void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int duration_ms) {
     TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms);
     float font_scale = 1.0f/view->getScale();
     float text_effect_width = font_scale*text_effect->boundingRect().width();
@@ -2987,7 +2985,7 @@ void PlayingGamestate::addStandardItem(Item *item) {
     this->standard_items[item->getKey()] = item;
 }
 
-Item *PlayingGamestate::cloneStandardItem(string name) const {
+Item *PlayingGamestate::cloneStandardItem(const string &name) const {
     map<string, Item *>::const_iterator iter = this->standard_items.find(name);
     if( iter == this->standard_items.end() ) {
         LOG("can't clone standard item which doesn't exist: %s\n", name.c_str());
@@ -3003,7 +3001,7 @@ Currency *PlayingGamestate::cloneGoldItem(int value) const {
     return item;
 }
 
-QPixmap &PlayingGamestate::getItemImage(string name) {
+QPixmap &PlayingGamestate::getItemImage(const string &name) {
     map<string, QPixmap>::iterator image_iter = this->item_images.find(name.c_str());
     if( image_iter == this->item_images.end() ) {
         LOG("failed to find image for item: %s\n", name.c_str());
@@ -3142,7 +3140,7 @@ void Game::update() {
             delete message;
             stringstream str;
             str << "Failed to load game data:\n" << error;
-            game_g->showErrorDialog(str.str().c_str());
+            game_g->showErrorDialog(str.str());
             qApp->quit();
         }
         delete message;
@@ -3157,9 +3155,9 @@ void Game::update() {
     gamestate->mouseClick(m_x, m_y);
 }*/
 
-string Game::getApplicationFilename(const char *name) {
+string Game::getApplicationFilename(const string &name) {
     // not safe to use LOG here, as logfile may not have been initialised!
-    QString pathQt = QString(application_path.c_str()) + QString("/") + QString(name);
+    QString pathQt = QString(application_path.c_str()) + QString("/") + QString(name.c_str());
     QString nativePath(QDir::toNativeSeparators(pathQt));
     string filename = nativePath.toStdString();
     qDebug("getApplicationFilename returns: %s", filename.c_str());
@@ -3181,15 +3179,15 @@ void Game::log(const char *text, ...) {
         fclose(logfile);
 }
 
-QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int width, int height) const {
+QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height) const {
     // need to use QImageReader - QPixmap::load doesn't work on large images on Symbian!
-    QImageReader reader(filename);
+    QImageReader reader(filename.c_str());
     if( clip ) {
         reader.setClipRect(QRect(xpos, ypos, width, height));
     }
     QImage image = reader.read();
     if( image.isNull() ) {
-        LOG("failed to read image: %s\n", filename);
+        LOG("failed to read image: %s\n", filename.c_str());
         LOG("error: %d\n", reader.error());
         LOG("error string: %s\n", reader.errorString().toStdString().c_str());
         stringstream error;
@@ -3198,34 +3196,34 @@ QPixmap Game::loadImage(const char *filename, bool clip, int xpos, int ypos, int
     }
     QPixmap pixmap = QPixmap::fromImage(image);
     if( pixmap.isNull() ) {
-        LOG("failed to convert image to pixmap: %s\n", filename);
+        LOG("failed to convert image to pixmap: %s\n", filename.c_str());
         throw string("Failed to convert image to pixmap");
     }
     return pixmap;
 }
 
-void Game::showErrorDialog(const char *message) {
-    LOG("Game::showErrorDialog: %s\n", message);
+void Game::showErrorDialog(const string &message) {
+    LOG("Game::showErrorDialog: %s\n", message.c_str());
     //LOG("1\n");
     this->getScreen()->enableUpdateTimer(false);
     //LOG("2\n");
-    QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message);
+    QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message.c_str());
     //LOG("3\n");
     this->getScreen()->enableUpdateTimer(true);
     //LOG("4\n");
 }
 
-void Game::showInfoDialog(const char *title, const char *message) {
-    LOG("Game::showInfoDialog: %s\n", message);
+void Game::showInfoDialog(const string &title, const string &message) {
+    LOG("Game::showInfoDialog: %s\n", message.c_str());
     this->getScreen()->enableUpdateTimer(false);
-    QMessageBox::information(this->getScreen()->getMainWindow(), title, message);
+    QMessageBox::information(this->getScreen()->getMainWindow(), title.c_str(), message.c_str());
     this->getScreen()->enableUpdateTimer(true);
 }
 
-bool Game::askQuestionDialog(const char *title, const char *message) {
-    LOG("Game::askQuestionWindow: %s\n", message);
+bool Game::askQuestionDialog(const string &title, const string &message) {
+    LOG("Game::askQuestionWindow: %s\n", message.c_str());
     this->getScreen()->enableUpdateTimer(false);
-    int res = QMessageBox::question(this->getScreen()->getMainWindow(), title, message, QMessageBox::Yes, QMessageBox::No);
+    int res = QMessageBox::question(this->getScreen()->getMainWindow(), title.c_str(), message.c_str(), QMessageBox::Yes, QMessageBox::No);
     this->getScreen()->enableUpdateTimer(true);
     LOG("    answer is %d\n", res);
     return res == QMessageBox::Yes;

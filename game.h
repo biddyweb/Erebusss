@@ -97,12 +97,12 @@ public:
     ~AnimationLayer() {
     }
 
-    void addAnimationSet(string name, const AnimationSet *animation_set) {
+    void addAnimationSet(const string &name, const AnimationSet *animation_set) {
         //this->animation_sets[name] = animation_set;
         //this->animation_sets.insert(pair<string, const AnimationSet *>(name, animation_set));
         this->animation_sets[name] = animation_set;
     }
-    const AnimationSet *getAnimationSet(string name) const {
+    const AnimationSet *getAnimationSet(const string &name) const {
         map<string, const AnimationSet *>::const_iterator iter = this->animation_sets.find(name);
         if( iter == this->animation_sets.end() )
             return NULL;
@@ -113,7 +113,7 @@ public:
     }
 
     static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
-    static AnimationLayer *create(string filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
 };
 
 //class AnimatedObject : public QGraphicsPixmapItem {
@@ -141,7 +141,7 @@ public:
     //void setAnimationLayer(AnimationLayer *animation_layer);
     void addAnimationLayer(AnimationLayer *animation_layer);
     void clearAnimationLayers();
-    void setAnimationSet(string name);
+    void setAnimationSet(const string &name);
     void setDirection(Direction c_direction);
     int getSize() const;
 };
@@ -454,7 +454,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, CharacterTemplate *> character_templates;
     vector<Shop *> shops;
 
-    void showInfoWindow(const char *html);
+    void showInfoWindow(const string &html);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
 
@@ -480,7 +480,7 @@ public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
     virtual void characterMoved(Character *character, void *user_data);
-    virtual void characterSetAnimation(const Character *character, void *user_data, string name);
+    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name);
     virtual void characterDeath(Character *character, void *user_data);
 
     virtual void locationAddItem(const Location *location, Item *item);
@@ -492,7 +492,7 @@ public:
 
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
-    void addTextEffect(string text, Vector2D pos, int duration_ms);
+    void addTextEffect(const string &text, Vector2D pos, int duration_ms);
 
     Character *getPlayer() {
         return this->player;
@@ -511,7 +511,7 @@ public:
     }
 
     void addStandardItem(Item *item);
-    Item *cloneStandardItem(string name) const;
+    Item *cloneStandardItem(const string &name) const;
     Currency *cloneGoldItem(int value) const;
 
     vector<Shop *>::const_iterator shopsBegin() const {
@@ -521,7 +521,7 @@ public:
         return shops.end();
     }
 
-    QPixmap &getItemImage(string name);
+    QPixmap &getItemImage(const string &name);
 };
 
 // used for passing messages
@@ -585,15 +585,15 @@ public:
     void run();
     void update();
     //void mouseClick(int m_x, int m_y);
-    string getApplicationFilename(const char *name);
+    string getApplicationFilename(const string &name);
     void log(const char *text, ...);
-    QPixmap loadImage(const char *filename, bool clip, int xpos, int ypos, int width, int height) const;
-    QPixmap loadImage(const char *filename) const {
+    QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height) const;
+    QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0);
     }
-    void showErrorDialog(const char *message);
-    void showInfoDialog(const char *title, const char *message);
-    bool askQuestionDialog(const char *title, const char *message);
+    void showErrorDialog(const string &message);
+    void showInfoDialog(const string &title, const string &message);
+    bool askQuestionDialog(const string &title, const string &message);
 };
 
 extern Game *game_g;

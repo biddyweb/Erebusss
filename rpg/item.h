@@ -37,7 +37,7 @@ protected:
     int rating;
     bool is_magical;
 public:
-    Item(string name, string image_name, int weight);
+    Item(const string &name, const string &image_name, int weight);
     virtual ~Item();
 
     virtual ItemType getType() const {
@@ -98,7 +98,7 @@ public:
     /*void setUse(ItemUse item_use) {
         this->item_use = item_use;
     }*/
-    void setUse(string item_use, string item_use_verb) {
+    void setUse(const string &item_use, const string &item_use_verb) {
         this->item_use = item_use;
         this->item_use_verb = item_use_verb;
     }
@@ -120,7 +120,7 @@ class Weapon : public Item {
     bool requires_ammo;
     string ammo_key;
 public:
-    Weapon(string name, string image_name, int weight, string animation_name);
+    Weapon(const string &name, const string &image_name, int weight, const string &animation_name);
     virtual ~Weapon() {
     }
 
@@ -145,7 +145,7 @@ public:
     bool isRanged() const {
         return this->is_ranged;
     }
-    void setRequiresAmmo(bool requires_ammo, string ammo_key) {
+    void setRequiresAmmo(bool requires_ammo, const string &ammo_key) {
         this->requires_ammo = requires_ammo;
         this->ammo_key = ammo_key;
     }
@@ -160,7 +160,7 @@ public:
 class Shield : public Item {
     string animation_name;
 public:
-    Shield(string name, string image_name, int weight, string animation_name);
+    Shield(const string &name, const string &image_name, int weight, const string &animation_name);
     virtual ~Shield() {
     }
 
@@ -177,7 +177,7 @@ public:
 class Armour : public Item {
     //int rating;
 public:
-    Armour(string name, string image_name, int weight, int rating);
+    Armour(const string &name, const string &image_name, int weight, int rating);
     virtual ~Armour() {
     }
 
@@ -195,7 +195,7 @@ class Ammo : public Item {
     string projectile_image_name;
     int amount;
 public:
-    Ammo(string name, string image_name, string projectile_image_name, int amount);
+    Ammo(const string &name, const string &image_name, const string &projectile_image_name, int amount);
     virtual ~Ammo() {
     }
 
@@ -220,7 +220,7 @@ public:
 class Currency : public Item {
     int value;
 public:
-    Currency(string name, string image_name);
+    Currency(const string &name, const string &image_name);
     virtual ~Currency() {
     }
 
@@ -243,7 +243,7 @@ class Shop {
     vector<const Item *> items;
     vector<int> costs;
 public:
-    Shop(string name);
+    Shop(const string &name);
     ~Shop();
 
     virtual string getName() const {

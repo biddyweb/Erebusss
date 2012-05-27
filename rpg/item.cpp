@@ -9,7 +9,7 @@ using std::stringstream;
 #include <cassert>
 #endif
 
-Item::Item(string name, string image_name, int weight) :
+Item::Item(const string &name, const string &image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), icon_width(0.5f), weight(weight),
     /*item_use(ITEMUSE_NONE), */rating(1), is_magical(false)
 {
@@ -68,7 +68,7 @@ bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
     return false;
 }
 
-Weapon::Weapon(string name, string image_name, int weight, string animation_name) :
+Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name) :
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), is_ranged(false), requires_ammo(false)
 {
@@ -78,7 +78,7 @@ Weapon *Weapon::clone() const {
     return new Weapon(*this);
 }
 
-Shield::Shield(string name, string image_name, int weight, string animation_name) :
+Shield::Shield(const string &name, const string &image_name, int weight, const string &animation_name) :
     Item(name, image_name, weight), animation_name(animation_name)
 {
 }
@@ -87,7 +87,7 @@ Shield *Shield::clone() const {
     return new Shield(*this);
 }
 
-Armour::Armour(string name, string image_name, int weight, int rating) :
+Armour::Armour(const string &name, const string &image_name, int weight, int rating) :
     Item(name, image_name, weight)
 {
     this->rating = rating;
@@ -97,7 +97,7 @@ Armour *Armour::clone() const {
     return new Armour(*this);
 }
 
-Ammo::Ammo(string name, string image_name, string projectile_image_name, int amount) :
+Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int amount) :
     Item(name, image_name, 0), projectile_image_name(projectile_image_name), amount(amount)
 {
 }
@@ -112,7 +112,7 @@ string Ammo::getName() const {
     return ammo_name.str();
 }
 
-Currency::Currency(string name, string image_name) :
+Currency::Currency(const string &name, const string &image_name) :
     Item(name, image_name, 0), value(0)
 {
 }
@@ -127,7 +127,7 @@ string Currency::getName() const {
     return currency_name.str();
 }
 
-Shop::Shop(string name) : name(name) {
+Shop::Shop(const string &name) : name(name) {
 }
 
 Shop::~Shop() {
