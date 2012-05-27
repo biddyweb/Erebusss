@@ -457,6 +457,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void showInfoWindow(const string &html);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
+    bool saveGame(const string &filename);
 
 private slots:
     void clickedStats();

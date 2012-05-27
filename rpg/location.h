@@ -198,10 +198,10 @@ protected:
     set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing
     set<Item *> items; // stored here as well as the Location, for visibility testing
 
+public:
     FloorRegion() : Polygon2D(), is_visible(false) {
     }
 
-public:
     virtual void addPoint(Vector2D point) {
         Polygon2D::addPoint(point);
         this->edge_types.push_back(EDGETYPE_EXTERNAL);

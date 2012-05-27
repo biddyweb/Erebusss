@@ -1451,7 +1451,7 @@ PlayingGamestate::PlayingGamestate() :
     {
         QFile file(":/data/images.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open xml file");
+            throw string("Failed to open images xml file");
         }
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
@@ -1460,11 +1460,15 @@ PlayingGamestate::PlayingGamestate() :
             {
                 if( reader.name() == "image" ) {
                     QStringRef type_s = reader.attributes().value("type");
-                    if( type_s.length() == 0 )
+                    if( type_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         throw string("image element has no type attribute or is zero length");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
-                    if( name_s.length() == 0 )
+                    if( name_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         throw string("image element has no name attribute or is zero length");
+                    }
                     QStringRef imagetype_s = reader.attributes().value("imagetype");
                     LOG("image element type: %s name: %s imagetype: %s\n", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
                     QPixmap pixmap;
@@ -1473,8 +1477,10 @@ PlayingGamestate::PlayingGamestate() :
                     if( imagetype_s.length() == 0 ) {
                         // load file
                         QStringRef filename_s = reader.attributes().value("filename");
-                        if( filename_s.length() == 0 )
+                        if( filename_s.length() == 0 ) {
+                            LOG("error at line %d\n", reader.lineNumber());
                             throw string("image element has no filename attribute or is zero length");
+                        }
                         QString filename = ":/" + filename_s.toString();
                         LOG("    filename: %s\n", filename.toStdString().c_str());
                         QStringRef xpos_s = reader.attributes().value("xpos");
@@ -1519,8 +1525,9 @@ PlayingGamestate::PlayingGamestate() :
                         pixmap = createNoise(64, 64, 4.0f, 4.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
                     }
                     else {
-                        LOG("unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
-                        throw string("unknown imagetype");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        LOG("image element has unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
+                        throw string("image element has unknown imagetype");
                     }
                     if( type_s == "item") {
                         this->item_images[name_s.toString().toStdString()] = pixmap;
@@ -1560,11 +1567,13 @@ PlayingGamestate::PlayingGamestate() :
                                         animation_type = AnimationSet::ANIMATIONTYPE_BOUNCE;
                                     }
                                     else {
-                                        throw string("unknown animation type");
+                                        LOG("error at line %d\n", reader.lineNumber());
+                                        throw string("npc has unknown animation type");
                                     }
                                     animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
                                 }
                                 else {
+                                    LOG("error at line %d\n", reader.lineNumber());
                                     throw string("unknown xml tag within npc section");
                                 }
                             }
@@ -1573,14 +1582,16 @@ PlayingGamestate::PlayingGamestate() :
                         this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition);
                     }
                     else {
+                        LOG("error at line %d\n", reader.lineNumber());
                         throw string("image element has unknown type attribute");
                     }
                 }
             }
         }
         if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
             LOG("error reading images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading xml file");
+            throw string("error reading images xml file");
         }
     }
 
@@ -1591,7 +1602,7 @@ PlayingGamestate::PlayingGamestate() :
     {
         QFile file(":/data/items.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open xml file");
+            throw string("Failed to open items xml file");
         }
         enum ItemsXMLType {
             ITEMS_XML_TYPE_NONE = 0,
@@ -1609,7 +1620,8 @@ PlayingGamestate::PlayingGamestate() :
                 qDebug("    n attributes: %d", reader.attributes().size());*/
                 if( reader.name() == "item" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: item element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1640,7 +1652,8 @@ PlayingGamestate::PlayingGamestate() :
                 else if( reader.name() == "weapon" ) {
                     //qDebug("    weapon:");
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: weapon element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1669,7 +1682,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "shield" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: shield element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1681,7 +1695,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "armour" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: armour element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1694,7 +1709,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "ammo" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: ammo element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1706,7 +1722,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "currency" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: currency element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -1715,7 +1732,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "shop" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: shop element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     shop = new Shop(name_s.toString().toStdString());
@@ -1724,7 +1742,8 @@ PlayingGamestate::PlayingGamestate() :
                 }
                 else if( reader.name() == "purchase" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: purchase element wasn't expected here");
                     }
                     QStringRef template_s = reader.attributes().value("template");
                     QStringRef cost_s = reader.attributes().value("cost");
@@ -1736,7 +1755,8 @@ PlayingGamestate::PlayingGamestate() :
             else if( reader.isEndElement() ) {
                 if( reader.name() == "shop" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
-                        throw string("unexpected items xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: shop end element wasn't expected here");
                     }
                     shop = NULL;
                     itemsXMLType = ITEMS_XML_TYPE_NONE;
@@ -1744,8 +1764,9 @@ PlayingGamestate::PlayingGamestate() :
             }
         }
         if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
             LOG("error reading items.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading xml file");
+            throw string("error reading items xml file");
         }
     }
 
@@ -1766,7 +1787,7 @@ PlayingGamestate::PlayingGamestate() :
     {
         QFile file(":/data/npcs.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open xml file");
+            throw string("Failed to open npcs xml file");
         }
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
@@ -1791,8 +1812,9 @@ PlayingGamestate::PlayingGamestate() :
             }
         }
         if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
             LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading xml file");
+            throw string("error reading npcs xml file");
         }
     }
 
@@ -1847,7 +1869,7 @@ PlayingGamestate::PlayingGamestate() :
     {
         QFile file(":/data/quests.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open xml file");
+            throw string("Failed to open quests xml file");
         }
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
@@ -1858,6 +1880,7 @@ PlayingGamestate::PlayingGamestate() :
                     QStringRef filename_s = reader.attributes().value("filename");
                     LOG("found quest: %s\n", filename_s.toString().toStdString().c_str());
                     if( filename_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         throw string("quest doesn't have filename info");
                     }
                     QuestInfo quest_info(filename_s.toString().toStdString());
@@ -1866,8 +1889,9 @@ PlayingGamestate::PlayingGamestate() :
             }
         }
         if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
             LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading xml file");
+            throw string("error reading quests xml file");
         }
     }
     if( this->quest_list.size() == 0 ) {
@@ -1936,18 +1960,20 @@ void PlayingGamestate::loadQuest() {
             QUEST_XML_TYPE_NONE = 0,
             //QUEST_XML_TYPE_BOUNDARY = 1,
             QUEST_XML_TYPE_SCENERY = 2,
-            QUEST_XML_TYPE_NPC = 3
+            QUEST_XML_TYPE_NPC = 3,
+            QUEST_XML_TYPE_FLOORREGION = 4
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         Polygon2D boundary;
         Scenery *scenery = NULL;
         Character *npc = NULL;
+        FloorRegion *floor_region = NULL;
         QString qt_filename = ":/" + QString(c_quest_info.getFilename().c_str());
         LOG("load quest: %s\n", qt_filename.toStdString().c_str());
         QFile file(qt_filename);
         //QFile file(":/data/quest.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open xml file");
+            throw string("Failed to open quest xml file");
         }
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
@@ -1957,7 +1983,8 @@ void PlayingGamestate::loadQuest() {
                 //LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
                 if( reader.name() == "info" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: info element wasn't expected here");
                     }
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     LOG("quest info: %s\n", info.toStdString().c_str());
@@ -1965,19 +1992,43 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floorregion element wasn't expected here");
                     }
-                    QStringRef rect_x_s = reader.attributes().value("rect_x");
-                    float rect_x = parseFloat(rect_x_s.toString());
-                    QStringRef rect_y_s = reader.attributes().value("rect_y");
-                    float rect_y = parseFloat(rect_y_s.toString());
-                    QStringRef rect_w_s = reader.attributes().value("rect_w");
-                    float rect_w = parseFloat(rect_w_s.toString());
-                    QStringRef rect_h_s = reader.attributes().value("rect_h");
-                    float rect_h = parseFloat(rect_h_s.toString());
-                    //LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
-                    FloorRegion *floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
-                    location->addFloorRegion(floor_region);
+                    QStringRef shape_s = reader.attributes().value("shape");
+                    if( shape_s == "rect" ) {
+                        QStringRef rect_x_s = reader.attributes().value("rect_x");
+                        float rect_x = parseFloat(rect_x_s.toString());
+                        QStringRef rect_y_s = reader.attributes().value("rect_y");
+                        float rect_y = parseFloat(rect_y_s.toString());
+                        QStringRef rect_w_s = reader.attributes().value("rect_w");
+                        float rect_w = parseFloat(rect_w_s.toString());
+                        QStringRef rect_h_s = reader.attributes().value("rect_h");
+                        float rect_h = parseFloat(rect_h_s.toString());
+                        //LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
+                        questXMLType = QUEST_XML_TYPE_FLOORREGION;
+                        floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
+                        // will be added to location when doing the end floorregion element
+                    }
+                    else if( shape_s == "polygon" ) {
+                        questXMLType = QUEST_XML_TYPE_FLOORREGION;
+                        floor_region = new FloorRegion();
+                    }
+                    else {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("floorregion has unknown shape");
+                    }
+                }
+                else if( reader.name() == "floorregion_point" ) {
+                    if( questXMLType != QUEST_XML_TYPE_FLOORREGION ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floorregion_point element wasn't expected here");
+                    }
+                    QStringRef x_s = reader.attributes().value("x");
+                    float x = parseFloat(x_s.toString());
+                    QStringRef y_s = reader.attributes().value("y");
+                    float y = parseFloat(y_s.toString());
+                    floor_region->addPoint(Vector2D(x, y));
                 }
                 /*else if( reader.name() == "boundary" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -1999,7 +2050,8 @@ void PlayingGamestate::loadQuest() {
                 }*/
                 else if( reader.name() == "player_start" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: player_start element wasn't expected here");
                     }
                     QStringRef pos_x_s = reader.attributes().value("x");
                     float pos_x = parseFloat(pos_x_s.toString());
@@ -2016,7 +2068,8 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "npc" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: npc element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef template_s = reader.attributes().value("template");
@@ -2026,6 +2079,7 @@ void PlayingGamestate::loadQuest() {
                     float pos_y = parseFloat(pos_y_s.toString());
                     CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
                     if( character_template == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
                         throw string("can't find character template");
                     }
@@ -2035,11 +2089,13 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "item" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: item element wasn't expected here");
                     }
                     QStringRef template_s = reader.attributes().value("template");
                     Item *item = this->cloneStandardItem(template_s.toString().toStdString());
                     if( item == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
                         throw string("can't find item");
                     }
@@ -2059,12 +2115,14 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "gold" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: gold element wasn't expected here");
                     }
                     QStringRef amount_s = reader.attributes().value("amount");
                     int amount = parseInt(amount_s.toString());
                     Item *item = this->cloneGoldItem(amount);
                     if( item == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         LOG("can't find gold item\n");
                         throw string("can't find gold item");
                     }
@@ -2084,7 +2142,8 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "scenery" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: scenery element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
@@ -2112,6 +2171,7 @@ void PlayingGamestate::loadQuest() {
                     location->addScenery(scenery, pos_x, pos_y);
                     scenery->setBlocking(blocking, block_visibility);
                     if( door && exit ) {
+                        LOG("error at line %d\n", reader.lineNumber());
                         throw string("scenery can't be both a door and an exit");
                     }
                     scenery->setDoor(door);
@@ -2124,7 +2184,8 @@ void PlayingGamestate::loadQuest() {
                 }
                 else if( reader.name() == "trap" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: trap element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef pos_x_s = reader.attributes().value("x");
@@ -2151,27 +2212,44 @@ void PlayingGamestate::loadQuest() {
                 }
                 else */if( reader.name() == "npc" ) {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: npc end element wasn't expected here");
                     }
                     npc = NULL;
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
                 else if( reader.name() == "scenery" ) {
                     if( questXMLType != QUEST_XML_TYPE_SCENERY ) {
-                        throw string("unexpected quest xml");
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: scenery end element wasn't expected here");
                     }
                     scenery = NULL;
+                    questXMLType = QUEST_XML_TYPE_NONE;
+                }
+                else if( reader.name() == "floorregion" ) {
+                    if( questXMLType != QUEST_XML_TYPE_FLOORREGION ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floorregion end element wasn't expected here");
+                    }
+                    if( floor_region->getNPoints() < 3 ) {
+                        LOG("floorregion only has %d points\n", floor_region->getNPoints());
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("floorregion has insufficient points");
+                    }
+                    location->addFloorRegion(floor_region);
+                    floor_region = NULL;
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
             }
         }
         if( reader.hasError() ) {
-            LOG("error reading quest.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading xml file");
+            LOG("error at line %d\n", reader.lineNumber());
+            LOG("error reading quest xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading quest xml file");
         }
         else if( !done_player_start ) {
-            LOG("quest.xml didn't define player_start\n");
-            throw string("quest.xml didn't define player_start");
+            LOG("quest xml didn't define player_start\n");
+            throw string("quest xml didn't define player_start");
         }
     }
 
@@ -2951,6 +3029,42 @@ void PlayingGamestate::updateVisibility(Vector2D pos) {
     }
 }
 
+bool PlayingGamestate::saveGame(const string &filename) {
+    LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
+    string full_path = game_g->getApplicationFilename(filename);
+    LOG("full path: %s\n", full_path.c_str());
+
+    FILE *file = fopen(full_path.c_str(), "wt");
+    if( file = NULL ) {
+        LOG("failed to create file\n");
+        return false;
+    }
+
+    fprintf(file, "<?xml version=\"1.0\" ?>\n");
+    fprintf(file, "<savegame>\n");
+    fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
+    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = c_location->getFloorRegion(i);
+        //fprintf(file, "<floorregion rect_x=\"%f\" rect_y=\"%f\" rect_w=\"%f\" rect_h=\"%f\" />\n", floor_region->getPoint());
+        //<floorregion rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
+    }
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "\n");
+    fprintf(file, "</savegame>\n");
+
+    fclose(file);
+}
+
 void PlayingGamestate::addWidget(QWidget *widget) {
     this->main_stacked_widget->addWidget(widget);
     this->main_stacked_widget->setCurrentWidget(widget);
@@ -3014,8 +3128,14 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
 Game::Game() {
     game_g = this;
 
+    QCoreApplication::setApplicationName("erebus");
+
     // initialise paths
-    QString pathQt (QDesktopServices::storageLocation (QDesktopServices::DataLocation));
+    QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    if( !QDir(pathQt).exists() ) {
+        QDir().mkpath(pathQt);
+    }
+    //QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + QString("/erebus");
     QString nativePath(QDir::toNativeSeparators(pathQt));
     application_path = nativePath.toStdString();
     logfilename = getApplicationFilename("log.txt");
@@ -3204,13 +3324,9 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
 
 void Game::showErrorDialog(const string &message) {
     LOG("Game::showErrorDialog: %s\n", message.c_str());
-    //LOG("1\n");
     this->getScreen()->enableUpdateTimer(false);
-    //LOG("2\n");
     QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message.c_str());
-    //LOG("3\n");
     this->getScreen()->enableUpdateTimer(true);
-    //LOG("4\n");
 }
 
 void Game::showInfoDialog(const string &title, const string &message) {
