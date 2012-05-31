@@ -9,7 +9,7 @@ QT += xml
 
 symbian:TARGET.UID3 = 0xE11B6032
 
-VERSION = 1.0
+VERSION = 0.1
 
 # Smart Installer package's UID
 # This UID is from the protected range 
@@ -37,6 +37,13 @@ symbian {
 # MOBILITY variable. 
 # CONFIG += mobility
 # MOBILITY +=
+
+symbian {
+    ICON = erebus.svg # Symbian icon
+}
+win32 {
+    RC_FILE = resource.rc # Windows icon
+}
 
 SOURCES += main.cpp mainwindow.cpp \
     game.cpp \
