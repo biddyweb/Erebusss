@@ -24,7 +24,8 @@ erebus_reg.rss
 *.sis
 *.pkg
 
-*.svg
+*.ico
 *.png
+*.svg
 
 gpl.txt
