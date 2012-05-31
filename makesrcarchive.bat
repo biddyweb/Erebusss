@@ -15,6 +15,8 @@ REM copy %docsrc%\comp_erebus.html %dst%\readme.html
 copy %src%\erebus.pro %dst%
 copy %src%\deployment.pri %dst%
 copy %src%\erebus.qrc %dst%
+copy %src%\erebus.ico %dst%
+copy %src%\resource.rc %dst%
 copy %src%\erebus.svg %dst%
 
 copy %src%\gpl.txt %dst%
