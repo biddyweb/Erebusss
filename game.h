@@ -454,10 +454,14 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, CharacterTemplate *> character_templates;
     vector<Shop *> shops;
 
+    Item *parseXMLItem(const QXmlStreamReader &reader);
     void showInfoWindow(const string &html);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
-    bool saveGame(const string &filename);
+
+    void saveItem(FILE *file, const Item *item) const;
+    void saveItem(FILE *file, const Item *item, const Character *character) const;
+    bool saveGame(const string &filename) const;
 
 private slots:
     void clickedStats();
@@ -465,14 +469,15 @@ private slots:
     void clickedJournal();
     void clickedOptions();
     void clickedRest();
+    void clickedSave();
     void clickedQuit();
     void clickedCloseSubwindow();
 
 public:
-    PlayingGamestate();
+    PlayingGamestate(bool is_savegame);
     virtual ~PlayingGamestate();
 
-    void loadQuest();
+    void loadQuest(string filename, bool is_savegame);
 
     virtual void quitGame();
     virtual void update();
@@ -510,6 +515,9 @@ public:
     const Quest *getQuest() const {
         return this->quest;
     }
+    const QuestInfo &getCQuestInfo() const {
+        return this->quest_list.at(this->c_quest_indx);
+    }
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;
@@ -530,7 +538,8 @@ class GameMessage {
 public:
     enum GameMessageType {
         GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING = 0,
-        GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS = 1
+        GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD = 1,
+        GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS = 2
     };
 
 protected:

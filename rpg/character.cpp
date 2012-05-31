@@ -37,7 +37,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), is_hitting(false),
-    fighting_prowess(0), strength(0), health(0), max_health(0),
+    /*fighting_prowess(0), strength(0),*/ health(0), max_health(0),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
 {
 
@@ -51,7 +51,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), is_hitting(false),
-    fighting_prowess(0), strength(0), health(0), max_health(0),
+    /*fighting_prowess(0), strength(0),*/ health(0), max_health(0),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
 {
     this->animation_name = character_template.getAnimationName();
@@ -450,7 +450,7 @@ void Character::wearArmour(Armour *item) {
     }
 }
 
-void Character::addItem(Item *item) {
+void Character::addItem(Item *item, bool auto_arm) {
     if( item->getType() == ITEMTYPE_CURRENCY ) {
         // special case
         Currency *currency = static_cast<Currency *>(item);
@@ -461,15 +461,15 @@ void Character::addItem(Item *item) {
     }
 
     this->items.insert(item);
-    if( this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
+    if( auto_arm && this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon
         this->armWeapon( static_cast<Weapon *>(item) );
     }
-    if( this->current_shield == NULL && item->getType() == ITEMTYPE_SHIELD ) {
+    if( auto_arm && this->current_shield == NULL && item->getType() == ITEMTYPE_SHIELD ) {
         // automatically arm shield
         this->armShield( static_cast<Shield *>(item) );
     }
-    if( this->current_armour == NULL && item->getType() == ITEMTYPE_ARMOUR ) {
+    if( auto_arm && this->current_armour == NULL && item->getType() == ITEMTYPE_ARMOUR ) {
         // automatically wear aromur
         this->wearArmour( static_cast<Armour *>(item) );
     }

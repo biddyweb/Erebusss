@@ -31,11 +31,11 @@ public:
 
 class Scenery {
 protected:
-    Location *location;
+    Location *location; // not saved
     string name;
     string image_name;
     Vector2D pos; // pos in Location (for centre)
-    void *user_data_gfx;
+    void *user_data_gfx; // not saved
 
     bool is_blocking;
     bool blocks_visibility;
@@ -161,6 +161,9 @@ public:
     /*void setLocation(Location *location) {
         this->location = location;
     }*/
+    const string &getType() const {
+        return this->type;
+    }
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
     }
@@ -416,6 +419,12 @@ public:
     QuestObjective(const string &type, const string &arg1);
 
     bool testIfComplete(const Quest *quest) const;
+    const string &getType() const {
+        return type;
+    }
+    const string &getArg1() const {
+        return arg1;
+    }
 };
 
 class Quest {
@@ -430,6 +439,9 @@ public:
     void addLocation(Location *location);
     void setQuestObjective(QuestObjective *quest_objective) {
         this->quest_objective = quest_objective;
+    }
+    const QuestObjective *getQuestObjective() const {
+        return this->quest_objective;
     }
     void setInfo(const string &info) {
         this->info = info;

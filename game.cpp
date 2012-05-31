@@ -161,6 +161,9 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 }
 
 void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
+    if( animation_layer == NULL ) {
+        throw string("AnimatedObject::addAnimationLayer received NULL animated_layer");
+    }
     this->animation_layers.push_back(animation_layer);
     const AnimationSet *c_animation_set = animation_layer->getAnimationSet("");
     this->c_animation_sets.push_back(c_animation_set);
@@ -322,6 +325,9 @@ void OptionsGamestate::clickedStart() {
 
 void OptionsGamestate::clickedLoad() {
     LOG("OptionsGamestate::clickedLoad()\n");
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD);
+    game_g->pushMessage(game_message);
 }
 
 void OptionsGamestate::clickedQuit() {
@@ -1040,7 +1046,7 @@ void ItemsWindow::clickedUseItem() {
     }
     Item *item = list_items.at(index);
     Character *player = this->playing_gamestate->getPlayer();
-    if( item->use(this->playing_gamestate, player) ) {
+    if( item->useItem(this->playing_gamestate, player) ) {
         // item is deleted
         player->takeItem(item);
         item = NULL;
@@ -1304,7 +1310,7 @@ void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
 }
 
-PlayingGamestate::PlayingGamestate() :
+PlayingGamestate::PlayingGamestate(bool is_savegame) :
     scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
     player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
 {
@@ -1447,10 +1453,12 @@ PlayingGamestate::PlayingGamestate() :
 
     // create RPG data
 
-    LOG("create player\n");
-    this->player = new Character("Player", "", false);
-    player->initialiseHealth(100);
-    player->addGold( rollDice(2, 6, 10) );
+    if( !is_savegame ) {
+        LOG("create player\n");
+        this->player = new Character("Player", "", false);
+        player->initialiseHealth(100);
+        player->addGold( rollDice(2, 6, 10) );
+    }
 
     LOG("load images\n");
     {
@@ -1624,119 +1632,7 @@ PlayingGamestate::PlayingGamestate() :
                 /*qDebug("read xml: %s", reader.name().toString().toStdString().c_str());
                 qDebug("    type: %d", reader.tokenType());
                 qDebug("    n attributes: %d", reader.attributes().size());*/
-                if( reader.name() == "item" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: item element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef icon_width_s = reader.attributes().value("icon_width");
-                    QStringRef weight_s = reader.attributes().value("weight");
-                    QStringRef rating_s = reader.attributes().value("rating");
-                    QStringRef magical_s = reader.attributes().value("magical");
-                    QStringRef use_s = reader.attributes().value("use");
-                    QStringRef use_verb_s = reader.attributes().value("use_verb");
-                    int weight = parseInt(weight_s.toString());
-                    int rating = parseInt(rating_s.toString(), true);
-                    if( rating == 0 )
-                        rating = 1; // so the default of 0 defaults instead to 1
-                    bool magical = parseBool(magical_s.toString(), true);
-                    Item *item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
-                    if( icon_width_s.length() > 0 ) {
-                        float icon_width = parseFloat(icon_width_s.toString());
-                        //LOG("icon_width: %f\n", icon_width);
-                        item->setIconWidth(icon_width);
-                    }
-                    item->setRating(rating);
-                    item->setMagical(magical);
-                    if( use_s.length() > 0 ) {
-                        item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
-                    }
-                    this->addStandardItem( item );
-                }
-                else if( reader.name() == "weapon" ) {
-                    //qDebug("    weapon:");
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: weapon element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef weight_s = reader.attributes().value("weight");
-                    QStringRef animation_name_s = reader.attributes().value("animation_name");
-                    QStringRef two_handed_s = reader.attributes().value("two_handed");
-                    QStringRef ranged_s = reader.attributes().value("ranged");
-                    QStringRef ammo_s = reader.attributes().value("ammo");
-                    /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
-                    qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
-                    qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
-                    qDebug("    weight: %s", weight_s.toString().toStdString().c_str());
-                    qDebug("    two_handed_s: %s", two_handed_s.toString().toStdString().c_str());
-                    qDebug("    ranged_s: %s", ranged_s.toString().toStdString().c_str());
-                    qDebug("    ammo_s: %s", ammo_s.toString().toStdString().c_str());*/
-                    int weight = parseInt(weight_s.toString());
-                    bool two_handed = parseBool(two_handed_s.toString(), true);
-                    bool ranged = parseBool(ranged_s.toString(), true);
-                    Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
-                    weapon->setTwoHanded(two_handed);
-                    weapon->setRanged(ranged);
-                    if( ammo_s.length() > 0 ) {
-                        weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
-                    }
-                    this->addStandardItem( weapon );
-                }
-                else if( reader.name() == "shield" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: shield element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef weight_s = reader.attributes().value("weight");
-                    QStringRef animation_name_s = reader.attributes().value("animation_name");
-                    int weight = parseInt(weight_s.toString());
-                    Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
-                    this->addStandardItem( shield );
-                }
-                else if( reader.name() == "armour" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: armour element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef weight_s = reader.attributes().value("weight");
-                    QStringRef rating_s = reader.attributes().value("rating");
-                    int weight = parseInt(weight_s.toString());
-                    int rating = parseInt(rating_s.toString());
-                    Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
-                    this->addStandardItem( armour );
-                }
-                else if( reader.name() == "ammo" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: ammo element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
-                    QStringRef amount_s = reader.attributes().value("amount");
-                    int amount = parseInt(amount_s.toString());
-                    Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), amount);
-                    this->addStandardItem( ammo );
-                }
-                else if( reader.name() == "currency" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: currency element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    Currency *currency = new Currency(name_s.toString().toStdString(), image_name_s.toString().toStdString());
-                    this->addStandardItem( currency );
-                }
-                else if( reader.name() == "shop" ) {
+                if( reader.name() == "shop" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected items xml: shop element wasn't expected here");
@@ -1773,13 +1669,26 @@ PlayingGamestate::PlayingGamestate() :
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected items xml: player_default_item element wasn't expected here");
                     }
-                    QStringRef template_s = reader.attributes().value("template");
-                    if( template_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("player_default_item element has no template attribute");
+                    if( !is_savegame ) {
+                        QStringRef template_s = reader.attributes().value("template");
+                        if( template_s.length() == 0 ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("player_default_item element has no template attribute");
+                        }
+                        Item *item = this->cloneStandardItem(template_s.toString().toStdString());
+                        player->addItem(item);
                     }
-                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
-                    player->addItem(item);
+                }
+                else {
+                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected items xml: element wasn't expected here");
+                    }
+                    Item *item = parseXMLItem( reader );
+                    if( item != NULL ) {
+                        this->addStandardItem( item );
+                    }
+                    // else ignore unknown element
                 }
             }
             else if( reader.isEndElement() ) {
@@ -1809,12 +1718,6 @@ PlayingGamestate::PlayingGamestate() :
 
     gui_overlay->setProgress(30);
     qApp->processEvents();
-
-    /*player->addItem( this->cloneStandardItem("Long Sword") );
-    player->addItem( this->cloneStandardItem("Shield") );
-    player->addItem( this->cloneStandardItem("Longbow") );
-    player->addItem( this->cloneStandardItem("Leather Armour") );
-    player->addItem( this->cloneStandardItem("Arrows") );*/
 
     LOG("load NPCs\n");
     {
@@ -1972,14 +1875,112 @@ PlayingGamestate::~PlayingGamestate() {
     LOG("done\n");
 }
 
-void PlayingGamestate::loadQuest() {
-    LOG("PlayingGamestate::loadQuest()\n");
+Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
+    Item *item = NULL;
+    if( reader.name() == "item" ) {
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef icon_width_s = reader.attributes().value("icon_width");
+        QStringRef weight_s = reader.attributes().value("weight");
+        QStringRef rating_s = reader.attributes().value("rating");
+        QStringRef magical_s = reader.attributes().value("magical");
+        QStringRef use_s = reader.attributes().value("use");
+        QStringRef use_verb_s = reader.attributes().value("use_verb");
+        int weight = parseInt(weight_s.toString());
+        int rating = parseInt(rating_s.toString(), true);
+        if( rating == 0 )
+            rating = 1; // so the default of 0 defaults instead to 1
+        bool magical = parseBool(magical_s.toString(), true);
+        item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
+        if( icon_width_s.length() > 0 ) {
+            float icon_width = parseFloat(icon_width_s.toString());
+            //LOG("icon_width: %f\n", icon_width);
+            item->setIconWidth(icon_width);
+        }
+        item->setRating(rating);
+        item->setMagical(magical);
+        if( use_s.length() > 0 ) {
+            item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
+        }
+    }
+    else if( reader.name() == "weapon" ) {
+        //qDebug("    weapon:");
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef weight_s = reader.attributes().value("weight");
+        QStringRef animation_name_s = reader.attributes().value("animation_name");
+        QStringRef two_handed_s = reader.attributes().value("two_handed");
+        QStringRef ranged_s = reader.attributes().value("ranged");
+        QStringRef ammo_s = reader.attributes().value("ammo");
+        /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
+        qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
+        qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
+        qDebug("    weight: %s", weight_s.toString().toStdString().c_str());
+        qDebug("    two_handed_s: %s", two_handed_s.toString().toStdString().c_str());
+        qDebug("    ranged_s: %s", ranged_s.toString().toStdString().c_str());
+        qDebug("    ammo_s: %s", ammo_s.toString().toStdString().c_str());*/
+        int weight = parseInt(weight_s.toString());
+        bool two_handed = parseBool(two_handed_s.toString(), true);
+        bool ranged = parseBool(ranged_s.toString(), true);
+        Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
+        item = weapon;
+        weapon->setTwoHanded(two_handed);
+        weapon->setRanged(ranged);
+        if( ammo_s.length() > 0 ) {
+            weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
+        }
+    }
+    else if( reader.name() == "shield" ) {
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef weight_s = reader.attributes().value("weight");
+        QStringRef animation_name_s = reader.attributes().value("animation_name");
+        int weight = parseInt(weight_s.toString());
+        Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
+        item = shield;
+    }
+    else if( reader.name() == "armour" ) {
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef weight_s = reader.attributes().value("weight");
+        QStringRef rating_s = reader.attributes().value("rating");
+        int weight = parseInt(weight_s.toString());
+        int rating = parseInt(rating_s.toString());
+        Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
+        item = armour;
+    }
+    else if( reader.name() == "ammo" ) {
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
+        QStringRef amount_s = reader.attributes().value("amount");
+        int amount = parseInt(amount_s.toString());
+        Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), amount);
+        item = ammo;
+    }
+    else if( reader.name() == "currency" ) {
+        QStringRef name_s = reader.attributes().value("name");
+        QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef value_s = reader.attributes().value("value");
+        Currency *currency = new Currency(name_s.toString().toStdString(), image_name_s.toString().toStdString());
+        if( value_s.length() > 0 ) {
+            // n.b., when currency is defined as a template, the value is left as 0, and overridden when we instantiate it by the special "gold" element
+            int value = parseInt(value_s.toString());
+            currency->setValue(value);
+        }
+        item = currency;
+    }
+    // else ignore unknown element - leave item as NULL
+    return item;
+}
+
+void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
+    LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
 
-    const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
     this->quest = new Quest();
     Location *location = new Location();
     this->quest->addLocation(location);
@@ -2001,10 +2002,11 @@ void PlayingGamestate::loadQuest() {
         Scenery *scenery = NULL;
         Character *npc = NULL;
         FloorRegion *floor_region = NULL;
+        /*const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
         QString qt_filename = ":/" + QString(c_quest_info.getFilename().c_str());
         LOG("load quest: %s\n", qt_filename.toStdString().c_str());
-        QFile file(qt_filename);
-        //QFile file(":/data/quest.xml");
+        QFile file(qt_filename);*/
+        QFile file(filename.c_str());
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
         }
@@ -2022,6 +2024,16 @@ void PlayingGamestate::loadQuest() {
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     LOG("quest info: %s\n", info.toStdString().c_str());
                     quest->setInfo(info.toStdString());
+                }
+                else if( reader.name() == "journal" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: journal element wasn't expected here");
+                    }
+                    QString encoded = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
+                    this->journal_ss.clear();
+                    this->journal_ss << journal.data();
                 }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -2050,6 +2062,11 @@ void PlayingGamestate::loadQuest() {
                     else {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("floorregion has unknown shape");
+                    }
+                    QStringRef visible_s = reader.attributes().value("visible");
+                    if( visible_s.length() > 0 ) {
+                        bool visible = parseBool(visible_s.toString());
+                        floor_region->setVisible(visible);
                     }
                 }
                 else if( reader.name() == "floorregion_point" ) {
@@ -2090,6 +2107,9 @@ void PlayingGamestate::loadQuest() {
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
+                    if( player == NULL ) {
+                        throw string("encountered player_start element, but player not yet defined");
+                    }
                     location->addCharacter(player, pos_x, pos_y);
                     done_player_start = true;
                 }
@@ -2099,10 +2119,10 @@ void PlayingGamestate::loadQuest() {
                     QuestObjective *quest_objective = new QuestObjective(type_s.toString().toStdString(), arg1_s.toString().toStdString());
                     this->quest->setQuestObjective(quest_objective);
                 }
-                else if( reader.name() == "npc" ) {
+                else if( reader.name() == "npc" || reader.name() == "player" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: npc element wasn't expected here");
+                        throw string("unexpected quest xml: npc/player element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef template_s = reader.attributes().value("template");
@@ -2110,33 +2130,109 @@ void PlayingGamestate::loadQuest() {
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
-                    CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
-                    if( character_template == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
-                        throw string("can't find character template");
+                    if( template_s.length() > 0 ) {
+                        if( reader.name() == "player" ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("didn't expect player element to load by template");
+                        }
+                        // load from template
+                        CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
+                        if( character_template == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
+                            throw string("can't find character template");
+                        }
+                        npc = new Character(name_s.toString().toStdString(), true, *character_template);
                     }
-                    npc = new Character(name_s.toString().toStdString(), true, *character_template);
+                    else {
+                        if( reader.name() == "player" ) {
+                            //LOG("player: %s\n", name_s.toString().toStdString());
+                            this->player = npc = new Character(name_s.toString().toStdString(), "", false);
+                        }
+                        else {
+                            //LOG("npc: %s\n", name_s.toString().toStdString());
+                            QStringRef animation_name_s = reader.attributes().value("animation_name");
+                            if( animation_name_s.length() == 0 ) {
+                                throw string("npc has no animation_name");
+                            }
+                            QStringRef is_hostile_s = reader.attributes().value("is_hostile");
+                            bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
+                            npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), is_hostile);
+                        }
+                        QStringRef is_dead_s = reader.attributes().value("is_dead");
+                        npc->setDead( parseBool(is_dead_s.toString()) );
+                        QStringRef health_s = reader.attributes().value("health");
+                        QStringRef max_health_s = reader.attributes().value("max_health");
+                        npc->initialiseHealth( parseInt( max_health_s.toString()) );
+                        npc->setHealth( parseInt( health_s.toString()) );
+                        QStringRef gold_s = reader.attributes().value("gold");
+                        npc->addGold( parseInt( gold_s.toString()) );
+                    }
                     location->addCharacter(npc, pos_x, pos_y);
                     questXMLType = QUEST_XML_TYPE_NPC;
                 }
-                else if( reader.name() == "item" ) {
+                else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ammo" || reader.name() == "currency" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
                     }
                     QStringRef template_s = reader.attributes().value("template");
-                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
-                    if( item == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
-                        throw string("can't find item");
+                    Item *item = NULL;
+                    if( template_s.length() > 0 ) {
+                        // load from template
+                        if( reader.name() != "item" ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("only allowed item element type when loading as template");
+                        }
+                        item = this->cloneStandardItem(template_s.toString().toStdString());
+                        if( item == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
+                            throw string("can't find item");
+                        }
+                    }
+                    else {
+                        item = parseXMLItem(reader);
+                        if( item == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unknown item element");
+                        }
                     }
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                         scenery->addItem(item);
                     }
                     else if( questXMLType == QUEST_XML_TYPE_NPC ) {
-                        npc->addItem(item);
+                        QStringRef current_weapon_s = reader.attributes().value("current_weapon");
+                        bool current_weapon = parseBool(current_weapon_s.toString(), true);
+                        QStringRef current_shield_s = reader.attributes().value("current_shield");
+                        bool current_shield = parseBool(current_shield_s.toString(), true);
+                        QStringRef current_armour_s = reader.attributes().value("current_armour");
+                        bool current_armour = parseBool(current_armour_s.toString(), true);
+                        npc->addItem(item, npc != this->player);
+                        if( current_weapon ) {
+                            if( item->getType() != ITEMTYPE_WEAPON ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("current_weapon is not a weapon");
+                            }
+                            Weapon *weapon = static_cast<Weapon *>(item);
+                            npc->armWeapon(weapon);
+                        }
+                        else if( current_shield ) {
+                            if( item->getType() != ITEMTYPE_SHIELD ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("current_shield is not a shield");
+                            }
+                            Shield *shield = static_cast<Shield *>(item);
+                            npc->armShield(shield);
+                        }
+                        else if( current_armour ) {
+                            if( item->getType() != ITEMTYPE_ARMOUR ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("current_armour is not a armour");
+                            }
+                            Armour *armour = static_cast<Armour *>(item);
+                            npc->wearArmour(armour);
+                        }
                     }
                     else {
                         QStringRef pos_x_s = reader.attributes().value("x");
@@ -2220,7 +2316,7 @@ void PlayingGamestate::loadQuest() {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: trap element wasn't expected here");
                     }
-                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef type_s = reader.attributes().value("type");
                     QStringRef pos_x_s = reader.attributes().value("x");
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
@@ -2229,8 +2325,7 @@ void PlayingGamestate::loadQuest() {
                     float size_w = parseFloat(size_w_s.toString());
                     QStringRef size_h_s = reader.attributes().value("h");
                     float size_h = parseFloat(size_h_s.toString());
-
-                    Trap *trap = new Trap(name_s.toString().toStdString(), size_w, size_h);
+                    Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
                     location->addTrap(trap, pos_x, pos_y);
                 }
             }
@@ -2243,10 +2338,10 @@ void PlayingGamestate::loadQuest() {
                     location->addBoundary(boundary);
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
-                else */if( reader.name() == "npc" ) {
+                else */if( reader.name() == "npc" || reader.name() == "player" ) {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: npc end element wasn't expected here");
+                        throw string("unexpected quest xml: npc/player end element wasn't expected here");
                     }
                     npc = NULL;
                     questXMLType = QUEST_XML_TYPE_NONE;
@@ -2404,11 +2499,12 @@ void PlayingGamestate::loadQuest() {
     gui_overlay->setProgress(90);
     qApp->processEvents();
 
-    LOG("add graphics items\n");
+    LOG("add graphics for items\n");
     for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
         Item *item = *iter;
         this->locationAddItem(location, item);
     }
+    LOG("add graphics for scenery");
     for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
         this->locationAddScenery(location, scenery);
@@ -2417,6 +2513,7 @@ void PlayingGamestate::loadQuest() {
     gui_overlay->setProgress(95);
     qApp->processEvents();
 
+    LOG("add graphics for characters");
     for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
         Character *character = *iter;
         AnimatedObject *object = new AnimatedObject();
@@ -2440,6 +2537,7 @@ void PlayingGamestate::loadQuest() {
     }*/
     //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
+    LOG("init visibility\n");
     location->initVisibility(player->getPos());
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
@@ -2453,7 +2551,7 @@ void PlayingGamestate::loadQuest() {
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
 
-    if( quest->getInfo().length() > 0 ) {
+    if( !is_savegame && quest->getInfo().length() > 0 ) {
         stringstream str;
         str << "<html><body>";
         str << "<h1>Quest</h1>";
@@ -2623,6 +2721,12 @@ void PlayingGamestate::clickedOptions() {
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 
+    QPushButton *saveButton = new QPushButton("Save game");
+    saveButton->setFont(game_g->getFontBig());
+    saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(saveButton);
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
+
     QPushButton *closeButton = new QPushButton("Back to game");
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -2652,6 +2756,11 @@ void PlayingGamestate::clickedRest() {
             str << "s";
         this->addTextEffect(str.str(), player->getPos(), 2000);
     }
+}
+
+void PlayingGamestate::clickedSave() {
+    LOG("clickedSave()\n");
+    this->saveGame("savegame.xml");
 }
 
 void PlayingGamestate::clickedQuit() {
@@ -2778,6 +2887,9 @@ void PlayingGamestate::update() {
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
+    if( object == NULL ) {
+        throw string("character has NULL graphics object");
+    }
     object->clearAnimationLayers();
     if( character == player ) {
         object->addAnimationLayer( this->animation_layers["clothes"] );
@@ -3062,40 +3174,216 @@ void PlayingGamestate::updateVisibility(Vector2D pos) {
     }
 }
 
-bool PlayingGamestate::saveGame(const string &filename) {
+void PlayingGamestate::saveItem(FILE *file, const Item *item) const {
+    return saveItem(file, item, NULL);
+}
+
+void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *character) const {
+    switch( item->getType() ) {
+    case ITEMTYPE_GENERAL:
+        fprintf(file, "<item");
+        break;
+    case ITEMTYPE_WEAPON:
+        fprintf(file, "<weapon");
+        break;
+    case ITEMTYPE_SHIELD:
+        fprintf(file, "<shield");
+        break;
+    case ITEMTYPE_ARMOUR:
+        fprintf(file, "<armour");
+        break;
+    case ITEMTYPE_AMMO:
+        fprintf(file, "<ammo");
+        break;
+    case ITEMTYPE_CURRENCY:
+        fprintf(file, "<currency");
+        break;
+    }
+    fprintf(file, " name=\"%s\"", item->getKey().c_str()); // n.b., we use the key, not the name, as the latter may be overloaded to give more descriptive names
+    fprintf(file, " image_name=\"%s\"", item->getImageName().c_str());
+    fprintf(file, " x=\"%f\" y=\"%f\"", item->getX(), item->getY());
+    fprintf(file, " icon_width=\"%f\"", item->getIconWidth());
+    fprintf(file, " weight=\"%d\"", item->getWeight());
+    fprintf(file, " use=\"%s\"", item->getUse().c_str());
+    fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
+    fprintf(file, " rating=\"%d\"", item->getRating());
+    fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
+    // now do subclasses
+    switch( item->getType() ) {
+    case ITEMTYPE_WEAPON:
+    {
+        const Weapon *weapon = static_cast<const Weapon *>(item);
+        fprintf(file, " animation_name=\"%s\"", weapon->getAnimationName().c_str());
+        fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
+        fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
+        if( weapon->getRequiresAmmo() ) {
+            fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey());
+        }
+        if( character != NULL && weapon == character->getCurrentWeapon() ) {
+            fprintf(file, " current_weapon=\"true\"");
+        }
+        break;
+    }
+    case ITEMTYPE_SHIELD:
+    {
+        const Shield *shield = static_cast<const Shield *>(item);
+        fprintf(file, " animation_name=\"%s\"", shield->getAnimationName().c_str());
+        if( character != NULL && shield == character->getCurrentShield() ) {
+            fprintf(file, " current_shield=\"true\"");
+        }
+        break;
+    }
+    case ITEMTYPE_ARMOUR:
+    {
+        const Armour *armour = static_cast<const Armour *>(item);
+        if( character != NULL && armour == character->getCurrentArmour() ) {
+            fprintf(file, " current_armour=\"true\"");
+        }
+        break;
+    }
+    case ITEMTYPE_AMMO:
+    {
+        const Ammo *ammo = static_cast<const Ammo *>(item);
+        fprintf(file, " projectile_image_name=\"%s\"", ammo->getProjectileImageName().c_str());
+        fprintf(file, " amount=\"%d\"", ammo->getAmount());
+        break;
+    }
+    case ITEMTYPE_CURRENCY:
+    {
+        const Currency *currency = static_cast<const Currency *>(item);
+        fprintf(file, " value=\"%d\"", currency->getValue());
+        break;
+    }
+    }
+    fprintf(file, "/>\n");
+}
+
+bool PlayingGamestate::saveGame(const string &filename) const {
     LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
     string full_path = game_g->getApplicationFilename(filename);
     LOG("full path: %s\n", full_path.c_str());
 
     FILE *file = fopen(full_path.c_str(), "wt");
-    if( file = NULL ) {
+    if( file == NULL ) {
         LOG("failed to create file\n");
         return false;
     }
 
+    const int savegame_version = 1;
+
     fprintf(file, "<?xml version=\"1.0\" ?>\n");
-    fprintf(file, "<savegame>\n");
+    fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
+    fprintf(file, "\n");
     fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
+    fprintf(file, "\n");
+
+    LOG("save locations\n");
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
-        FloorRegion *floor_region = c_location->getFloorRegion(i);
-        //fprintf(file, "<floorregion rect_x=\"%f\" rect_y=\"%f\" rect_w=\"%f\" rect_h=\"%f\" />\n", floor_region->getPoint());
-        //<floorregion rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
+        const FloorRegion *floor_region = c_location->getFloorRegion(i);
+        fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D point = floor_region->getPoint(j);
+            fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
+        }
+        fprintf(file, "</floorregion>\n");
     }
     fprintf(file, "\n");
+
+    LOG("save player and npcs\n");
+    for(set<Character *>::const_iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        const Character *character = *iter;
+        if( player == character )
+            fprintf(file, "<player");
+        else {
+            fprintf(file, "<npc");
+            fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
+            fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
+        }
+        fprintf(file, " name=\"%s\"", character->getName().c_str());
+        fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
+        fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
+        fprintf(file, " health=\"%d\"", character->getHealth());
+        fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
+        fprintf(file, " gold=\"%d\"", character->getGold());
+        fprintf(file, ">\n");
+        for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
+            const Item *item = *iter2;
+            this->saveItem(file, item, character);
+        }
+        if( player == character )
+            fprintf(file, "</player>\n");
+        else
+            fprintf(file, "</npc>\n");
+    }
     fprintf(file, "\n");
+
+    LOG("save player additional info\n");
+    fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
     fprintf(file, "\n");
+
+    LOG("save scenery\n");
+    for(set<Scenery *>::const_iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+        const Scenery *scenery = *iter;
+        fprintf(file, "<scenery");
+        fprintf(file, " name=\"%s\"", scenery->getName().c_str());
+        fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
+        fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
+        fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
+        fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
+        fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+        fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
+        fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
+        fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
+        fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+        fprintf(file, ">");
+        for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
+            const Item *item = *iter2;
+            this->saveItem(file, item);
+        }
+        fprintf(file, "</scenery>");
+    }
     fprintf(file, "\n");
+
+    LOG("save items\n");
+    for(set<Item *>::const_iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
+        const Item *item = *iter;
+        this->saveItem(file, item);
+    }
     fprintf(file, "\n");
+
+    LOG("save traps\n");
+    for(set<Trap *>::const_iterator iter = c_location->trapsBegin(); iter != c_location->trapsEnd(); ++iter) {
+        const Trap *trap = *iter;
+        fprintf(file, "<trap");
+        fprintf(file, " type=\"%s\"", trap->getType().c_str());
+        fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
+        fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
+        fprintf(file, " />");
+    }
     fprintf(file, "\n");
+
+    const QuestObjective *quest_objective = this->getQuest()->getQuestObjective();
+    if( quest_objective != NULL ) {
+        LOG("save quest objective\n");
+        fprintf(file, "<quest_objective");
+        fprintf(file, " type=\"%s\"", quest_objective->getType().c_str());
+        fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
+        fprintf(file, " />");
+    }
     fprintf(file, "\n");
+
+    LOG("save journal\n");
+    fprintf(file, "<journal>\n");
+    QByteArray encoded = QUrl::toPercentEncoding(this->journal_ss.str().c_str(), QByteArray(), "<>");
+    fprintf(file, "%s", encoded.data());
+    fprintf(file, "</journal>\n");
     fprintf(file, "\n");
-    fprintf(file, "\n");
-    fprintf(file, "\n");
-    fprintf(file, "\n");
-    fprintf(file, "\n");
+
     fprintf(file, "</savegame>\n");
 
     fclose(file);
+
+    game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
 }
 
 void PlayingGamestate::addWidget(QWidget *widget) {
@@ -3267,9 +3555,22 @@ void Game::update() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate();
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false);
                 gamestate = playing_gamestate;
-                playing_gamestate->loadQuest();
+                const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
+                string qt_filename = ":/" + c_quest_info.getFilename();
+                playing_gamestate->loadQuest(qt_filename, false);
+                this->getScreen()->getMainWindow()->unsetCursor();
+                break;
+            }
+            case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD:
+            {
+                delete gamestate;
+                gamestate = NULL;
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true);
+                gamestate = playing_gamestate;
+                string filename = this->getApplicationFilename("savegame.xml");
+                playing_gamestate->loadQuest(filename, true);
                 this->getScreen()->getMainWindow()->unsetCursor();
                 break;
             }

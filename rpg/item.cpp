@@ -24,7 +24,7 @@ Item *Item::clone() const {
 
 bool Item::canUse() const {
     //return item_use != ITEMUSE_NONE;
-    return item_use.length() > 0;
+    return use.length() > 0;
 }
 
 string Item::getUseVerb() const {
@@ -38,12 +38,12 @@ string Item::getUseVerb() const {
     LOG("Item::getUseVerb() unknown item_use: %s\n", this->item_use.c_str());
     throw string("Unknown ItemUse type");
     return "";*/
-    if( item_use_verb.length() == 0 )
+    if( use_verb.length() == 0 )
         return "Use";
-    return item_use_verb;
+    return use_verb;
 }
 
-bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
+bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
     // returns true if item used up
     // n.b., must be an item owned by Character!
     if( !this->canUse() ) {
@@ -52,7 +52,7 @@ bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
     }
 
     //if( this->item_use == ITEMUSE_POTION_HEALING ) {
-    if( this->item_use == "ITEMUSE_POTION_HEALING" ) {
+    if( this->use == "ITEMUSE_POTION_HEALING" ) {
         int amount = rollDice(this->rating, 6, 0);
         LOG("Character: %s drinks potion of healing, heal %d\n", character->getName().c_str(), amount);
         character->increaseHealth( amount );
@@ -62,7 +62,7 @@ bool Item::use(PlayingGamestate *playing_gamestate, Character *character) {
     }
     else {
         //LOG("Item::use() unknown item_use: %d\n", this->item_use);
-        LOG("Item::use() unknown item_use: %s\n", this->item_use.c_str());
+        LOG("Item::use() unknown item_use: %s\n", this->use.c_str());
         throw string("Unknown ItemUse type");
     }
     return false;

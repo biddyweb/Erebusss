@@ -61,29 +61,27 @@ public:
 class Character {
     // basic info
     string name;
-    bool is_ai;
+    bool is_ai; // not saved
     bool is_hostile;
     string animation_name; // for NPCs (player is handled separately)
 
     // game data
-    Location *location;
-    CharacterListener *listener;
-    void *listener_data;
+    Location *location; // not saved
+    CharacterListener *listener; // not saved
+    void *listener_data; // not saved
     bool is_dead;
-    int time_of_death_ms;
+    int time_of_death_ms; // not saved
     Vector2D pos;
-    bool is_visible; // for NPCs: whether player and NPC can see each other
-    /*bool has_destination;
-    Vector2D dest;*/
-    bool has_path;
-    vector<Vector2D> path;
-    Character *target_npc;
-    int time_last_action_ms;
-    bool is_hitting;
+    bool is_visible; // not saved // for NPCs: whether player and NPC can see each other
+    bool has_path; // not saved
+    vector<Vector2D> path; // not saved
+    Character *target_npc; // not saved
+    int time_last_action_ms; // not saved
+    bool is_hitting; // not saved
 
     // rpg data
-    int fighting_prowess;
-    int strength;
+    /*int fighting_prowess;
+    int strength;*/
     int health;
     int max_health;
 
@@ -146,6 +144,10 @@ public:
     bool isDead() const {
         return this->is_dead;
     }
+    void setDead(bool is_dead) {
+        this->is_dead = is_dead;
+    }
+
     void setVisible(bool is_visible) {
         this->is_visible = is_visible;
     }
@@ -189,8 +191,8 @@ public:
         this->health = max_health;
         this->max_health = max_health;
     }
-    void setHealth(int heath) {
-        if( heath > max_health ) {
+    void setHealth(int health) {
+        if( health > max_health ) {
             throw string("health set to greater than max_health");
         }
         else if( health <= 0 ) {
@@ -235,7 +237,10 @@ public:
         return this->current_armour;
     }
     void wearArmour(Armour *item);
-    void addItem(Item *item);
+    void addItem(Item *item) {
+        addItem(item, true);
+    }
+    void addItem(Item *item, bool auto_arm);
     void pickupItem(Item *item);
     void takeItem(Item *item);
     void dropItem(Item *item);

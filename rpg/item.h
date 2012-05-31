@@ -27,13 +27,12 @@ protected:
     string name;
     string image_name;
     Vector2D pos; // when stored in a Location
-    void *user_data_gfx;
+    void *user_data_gfx; // not saved
     float icon_width; // width of icon when drawn on screen in metres
     int weight; // in multiples of 100g
 
-    //ItemUse item_use;
-    string item_use;
-    string item_use_verb;
+    string use;
+    string use_verb;
     int rating;
     bool is_magical;
 public:
@@ -93,17 +92,23 @@ public:
         return this->weight;
     }
     bool canUse() const;
+    string getUse() const {
+        return this->use;
+    }
     string getUseVerb() const;
-    bool use(PlayingGamestate *playing_gamestate, Character *character);
+    bool useItem(PlayingGamestate *playing_gamestate, Character *character);
     /*void setUse(ItemUse item_use) {
         this->item_use = item_use;
     }*/
-    void setUse(const string &item_use, const string &item_use_verb) {
-        this->item_use = item_use;
-        this->item_use_verb = item_use_verb;
+    void setUse(const string &use, const string &use_verb) {
+        this->use = use;
+        this->use_verb = use_verb;
     }
     void setRating(int rating) {
         this->rating = rating;
+    }
+    int getRating() const {
+        return this->rating;
     }
     void setMagical(bool is_magical) {
         this->is_magical = is_magical;
