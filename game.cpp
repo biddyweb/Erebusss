@@ -276,24 +276,24 @@ OptionsGamestate::OptionsGamestate()
     layout->addWidget(titleLabel);
 
     QPushButton *startButton = new QPushButton("Start game");
+    game_g->initButton(startButton);
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
-    //this->initButton(prevButton);
 
     QPushButton *loadButton = new QPushButton("Load game");
+    game_g->initButton(loadButton);
     loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
-    //this->initButton(prevButton);
 
 #ifndef Q_OS_ANDROID
     // applications don't quit on Android.
     QPushButton *quitButton = new QPushButton("Quit game");
+    game_g->initButton(quitButton);
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
-    //this->initButton(prevButton);
 #endif
 }
 
@@ -634,6 +634,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(label);
 
     QPushButton *closeButton = new QPushButton("Continue");
+    game_g->initButton(closeButton);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
@@ -680,30 +681,37 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         layout->addLayout(h_layout);
 
         QPushButton *viewAllButton = new QPushButton("All");
+        game_g->initButton(viewAllButton);
         h_layout->addWidget(viewAllButton);
         connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
 
         QPushButton *viewWeaponsButton = new QPushButton("Weapons");
+        game_g->initButton(viewWeaponsButton);
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
 
         QPushButton *viewAmmoButton = new QPushButton("Ammo");
+        game_g->initButton(viewAmmoButton);
         h_layout->addWidget(viewAmmoButton);
         connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
 
         QPushButton *viewShieldsButton = new QPushButton("Shields");
+        game_g->initButton(viewShieldsButton);
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
         QPushButton *viewArmourButton = new QPushButton("Armour");
+        game_g->initButton(viewArmourButton);
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
 
         QPushButton *viewMagicButton = new QPushButton("Magic");
+        game_g->initButton(viewMagicButton);
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
 
         QPushButton *viewMiscButton = new QPushButton("Misc");
+        game_g->initButton(viewMiscButton);
         h_layout->addWidget(viewMiscButton);
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
     }
@@ -748,25 +756,29 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        //armButton = new QPushButton("Arm Weapon");
         armButton = new QPushButton(""); // text set in changedSelectedItem()
+        game_g->initButton(armButton);
         h_layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
 
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
+        game_g->initButton(wearButton);
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
 
         useButton = new QPushButton(""); // text set in changedSelectedItem()
+        game_g->initButton(useButton);
         h_layout->addWidget(useButton);
         connect(useButton, SIGNAL(clicked()), this, SLOT(clickedUseItem()));
 
         dropButton = new QPushButton("Drop Item");
+        game_g->initButton(dropButton);
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
     }
 
     QPushButton *closeButton = new QPushButton("Continue");
+    game_g->initButton(closeButton);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 
@@ -1155,15 +1167,18 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         layout->addLayout(h_layout);
 
         QPushButton *sellButton = new QPushButton("Sell");
+        game_g->initButton(sellButton);
         h_layout->addWidget(sellButton);
         connect(sellButton, SIGNAL(clicked()), this, SLOT(clickedSell()));
 
         QPushButton *buyButton = new QPushButton("Buy");
+        game_g->initButton(buyButton);
         h_layout->addWidget(buyButton);
         connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
     }
 
     QPushButton *closeButton = new QPushButton("Finish Trading");
+    game_g->initButton(closeButton);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
 }
@@ -1266,6 +1281,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     for(vector<Shop *>::const_iterator iter = playing_gamestate->shopsBegin(); iter != playing_gamestate->shopsEnd(); ++iter) {
         const Shop *shop = *iter;
         QPushButton *shopButton = new QPushButton(shop->getName().c_str());
+        game_g->initButton(shopButton);
         QVariant variant = qVariantFromValue((void *)shop);
         shopButton->setProperty("shop", variant);
         //shopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1274,11 +1290,13 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     }
 
     QPushButton *trainingButton = new QPushButton("Training");
+    game_g->initButton(trainingButton);
     //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(trainingButton);
     connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
 
     QPushButton *closeButton = new QPushButton(playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest");
+    game_g->initButton(closeButton);
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
@@ -1308,6 +1326,7 @@ void CampaignWindow::clickedMagicShop() {
 
 void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
+    game_g->showInfoDialog("Training", "This feature is not yet implemented");
 }
 
 PlayingGamestate::PlayingGamestate(bool is_savegame) :
@@ -1361,45 +1380,53 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         layout->addLayout(v_layout);
 
         QPushButton *statsButton = new QPushButton("Stats");
+        game_g->initButton(statsButton);
         statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
         v_layout->addWidget(statsButton);
 
         QPushButton *itemsButton = new QPushButton("Items");
+        game_g->initButton(itemsButton);
         itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
         QPushButton *spellsButton = new QPushButton("Spells");
+        game_g->initButton(spellsButton);
         spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);
 
         QPushButton *journalButton = new QPushButton("Journal");
+        game_g->initButton(journalButton);
         journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
         v_layout->addWidget(journalButton);
 
         /*QPushButton *quitButton = new QPushButton("Quit");
+        game_g->initButton(quitButton);
         quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
 
         QPushButton *pauseButton = new QPushButton("Pause");
+        game_g->initButton(pauseButton);
         pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
 
         QPushButton *restButton = new QPushButton("Rest");
+        game_g->initButton(restButton);
         restButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
+        game_g->initButton(optionsButton);
         optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
@@ -1418,10 +1445,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
             v_layout->addLayout(h_layout);
 
             QPushButton *zoomoutButton = new QPushButton("-");
+            game_g->initButton(zoomoutButton);
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             h_layout->addWidget(zoomoutButton);
 
             QPushButton *zoominButton = new QPushButton("+");
+            game_g->initButton(zoominButton);
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
         }
@@ -1432,21 +1461,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     gui_overlay = new GUIOverlay(this, view);
     gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
     view->setGUIOverlay(gui_overlay);
-
-    /*QVBoxLayout *view_layout = new QVBoxLayout(view);
-    view_layout->addSpacing(1);
-    {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        view_layout->addLayout(h_layout);
-
-        //QPushButton *zoomoutButton = new QPushButton("-", view);
-        QPushButton *zoomoutButton = new QPushButton("-");
-        h_layout->addWidget(zoomoutButton);
-        //zoomoutButton->move(view->width() - zoomoutButton->width() - 8, 32);
-
-        h_layout->addSpacing(1);
-
-    }*/
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -2716,18 +2730,21 @@ void PlayingGamestate::clickedOptions() {
     subwindow->setLayout(layout);
 
     QPushButton *quitButton = new QPushButton("Quit game");
+    game_g->initButton(quitButton);
     quitButton->setFont(game_g->getFontBig());
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 
     QPushButton *saveButton = new QPushButton("Save game");
+    game_g->initButton(saveButton);
     saveButton->setFont(game_g->getFontBig());
     saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(saveButton);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
 
     QPushButton *closeButton = new QPushButton("Back to game");
+    game_g->initButton(closeButton);
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
@@ -2785,6 +2802,7 @@ void PlayingGamestate::showInfoWindow(const string &html) {
     layout->addWidget(label);
 
     QPushButton *closeButton = new QPushButton("Continue");
+    game_g->initButton(closeButton);
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
@@ -3537,12 +3555,25 @@ void Game::run() {
         this->font_big = QFont("Verdana", 48, QFont::Bold);
     }
 
+    /*unsigned char filter_max[] = {220, 172, 0};
+    unsigned char filter_min[] = {120, 90, 0};*/
+    unsigned char filter_max[] = {220, 220, 220};
+    unsigned char filter_min[] = {120, 120, 120};
+    QPixmap gui_pixmap_buttons = createNoise(256, 256, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
+    this->gui_brush_buttons.setTexture(gui_pixmap_buttons);
+    this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
+
     gamestate = new OptionsGamestate();
 
     screen->runMainLoop();
 
     delete gamestate;
     delete screen;
+}
+
+void Game::initButton(QPushButton *button) const {
+    button->setAutoFillBackground(true);
+    button->setPalette(this->gui_palette);
 }
 
 void Game::update() {

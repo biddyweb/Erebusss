@@ -563,6 +563,9 @@ class Game {
     QFont font_std;
     QFont font_big;
 
+    QPalette gui_palette;
+    QBrush gui_brush_buttons;
+
     Gamestate *gamestate;
     Screen *screen;
     queue<GameMessage *> message_queue;
@@ -587,6 +590,11 @@ public:
     QFont getFontBig() const {
         return this->font_big;
     }
+    /*const QBrush &getGuiBrushButtons() const {
+        return this->gui_brush_buttons;
+    }*/
+
+    void initButton(QPushButton *button) const;
 
     void pushMessage(GameMessage *message) {
         message_queue.push(message);
