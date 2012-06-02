@@ -590,9 +590,9 @@ class Game : public QObject {
     queue<GameMessage *> message_queue;
 
 private slots:
-#ifndef Q_OS_ANDROID
+/*#ifndef Q_OS_ANDROID
     void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const;
-#endif
+#endif*/
 
 public:
     Game();

@@ -11,7 +11,7 @@
 #endif
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int health_min, int health_max, int gold_min, int gold_max) :
-    animation_name(animation_name), health_min(health_min), health_max(health_max), gold_min(gold_min), gold_max(gold_max)
+    health_min(health_min), health_max(health_max), gold_min(gold_min), gold_max(gold_max), animation_name(animation_name)
 {
 }
 
@@ -30,10 +30,11 @@ int CharacterTemplate::getGold() const {
 }
 
 Character::Character(const string &name, string animation_name, bool is_ai) :
-    name(name), animation_name(animation_name),
+    name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
-    location(NULL), is_dead(false), time_of_death_ms(0),
-    listener(NULL), listener_data(NULL),
+    animation_name(animation_name),
+    location(NULL), listener(NULL), listener_data(NULL),
+    is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), is_hitting(false),
@@ -44,10 +45,10 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
 }
 
 Character::Character(const string &name, bool is_ai, const CharacterTemplate &character_template) :
-    name(name), //animation_name(animation_name),
+    name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
-    location(NULL), is_dead(false), time_of_death_ms(0),
-    listener(NULL), listener_data(NULL),
+    location(NULL), listener(NULL), listener_data(NULL),
+    is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), is_hitting(false),

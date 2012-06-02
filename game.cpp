@@ -1111,7 +1111,7 @@ void ItemsWindow::itemIsDeleted(size_t index) {
 }
 
 TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs) :
-    playing_gamestate(playing_gamestate), list(NULL), player_list(NULL), items(items), costs(costs)
+    playing_gamestate(playing_gamestate), goldLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
 {
     playing_gamestate->addWidget(this);
 
@@ -1953,8 +1953,10 @@ PlayingGamestate::~PlayingGamestate() {
 void PlayingGamestate::playBackgroundMusic() {
     // needed for looping
     qDebug("PlayingGamestate::playBackgroundMusic()");
+#ifndef Q_OS_ANDROID
     this->sound_effects["background"]->stop();
     this->sound_effects["background"]->play();
+#endif
 }
 
 Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
@@ -3310,6 +3312,8 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
     // now do subclasses
     switch( item->getType() ) {
+    case ITEMTYPE_GENERAL:
+        break;
     case ITEMTYPE_WEAPON:
     {
         const Weapon *weapon = static_cast<const Weapon *>(item);
@@ -3317,7 +3321,7 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
         fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
         if( weapon->getRequiresAmmo() ) {
-            fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey());
+            fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
         }
         if( character != NULL && weapon == character->getCurrentWeapon() ) {
             fprintf(file, " current_weapon=\"true\"");
@@ -3672,8 +3676,11 @@ void Game::run() {
 }
 
 void Game::initButton(QPushButton *button) const {
+    // crashes on Android?!
+#ifndef Q_OS_ANDROID
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);
+#endif
 }
 
 void Game::update() {
@@ -3790,14 +3797,14 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
 #ifndef Q_OS_ANDROID
 Phonon::MediaObject *Game::loadSound(string filename) const {
     Phonon::MediaObject *sound = new Phonon::MediaObject(qApp);
-    connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
+    //connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
     sound->setCurrentSource(Phonon::MediaSource(filename.c_str()));
     Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
     Phonon::Path audioPath = Phonon::createPath(sound, audioOutput);
     return sound;
 }
 
-void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const {
+/*void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const {
     qDebug("Game::mediaStateChanged(%d, %d)", newstate, oldstate);
     if( newstate == Phonon::ErrorState ) {
         Phonon::MediaObject *sound = static_cast<Phonon::MediaObject *>(this->sender());
@@ -3807,7 +3814,7 @@ void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) con
             qDebug("    error string: %s", sound->errorString().toStdString().c_str());
         }
     }
-}
+}*/
 #endif
 
 void Game::showErrorDialog(const string &message) {
