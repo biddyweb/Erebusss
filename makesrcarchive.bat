@@ -53,6 +53,12 @@ mkdir %dst%\gfx
 REM copy %src%\gfx\ %dst%\gfx\
 xcopy %src%\gfx %dst%\gfx /E /Y
 
+mkdir %dst%\sound
+xcopy %src%\sound %dst%\sound /E /Y
+
+mkdir %dst%\music
+xcopy %src%\music %dst%\music /E /Y
+
 mkdir %dst%\android
 xcopy %src%\android %dst%\android /E /Y
 

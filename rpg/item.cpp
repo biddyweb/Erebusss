@@ -58,6 +58,9 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         character->increaseHealth( amount );
         LOG("    health is now: %d\n", character->getHealth());
         playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
+        if( character == playing_gamestate->getPlayer() ) {
+            playing_gamestate->playSound("drink");
+        }
         return true;
     }
     else {

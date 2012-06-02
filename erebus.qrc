@@ -33,5 +33,15 @@
         <file>gfx/textures/items/skull.png</file>
         <file>data/quest_kill_goblins.xml</file>
         <file>data/quests.xml</file>
+        <file>sound/door.wav</file>
+        <file>sound/swing2.wav</file>
+        <file>sound/bubble2.wav</file>
+        <file>sound/coin.wav</file>
+        <file>sound/sword-unsheathe5.wav</file>
+        <file>sound/chainmail1.wav</file>
+        <file>sound/click_short.wav</file>
+        <file>sound/container.wav</file>
+        <file>sound/turn_page.wav</file>
+        <file>sound/lock.wav</file>
     </qresource>
 </RCC>

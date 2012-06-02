@@ -251,6 +251,19 @@ OptionsGamestate::OptionsGamestate()
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
 
+#ifndef Q_OS_ANDROID
+    this->music = NULL;
+    if( !mobile_c ) {
+        /*music = new Phonon::MediaObject(qApp);
+        connect(music, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
+        music->setCurrentSource(Phonon::MediaSource("music/no_more_magic.ogg"));
+        Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
+        Phonon::Path audioPath = Phonon::createPath(music, audioOutput);*/
+        music = game_g->loadSound("music/no_more_magic.ogg");
+        music->play();
+    }
+#endif
+
     MainWindow *window = game_g->getScreen()->getMainWindow();
     QFont font = game_g->getFontBig();
     window->setFont(font);
@@ -303,6 +316,12 @@ OptionsGamestate::~OptionsGamestate() {
     VI_GraphicsEnvironment *genv = game_g->getGraphicsEnvironment();
     game_g->getGraphicsEnvironment()->setPanel(NULL); // as the main panel is now destroyed
     */
+#ifndef Q_OS_ANDROID
+    if( music != NULL ) {
+        delete music;
+    }
+#endif
+
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();
     window->setCentralWidget(NULL);
@@ -310,6 +329,16 @@ OptionsGamestate::~OptionsGamestate() {
     optionsGamestate = NULL;
     LOG("deleted OptionsGamestate\n");
 }
+
+/*#ifndef Q_OS_ANDROID
+void OptionsGamestate::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) {
+    LOG("OptionsGamestate::mediaStateChanged(%d, %d)\n", newstate, oldstate);
+    if( newstate == Phonon::ErrorState ) {
+        LOG("phonon reports error!: %d\n", music->errorType());
+        LOG("error string: %s\n", music->errorString().toStdString().c_str());
+    }
+}
+#endif*/
 
 void OptionsGamestate::quitGame() {
     LOG("OptionsGamestate::quitGame()\n");
@@ -988,6 +1017,7 @@ void ItemsWindow::clickedArmWeapon() {
         else {
             LOG("player armed weapon: %s\n", item->getName().c_str());
             playing_gamestate->getPlayer()->armWeapon(weapon);
+            playing_gamestate->playSound("weapon_unsheath");
         }
     }
     else if( item->getType() == ITEMTYPE_SHIELD ) {
@@ -1037,6 +1067,7 @@ void ItemsWindow::clickedWearArmour() {
     else {
         LOG("player put on armour: %s\n", item->getName().c_str());
         playing_gamestate->getPlayer()->wearArmour(armour);
+        playing_gamestate->playSound("wear_armour");
     }
 
     /*QListWidgetItem *item_widget = list->item(index);
@@ -1799,17 +1830,41 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
-    gui_overlay->setProgress(70);
-    qApp->processEvents();
-
     LOG("load floor image\n");
     builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
 
-    gui_overlay->setProgress(80);
+    gui_overlay->setProgress(65);
     qApp->processEvents();
 
     LOG("load wall image\n");
     builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
+
+    gui_overlay->setProgress(70);
+    qApp->processEvents();
+
+    LOG("load sound effects\n");
+#ifndef Q_OS_ANDROID
+    if( !mobile_c ) {
+        /*
+        //this->sound_effects["background"] = game_g->loadSound("music/discordance.ogg");
+        this->sound_effects["background"] = game_g->loadSound(":/sound/door.wav"); // test
+        //connect(this->sound_effects["background"], SIGNAL(finished()), this, SLOT(playBackgroundMusic())); // for looping
+        connect(this->sound_effects["background"], SIGNAL(aboutToFinish()), this, SLOT(playBackgroundMusic())); // for looping
+        this->sound_effects["background"]->play();
+        */
+
+        this->sound_effects["click"] = game_g->loadSound(":/sound/click_short.wav");
+        this->sound_effects["coin"] = game_g->loadSound(":/sound/coin.wav");
+        this->sound_effects["container"] = game_g->loadSound(":/sound/container.wav");
+        this->sound_effects["door"] = game_g->loadSound(":/sound/door.wav");
+        this->sound_effects["drink"] = game_g->loadSound(":/sound/bubble2.wav");
+        this->sound_effects["lock"] = game_g->loadSound(":/sound/lock.wav");
+        this->sound_effects["swing"] = game_g->loadSound(":/sound/swing2.wav");
+        this->sound_effects["turn_page"] = game_g->loadSound(":/sound/turn_page.wav");
+        this->sound_effects["weapon_unsheath"] = game_g->loadSound(":/sound/sword-unsheathe5.wav");
+        this->sound_effects["wear_armour"] = game_g->loadSound(":/sound/chainmail1.wav");
+    }
+#endif
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
@@ -1886,7 +1941,20 @@ PlayingGamestate::~PlayingGamestate() {
         Shop *shop = *iter;
         delete shop;
     }
+#ifndef Q_OS_ANDROID
+    for(map<string, Phonon::MediaObject *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
+        Phonon::MediaObject *sound = iter->second;
+        delete sound;
+    }
+#endif
     LOG("done\n");
+}
+
+void PlayingGamestate::playBackgroundMusic() {
+    // needed for looping
+    qDebug("PlayingGamestate::playBackgroundMusic()");
+    this->sound_effects["background"]->stop();
+    this->sound_effects["background"]->play();
 }
 
 Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
@@ -2709,6 +2777,7 @@ void PlayingGamestate::clickedItems() {
 
 void PlayingGamestate::clickedJournal() {
     LOG("clickedJournal()\n");
+    this->playSound("turn_page");
     stringstream str;
     str << "<html><body>";
     str << "<h1>Journal</h1>";
@@ -2777,7 +2846,13 @@ void PlayingGamestate::clickedRest() {
 
 void PlayingGamestate::clickedSave() {
     LOG("clickedSave()\n");
-    this->saveGame("savegame.xml");
+    if( this->saveGame("savegame.xml") ) {
+        game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+    }
+    else {
+        game_g->showErrorDialog("Failed to save game!");
+
+    }
 }
 
 void PlayingGamestate::clickedQuit() {
@@ -2966,6 +3041,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
                 int damage = rollDice(3, 6, 0);
                 character->decreaseHealth(this, damage);
                 this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
+                this->playSound("click");
                 if( character->isDead() ) {
                     break;
                 }
@@ -3052,6 +3128,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
             if( picked_item != NULL ) {
                 this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
+                if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
+                    this->playSound("coin");
+                }
                 player->pickupItem(picked_item);
             }
         }
@@ -3066,7 +3145,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 float scenery_width = scenery->getWidth();
                 float scenery_height = scenery->getHeight();
                 float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
-                LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
+                //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
                 /*if( dest.x >= scenery_pos.x - 0.5f * scenery_width - npc_radius_c && dest.x <= scenery_pos.x + 0.5f * scenery_width + npc_radius_c &&
                     dest.y >= scenery_pos.y - 0.5f * scenery_height - npc_radius_c && dest.y <= scenery_pos.y + 0.5f * scenery_height + npc_radius_c ) {*/
                 if( dist_from_click <= npc_radius_c ) {
@@ -3082,10 +3161,10 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
                     float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;*/
                     float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
-                    LOG("    player_dist : %f", player_dist);
+                    //LOG("    player_dist : %f", player_dist);
                     if( player_dist <= npc_radius_c + 0.5f ) {
                         if( selected_scenery == NULL || dist_from_click < min_dist ) {
-                            LOG("    selected!\n");
+                            //LOG("    selected!\n");
                             done = true;
                             selected_scenery = scenery;
                             min_dist = dist_from_click;
@@ -3109,6 +3188,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
 
                 if( !selected_scenery->isOpened() ) {
+                    this->playSound("container");
                     selected_scenery->setOpened(true);
                 }
 
@@ -3130,6 +3210,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             }
                         }
                         if( is_locked ) {
+                            this->playSound("lock");
                             this->addTextEffect("The door is locked!", player->getPos(), 2000);
                         }
                         else {
@@ -3139,6 +3220,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     }
                     if( !is_locked ) {
                         // open door
+                        this->playSound("door");
                         c_location->removeScenery(selected_scenery);
                         delete selected_scenery;
                         selected_scenery = NULL;
@@ -3401,7 +3483,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 
     fclose(file);
 
-    game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+    return true;
 }
 
 void PlayingGamestate::addWidget(QWidget *widget) {
@@ -3432,6 +3514,24 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
     //text_effect->setZValue(text_effect->pos().y() + 1.0f);
     text_effect->setZValue(text_effect->pos().y() + 1000.0f);
     view->addTextEffect(text_effect);
+}
+
+void PlayingGamestate::playSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    Phonon::MediaObject *sound = this->sound_effects[sound_effect];
+    ASSERT_LOGGER(sound != NULL);
+    if( sound != NULL ) {
+        qDebug("play sound: %s\n", sound_effect.c_str());
+        if( sound->state() == Phonon::PlayingState ) {
+            qDebug("    already playing");
+        }
+        else {
+            //sound->stop();
+            sound->seek(0);
+            sound->play();
+        }
+    }
+#endif
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
@@ -3686,6 +3786,29 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     }
     return pixmap;
 }
+
+#ifndef Q_OS_ANDROID
+Phonon::MediaObject *Game::loadSound(string filename) const {
+    Phonon::MediaObject *sound = new Phonon::MediaObject(qApp);
+    connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
+    sound->setCurrentSource(Phonon::MediaSource(filename.c_str()));
+    Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
+    Phonon::Path audioPath = Phonon::createPath(sound, audioOutput);
+    return sound;
+}
+
+void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const {
+    qDebug("Game::mediaStateChanged(%d, %d)", newstate, oldstate);
+    if( newstate == Phonon::ErrorState ) {
+        Phonon::MediaObject *sound = static_cast<Phonon::MediaObject *>(this->sender());
+        qDebug("phonon reports error!");
+        if( sound != NULL ) {
+            qDebug("    error code: %d", sound->errorType());
+            qDebug("    error string: %s", sound->errorString().toStdString().c_str());
+        }
+    }
+}
+#endif
 
 void Game::showErrorDialog(const string &message) {
     LOG("Game::showErrorDialog: %s\n", message.c_str());

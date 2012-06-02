@@ -3,6 +3,14 @@
 # file1.source = myfile
 # dir1.source = mydir
 DEPLOYMENTFOLDERS = # file1 dir1
+android {
+}
+else:symbian {
+}
+else {
+    dir1.source = music
+    DEPLOYMENTFOLDERS += dir1
+}
 
 QT += webkit
 QT += xml
@@ -38,10 +46,17 @@ symbian {
 # CONFIG += mobility
 # MOBILITY +=
 
+android {
+    # phonon not supported on Android
+}
+else {
+    QT += phonon
+}
+
 symbian {
     ICON = erebus.svg # Symbian icon
 }
-win32 {
+else:win32 {
     RC_FILE = resource.rc # Windows icon
 }
 

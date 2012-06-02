@@ -5,6 +5,12 @@
 
 #include <QtGui>
 
+#ifndef Q_OS_ANDROID
+// Phonon not supported on Qt Android?
+#include <phonon/MediaObject>
+#include <phonon/AudioOutput>
+#endif
+
 #include <queue>
 using std::queue;
 
@@ -177,11 +183,17 @@ class OptionsGamestate : public Gamestate {
     VI_Button *quitgameButton;*/
 
     //static void action(VI_Panel *source);
+#ifndef Q_OS_ANDROID
+    Phonon::MediaObject *music;
+#endif
 
 private slots:
     void clickedStart();
     void clickedLoad();
     void clickedQuit();
+/*#ifndef Q_OS_ANDROID
+    void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate);
+#endif*/
 
 public:
     OptionsGamestate();
@@ -453,6 +465,9 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> builtin_images;
     map<string, CharacterTemplate *> character_templates;
     vector<Shop *> shops;
+#ifndef Q_OS_ANDROID
+    map<string, Phonon::MediaObject *> sound_effects;
+#endif
 
     Item *parseXMLItem(const QXmlStreamReader &reader);
     void showInfoWindow(const string &html);
@@ -472,6 +487,7 @@ private slots:
     void clickedSave();
     void clickedQuit();
     void clickedCloseSubwindow();
+    void playBackgroundMusic();
 
 public:
     PlayingGamestate(bool is_savegame);
@@ -499,6 +515,7 @@ public:
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
+    void playSound(const string &sound_effect);
 
     Character *getPlayer() {
         return this->player;
@@ -554,7 +571,9 @@ public:
     }
 };
 
-class Game {
+class Game : public QObject {
+    Q_OBJECT
+
     string application_path;
     string logfilename;
     string oldlogfilename;
@@ -569,6 +588,11 @@ class Game {
     Gamestate *gamestate;
     Screen *screen;
     queue<GameMessage *> message_queue;
+
+private slots:
+#ifndef Q_OS_ANDROID
+    void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const;
+#endif
 
 public:
     Game();
@@ -609,6 +633,9 @@ public:
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0);
     }
+#ifndef Q_OS_ANDROID
+    Phonon::MediaObject *loadSound(string filename) const;
+#endif
     void showErrorDialog(const string &message);
     void showInfoDialog(const string &title, const string &message);
     bool askQuestionDialog(const string &title, const string &message);

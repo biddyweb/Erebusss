@@ -244,6 +244,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     this->listener->characterTurn(this, this->listener_data, dir);
                                 }
                             }
+                            playing_gamestate->playSound("swing");
                         }
                     }
                 }
