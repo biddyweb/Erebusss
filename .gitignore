@@ -28,5 +28,6 @@ erebus_reg.rss
 *.ogg
 *.png
 *.svg
+*.wav
 
 gpl.txt
