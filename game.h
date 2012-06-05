@@ -165,6 +165,20 @@ public:
     }
 };
 
+class ScrollingListWidget : public QListWidget {
+    Q_OBJECT
+
+    int saved_x;
+    int saved_y;
+
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+public:
+    ScrollingListWidget();
+    virtual ~ScrollingListWidget() {
+    }
+};
+
 class Gamestate : public QObject {
 public:
     //virtual VI_Panel *getPanel()=0;
@@ -178,11 +192,10 @@ class OptionsGamestate : public Gamestate {
     Q_OBJECT
 
     static OptionsGamestate *optionsGamestate; // singleton pointer, needed for static member functions
-    /*VI_Panel  *gamePanel;
-    VI_Button *startgameButton;
-    VI_Button *quitgameButton;*/
 
-    //static void action(VI_Panel *source);
+    QStackedWidget *main_stacked_widget;
+    ScrollingListWidget *load_list;
+
 #ifndef Q_OS_ANDROID
     Phonon::MediaObject *music;
 #endif
@@ -190,7 +203,9 @@ class OptionsGamestate : public Gamestate {
 private slots:
     void clickedStart();
     void clickedLoad();
+    void clickedLoadGame();
     void clickedQuit();
+    void closeAllSubWindows();
 /*#ifndef Q_OS_ANDROID
     void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate);
 #endif*/
@@ -198,10 +213,6 @@ private slots:
 public:
     OptionsGamestate();
     virtual ~OptionsGamestate();
-
-    /*virtual VI_Panel *getPanel() {
-        return gamePanel;
-    }*/
 
     virtual void quitGame();
     virtual void update() {
@@ -320,20 +331,6 @@ public:
     }
 };
 
-class ScrollingListWidget : public QListWidget {
-    Q_OBJECT
-
-    int saved_x;
-    int saved_y;
-
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
-public:
-    ScrollingListWidget();
-    virtual ~ScrollingListWidget() {
-    }
-};
-
 class ItemsWindow : public QWidget {
     Q_OBJECT
 
@@ -423,14 +420,29 @@ class CampaignWindow : public QWidget {
 
 private slots:
     void clickedShop();
-    /*void clickedArmourer();
-    void clickedGeneralStores();
-    void clickedMagicShop();*/
     void clickedTraining();
 
 public:
     CampaignWindow(PlayingGamestate *playing_gamestate);
     virtual ~CampaignWindow() {
+    }
+};
+
+class SaveGameWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+    QListWidget *list;
+    QLineEdit *edit;
+
+private slots:
+    void clickedSave();
+    void clickedDelete();
+    void clickedSaveNew();
+
+public:
+    SaveGameWindow(PlayingGamestate *playing_gamestate);
+    virtual ~SaveGameWindow() {
     }
 };
 
@@ -476,7 +488,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
-    bool saveGame(const string &filename) const;
 
 private slots:
     void clickedStats();
@@ -486,7 +497,6 @@ private slots:
     void clickedRest();
     void clickedSave();
     void clickedQuit();
-    void clickedCloseSubwindow();
     void playBackgroundMusic();
 
 public:
@@ -494,6 +504,7 @@ public:
     virtual ~PlayingGamestate();
 
     void loadQuest(string filename, bool is_savegame);
+    bool saveGame(const string &filename) const;
 
     virtual void quitGame();
     virtual void update();
@@ -548,6 +559,10 @@ public:
     }
 
     QPixmap &getItemImage(const string &name);
+
+public slots:
+    void closeSubWindow();
+    void closeAllSubWindows();
 };
 
 // used for passing messages
@@ -568,6 +583,17 @@ public:
 
     GameMessageType getGameMessageType() const {
         return game_message_type;
+    }
+};
+
+class LoadGameMessage : public GameMessage {
+    string filename;
+public:
+    LoadGameMessage(string filename) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD), filename(filename) {
+    }
+
+    const string &getFilename() const {
+        return this->filename;
     }
 };
 

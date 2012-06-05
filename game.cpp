@@ -34,13 +34,9 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 const int versionMajor = 0;
 const int versionMinor = 1;
 
-//const float player_scale = 1.0f/32.0f; // 32 pixels for 1 metre
-//const float item_scale = 1.0f/64.0f; // 64 pixels for 1 metre
-//const float item_width = 0.5f;
-//const float scenery_width = item_width;
-//const float font_scale = 1.0f/64.0f;
-
-//const int scene_item_character_key_c = 0;
+string savegame_root = "savegame_";
+string savegame_ext = ".xml";
+string savegame_folder = "savegames/";
 
 AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
     if( pixmaps.size() != N_DIRECTIONS * n_frames ) {
@@ -220,9 +216,11 @@ int AnimatedObject::getSize() const {
 
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms) :
     QGraphicsTextItem(text), time_expire(0), view(view) {
+
     this->setDefaultTextColor(Qt::white);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
-    this->setFont(game_g->getFontStd());
+    //this->setFont(game_g->getFontStd());
+    this->setFont(game_g->getFontSmall());
 
     {
         // centre alignment - see http://www.cesarbs.org/blog/2011/05/30/aligning-text-in-qgraphicstextitem/
@@ -246,7 +244,7 @@ void TextEffect::advance(int phase) {
     }
 }
 
-OptionsGamestate::OptionsGamestate()
+OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -268,9 +266,14 @@ OptionsGamestate::OptionsGamestate()
     QFont font = game_g->getFontBig();
     window->setFont(font);
 
+    this->main_stacked_widget = new QStackedWidget();
+    main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    window->setCentralWidget(main_stacked_widget);
+
     QWidget *centralWidget = new QWidget(window);
-    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(centralWidget);
+    //centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+    //window->setCentralWidget(centralWidget);
+    main_stacked_widget->addWidget(centralWidget);
 
     QVBoxLayout *layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
@@ -308,6 +311,8 @@ OptionsGamestate::OptionsGamestate()
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 #endif
+
+    window->setEnabled(true); // ensure is enabled - may have been disabled if fail to load game, and return to OptionsGamestate
 }
 
 OptionsGamestate::~OptionsGamestate() {
@@ -354,9 +359,72 @@ void OptionsGamestate::clickedStart() {
 
 void OptionsGamestate::clickedLoad() {
     LOG("OptionsGamestate::clickedLoad()\n");
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
     GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD);
+    game_g->pushMessage(game_message);*/
+
+    QWidget *widget = new QWidget();
+    this->main_stacked_widget->addWidget(widget);
+    this->main_stacked_widget->setCurrentWidget(widget);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    widget->setLayout(layout);
+
+    load_list = new ScrollingListWidget();
+    if( !mobile_c ) {
+        QFont list_font = load_list->font();
+        list_font.setPointSize( list_font.pointSize() + 8 );
+        load_list->setFont(list_font);
+    }
+    layout->addWidget(load_list);
+    load_list->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
+    QStringList filter;
+    filter << "*" + QString( savegame_ext.c_str() );
+    QStringList files = dir.entryList(filter);
+    for(int i=0;i<files.size();i++) {
+        const QString &file = files.at(i);
+        load_list->addItem(file);
+    }
+
+    load_list->setCurrentRow(0);
+
+    QPushButton *loadButton = new QPushButton("Load");
+    game_g->initButton(loadButton);
+    //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(loadButton);
+    connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
+
+    QPushButton *closeButton = new QPushButton("Cancel");
+    game_g->initButton(closeButton);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+}
+
+void OptionsGamestate::clickedLoadGame() {
+    LOG("OptionsGamestate::clickedLoadGame()\n");
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    //GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD);
+    int index = load_list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < load_list->count() );
+    QString filename = this->load_list->item(index)->text();
+    LoadGameMessage *game_message = new LoadGameMessage(filename.toStdString());
     game_g->pushMessage(game_message);
+}
+
+void OptionsGamestate::closeAllSubWindows() {
+    LOG("OptionsGamestate::closeAllSubWindows");
+    while( this->main_stacked_widget->count() > 1 ) {
+        QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
+        this->main_stacked_widget->removeWidget(subwindow);
+        subwindow->deleteLater();
+    }
 }
 
 void OptionsGamestate::clickedQuit() {
@@ -665,7 +733,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     QPushButton *closeButton = new QPushButton("Continue");
     game_g->initButton(closeButton);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
@@ -809,7 +877,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     QPushButton *closeButton = new QPushButton("Continue");
     game_g->initButton(closeButton);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 
     /*if( list_items.size() > 0 ) {
         list->setCurrentRow(0);
@@ -1211,7 +1279,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
     QPushButton *closeButton = new QPushButton("Finish Trading");
     game_g->initButton(closeButton);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
 
 void TradeWindow::updateGoldLabel() {
@@ -1330,7 +1398,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     game_g->initButton(closeButton);
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
 
 void CampaignWindow::clickedShop() {
@@ -1358,6 +1426,184 @@ void CampaignWindow::clickedMagicShop() {
 void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
     game_g->showInfoDialog("Training", "This feature is not yet implemented");
+}
+
+SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
+    playing_gamestate(playing_gamestate), list(NULL), edit(NULL)
+{
+    playing_gamestate->addWidget(this);
+
+    QFont font = game_g->getFontBig();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    list = new ScrollingListWidget();
+    if( !mobile_c ) {
+        QFont list_font = list->font();
+        list_font.setPointSize( list_font.pointSize() + 8 );
+        list->setFont(list_font);
+    }
+    layout->addWidget(list);
+    list->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    list->addItem("New Save Game File");
+
+    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
+    QStringList filter;
+    filter << "*" + QString( savegame_ext.c_str() );
+    QStringList files = dir.entryList(filter);
+    for(int i=0;i<files.size();i++) {
+        const QString &file = files.at(i);
+        list->addItem(file);
+    }
+
+    list->setCurrentRow(0);
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *saveButton = new QPushButton("Save");
+        game_g->initButton(saveButton);
+        //saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(saveButton);
+        connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
+
+        QPushButton *deleteButton = new QPushButton("Delete File");
+        game_g->initButton(deleteButton);
+        //deleteButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(deleteButton);
+        connect(deleteButton, SIGNAL(clicked()), this, SLOT(clickedDelete()));
+    }
+
+    QPushButton *closeButton = new QPushButton("Cancel");
+    game_g->initButton(closeButton);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
+}
+
+void SaveGameWindow::clickedSave() {
+    LOG("SaveGameWindow::clickedSave()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < list->count());
+    if( index == 0 ) {
+        QString filename = QString(savegame_root.c_str());
+        QDateTime date_time = QDateTime::currentDateTime();
+        QDate date = date_time.date();
+        filename += QString::number(date.year());
+        filename += "-";
+        filename += QString::number(date.month());
+        filename += "-";
+        filename += QString::number(date.daysInMonth());
+        filename += "_";
+        QTime time = date_time.time();
+        filename += QString::number(time.hour());
+        filename += "-";
+        filename += QString::number(time.minute());
+        filename += "-";
+        filename += QString::number(time.second());
+        //filename += date_time.toString();
+
+        QWidget *subwindow = new QWidget();
+        playing_gamestate->addWidget(subwindow);
+
+        QVBoxLayout *layout = new QVBoxLayout();
+        subwindow->setLayout(layout);
+
+        QLabel *label = new QLabel("Choose a filename:");
+        layout->addWidget(label);
+
+        this->edit = new QLineEdit(filename);
+        // disallow: \ / : * ? " < > |
+        QRegExp rx("[^\\\\/:*?\"<>|]*");
+        QValidator *validator = new QRegExpValidator(rx, this);
+        this->edit->setValidator(validator);
+        layout->addWidget(edit);
+        this->edit->setFocus();
+
+        QPushButton *saveButton = new QPushButton("Save game");
+        game_g->initButton(saveButton);
+        saveButton->setFont(game_g->getFontBig());
+        saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(saveButton);
+        connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSaveNew()));
+
+        QPushButton *closeButton = new QPushButton("Cancel");
+        game_g->initButton(closeButton);
+        closeButton->setFont(game_g->getFontBig());
+        closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(closeButton);
+        connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
+    }
+    else {
+        QString filename = list->item(index)->text();
+        LOG("save as existing file: %s\n", filename.toStdString().c_str());
+        if( playing_gamestate->saveGame(filename.toStdString()) ) {
+            game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+        }
+        else {
+            game_g->showErrorDialog("Failed to save game!");
+        }
+        playing_gamestate->closeAllSubWindows();
+    }
+}
+
+void SaveGameWindow::clickedDelete() {
+    LOG("SaveGameWindow::clickedDelete()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < list->count());
+    if( index >= 1 ) {
+        QString filename = list->item(index)->text();
+        if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
+            LOG("delete existing file: %s\n", filename.toStdString().c_str());
+            string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
+            LOG("full path: %s\n", full_path.c_str());
+            remove(full_path.c_str());
+            QListWidgetItem *list_item = list->takeItem(index);
+            delete list_item;
+        }
+    }
+}
+
+void SaveGameWindow::clickedSaveNew() {
+    LOG("SaveGameWindow::clickedSaveNew()\n");
+    ASSERT_LOGGER(this->edit != NULL);
+    QString filename = this->edit->text();
+    filename += QString(savegame_ext.c_str());
+    LOG("save as new file: %s\n", filename.toStdString().c_str());
+
+    string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
+    QFile qfile( QString(full_path.c_str()) );
+    bool ok = true;
+    if( qfile.exists() ) {
+        LOG("file exists!\n");
+        if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
+            LOG("user says to not save\n");
+            ok = false;
+        }
+    }
+    if( ok ) {
+        if( playing_gamestate->saveGame(filename.toStdString()) ) {
+            game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+        }
+        else {
+            game_g->showErrorDialog("Failed to save game!");
+        }
+    }
+    playing_gamestate->closeAllSubWindows();
 }
 
 PlayingGamestate::PlayingGamestate(bool is_savegame) :
@@ -1911,7 +2157,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
 PlayingGamestate::~PlayingGamestate() {
     LOG("PlayingGamestate::~PlayingGamestate()\n");
-    this->clickedCloseSubwindow();
+    //this->closeSubWindow();
+    this->closeAllSubWindows();
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();
     window->setCentralWidget(NULL);
@@ -2060,6 +2307,7 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
 
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
+    // filename should be full path
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
@@ -2763,7 +3011,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
 
 void PlayingGamestate::clickedStats() {
     LOG("clickedStats()\n");
-    this->clickedCloseSubwindow();
+    this->closeSubWindow();
 
     new StatsWindow(this);
     game_g->getScreen()->setPaused(true);
@@ -2771,7 +3019,7 @@ void PlayingGamestate::clickedStats() {
 
 void PlayingGamestate::clickedItems() {
     LOG("clickedItems()\n");
-    this->clickedCloseSubwindow();
+    this->closeSubWindow();
 
     new ItemsWindow(this);
     game_g->getScreen()->setPaused(true);
@@ -2790,7 +3038,7 @@ void PlayingGamestate::clickedJournal() {
 
 void PlayingGamestate::clickedOptions() {
     LOG("clickedOptions()\n");
-    this->clickedCloseSubwindow();
+    this->closeSubWindow();
 
     game_g->getScreen()->setPaused(true);
 
@@ -2819,7 +3067,7 @@ void PlayingGamestate::clickedOptions() {
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
 
     //subwindow->showFullScreen();
     //game_g->getScreen()->getMainWindow()->hide();
@@ -2847,14 +3095,12 @@ void PlayingGamestate::clickedRest() {
 }
 
 void PlayingGamestate::clickedSave() {
-    LOG("clickedSave()\n");
-    if( this->saveGame("savegame.xml") ) {
-        game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+    LOG("PlayingGamestate::clickedSave()\n");
+    if( c_location->hasEnemies(this) ) {
+        game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
+        return;
     }
-    else {
-        game_g->showErrorDialog("Failed to save game!");
-
-    }
+    new SaveGameWindow(this);
 }
 
 void PlayingGamestate::clickedQuit() {
@@ -2864,7 +3110,7 @@ void PlayingGamestate::clickedQuit() {
 
 void PlayingGamestate::showInfoWindow(const string &html) {
     LOG("showInfoWindow()\n");
-    this->clickedCloseSubwindow();
+    this->closeSubWindow();
 
     game_g->getScreen()->setPaused(true);
 
@@ -2883,11 +3129,11 @@ void PlayingGamestate::showInfoWindow(const string &html) {
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCloseSubwindow()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
 }
 
-void PlayingGamestate::clickedCloseSubwindow() {
-    LOG("clickedCloseSubwindow\n");
+void PlayingGamestate::closeSubWindow() {
+    LOG("closeSubWindow\n");
     int n_stacked_widgets = this->main_stacked_widget->count();
     if( n_stacked_widgets > 1 ) {
         QWidget *subwindow = this->main_stacked_widget->widget(n_stacked_widgets-1);
@@ -2897,6 +3143,16 @@ void PlayingGamestate::clickedCloseSubwindow() {
             game_g->getScreen()->setPaused(false);
         }
     }
+}
+
+void PlayingGamestate::closeAllSubWindows() {
+    LOG("closeAllSubWindows");
+    while( this->main_stacked_widget->count() > 1 ) {
+        QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
+        this->main_stacked_widget->removeWidget(subwindow);
+        subwindow->deleteLater();
+    }
+    game_g->getScreen()->setPaused(false);
 }
 
 void PlayingGamestate::quitGame() {
@@ -3231,7 +3487,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 else if( selected_scenery->isExit() ) {
                     LOG("clicked on an exit");
                     // exit
-                    this->clickedCloseSubwindow(); // just in case
+                    this->closeSubWindow(); // just in case
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
                     this->player->restoreHealth();
@@ -3364,7 +3620,7 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
 
 bool PlayingGamestate::saveGame(const string &filename) const {
     LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
-    string full_path = game_g->getApplicationFilename(filename);
+    string full_path = game_g->getApplicationFilename(savegame_folder + filename);
     LOG("full path: %s\n", full_path.c_str());
 
     FILE *file = fopen(full_path.c_str(), "wt");
@@ -3574,7 +3830,9 @@ Game::Game() {
     QCoreApplication::setApplicationName("erebus");
 
     // initialise paths
+    // n.b., not safe to use logging until after copied/removed old log files!
     QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    qDebug("user data location path: %s", pathQt.toStdString().c_str());
     if( !QDir(pathQt).exists() ) {
         QDir().mkpath(pathQt);
     }
@@ -3583,7 +3841,6 @@ Game::Game() {
     application_path = nativePath.toStdString();
     logfilename = getApplicationFilename("log.txt");
     oldlogfilename = getApplicationFilename("log_old.txt");
-    // n.b., not safe to use logging until after copied/removed old log files!
     qDebug("application_path: %s", application_path.c_str());
     qDebug("logfilename: %s", logfilename.c_str());
     qDebug("oldlogfilename: %s", oldlogfilename.c_str());
@@ -3620,6 +3877,15 @@ Game::Game() {
 #else
     LOG("Platform: UNKNOWN\n");
 #endif
+
+    QString savegame_path = QString(getApplicationFilename(savegame_folder).c_str());
+    if( !QDir(savegame_path).exists() ) {
+        LOG("create savegame_path: %s\n", savegame_path.toStdString().c_str());
+        QDir().mkpath(savegame_path);
+        if( !QDir(savegame_path).exists() ) {
+            LOG("failed to create savegame_path!\n");
+        }
+    }
 }
 
 void Game::run() {
@@ -3648,7 +3914,7 @@ void Game::run() {
         this->font_big = new_font;
 #else
         this->font_small = QFont(new_font);
-        this->font_small.setPointSize(font_small.pointSize() - 4);
+        this->font_small.setPointSize(font_small.pointSize() - 2);
         this->font_std = new_font;
         this->font_big = new_font;
 #endif
@@ -3676,8 +3942,10 @@ void Game::run() {
 }
 
 void Game::initButton(QPushButton *button) const {
+#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     // crashes on Android?!
-#ifndef Q_OS_ANDROID
+    // and doesn't work on Symbian
+#else
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);
 #endif
@@ -3707,9 +3975,22 @@ void Game::update() {
                 gamestate = NULL;
                 PlayingGamestate *playing_gamestate = new PlayingGamestate(true);
                 gamestate = playing_gamestate;
-                string filename = this->getApplicationFilename("savegame.xml");
-                playing_gamestate->loadQuest(filename, true);
-                this->getScreen()->getMainWindow()->unsetCursor();
+                try {
+                    LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
+                    string full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
+                    playing_gamestate->loadQuest(full_filename, true);
+                    this->getScreen()->getMainWindow()->unsetCursor();
+                }
+                catch(string &error) {
+                    LOG("exception creating new gamestate when loading: %s\n", error.c_str());
+                    this->getScreen()->getMainWindow()->unsetCursor();
+                    stringstream str;
+                    str << "Failed to load save game file:\n" << error;
+                    game_g->showErrorDialog(str.str());
+                    delete gamestate;
+                    gamestate = NULL;
+                    gamestate = new OptionsGamestate();
+                }
                 break;
             }
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS:
@@ -3724,7 +4005,6 @@ void Game::update() {
         catch(string &error) {
             LOG("exception creating new gamestate: %s\n", error.c_str());
             this->getScreen()->getMainWindow()->unsetCursor();
-            this->getScreen()->getMainWindow()->setEnabled(true);
             if( gamestate != NULL ) {
                 delete gamestate;
                 gamestate = NULL;
