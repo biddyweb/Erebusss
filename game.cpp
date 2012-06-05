@@ -1366,39 +1366,64 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    /*QWebView *label = new QWebView();
-    QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
-    label->setHtml(html);
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    layout->addWidget(label);*/
-    QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
-    label->setFont(game_g->getFontSmall());
-    label->setWordWrap(true);
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(label);
+    QString close_text;
+    if( playing_gamestate->getQuest()->isCompleted() && playing_gamestate->isLastQuest() ) {
+        QLabel *label = new QLabel("You have completed all the quests!");
+        label->setFont(game_g->getFontSmall());
+        label->setWordWrap(true);
+        label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(label);
 
-    for(vector<Shop *>::const_iterator iter = playing_gamestate->shopsBegin(); iter != playing_gamestate->shopsEnd(); ++iter) {
-        const Shop *shop = *iter;
-        QPushButton *shopButton = new QPushButton(shop->getName().c_str());
-        game_g->initButton(shopButton);
-        QVariant variant = qVariantFromValue((void *)shop);
-        shopButton->setProperty("shop", variant);
-        //shopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        layout->addWidget(shopButton);
-        connect(shopButton, SIGNAL(clicked()), this, SLOT(clickedShop()));
+        close_text = "Finish game";
+    }
+    else {
+        /*QWebView *label = new QWebView();
+        QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
+        label->setHtml(html);
+        label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        layout->addWidget(label);*/
+        QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
+        label->setFont(game_g->getFontSmall());
+        label->setWordWrap(true);
+        label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(label);
+
+        for(vector<Shop *>::const_iterator iter = playing_gamestate->shopsBegin(); iter != playing_gamestate->shopsEnd(); ++iter) {
+            const Shop *shop = *iter;
+            QPushButton *shopButton = new QPushButton(shop->getName().c_str());
+            game_g->initButton(shopButton);
+            QVariant variant = qVariantFromValue((void *)shop);
+            shopButton->setProperty("shop", variant);
+            //shopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            layout->addWidget(shopButton);
+            connect(shopButton, SIGNAL(clicked()), this, SLOT(clickedShop()));
+        }
+
+        QPushButton *trainingButton = new QPushButton("Training");
+        game_g->initButton(trainingButton);
+        //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(trainingButton);
+        connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
+
+        close_text = playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest";
     }
 
-    QPushButton *trainingButton = new QPushButton("Training");
-    game_g->initButton(trainingButton);
-    //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(trainingButton);
-    connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
-
-    QPushButton *closeButton = new QPushButton(playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest");
+    QPushButton *closeButton = new QPushButton(close_text);
     game_g->initButton(closeButton);
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedClose()));
+}
+
+void CampaignWindow::clickedClose() {
+    LOG("CampaignWindow::clickedClose()\n");
+    if( playing_gamestate->getQuest()->isCompleted() && playing_gamestate->isLastQuest() ) {
+        GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
+        game_g->pushMessage(game_message);
+    }
+    else {
+        this->playing_gamestate->closeSubWindow();
+    }
 }
 
 void CampaignWindow::clickedShop() {
@@ -2450,6 +2475,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef arg1_s = reader.attributes().value("arg1");
                     QuestObjective *quest_objective = new QuestObjective(type_s.toString().toStdString(), arg1_s.toString().toStdString());
                     this->quest->setQuestObjective(quest_objective);
+                }
+                else if( reader.name() == "quest_info" ) {
+                    QStringRef complete_s = reader.attributes().value("complete");
+                    bool complete = parseBool(complete_s.toString(), true);
+                    this->quest->setCompleted(complete);
                 }
                 else if( reader.name() == "npc" || reader.name() == "player" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -3730,6 +3760,10 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
         fprintf(file, " />");
     }
+    fprintf(file, "\n");
+
+    LOG("save current quest info\n");
+    fprintf(file, "<quest_info complete=\"%s\"/>\n", this->getQuest()->isCompleted() ? "true" : "false");
     fprintf(file, "\n");
 
     LOG("save journal\n");

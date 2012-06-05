@@ -419,6 +419,7 @@ class CampaignWindow : public QWidget {
     PlayingGamestate *playing_gamestate;
 
 private slots:
+    void clickedClose();
     void clickedShop();
     void clickedTraining();
 
@@ -545,6 +546,9 @@ public:
     }
     const QuestInfo &getCQuestInfo() const {
         return this->quest_list.at(this->c_quest_indx);
+    }
+    bool isLastQuest() const {
+        return this->c_quest_indx == this->quest_list.size()-1;
     }
 
     void addStandardItem(Item *item);

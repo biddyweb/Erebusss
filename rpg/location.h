@@ -460,6 +460,9 @@ public:
         return this->is_completed;
     }
     bool testIfComplete();
+    void setCompleted(bool is_completed) {
+        this->is_completed = is_completed;
+    }
 };
 
 class QuestInfo {
