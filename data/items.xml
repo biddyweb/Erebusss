@@ -2,8 +2,10 @@
 <items>
 
 <weapon name="Long Sword" image_name="longsword" weight="14"
+    damageX="2" damageY="10" damageZ="0"
     animation_name="longsword"/>
 <weapon name="Longbow" image_name="longbow" weight="5"
+    damageX="2" damageY="12" damageZ="-1"
     animation_name="longbow"
     two_handed="true" ranged="true" ammo="Arrows"/>
 

@@ -3,13 +3,17 @@
 #include "game.h"
 
 Screen::Screen() :
-    paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0)
+    mainWindow(NULL), paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0)
 {
-    mainWindow.setOrientation(MainWindow::ScreenOrientationLockLandscape);
-    mainWindow.showExpanded();
+    qDebug("Screen::Screen()");
+    mainWindow = new MainWindow();
+    mainWindow->setOrientation(MainWindow::ScreenOrientationLockLandscape);
+    mainWindow->showExpanded();
 }
 
 Screen::~Screen() {
+    if( mainWindow != NULL )
+        delete mainWindow;
 }
 
 int Screen::getElapsedMS() const {
@@ -17,7 +21,7 @@ int Screen::getElapsedMS() const {
 }
 
 void Screen::runMainLoop() {
-    //LOG("run main loop...\n");
+    qDebug("run main loop...");
     const int time_per_frame_c = 1000/25;
     //QObject::connect(&timer, SIGNAL(timeout()), &mainWindow, SLOT(updateScene()));
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -29,6 +33,7 @@ void Screen::runMainLoop() {
 
 void Screen::update() {
     //qApp->beep();
+    //qDebug("Screen::update()");
 
     int new_elapsed_time_ms = this->getElapsedMS();
     if( paused ) {
@@ -76,6 +81,7 @@ void Screen::restartElapsedTimer() {
 }
 
 void Screen::enableUpdateTimer(bool enabled) {
+    qDebug("Screen:enableUpdateTimer(%d)", enabled);
     if( enabled ) {
         timer.start();
     }

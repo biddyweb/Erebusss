@@ -45,13 +45,55 @@ public:
 };
 
 class CharacterTemplate {
+    int FP, BS, S, A, M, D, B;
+    float Sp;
     int health_min, health_max;
+    bool has_natural_damage;
+    int natural_damageX, natural_damageY, natural_damageZ;
     int gold_min, gold_max;
     string animation_name;
 public:
-    CharacterTemplate(const string &animation_name, int health_min, int health_max, int gold_min, int gold_max);
+    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
 
+    int getFP() const {
+        return this->FP;
+    }
+    int getBS() const {
+        return this->BS;
+    }
+    int getStrength() const {
+        return this->S;
+    }
+    int getAttacks() const {
+        return this->A;
+    }
+    int getMind() const {
+        return this->M;
+    }
+    int getDexterity() const {
+        return this->D;
+    }
+    int getBravery() const {
+        return this->B;
+    }
+    float getSpeed() const {
+        return this->Sp;
+    }
     int getHealth() const;
+    void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
+        this->has_natural_damage = true;
+        this->natural_damageX = natural_damageX;
+        this->natural_damageY = natural_damageY;
+        this->natural_damageZ = natural_damageZ;
+    }
+    bool hasNaturalDamage() const {
+        return this->has_natural_damage;
+    }
+    void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
+        *natural_damageX = this->natural_damageX;
+        *natural_damageY = this->natural_damageY;
+        *natural_damageZ = this->natural_damageZ;
+    }
     int getGold() const;
     string getAnimationName() const {
         return this->animation_name;
@@ -80,10 +122,11 @@ class Character {
     bool is_hitting; // not saved
 
     // rpg data
-    /*int fighting_prowess;
-    int strength;*/
+    int FP, BS, S, A, M, D, B;
+    float Sp;
     int health;
     int max_health;
+    int natural_damageX, natural_damageY, natural_damageZ;
 
     set<Item *> items;
     Weapon *current_weapon;
@@ -92,9 +135,9 @@ class Character {
     int gold;
 
     void setStateIdle();
-
     Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
+    int getNaturalDamage() const;
 
 public:
     Character(const string &name, string animation_name, bool is_ai);
@@ -184,6 +227,40 @@ public:
         return 0.25f;
     }*/
 
+    void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->FP = FP;
+        this->BS = BS;
+        this->S = S;
+        this->A = A;
+        this->M = M;
+        this->D = D;
+        this->B = B;
+        this->Sp = Sp;
+    }
+    int getFP() const {
+        return this->FP;
+    }
+    int getBS() const {
+        return this->BS;
+    }
+    int getStrength() const {
+        return this->S;
+    }
+    int getAttacks() const {
+        return this->A;
+    }
+    int getMind() const {
+        return this->M;
+    }
+    int getDexterity() const {
+        return this->D;
+    }
+    int getBravery() const {
+        return this->B;
+    }
+    float getSpeed() const {
+        return this->Sp;
+    }
     void initialiseHealth(int max_health) {
         if( max_health <= 0 ) {
             throw string("max health must be greater than 0");
@@ -214,6 +291,16 @@ public:
     int decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease);
     void restoreHealth() {
         this->health = this->max_health;
+    }
+    void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
+        this->natural_damageX = natural_damageX;
+        this->natural_damageY = natural_damageY;
+        this->natural_damageZ = natural_damageZ;
+    }
+    void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
+        *natural_damageX = this->natural_damageX;
+        *natural_damageY = this->natural_damageY;
+        *natural_damageZ = this->natural_damageZ;
     }
 
     const Weapon *getCurrentWeapon() const {

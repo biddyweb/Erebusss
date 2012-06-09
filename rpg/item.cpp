@@ -71,14 +71,20 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
     return false;
 }
 
-Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name) :
+Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
-    is_two_handed(false), is_ranged(false), requires_ammo(false)
+    is_two_handed(false), is_ranged(false), requires_ammo(false),
+    damageX(damageX), damageY(damageY), damageZ(damageZ)
 {
 }
 
 Weapon *Weapon::clone() const {
     return new Weapon(*this);
+}
+
+int Weapon::getDamage() const {
+    int roll = rollDice(damageX, damageY, damageZ);
+    return roll;
 }
 
 Shield::Shield(const string &name, const string &image_name, int weight, const string &animation_name) :

@@ -711,6 +711,15 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += player->getName().c_str();
     html += "<br/>";
 
+    html += "<b>Fighting Prowess:</b> " + QString::number(player->getFP()) + "<br/>";
+    html += "<b>Bow Skill:</b> " + QString::number(player->getBS()) + "<br/>";
+    html += "<b>Strength:</b> " + QString::number(player->getStrength()) + "<br/>";
+    html += "<b>Attacks:</b> " + QString::number(player->getAttacks()) + "<br/>";
+    html += "<b>Mind:</b> " + QString::number(player->getMind()) + "<br/>";
+    html += "<b>Dexterity:</b> " + QString::number(player->getDexterity()) + "<br/>";
+    html += "<b>Bravery:</b> " + QString::number(player->getBravery()) + "<br/>";
+    html += "<b>Speed:</b> " + QString::number(player->getSpeed()) + "<br/>";
+
     html += "<b>Health:</b> ";
     if( player->getHealth() < player->getMaxHealth() ) {
         html += "<font color=\"#ff0000\">";
@@ -1771,8 +1780,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     if( !is_savegame ) {
         LOG("create player\n");
-        this->player = new Character("Player", "", false);
-        player->initialiseHealth(100);
+        this->player = new Character("Warrior", "", false);
+        this->player->setProfile(10, 9, 10, 1, 8, 9, 10, 2.75f);
+        player->initialiseHealth(40);
         player->addGold( rollDice(2, 6, 10) );
     }
 
@@ -2050,6 +2060,22 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     QStringRef name_s = reader.attributes().value("name");
                     LOG("found npc template: %s\n", name_s.toString().toStdString().c_str());
                     QStringRef animation_name_s = reader.attributes().value("animation_name");
+                    QStringRef FP_s = reader.attributes().value("FP");
+                    int FP = parseInt(FP_s.toString());
+                    QStringRef BS_s = reader.attributes().value("BS");
+                    int BS = parseInt(BS_s.toString());
+                    QStringRef S_s = reader.attributes().value("S");
+                    int S = parseInt(S_s.toString());
+                    QStringRef A_s = reader.attributes().value("A");
+                    int A = parseInt(A_s.toString());
+                    QStringRef M_s = reader.attributes().value("M");
+                    int M = parseInt(M_s.toString());
+                    QStringRef D_s = reader.attributes().value("D");
+                    int D = parseInt(D_s.toString());
+                    QStringRef B_s = reader.attributes().value("B");
+                    int B = parseInt(B_s.toString());
+                    QStringRef Sp_s = reader.attributes().value("Sp");
+                    float Sp = parseFloat(Sp_s.toString());
                     QStringRef health_min_s = reader.attributes().value("health_min");
                     int health_min = parseInt(health_min_s.toString());
                     QStringRef health_max_s = reader.attributes().value("health_max");
@@ -2058,7 +2084,16 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     int gold_min = parseInt(gold_min_s.toString());
                     QStringRef gold_max_s = reader.attributes().value("gold_max");
                     int gold_max = parseInt(gold_max_s.toString());
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), health_min, health_max, gold_min, gold_max);
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max);
+                    QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
+                    QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
+                    QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
+                    if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
+                        int natural_damageX = parseInt(natural_damageX_s.toString());
+                        int natural_damageY = parseInt(natural_damageY_s.toString());
+                        int natural_damageZ = parseInt(natural_damageZ_s.toString());
+                        character_template->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
+                    }
                     this->character_templates[ name_s.toString().toStdString() ] = character_template;
                 }
             }
@@ -2115,7 +2150,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     LOG("load sound effects\n");
 #ifndef Q_OS_ANDROID
-    if( !mobile_c ) {
+    //if( !mobile_c )
+    {
         /*
         //this->sound_effects["background"] = game_g->loadSound("music/discordance.ogg");
         this->sound_effects["background"] = game_g->loadSound(":/sound/door.wav"); // test
@@ -2268,6 +2304,9 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         QStringRef two_handed_s = reader.attributes().value("two_handed");
         QStringRef ranged_s = reader.attributes().value("ranged");
         QStringRef ammo_s = reader.attributes().value("ammo");
+        QStringRef damageX_s = reader.attributes().value("damageX");
+        QStringRef damageY_s = reader.attributes().value("damageY");
+        QStringRef damageZ_s = reader.attributes().value("damageZ");
         /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
         qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
         qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
@@ -2278,7 +2317,10 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         int weight = parseInt(weight_s.toString());
         bool two_handed = parseBool(two_handed_s.toString(), true);
         bool ranged = parseBool(ranged_s.toString(), true);
-        Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
+        int damageX = parseInt(damageX_s.toString());
+        int damageY = parseInt(damageY_s.toString());
+        int damageZ = parseInt(damageZ_s.toString());
+        Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString(), damageX, damageY, damageZ);
         item = weapon;
         weapon->setTwoHanded(two_handed);
         weapon->setRanged(ranged);
@@ -2372,7 +2414,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
             reader.readNext();
             if( reader.isStartElement() )
             {
-                //LOG("read start element: %s\n", reader.name().toString().toStdString().c_str());
+                qDebug("read start element: %s", reader.name().toString().toStdString().c_str());
                 if( reader.name() == "info" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2508,11 +2550,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     else {
                         if( reader.name() == "player" ) {
-                            //LOG("player: %s\n", name_s.toString().toStdString());
+                            qDebug("player: %s", name_s.toString().toStdString());
                             this->player = npc = new Character(name_s.toString().toStdString(), "", false);
                         }
                         else {
-                            //LOG("npc: %s\n", name_s.toString().toStdString());
+                            qDebug("npc: %s", name_s.toString().toStdString());
                             QStringRef animation_name_s = reader.attributes().value("animation_name");
                             if( animation_name_s.length() == 0 ) {
                                 throw string("npc has no animation_name");
@@ -2527,6 +2569,32 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef max_health_s = reader.attributes().value("max_health");
                         npc->initialiseHealth( parseInt( max_health_s.toString()) );
                         npc->setHealth( parseInt( health_s.toString()) );
+                        QStringRef FP_s = reader.attributes().value("FP");
+                        int FP = parseInt(FP_s.toString());
+                        QStringRef BS_s = reader.attributes().value("BS");
+                        int BS = parseInt(BS_s.toString());
+                        QStringRef S_s = reader.attributes().value("S");
+                        int S = parseInt(S_s.toString());
+                        QStringRef A_s = reader.attributes().value("A");
+                        int A = parseInt(A_s.toString());
+                        QStringRef M_s = reader.attributes().value("M");
+                        int M = parseInt(M_s.toString());
+                        QStringRef D_s = reader.attributes().value("D");
+                        int D = parseInt(D_s.toString());
+                        QStringRef B_s = reader.attributes().value("B");
+                        int B = parseInt(B_s.toString());
+                        QStringRef Sp_s = reader.attributes().value("Sp");
+                        float Sp = parseFloat(Sp_s.toString());
+                        npc->setProfile(FP, BS, S, A, M, D, B, Sp);
+                        QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
+                        QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
+                        QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
+                        if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
+                            int natural_damageX = parseInt(natural_damageX_s.toString());
+                            int natural_damageY = parseInt(natural_damageX_s.toString());
+                            int natural_damageZ = parseInt(natural_damageX_s.toString());
+                            npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
+                        }
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString()) );
                     }
@@ -3606,6 +3674,11 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         fprintf(file, " animation_name=\"%s\"", weapon->getAnimationName().c_str());
         fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
         fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
+        int damageX = 0, damageY = 0, damageZ = 0;
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        fprintf(file, " damageX=\"%d\"", damageX);
+        fprintf(file, " damageY=\"%d\"", damageY);
+        fprintf(file, " damageZ=\"%d\"", damageZ);
         if( weapon->getRequiresAmmo() ) {
             fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
         }
@@ -3694,6 +3767,19 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
         fprintf(file, " health=\"%d\"", character->getHealth());
         fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
+        fprintf(file, " FP=\"%d\"", character->getFP());
+        fprintf(file, " BS=\"%d\"", character->getBS());
+        fprintf(file, " S=\"%d\"", character->getStrength());
+        fprintf(file, " A=\"%d\"", character->getAttacks());
+        fprintf(file, " M=\"%d\"", character->getMind());
+        fprintf(file, " D=\"%d\"", character->getDexterity());
+        fprintf(file, " B=\"%d\"", character->getBravery());
+        fprintf(file, " Sp=\"%f\"", character->getSpeed());
+        int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
+        character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
+        fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
+        fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
+        fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
         fprintf(file, " gold=\"%d\"", character->getGold());
         fprintf(file, ">\n");
         for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
@@ -3812,10 +3898,10 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
 
 void PlayingGamestate::playSound(const string &sound_effect) {
 #ifndef Q_OS_ANDROID
+    qDebug("play sound: %s\n", sound_effect.c_str());
     Phonon::MediaObject *sound = this->sound_effects[sound_effect];
     ASSERT_LOGGER(sound != NULL);
     if( sound != NULL ) {
-        qDebug("play sound: %s\n", sound_effect.c_str());
         if( sound->state() == Phonon::PlayingState ) {
             qDebug("    already playing");
         }
@@ -3858,7 +3944,7 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
     return image_iter->second;
 }
 
-Game::Game() {
+Game::Game() : gamestate(NULL), screen(NULL) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
@@ -4043,7 +4129,6 @@ void Game::update() {
                 delete gamestate;
                 gamestate = NULL;
             }
-            delete message;
             stringstream str;
             str << "Failed to load game data:\n" << error;
             game_g->showErrorDialog(str.str());

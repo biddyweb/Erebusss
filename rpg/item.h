@@ -124,8 +124,9 @@ class Weapon : public Item {
     bool is_ranged;
     bool requires_ammo;
     string ammo_key;
+    int damageX, damageY, damageZ;
 public:
-    Weapon(const string &name, const string &image_name, int weight, const string &animation_name);
+    Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ);
     virtual ~Weapon() {
     }
 
@@ -160,6 +161,12 @@ public:
     string getAmmoKey() const {
         return this->requires_ammo ? this->ammo_key : "";
     }
+    void getDamage(int *damageX, int *damageY, int *damageZ) const {
+        *damageX = this->damageX;
+        *damageY = this->damageY;
+        *damageZ = this->damageZ;
+    }
+    int getDamage() const;
 };
 
 class Shield : public Item {

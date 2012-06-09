@@ -7,8 +7,8 @@
 class Screen : public QObject {
     Q_OBJECT
 
-    MainWindow mainWindow;
     QTimer timer; // used to call update() per frame
+    MainWindow *mainWindow;
     QElapsedTimer elapsed_timer; // used to measure game time
 
     int getElapsedMS() const;
@@ -27,7 +27,10 @@ public:
     ~Screen();
 
     MainWindow *getMainWindow() {
-        return &mainWindow;
+        return mainWindow;
+    }
+    const MainWindow *getMainWindow() const {
+        return mainWindow;
     }
     void runMainLoop();
     bool isPaused() const {
