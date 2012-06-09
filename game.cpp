@@ -1562,6 +1562,7 @@ void SaveGameWindow::clickedSave() {
         this->edit->setValidator(validator);
         layout->addWidget(edit);
         this->edit->setFocus();
+        connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
         QPushButton *saveButton = new QPushButton("Save game");
         game_g->initButton(saveButton);
