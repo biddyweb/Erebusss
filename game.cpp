@@ -1782,8 +1782,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     if( !is_savegame ) {
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
-        this->player->setProfile(10, 9, 10, 1, 8, 9, 10, 2.75f);
-        player->initialiseHealth(40);
+        this->player->setProfile(8, 7, 8, 1, 6, 7, 8, 2.75f);
+        player->initialiseHealth(60);
         player->addGold( rollDice(2, 6, 10) );
     }
 
@@ -2551,11 +2551,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     else {
                         if( reader.name() == "player" ) {
-                            qDebug("player: %s", name_s.toString().toStdString());
+                            qDebug("player: %s", name_s.toString().toStdString().c_str());
                             this->player = npc = new Character(name_s.toString().toStdString(), "", false);
                         }
                         else {
-                            qDebug("npc: %s", name_s.toString().toStdString());
+                            qDebug("npc: %s", name_s.toString().toStdString().c_str());
                             QStringRef animation_name_s = reader.attributes().value("animation_name");
                             if( animation_name_s.length() == 0 ) {
                                 throw string("npc has no animation_name");
@@ -3393,14 +3393,20 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         for(set<Trap *>::iterator iter = this->c_location->trapsBegin(); iter != this->c_location->trapsEnd(); ++iter) {
             Trap *trap = *iter;
             if( trap->isSetOff(character) ) {
-                LOG("character: %s has set of trap at %f, %f\n", character->getName().c_str(), trap->getX(), trap->getY());
-                delete_traps.push_back(trap);
-                int damage = rollDice(3, 6, 0);
-                character->decreaseHealth(this, damage);
-                this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
+                int rollD = rollDice(2, 6, 0);
+                LOG("character: %s has set of trap at %f, %f roll %d\n", character->getName().c_str(), trap->getX(), trap->getY(), rollD);
                 this->playSound("click");
-                if( character->isDead() ) {
-                    break;
+                delete_traps.push_back(trap);
+                if( rollD <= character->getDexterity() ) {
+                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!", player->getPos(), 2000);
+                }
+                else {
+                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
+                    int damage = rollDice(2, 12, -1);
+                    character->decreaseHealth(this, damage, true, false);
+                    if( character->isDead() ) {
+                        break;
+                    }
                 }
             }
         }
@@ -4046,13 +4052,17 @@ void Game::run() {
         this->font_big = QFont("Verdana", 48, QFont::Bold);
     }
 
-    /*unsigned char filter_max[] = {220, 172, 0};
-    unsigned char filter_min[] = {120, 90, 0};*/
+#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+    // crashes on Android?!
+    // and doesn't work on Symbian
+    // see Game::initButton()
+#else
     unsigned char filter_max[] = {220, 220, 220};
     unsigned char filter_min[] = {120, 120, 120};
     QPixmap gui_pixmap_buttons = createNoise(256, 256, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
     this->gui_brush_buttons.setTexture(gui_pixmap_buttons);
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
+#endif
 
     gamestate = new OptionsGamestate();
 
@@ -4066,6 +4076,7 @@ void Game::initButton(QPushButton *button) const {
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     // crashes on Android?!
     // and doesn't work on Symbian
+    // if we change this, remember to change it where we initialise gui_palette, in Game::run().
 #else
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);

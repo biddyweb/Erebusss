@@ -286,9 +286,8 @@ public:
     int getHealthPercent() const {
         return (int)((100.0f * health)/(float)max_health);
     }
-    //int changeHealth(const PlayingGamestate *playing_gamestate, int change);
-    int increaseHealth(int increase);
-    int decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease);
+    void increaseHealth(int increase);
+    bool decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield);
     void restoreHealth() {
         this->health = this->max_health;
     }

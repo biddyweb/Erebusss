@@ -189,25 +189,26 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 LOG("    extra strong hit!\n");
                                 damage++;
                             }
-                            int armour = target_npc->getCurrentArmour() != NULL ? target_npc->getCurrentArmour()->getRating() : 0;
+                            /*int armour = target_npc->getCurrentArmour() != NULL ? target_npc->getCurrentArmour()->getRating() : 0;
                             if( target_npc->getCurrentShield() != NULL )
                                 armour++;
                             damage -= armour;
-                            damage = std::max(damage, 0);
+                            damage = std::max(damage, 0);*/
                             LOG("    damage: %d\n", damage);
                             if( damage > 0 ) {
-                                target_npc->decreaseHealth(playing_gamestate, damage);
-                                string text;
-                                int r = rand() % 4;
-                                if( r == 0 )
-                                    text = "Argh!";
-                                else if( r == 1 )
-                                    text = "Ow!";
-                                else if( r == 2 )
-                                    text = "Ouch!";
-                                else
-                                    text = "Eek!";
-                                playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+                                if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
+                                    string text;
+                                    int r = rand() % 4;
+                                    if( r == 0 )
+                                        text = "Argh!";
+                                    else if( r == 1 )
+                                        text = "Ow!";
+                                    else if( r == 2 )
+                                        text = "Ouch!";
+                                    else
+                                        text = "Eek!";
+                                    playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+                                }
                             }
                         }
                     }
@@ -396,7 +397,7 @@ int Character::getNaturalDamage() const {
     return roll;
 }
 
-int Character::increaseHealth(int increase) {
+void Character::increaseHealth(int increase) {
     if( this->is_dead ) {
         LOG("tried to increaseHealth of %s by %d - already dead!\n", this->getName().c_str(), increase);
         ASSERT_LOGGER( !this->is_dead );
@@ -408,10 +409,9 @@ int Character::increaseHealth(int increase) {
     this->health += increase;
     if( health > max_health )
         health = max_health;
-    return this->health;
 }
 
-int Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease) {
+bool Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield) {
     if( this->is_dead ) {
         LOG("tried to decreaseHealth of %s by %d - already dead!\n", this->getName().c_str(), decrease);
         ASSERT_LOGGER( !this->is_dead );
@@ -420,6 +420,13 @@ int Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int dec
         LOG("decreaseHealth: received negative decrease: %d\n", decrease);
         ASSERT_LOGGER( decrease >= 0 );
     }
+    int armour_value = 0;
+    if( armour && this->getCurrentArmour() != NULL )
+        armour_value += this->getCurrentArmour()->getRating();
+    if( shield && this->getCurrentShield() != NULL )
+        armour_value++;
+    decrease -= armour_value;
+    decrease = std::max(decrease, 0);
     this->health -= decrease;
     if( health <= 0 ) {
         this->health = 0;
@@ -442,7 +449,7 @@ int Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int dec
             }
         }
     }
-    return this->health;
+    return (decrease > 0);
 }
 
 void Character::armWeapon(Weapon *item) {
