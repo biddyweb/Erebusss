@@ -340,10 +340,11 @@ class ItemsWindow : public QWidget {
 
     QLabel *weightLabel;
 
-    QPushButton *dropButton;
     QPushButton *armButton;
     QPushButton *wearButton;
     QPushButton *useButton;
+    QPushButton *dropButton;
+    QPushButton *infoButton;
 
     enum ViewType {
         VIEWTYPE_ALL = 0,
@@ -374,10 +375,11 @@ private slots:
     void clickedViewMagic();
     void clickedViewMisc();
 
-    void clickedDropItem();
     void clickedArmWeapon();
     void clickedWearArmour();
     void clickedUseItem();
+    void clickedDropItem();
+    void clickedInfo();
 
 public:
     ItemsWindow(PlayingGamestate *playing_gamestate);
@@ -483,7 +485,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 #endif
 
     Item *parseXMLItem(const QXmlStreamReader &reader);
-    void showInfoWindow(const string &html);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
 
@@ -528,6 +529,7 @@ public:
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
     void playSound(const string &sound_effect);
+    void showInfoWindow(const string &html);
 
     Character *getPlayer() {
         return this->player;

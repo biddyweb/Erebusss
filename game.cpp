@@ -615,7 +615,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     //this->move(0, 0);
     QPainter painter(this);
-    painter.setFont( game_g->getFontStd() );
+    painter.setFont( game_g->getFontSmall() );
     /*QBrush brush(QColor(255, 0, 0, 255));
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
     //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
@@ -881,6 +881,11 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         game_g->initButton(dropButton);
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
+
+        infoButton = new QPushButton("Info");
+        game_g->initButton(infoButton);
+        h_layout->addWidget(infoButton);
+        connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
     QPushButton *closeButton = new QPushButton("Continue");
@@ -990,9 +995,11 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         armButton->setVisible(false);
         wearButton->setVisible(false);
         useButton->setVisible(false);
+        infoButton->setVisible(false);
         return;
     }
     dropButton->setVisible(true);
+    infoButton->setVisible(true);
     Item *item = list_items.at(currentRow);
     if( item->getType() == ITEMTYPE_WEAPON ) {
         armButton->setVisible(true);
@@ -1050,30 +1057,6 @@ void ItemsWindow::setWeightLabel() {
     Character *player = this->playing_gamestate->getPlayer();
     int weight = player->calculateItemsWeight();
     this->weightLabel->setText("Weight: " + QString::number(weight));
-}
-
-void ItemsWindow::clickedDropItem() {
-    LOG("clickedDropItem()\n");
-    /*QList<QListWidgetItem *> selected_items = list->selectedItems();
-    if( selected_items.size() == 1 ) {
-        QListWidgetItem *selected_item = selected_items.at(0);*/
-    int index = list->currentRow();
-    LOG("clicked index %d\n", index);
-    if( index == -1 ) {
-        return;
-    }
-    Item *item = list_items.at(index);
-    Character *player = playing_gamestate->getPlayer();
-    player->dropItem(item);
-
-    /*list->clear();
-    list_items.clear();
-    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        list->addItem( item->getName().c_str() );
-        list_items.push_back(item);
-    }*/
-    this->itemIsDeleted(index);
 }
 
 void ItemsWindow::clickedArmWeapon() {
@@ -1172,6 +1155,82 @@ void ItemsWindow::clickedUseItem() {
         item = NULL;
         this->itemIsDeleted(index);
     }
+}
+
+void ItemsWindow::clickedDropItem() {
+    LOG("clickedDropItem()\n");
+    /*QList<QListWidgetItem *> selected_items = list->selectedItems();
+    if( selected_items.size() == 1 ) {
+        QListWidgetItem *selected_item = selected_items.at(0);*/
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    Item *item = list_items.at(index);
+    Character *player = playing_gamestate->getPlayer();
+    player->dropItem(item);
+
+    /*list->clear();
+    list_items.clear();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        list->addItem( item->getName().c_str() );
+        list_items.push_back(item);
+    }*/
+    this->itemIsDeleted(index);
+}
+
+void ItemsWindow::clickedInfo() {
+    LOG("clickedInfo()\n");
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    const Item *item = list_items.at(index);
+    stringstream str;
+    str << "<html><body>";
+    str << "<h2>" << item->getName() << "</h2>";
+    str << "<p>";
+    if( item->getType() == ITEMTYPE_WEAPON ) {
+        str << "<b>Type:</b> Weapon<br/>";
+        const Weapon *weapon = static_cast<const Weapon *>(item);
+        int damageX = 0, damageY = 0, damageZ = 0;
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        if( damageZ != 0 ) {
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << "+" << damageZ << "<br/>";
+        }
+        else {
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
+        }
+        str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
+        str << "<b>Ranged?:</b> " << (weapon->isRanged() ? "Yes" : "No") << "<br/>";
+        if( weapon->isRanged() ) {
+            str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
+        }
+    }
+    else if( item->getType() == ITEMTYPE_SHIELD ) {
+        str << "<b>Type:</b> Shield<br/>";
+        //const Shield *shield = static_cast<const Shield *>(item);
+    }
+    else if( item->getType() == ITEMTYPE_ARMOUR ) {
+        str << "<b>Type:</b> Armour<br/>";
+        //const Armour *armour = static_cast<const Armour *>(item);
+    }
+    else if( item->getType() == ITEMTYPE_AMMO ) {
+        str << "<b>Type:</b> Ammo<br/>";
+        const Ammo *ammo = static_cast<const Ammo *>(item);
+        str << "<b>Amount:</b> " << ammo->getAmount() << "<br/>";
+    }
+    str << "<b>Weight: </b>" << item->getWeight() << "<br/>";
+    str << "<b>Magical: </b>" << (item->isMagical() ? "Yes" : "No") << "<br/>";
+    if( item->getRating() > 0 ) {
+        str << "<b>Rating:</b> " << item->getRating() << "<br/>";
+    }
+    str << "</p>";
+    str << "</body></html>";
+    playing_gamestate->showInfoWindow(str.str());
 }
 
 void ItemsWindow::itemIsDeleted(size_t index) {
@@ -3126,6 +3185,7 @@ void PlayingGamestate::clickedItems() {
 
 void PlayingGamestate::clickedJournal() {
     LOG("clickedJournal()\n");
+    this->closeSubWindow();
     this->playSound("turn_page");
     stringstream str;
     str << "<html><body>";
@@ -3209,7 +3269,6 @@ void PlayingGamestate::clickedQuit() {
 
 void PlayingGamestate::showInfoWindow(const string &html) {
     LOG("showInfoWindow()\n");
-    this->closeSubWindow();
 
     game_g->getScreen()->setPaused(true);
 
