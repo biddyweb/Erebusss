@@ -26,6 +26,7 @@ class Item {
 protected:
     string name;
     string image_name;
+    string description;
     Vector2D pos; // when stored in a Location
     void *user_data_gfx; // not saved
     float icon_width; // width of icon when drawn on screen in metres
@@ -69,6 +70,12 @@ public:
     virtual string getName() const {
         // may be overloaded to give more descriptive names
         return this->name;
+    }
+    void setDescription(const string &description) {
+        this->description = description;
+    }
+    string getDescription() const {
+        return this->description;
     }
     string getImageName() const {
         return this->image_name;

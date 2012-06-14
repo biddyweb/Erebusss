@@ -1229,6 +1229,9 @@ void ItemsWindow::clickedInfo() {
         str << "<b>Rating:</b> " << item->getRating() << "<br/>";
     }
     str << "</p>";
+    if( item->getDescription().length() > 0 ) {
+        str << item->getDescription();
+    }
     str << "</body></html>";
     playing_gamestate->showInfoWindow(str.str());
 }
@@ -2327,7 +2330,7 @@ void PlayingGamestate::playBackgroundMusic() {
 #endif
 }
 
-Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
+Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
     if( reader.name() == "item" ) {
         QStringRef name_s = reader.attributes().value("name");
@@ -2354,6 +2357,9 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         if( use_s.length() > 0 ) {
             item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
         }
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "weapon" ) {
         //qDebug("    weapon:");
@@ -2387,6 +2393,9 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         if( ammo_s.length() > 0 ) {
             weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
         }
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        weapon->setDescription(description.toStdString());
     }
     else if( reader.name() == "shield" ) {
         QStringRef name_s = reader.attributes().value("name");
@@ -2396,16 +2405,24 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         int weight = parseInt(weight_s.toString());
         Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
         item = shield;
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        shield->setDescription(description.toStdString());
     }
     else if( reader.name() == "armour" ) {
+        //qDebug("    armour:");
         QStringRef name_s = reader.attributes().value("name");
         QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef weight_s = reader.attributes().value("weight");
         QStringRef rating_s = reader.attributes().value("rating");
         int weight = parseInt(weight_s.toString());
         int rating = parseInt(rating_s.toString());
+        //qDebug("    name: %s", name_s.toString().toStdString().c_str());
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
         item = armour;
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        armour->setDescription(description.toStdString());
     }
     else if( reader.name() == "ammo" ) {
         QStringRef name_s = reader.attributes().value("name");
@@ -2415,6 +2432,9 @@ Item *PlayingGamestate::parseXMLItem(const QXmlStreamReader &reader) {
         int amount = parseInt(amount_s.toString());
         Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), amount);
         item = ammo;
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        ammo->setDescription(description.toStdString());
     }
     else if( reader.name() == "currency" ) {
         QStringRef name_s = reader.attributes().value("name");

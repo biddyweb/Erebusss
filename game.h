@@ -484,7 +484,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, Phonon::MediaObject *> sound_effects;
 #endif
 
-    Item *parseXMLItem(const QXmlStreamReader &reader);
+    Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
 
