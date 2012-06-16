@@ -1931,7 +1931,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         LOG("image element has unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
                         throw string("image element has unknown imagetype");
                     }
-                    if( type_s == "item") {
+
+                    if( type_s == "generic") {
+                        // TODO
+                    }
+                    else if( type_s == "item") {
                         this->item_images[name_s.toString().toStdString()] = pixmap;
                     }
                     else if( type_s == "scenery" ) {
@@ -2200,7 +2204,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     qApp->processEvents();
 
     LOG("load floor image\n");
-    builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
+    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
+    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_dirt.png");
+    builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_rock.png");
+    /*unsigned char filter_max[] = {80, 40, 20};
+    unsigned char filter_min[] = {40, 20, 10};
+    builtin_images["floor"] = createNoise(128, 128, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);*/
 
     gui_overlay->setProgress(65);
     qApp->processEvents();
@@ -2791,7 +2800,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
                     QStringRef blocking_s = reader.attributes().value("blocking");
-                    bool blocking = parseBool(blocking_s.toString());
+                    bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
                     bool block_visibility = parseBool(block_visibility_s.toString(), true);
                     QStringRef door_s = reader.attributes().value("door");
@@ -3347,6 +3356,35 @@ void PlayingGamestate::update() {
 
     if( game_g->getScreen()->isPaused() ) {
         return;
+    }
+
+    // scroll
+    if( !mobile_c ) {
+        int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+        float speed = (4.0f * time_ms)/1000.0f;
+        int m_x = QCursor::pos().x();
+        int m_y = QCursor::pos().y();
+        int screen_width = QApplication::desktop()->width();
+        int screen_height = QApplication::desktop()->height();
+        //qDebug("mouse at %d, %d", m_x, m_y);
+        //qDebug("screen size %d x %d", screen_width, screen_height);
+        QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
+        if( m_x <= 0 ) {
+            centre.setX( centre.x() - speed );
+            this->view->centerOn(centre);
+        }
+        else if( m_x >= screen_width-1 ) {
+            centre.setX( centre.x() + speed );
+            this->view->centerOn(centre);
+        }
+        if( m_y <= 0 ) {
+            centre.setY( centre.y() - speed );
+            this->view->centerOn(centre);
+        }
+        else if( m_y >= screen_height-1 ) {
+            centre.setY( centre.y() + speed );
+            this->view->centerOn(centre);
+        }
     }
 
     // test for fog of war

@@ -1,6 +1,9 @@
 <?xml version="1.0" ?>
 <images>
 
+<image type="generic" name="wall" filename="gfx/textures/wall.png"/>
+<image type="generic" name="floor_rock" filename="gfx/textures/floor_rock.png"/>
+
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
 <image type="item" name="shield" filename="gfx/textures/items/shield.png"/>
@@ -18,6 +21,8 @@
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
+<image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
+<image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"
     filename_opened="gfx/textures/scenery/chest_opened.png"
     xpos="6" ypos="2" width="52" height="52"

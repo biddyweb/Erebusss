@@ -43,5 +43,9 @@
         <file>sound/container.wav</file>
         <file>sound/turn_page.wav</file>
         <file>sound/lock.wav</file>
+        <file>gfx/textures/scenery/rock1.png</file>
+        <file>gfx/textures/floor_dirt.png</file>
+        <file>gfx/textures/scenery/campfire.png</file>
+        <file>gfx/textures/floor_rock.png</file>
     </qresource>
 </RCC>
