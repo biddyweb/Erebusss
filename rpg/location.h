@@ -44,6 +44,7 @@ protected:
     string unlock_item_name;
     float width, height;
 
+    bool can_be_opened;
     bool opened;
     set<Item *> items;
 
@@ -139,6 +140,12 @@ public:
     }
     int getNItems() const {
         return this->items.size();
+    }
+    void setCanBeOpened(bool can_be_opened) {
+        this->can_be_opened = can_be_opened;
+    }
+    bool canBeOpened() const {
+        return this->can_be_opened;
     }
     void setOpened(bool opened);
     bool isOpened() const {
@@ -290,6 +297,9 @@ protected:
 
     Graph *distance_graph;
 
+    string wall_image_name;
+    string floor_image_name;
+
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries;
 
@@ -306,6 +316,18 @@ public:
     Location();
     ~Location();
 
+    void setWallImageName(const string &wall_image_name) {
+        this->wall_image_name = wall_image_name;
+    }
+    string getWallImageName() const {
+        return this->wall_image_name;
+    }
+    void setFloorImageName(const string &floor_image_name) {
+        this->floor_image_name = floor_image_name;
+    }
+    string getFloorImageName() const {
+        return this->floor_image_name;
+    }
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
         return this->floor_regions.at(i);

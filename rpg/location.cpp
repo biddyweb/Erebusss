@@ -19,7 +19,7 @@ using std::swap;
 Scenery::Scenery(const string &name, const string &image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), width(width), height(height),
-    opened(false)
+    can_be_opened(false), opened(false)
 {
 }
 
@@ -40,6 +40,7 @@ void Scenery::removeItem(Item *item) {
 }
 
 void Scenery::setOpened(bool opened) {
+    ASSERT_LOGGER( this->can_be_opened );
     this->opened = opened;
     if( this->location != NULL ) {
         this->location->updateScenery(this);

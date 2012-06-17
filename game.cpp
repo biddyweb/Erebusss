@@ -1957,7 +1957,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     }
 
                     if( type_s == "generic") {
-                        // TODO
+                        this->builtin_images[name_s.toString().toStdString()] = pixmap;
                     }
                     else if( type_s == "item") {
                         this->item_images[name_s.toString().toStdString()] = pixmap;
@@ -2227,10 +2227,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     gui_overlay->setProgress(60);
     qApp->processEvents();
 
-    LOG("load floor image\n");
+    //LOG("load floor image\n");
     //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
     //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_dirt.png");
-    builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_rock.png");
+    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_rock.png");
     /*unsigned char filter_max[] = {80, 40, 20};
     unsigned char filter_min[] = {40, 20, 10};
     builtin_images["floor"] = createNoise(128, 128, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);*/
@@ -2238,8 +2238,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     gui_overlay->setProgress(65);
     qApp->processEvents();
 
-    LOG("load wall image\n");
-    builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
+    //LOG("load wall image\n");
+    //builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
 
     gui_overlay->setProgress(70);
     qApp->processEvents();
@@ -2547,6 +2547,30 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     this->journal_ss.clear();
                     this->journal_ss << journal.data();
                 }
+                else if( reader.name() == "floor" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floor element wasn't expected here");
+                    }
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    if( image_name_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floor element has no image_name attribute");
+                    }
+                    location->setFloorImageName(image_name_s.toString().toStdString());
+                }
+                else if( reader.name() == "wall" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wall element wasn't expected here");
+                    }
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    if( image_name_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wall element has no image_name attribute");
+                    }
+                    location->setWallImageName(image_name_s.toString().toStdString());
+                }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2852,6 +2876,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( unlock_item_name_s.length() > 0 ) {
                         scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
                     }
+                    map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName());
+                    if( image_iter != this->scenery_opened_images.end() ) {
+                        scenery->setCanBeOpened(true);
+                    }
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
                 else if( reader.name() == "trap" ) {
@@ -2961,9 +2989,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
     int pixels_per_unit = 64;
     float scale = 1.0f/(float)pixels_per_unit;
-    QBrush floor_brush(builtin_images["floor"]);
+    //QBrush floor_brush(builtin_images["floor"]);
+    QBrush floor_brush(builtin_images[location->getFloorImageName()]);
     floor_brush.setTransform(QTransform::fromScale(scale, scale));
-    QBrush wall_brush(builtin_images["wall"]);
+    //QBrush wall_brush(builtin_images["wall"]);
+    QBrush wall_brush(builtin_images[location->getWallImageName()]);
     wall_brush.setTransform(QTransform::fromScale(scale, scale));
 
     for(size_t i=0;i<location->getNFloorRegions();i++) {
@@ -3200,14 +3230,14 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     if( object != NULL ) {
         bool done = false;
         if( scenery->isOpened() ) {
-            map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName().c_str());
+            map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName());
             if( image_iter != this->scenery_opened_images.end() ) {
                 done = true;
                 object->setPixmap( image_iter->second );
             }
         }
         if( !done ) {
-            map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName().c_str());
+            map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName());
             if( image_iter == this->scenery_images.end() ) {
                 LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
                 LOG("    image name: %s\n", scenery->getImageName().c_str());
@@ -3486,10 +3516,10 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         object->addAnimationLayer( this->animation_layers["clothes"] );
         object->addAnimationLayer( this->animation_layers["head"] );
         if( character->getCurrentWeapon() != NULL ) {
-            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName().c_str() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName() ] );
         }
         if( character->getCurrentShield() != NULL ) {
-            object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName().c_str() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName() ] );
         }
     }
     else {
@@ -3691,13 +3721,13 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
                 }
 
-                if( !selected_scenery->isOpened() ) {
+                if( selected_scenery->canBeOpened() && !selected_scenery->isOpened() ) {
                     this->playSound("container");
                     selected_scenery->setOpened(true);
                 }
 
                 if( selected_scenery->isDoor() ) {
-                    LOG("clicked on a door\n");
+                    qDebug("clicked on a door");
                     bool is_locked = false;
                     if( selected_scenery->isLocked() ) {
                         // can we unlock it?
@@ -4083,7 +4113,7 @@ Currency *PlayingGamestate::cloneGoldItem(int value) const {
 }
 
 QPixmap &PlayingGamestate::getItemImage(const string &name) {
-    map<string, QPixmap>::iterator image_iter = this->item_images.find(name.c_str());
+    map<string, QPixmap>::iterator image_iter = this->item_images.find(name);
     if( image_iter == this->item_images.end() ) {
         LOG("failed to find image for item: %s\n", name.c_str());
         LOG("    image name: %s\n", name.c_str());
