@@ -252,6 +252,7 @@ public:
         this->gui_overlay = gui_overlay;
     }
     void setScale(float c_scale);
+    void setScale(QPointF centre, float c_scale);
     float getScale() const {
         return this->c_scale;
     }

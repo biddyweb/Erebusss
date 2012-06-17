@@ -440,13 +440,14 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
 void MainGraphicsView::zoom(bool in) {
     qDebug("MainGraphicsView::zoom(%d)", in);
     const float factor_c = 1.1f;
+    QPointF zoom_centre = this->mapToScene( this->mapFromGlobal( QCursor::pos() ) );
     if( in ) {
         float n_scale = c_scale * factor_c;
-        this->setScale(n_scale);
+        this->setScale(zoom_centre, n_scale);
     }
     else {
         float n_scale = c_scale / factor_c;
-        this->setScale(n_scale);
+        this->setScale(zoom_centre, n_scale);
     }
 }
 
@@ -463,6 +464,8 @@ bool MainGraphicsView::event(QEvent *event) {
             /*float scale_factor =
                     QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
                     / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();*/
+            QPointF touch_centre = (touchPoint0.pos() + touchPoint1.pos())*0.5;
+            QPointF zoom_centre = this->mapToScene(QPoint(touch_centre.x(), touch_centre.y()));
             float scale_factor =
                     QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
                     / QLineF(touchPoint0.lastPos(), touchPoint1.lastPos()).length();
@@ -477,7 +480,7 @@ bool MainGraphicsView::event(QEvent *event) {
                                             totalScaleFactor * currentScaleFactor));*/
             float n_scale = c_scale *scale_factor;
             LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
-            this->setScale(n_scale);
+            this->setScale(zoom_centre, n_scale);
         }
         return true;
     }
@@ -563,6 +566,27 @@ void MainGraphicsView::setScale(float c_scale) {
     this->c_scale = std::max(this->c_scale, min_zoom_c);
     this->resetTransform();
     this->scale(this->c_scale, this->c_scale);
+}
+
+void MainGraphicsView::setScale(QPointF centre, float c_scale) {
+    LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
+    float old_scale = this->c_scale;
+    this->c_scale = c_scale;
+    this->c_scale = std::min(this->c_scale, max_zoom_c);
+    this->c_scale = std::max(this->c_scale, min_zoom_c);
+
+    float scale_factor = this->c_scale / old_scale;
+    QPointF view_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    QPointF diff = ( view_centre - centre );
+    qDebug("view_centre: %f, %f", view_centre.x(), view_centre.y());
+    qDebug("diff: %f, %f", diff.x(), diff.y());
+    qDebug("scale_factor: %f", scale_factor);
+
+    this->resetTransform();
+    this->scale(this->c_scale, this->c_scale);
+    QPointF new_view_centre = centre + diff / scale_factor;
+    qDebug("new_view_centre: %f, %f", new_view_centre.x(), new_view_centre.y());
+    this->centerOn(new_view_centre);
 }
 
 void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
