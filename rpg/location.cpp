@@ -163,7 +163,7 @@ void Location::addItem(Item *item, float xpos, float ypos) {
 
     FloorRegion *floor_region = this->findFloorRegionAt(item->getPos());
     if( floor_region == NULL ) {
-        LOG("failed to find floor region for item %s at %f, %f\n", item->getName(), item->getX(), item->getY());
+        LOG("failed to find floor region for item %s at %f, %f\n", item->getName().c_str(), item->getX(), item->getY());
         throw string("failed to find floor region for item");
     }
     floor_region->addItem(item);
@@ -178,7 +178,7 @@ void Location::removeItem(Item *item) {
 
     FloorRegion *floor_region = this->findFloorRegionAt(item->getPos());
     if( floor_region == NULL ) {
-        LOG("failed to find floor region for item %s at %f, %f\n", item->getName(), item->getX(), item->getY());
+        LOG("failed to find floor region for item %s at %f, %f\n", item->getName().c_str(), item->getX(), item->getY());
         throw string("failed to find floor region for item");
     }
     floor_region->removeItem(item);
@@ -199,7 +199,7 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
 
     FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
     if( floor_region == NULL ) {
-        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName(), scenery->getX(), scenery->getY());
+        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
         throw string("failed to find floor region for scenery");
     }
     /*LOG("scenery at %f, %f added to floor region:\n", scenery->getX(), scenery->getY());
@@ -233,7 +233,7 @@ void Location::removeScenery(Scenery *scenery) {
 
     FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
     if( floor_region == NULL ) {
-        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName(), scenery->getX(), scenery->getY());
+        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
         throw string("failed to find floor region for scenery");
     }
     floor_region->removeScenery(scenery);
