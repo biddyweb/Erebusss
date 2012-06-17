@@ -560,11 +560,16 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
         // check for collision with end circle
         Vector2D end(0.0f, ymax);
         Vector2D diff = end - p0;
-        float dt = ( diff % dp ) / dp_length;
+        float dt = ( diff % dp ) / (dp_length*dp_length);
+        /*qDebug("    saved: %f, %f to %f, %f", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y);
+        qDebug("    dp: %f, %f", dp.x, dp.y);
+        qDebug("    dt = %f", dt);*/
         if( dt >= 0.0f && dt <= 1.0f ) {
             Vector2D closest_pt = p0 + dp * dt; // point on line seg closest to end
+            //qDebug("    closest_pt: %f, %f", closest_pt.x, closest_pt.y);
             if( closest_pt.y > ymax ) {
                 double dist = (closest_pt - end).magnitude();
+                //qDebug("    dist = %f", dist);
                 if( dist <= width ) {
                     // we don't bother calculating the exact collision point - just move back far enough
                     float this_hit_dist = ymax - width;
