@@ -2448,12 +2448,12 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     else if( reader.name() == "armour" ) {
         //qDebug("    armour:");
         QStringRef name_s = reader.attributes().value("name");
+        qDebug("    name: %s", name_s.toString().toStdString().c_str());
         QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef weight_s = reader.attributes().value("weight");
         QStringRef rating_s = reader.attributes().value("rating");
         int weight = parseInt(weight_s.toString());
         int rating = parseInt(rating_s.toString());
-        //qDebug("    name: %s", name_s.toString().toStdString().c_str());
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
         item = armour;
         // must be done last
@@ -2530,7 +2530,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
             reader.readNext();
             if( reader.isStartElement() )
             {
-                qDebug("read start element: %s", reader.name().toString().toStdString().c_str());
+                qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
                 if( reader.name() == "info" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2748,8 +2748,29 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     QStringRef template_s = reader.attributes().value("template");
                     Item *item = NULL;
+                    // need to read everything we want from the reader, before calling parseXMLItem.
+                    bool current_weapon = false, current_shield = false, current_armour = false;
+                    float pos_x = 0.0f, pos_y = 0.0f;
+                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
+                    }
+                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
+                        QStringRef current_weapon_s = reader.attributes().value("current_weapon");
+                        current_weapon = parseBool(current_weapon_s.toString(), true);
+                        QStringRef current_shield_s = reader.attributes().value("current_shield");
+                        current_shield = parseBool(current_shield_s.toString(), true);
+                        QStringRef current_armour_s = reader.attributes().value("current_armour");
+                        current_armour = parseBool(current_armour_s.toString(), true);
+                    }
+                    else {
+                        QStringRef pos_x_s = reader.attributes().value("x");
+                        pos_x = parseFloat(pos_x_s.toString());
+                        QStringRef pos_y_s = reader.attributes().value("y");
+                        pos_y = parseFloat(pos_y_s.toString());
+                    }
+
                     if( template_s.length() > 0 ) {
                         // load from template
+                        qDebug("load item from template");
                         if( reader.name() != "item" ) {
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("only allowed item element type when loading as template");
@@ -2762,22 +2783,17 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
                     else {
-                        item = parseXMLItem(reader);
+                        item = parseXMLItem(reader); // n.b., reader will advance to end element!
                         if( item == NULL ) {
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("unknown item element");
                         }
                     }
+
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                         scenery->addItem(item);
                     }
                     else if( questXMLType == QUEST_XML_TYPE_NPC ) {
-                        QStringRef current_weapon_s = reader.attributes().value("current_weapon");
-                        bool current_weapon = parseBool(current_weapon_s.toString(), true);
-                        QStringRef current_shield_s = reader.attributes().value("current_shield");
-                        bool current_shield = parseBool(current_shield_s.toString(), true);
-                        QStringRef current_armour_s = reader.attributes().value("current_armour");
-                        bool current_armour = parseBool(current_armour_s.toString(), true);
                         npc->addItem(item, npc != this->player);
                         if( current_weapon ) {
                             if( item->getType() != ITEMTYPE_WEAPON ) {
@@ -2805,11 +2821,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
                     else {
-                        QStringRef pos_x_s = reader.attributes().value("x");
-                        float pos_x = parseFloat(pos_x_s.toString());
-                        QStringRef pos_y_s = reader.attributes().value("y");
-                        float pos_y = parseFloat(pos_y_s.toString());
+                        qDebug("ping");
                         location->addItem(item, pos_x, pos_y);
+                        qDebug("pong");
                     }
                 }
                 else if( reader.name() == "gold" ) {
@@ -3918,7 +3932,29 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         break;
     }
     }
-    fprintf(file, "/>\n");
+    fprintf(file, ">");
+    fprintf(file, "%s", item->getDescription().c_str());
+    switch( item->getType() ) {
+    case ITEMTYPE_GENERAL:
+        fprintf(file, "</item>");
+        break;
+    case ITEMTYPE_WEAPON:
+        fprintf(file, "</weapon>");
+        break;
+    case ITEMTYPE_SHIELD:
+        fprintf(file, "</shield>");
+        break;
+    case ITEMTYPE_ARMOUR:
+        fprintf(file, "</armour>");
+        break;
+    case ITEMTYPE_AMMO:
+        fprintf(file, "</ammo>");
+        break;
+    case ITEMTYPE_CURRENCY:
+        fprintf(file, "</currency>");
+        break;
+    }
+    fprintf(file, "\n");
 }
 
 bool PlayingGamestate::saveGame(const string &filename) const {
@@ -3950,6 +3986,11 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         }
         fprintf(file, "</floorregion>\n");
     }
+    fprintf(file, "\n");
+
+    LOG("save location images\n");
+    fprintf(file, "<floor image_name=\"%s\"/>\n", c_location->getFloorImageName().c_str());
+    fprintf(file, "<wall image_name=\"%s\"/>\n", c_location->getWallImageName().c_str());
     fprintf(file, "\n");
 
     LOG("save player and npcs\n");
