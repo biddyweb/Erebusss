@@ -1179,6 +1179,9 @@ void ItemsWindow::clickedUseItem() {
         item = NULL;
         this->itemIsDeleted(index);
     }
+    if( player->isDead() ) {
+        this->playing_gamestate->closeSubWindow();
+    }
 }
 
 void ItemsWindow::clickedDropItem() {
@@ -2858,10 +2861,29 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef locked_s = reader.attributes().value("locked");
                     bool locked = parseBool(locked_s.toString(), true);
                     QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
-                    QStringRef size_w_s = reader.attributes().value("w");
-                    float size_w = parseFloat(size_w_s.toString());
-                    QStringRef size_h_s = reader.attributes().value("h");
-                    float size_h = parseFloat(size_h_s.toString());
+                    float size_w = 0.0f, size_h = 0.0f;
+                    QStringRef size_s = reader.attributes().value("size");
+                    if( size_s.length() > 0 ) {
+                        float size = parseFloat(size_s.toString());
+                        QPixmap image = this->scenery_images[image_name_s.toString().toStdString()];
+                        int image_w = image.width();
+                        int image_h = image.height();
+                        if( image_w > image_h ) {
+                            size_w = size;
+                            size_h = (size*image_h)/(float)image_w;
+                        }
+                        else {
+                            size_h = size;
+                            size_w = (size*image_w)/(float)image_h;
+                        }
+                        qDebug("size: %f size_w: %f size_h: %f", size, size_w, size_h);
+                    }
+                    else {
+                        QStringRef size_w_s = reader.attributes().value("w");
+                        QStringRef size_h_s = reader.attributes().value("h");
+                        size_w = parseFloat(size_w_s.toString());
+                        size_h = parseFloat(size_h_s.toString());
+                    }
 
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h);
                     location->addScenery(scenery, pos_x, pos_y);

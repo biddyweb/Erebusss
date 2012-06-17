@@ -48,5 +48,6 @@
         <file>gfx/textures/scenery/campfire.png</file>
         <file>gfx/textures/floor_rock.png</file>
         <file>gfx/textures/scenery/boulders.png</file>
+        <file>gfx/textures/items/mushroom.png</file>
     </qresource>
 </RCC>

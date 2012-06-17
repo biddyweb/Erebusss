@@ -89,17 +89,16 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <item template="Skull" x="8.5" y="7.0"/>
 
-<scenery name="Rock" image_name="rock1" x="2.0" y="10.7" w="0.2" h="0.12"/>
+<scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2"/>
 
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>
     <item template="Arrows"/>
 </scenery>
 
+<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
+<item template="Mushroom" x="12.0" y="5.0"/>
 <scenery name="Fire" image_name="campfire" x="14.0" y="3.0" w="1.0" h="1.0"/>
-
-<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" w="0.58" h="0.38" blocking="true"/>
-
 <scenery name="Barrel" image_name="barrel" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>

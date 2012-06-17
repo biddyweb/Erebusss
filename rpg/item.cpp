@@ -63,10 +63,31 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         }
         return true;
     }
+    else if( this->use == "ITEMUSE_MUSHROOM" ) {
+        int roll = rollDice(1, 6, 0);
+        LOG("Character: %s eats mushroom, rolls %d\n", character->getName().c_str(), roll);
+        if( roll <= 4 ) {
+            // heals
+            int amount = rollDice(1, 6, 0);
+            LOG("    heal %d\n", amount);
+            character->increaseHealth( amount );
+            LOG("    health is now: %d\n", character->getHealth());
+            playing_gamestate->addTextEffect("Yum!", character->getPos(), 1000);
+        }
+        else {
+            // harms
+            int amount = rollDice(1, 6, 0);
+            LOG("    harm %d\n", amount);
+            character->decreaseHealth(playing_gamestate, amount, false, false);
+            LOG("    health is now: %d\n", character->getHealth());
+            playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
+        }
+        return true;
+    }
     else {
         //LOG("Item::use() unknown item_use: %d\n", this->item_use);
         LOG("Item::use() unknown item_use: %s\n", this->use.c_str());
-        throw string("Unknown ItemUse type");
+        ASSERT_LOGGER(false);
     }
     return false;
 }
