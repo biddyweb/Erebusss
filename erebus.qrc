@@ -47,5 +47,6 @@
         <file>gfx/textures/floor_dirt.png</file>
         <file>gfx/textures/scenery/campfire.png</file>
         <file>gfx/textures/floor_rock.png</file>
+        <file>gfx/textures/scenery/boulders.png</file>
     </qresource>
 </RCC>

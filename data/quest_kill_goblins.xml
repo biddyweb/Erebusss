@@ -98,6 +98,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <scenery name="Fire" image_name="campfire" x="14.0" y="3.0" w="1.0" h="1.0"/>
 
+<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" w="0.58" h="0.38" blocking="true"/>
+
 <scenery name="Barrel" image_name="barrel" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
