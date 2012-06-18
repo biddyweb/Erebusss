@@ -36,6 +36,13 @@ class Currency;
 class Shop;
 class CharacterTemplate;
 
+enum Difficulty {
+    DIFFICULTY_EASY = 0,
+    DIFFICULTY_MEDIUM = 1,
+    DIFFICULTY_HARD = 2,
+    N_DIFFICULTIES = 3
+};
+
 enum Direction {
     DIRECTION_W = 0,
     DIRECTION_NW = 1,
@@ -194,6 +201,9 @@ class OptionsGamestate : public Gamestate {
     static OptionsGamestate *optionsGamestate; // singleton pointer, needed for static member functions
 
     QStackedWidget *main_stacked_widget;
+
+    QComboBox *difficultyComboBox;
+
     ScrollingListWidget *load_list;
 
     QCheckBox *soundCheck;
@@ -204,6 +214,7 @@ class OptionsGamestate : public Gamestate {
 
 private slots:
     void clickedStart();
+    void clickedStartGame();
     void clickedLoad();
     void clickedLoadGame();
     void clickedOptions();
@@ -461,6 +472,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QStackedWidget *main_stacked_widget;
 
+    Difficulty difficulty;
+
     Character *player;
     stringstream journal_ss;
 
@@ -506,6 +519,10 @@ public:
     PlayingGamestate(bool is_savegame);
     virtual ~PlayingGamestate();
 
+    Difficulty getDifficulty() const {
+        return this->difficulty;
+    }
+    void setDifficulty(Difficulty difficulty);
     void loadQuest(string filename, bool is_savegame);
     bool saveGame(const string &filename) const;
 
@@ -593,6 +610,17 @@ public:
     }
 };
 
+class StartGameMessage : public GameMessage {
+    Difficulty difficulty;
+public:
+    StartGameMessage(Difficulty difficulty) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty) {
+    }
+
+    Difficulty getDifficulty() const {
+        return this->difficulty;
+    }
+};
+
 class LoadGameMessage : public GameMessage {
     string filename;
 public:
@@ -606,13 +634,6 @@ public:
 
 class Game : public QObject {
     Q_OBJECT
-
-public:
-    enum Difficulty {
-        DIFFICULTY_EASY = 0,
-        DIFFICULTY_MEDIUM = 1,
-        DIFFICULTY_HARD = 2
-    };
 
 protected:
     QSettings *settings;
@@ -633,7 +654,6 @@ protected:
     queue<GameMessage *> message_queue;
 
     bool sound_enabled;
-    Difficulty difficulty;
 
 private slots:
 /*#ifndef Q_OS_ANDROID
@@ -686,10 +706,6 @@ public:
         return this->sound_enabled;
     }
     void setSoundEnabled(bool sound_enabled);
-    Difficulty getDifficulty() const {
-        return this->difficulty;
-    }
-    void setDifficulty(Difficulty difficulty);
     static string getDifficultyString(Difficulty difficulty);
     void showErrorDialog(const string &message);
     void showInfoDialog(const string &title, const string &message);

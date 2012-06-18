@@ -248,7 +248,7 @@ void TextEffect::advance(int phase) {
 }
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), load_list(NULL), soundCheck(NULL)
+    main_stacked_widget(NULL), difficultyComboBox(NULL), load_list(NULL), soundCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -357,17 +357,50 @@ void OptionsGamestate::quitGame() {
 
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
     GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
+    game_g->pushMessage(game_message);*/
+
+    QWidget *widget = new QWidget();
+    this->main_stacked_widget->addWidget(widget);
+    this->main_stacked_widget->setCurrentWidget(widget);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    widget->setLayout(layout);
+
+    difficultyComboBox = new QComboBox();
+    for(int i=0;i<N_DIFFICULTIES;i++) {
+        Difficulty test_difficulty = (Difficulty)i;
+        difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
+    }
+    difficultyComboBox->setCurrentIndex(1);
+    layout->addWidget(difficultyComboBox);
+
+    QPushButton *startButton = new QPushButton("Start");
+    game_g->initButton(startButton);
+    //startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(startButton);
+    connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
+
+    QPushButton *closeButton = new QPushButton("Cancel");
+    game_g->initButton(closeButton);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+}
+
+void OptionsGamestate::clickedStartGame() {
+    LOG("OptionsGamestate::clickedStartGame()\n");
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    //GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
+    ASSERT_LOGGER(this->difficultyComboBox->currentIndex() < (int)N_DIFFICULTIES);
+    Difficulty difficulty = (Difficulty)this->difficultyComboBox->currentIndex();
+    StartGameMessage *game_message = new StartGameMessage(difficulty);
     game_g->pushMessage(game_message);
 }
 
 void OptionsGamestate::clickedLoad() {
     LOG("OptionsGamestate::clickedLoad()\n");
-    /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
-    GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD);
-    game_g->pushMessage(game_message);*/
-
     QWidget *widget = new QWidget();
     this->main_stacked_widget->addWidget(widget);
     this->main_stacked_widget->setCurrentWidget(widget);
@@ -437,14 +470,6 @@ void OptionsGamestate::clickedOptions() {
     soundCheck->setChecked(game_g->isSoundEnabled());
     layout->addWidget(soundCheck);
 
-    /*difficultyComboBox = new QComboBox();
-    for(int i=0;i<N_DIFFICULTY && !done_difficulty;i++) {
-        Game::Difficulty test_difficulty = (Game::Difficulty)i;
-        difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty));
-    }
-    difficultyComboBox->setCurrentIndex((int)game_g->getDifficulty());
-    layout->addWidget(difficultyComboBox);*/
-
     QPushButton *okayButton = new QPushButton("Okay");
     game_g->initButton(okayButton);
     okayButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -471,8 +496,6 @@ void OptionsGamestate::clickedOptionsOkay() {
             this->music->pause();
         }
     }
-
-    //game_g->setDifficulty((Game::Difficulty)this->difficultyComboBox->currentIndex());
 
     this->closeAllSubWindows();
 }
@@ -802,6 +825,10 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     html += "<b>Name:</b> ";
     html += player->getName().c_str();
+    html += "<br/>";
+
+    html += "<b>Difficulty:</b> ";
+    html += Game::getDifficultyString(this->playing_gamestate->getDifficulty()).c_str();
     html += "<br/>";
 
     html += "<b>Fighting Prowess:</b> " + QString::number(player->getFP()) + "<br/>";
@@ -1801,7 +1828,7 @@ void SaveGameWindow::clickedSaveNew() {
 
 PlayingGamestate::PlayingGamestate(bool is_savegame) :
     scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
-    player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
+    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -2551,6 +2578,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     return item;
 }
 
+void PlayingGamestate::setDifficulty(Difficulty difficulty) {
+    LOG("set difficulty to: %d\n", difficulty);
+    this->difficulty = difficulty;
+}
+
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
     // filename should be full path
@@ -2595,6 +2627,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
             {
                 qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
                 if( reader.name() == "info" ) {
+                    if( is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: info element not expected in save games");
+                    }
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: info element wasn't expected here");
@@ -2604,6 +2640,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     quest->setInfo(info.toStdString());
                 }
                 else if( reader.name() == "journal" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: journal element only allowed in save games");
+                    }
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: journal element wasn't expected here");
@@ -2612,6 +2652,27 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
                     this->journal_ss.clear();
                     this->journal_ss << journal.data();
+                }
+                else if( reader.name() == "game" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: game element only allowed in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: game element wasn't expected here");
+                    }
+                    QStringRef difficulty_s = reader.attributes().value("difficulty");
+                    LOG("read difficulty: %s\n", difficulty_s.toString().toStdString().c_str());
+                    for(int i=0;i<N_DIFFICULTIES;i++) {
+                        Difficulty test_difficulty = (Difficulty)i;
+                        if( difficulty_s.toString().toStdString() == Game::getDifficultyString(test_difficulty) ) {
+                            this->difficulty = test_difficulty;
+                            LOG("    set difficulty to: %d\n", difficulty);
+                            break;
+                        }
+                    }
+                    // if not defined, we keep to the default
                 }
                 else if( reader.name() == "floor" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -4036,6 +4097,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     fprintf(file, "<?xml version=\"1.0\" ?>\n");
     fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
     fprintf(file, "\n");
+    fprintf(file, "<game difficulty=\"%s\"/>", Game::getDifficultyString(difficulty).c_str());
     fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
     fprintf(file, "\n");
 
@@ -4428,6 +4490,8 @@ void Game::update() {
                 gamestate = NULL;
                 PlayingGamestate *playing_gamestate = new PlayingGamestate(false);
                 gamestate = playing_gamestate;
+                StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
+                playing_gamestate->setDifficulty(start_message->getDifficulty());
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
                 string qt_filename = ":/" + c_quest_info.getFilename();
                 playing_gamestate->loadQuest(qt_filename, false);
@@ -4564,12 +4628,6 @@ Phonon::MediaObject *Game::loadSound(string filename) const {
 void Game::setSoundEnabled(bool sound_enabled) {
     this->sound_enabled = sound_enabled;
     this->settings->setValue(sound_enabled_key_c, sound_enabled ? 1 : 0);
-}
-
-void Game::setDifficulty(Difficulty difficulty) {
-    this->difficulty = difficulty;
-    //this->settings->setValue(difficulty_key_c, (int)difficulty);
-    //this->settings->setValue(difficulty_key_c, getDifficultyString(difficulty));
 }
 
 string Game::getDifficultyString(Difficulty difficulty) {
