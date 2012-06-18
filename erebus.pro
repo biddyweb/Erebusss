@@ -4,8 +4,10 @@
 # dir1.source = mydir
 DEPLOYMENTFOLDERS = # file1 dir1
 android {
+    # no music on Android, to reduce file size
 }
 else:symbian {
+    # no music on Symbian, to reduce file size
 }
 else {
     dir1.source = music
