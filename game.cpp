@@ -34,6 +34,9 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 const int versionMajor = 0;
 const int versionMinor = 1;
 
+const QString sound_enabled_key_c = "sound_enabled";
+const int default_sound_enabled_c = true;
+
 string savegame_root = "savegame_";
 string savegame_ext = ".xml";
 string savegame_folder = "savegames/";
@@ -244,7 +247,8 @@ void TextEffect::advance(int phase) {
     }
 }
 
-OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL)
+OptionsGamestate::OptionsGamestate() :
+    main_stacked_widget(NULL), load_list(NULL), soundCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -258,7 +262,9 @@ OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL
         Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
         Phonon::Path audioPath = Phonon::createPath(music, audioOutput);*/
         music = game_g->loadSound("music/no_more_magic.ogg");
-        music->play();
+        if( game_g->isSoundEnabled() ) {
+            music->play();
+        }
     }
 #endif
 
@@ -278,19 +284,6 @@ OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL
     QVBoxLayout *layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
 
-    //QLabel *titleLabel = new QLabel("erebus");
-    QLabel *titleLabel = new QLabel("");
-    titleLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed for fix layout problem on Qt Simulator at least, when returning to the options gamestate after playing the game
-    titleLabel->setAlignment(Qt::AlignCenter);
-    titleLabel->setStyleSheet("QLabel { color : red; }");
-    titleLabel->setFont(font);
-    /*{
-        QFont font = titleLabel->font();
-        font.setPointSize( font.pointSize() + 8 );
-        titleLabel->setFont(font);
-    }*/
-    layout->addWidget(titleLabel);
-
     QPushButton *startButton = new QPushButton("Start game");
     game_g->initButton(startButton);
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -303,6 +296,12 @@ OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
 
+    QPushButton *optionsButton = new QPushButton("Options");
+    game_g->initButton(optionsButton);
+    optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(optionsButton);
+    connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
+
 #ifndef Q_OS_ANDROID
     // applications don't quit on Android.
     QPushButton *quitButton = new QPushButton("Quit game");
@@ -311,6 +310,12 @@ OptionsGamestate::OptionsGamestate() : main_stacked_widget(NULL), load_list(NULL
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 #endif
+
+    QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
+    //titleLabel->setAlignment(Qt::AlignCenter);
+    //titleLabel->setStyleSheet("QLabel { color : red; }");
+    titleLabel->setFont(game_g->getFontSmall());
+    layout->addWidget(titleLabel);
 
     window->setEnabled(true); // ensure is enabled - may have been disabled if fail to load game, and return to OptionsGamestate
 }
@@ -416,6 +421,60 @@ void OptionsGamestate::clickedLoadGame() {
     QString filename = this->load_list->item(index)->text();
     LoadGameMessage *game_message = new LoadGameMessage(filename.toStdString());
     game_g->pushMessage(game_message);
+}
+
+void OptionsGamestate::clickedOptions() {
+    LOG("OptionsGamestate::clickedOptions()\n");
+
+    QWidget *widget = new QWidget();
+    this->main_stacked_widget->addWidget(widget);
+    this->main_stacked_widget->setCurrentWidget(widget);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    widget->setLayout(layout);
+
+    soundCheck = new QCheckBox("Sound");
+    soundCheck->setChecked(game_g->isSoundEnabled());
+    layout->addWidget(soundCheck);
+
+    /*difficultyComboBox = new QComboBox();
+    for(int i=0;i<N_DIFFICULTY && !done_difficulty;i++) {
+        Game::Difficulty test_difficulty = (Game::Difficulty)i;
+        difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty));
+    }
+    difficultyComboBox->setCurrentIndex((int)game_g->getDifficulty());
+    layout->addWidget(difficultyComboBox);*/
+
+    QPushButton *okayButton = new QPushButton("Okay");
+    game_g->initButton(okayButton);
+    okayButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(okayButton);
+    connect(okayButton, SIGNAL(clicked()), this, SLOT(clickedOptionsOkay()));
+
+    QPushButton *closeButton = new QPushButton("Cancel");
+    game_g->initButton(closeButton);
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+}
+
+void OptionsGamestate::clickedOptionsOkay() {
+    LOG("OptionsGamestate::clickedOptionsOkay");
+
+    bool new_sound_enabled = soundCheck->isChecked();
+    if( new_sound_enabled != game_g->isSoundEnabled() ) {
+        game_g->setSoundEnabled(new_sound_enabled);
+        if( new_sound_enabled ) {
+            this->music->play();
+        }
+        else {
+            this->music->pause();
+        }
+    }
+
+    //game_g->setDifficulty((Game::Difficulty)this->difficultyComboBox->currentIndex());
+
+    this->closeAllSubWindows();
 }
 
 void OptionsGamestate::closeAllSubWindows() {
@@ -2261,14 +2320,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 #ifndef Q_OS_ANDROID
     //if( !mobile_c )
     {
-        /*
-        //this->sound_effects["background"] = game_g->loadSound("music/discordance.ogg");
-        this->sound_effects["background"] = game_g->loadSound(":/sound/door.wav"); // test
-        //connect(this->sound_effects["background"], SIGNAL(finished()), this, SLOT(playBackgroundMusic())); // for looping
-        connect(this->sound_effects["background"], SIGNAL(aboutToFinish()), this, SLOT(playBackgroundMusic())); // for looping
-        this->sound_effects["background"]->play();
-        */
-
         this->sound_effects["click"] = game_g->loadSound(":/sound/click_short.wav");
         this->sound_effects["coin"] = game_g->loadSound(":/sound/coin.wav");
         this->sound_effects["container"] = game_g->loadSound(":/sound/container.wav");
@@ -2371,8 +2422,10 @@ void PlayingGamestate::playBackgroundMusic() {
     // needed for looping
     qDebug("PlayingGamestate::playBackgroundMusic()");
 #ifndef Q_OS_ANDROID
-    this->sound_effects["background"]->stop();
-    this->sound_effects["background"]->play();
+    if( game_g->isSoundEnabled() ) {
+        this->sound_effects["background"]->stop();
+        this->sound_effects["background"]->play();
+    }
 #endif
 }
 
@@ -4150,16 +4203,18 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
 void PlayingGamestate::playSound(const string &sound_effect) {
 #ifndef Q_OS_ANDROID
     qDebug("play sound: %s\n", sound_effect.c_str());
-    Phonon::MediaObject *sound = this->sound_effects[sound_effect];
-    ASSERT_LOGGER(sound != NULL);
-    if( sound != NULL ) {
-        if( sound->state() == Phonon::PlayingState ) {
-            qDebug("    already playing");
-        }
-        else {
-            //sound->stop();
-            sound->seek(0);
-            sound->play();
+    if( game_g->isSoundEnabled() ) {
+        Phonon::MediaObject *sound = this->sound_effects[sound_effect];
+        ASSERT_LOGGER(sound != NULL);
+        if( sound != NULL ) {
+            if( sound->state() == Phonon::PlayingState ) {
+                qDebug("    already playing");
+            }
+            else {
+                //sound->stop();
+                sound->seek(0);
+                sound->play();
+            }
         }
     }
 #endif
@@ -4195,10 +4250,44 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
     return image_iter->second;
 }
 
-Game::Game() : gamestate(NULL), screen(NULL) {
+Game::Game() : settings(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
+    settings = new QSettings("Mark Harman", "erebus", this);
+
+    bool ok = true;
+
+    int sound_enabled_i = settings->value(sound_enabled_key_c, default_sound_enabled_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings sound_enabled not ok, set to default");
+        this->sound_enabled = default_sound_enabled_c;
+    }
+    else {
+        this->sound_enabled = sound_enabled_i != 0;
+    }
+
+    /*int difficulty_i = settings->value(difficulty_key_c, default_difficulty_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings difficulty not ok, set to default");
+        this->difficulty = default_difficulty_c;
+    }
+    else {
+        this->difficulty = (Difficulty)difficulty_i;
+    }*/
+    /*string difficulty_s = settings->value(difficulty_key_c, getDifficultyString(default_difficulty_c)).toString().toStdString();
+    bool done_difficulty = false;
+    for(int i=0;i<N_DIFFICULTY && !done_difficulty;i++) {
+        Difficulty test_difficulty = (Difficulty)i;
+        if( difficulty_s = getDifficultyString(test_difficulty) ) {
+            done_difficulty = true;
+            this->difficulty = test_difficulty;
+        }
+    }
+    if( !done_difficulty ) {
+        qDebug("settings difficulty not ok, set to default");
+        this->difficulty = default_difficulty_c;
+    }*/
 
     // initialise paths
     // n.b., not safe to use logging until after copied/removed old log files!
@@ -4471,6 +4560,31 @@ Phonon::MediaObject *Game::loadSound(string filename) const {
     }
 }*/
 #endif
+
+void Game::setSoundEnabled(bool sound_enabled) {
+    this->sound_enabled = sound_enabled;
+    this->settings->setValue(sound_enabled_key_c, sound_enabled ? 1 : 0);
+}
+
+void Game::setDifficulty(Difficulty difficulty) {
+    this->difficulty = difficulty;
+    //this->settings->setValue(difficulty_key_c, (int)difficulty);
+    //this->settings->setValue(difficulty_key_c, getDifficultyString(difficulty));
+}
+
+string Game::getDifficultyString(Difficulty difficulty) {
+    if( difficulty == DIFFICULTY_EASY ) {
+        return "Easy";
+    }
+    else if( difficulty == DIFFICULTY_MEDIUM ) {
+        return "Medium";
+    }
+    else if( difficulty == DIFFICULTY_HARD ) {
+        return "Hard";
+    }
+    ASSERT_LOGGER(false);
+    return "";
+}
 
 void Game::showErrorDialog(const string &message) {
     LOG("Game::showErrorDialog: %s\n", message.c_str());

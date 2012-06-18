@@ -196,6 +196,8 @@ class OptionsGamestate : public Gamestate {
     QStackedWidget *main_stacked_widget;
     ScrollingListWidget *load_list;
 
+    QCheckBox *soundCheck;
+
 #ifndef Q_OS_ANDROID
     Phonon::MediaObject *music;
 #endif
@@ -204,6 +206,8 @@ private slots:
     void clickedStart();
     void clickedLoad();
     void clickedLoadGame();
+    void clickedOptions();
+    void clickedOptionsOkay();
     void clickedQuit();
     void closeAllSubWindows();
 /*#ifndef Q_OS_ANDROID
@@ -603,6 +607,16 @@ public:
 class Game : public QObject {
     Q_OBJECT
 
+public:
+    enum Difficulty {
+        DIFFICULTY_EASY = 0,
+        DIFFICULTY_MEDIUM = 1,
+        DIFFICULTY_HARD = 2
+    };
+
+protected:
+    QSettings *settings;
+
     string application_path;
     string logfilename;
     string oldlogfilename;
@@ -617,6 +631,9 @@ class Game : public QObject {
     Gamestate *gamestate;
     Screen *screen;
     queue<GameMessage *> message_queue;
+
+    bool sound_enabled;
+    Difficulty difficulty;
 
 private slots:
 /*#ifndef Q_OS_ANDROID
@@ -665,6 +682,15 @@ public:
 #ifndef Q_OS_ANDROID
     Phonon::MediaObject *loadSound(string filename) const;
 #endif
+    bool isSoundEnabled() const {
+        return this->sound_enabled;
+    }
+    void setSoundEnabled(bool sound_enabled);
+    Difficulty getDifficulty() const {
+        return this->difficulty;
+    }
+    void setDifficulty(Difficulty difficulty);
+    static string getDifficultyString(Difficulty difficulty);
     void showErrorDialog(const string &message);
     void showInfoDialog(const string &title, const string &message);
     bool askQuestionDialog(const string &title, const string &message);
