@@ -437,10 +437,19 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
 {
 }
 
-void MainGraphicsView::zoom(bool in) {
+void MainGraphicsView::zoomOut() {
+    QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    this->zoom(zoom_centre, false);
+}
+
+void MainGraphicsView::zoomIn() {
+    QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    this->zoom(zoom_centre, true);
+}
+
+void MainGraphicsView::zoom(QPointF zoom_centre, bool in) {
     qDebug("MainGraphicsView::zoom(%d)", in);
     const float factor_c = 1.1f;
-    QPointF zoom_centre = this->mapToScene( this->mapFromGlobal( QCursor::pos() ) );
     if( in ) {
         float n_scale = c_scale * factor_c;
         this->setScale(zoom_centre, n_scale);
@@ -539,11 +548,12 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 void MainGraphicsView::wheelEvent(QWheelEvent *event) {
     if( !mobile_c ) {
         // mobile UI needs to be done via multitouch instead
+        QPointF zoom_centre = this->mapToScene( this->mapFromGlobal( QCursor::pos() ) );
         if( event->delta() > 0 ) {
-            this->zoom(true);
+            this->zoom(zoom_centre, true);
         }
         else if( event->delta() < 0 ) {
-            this->zoom(false);
+            this->zoom(zoom_centre, false);
         }
     }
 }

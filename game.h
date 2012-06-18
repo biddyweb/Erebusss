@@ -234,7 +234,7 @@ class MainGraphicsView : public QGraphicsView {
     const static float min_zoom_c;
     const static float max_zoom_c;
 
-    void zoom(bool in);
+    void zoom(QPointF zoom_centre, bool in);
 
     virtual bool event(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
@@ -260,12 +260,8 @@ public:
     void removeTextEffect(TextEffect *text_effect);
 
 public slots:
-    void zoomOut() {
-        this->zoom(false);
-    }
-    void zoomIn() {
-        this->zoom(true);
-    }
+    void zoomOut();
+    void zoomIn();
 };
 
 class GUIOverlay : public QWidget {
