@@ -583,6 +583,27 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
                 }
             }
         }
+        else {
+            // need to look at ends of line seg!
+            for(int i=0;i<2 && !(*done);i++) {
+                Vector2D pt = i==0 ? p0 : p1;
+                if( pt.y > ymax ) {
+                    double dist = (pt - end).magnitude();
+                    //qDebug("    dist = %f", dist);
+                    if( dist <= width ) {
+                        // we don't bother calculating the exact collision point - just move back far enough
+                        float this_hit_dist = ymax - width;
+                        this_hit_dist = max(this_hit_dist, 0.0f);
+                        if( !(*hit) || this_hit_dist < *hit_dist ) {
+                            *hit = true;
+                            *hit_dist = this_hit_dist;
+                            if( *hit_dist == 0.0f || !find_earliest )
+                                *done = true; // no point doing anymore collisions
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
