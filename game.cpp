@@ -368,13 +368,22 @@ void OptionsGamestate::clickedStart() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    difficultyComboBox = new QComboBox();
-    for(int i=0;i<N_DIFFICULTIES;i++) {
-        Difficulty test_difficulty = (Difficulty)i;
-        difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *label = new QLabel("Difficulty: ");
+        label->setAlignment(Qt::AlignRight);
+        h_layout->addWidget(label);
+
+        difficultyComboBox = new QComboBox();
+        for(int i=0;i<N_DIFFICULTIES;i++) {
+            Difficulty test_difficulty = (Difficulty)i;
+            difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
+        }
+        difficultyComboBox->setCurrentIndex(1);
+        h_layout->addWidget(difficultyComboBox);
     }
-    difficultyComboBox->setCurrentIndex(1);
-    layout->addWidget(difficultyComboBox);
 
     QPushButton *startButton = new QPushButton("Start");
     game_g->initButton(startButton);
