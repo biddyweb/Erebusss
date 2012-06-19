@@ -2,6 +2,7 @@
 #include "character.h"
 #include "item.h"
 #include "../game.h"
+#include "../playinggamestate.h"
 
 #include <qdebug.h>
 

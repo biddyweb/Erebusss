@@ -50,6 +50,7 @@ symbian {
 
 android {
     # phonon not supported on Android
+    //LIBS += -lOpenSLES
 }
 else {
     QT += phonon
@@ -69,7 +70,10 @@ SOURCES += main.cpp mainwindow.cpp \
     rpg/character.cpp \
     rpg/utils.cpp \
     rpg/item.cpp \
-    qt_utils.cpp
+    qt_utils.cpp \
+    playinggamestate.cpp \
+    optionsgamestate.cpp \
+    gamestate.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -77,7 +81,10 @@ HEADERS += mainwindow.h \
     rpg/character.h \
     rpg/utils.h \
     rpg/item.h \
-    qt_utils.h
+    qt_utils.h \
+    playinggamestate.h \
+    optionsgamestate.h \
+    gamestate.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

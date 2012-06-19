@@ -261,6 +261,7 @@ public:
     float getSpeed() const {
         return this->Sp;
     }
+    int modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const;
     void initialiseHealth(int max_health) {
         if( max_health <= 0 ) {
             throw string("max health must be greater than 0");

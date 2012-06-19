@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QtGui/QMainWindow>
 
@@ -27,5 +26,3 @@ public:
 /*public slots:
     void updateScene();*/
 };
-
-#endif // MAINWINDOW_H

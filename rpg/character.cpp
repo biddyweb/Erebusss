@@ -2,6 +2,7 @@
 #include "location.h"
 #include "item.h"
 #include "../game.h"
+#include "../playinggamestate.h"
 #include "../qt_screen.h"
 
 #include <cmath>
@@ -112,6 +113,16 @@ bool Character::useAmmo(Ammo *ammo) {
     return used_up;
 }
 
+int Character::modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const {
+    if( this == playing_gamestate->getPlayer() ) {
+        value = (int)(value * playing_gamestate->getDifficultyModifier() + 0.5f);
+    }
+    else {
+        value = (int)(value / playing_gamestate->getDifficultyModifier() + 0.5f);
+    }
+    return value;
+}
+
 bool Character::update(PlayingGamestate *playing_gamestate) {
     if( this->location == NULL ) {
         return false;
@@ -180,7 +191,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 this->setStateIdle();
                 if( can_hit ) {
                     int hit_roll = rollDice(2, 6, 0);
-                    if( hit_roll <= this->FP ) {
+                    int mod_FP = this->modifyStatForDifficulty(playing_gamestate, this->FP);
+                    if( hit_roll <= mod_FP ) {
                         LOG("character %s rolled %d, hit %s\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str());
                         ai_try_moving = false; // no point trying to move, just wait to hit again
                         if( !target_npc->is_dead ) {

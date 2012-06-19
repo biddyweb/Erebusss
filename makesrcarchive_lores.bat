@@ -22,13 +22,19 @@ copy %src%\erebus.svg %dst%
 copy %src%\gpl.txt %dst%
 
 copy %src%\game.cpp %dst%
+copy %src%\gamestate.cpp %dst%
 copy %src%\main.cpp %dst%
 copy %src%\mainwindow.cpp %dst%
+copy %src%\optionsgamestate.cpp %dst%
+copy %src%\playinggamestate.cpp %dst%
 copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
 
 copy %src%\game.h %dst%
+copy %src%\gamestate.h %dst%
 copy %src%\mainwindow.h %dst%
+copy %src%\optionsgamestate.h %dst%
+copy %src%\playinggamestate.h %dst%
 copy %src%\qt_screen.h %dst%
 copy %src%\qt_utils.h %dst%
 
