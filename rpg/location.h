@@ -424,6 +424,7 @@ public:
     bool collideWithTransient(const Character *character, Vector2D pos) const;
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
     //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
+    Vector2D nudgeToFreeSpace(Vector2D pos, float width) const;
 
     void calculateDistanceGraph();
     const Graph *getDistanceGraph() const {

@@ -463,6 +463,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
     // n.b., dp is kept as non-unit vector
     Vector2D normal_from_wall = dp.perpendicularYToX(); // since walls are defined anti-clockwise, this vector must point away from the wall
+    // n.b., normal_from_wall is also non-unit!!!
     //qDebug("candidate hit wall from %f, %f to %f, %f:", saved_p0.x, saved_p0.y, saved_p1.x, saved_p1.y);
     //qDebug("    transformed to: %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
     //qDebug("    normal_from_wall = %f, %f", normal_from_wall.x, normal_from_wall.y);
@@ -583,7 +584,8 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
                 }
             }
         }
-        else {
+        // n.b., only care about the closest point on the line seg, and not the end points of the line seg - as we'll look at the adjacent boundary segments to find the real closest point
+        /*else {
             // need to look at ends of line seg!
             for(int i=0;i<2 && !(*done);i++) {
                 Vector2D pt = i==0 ? p0 : p1;
@@ -603,7 +605,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
                     }
                 }
             }
-        }
+        }*/
     }
 }
 
@@ -663,6 +665,49 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
         *hit_pos = start + dv * hit_dist;
     }
     return hit;
+}
+
+Vector2D Location::nudgeToFreeSpace(Vector2D pos, float width) const {
+    Vector2D saved_pos = pos; // saved for debugging
+    bool nudged = false;
+    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
+        const Polygon2D *boundary = &*iter;
+        for(size_t j=0;j<boundary->getNPoints();j++) {
+            Vector2D p0 = boundary->getPoint(j);
+            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            // n.b., dp is kept as non-unit vector
+
+            Vector2D diff = pos - p0;
+            float dt = ( diff % dp ) / (dp_length*dp_length);
+            if( dt >= 0.0f && dt <= 1.0f ) {
+                Vector2D closest_pt = p0 + dp * dt; // point on line seg closest to end
+                //double dist = (closest_pt - pos).magnitude();
+                Vector2D normal_from_wall = dp.perpendicularYToX(); // since walls are defined anti-clockwise, this vector must point away from the wall
+                normal_from_wall /= dp_length;
+                double dist = (pos - closest_pt) % normal_from_wall;
+                //qDebug("    dist = %f", dist);
+                if( fabs(dist) <= width ) {
+                    float move_dist = width - dist;
+                    move_dist += E_TOL_LINEAR;
+                    pos += normal_from_wall * move_dist;
+                    /*qDebug("    nudged %f, %f to %f, %f (dist %f)", saved_pos.x, saved_pos.y, pos.x, pos.y, dist);
+                    qDebug("        due to %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);*/
+                    nudged = true;
+                }
+            }
+            // n.b., only care about the closest point on the line seg, and not the end points of the line seg - as we'll look at the adjacent boundary segments to find the real closest point
+        }
+    }
+
+    if( nudged ) {
+        qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
+    }
+    return pos;
 }
 
 /*bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {

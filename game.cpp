@@ -3941,6 +3941,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         }
 
+        // nudge position due to boundaries
+        dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
         if( dest != player->getPos() ) {
             player->setDestination(dest.x, dest.y, ignore_scenery);
             if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
