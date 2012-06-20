@@ -131,7 +131,8 @@ OTHER_FILES += \
     android/version.xml \
     data/npcs.xml \
     data/quests.xml \
-    data/quest_kill_goblins.xml
+    data/quest_kill_goblins.xml \
+    _docs/erebus.html
 
 RESOURCES += \
     erebus.qrc
