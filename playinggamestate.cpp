@@ -394,6 +394,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += "</body></html>";
 
     QWebView *label = new QWebView();
+    game_g->setWebView(label);
     label->setHtml(html);
     layout->addWidget(label);
 
@@ -1088,6 +1089,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     }
     else {
         /*QWebView *label = new QWebView();
+        game_g->setWebView(label);
         QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
         label->setHtml(html);
         label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -3057,6 +3059,7 @@ void PlayingGamestate::showInfoWindow(const string &html) {
     subwindow->setLayout(layout);
 
     QWebView *label = new QWebView();
+    game_g->setWebView(label);
     label->setHtml(html.c_str());
     layout->addWidget(label);
 
