@@ -39,6 +39,8 @@ private slots:
     void clickedOptions();
     void clickedOptionsOkay();
     void clickedQuit();
+    void clickedOnlineHelp();
+    void clickedOfflineHelp();
     void closeAllSubWindows();
 /*#ifndef Q_OS_ANDROID
     void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate);

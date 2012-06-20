@@ -4,6 +4,7 @@
 #include "rpg/location.h"
 
 #include <QtGui>
+#include <QtWebKit/QWebView>
 
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
@@ -65,6 +66,24 @@ enum Direction {
     DIRECTION_S = 6,
     DIRECTION_SW = 7,
     N_DIRECTIONS = 8
+};
+
+class WebViewEventFilter : public QObject {
+    Q_OBJECT
+
+    QWebView *webView;
+    bool filterMouseMove;
+    int orig_mouse_x, orig_mouse_y;
+    int saved_mouse_x, saved_mouse_y;
+protected:
+
+    bool eventFilter(QObject *obj, QEvent *event);
+
+public:
+    WebViewEventFilter(QObject *parent) : QObject(parent), webView(NULL), filterMouseMove(false), orig_mouse_x(0), orig_mouse_y(0), saved_mouse_x(0), saved_mouse_y(0) {
+    }
+
+    void setWebView(QWebView *webView);
 };
 
 //class AnimationSet : public QGraphicsItem {
@@ -242,6 +261,8 @@ protected:
     QFont font_std;
     QFont font_big;
 
+    WebViewEventFilter *webViewEventFilter;
+
     QPalette gui_palette;
     QBrush gui_brush_buttons;
 
@@ -286,6 +307,10 @@ public:
         message_queue.push(message);
     }
 
+    void setWebView(QWebView *webView) {
+        this->webViewEventFilter->setWebView(webView);
+    }
+
     void run();
     void update();
     //void mouseClick(int m_x, int m_y);
@@ -303,6 +328,7 @@ public:
     }
     void setSoundEnabled(bool sound_enabled);
     static string getDifficultyString(Difficulty difficulty);
+
     void showErrorDialog(const string &message);
     void showInfoDialog(const string &title, const string &message);
     bool askQuestionDialog(const string &title, const string &message);

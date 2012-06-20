@@ -49,5 +49,6 @@
         <file>gfx/textures/floor_rock.png</file>
         <file>gfx/textures/scenery/boulders.png</file>
         <file>gfx/textures/items/mushroom.png</file>
+        <file>_docs/erebus.html</file>
     </qresource>
 </RCC>

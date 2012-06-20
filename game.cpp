@@ -6,6 +6,7 @@
 
 #include <ctime>
 
+#include <QWebFrame>
 #include <QXmlStreamReader>
 
 #ifdef _DEBUG
@@ -16,6 +17,86 @@ Game *game_g = NULL;
 
 const QString sound_enabled_key_c = "sound_enabled";
 const int default_sound_enabled_c = true;
+
+void WebViewEventFilter::setWebView(QWebView *webView) {
+    qDebug("setWebView");
+    this->webView = webView;
+    this->webView->installEventFilter(this);
+}
+
+bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
+    switch( event->type() ) {
+        case QEvent::MouseButtonPress:
+            {
+                QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+                if( mouseEvent->button() == Qt::LeftButton ) {
+                    //filterMouseMove = true;
+                    // disallow selection - but we need to allow click and drag for the scroll bars!
+                    if( webView != NULL ) {
+                        QRect vertRect = webView->page()->mainFrame()->scrollBarGeometry(Qt::Vertical);
+                        QRect horizRect = webView->page()->mainFrame()->scrollBarGeometry(Qt::Horizontal);
+                        int scrollbar_x = vertRect.left();
+                        int scrollbar_y = horizRect.top();
+                        if( ( vertRect.isEmpty() || mouseEvent->x() <= scrollbar_x ) && ( horizRect.isEmpty() || mouseEvent->y() <= scrollbar_y ) ) {
+                            // disallow mouse dragging
+                            filterMouseMove = true;
+                            orig_mouse_x = saved_mouse_x = mouseEvent->globalX();
+                            orig_mouse_y = saved_mouse_y = mouseEvent->globalY();
+                        }
+                    }
+                }
+                break;
+            }
+        case QEvent::MouseButtonRelease:
+            {
+                QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+                if( mouseEvent->button() == Qt::LeftButton ) {
+                    filterMouseMove = false;
+                    // if we've clicked and dragged, we don't want to allow clicking links
+                    int mouse_x = mouseEvent->globalX();
+                    int mouse_y = mouseEvent->globalY();
+                    int diff_x = mouse_x - orig_mouse_x;
+                    int diff_y = mouse_y - orig_mouse_y;
+                    int dist2 = diff_x*diff_x + diff_y*diff_y;
+                    const int tolerance = 16;
+                    qDebug("drag %d, %d : dist2: %d", diff_x, diff_y, dist2);
+                    if( dist2 > tolerance*tolerance ) {
+                        // need to allow some tolerance, otherwise hard to click on a touchscreen device!
+                        return true;
+                    }
+                }
+               break;
+            }
+        case QEvent::MouseMove:
+            {
+                /*if( filterMouseMove && webView != NULL ) {
+                    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+                    int scrollbar_x = webView->page()->mainFrame()->scrollBarGeometry(Qt::Vertical).left();
+                    int scrollbar_y = webView->page()->mainFrame()->scrollBarGeometry(Qt::Horizontal).top();
+                    if( mouseEvent->x() <= scrollbar_x && mouseEvent->y() <= scrollbar_y ) {
+                        // filter
+                        return true;
+                    }
+                }*/
+                if( filterMouseMove ) {
+                    if( webView != NULL ) {
+                        // support for swype scrolling
+                        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+                        int new_mouse_x = mouseEvent->globalX();
+                        int new_mouse_y = mouseEvent->globalY();
+                        webView->page()->mainFrame()->scroll(saved_mouse_x - new_mouse_x, saved_mouse_y - new_mouse_y);
+                        saved_mouse_x = new_mouse_x;
+                        saved_mouse_y = new_mouse_y;
+                    }
+                    return true;
+                }
+            }
+            break;
+        default:
+            break;
+    }
+    return false;
+}
 
 AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
     if( pixmaps.size() != N_DIRECTIONS * n_frames ) {
@@ -215,11 +296,13 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     saved_y = event->y();
 }
 
-Game::Game() : settings(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
+Game::Game() : settings(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
     settings = new QSettings("Mark Harman", "erebus", this);
+
+    webViewEventFilter = new WebViewEventFilter(this);
 
     bool ok = true;
 

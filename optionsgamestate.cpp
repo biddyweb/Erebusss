@@ -2,6 +2,8 @@
 #include <cassert>
 #endif
 
+#include <QtWebKit/QWebView>
+
 #include "optionsgamestate.h"
 #include "game.h"
 #include "qt_screen.h"
@@ -73,11 +75,30 @@ OptionsGamestate::OptionsGamestate() :
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 #endif
 
-    QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
-    //titleLabel->setAlignment(Qt::AlignCenter);
-    //titleLabel->setStyleSheet("QLabel { color : red; }");
-    titleLabel->setFont(game_g->getFontSmall());
-    layout->addWidget(titleLabel);
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
+        //titleLabel->setAlignment(Qt::AlignCenter);
+        //titleLabel->setStyleSheet("QLabel { color : red; }");
+        titleLabel->setFont(game_g->getFontSmall());
+        h_layout->addWidget(titleLabel);
+
+        QPushButton *offlineHelpButton = new QPushButton("Offline Help");
+        game_g->initButton(offlineHelpButton);
+        //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        offlineHelpButton->setFont(game_g->getFontSmall());
+        h_layout->addWidget(offlineHelpButton);
+        connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
+
+        QPushButton *onlineHelpButton = new QPushButton("Online Help");
+        game_g->initButton(onlineHelpButton);
+        //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        onlineHelpButton->setFont(game_g->getFontSmall());
+        h_layout->addWidget(onlineHelpButton);
+        connect(onlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOnlineHelp()));
+    }
 
     window->setEnabled(true); // ensure is enabled - may have been disabled if fail to load game, and return to OptionsGamestate
 }
@@ -273,8 +294,38 @@ void OptionsGamestate::clickedOptionsOkay() {
     this->closeAllSubWindows();
 }
 
+void OptionsGamestate::clickedOnlineHelp() {
+    LOG("OptionsGamestate::clickedOnlineHelp\n");
+    QDesktopServices::openUrl(QUrl("http://homepage.ntlworld.com/mark.harman/erebus.html"));
+    //this->activateWindow(); // needed for Android at least
+}
+
+void OptionsGamestate::clickedOfflineHelp() {
+    LOG("OptionsGamestate::clickedOfflineHelp\n");
+
+    QWidget *widget = new QWidget();
+    this->main_stacked_widget->addWidget(widget);
+    this->main_stacked_widget->setCurrentWidget(widget);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    widget->setLayout(layout);
+
+    QWebView *help = new QWebView();
+    game_g->setWebView(help);
+    help->setUrl(QUrl("qrc:/_docs/erebus.html"));
+    help->show();
+    layout->addWidget(help);
+
+    QPushButton *closeButton = new QPushButton("Close");
+    game_g->initButton(closeButton);
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    closeButton->setFont(game_g->getFontSmall());
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+}
+
 void OptionsGamestate::closeAllSubWindows() {
-    LOG("OptionsGamestate::closeAllSubWindows");
+    LOG("OptionsGamestate::closeAllSubWindows\n");
     while( this->main_stacked_widget->count() > 1 ) {
         QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
         this->main_stacked_widget->removeWidget(subwindow);
