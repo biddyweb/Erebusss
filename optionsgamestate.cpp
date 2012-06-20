@@ -260,12 +260,14 @@ void OptionsGamestate::clickedOptionsOkay() {
     bool new_sound_enabled = soundCheck->isChecked();
     if( new_sound_enabled != game_g->isSoundEnabled() ) {
         game_g->setSoundEnabled(new_sound_enabled);
+#ifndef Q_OS_ANDROID
         if( new_sound_enabled ) {
             this->music->play();
         }
         else {
             this->music->pause();
         }
+#endif
     }
 
     this->closeAllSubWindows();
