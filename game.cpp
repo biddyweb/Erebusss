@@ -296,11 +296,13 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     saved_y = event->y();
 }
 
-Game::Game() : settings(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
+Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
     settings = new QSettings("Mark Harman", "erebus", this);
+
+    style = new QWindowsStyle(); // needed to get the textured buttons (which doesn't work with Windows XP, Symbian or Android styles)
 
     webViewEventFilter = new WebViewEventFilter(this);
 
@@ -396,6 +398,12 @@ Game::Game() : settings(NULL), webViewEventFilter(NULL), gamestate(NULL), screen
     }
 }
 
+Game::~Game() {
+    if( style != NULL ) {
+        delete style;
+    }
+}
+
 void Game::run() {
     screen = new Screen();
 
@@ -433,17 +441,19 @@ void Game::run() {
         this->font_big = QFont("Verdana", 48, QFont::Bold);
     }
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+/*#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     // crashes on Android?!
     // and doesn't work on Symbian
     // see Game::initButton()
-#else
+#else*/
     unsigned char filter_max[] = {220, 220, 220};
     unsigned char filter_min[] = {120, 120, 120};
     QPixmap gui_pixmap_buttons = createNoise(256, 256, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
     this->gui_brush_buttons.setTexture(gui_pixmap_buttons);
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
-#endif
+    //this->gui_palette.setBrush(QPalette::WindowText, QBrush(Qt::red)); // needed for Symbian at least
+    //this->gui_palette.setBrush(QPalette::WindowText, gui_brush_buttons);
+//#endif
 
     gamestate = new OptionsGamestate();
 
@@ -454,14 +464,16 @@ void Game::run() {
 }
 
 void Game::initButton(QPushButton *button) const {
-#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
+/*#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     // crashes on Android?!
     // and doesn't work on Symbian
     // if we change this, remember to change it where we initialise gui_palette, in Game::run().
-#else
+#else*/
+    button->setStyle(style);
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);
-#endif
+//#endif
+    //button->setStyleSheet("QPushButton { color : red; }");
 }
 
 void Game::update() {

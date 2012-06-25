@@ -257,6 +257,7 @@ protected:
     string logfilename;
     string oldlogfilename;
 
+    QStyle *style;
     QFont font_small;
     QFont font_std;
     QFont font_big;
@@ -279,8 +280,7 @@ private slots:
 
 public:
     Game();
-    ~Game() {
-    }
+    ~Game();
 
     Screen *getScreen() {
         return this->screen;
