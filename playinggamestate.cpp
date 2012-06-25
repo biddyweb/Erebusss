@@ -228,6 +228,8 @@ void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
     qDebug("    at %f, %f", text_effect->x(), text_effect->y());
     qDebug("    rect %f, %f : %f, %f", text_effect->boundingRect().left(), text_effect->boundingRect().top(), text_effect->boundingRect().right(), text_effect->boundingRect().bottom());
     qDebug("    size %f x %f", text_effect_w, text_effect_h);*/
+    bool set_new_y = false;
+    float new_y = -1.0f;
     for(set<TextEffect *>::const_iterator iter = text_effects.begin(); iter != text_effects.end(); ++iter) {
         const TextEffect *te = *iter;
         float te_w = te->boundingRect().width() * font_scale;
@@ -246,8 +248,16 @@ void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
             qDebug("    rect %f, %f : %f, %f", te->boundingRect().left(), te->boundingRect().top(), te->boundingRect().right(), te->boundingRect().bottom());
             qDebug("    size %f x %f", te_w, te_h);*/
             //text_effect->setPos( text_effect->x(), te->boundingRect().bottom() );
-            text_effect->setPos( text_effect->x(), te->y() + te_h );
+            //text_effect->setPos( text_effect->x(), te->y() + te_h );
+            float this_new_y = te->y() + te_h;
+            if( !set_new_y || this_new_y > new_y ) {
+                set_new_y = true;
+                new_y = this_new_y;
+            }
         }
+    }
+    if( set_new_y ) {
+        text_effect->setPos( text_effect->x(), new_y );
     }
     this->scene()->addItem(text_effect);
     text_effects.insert(text_effect);
