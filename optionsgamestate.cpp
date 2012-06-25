@@ -82,20 +82,20 @@ OptionsGamestate::OptionsGamestate() :
         QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
         //titleLabel->setAlignment(Qt::AlignCenter);
         //titleLabel->setStyleSheet("QLabel { color : red; }");
-        titleLabel->setFont(game_g->getFontSmall());
+        titleLabel->setFont(game_g->getFontStd());
         h_layout->addWidget(titleLabel);
 
         QPushButton *offlineHelpButton = new QPushButton("Offline Help");
         game_g->initButton(offlineHelpButton);
         //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        offlineHelpButton->setFont(game_g->getFontSmall());
+        offlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(offlineHelpButton);
         connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
 
         QPushButton *onlineHelpButton = new QPushButton("Online Help");
         game_g->initButton(onlineHelpButton);
         //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        onlineHelpButton->setFont(game_g->getFontSmall());
+        onlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(onlineHelpButton);
         connect(onlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOnlineHelp()));
     }
@@ -156,7 +156,7 @@ void OptionsGamestate::clickedStart() {
         layout->addLayout(h_layout);
 
         QLabel *label = new QLabel("Difficulty: ");
-        label->setAlignment(Qt::AlignRight);
+        label->setAlignment(Qt::AlignCenter);
         h_layout->addWidget(label);
 
         difficultyComboBox = new QComboBox();
@@ -165,18 +165,19 @@ void OptionsGamestate::clickedStart() {
             difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
         }
         difficultyComboBox->setCurrentIndex(1);
+        difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(difficultyComboBox);
     }
 
     QPushButton *startButton = new QPushButton("Start");
     game_g->initButton(startButton);
-    //startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
-    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
 }
@@ -282,11 +283,13 @@ void OptionsGamestate::clickedOptionsOkay() {
     if( new_sound_enabled != game_g->isSoundEnabled() ) {
         game_g->setSoundEnabled(new_sound_enabled);
 #ifndef Q_OS_ANDROID
-        if( new_sound_enabled ) {
-            this->music->play();
-        }
-        else {
-            this->music->pause();
+        if( music != NULL ) {
+            if( new_sound_enabled ) {
+                this->music->play();
+            }
+            else {
+                this->music->pause();
+            }
         }
 #endif
     }
@@ -318,7 +321,7 @@ void OptionsGamestate::clickedOfflineHelp() {
 
     QPushButton *closeButton = new QPushButton("Close");
     game_g->initButton(closeButton);
-    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     closeButton->setFont(game_g->getFontSmall());
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
