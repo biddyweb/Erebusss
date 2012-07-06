@@ -319,6 +319,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         const float x_off = 16.0f/640.0f;
         const float hgt = 64.0f/360.0f;
         this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
+        qDebug(">>> draw progress: %d", this->progress_percent);
     }
 
     /*{
@@ -839,51 +840,8 @@ void ItemsWindow::clickedInfo() {
         return;
     }
     const Item *item = list_items.at(index);
-    stringstream str;
-    str << "<html><body>";
-    str << "<h2>" << item->getName() << "</h2>";
-    str << "<p>";
-    if( item->getType() == ITEMTYPE_WEAPON ) {
-        str << "<b>Type:</b> Weapon<br/>";
-        const Weapon *weapon = static_cast<const Weapon *>(item);
-        int damageX = 0, damageY = 0, damageZ = 0;
-        weapon->getDamage(&damageX, &damageY, &damageZ);
-        if( damageZ != 0 ) {
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << "+" << damageZ << "<br/>";
-        }
-        else {
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
-        }
-        str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
-        str << "<b>Ranged?:</b> " << (weapon->isRanged() ? "Yes" : "No") << "<br/>";
-        if( weapon->isRanged() ) {
-            str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
-        }
-    }
-    else if( item->getType() == ITEMTYPE_SHIELD ) {
-        str << "<b>Type:</b> Shield<br/>";
-        //const Shield *shield = static_cast<const Shield *>(item);
-    }
-    else if( item->getType() == ITEMTYPE_ARMOUR ) {
-        str << "<b>Type:</b> Armour<br/>";
-        //const Armour *armour = static_cast<const Armour *>(item);
-    }
-    else if( item->getType() == ITEMTYPE_AMMO ) {
-        str << "<b>Type:</b> Ammo<br/>";
-        const Ammo *ammo = static_cast<const Ammo *>(item);
-        str << "<b>Amount:</b> " << ammo->getAmount() << "<br/>";
-    }
-    str << "<b>Weight: </b>" << item->getWeight() << "<br/>";
-    str << "<b>Magical: </b>" << (item->isMagical() ? "Yes" : "No") << "<br/>";
-    if( item->getRating() > 0 ) {
-        str << "<b>Rating:</b> " << item->getRating() << "<br/>";
-    }
-    str << "</p>";
-    if( item->getDescription().length() > 0 ) {
-        str << item->getDescription();
-    }
-    str << "</body></html>";
-    playing_gamestate->showInfoWindow(str.str());
+    string info = item->getDetailedDescription();
+    playing_gamestate->showInfoWindow(info);
 }
 
 void ItemsWindow::itemIsDeleted(size_t index) {
@@ -995,6 +953,11 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         game_g->initButton(buyButton);
         h_layout->addWidget(buyButton);
         connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
+
+        QPushButton *infoButton = new QPushButton("Info");
+        game_g->initButton(infoButton);
+        h_layout->addWidget(infoButton);
+        connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
     QPushButton *closeButton = new QPushButton("Finish Trading");
@@ -1074,6 +1037,21 @@ void TradeWindow::clickedSell() {
     else {
         game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
     }
+}
+
+void TradeWindow::clickedInfo() {
+    LOG("TradeWindow::clickedInfo()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < items.size() );
+
+    const Item *selected_item = items.at(index);
+    string info = selected_item->getDetailedDescription();
+    playing_gamestate->showInfoWindow(info);
 }
 
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
@@ -2492,9 +2470,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
                     else {
-                        qDebug("ping");
                         location->addItem(item, pos_x, pos_y);
-                        qDebug("pong");
+
                     }
                 }
                 else if( reader.name() == "gold" ) {

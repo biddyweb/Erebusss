@@ -94,6 +94,7 @@ public:
     void setProgress(int progress_percent) {
         this->display_progress = true;
         this->progress_percent = progress_percent;
+        this->repaint();
     }
     void unsetProgress() {
         this->display_progress = false;
@@ -215,6 +216,7 @@ class TradeWindow : public QWidget {
 private slots:
     void clickedBuy();
     void clickedSell();
+    void clickedInfo();
 
 public:
     TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs);

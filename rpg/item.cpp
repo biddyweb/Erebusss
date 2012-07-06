@@ -93,6 +93,54 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
     return false;
 }
 
+string Item::getDetailedDescription() const {
+    stringstream str;
+    str << "<html><body>";
+    str << "<h2>" << this->getName() << "</h2>";
+    str << "<p>";
+    if( this->getType() == ITEMTYPE_WEAPON ) {
+        str << "<b>Type:</b> Weapon<br/>";
+        const Weapon *weapon = static_cast<const Weapon *>(this);
+        int damageX = 0, damageY = 0, damageZ = 0;
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        if( damageZ != 0 ) {
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << "+" << damageZ << "<br/>";
+        }
+        else {
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
+        }
+        str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
+        str << "<b>Ranged?:</b> " << (weapon->isRanged() ? "Yes" : "No") << "<br/>";
+        if( weapon->isRanged() ) {
+            str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
+        }
+    }
+    else if( this->getType() == ITEMTYPE_SHIELD ) {
+        str << "<b>Type:</b> Shield<br/>";
+        //const Shield *shield = static_cast<const Shield *>(item);
+    }
+    else if( this->getType() == ITEMTYPE_ARMOUR ) {
+        str << "<b>Type:</b> Armour<br/>";
+        //const Armour *armour = static_cast<const Armour *>(item);
+    }
+    else if( this->getType() == ITEMTYPE_AMMO ) {
+        str << "<b>Type:</b> Ammo<br/>";
+        const Ammo *ammo = static_cast<const Ammo *>(this);
+        str << "<b>Amount:</b> " << ammo->getAmount() << "<br/>";
+    }
+    str << "<b>Weight: </b>" << this->getWeight() << "<br/>";
+    str << "<b>Magical: </b>" << (this->isMagical() ? "Yes" : "No") << "<br/>";
+    if( this->getRating() > 0 ) {
+        str << "<b>Rating:</b> " << this->getRating() << "<br/>";
+    }
+    str << "</p>";
+    if( this->getDescription().length() > 0 ) {
+        str << this->getDescription();
+    }
+    str << "</body></html>";
+    return str.str();
+}
+
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), is_ranged(false), requires_ammo(false),
