@@ -191,6 +191,7 @@ public:
     }
 
     bool isSetOff(const Character *character);
+    bool setOff(PlayingGamestate *playing_gamestate, Character *character) const;
 };
 
 class FloorRegion : public Polygon2D {

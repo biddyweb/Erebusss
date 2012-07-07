@@ -402,6 +402,8 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += QString::number(player->getMaxHealth());
     html += "<br/>";
 
+    html += "<b>XP:</b> " + QString::number(player->getXP()) + "<br/>";
+
     html += "</body></html>";
 
     QWebView *label = new QWebView();
@@ -1780,7 +1782,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     int gold_min = parseInt(gold_min_s.toString());
                     QStringRef gold_max_s = reader.attributes().value("gold_max");
                     int gold_max = parseInt(gold_max_s.toString());
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max);
+                    QStringRef xp_s = reader.attributes().value("xp");
+                    int xp = parseInt(xp_s.toString());
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -3249,20 +3253,16 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         for(set<Trap *>::iterator iter = this->c_location->trapsBegin(); iter != this->c_location->trapsEnd(); ++iter) {
             Trap *trap = *iter;
             if( trap->isSetOff(character) ) {
-                int rollD = rollDice(2, 6, 0);
-                LOG("character: %s has set of trap at %f, %f roll %d\n", character->getName().c_str(), trap->getX(), trap->getY(), rollD);
-                this->playSound("click");
-                delete_traps.push_back(trap);
-                if( rollD <= character->getDexterity() ) {
-                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!", player->getPos(), 2000);
+                if( trap->setOff(this, character) ) {
+                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
                 }
                 else {
-                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
-                    int damage = rollDice(2, 12, -1);
-                    character->decreaseHealth(this, damage, true, false);
-                    if( character->isDead() ) {
-                        break;
-                    }
+                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!", player->getPos(), 2000);
+                }
+                this->playSound("click");
+                delete_traps.push_back(trap);
+                if( character->isDead() ) {
+                    break;
                 }
             }
         }

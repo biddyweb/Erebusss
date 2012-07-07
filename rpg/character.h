@@ -51,9 +51,10 @@ class CharacterTemplate {
     bool has_natural_damage;
     int natural_damageX, natural_damageY, natural_damageZ;
     int gold_min, gold_max;
+    int xp_worth;
     string animation_name;
 public:
-    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
+    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth);
 
     int getFP() const {
         return this->FP;
@@ -95,6 +96,9 @@ public:
         *natural_damageZ = this->natural_damageZ;
     }
     int getGold() const;
+    int getXPWorth() const {
+        return xp_worth;
+    }
     string getAnimationName() const {
         return this->animation_name;
     }
@@ -133,6 +137,9 @@ class Character {
     Shield *current_shield;
     Armour *current_armour;
     int gold;
+
+    int xp;
+    int xp_worth;
 
     void setStateIdle();
     Item *findItem(const string &key);
@@ -350,4 +357,11 @@ public:
     int calculateItemsWeight() const;
     int getCanCarryWeight() const;
     bool canMove() const;
+    int getXP() const {
+        return xp;
+    }
+    void addXP(int change);
+    int getXPWorth() const {
+        return xp_worth;
+    }
 };

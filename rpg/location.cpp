@@ -48,7 +48,8 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
-Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height) {
+Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height)
+{
 }
 
 bool Trap::isSetOff(const Character *character) {
@@ -58,6 +59,21 @@ bool Trap::isSetOff(const Character *character) {
         return true;
     }
     return false;
+}
+
+bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) const {
+    bool character_affected = false;
+    int rollD = rollDice(2, 6, 0);
+    LOG("character: %s has set of trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
+    if( rollD <= character->getDexterity() ) {
+        // avoided!
+    }
+    else {
+        character_affected = true;
+        int damage = rollDice(2, 12, -1);
+        character->decreaseHealth(playing_gamestate, damage, true, false);
+    }
+    return character_affected;
 }
 
 void FloorRegion::insertPoint(size_t indx, Vector2D point) {

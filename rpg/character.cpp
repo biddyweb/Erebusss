@@ -11,8 +11,8 @@
 #include <cassert>
 #endif
 
-CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max) :
-    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), animation_name(animation_name)
+CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
+    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), animation_name(animation_name)
 {
 }
 
@@ -46,7 +46,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0)
 {
 
 }
@@ -62,7 +62,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0)
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0)
 {
     this->animation_name = character_template.getAnimationName();
     this->initialiseHealth( character_template.getHealth() );
@@ -70,6 +70,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
         character_template.getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
     }
     this->gold = character_template.getGold();
+    this->xp_worth = character_template.getXPWorth();
 }
 
 Character::~Character() {
@@ -220,6 +221,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     else
                                         text = "Eek!";
                                     playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+                                    if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
+                                        this->addXP( target_npc->getXPWorth() );
+                                        stringstream xp_str;
+                                        xp_str << target_npc->getXPWorth();
+                                        playing_gamestate->addTextEffect(xp_str.str(), target_npc->getPos(), 500);
+                                    }
                                 }
                             }
                         }
@@ -692,4 +699,8 @@ bool Character::canMove() const {
         can_move = false;
     }
     return can_move;
+}
+
+void Character::addXP(int change) {
+    this->xp += change;
 }
