@@ -24,7 +24,7 @@ class TextEffect : public QGraphicsTextItem {
 
     virtual void advance(int phase);
 public:
-    TextEffect(MainGraphicsView *view, const QString &text, int duration_ms);
+    TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color);
     virtual ~TextEffect() {
     }
 };
@@ -344,6 +344,7 @@ public:
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
+    void addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b);
     void playSound(const string &sound_effect);
     void showInfoWindow(const string &html);
 

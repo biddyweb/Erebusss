@@ -22,10 +22,10 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
-TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms) :
+TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
     QGraphicsTextItem(text), time_expire(0), view(view) {
 
-    this->setDefaultTextColor(Qt::white);
+    this->setDefaultTextColor(color);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
     //this->setFont(game_g->getFontStd());
     this->setFont(game_g->getFontSmall());
@@ -872,9 +872,18 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 
     Character *player = playing_gamestate->getPlayer();
 
-    QLabel *label = new QLabel("What would you like to buy?");
-    label->setWordWrap(true);
-    layout->addWidget(label);
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *label = new QLabel("What would you like to buy?");
+        label->setWordWrap(true);
+        h_layout->addWidget(label);
+
+        goldLabel = new QLabel("");
+        h_layout->addWidget(goldLabel);
+        this->updateGoldLabel();
+    }
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -937,10 +946,6 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
             list->addItem(list_item);
         }
     }
-
-    goldLabel = new QLabel("");
-    layout->addWidget(goldLabel);
-    this->updateGoldLabel();
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -3435,6 +3440,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                         else {
                             this->addTextEffect("You unlock the door.", player->getPos(), 2000);
                             selected_scenery->setLocked(false); // we'll delete the door anyway below, but just to be safe...
+                            player->addXP(this, 20);
                         }
                     }
                     if( !is_locked ) {
@@ -3765,8 +3771,13 @@ void PlayingGamestate::addWidget(QWidget *widget) {
 }
 
 void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int duration_ms) {
-    TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms);
-    float font_scale = 1.0f/view->getScale();
+    this->addTextEffect(text, pos, duration_ms, 255, 255, 255);
+}
+
+void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b) {
+    QColor qt_color(r, g, b);
+    TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms, qt_color);
+    float font_scale = 1.2f/view->getScale();
     float text_effect_width = font_scale*text_effect->boundingRect().width();
     Vector2D text_effect_pos = pos;
     text_effect_pos.x -= 0.5*text_effect_width;

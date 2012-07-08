@@ -360,7 +360,7 @@ public:
     int getXP() const {
         return xp;
     }
-    void addXP(int change);
+    void addXP(PlayingGamestate *playing_gamestate, int change);
     int getXPWorth() const {
         return xp_worth;
     }

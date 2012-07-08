@@ -202,11 +202,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 LOG("    extra strong hit!\n");
                                 damage++;
                             }
-                            /*int armour = target_npc->getCurrentArmour() != NULL ? target_npc->getCurrentArmour()->getRating() : 0;
-                            if( target_npc->getCurrentShield() != NULL )
-                                armour++;
-                            damage -= armour;
-                            damage = std::max(damage, 0);*/
                             LOG("    damage: %d\n", damage);
                             if( damage > 0 ) {
                                 if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
@@ -222,10 +217,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         text = "Eek!";
                                     playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
                                     if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
-                                        this->addXP( target_npc->getXPWorth() );
-                                        stringstream xp_str;
-                                        xp_str << target_npc->getXPWorth();
-                                        playing_gamestate->addTextEffect(xp_str.str(), target_npc->getPos(), 500);
+                                        this->addXP(playing_gamestate, target_npc->getXPWorth());
                                     }
                                 }
                             }
@@ -701,6 +693,11 @@ bool Character::canMove() const {
     return can_move;
 }
 
-void Character::addXP(int change) {
+void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
     this->xp += change;
+    if( this == playing_gamestate->getPlayer() ) {
+        stringstream xp_str;
+        xp_str << change << " XP";
+        playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 0, 0);
+    }
 }
