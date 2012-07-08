@@ -1,5 +1,11 @@
 #include "qt_utils.h"
-#include "game.h"
+#include "logiface.h"
+#include "rpg/utils.h"
+
+#include <string>
+using std::string;
+
+#include <cmath>
 
 #ifdef _DEBUG
 #include <cassert>

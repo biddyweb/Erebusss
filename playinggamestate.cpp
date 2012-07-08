@@ -12,6 +12,7 @@
 #include "game.h"
 #include "qt_screen.h"
 #include "qt_utils.h"
+#include "logiface.h"
 
 #ifdef _DEBUG
 //#define DEBUG_SHOW_PATH

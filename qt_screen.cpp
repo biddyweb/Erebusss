@@ -1,6 +1,7 @@
 #include "qt_screen.h"
 
 #include "game.h"
+#include "logiface.h"
 
 Screen::Screen() :
     mainWindow(NULL), paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0)

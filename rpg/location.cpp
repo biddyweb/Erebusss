@@ -1,8 +1,8 @@
 #include "location.h"
 #include "character.h"
 #include "item.h"
-#include "../game.h"
 #include "../playinggamestate.h"
+#include "../logiface.h"
 
 #include <qdebug.h>
 

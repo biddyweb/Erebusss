@@ -1,5 +1,8 @@
 #include "utils.h"
-#include "../game.h"
+#include "../logiface.h"
+
+#include <string>
+using std::string;
 
 #include <queue>
 using std::priority_queue;

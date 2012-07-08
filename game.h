@@ -315,7 +315,8 @@ public:
     void update();
     //void mouseClick(int m_x, int m_y);
     string getApplicationFilename(const string &name);
-    void log(const char *text, ...);
+    //void log(const char *text, ...);
+    void log(const char *text);
     QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height) const;
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0);
@@ -336,45 +337,8 @@ public:
 
 extern Game *game_g;
 
-const bool LOGGING = true; // enable logging even for release builds, for now
+/*const bool LOGGING = true; // enable logging even for release builds, for now
 
 #ifndef LOG
 #define LOG if( !LOGGING ) ((void)0); else game_g->log
-#endif
-
-/** If test is not true:
-  *   In debug versions, writes the test, file and line to the log, and exits (via assert).
-  *   In release versions, we still write to the log file, but then continue.
-  */
-#ifndef ASSERT_LOGGER
-#ifdef _DEBUG
-
-#define ASSERT_LOGGER(test) {                          \
-        bool v = test;                                 \
-        if( v )                                        \
-                ((void)0);                             \
-        else {                                         \
-                LOG("ASSERTION FAILED:\n");            \
-                LOG("%s\n", #test);                    \
-                LOG("File: %s\n", __FILE__);           \
-                LOG("Line: %d\n", __LINE__);           \
-                assert(test);                          \
-        }                                              \
-}
-
-#else
-
-#define ASSERT_LOGGER(test) {                          \
-        bool v = test;                                 \
-        if( v )                                        \
-                ((void)0);                             \
-        else {                                         \
-                LOG("ASSERTION FAILED:\n");            \
-                LOG("%s\n", #test);                    \
-                LOG("File: %s\n", __FILE__);           \
-                LOG("Line: %d\n", __LINE__);           \
-        }                                              \
-}
-
-#endif
-#endif
+#endif*/

@@ -3,6 +3,7 @@
 #include "playinggamestate.h"
 #include "qt_screen.h"
 #include "qt_utils.h"
+#include "logiface.h"
 
 #include <ctime>
 
@@ -562,7 +563,7 @@ string Game::getApplicationFilename(const string &name) {
     return filename;
 }
 
-void Game::log(const char *text, ...) {
+/*void Game::log(const char *text, ...) {
     FILE *logfile = fopen(logfilename.c_str(), "at+");
     va_list vlist;
     char buffer[65536] = "";
@@ -573,6 +574,15 @@ void Game::log(const char *text, ...) {
     //printf(buffer);
     qDebug("%s", buffer);
     va_end(vlist);
+    if( logfile != NULL )
+        fclose(logfile);
+}*/
+
+void Game::log(const char *text) {
+    FILE *logfile = fopen(logfilename.c_str(), "at+");
+    if( logfile != NULL )
+        fprintf(logfile, text);
+    qDebug("%s", text);
     if( logfile != NULL )
         fclose(logfile);
 }

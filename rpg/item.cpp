@@ -1,7 +1,7 @@
 #include "item.h"
 #include "character.h"
-#include "../game.h"
 #include "../playinggamestate.h"
+#include "../logiface.h"
 
 #include <sstream>
 using std::stringstream;

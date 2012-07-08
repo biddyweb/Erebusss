@@ -24,6 +24,7 @@ copy %src%\gpl.txt %dst%
 
 copy %src%\game.cpp %dst%
 copy %src%\gamestate.cpp %dst%
+copy %src%\logiface.cpp %dst%
 copy %src%\main.cpp %dst%
 copy %src%\mainwindow.cpp %dst%
 copy %src%\optionsgamestate.cpp %dst%
@@ -33,6 +34,7 @@ copy %src%\qt_utils.cpp %dst%
 
 copy %src%\game.h %dst%
 copy %src%\gamestate.h %dst%
+copy %src%\logiface.h %dst%
 copy %src%\mainwindow.h %dst%
 copy %src%\optionsgamestate.h %dst%
 copy %src%\playinggamestate.h %dst%

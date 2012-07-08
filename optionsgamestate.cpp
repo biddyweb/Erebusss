@@ -8,6 +8,7 @@
 #include "game.h"
 #include "qt_screen.h"
 #include "mainwindow.h"
+#include "logiface.h"
 
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 

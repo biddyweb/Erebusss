@@ -4,6 +4,7 @@
 #include "../game.h"
 #include "../playinggamestate.h"
 #include "../qt_screen.h"
+#include "../logiface.h"
 
 #include <cmath>
 

@@ -73,7 +73,8 @@ SOURCES += main.cpp mainwindow.cpp \
     qt_utils.cpp \
     playinggamestate.cpp \
     optionsgamestate.cpp \
-    gamestate.cpp
+    gamestate.cpp \
+    logiface.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -84,7 +85,8 @@ HEADERS += mainwindow.h \
     qt_utils.h \
     playinggamestate.h \
     optionsgamestate.h \
-    gamestate.h
+    gamestate.h \
+    logiface.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
