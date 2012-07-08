@@ -307,9 +307,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
         if( !done_target ) {
             this->setTargetNPC(NULL);
-            //this->has_destination = false;
-            //this->has_path = false;
-            if( this->has_path ) {
+            if( this->has_default_position && this->default_position != this->pos ) {
+                this->setDestination(this->default_position.x, this->default_position.y, NULL);
+                done_target = true;
+            }
+            else if( this->has_path ) {
                 this->setStateIdle();
             }
         }

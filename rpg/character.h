@@ -125,6 +125,10 @@ class Character {
     int time_last_action_ms; // not saved
     bool is_hitting; // not saved
 
+    // default positions only relevant for NPCs that don't change locations
+    bool has_default_position; // saved
+    Vector2D default_position; // saved
+
     // rpg data
     int FP, BS, S, A, M, D, B;
     float Sp;
@@ -151,6 +155,19 @@ public:
     Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
+    void setDefaultPosition(float xpos, float ypos) {
+        this->has_default_position = true;
+        this->default_position.set(xpos, ypos);
+    }
+    bool hasDefaultPosition() const {
+        return this->has_default_position;
+    }
+    float getDefaultX() const {
+        return this->default_position.x;
+    }
+    float getDefaultY() const {
+        return this->default_position.y;
+    }
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
         if( this->listener != NULL ) {

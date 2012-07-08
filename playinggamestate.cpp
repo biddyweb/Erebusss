@@ -2332,6 +2332,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
+                    QStringRef default_pos_x_s = reader.attributes().value("default_x");
+                    QStringRef default_pos_y_s = reader.attributes().value("default_y");
                     if( template_s.length() > 0 ) {
                         if( reader.name() == "player" ) {
                             LOG("error at line %d\n", reader.lineNumber());
@@ -2395,6 +2397,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString()) );
+                    }
+                    // if an NPC doesn't have a default position defined in the file, we set it to the position
+                    if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
+                        float default_pos_x = parseFloat(pos_x_s.toString());
+                        float default_pos_y = parseFloat(pos_y_s.toString());
+                        npc->setDefaultPosition(default_pos_x, default_pos_y);
+                    }
+                    else {
+                        npc->setDefaultPosition(pos_x, pos_y);
                     }
                     location->addCharacter(npc, pos_x, pos_y);
                     questXMLType = QUEST_XML_TYPE_NPC;
@@ -3664,6 +3675,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " name=\"%s\"", character->getName().c_str());
         fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
         fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
+        if( character->hasDefaultPosition() ) {
+            fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
+        }
         fprintf(file, " health=\"%d\"", character->getHealth());
         fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
         fprintf(file, " FP=\"%d\"", character->getFP());
