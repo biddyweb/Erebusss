@@ -65,14 +65,43 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     bool character_affected = false;
     int rollD = rollDice(2, 6, 0);
     LOG("character: %s has set of trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
+    string text;
     if( rollD <= character->getDexterity() ) {
         // avoided!
+        if( type == "arrow" ) {
+            text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
+        }
+        else if( type == "mantrap" ) {
+            text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
+        }
+        else {
+            LOG("unknown trap: %s\n", type.c_str());
+            ASSERT_LOGGER(false);
+        }
     }
     else {
         character_affected = true;
-        int damage = rollDice(2, 12, -1);
-        character->decreaseHealth(playing_gamestate, damage, true, false);
+        if( type == "arrow" ) {
+            text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
+            int damage = rollDice(2, 12, -1);
+            character->decreaseHealth(playing_gamestate, damage, true, false);
+        }
+        else if( type == "mantrap" ) {
+            text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
+            int damage = rollDice(4, 12, 0);
+            character->decreaseHealth(playing_gamestate, damage, true, false);
+        }
+        else {
+            LOG("unknown trap: %s\n", type.c_str());
+            ASSERT_LOGGER(false);
+        }
     }
+
+    if( character == playing_gamestate->getPlayer() ) {
+        playing_gamestate->addTextEffect(text, character->getPos(), 4000);
+        playing_gamestate->playSound("click");
+    }
+
     return character_affected;
 }
 

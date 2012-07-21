@@ -3295,13 +3295,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         for(set<Trap *>::iterator iter = this->c_location->trapsBegin(); iter != this->c_location->trapsEnd(); ++iter) {
             Trap *trap = *iter;
             if( trap->isSetOff(character) ) {
-                if( trap->setOff(this, character) ) {
-                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall and hits you!", player->getPos(), 2000);
-                }
-                else {
-                    this->addTextEffect("You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!", player->getPos(), 2000);
-                }
-                this->playSound("click");
+                trap->setOff(this, character);
                 delete_traps.push_back(trap);
                 if( character->isDead() ) {
                     break;
