@@ -120,11 +120,11 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <gold amount="50"/>
 </scenery>
 
-<trap x="3.0" y="10.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="3.0" y="10.0" w="1.0" h="1.0" type="mantrap"/>
 
-<trap x="8.0" y="15.0" w="1.0" h="1.0" type="arrow"/>
-<trap x="13.0" y="15.0" w="1.0" h="1.0" type="arrow"/>
-<trap x="16.0" y="15.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="8.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
+<trap x="13.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
+<trap x="16.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 
