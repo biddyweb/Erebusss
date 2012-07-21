@@ -7,7 +7,8 @@ To compile from the command line, you need to install Qt 4 and Phonon. On Ubuntu
 
 sudo apt-get install g++
 sudo apt-get install libqt4-dev
-sudo apt-get install libphonon-dev
+sudo apt-get install phonon
+sudo apt-get install libphonon-dev 
 
 To compile, open a terminal window, cd to the Erebus directory (the one containing erebus.pro). You can then compile with:
 
@@ -17,6 +18,8 @@ make
 This should then produce the executable file erebus. To run, type:
 
 ./erebus
+
+The Linux version has been tested on Ubuntu 12.04 Precise Pangolin 32-bit.
 
 Windows etc
 ===========
