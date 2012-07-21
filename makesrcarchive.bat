@@ -8,7 +8,7 @@ set dst="c:\temp\erebussrc"
 copy %src%\makesrcarchive.bat %dst%
 copy %src%\makesymbianfolder.bat %dst%
 copy %src%\makeandroidfolder.bat %dst%
-REM copy %src%\erebus_source.txt %dst%
+copy %src%\erebus_source.txt %dst%
 mkdir %dst%\_docs\
 copy %src%\_docs\erebus.html %dst%\_docs\
 
@@ -58,8 +58,10 @@ mkdir %dst%\data\
 copy %src%\data\ %dst%\data\
 
 mkdir %dst%\gfx
-REM copy %src%\gfx\ %dst%\gfx\
 xcopy %src%\gfx %dst%\gfx /E /Y
+
+mkdir %dst%\gfx_lores
+xcopy %src%\gfx_lores %dst%\gfx_lores /E /Y
 
 mkdir %dst%\sound
 xcopy %src%\sound %dst%\sound /E /Y
