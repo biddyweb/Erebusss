@@ -1788,9 +1788,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     int gold_min = parseInt(gold_min_s.toString());
                     QStringRef gold_max_s = reader.attributes().value("gold_max");
                     int gold_max = parseInt(gold_max_s.toString());
-                    QStringRef xp_s = reader.attributes().value("xp");
-                    int xp = parseInt(xp_s.toString());
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp);
+                    QStringRef xp_worth_s = reader.attributes().value("xp_worth");
+                    int xp_worth = parseInt(xp_worth_s.toString());
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -2396,6 +2396,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             int natural_damageZ = parseInt(natural_damageX_s.toString());
                             npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
                         }
+                        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
+                        int xp_worth = parseInt(xp_worth_s.toString());
+                        npc->setXPWorth(xp_worth);
+                        QStringRef xp_s = reader.attributes().value("xp");
+                        int xp = parseInt(xp_s.toString());
+                        npc->setXP(xp);
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString()) );
                     }
@@ -3713,6 +3719,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
         fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
         fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
+        fprintf(file, " xp=\"%d\"", character->getXP());
+        fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
         fprintf(file, " gold=\"%d\"", character->getGold());
         fprintf(file, ">\n");
         for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {

@@ -377,8 +377,15 @@ public:
     int getXP() const {
         return xp;
     }
+    void setXP(int xp) {
+        // should only be used in initialisation/loading
+        this->xp = xp;
+    }
     void addXP(PlayingGamestate *playing_gamestate, int change);
     int getXPWorth() const {
         return xp_worth;
+    }
+    void setXPWorth(int xp_worth) {
+        this->xp_worth = xp_worth;
     }
 };
