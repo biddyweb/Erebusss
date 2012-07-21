@@ -1,8 +1,6 @@
 #include "utils.h"
 #include "../logiface.h"
 
-#include <cstdlib>
-
 #include <string>
 using std::string;
 

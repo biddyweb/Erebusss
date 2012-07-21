@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib> // for size_t (needed for Linux at least)
+
 #include <cmath>
 
 #include <vector>
