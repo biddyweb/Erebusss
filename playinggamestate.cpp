@@ -3263,6 +3263,25 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         QPointF dir = new_pos - old_pos;
         Vector2D vdir(dir.x(), dir.y());
         this->characterTurn(character, user_data, vdir);
+
+        if( character == this->player ) {
+            // handle popup text
+            Vector2D old_pos_v(old_pos.x(), old_pos.y());
+            Vector2D new_pos_v = character->getPos();
+            for(set<Scenery *>::const_iterator iter = this->c_location->scenerysBegin(); iter != this->c_location->scenerysEnd(); ++iter) {
+                const Scenery *scenery = *iter;
+                if( scenery->getPopupText().length() > 0 ) {
+                    Vector2D scenery_pos = scenery->getPos();
+                    float old_dist = (scenery_pos - old_pos_v).magnitude();
+                    float new_dist = (scenery_pos - new_pos_v).magnitude();
+                    const float influence_radius_c = 3.0f;
+                    if( new_dist <= influence_radius_c && old_dist > influence_radius_c ) {
+                        qDebug("popup text: dists %f, %f ; at %f, %f", old_dist, new_dist, scenery->getX(), scenery->getY());
+                        this->addTextEffect(scenery->getPopupText(), scenery->getPos(), 2000);
+                    }
+                }
+            }
+        }
     }
     if( character == this->player ) {
         // handle traps

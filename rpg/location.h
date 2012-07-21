@@ -48,6 +48,8 @@ protected:
     bool opened;
     set<Item *> items;
 
+    string popup_text; // not saved at the moment
+
 public:
     Scenery(const string &name, const string &image_name, float width, float height);
     virtual ~Scenery() {
@@ -80,7 +82,9 @@ public:
     void *getUserGfxData() {
         return this->user_data_gfx;
     }
-
+    string getPopupText() const {
+        return this->popup_text;
+    }
     void setBlocking(bool is_blocking, bool blocks_visibility);
     bool isBlocking() const {
         return this->is_blocking;
@@ -96,6 +100,9 @@ public:
     }
     void setExit(bool is_exit) {
         this->is_exit = is_exit;
+        if( is_exit ) {
+            this->popup_text = "Click on the door to exit this dungeon";
+        }
     }
     bool isExit() const {
         return this->is_exit;
