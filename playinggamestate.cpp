@@ -1363,7 +1363,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     view = new MainGraphicsView(this, scene, window);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setBackgroundBrush(QBrush(Qt::black));
+    //view->setBackgroundBrush(QBrush(Qt::black));
     view->setFrameStyle(QFrame::NoFrame);
     view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
     //view->grabGesture(Qt::PinchGesture);
@@ -2233,6 +2233,18 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     location->setWallImageName(image_name_s.toString().toStdString());
                 }
+                else if( reader.name() == "background" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: background element wasn't expected here");
+                    }
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    if( image_name_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: background element has no image_name attribute");
+                    }
+                    location->setBackgroundImageName(image_name_s.toString().toStdString());
+                }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2706,6 +2718,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     //QBrush wall_brush(builtin_images["wall"]);
     QBrush wall_brush(builtin_images[location->getWallImageName()]);
     wall_brush.setTransform(QTransform::fromScale(scale, scale));
+
+    QBrush background_brush(builtin_images[location->getBackgroundImageName()]);
+    background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
+    scene->setBackgroundBrush(background_brush);
 
     for(size_t i=0;i<location->getNFloorRegions();i++) {
         FloorRegion *floor_region = location->getFloorRegion(i);
