@@ -1363,7 +1363,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     view = new MainGraphicsView(this, scene, window);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //view->setBackgroundBrush(QBrush(Qt::black));
+    view->setBackgroundBrush(QBrush(Qt::black));
     view->setFrameStyle(QFrame::NoFrame);
     view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
     //view->grabGesture(Qt::PinchGesture);
@@ -2765,10 +2765,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         QPen wall_pen(Qt::red);
         for(size_t i=0;i<location->getNBoundaries();i++) {
             const Polygon2D *boundary = location->getBoundary(i);
+            //qDebug("boundary %d:", i);
             for(size_t j=0;j<boundary->getNPoints();j++) {
                 Vector2D p0 = boundary->getPoint(j);
                 Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
                 //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
+                //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
                 scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
             }
         }
