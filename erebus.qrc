@@ -50,5 +50,6 @@
         <file>gfx/textures/scenery/boulders.png</file>
         <file>gfx/textures/items/mushroom.png</file>
         <file>_docs/erebus.html</file>
+        <file>data/quest_wizard_dungeon_find_item.xml</file>
     </qresource>
 </RCC>
