@@ -13,6 +13,7 @@
 #include "gamestate.h"
 
 class ScrollingListWidget;
+class Sound;
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
@@ -28,7 +29,7 @@ class OptionsGamestate : public Gamestate {
     QCheckBox *soundCheck;
 
 #ifndef Q_OS_ANDROID
-    Phonon::MediaObject *music;
+    Sound *music;
 #endif
 
 private slots:

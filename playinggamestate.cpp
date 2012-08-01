@@ -1953,8 +1953,8 @@ PlayingGamestate::~PlayingGamestate() {
         delete shop;
     }
 #ifndef Q_OS_ANDROID
-    for(map<string, Phonon::MediaObject *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
-        Phonon::MediaObject *sound = iter->second;
+    for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
+        Sound *sound = iter->second;
         delete sound;
     }
 #endif
@@ -3859,7 +3859,7 @@ void PlayingGamestate::playSound(const string &sound_effect) {
 #ifndef Q_OS_ANDROID
     qDebug("play sound: %s\n", sound_effect.c_str());
     if( game_g->isSoundEnabled() ) {
-        Phonon::MediaObject *sound = this->sound_effects[sound_effect];
+        Sound *sound = this->sound_effects[sound_effect];
         ASSERT_LOGGER(sound != NULL);
         if( sound != NULL ) {
             if( sound->state() == Phonon::PlayingState ) {

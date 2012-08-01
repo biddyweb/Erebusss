@@ -68,6 +68,36 @@ enum Direction {
     N_DIRECTIONS = 8
 };
 
+#ifndef Q_OS_ANDROID
+class Sound {
+    Phonon::MediaObject *mediaObject;
+    Phonon::AudioOutput *audioOutput;
+public:
+    Sound(Phonon::MediaObject *mediaObject, Phonon::AudioOutput *audioOutput) : mediaObject(mediaObject), audioOutput(audioOutput) {
+    }
+    ~Sound() {
+        delete mediaObject;
+        delete audioOutput;
+    }
+
+    void play() {
+        this->mediaObject->play();
+    }
+    void pause() {
+        this->mediaObject->pause();
+    }
+    void stop() {
+        this->mediaObject->stop();
+    }
+    void seek(qint64 time) {
+        this->mediaObject->seek(time);
+    }
+    Phonon::State state() const {
+        return this->mediaObject->state();
+    }
+};
+#endif
+
 class WebViewEventFilter : public QObject {
     Q_OBJECT
 
@@ -322,7 +352,7 @@ public:
         return loadImage(filename, false, 0, 0, 0, 0);
     }
 #ifndef Q_OS_ANDROID
-    Phonon::MediaObject *loadSound(string filename) const;
+    Sound *loadSound(string filename) const;
 #endif
     bool isSoundEnabled() const {
         return this->sound_enabled;

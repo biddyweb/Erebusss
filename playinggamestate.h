@@ -17,6 +17,7 @@ using std::stringstream;
 #include "gamestate.h"
 
 class MainGraphicsView;
+class Sound;
 
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
@@ -292,7 +293,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, CharacterTemplate *> character_templates;
     vector<Shop *> shops;
 #ifndef Q_OS_ANDROID
-    map<string, Phonon::MediaObject *> sound_effects;
+    map<string, Sound *> sound_effects;
 #endif
 
     Item *parseXMLItem(QXmlStreamReader &reader);

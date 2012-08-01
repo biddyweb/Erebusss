@@ -405,6 +405,7 @@ Game::~Game() {
     if( style != NULL ) {
         delete style;
     }
+    game_g = NULL;
 }
 
 void Game::run() {
@@ -463,7 +464,13 @@ void Game::run() {
     screen->runMainLoop();
 
     delete gamestate;
-    delete screen;
+    gamestate = NULL;
+    {
+        // hack to prevent the MyApplication::event() from calling screen functions when deactivating
+        Screen *local_screen = screen;
+        screen = NULL;
+        delete local_screen;
+    }
 }
 
 void Game::initButton(QPushButton *button) const {
@@ -613,12 +620,13 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
 }
 
 #ifndef Q_OS_ANDROID
-Phonon::MediaObject *Game::loadSound(string filename) const {
-    Phonon::MediaObject *sound = new Phonon::MediaObject(qApp);
+Sound *Game::loadSound(string filename) const {
+    Phonon::MediaObject *mediaObject = new Phonon::MediaObject(qApp);
     //connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
-    sound->setCurrentSource(Phonon::MediaSource(filename.c_str()));
+    mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
     Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
-    Phonon::Path audioPath = Phonon::createPath(sound, audioOutput);
+    Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);
+    Sound *sound = new Sound(mediaObject, audioOutput);
     return sound;
 }
 
