@@ -198,7 +198,9 @@ void AnimatedObject::advance(int phase) {
 
 QRectF AnimatedObject::boundingRect() const {
     //qDebug("boundingRect");
-    return QRectF(0.0f, 0.0f, 64.0f, 64.0f);
+    float size = static_cast<float>(this->getSize());
+    //qDebug("size = %f", size);
+    return QRectF(0.0f, 0.0f, size, size);
 }
 
 void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
