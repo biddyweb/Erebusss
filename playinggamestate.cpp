@@ -3447,6 +3447,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
 
             if( selected_scenery != NULL ) {
+                qDebug("clicked on scenery: %s", selected_scenery->getName().c_str());
                 if( selected_scenery->getNItems() > 0 ) {
                     bool all_gold = true;
                     for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
