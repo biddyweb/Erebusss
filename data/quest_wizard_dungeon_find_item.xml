@@ -10,6 +10,8 @@
 
 <player_start x="32.0" y="2.0"/>
 
+<!--main room-->
+
 <floorregion shape="polygon">
     <floorregion_point x="30.0" y="1.0" />
     <floorregion_point x="28.0" y="3.0" />
@@ -23,13 +25,21 @@
 <scenery name="Rock" image_name="rock1" x="36.2" y="2.5" size="0.2"/>
 
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
-<scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true"/>
-<scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true"/>
-<scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true"/>
+<scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" w="0.8" h="0.8" blocking="true">
     <gold amount="7"/>
 </scenery>
+
+<!--western route, goblins-->
+
+    <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
+<floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
+<floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
+<npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
+<npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 
