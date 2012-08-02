@@ -343,6 +343,7 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
     QBrush brush_bg(Qt::black);
     QBrush brush_fg(color);
     painter.setPen(Qt::white);
+    painter.setOpacity(0.6f);
     painter.drawRect(x, y, width-1, height-1);
     painter.fillRect(x2, y2, width2, height2, brush_bg);
     painter.fillRect(x2, y2, width2*fraction, height2, brush_fg);
