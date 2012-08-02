@@ -1125,13 +1125,26 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 
 void CampaignWindow::clickedClose() {
     LOG("CampaignWindow::clickedClose()\n");
-    if( playing_gamestate->getQuest()->isCompleted() && playing_gamestate->isLastQuest() ) {
-        GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
-        game_g->pushMessage(game_message);
+    this->playing_gamestate->closeSubWindow();
+    if( playing_gamestate->getQuest()->isCompleted() ) {
+        LOG("quest is completed\n");
+        if( playing_gamestate->isLastQuest() ) {
+            LOG("last quest, so game is complete\n");
+            GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
+            game_g->pushMessage(game_message);
+        }
+        else {
+            LOG("move onto next quest\n");
+            playing_gamestate->advanceQuest();
+            const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
+            string qt_filename = ":/" + c_quest_info.getFilename();
+            LOG("move onto next quest: %s\n", c_quest_info.getFilename().c_str());
+            playing_gamestate->loadQuest(qt_filename, false);
+        }
     }
-    else {
+    /*else {
         this->playing_gamestate->closeSubWindow();
-    }
+    }*/
 }
 
 void CampaignWindow::clickedShop() {
@@ -2126,6 +2139,20 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
 
+    if( this->player != NULL && this->player->getLocation() != NULL ) {
+        LOG("remove player from location\n");
+        this->player->getLocation()->removeCharacter(this->player);
+        this->player->setListener(NULL, NULL);
+    }
+    if( this->quest != NULL ) {
+        LOG("delete previous quest...\n");
+        delete this->quest;
+    }
+    // delete any items from previous quests
+    scene->clear();
+    //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
+
+    LOG("create new quest\n");
     this->quest = new Quest();
     Location *location = new Location();
     this->quest->addLocation(location);
@@ -2320,6 +2347,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( player == NULL ) {
                         throw string("encountered player_start element, but player not yet defined");
                     }
+                    LOG("player starts at %f, %f\n", pos_x, pos_y);
                     location->addCharacter(player, pos_x, pos_y);
                     done_player_start = true;
                 }
@@ -3231,7 +3259,7 @@ void PlayingGamestate::update() {
     }
     if( delete_characters.size() > 0 ) {
         if( !this->quest->isCompleted() && this->quest->testIfComplete() ) {
-            game_g->showInfoDialog("Game over", "You have completed the quest! Now return to the dungeon exit.");
+            game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
         }
     }
 }
@@ -3873,6 +3901,11 @@ void PlayingGamestate::playSound(const string &sound_effect) {
         }
     }
 #endif
+}
+
+void PlayingGamestate::advanceQuest() {
+    this->c_quest_indx++;
+    ASSERT_LOGGER(this->c_quest_indx < this->quest_list.size());
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {

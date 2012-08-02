@@ -145,7 +145,6 @@ class Character {
     int xp;
     int xp_worth;
 
-    void setStateIdle();
     Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
     int getNaturalDamage() const;
@@ -155,6 +154,7 @@ public:
     Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
+    void setStateIdle();
     void setDefaultPosition(float xpos, float ypos) {
         this->has_default_position = true;
         this->default_position.set(xpos, ypos);
@@ -191,6 +191,9 @@ public:
     }
     void setLocation(Location *location) {
         this->location = location;
+    }
+    Location *getLocation() const {
+        return this->location;
     }
     void setListener(CharacterListener *listener, void *listener_data) {
         this->listener = listener;

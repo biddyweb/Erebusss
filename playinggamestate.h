@@ -370,6 +370,7 @@ public:
     bool isLastQuest() const {
         return this->c_quest_indx == this->quest_list.size()-1;
     }
+    void advanceQuest();
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;

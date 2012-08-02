@@ -184,6 +184,8 @@ void Location::addCharacter(Character *character, float xpos, float ypos) {
 }
 
 void Location::removeCharacter(Character *character) {
+    ASSERT_LOGGER(character->getLocation() == this);
+    character->setStateIdle();
     character->setLocation(NULL);
     this->characters.erase(character);
 }
