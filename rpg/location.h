@@ -30,6 +30,12 @@ public:
 };
 
 class Scenery {
+public:
+    enum DrawType {
+        DRAWTYPE_NORMAL = 0,
+        DRAWTYPE_FLOATING = 1
+    };
+
 protected:
     Location *location; // not saved
     string name;
@@ -42,6 +48,8 @@ protected:
     bool is_door, is_exit;
     bool is_locked; // relevant only for some types, e.g., containers, doors
     string unlock_item_name;
+    DrawType draw_type;
+    float opacity;
     float width, height;
 
     bool can_be_opened;
@@ -118,6 +126,18 @@ public:
     }
     string getUnlockItemName() const {
         return this->unlock_item_name;
+    }
+    void setDrawType(DrawType draw_type) {
+        this->draw_type = draw_type;
+    }
+    DrawType getDrawType() const {
+        return this->draw_type;
+    }
+    void setOpacity(float opacity) {
+        this->opacity = opacity;
+    }
+    float getOpacity() const {
+        return this->opacity;
     }
 
     float getWidth() const {

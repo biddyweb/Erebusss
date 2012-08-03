@@ -2580,6 +2580,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
+                    QStringRef opacity_s = reader.attributes().value("opacity");
+                    QStringRef draw_type_s = reader.attributes().value("draw_type");
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
@@ -2621,6 +2623,20 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( door && exit ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("scenery can't be both a door and an exit");
+                    }
+                    if( opacity_s.length() > 0 ) {
+                        float opacity = parseFloat(opacity_s.toString());
+                        scenery->setOpacity(opacity);
+                    }
+                    if( draw_type_s.length() > 0 ) {
+                        if( draw_type_s == "floating" ) {
+                            scenery->setDrawType(Scenery::DRAWTYPE_FLOATING);
+                        }
+                        else {
+                            LOG("unrecognised draw_type: %s\n", draw_type_s.toString().toStdString().c_str());
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unrecognised draw_type for scenery");
+                        }
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
@@ -2942,9 +2958,14 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         scenery->setUserGfxData(object);
         this->locationUpdateScenery(scenery);
+        object->setOpacity(scenery->getOpacity());
         scene->addItem(object);
         object->setPos(scenery->getX(), scenery->getY());
-        object->setZValue(object->pos().y());
+        float z_value = object->pos().y();
+        if( scenery->getDrawType() == Scenery::DRAWTYPE_FLOATING ) {
+            z_value += 1000.0f;
+        }
+        object->setZValue(z_value);
         /*
         //float scenery_scale = scenery_width / object->pixmap().width();
         // n.b., aspect-ratio of scenery should match that of the corresponding image for this scenery!
@@ -3788,6 +3809,17 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
         fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
         fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
+        fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
+        switch( scenery->getDrawType() ) {
+        case Scenery::DRAWTYPE_NORMAL:
+            break;
+        case Scenery::DRAWTYPE_FLOATING:
+            fprintf(file, " draw_type=\"floating\"");
+            break;
+        default:
+            ASSERT_LOGGER(false);
+            break;
+        }
         fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
         fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
         fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");

@@ -19,7 +19,7 @@ using std::swap;
 
 Scenery::Scenery(const string &name, const string &image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
-    is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), width(width), height(height),
+    is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), width(width), height(height),
     can_be_opened(false), opened(false)
 {
 }

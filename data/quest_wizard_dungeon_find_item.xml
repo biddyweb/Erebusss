@@ -26,8 +26,8 @@
 
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" w="0.8" h="0.8" blocking="true">
     <gold amount="7"/>
@@ -40,6 +40,14 @@
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
 <npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
+
+<!--southern route, poisonous fog-->
+<floorregion shape="rect" rect_x="32.0" rect_y="6.0" rect_w="1.0" rect_h="8.0" />
+<floorregion shape="rect" rect_x="33.0" rect_y="10.0" rect_w="8.0" rect_h="1.0" />
+
+<scenery name="Door" image_name="door_wood" x="32.5" y="14.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="1.0" h="8.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating"/>
+<scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="8.0" h="1.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating"/>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 
