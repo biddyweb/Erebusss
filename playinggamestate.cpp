@@ -3458,8 +3458,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
         }
 
-        Scenery *ignore_scenery = NULL;
-        if( !done ) {
+        Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
+        /*if( !done ) {
             // search for clicking on a scenery
             Scenery *selected_scenery = NULL;
             for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
@@ -3469,20 +3469,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 float scenery_height = scenery->getHeight();
                 float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
                 //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
-                /*if( dest.x >= scenery_pos.x - 0.5f * scenery_width - npc_radius_c && dest.x <= scenery_pos.x + 0.5f * scenery_width + npc_radius_c &&
-                    dest.y >= scenery_pos.y - 0.5f * scenery_height - npc_radius_c && dest.y <= scenery_pos.y + 0.5f * scenery_height + npc_radius_c ) {*/
                 if( dist_from_click <= npc_radius_c ) {
                     // clicked on or near this scenery
                     ignore_scenery = scenery;
                 }
-                /*if( dest.x >= scenery_pos.x - 0.5f * scenery_width && dest.x <= scenery_pos.x + 0.5f * scenery_width &&
-                    dest.y >= scenery_pos.y - 0.5f * scenery_height && dest.y <= scenery_pos.y + 0.5f * scenery_height ) {*/
                 if( dist_from_click <= click_tol_scenery_c ) {
                     // clicked on this scenery
-                    /*Vector2D player_pos = player->getPos();
-                    float player_dist_x = abs(player_pos.x - scenery_pos.x) - 0.5f * scenery_width;
-                    float player_dist_y = abs(player_pos.y - scenery_pos.y) - 0.5f * scenery_height;
-                    float player_dist = player_dist_x > player_dist_y ? player_dist_x : player_dist_y;*/
                     float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
                     //LOG("    player_dist : %f", player_dist);
                     if( player_dist <= npc_radius_c + 0.5f ) {
@@ -3561,11 +3553,109 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
 
+        }*/
+
+        if( !done ) {
+            // search for clicking on a scenery
+            vector<Scenery *> clicked_scenerys;
+            for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+                Scenery *scenery = *iter;
+                Vector2D scenery_pos = scenery->getPos();
+                float scenery_width = scenery->getWidth();
+                float scenery_height = scenery->getHeight();
+                float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
+                //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
+                if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
+                    // clicked on or near this scenery
+                    ignore_scenery = scenery;
+                }
+                if( dist_from_click <= click_tol_scenery_c ) {
+                    // clicked on this scenery
+                    float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
+                    //LOG("    player_dist : %f", player_dist);
+                    if( player_dist <= npc_radius_c + 0.5f ) {
+                        clicked_scenerys.push_back(scenery);
+                    }
+                }
+            }
+
+            for(vector<Scenery *>::iterator iter = clicked_scenerys.begin(); iter != clicked_scenerys.end() && !done; ++iter) {
+                Scenery *scenery = *iter;
+                qDebug("clicked on scenery: %s", scenery->getName().c_str());
+
+                if( scenery->getNItems() > 0 ) {
+                    done = true;
+                    bool all_gold = true;
+                    for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
+                        Item *item = *iter;
+                        if( item->getType() != ITEMTYPE_CURRENCY ) {
+                            all_gold = false;
+                        }
+                        c_location->addItem(item, player->getX(), player->getY());
+                    }
+                    scenery->eraseAllItems();
+                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
+                }
+
+                if( scenery->canBeOpened() && !scenery->isOpened() ) {
+                    done = true;
+                    this->playSound("container");
+                    scenery->setOpened(true);
+                }
+
+                if( scenery->isDoor() ) {
+                    done = true;
+                    qDebug("clicked on a door");
+                    bool is_locked = false;
+                    if( scenery->isLocked() ) {
+                        // can we unlock it?
+                        is_locked = true;
+                        string unlock_item_name = scenery->getUnlockItemName();
+                        if( unlock_item_name.length() > 0 ) {
+                            //LOG("search for %s\n", unlock_item_name.c_str());
+                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                                const Item *item = *iter;
+                                //LOG("    compare to: %s\n", item->getKey().c_str());
+                                if( item->getKey() == unlock_item_name ) {
+                                    is_locked = false;
+                                }
+                            }
+                        }
+                        if( is_locked ) {
+                            this->playSound("lock");
+                            this->addTextEffect("The door is locked!", player->getPos(), 2000);
+                        }
+                        else {
+                            this->addTextEffect("You unlock the door.", player->getPos(), 2000);
+                            scenery->setLocked(false); // we'll delete the door anyway below, but just to be safe...
+                            player->addXP(this, 20);
+                        }
+                    }
+                    if( !is_locked ) {
+                        // open door
+                        this->playSound("door");
+                        c_location->removeScenery(scenery);
+                        delete scenery;
+                        scenery = NULL;
+                        ignore_scenery = NULL;
+                    }
+                }
+                else if( scenery->isExit() ) {
+                    done = true;
+                    LOG("clicked on an exit");
+                    // exit
+                    this->closeSubWindow(); // just in case
+                    new CampaignWindow(this);
+                    game_g->getScreen()->setPaused(true);
+                    this->player->restoreHealth();
+                }
+            }
         }
 
         // nudge position due to boundaries
         dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
         if( dest != player->getPos() ) {
+            qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
             player->setDestination(dest.x, dest.y, ignore_scenery);
             if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
                 this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
