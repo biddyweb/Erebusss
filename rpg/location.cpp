@@ -924,14 +924,30 @@ void Location::calculateDistanceGraph() {
     LOG("Location::calculateDistanceGraph() total time taken: %d\n", clock() - time_s);
 }
 
+bool Location::testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const {
+    //Vector2D point = floor_region->getPoint(j);
+    Vector2D point = floor_region->offsetInwards(j, 2.0f*E_TOL_LINEAR); // offset, so we don't collide with the floor region we've sampled from!
+    // test we get get to the way point
+    Vector2D hit_pos;
+    // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
+    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL) ) {
+        return true;
+    }
+    return false;
+}
+
 void Location::initVisibility(Vector2D pos) {
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
-            Vector2D point = floor_region->getPoint(j);
+            /*Vector2D point = floor_region->getPoint(j);
             // test we get get to the way point
             Vector2D hit_pos;
-            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, 0.0f, INTERSECTTYPE_VISIBILITY, NULL) ) {
+            // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
+            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL) ) {
+                floor_region->setVisible(true);
+            }*/
+            if( this->testVisibility(pos, floor_region, j) ) {
                 floor_region->setVisible(true);
             }
         }
@@ -949,9 +965,15 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
             // now only need to check for points on internal edges
             if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL || floor_region->getEdgeType(p_j) == FloorRegion::EDGETYPE_INTERNAL )
             {
+                /*
                 // test we get get to the way point
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, 0.0f, INTERSECTTYPE_VISIBILITY, NULL) ) {
+                // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL) ) {
+                    floor_region->setVisible(true);
+                    update_floor_regions.push_back(floor_region);
+                }*/
+                if( this->testVisibility(pos, floor_region, j) ) {
                     floor_region->setVisible(true);
                     update_floor_regions.push_back(floor_region);
                 }

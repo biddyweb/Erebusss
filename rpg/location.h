@@ -33,7 +33,8 @@ class Scenery {
 public:
     enum DrawType {
         DRAWTYPE_NORMAL = 0,
-        DRAWTYPE_FLOATING = 1
+        DRAWTYPE_FLOATING = 1,
+        DRAWTYPE_BACKGROUND = 2
     };
 
 protected:
@@ -341,6 +342,8 @@ protected:
     void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
 
     vector<Vector2D> calculatePathWayPoints() const;
+
+    bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
 public:
     Location();
     ~Location();
