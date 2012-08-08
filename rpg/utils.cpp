@@ -60,6 +60,37 @@ void Polygon2D::insertPoint(size_t indx, Vector2D point) {
     this->points.insert( this->points.begin() + indx, point );
 }
 
+Vector2D Polygon2D::offsetInwards(size_t indx, float dist) const {
+    int n_points = this->getNPoints();
+    Vector2D p_point = this->getPoint((indx+n_points-1) % n_points);
+    Vector2D point = this->getPoint(indx);
+    Vector2D n_point = this->getPoint((indx+1) % n_points);
+    Vector2D d0 = point - p_point;
+    Vector2D d1 = n_point - point;
+    if( d0.magnitude() < E_TOL_LINEAR || d1.magnitude() < E_TOL_LINEAR ) {
+        LOG("p_point: %f, %f\n", p_point.x, p_point.y);
+        LOG("point: %f, %f\n", point.x, point.y);
+        LOG("n_point: %f, %f\n", n_point.x, n_point.y);
+        throw string("coi polygon points not allowed");
+    }
+    d0.normalise();
+    d1.normalise();
+    // these vectors must point away from the wall
+    Vector2D normal_from_wall0 = d0.perpendicularYToX();
+    Vector2D normal_from_wall1 = d1.perpendicularYToX();
+    Vector2D inwards = normal_from_wall0 + normal_from_wall1;
+    if( inwards.magnitude() > E_TOL_MACHINE ) {
+        float angle = acos(normal_from_wall0 % normal_from_wall1);
+        float ratio = cos( 0.5f * angle );
+        inwards.normalise();
+        point += inwards * dist;
+    }
+    else {
+        throw string("knife edge polygon not allowed");
+    }
+    return point;
+}
+
 bool Polygon2D::pointInsideConvex(Vector2D pvec) const {
     int sign = 0;
     for(size_t j=0;j<this->getNPoints();j++) {
