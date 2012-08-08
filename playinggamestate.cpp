@@ -15,7 +15,7 @@
 #include "logiface.h"
 
 #ifdef _DEBUG
-//#define DEBUG_SHOW_PATH
+#define DEBUG_SHOW_PATH
 #endif
 
 const float MainGraphicsView::min_zoom_c = 10.0f;
@@ -2632,6 +2632,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         if( draw_type_s == "floating" ) {
                             scenery->setDrawType(Scenery::DRAWTYPE_FLOATING);
                         }
+                        else if( draw_type_s == "background" ) {
+                            scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
+                        }
                         else {
                             LOG("unrecognised draw_type: %s\n", draw_type_s.toString().toStdString().c_str());
                             LOG("error at line %d\n", reader.lineNumber());
@@ -2964,6 +2967,9 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         float z_value = object->pos().y();
         if( scenery->getDrawType() == Scenery::DRAWTYPE_FLOATING ) {
             z_value += 1000.0f;
+        }
+        else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
+            z_value = 0.1f;
         }
         object->setZValue(z_value);
         /*
@@ -3905,6 +3911,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             break;
         case Scenery::DRAWTYPE_FLOATING:
             fprintf(file, " draw_type=\"floating\"");
+            break;
+        case Scenery::DRAWTYPE_BACKGROUND:
+            fprintf(file, " draw_type=\"background\"");
             break;
         default:
             ASSERT_LOGGER(false);
