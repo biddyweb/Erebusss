@@ -52,5 +52,6 @@
         <file>_docs/erebus.html</file>
         <file>data/quest_wizard_dungeon_find_item.xml</file>
         <file>gfx/textures/scenery/skeleton.png</file>
+        <file>gfx/textures/items/book.png</file>
     </qresource>
 </RCC>
