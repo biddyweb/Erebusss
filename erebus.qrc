@@ -51,5 +51,6 @@
         <file>gfx/textures/items/mushroom.png</file>
         <file>_docs/erebus.html</file>
         <file>data/quest_wizard_dungeon_find_item.xml</file>
+        <file>gfx/textures/scenery/skeleton.png</file>
     </qresource>
 </RCC>
