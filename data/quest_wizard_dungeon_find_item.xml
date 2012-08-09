@@ -59,7 +59,9 @@
 <npc name="Goblin" template="Goblin" x="48.0" y="12.0"/>
 
 <scenery name="Skeleton" image_name="skeleton" x="47.0" y="12.0" size="0.7" draw_type="background"/>
-<item template="Book" x="46.5" y="12.2"/>
+<item name="Book" x="46.5" y="12.2" image_name="book" icon_width="0.25" weight="1">
+blah blah
+</item>
 <scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
 
 <quest_objective type="kill" arg1="all_hostile"/>
