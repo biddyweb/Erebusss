@@ -20,6 +20,7 @@ using std::swap;
 Scenery::Scenery(const string &name, const string &image_name, float width, float height) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), width(width), height(height),
+    action_last_time(0), action_delay(0), action_value(0),
     can_be_opened(false), opened(false)
 {
 }
@@ -48,11 +49,22 @@ void Scenery::setOpened(bool opened) {
     }
 }
 
+bool Scenery::isOn(const Character *character) const {
+    Vector2D ch_pos = character->getPos();
+    float hw = 0.5f * this->width;
+    float hh = 0.5f * this->height;
+    if( ch_pos.x >= this->pos.x - hw && ch_pos.x <= this->pos.x + hw &&
+            ch_pos.y >= this->pos.y - hh && ch_pos.y <= this->pos.y +hh ) {
+        return true;
+    }
+    return false;
+}
+
 Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height)
 {
 }
 
-bool Trap::isSetOff(const Character *character) {
+bool Trap::isSetOff(const Character *character) const {
     Vector2D ch_pos = character->getPos();
     if( ch_pos.x >= this->pos.x && ch_pos.x <= this->pos.x + this->width &&
             ch_pos.y >= this->pos.y && ch_pos.y <= this->pos.y + this->height ) {

@@ -2582,6 +2582,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float pos_y = parseFloat(pos_y_s.toString());
                     QStringRef opacity_s = reader.attributes().value("opacity");
                     QStringRef draw_type_s = reader.attributes().value("draw_type");
+                    QStringRef action_last_time_s = reader.attributes().value("action_last_time");
+                    QStringRef action_delay_s = reader.attributes().value("action_delay");
+                    QStringRef action_type_s = reader.attributes().value("action_type");
+                    QStringRef action_value_s = reader.attributes().value("action_value");
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
@@ -2640,6 +2644,21 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("unrecognised draw_type for scenery");
                         }
+                    }
+                    if( action_last_time_s.length() > 0 ) {
+                        int action_last_time = parseInt(action_last_time_s.toString());
+                        scenery->setActionLastTime(action_last_time);
+                    }
+                    if( action_delay_s.length() > 0 ) {
+                        int action_delay = parseInt(action_delay_s.toString());
+                        scenery->setActionDelay(action_delay);
+                    }
+                    if( action_type_s.length() > 0 ) {
+                        scenery->setActionType(action_type_s.toString().toStdString());
+                    }
+                    if( action_value_s.length() > 0 ) {
+                        int action_value = parseInt(action_value_s.toString());
+                        scenery->setActionValue(action_value);
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
@@ -3192,7 +3211,7 @@ void PlayingGamestate::quitGame() {
 }
 
 void PlayingGamestate::update() {
-    //LOG("update: %d\n", time_ms);
+    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     if( game_g->getScreen()->isPaused() ) {
         return;
@@ -3253,18 +3272,38 @@ void PlayingGamestate::update() {
     scene->advance();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 
-    //vector< set<Character *>::iterator > delete_characters;
+    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+        Scenery *scenery = *iter;
+        if( scenery->getActionType().length() > 0 ) {
+            if( elapsed_ms >= scenery->getActionLastTime() + scenery->getActionDelay() ) {
+                bool has_effect = false;
+                if( scenery->getActionType() == "harm_player" ) {
+                    if( !player->isDead() && scenery->isOn(player) ) {
+                        LOG("scenery %s harms player\n", scenery->getName().c_str());
+                        has_effect = true;
+                        player->decreaseHealth(this, scenery->getActionValue(), false, false);
+                    }
+                }
+                else {
+                    LOG("unknown action type: %s\n", scenery->getActionType().c_str());
+                    ASSERT_LOGGER(false);
+                }
+
+                if( has_effect ) {
+                    scenery->setActionLastTime(elapsed_ms);
+                }
+            }
+        }
+    }
+
     vector<Character *> delete_characters;
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         if( character->update(this) ) {
             LOG("character is about to die: %s\n", character->getName().c_str());
-            //delete_characters.push_back(iter);
             delete_characters.push_back(character);
         }
     }
-    /*for(vector< set<Character *>::iterator >::iterator iter2 = delete_characters.begin(); iter2 != delete_characters.end(); ++iter2) {
-        set<Character *>::iterator iter = *iter2;*/
     for(vector<Character *>::iterator iter = delete_characters.begin(); iter != delete_characters.end(); ++iter) {
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
@@ -3919,6 +3958,10 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             ASSERT_LOGGER(false);
             break;
         }
+        fprintf(file, " action_last_time=\"%d\"", scenery->getActionLastTime());
+        fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
+        fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
+        fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
         fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
         fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
         fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");

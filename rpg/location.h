@@ -53,6 +53,11 @@ protected:
     float opacity;
     float width, height;
 
+    int action_last_time;
+    int action_delay;
+    string action_type;
+    int action_value;
+
     bool can_be_opened;
     bool opened;
     set<Item *> items;
@@ -140,6 +145,30 @@ public:
     float getOpacity() const {
         return this->opacity;
     }
+    void setActionLastTime(int action_last_time) {
+        this->action_last_time = action_last_time;
+    }
+    int getActionLastTime() const {
+        return this->action_last_time;
+    }
+    void setActionDelay(int action_delay) {
+        this->action_delay = action_delay;
+    }
+    int getActionDelay() const {
+        return this->action_delay;
+    }
+    void setActionType(const string &action_type) {
+        this->action_type = action_type;
+    }
+    string getActionType() const {
+        return this->action_type;
+    }
+    void setActionValue(int action_value) {
+        this->action_value = action_value;
+    }
+    int getActionValue() const {
+        return this->action_value;
+    }
 
     float getWidth() const {
         return this->width;
@@ -179,6 +208,7 @@ public:
     bool isOpened() const {
         return this->opened;
     }
+    bool isOn(const Character *character) const;
 };
 
 class Trap {
@@ -218,7 +248,7 @@ public:
         return this->height;
     }
 
-    bool isSetOff(const Character *character);
+    bool isSetOff(const Character *character) const;
     bool setOff(PlayingGamestate *playing_gamestate, Character *character) const;
 };
 
