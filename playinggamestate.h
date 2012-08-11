@@ -69,6 +69,10 @@ public:
     }
     void addTextEffect(TextEffect *text_effect);
     void removeTextEffect(TextEffect *text_effect);
+    void clear() {
+        this->scene()->clear();
+        this->text_effects.clear();
+    }
 
 public slots:
     void zoomOut();

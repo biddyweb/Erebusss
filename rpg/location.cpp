@@ -76,9 +76,10 @@ bool Trap::isSetOff(const Character *character) const {
 bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) const {
     bool character_affected = false;
     int rollD = rollDice(2, 6, 0);
-    LOG("character: %s has set of trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
+    LOG("character: %s has set off trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
     string text;
     if( rollD <= character->getDexterity() ) {
+        LOG("avoided\n");
         // avoided!
         if( type == "arrow" ) {
             text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
@@ -92,6 +93,7 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
     }
     else {
+        LOG("affected\n");
         character_affected = true;
         if( type == "arrow" ) {
             text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
@@ -109,10 +111,15 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
     }
 
+    LOG("1\n");
     if( character == playing_gamestate->getPlayer() ) {
+        LOG("2\n");
         playing_gamestate->addTextEffect(text, character->getPos(), 4000);
+        LOG("3\n");
         playing_gamestate->playSound("click");
+        LOG("4\n");
     }
+    LOG("5\n");
 
     return character_affected;
 }

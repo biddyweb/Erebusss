@@ -2150,11 +2150,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         delete this->quest;
     }
     // delete any items from previous quests
-    scene->clear();
+    view->clear();
     //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
 
     LOG("create new quest\n");
     this->quest = new Quest();
+    //this->quest->setCompleted(true); // test
     Location *location = new Location();
     this->quest->addLocation(location);
 
@@ -4033,6 +4034,7 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
 }
 
 void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b) {
+    LOG("PlayingGamestate::addTextEffect(%s, (%f, %f), %d, %d, %d, %d)\n", text.c_str(), pos.x, pos.y, duration_ms, r, g, b);
     QColor qt_color(r, g, b);
     TextEffect *text_effect = new TextEffect(this->view, text.c_str(), duration_ms, qt_color);
     float font_scale = 1.2f/view->getScale();
