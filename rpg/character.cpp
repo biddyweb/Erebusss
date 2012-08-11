@@ -129,9 +129,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     if( this->location == NULL ) {
         return false;
     }
-    /*if( is_ai )
-        return false;*/
-    //int elapsed_ms = game_g->getScreen()->getElapsedMS();
+
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     if( is_dead ) {
@@ -141,12 +139,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         return false;
     }
 
-    //float hit_range_c = target_npc == NULL ? 0.0f : sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
     bool ai_try_moving = true;
 
-    /*if( is_hitting && target_npc == NULL ) {
-        throw string("is_hitting is true, but no target_npc");
-    }*/
     ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
     if( target_npc != NULL ) {
         enum HitState {
