@@ -3,6 +3,7 @@
 
 <image type="generic" name="wall" filename="gfx/textures/wall.png"/>
 <image type="generic" name="floor_rock" filename="gfx/textures/floor_rock.png"/>
+<image type="generic" name="floor_paved" filename="gfx/textures/floor_paved.png"/>
 <!--<image type="generic" name="background_dark" imagetype="perlin" max_red="10" max_green="10" max_blue="50" min_red="0" min_green="0" min_blue="0"/>-->
 <image type="generic" name="background_dark" imagetype="perlin" max_red="40" max_green="40" max_blue="50" min_red="0" min_green="0" min_blue="0"/>
 
@@ -43,6 +44,8 @@
 <!--<image type="scenery" name="door_wood" filename="gfx/textures/door_wood.png"/>-->
 <image type="scenery" name="fog_red" imagetype="perlin" max_red="150" max_green="0" max_blue="0" min_red="40" min_green="0" min_blue="0"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>
+<image type="scenery" name="table" filename="gfx/textures/scenery/table.png"/>
+<image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
 <image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png">
     <animation name="" start="0" length="4" type="bounce"/>
