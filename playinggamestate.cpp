@@ -2587,6 +2587,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef action_delay_s = reader.attributes().value("action_delay");
                     QStringRef action_type_s = reader.attributes().value("action_type");
                     QStringRef action_value_s = reader.attributes().value("action_value");
+                    QStringRef interact_type_s = reader.attributes().value("interact_type");
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
@@ -2660,6 +2661,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( action_value_s.length() > 0 ) {
                         int action_value = parseInt(action_value_s.toString());
                         scenery->setActionValue(action_value);
+                    }
+                    if( interact_type_s.length() > 0 ) {
+                        scenery->setInteractType(interact_type_s.toString().toStdString());
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
@@ -3963,6 +3967,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
         fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
         fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
+        fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
         fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
         fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
         fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");

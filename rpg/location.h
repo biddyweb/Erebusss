@@ -53,10 +53,13 @@ protected:
     float opacity;
     float width, height;
 
+    // actions are events which happen periodically
     int action_last_time;
     int action_delay;
     string action_type;
     int action_value;
+
+    string interact_type;
 
     bool can_be_opened;
     bool opened;
@@ -168,6 +171,12 @@ public:
     }
     int getActionValue() const {
         return this->action_value;
+    }
+    string getInteractType() const {
+        return this->interact_type;
+    }
+    void setInteractType(const string &interact_type) {
+        this->interact_type = interact_type;
     }
 
     float getWidth() const {
