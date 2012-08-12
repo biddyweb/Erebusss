@@ -4,7 +4,7 @@
 <info>
 </info>
 
-<floor image_name="floor_rock"/>
+<floor image_name="floor_paved"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
@@ -24,6 +24,8 @@
 <scenery name="Rock" image_name="rock1" x="35.0" y="5.3" size="0.2"/>
 <scenery name="Rock" image_name="rock1" x="36.2" y="2.5" size="0.2"/>
 
+<scenery name="Table" image_name="table" x="35.0" y="2.5" size="0.8" blocking="true"/>
+
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
@@ -37,7 +39,7 @@
 
     <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
-<floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
+<floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
 <npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
 <npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
 
@@ -45,11 +47,10 @@
 <floorregion shape="rect" rect_x="32.0" rect_y="6.0" rect_w="1.0" rect_h="8.0" />
 <floorregion shape="rect" rect_x="33.0" rect_y="10.0" rect_w="8.0" rect_h="1.0" />
 
-<!--<scenery name="Door" image_name="door_wood" x="32.5" y="14.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>-->
 <scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="1.0" h="8.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
 <scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="8.0" h="1.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="1500"/>
 
-<!--eastern route, goblins-->
+<!--eastern rooms, goblins-->
     <floorregion shape="rect" rect_x="37.0" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
 <floorregion shape="rect" rect_x="37.5" rect_y="3.0" rect_w="8.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
@@ -63,6 +64,31 @@
 blah blah
 </item>
 <scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
+
+<!-- southern passage-->
+
+<floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
+
+<!-- room with orc-->
+
+    <floorregion shape="rect" rect_x="26.5" rect_y="13.5" rect_w="1.0" rect_h="0.5" />
+<floorregion shape="rect" rect_x="25.0" rect_y="10.0" rect_w="4.0" rect_h="3.5" />
+<scenery name="Door" image_name="door_wood" x="27.0" y="14.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+
+<npc name="Orc" template="Orc" x="27.0" y="12.0"/>
+<scenery name="Chest" image_name="chest" x="28.0" y="11.0" size="0.8" blocking="true">
+    <item template="Potion of Healing"/>
+    <gold amount="53"/>
+</scenery>
+
+<!-- room with chairs-->
+
+<floorregion shape="rect" rect_x="35.0" rect_y="12.0" rect_w="6.0" rect_h="5.0" />
+<scenery name="Door" image_name="door_wood" x="35.0" y="14.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Throne" image_name="throne" x="37.0" y="13.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_FP"/>
+<scenery name="Throne" image_name="throne" x="39.0" y="13.5" size="0.8" blocking="true"/>
+<scenery name="Throne" image_name="throne" x="37.0" y="15.5" size="0.8" blocking="true"/>
+<scenery name="Throne" image_name="throne" x="39.0" y="15.5" size="0.8" blocking="true"/>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 
