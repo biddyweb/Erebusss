@@ -61,7 +61,23 @@
 
 <scenery name="Skeleton" image_name="skeleton" x="47.0" y="12.0" size="0.7" draw_type="background"/>
 <item name="Book" x="46.5" y="12.2" image_name="book" icon_width="0.25" weight="1">
-blah blah
+The book appears to be a journal of some kind - you read some of the most
+recent entries:
+
+27th - I have decide to explore the dungeons of the long dead wizard, in search
+of the great treasure rumoured to be found in there.
+
+...
+
+28th - I have received some useful advice, from an old adventurer who once
+tried to explore the wizard's lair. She told me of a cursed level - every item
+and offering there brings nothing but misery and harm, except for one single
+blessing.
+
+...
+
+30th - Today I set out on my quest, confident that I will soon be rewarded for
+my efforts with the great riches to be found!
 </item>
 <scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
 
