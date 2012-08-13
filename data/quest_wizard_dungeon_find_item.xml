@@ -4,6 +4,8 @@
 <info>
 </info>
 
+<location>
+
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
@@ -105,6 +107,8 @@ my efforts with the great riches to be found!
 <scenery name="Throne" image_name="throne" x="39.0" y="13.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_GOLD"/>
 <scenery name="Throne" image_name="throne" x="37.0" y="15.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_M"/>
 <scenery name="Throne" image_name="throne" x="39.0" y="15.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_H"/>
+
+</location>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 

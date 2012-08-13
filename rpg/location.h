@@ -558,8 +558,14 @@ public:
     string getInfo() const {
         return this->info;
     }
+    vector<Location *>::iterator locationsBegin() {
+        return this->locations.begin();
+    }
     const vector<Location *>::const_iterator locationsBegin() const {
         return this->locations.begin();
+    }
+    const vector<Location *>::iterator locationsEnd() {
+        return this->locations.end();
     }
     const vector<Location *>::const_iterator locationsEnd() const {
         return this->locations.end();

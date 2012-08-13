@@ -2156,8 +2156,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("create new quest\n");
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
-    Location *location = new Location();
-    this->quest->addLocation(location);
+
+    /*Location *location = new Location();
+    this->quest->addLocation(location);*/
+    Location *location = NULL;
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -2238,6 +2240,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     // if not defined, we keep to the default
                 }
+                else if( reader.name() == "location" ) {
+                    if( location != NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: location element wasn't expected here");
+                    }
+                    location = new Location();
+                    quest->addLocation(location);
+                }
                 else if( reader.name() == "floor" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2247,6 +2257,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( image_name_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: floor element has no image_name attribute");
+                    }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floor element outside of location");
                     }
                     location->setFloorImageName(image_name_s.toString().toStdString());
                 }
@@ -2260,6 +2274,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: wall element has no image_name attribute");
                     }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wall element outside of location");
+                    }
                     location->setWallImageName(image_name_s.toString().toStdString());
                 }
                 else if( reader.name() == "background" ) {
@@ -2271,6 +2289,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( image_name_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: background element has no image_name attribute");
+                    }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: background element outside of location");
                     }
                     location->setBackgroundImageName(image_name_s.toString().toStdString());
                 }
@@ -2350,7 +2372,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("encountered player_start element, but player not yet defined");
                     }
                     LOG("player starts at %f, %f\n", pos_x, pos_y);
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: player_start element outside of location");
+                    }
                     location->addCharacter(player, pos_x, pos_y);
+                    this->c_location = location;
                     done_player_start = true;
                 }
                 else if( reader.name() == "quest_objective" ) {
@@ -2456,6 +2483,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     else {
                         npc->setDefaultPosition(pos_x, pos_y);
                     }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: npc/player element outside of location");
+                    }
                     location->addCharacter(npc, pos_x, pos_y);
                     questXMLType = QUEST_XML_TYPE_NPC;
                 }
@@ -2539,8 +2570,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
                     else {
+                        if( location == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected quest xml: item element outside of location");
+                        }
                         location->addItem(item, pos_x, pos_y);
-
                     }
                 }
                 else if( reader.name() == "gold" ) {
@@ -2567,6 +2601,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         float pos_x = parseFloat(pos_x_s.toString());
                         QStringRef pos_y_s = reader.attributes().value("y");
                         float pos_y = parseFloat(pos_y_s.toString());
+                        if( location == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected quest xml: gold element outside of location");
+                        }
                         location->addItem(item, pos_x, pos_y);
                     }
                 }
@@ -2625,6 +2663,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
 
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h);
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: scenery element outside of location");
+                    }
                     location->addScenery(scenery, pos_x, pos_y);
                     scenery->setBlocking(blocking, block_visibility);
                     if( door && exit ) {
@@ -2697,19 +2739,22 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef size_h_s = reader.attributes().value("h");
                     float size_h = parseFloat(size_h_s.toString());
                     Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: trap element outside of location");
+                    }
                     location->addTrap(trap, pos_x, pos_y);
                 }
             }
             else if( reader.isEndElement() ) {
-                //LOG("read end element: %s\n", reader.name().toString().toStdString().c_str());
-                /*if( reader.name() == "boundary" ) {
-                    if( questXMLType != QUEST_XML_TYPE_BOUNDARY ) {
-                        throw string("unexpected quest xml");
+                if( reader.name() == "location" ) {
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: location end element wasn't expected here");
                     }
-                    location->addBoundary(boundary);
-                    questXMLType = QUEST_XML_TYPE_NONE;
+                    location = NULL;
                 }
-                else */if( reader.name() == "npc" || reader.name() == "player" ) {
+                else if( reader.name() == "npc" || reader.name() == "player" ) {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: npc/player end element wasn't expected here");
@@ -2735,6 +2780,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("floorregion has insufficient points");
                     }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: floorregion end element outside of location");
+                    }
                     location->addFloorRegion(floor_region);
                     floor_region = NULL;
                     questXMLType = QUEST_XML_TYPE_NONE;
@@ -2755,14 +2804,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     gui_overlay->setProgress(50);
     qApp->processEvents();
 
-    location->createBoundariesForRegions();
-    location->createBoundariesForScenery();
-    location->calculateDistanceGraph();
-
     view->centerOn(player->getPos().x, player->getPos().y);
 
-    location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
-    this->c_location = location;
+    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
+        Location *loc = *iter;
+        loc->createBoundariesForRegions();
+        loc->createBoundariesForScenery();
+        loc->calculateDistanceGraph();
+        loc->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    }
 
     gui_overlay->setProgress(80);
     qApp->processEvents();
@@ -2771,14 +2821,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
-    location->calculateSize(&location_width, &location_height);
+    c_location->calculateSize(&location_width, &location_height);
     const float extra_offset_c = 5.0f; // so we can still scroll slightly past the boundary, and also that multitouch works beyond the boundary
     //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
-    //view->fitInView(0.0f, 0.0f, location->getWidth(), location->getHeight());
-    //int pixels_per_unit = 32;
-    //view->scale(pixels_per_unit, pixels_per_unit);
-    //view->setScale(pixels_per_unit);
     {
         const float desired_width_c = 10.0f;
         float initial_scale = window->width() / desired_width_c;
@@ -2790,18 +2836,18 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     int pixels_per_unit = 64;
     float scale = 1.0f/(float)pixels_per_unit;
     //QBrush floor_brush(builtin_images["floor"]);
-    QBrush floor_brush(builtin_images[location->getFloorImageName()]);
+    QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
     floor_brush.setTransform(QTransform::fromScale(scale, scale));
     //QBrush wall_brush(builtin_images["wall"]);
-    QBrush wall_brush(builtin_images[location->getWallImageName()]);
+    QBrush wall_brush(builtin_images[c_location->getWallImageName()]);
     wall_brush.setTransform(QTransform::fromScale(scale, scale));
 
-    QBrush background_brush(builtin_images[location->getBackgroundImageName()]);
+    QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
     background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
     scene->setBackgroundBrush(background_brush);
 
-    for(size_t i=0;i<location->getNFloorRegions();i++) {
-        FloorRegion *floor_region = location->getFloorRegion(i);
+    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = c_location->getFloorRegion(i);
         QPolygonF polygon;
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             Vector2D point = floor_region->getPoint(j);
@@ -2840,8 +2886,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     {
         // DEBUG ONLY
         QPen wall_pen(Qt::red);
-        for(size_t i=0;i<location->getNBoundaries();i++) {
-            const Polygon2D *boundary = location->getBoundary(i);
+        for(size_t i=0;i<c_location->getNBoundaries();i++) {
+            const Polygon2D *boundary = c_location->getBoundary(i);
             //qDebug("boundary %d:", i);
             for(size_t j=0;j<boundary->getNPoints();j++) {
                 Vector2D p0 = boundary->getPoint(j);
@@ -2855,7 +2901,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     {
         // DEBUG ONLY
         QPen wall_pen(Qt::red);
-        const Graph *distance_graph = location->getDistanceGraph();
+        const Graph *distance_graph = c_location->getDistanceGraph();
         for(size_t i=0;i<distance_graph->getNVertices();i++) {
             const GraphVertex *vertex = distance_graph->getVertex(i);
             Vector2D path_way_point = vertex->getPos();
@@ -2879,21 +2925,21 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     qApp->processEvents();
 
     LOG("add graphics for items\n");
-    for(set<Item *>::iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
+    for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
         Item *item = *iter;
-        this->locationAddItem(location, item);
+        this->locationAddItem(c_location, item);
     }
     LOG("add graphics for scenery");
-    for(set<Scenery *>::iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
+    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
-        this->locationAddScenery(location, scenery);
+        this->locationAddScenery(c_location, scenery);
     }
 
     gui_overlay->setProgress(95);
     qApp->processEvents();
 
     LOG("add graphics for characters");
-    for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         AnimatedObject *object = new AnimatedObject();
         this->characterUpdateGraphics(character, object);
@@ -2917,9 +2963,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
     LOG("init visibility\n");
-    location->initVisibility(player->getPos());
-    for(size_t i=0;i<location->getNFloorRegions();i++) {
-        FloorRegion *floor_region = location->getFloorRegion(i);
+    c_location->initVisibility(player->getPos());
+    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = c_location->getFloorRegion(i);
         this->updateVisibilityForFloorRegion(floor_region);
     }
 

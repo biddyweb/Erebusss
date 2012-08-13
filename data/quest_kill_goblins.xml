@@ -5,6 +5,8 @@
 these vermin, and you will be rewarded with 100 gold pieces!
 </info>
 
+<location>
+
 <floor image_name="floor_rock"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
@@ -126,6 +128,8 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <trap x="8.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
 <trap x="13.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
 <trap x="16.0" y="15.0" w="1.0" h="1.0" type="mantrap"/>
+
+</location>
 
 <quest_objective type="kill" arg1="all_hostile"/>
 
