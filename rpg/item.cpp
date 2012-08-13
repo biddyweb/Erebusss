@@ -135,7 +135,9 @@ string Item::getDetailedDescription() const {
     }
     str << "</p>";
     if( this->getDescription().length() > 0 ) {
+        str << "<pre>";
         str << this->getDescription();
+        str << "</pre>";
     }
     str << "</body></html>";
     return str.str();
