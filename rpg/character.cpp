@@ -437,27 +437,31 @@ bool Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int de
     decrease = std::max(decrease, 0);
     this->health -= decrease;
     if( health <= 0 ) {
-        this->health = 0;
-        LOG("%s has died\n", this->getName().c_str());
-        int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
-        this->is_dead = true;
-        this->time_of_death_ms = elapsed_ms;
-        if( this->listener != NULL ) {
-            this->listener->characterSetAnimation(this, this->listener_data, "death");
-        }
-        if( this->location != NULL ) {
-            while( this->items.size() > 0 ) {
-                Item *item = *this->items.begin();
-                this->dropItem(item);
-            }
-            if( this->gold > 0 ) {
-                Currency *currency = playing_gamestate->cloneGoldItem(this->gold);
-                location->addItem(currency, this->pos.x, this->pos.y);
-                this->gold = 0;
-            }
-        }
+        this->kill(playing_gamestate);
     }
     return (decrease > 0);
+}
+
+void Character::kill(const PlayingGamestate *playing_gamestate) {
+    this->health = 0;
+    LOG("%s has died\n", this->getName().c_str());
+    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+    this->is_dead = true;
+    this->time_of_death_ms = elapsed_ms;
+    if( this->listener != NULL ) {
+        this->listener->characterSetAnimation(this, this->listener_data, "death");
+    }
+    if( this->location != NULL ) {
+        while( this->items.size() > 0 ) {
+            Item *item = *this->items.begin();
+            this->dropItem(item);
+        }
+        if( this->gold > 0 ) {
+            Currency *currency = playing_gamestate->cloneGoldItem(this->gold);
+            location->addItem(currency, this->pos.x, this->pos.y);
+            this->gold = 0;
+        }
+    }
 }
 
 void Character::armWeapon(Weapon *item) {
@@ -564,6 +568,11 @@ void Character::dropItem(Item *item) {
     else {
         delete item;
     }
+}
+
+void Character::setGold(int gold) {
+    this->gold = gold;
+    ASSERT_LOGGER( gold >= 0 );
 }
 
 void Character::addGold(int change) {

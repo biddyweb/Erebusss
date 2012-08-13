@@ -21,6 +21,7 @@ Scenery::Scenery(const string &name, const string &image_name, float width, floa
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), width(width), height(height),
     action_last_time(0), action_delay(0), action_value(0),
+    interact_state(0),
     can_be_opened(false), opened(false)
 {
 }
@@ -58,6 +59,98 @@ bool Scenery::isOn(const Character *character) const {
         return true;
     }
     return false;
+}
+
+void Scenery::getInteractionText(string *dialog_title, string *dialog_text) const {
+    if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
+        *dialog_title = "Throne";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\nDo you wish to sit on the throne?";
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
+        *dialog_title = "Throne";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\nDo you wish to sit on the throne?";
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
+        *dialog_title = "Throne";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\nDo you wish to sit on the throne?";
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
+        *dialog_title = "Throne";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\nDo you wish to sit on the throne?";
+    }
+    else {
+        ASSERT_LOGGER(false);
+    }
+}
+
+void Scenery::interact(PlayingGamestate *playing_gamestate) {
+    string dialog_title, result_text;
+    if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
+        dialog_title = "Throne";
+        if( this->interact_state == 0 ) {
+            this->interact_state = 1;
+            result_text = "As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!";
+            int FP = playing_gamestate->getPlayer()->getFP();
+            playing_gamestate->getPlayer()->setFP( FP + 1 );
+        }
+        else {
+            result_text = "As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.\nThen everything goes dark...";
+            playing_gamestate->getPlayer()->kill(playing_gamestate);
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
+        dialog_title = "Throne";
+        if( this->interact_state == 0 ) {
+            this->interact_state = 1;
+            result_text = "As you sit, you suddenly feel something magically appear in your hands. Gold - 50 gold pieces!";
+            playing_gamestate->getPlayer()->addGold(50);
+        }
+        else {
+            if( playing_gamestate->getPlayer()->getGold() > 0 ) {
+                result_text = "You sit, but nothing seems to happen this time. It is only later that you notice your gold has crumbled into a fine worthless dust!";
+                playing_gamestate->getPlayer()->setGold(0);
+            }
+            else {
+                result_text = "You sit, but nothing seems to happen this time.";
+            }
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
+        dialog_title = "Throne";
+        if( this->interact_state == 0 ) {
+            this->interact_state = 1;
+            result_text = "As you sit, you see a flash before your eyes. You have gained great intellectual insight!";
+            int M = playing_gamestate->getPlayer()->getMind();
+            playing_gamestate->getPlayer()->setMind( M + 1 );
+        }
+        else {
+            result_text = "As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!\nYour adventure ends here.";
+            playing_gamestate->getPlayer()->kill(playing_gamestate);
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
+        dialog_title = "Throne";
+        if( this->interact_state == 0 ) {
+            if( playing_gamestate->getPlayer()->getHealth() < playing_gamestate->getPlayer()->getMaxHealth() ) {
+                this->interact_state = 1; // only set the state once the health benefit is used
+                result_text = "As you sit, you feel energy rush into you, and you see your wounds magically close up before your eyes!";
+                playing_gamestate->getPlayer()->restoreHealth();
+            }
+            else {
+                result_text = "You sit, but nothing seems to happen.";
+            }
+        }
+        else {
+            result_text = "As you sit, you are suddenly gripped by a terrible pain over your entire body. Your watch in horror as old wounds open up before your eyes.";
+            int damage = rollDice(10, 6, 0);
+            playing_gamestate->getPlayer()->decreaseHealth(playing_gamestate, damage, false, false);
+        }
+    }
+    else {
+        ASSERT_LOGGER(false);
+    }
+
+    game_g->showInfoDialog(dialog_title, result_text);
 }
 
 Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height)

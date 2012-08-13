@@ -2588,6 +2588,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef action_type_s = reader.attributes().value("action_type");
                     QStringRef action_value_s = reader.attributes().value("action_value");
                     QStringRef interact_type_s = reader.attributes().value("interact_type");
+                    QStringRef interact_state_s = reader.attributes().value("interact_state");
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
@@ -2664,6 +2665,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( interact_type_s.length() > 0 ) {
                         scenery->setInteractType(interact_type_s.toString().toStdString());
+                    }
+                    if( interact_state_s.length() > 0 ) {
+                        int interact_state = parseInt(interact_state_s.toString());
+                        scenery->setInteractState(interact_state);
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
@@ -3509,102 +3514,6 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         }
 
         Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
-        /*if( !done ) {
-            // search for clicking on a scenery
-            Scenery *selected_scenery = NULL;
-            for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
-                Scenery *scenery = *iter;
-                Vector2D scenery_pos = scenery->getPos();
-                float scenery_width = scenery->getWidth();
-                float scenery_height = scenery->getHeight();
-                float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
-                //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
-                if( dist_from_click <= npc_radius_c ) {
-                    // clicked on or near this scenery
-                    ignore_scenery = scenery;
-                }
-                if( dist_from_click <= click_tol_scenery_c ) {
-                    // clicked on this scenery
-                    float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
-                    //LOG("    player_dist : %f", player_dist);
-                    if( player_dist <= npc_radius_c + 0.5f ) {
-                        if( selected_scenery == NULL || dist_from_click < min_dist ) {
-                            //LOG("    selected!\n");
-                            done = true;
-                            selected_scenery = scenery;
-                            min_dist = dist_from_click;
-                        }
-                    }
-                }
-            }
-
-            if( selected_scenery != NULL ) {
-                qDebug("clicked on scenery: %s", selected_scenery->getName().c_str());
-                if( selected_scenery->getNItems() > 0 ) {
-                    bool all_gold = true;
-                    for(set<Item *>::iterator iter = selected_scenery->itemsBegin(); iter != selected_scenery->itemsEnd(); ++iter) {
-                        Item *item = *iter;
-                        if( item->getType() != ITEMTYPE_CURRENCY ) {
-                            all_gold = false;
-                        }
-                        c_location->addItem(item, player->getX(), player->getY());
-                    }
-                    selected_scenery->eraseAllItems();
-                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
-                }
-
-                if( selected_scenery->canBeOpened() && !selected_scenery->isOpened() ) {
-                    this->playSound("container");
-                    selected_scenery->setOpened(true);
-                }
-
-                if( selected_scenery->isDoor() ) {
-                    qDebug("clicked on a door");
-                    bool is_locked = false;
-                    if( selected_scenery->isLocked() ) {
-                        // can we unlock it?
-                        is_locked = true;
-                        string unlock_item_name = selected_scenery->getUnlockItemName();
-                        if( unlock_item_name.length() > 0 ) {
-                            //LOG("search for %s\n", unlock_item_name.c_str());
-                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                                const Item *item = *iter;
-                                //LOG("    compare to: %s\n", item->getKey().c_str());
-                                if( item->getKey() == unlock_item_name ) {
-                                    is_locked = false;
-                                }
-                            }
-                        }
-                        if( is_locked ) {
-                            this->playSound("lock");
-                            this->addTextEffect("The door is locked!", player->getPos(), 2000);
-                        }
-                        else {
-                            this->addTextEffect("You unlock the door.", player->getPos(), 2000);
-                            selected_scenery->setLocked(false); // we'll delete the door anyway below, but just to be safe...
-                            player->addXP(this, 20);
-                        }
-                    }
-                    if( !is_locked ) {
-                        // open door
-                        this->playSound("door");
-                        c_location->removeScenery(selected_scenery);
-                        delete selected_scenery;
-                        selected_scenery = NULL;
-                    }
-                }
-                else if( selected_scenery->isExit() ) {
-                    LOG("clicked on an exit");
-                    // exit
-                    this->closeSubWindow(); // just in case
-                    new CampaignWindow(this);
-                    game_g->getScreen()->setPaused(true);
-                    this->player->restoreHealth();
-                }
-            }
-
-        }*/
-
         if( !done ) {
             // search for clicking on a scenery
             vector<Scenery *> clicked_scenerys;
@@ -3698,6 +3607,16 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
                     this->player->restoreHealth();
+                }
+                else if( scenery->getInteractType().length() > 0 ) {
+                    done = true;
+                    LOG("interact_type: %s\n", scenery->getInteractType().c_str());
+                    string dialog_title;
+                    string dialog_text;
+                    scenery->getInteractionText(&dialog_title, &dialog_text);
+                    if( game_g->askQuestionDialog(dialog_title, dialog_text) ) {
+                        scenery->interact(this);
+                    }
                 }
             }
         }
@@ -3968,6 +3887,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
         fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
         fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
+        fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
         fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
         fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
         fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");

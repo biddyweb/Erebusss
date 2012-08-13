@@ -215,8 +215,10 @@ public:
         return this->is_dead;
     }
     void setDead(bool is_dead) {
+        // Should only be used to directly set flag, e.g., when loading games. To kill a character, use kill().
         this->is_dead = is_dead;
     }
+    void kill(const PlayingGamestate *playing_gamestate);
 
     void setVisible(bool is_visible) {
         this->is_visible = is_visible;
@@ -264,11 +266,20 @@ public:
         this->B = B;
         this->Sp = Sp;
     }
+    void setFP(int FP) {
+        this->FP = FP;
+    }
     int getFP() const {
         return this->FP;
     }
+    void setBS(int BS) {
+        this->BS = BS;
+    }
     int getBS() const {
         return this->BS;
+    }
+    void setStrength(int S) {
+        this->S = S;
     }
     int getStrength() const {
         return this->S;
@@ -276,14 +287,26 @@ public:
     int getAttacks() const {
         return this->A;
     }
+    void setMind(int M) {
+        this->M = M;
+    }
     int getMind() const {
         return this->M;
+    }
+    void setDexterity(int D) {
+        this->D = D;
     }
     int getDexterity() const {
         return this->D;
     }
+    void setBravery(int B) {
+        this->B = B;
+    }
     int getBravery() const {
         return this->B;
+    }
+    void setSpeed(int Sp) {
+        this->Sp = Sp;
     }
     float getSpeed() const {
         return this->Sp;
@@ -373,6 +396,7 @@ public:
     int getGold() const {
         return this->gold;
     }
+    void setGold(int gold);
     void addGold(int change);
     int calculateItemsWeight() const;
     int getCanCarryWeight() const;

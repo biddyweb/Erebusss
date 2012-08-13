@@ -60,6 +60,7 @@ protected:
     int action_value;
 
     string interact_type;
+    int interact_state;
 
     bool can_be_opened;
     bool opened;
@@ -178,6 +179,12 @@ public:
     void setInteractType(const string &interact_type) {
         this->interact_type = interact_type;
     }
+    int getInteractState() const {
+        return this->interact_state;
+    }
+    void setInteractState(int interact_state) {
+        this->interact_state = interact_state;
+    }
 
     float getWidth() const {
         return this->width;
@@ -218,6 +225,8 @@ public:
         return this->opened;
     }
     bool isOn(const Character *character) const;
+    void getInteractionText(string *dialog_title, string *dialog_text) const;
+    void interact(PlayingGamestate *playing_gamestate);
 };
 
 class Trap {
