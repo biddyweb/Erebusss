@@ -303,6 +303,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
+    void moveToLocation(Location *location, Vector2D pos);
+    void setupView();
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;

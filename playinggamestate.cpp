@@ -2132,6 +2132,181 @@ void PlayingGamestate::setDifficulty(Difficulty difficulty) {
     this->difficulty = difficulty;
 }
 
+void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
+    LOG("PlayingGamestate::moveToLocation(%s, %f, %f)\n", location->getName().c_str(), pos.x, pos.y);
+    if( this->player->getLocation() != NULL ) {
+        LOG("remove player from location\n");
+        this->player->getLocation()->removeCharacter(this->player);
+        this->player->setListener(NULL, NULL);
+    }
+    view->clear();
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        character->setListener(NULL, NULL);
+    }
+    this->c_location->setListener(NULL, NULL);
+
+    this->c_location = location;
+    this->c_location->addCharacter(player, pos.x, pos.y);
+    this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+
+    this->setupView();
+}
+
+void PlayingGamestate::setupView() {
+    LOG("PlayingGamestate::setupView()\n");
+    // set up the view on the RPG world
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+
+    view->centerOn(player->getPos().x, player->getPos().y);
+
+    const float offset_y = 0.5f;
+    float location_width = 0.0f, location_height = 0.0f;
+    c_location->calculateSize(&location_width, &location_height);
+    const float extra_offset_c = 5.0f; // so we can still scroll slightly past the boundary, and also that multitouch works beyond the boundary
+    //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
+    scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
+    {
+        const float desired_width_c = 10.0f;
+        float initial_scale = window->width() / desired_width_c;
+        LOG("width: %d\n", window->width());
+        LOG("initial_scale: %f\n", initial_scale);
+        view->setScale(initial_scale);
+    }
+
+    int pixels_per_unit = 64;
+    float scale = 1.0f/(float)pixels_per_unit;
+    //QBrush floor_brush(builtin_images["floor"]);
+    QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
+    floor_brush.setTransform(QTransform::fromScale(scale, scale));
+    //QBrush wall_brush(builtin_images["wall"]);
+    QBrush wall_brush(builtin_images[c_location->getWallImageName()]);
+    wall_brush.setTransform(QTransform::fromScale(scale, scale));
+
+    QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
+    background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
+    view->setBackgroundBrush(background_brush);
+    //view->setBackgroundBrush(QBrush(Qt::white));
+
+    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = c_location->getFloorRegion(i);
+        QPolygonF polygon;
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D point = floor_region->getPoint(j);
+            //QPointF qpoint(point.x, point.y + offset_y);
+            QPointF qpoint(point.x, point.y);
+            polygon.push_back(qpoint);
+        }
+        QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
+        floor_region->setUserGfxData(item);
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
+                continue;
+            }
+            size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
+            Vector2D p0 = floor_region->getPoint(j);
+            Vector2D p1 = floor_region->getPoint(n_j);
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            dp /= dp_length;
+            Vector2D normal_into_wall = - dp.perpendicularYToX();
+            QPolygonF wall_polygon;
+            float wall_dist = 0.1f;
+            wall_polygon.push_back(QPointF(p0.x, p0.y));
+            wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
+            wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
+            wall_polygon.push_back(QPointF(p1.x, p1.y));
+            QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
+            wall_item->setPen(Qt::NoPen);
+            wall_item->setBrush(wall_brush);
+        }
+    }
+#ifdef DEBUG_SHOW_PATH
+    {
+        // DEBUG ONLY
+        QPen wall_pen(Qt::red);
+        for(size_t i=0;i<c_location->getNBoundaries();i++) {
+            const Polygon2D *boundary = c_location->getBoundary(i);
+            //qDebug("boundary %d:", i);
+            for(size_t j=0;j<boundary->getNPoints();j++) {
+                Vector2D p0 = boundary->getPoint(j);
+                Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+                //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
+                //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
+                scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+            }
+        }
+    }
+    {
+        // DEBUG ONLY
+        QPen wall_pen(Qt::red);
+        const Graph *distance_graph = c_location->getDistanceGraph();
+        for(size_t i=0;i<distance_graph->getNVertices();i++) {
+            const GraphVertex *vertex = distance_graph->getVertex(i);
+            Vector2D path_way_point = vertex->getPos();
+            const float radius = 0.05f;
+            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
+            // n.b., draws edges twice, but doesn't matter for debug purposes...
+            for(size_t j=0;j<vertex->getNNeighbours();j++) {
+                const GraphVertex *o_vertex = vertex->getNeighbour(distance_graph, j);
+                Vector2D o_path_way_point = o_vertex->getPos();
+                float x1 = path_way_point.x;
+                float y1 = path_way_point.y;
+                float x2 = o_path_way_point.x;
+                float y2 = o_path_way_point.y;
+                scene->addLine(x1, y1, x2, y2, wall_pen);
+            }
+        }
+    }
+#endif
+
+    LOG("add graphics for items\n");
+    for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        this->locationAddItem(c_location, item);
+    }
+    LOG("add graphics for scenery");
+    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+        Scenery *scenery = *iter;
+        this->locationAddScenery(c_location, scenery);
+    }
+
+    LOG("add graphics for characters");
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        AnimatedObject *object = new AnimatedObject();
+        this->characterUpdateGraphics(character, object);
+        scene->addItem(object);
+        object->setPos(character->getX(), character->getY());
+        int character_size = object->getSize();
+        float character_scale = 2.0f / (float)character_size;
+        //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
+        object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
+        object->setScale(character_scale);
+
+        character->setListener(this, object);
+        //item->setAnimationSet("attack"); // test
+    }
+
+    /*{
+        TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
+        text_effect->setPos( player->getPos().x, player->getPos().y );
+        scene->addItem(text_effect);
+    }*/
+    //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
+
+    LOG("init visibility\n");
+    c_location->initVisibility(player->getPos());
+    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
+        FloorRegion *floor_region = c_location->getFloorRegion(i);
+        this->updateVisibilityForFloorRegion(floor_region);
+    }
+
+}
+
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
     // filename should be full path
@@ -2245,7 +2420,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: location element wasn't expected here");
                     }
-                    location = new Location();
+                    QStringRef name_s = reader.attributes().value("name");
+                    LOG("read location: %s\n", name_s.toString().toStdString().c_str());
+                    if( quest->findLocation(name_s.toString().toStdString()) != NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: duplicate location name");
+                    }
+                    location = new Location(name_s.toString().toStdString());
                     quest->addLocation(location);
                 }
                 else if( reader.name() == "floor" ) {
@@ -2376,8 +2557,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: player_start element outside of location");
                     }
-                    location->addCharacter(player, pos_x, pos_y);
                     this->c_location = location;
+                    this->c_location->addCharacter(player, pos_x, pos_y);
                     done_player_start = true;
                 }
                 else if( reader.name() == "quest_objective" ) {
@@ -2635,6 +2816,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     bool door = parseBool(door_s.toString(), true);
                     QStringRef exit_s = reader.attributes().value("exit");
                     bool exit = parseBool(exit_s.toString(), true);
+                    QStringRef exit_location_s = reader.attributes().value("exit_location");
                     QStringRef locked_s = reader.attributes().value("locked");
                     bool locked = parseBool(locked_s.toString(), true);
                     QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
@@ -2668,11 +2850,19 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: scenery element outside of location");
                     }
                     location->addScenery(scenery, pos_x, pos_y);
-                    scenery->setBlocking(blocking, block_visibility);
                     if( door && exit ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("scenery can't be both a door and an exit");
                     }
+                    else if( exit && exit_location_s.length() > 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("scenery can't be both an exit and an exit_location");
+                    }
+                    else if( exit_location_s.length() > 0 && door ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("scenery can't be both an exit_location and a door");
+                    }
+                    scenery->setBlocking(blocking, block_visibility);
                     if( opacity_s.length() > 0 ) {
                         float opacity = parseFloat(opacity_s.toString());
                         scenery->setOpacity(opacity);
@@ -2714,6 +2904,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
+                    if( exit_location_s.length() > 0 ) {
+                        QStringRef exit_location_x_s = reader.attributes().value("exit_location_x");
+                        float exit_location_x = parseFloat(exit_location_x_s.toString());
+                        QStringRef exit_location_y_s = reader.attributes().value("exit_location_y");
+                        float exit_location_y = parseFloat(exit_location_y_s.toString());
+                        scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y));
+                    }
                     scenery->setLocked(locked);
                     if( unlock_item_name_s.length() > 0 ) {
                         scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
@@ -2801,173 +2998,26 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         }
     }
 
-    gui_overlay->setProgress(50);
-    qApp->processEvents();
-
-    view->centerOn(player->getPos().x, player->getPos().y);
-
     for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
         Location *loc = *iter;
+        LOG("process location: %s\n", loc->getName().c_str());
+        if( loc->getBackgroundImageName().length() == 0 ) {
+            throw string("Location doesn't define background image name");
+        }
+        else if( loc->getFloorImageName().length() == 0 ) {
+            throw string("Location doesn't define floor image name");
+        }
+        else if( loc->getWallImageName().length() == 0 ) {
+            throw string("Location doesn't define wall image name");
+        }
+
         loc->createBoundariesForRegions();
         loc->createBoundariesForScenery();
         loc->calculateDistanceGraph();
-        loc->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
     }
 
-    gui_overlay->setProgress(80);
-    qApp->processEvents();
-
-    // set up the view on the RPG world
-
-    const float offset_y = 0.5f;
-    float location_width = 0.0f, location_height = 0.0f;
-    c_location->calculateSize(&location_width, &location_height);
-    const float extra_offset_c = 5.0f; // so we can still scroll slightly past the boundary, and also that multitouch works beyond the boundary
-    //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
-    scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
-    {
-        const float desired_width_c = 10.0f;
-        float initial_scale = window->width() / desired_width_c;
-        LOG("width: %d\n", window->width());
-        LOG("initial_scale: %f\n", initial_scale);
-        view->setScale(initial_scale);
-    }
-
-    int pixels_per_unit = 64;
-    float scale = 1.0f/(float)pixels_per_unit;
-    //QBrush floor_brush(builtin_images["floor"]);
-    QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
-    floor_brush.setTransform(QTransform::fromScale(scale, scale));
-    //QBrush wall_brush(builtin_images["wall"]);
-    QBrush wall_brush(builtin_images[c_location->getWallImageName()]);
-    wall_brush.setTransform(QTransform::fromScale(scale, scale));
-
-    QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
-    background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
-    scene->setBackgroundBrush(background_brush);
-
-    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
-        FloorRegion *floor_region = c_location->getFloorRegion(i);
-        QPolygonF polygon;
-        for(size_t j=0;j<floor_region->getNPoints();j++) {
-            Vector2D point = floor_region->getPoint(j);
-            //QPointF qpoint(point.x, point.y + offset_y);
-            QPointF qpoint(point.x, point.y);
-            polygon.push_back(qpoint);
-        }
-        QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
-        floor_region->setUserGfxData(item);
-        for(size_t j=0;j<floor_region->getNPoints();j++) {
-            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
-                continue;
-            }
-            size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
-            Vector2D p0 = floor_region->getPoint(j);
-            Vector2D p1 = floor_region->getPoint(n_j);
-            Vector2D dp = p1 - p0;
-            float dp_length = dp.magnitude();
-            if( dp_length == 0.0f ) {
-                continue;
-            }
-            dp /= dp_length;
-            Vector2D normal_into_wall = - dp.perpendicularYToX();
-            QPolygonF wall_polygon;
-            float wall_dist = 0.1f;
-            wall_polygon.push_back(QPointF(p0.x, p0.y));
-            wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
-            wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
-            wall_polygon.push_back(QPointF(p1.x, p1.y));
-            QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
-            wall_item->setPen(Qt::NoPen);
-            wall_item->setBrush(wall_brush);
-        }
-    }
-#ifdef DEBUG_SHOW_PATH
-    {
-        // DEBUG ONLY
-        QPen wall_pen(Qt::red);
-        for(size_t i=0;i<c_location->getNBoundaries();i++) {
-            const Polygon2D *boundary = c_location->getBoundary(i);
-            //qDebug("boundary %d:", i);
-            for(size_t j=0;j<boundary->getNPoints();j++) {
-                Vector2D p0 = boundary->getPoint(j);
-                Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-                //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
-                //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
-                scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
-            }
-        }
-    }
-    {
-        // DEBUG ONLY
-        QPen wall_pen(Qt::red);
-        const Graph *distance_graph = c_location->getDistanceGraph();
-        for(size_t i=0;i<distance_graph->getNVertices();i++) {
-            const GraphVertex *vertex = distance_graph->getVertex(i);
-            Vector2D path_way_point = vertex->getPos();
-            const float radius = 0.05f;
-            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
-            // n.b., draws edges twice, but doesn't matter for debug purposes...
-            for(size_t j=0;j<vertex->getNNeighbours();j++) {
-                const GraphVertex *o_vertex = vertex->getNeighbour(distance_graph, j);
-                Vector2D o_path_way_point = o_vertex->getPos();
-                float x1 = path_way_point.x;
-                float y1 = path_way_point.y;
-                float x2 = o_path_way_point.x;
-                float y2 = o_path_way_point.y;
-                scene->addLine(x1, y1, x2, y2, wall_pen);
-            }
-        }
-    }
-#endif
-
-    gui_overlay->setProgress(90);
-    qApp->processEvents();
-
-    LOG("add graphics for items\n");
-    for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        this->locationAddItem(c_location, item);
-    }
-    LOG("add graphics for scenery");
-    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
-        Scenery *scenery = *iter;
-        this->locationAddScenery(c_location, scenery);
-    }
-
-    gui_overlay->setProgress(95);
-    qApp->processEvents();
-
-    LOG("add graphics for characters");
-    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
-        Character *character = *iter;
-        AnimatedObject *object = new AnimatedObject();
-        this->characterUpdateGraphics(character, object);
-        scene->addItem(object);
-        object->setPos(character->getX(), character->getY());
-        int character_size = object->getSize();
-        float character_scale = 2.0f / (float)character_size;
-        //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
-        object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
-        object->setScale(character_scale);
-
-        character->setListener(this, object);
-        //item->setAnimationSet("attack"); // test
-    }
-
-    /*{
-        TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
-        text_effect->setPos( player->getPos().x, player->getPos().y );
-        scene->addItem(text_effect);
-    }*/
-    //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
-
-    LOG("init visibility\n");
-    c_location->initVisibility(player->getPos());
-    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
-        FloorRegion *floor_region = c_location->getFloorRegion(i);
-        this->updateVisibilityForFloorRegion(floor_region);
-    }
+    this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    this->setupView();
 
     gui_overlay->unsetProgress();
     qApp->processEvents();
@@ -3647,12 +3697,21 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
                 else if( scenery->isExit() ) {
                     done = true;
-                    LOG("clicked on an exit");
+                    LOG("clicked on an exit\n");
                     // exit
                     this->closeSubWindow(); // just in case
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
                     this->player->restoreHealth();
+                }
+                else if( scenery->getExitLocation().length() > 0 ) {
+                    done = true;
+                    LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
+                    Location *new_location = quest->findLocation(scenery->getExitLocation());
+                    ASSERT_LOGGER(new_location != NULL);
+                    if( new_location != NULL ) {
+                        this->moveToLocation(new_location, scenery->getExitLocationPos());
+                    }
                 }
                 else if( scenery->getInteractType().length() > 0 ) {
                     done = true;
@@ -3840,133 +3899,144 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     fprintf(file, "\n");
 
     LOG("save locations\n");
-    for(size_t i=0;i<c_location->getNFloorRegions();i++) {
-        const FloorRegion *floor_region = c_location->getFloorRegion(i);
-        fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
-        for(size_t j=0;j<floor_region->getNPoints();j++) {
-            Vector2D point = floor_region->getPoint(j);
-            fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
-        }
-        fprintf(file, "</floorregion>\n");
-    }
-    fprintf(file, "\n");
+    for(vector<Location *>::const_iterator iter_loc = quest->locationsBegin(); iter_loc != quest->locationsEnd(); ++iter_loc) {
+        const Location *location = *iter_loc;
 
-    LOG("save location images\n");
-    fprintf(file, "<floor image_name=\"%s\"/>\n", c_location->getFloorImageName().c_str());
-    fprintf(file, "<wall image_name=\"%s\"/>\n", c_location->getWallImageName().c_str());
-    fprintf(file, "\n");
+        fprintf(file, "<location name=\"%s\">\n\n", location->getName().c_str());
 
-    LOG("save player and npcs\n");
-    for(set<Character *>::const_iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
-        const Character *character = *iter;
-        if( player == character )
-            fprintf(file, "<player");
-        else {
-            fprintf(file, "<npc");
-            fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
-            fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
-        }
-        fprintf(file, " name=\"%s\"", character->getName().c_str());
-        fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
-        fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
-        if( character->hasDefaultPosition() ) {
-            fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
-        }
-        fprintf(file, " health=\"%d\"", character->getHealth());
-        fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
-        fprintf(file, " FP=\"%d\"", character->getFP());
-        fprintf(file, " BS=\"%d\"", character->getBS());
-        fprintf(file, " S=\"%d\"", character->getStrength());
-        fprintf(file, " A=\"%d\"", character->getAttacks());
-        fprintf(file, " M=\"%d\"", character->getMind());
-        fprintf(file, " D=\"%d\"", character->getDexterity());
-        fprintf(file, " B=\"%d\"", character->getBravery());
-        fprintf(file, " Sp=\"%f\"", character->getSpeed());
-        int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
-        character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
-        fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
-        fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
-        fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
-        fprintf(file, " xp=\"%d\"", character->getXP());
-        fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
-        fprintf(file, " gold=\"%d\"", character->getGold());
-        fprintf(file, ">\n");
-        for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
-            const Item *item = *iter2;
-            this->saveItem(file, item, character);
-        }
-        if( player == character )
-            fprintf(file, "</player>\n");
-        else
-            fprintf(file, "</npc>\n");
-    }
-    fprintf(file, "\n");
+        LOG("save location images\n");
+        fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
+        fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
+        fprintf(file, "<wall image_name=\"%s\"/>\n", location->getWallImageName().c_str());
+        fprintf(file, "\n");
 
-    LOG("save player additional info\n");
-    fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
-    fprintf(file, "\n");
-
-    LOG("save scenery\n");
-    for(set<Scenery *>::const_iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
-        const Scenery *scenery = *iter;
-        fprintf(file, "<scenery");
-        fprintf(file, " name=\"%s\"", scenery->getName().c_str());
-        fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
-        fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
-        fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
-        fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
-        switch( scenery->getDrawType() ) {
-        case Scenery::DRAWTYPE_NORMAL:
-            break;
-        case Scenery::DRAWTYPE_FLOATING:
-            fprintf(file, " draw_type=\"floating\"");
-            break;
-        case Scenery::DRAWTYPE_BACKGROUND:
-            fprintf(file, " draw_type=\"background\"");
-            break;
-        default:
-            ASSERT_LOGGER(false);
-            break;
+        for(size_t i=0;i<location->getNFloorRegions();i++) {
+            const FloorRegion *floor_region = location->getFloorRegion(i);
+            fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
+            for(size_t j=0;j<floor_region->getNPoints();j++) {
+                Vector2D point = floor_region->getPoint(j);
+                fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
+            }
+            fprintf(file, "</floorregion>\n");
         }
-        fprintf(file, " action_last_time=\"%d\"", scenery->getActionLastTime());
-        fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
-        fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
-        fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
-        fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
-        fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
-        fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
-        fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
-        fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
-        fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
-        fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
-        fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
-        fprintf(file, ">");
-        for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
-            const Item *item = *iter2;
+        fprintf(file, "\n");
+
+        LOG("save player and npcs\n");
+        for(set<Character *>::const_iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
+            const Character *character = *iter;
+            if( player == character )
+                fprintf(file, "<player");
+            else {
+                fprintf(file, "<npc");
+                fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
+                fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
+            }
+            fprintf(file, " name=\"%s\"", character->getName().c_str());
+            fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
+            fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
+            if( character->hasDefaultPosition() ) {
+                fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
+            }
+            fprintf(file, " health=\"%d\"", character->getHealth());
+            fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
+            fprintf(file, " FP=\"%d\"", character->getFP());
+            fprintf(file, " BS=\"%d\"", character->getBS());
+            fprintf(file, " S=\"%d\"", character->getStrength());
+            fprintf(file, " A=\"%d\"", character->getAttacks());
+            fprintf(file, " M=\"%d\"", character->getMind());
+            fprintf(file, " D=\"%d\"", character->getDexterity());
+            fprintf(file, " B=\"%d\"", character->getBravery());
+            fprintf(file, " Sp=\"%f\"", character->getSpeed());
+            int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
+            character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
+            fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
+            fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
+            fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
+            fprintf(file, " xp=\"%d\"", character->getXP());
+            fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
+            fprintf(file, " gold=\"%d\"", character->getGold());
+            fprintf(file, ">\n");
+            for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
+                const Item *item = *iter2;
+                this->saveItem(file, item, character);
+            }
+            if( player == character )
+                fprintf(file, "</player>\n");
+            else
+                fprintf(file, "</npc>\n");
+        }
+        fprintf(file, "\n");
+
+        if( location == c_location ) {
+            LOG("save player additional info\n");
+            fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
+            fprintf(file, "\n");
+        }
+
+        LOG("save scenery\n");
+        for(set<Scenery *>::const_iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
+            const Scenery *scenery = *iter;
+            fprintf(file, "<scenery");
+            fprintf(file, " name=\"%s\"", scenery->getName().c_str());
+            fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
+            fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
+            fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
+            fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
+            switch( scenery->getDrawType() ) {
+            case Scenery::DRAWTYPE_NORMAL:
+                break;
+            case Scenery::DRAWTYPE_FLOATING:
+                fprintf(file, " draw_type=\"floating\"");
+                break;
+            case Scenery::DRAWTYPE_BACKGROUND:
+                fprintf(file, " draw_type=\"background\"");
+                break;
+            default:
+                ASSERT_LOGGER(false);
+                break;
+            }
+            fprintf(file, " action_last_time=\"%d\"", scenery->getActionLastTime());
+            fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
+            fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
+            fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
+            fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
+            fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
+            fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
+            fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+            fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
+            fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
+            fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
+            fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
+            fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+            fprintf(file, ">");
+            for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
+                const Item *item = *iter2;
+                this->saveItem(file, item);
+            }
+            fprintf(file, "</scenery>\n");
+        }
+        fprintf(file, "\n");
+
+        LOG("save items\n");
+        for(set<Item *>::const_iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
+            const Item *item = *iter;
             this->saveItem(file, item);
         }
-        fprintf(file, "</scenery>");
-    }
-    fprintf(file, "\n");
+        fprintf(file, "\n");
 
-    LOG("save items\n");
-    for(set<Item *>::const_iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
-        const Item *item = *iter;
-        this->saveItem(file, item);
-    }
-    fprintf(file, "\n");
+        LOG("save traps\n");
+        for(set<Trap *>::const_iterator iter = location->trapsBegin(); iter != location->trapsEnd(); ++iter) {
+            const Trap *trap = *iter;
+            fprintf(file, "<trap");
+            fprintf(file, " type=\"%s\"", trap->getType().c_str());
+            fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
+            fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
+            fprintf(file, " />\n");
+        }
+        fprintf(file, "\n");
 
-    LOG("save traps\n");
-    for(set<Trap *>::const_iterator iter = c_location->trapsBegin(); iter != c_location->trapsEnd(); ++iter) {
-        const Trap *trap = *iter;
-        fprintf(file, "<trap");
-        fprintf(file, " type=\"%s\"", trap->getType().c_str());
-        fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
-        fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
-        fprintf(file, " />");
+        fprintf(file, "</location>\n\n");
     }
-    fprintf(file, "\n");
-
     const QuestObjective *quest_objective = this->getQuest()->getQuestObjective();
     if( quest_objective != NULL ) {
         LOG("save quest objective\n");

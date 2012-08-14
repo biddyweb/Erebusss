@@ -47,6 +47,8 @@ protected:
     bool is_blocking;
     bool blocks_visibility;
     bool is_door, is_exit;
+    string exit_location;
+    Vector2D exit_location_pos;
     bool is_locked; // relevant only for some types, e.g., containers, doors
     string unlock_item_name;
     DrawType draw_type;
@@ -125,6 +127,17 @@ public:
     bool isExit() const {
         return this->is_exit;
     }
+    void setExitLocation(const string &exit_location, Vector2D exit_location_pos) {
+        this->exit_location = exit_location;
+        this->exit_location_pos = exit_location_pos;
+    }
+    string getExitLocation() const {
+        return this->exit_location;
+    }
+    Vector2D getExitLocationPos() const {
+        return this->exit_location_pos;
+    }
+
     void setLocked(bool is_locked) {
         this->is_locked = is_locked;
     }
@@ -369,6 +382,7 @@ public:
     };
 
 protected:
+    string name;
     LocationListener *listener;
     void *listener_data;
 
@@ -393,9 +407,12 @@ protected:
 
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
 public:
-    Location();
+    Location(const string &name);
     ~Location();
 
+    string getName() const {
+        return this->name;
+    }
     void setWallImageName(const string &wall_image_name) {
         this->wall_image_name = wall_image_name;
     }
@@ -546,6 +563,7 @@ public:
     ~Quest();
 
     void addLocation(Location *location);
+    Location *findLocation(const string &name);
     void setQuestObjective(QuestObjective *quest_objective) {
         this->quest_objective = quest_objective;
     }

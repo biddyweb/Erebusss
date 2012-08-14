@@ -233,8 +233,8 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     return floor_regions;
 }
 
-Location::Location() :
-    listener(NULL), listener_data(NULL),
+Location::Location(const string &name) :
+    name(name), listener(NULL), listener_data(NULL),
     distance_graph(NULL)
 {
 }
@@ -1140,6 +1140,16 @@ Quest::~Quest() {
 
 void Quest::addLocation(Location *location) {
     this->locations.push_back(location);
+}
+
+Location *Quest::findLocation(const string &name) {
+    for(vector<Location *>::iterator iter = this->locations.begin(); iter != this->locations.end(); ++iter) {
+        Location *location = *iter;
+        if( location->getName() == name ) {
+            return location;
+        }
+    }
+    return NULL;
 }
 
 bool Quest::testIfComplete() {
