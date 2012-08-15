@@ -10,7 +10,7 @@
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.0" y="2.0"/>
+<!--<player_start x="32.0" y="2.0"/>-->
 
 <!--main room-->
 
@@ -28,7 +28,7 @@
 
 <scenery name="Table" image_name="table" x="35.0" y="2.5" size="0.8" blocking="true"/>
 
-<scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
+<scenery name="Door" image_name="door_wood" x="32.5" y="1.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -87,7 +87,7 @@ my efforts with the great riches to be found!
 
 <floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
 
-<scenery name="Door" image_name="door_wood" x="21.0" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="37.5" exit_location_y="1.0"/>
+<scenery name="Door" image_name="door_wood" x="21.0" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="37.5" exit_location_y="1.5"/>
 
 <!-- room with orc-->
 
@@ -118,7 +118,40 @@ my efforts with the great riches to be found!
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="35.0" rect_y="0.0" rect_w="5.0" rect_h="5.0" />
+<floorregion shape="rect" rect_x="35.0" rect_y="1.0" rect_w="5.0" rect_h="12.0" />
+<scenery name="Door" image_name="door_wood" x="37.5" y="1.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="14.5"/>
+
+<player_start x="37.5" y="1.5"/>
+
+<npc name="Orc" template="Orc" x="37.5" y="10.0"/>
+
+<!--cells-->
+
+<floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<item template="Skull" x="40.5" y="2.3"/>
+
+<floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
+<item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
+This is a small book, containing some notes. The writing is barely legible, and gets worse towards the end. You read some of the entries:
+
+I don't know how long I have been kept here, locked up in this tiny cell.
+</item>
+
+<floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<!--passage next to cells-->
+
+<floorregion shape="rect" rect_x="40.0" rect_y="12.0" rect_w="10.0" rect_h="1.0"/>
 
 </location>
 
