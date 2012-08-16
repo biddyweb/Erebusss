@@ -87,7 +87,7 @@ my efforts with the great riches to be found!
 
 <floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
 
-<scenery name="Door" image_name="door_wood" x="21.0" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="37.5" exit_location_y="1.5"/>
+<scenery name="Door" image_name="door_wood" x="21.0" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="1.5"/>
 
 <!-- room with orc-->
 
