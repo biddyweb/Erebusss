@@ -55,5 +55,7 @@
         <file>gfx/textures/items/book.png</file>
         <file>gfx/textures/scenery/throne.png</file>
         <file>gfx/textures/scenery/table.png</file>
+        <file>gfx/textures/scenery/bloodstain.png</file>
+        <file>gfx/textures/scenery/bloodstain2.png</file>
     </qresource>
 </RCC>

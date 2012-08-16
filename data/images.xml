@@ -36,6 +36,8 @@
 <image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png"
     filename_opened="gfx/textures/scenery/barrel_opened.png"
     />
+<image type="scenery" name="bloodstain" filename="gfx/textures/scenery/bloodstain.png"/>
+<image type="scenery" name="bloodstain2" filename="gfx/textures/scenery/bloodstain2.png"/>
 <image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png"
     filename_opened="gfx/textures/scenery/crate_opened.png"
     />

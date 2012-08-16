@@ -169,6 +169,7 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Wizard's Cell Key"/>
+<scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" size="0.7" opacity="0.9" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
