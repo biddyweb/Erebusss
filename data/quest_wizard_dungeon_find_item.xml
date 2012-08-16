@@ -154,7 +154,6 @@ my efforts with the great riches to be found!
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Wizard's Cell Key"/>
-<item template="Skull" x="40.5" y="2.3"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
@@ -178,6 +177,8 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Wizard's Cell Key"/>
+<item template="Skull" x="40.5" y="10.3"/>
+<gold amount="4" x="40.6" y="10.5"/>
 
 <!--passage next to cells-->
 
