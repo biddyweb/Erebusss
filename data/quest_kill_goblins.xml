@@ -83,7 +83,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <npc name="Orc" template="Orc" x="16.0" y="8.0">
     <item template="Leather Armour"/>
-    <item template="Key"/>
+    <item name="Orc's Key" image_name="key" icon_width="0.25" weight="0"/>
 </npc>
 
 <scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
@@ -91,7 +91,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 <scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="10.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Key"/>
+    locked="true" unlocked_by_template="Orc's Key"/>
 <scenery name="Door" image_name="door_wood" x="14.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="17.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>

@@ -118,21 +118,47 @@ my efforts with the great riches to be found!
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="35.0" rect_y="1.0" rect_w="5.0" rect_h="12.0" />
-<scenery name="Door" image_name="door_wood" x="37.5" y="1.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="14.5"/>
+<floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="5.0" rect_h="12.0"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="1.0" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="14.5"/>
 
-<player_start x="37.5" y="1.5"/>
+<player_start x="12.5" y="1.5"/>
 
-<npc name="Orc" template="Orc" x="37.5" y="10.0"/>
+<floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="4.0" rect_h="2.0"/>
+<scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="9"/>
+</scenery>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="8.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="18.0" rect_y="8.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Crate" image_name="crate" x="18.5" y="8.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="20"/>
+</scenery>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="1.0" rect_w="20.0" rect_h="1.0"/>
+<trap x="19.0" y="1.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="29.0" y="1.0" w="1.0" h="1.0" type="arrow"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="12.0" rect_w="20.0" rect_h="1.0"/>
+<trap x="19.0" y="12.0" w="1.0" h="1.0" type="arrow"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
+<npc name="Goblin" template="Goblin" x="24.5" y="11.5"/>
 
 <!--cells-->
 
+<floorregion shape="rect" rect_x="35.0" rect_y="1.0" rect_w="5.0" rect_h="12.0" />
+
+<npc name="Orc" template="Orc" x="37.5" y="10.0">
+    <item name="Wizard's Cell Key" image_name="key" icon_width="0.25" weight="0"/>
+</npc>
+
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wizard's Cell Key"/>
 <item template="Skull" x="40.5" y="2.3"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wizard's Cell Key"/>
 <scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
 <item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
 This is a small book, containing some notes. The writing is barely legible, and gets worse towards the end. You read some of the entries:
@@ -141,13 +167,16 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 </item>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wizard's Cell Key"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wizard's Cell Key"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wizard's Cell Key"/>
 
 <!--passage next to cells-->
 
