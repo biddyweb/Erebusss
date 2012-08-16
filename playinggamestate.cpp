@@ -3699,6 +3699,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     done = true;
                     LOG("clicked on an exit\n");
                     // exit
+                    this->playSound("door");
                     this->closeSubWindow(); // just in case
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true);
@@ -3706,6 +3707,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
                 else if( scenery->getExitLocation().length() > 0 ) {
                     done = true;
+                    this->playSound("door");
                     LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
                     Location *new_location = quest->findLocation(scenery->getExitLocation());
                     ASSERT_LOGGER(new_location != NULL);
