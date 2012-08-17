@@ -305,7 +305,7 @@ public:
     int getBravery() const {
         return this->B;
     }
-    void setSpeed(int Sp) {
+    void setSpeed(float Sp) {
         this->Sp = Sp;
     }
     float getSpeed() const {
