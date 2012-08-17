@@ -603,7 +603,7 @@ void Location::createBoundariesForScenery() {
         Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
         Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
         Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
-        /*if( this->findFloorRegionAt(p0) == NULL ) {
+        if( this->findFloorRegionAt(p0) == NULL ) {
             LOG("can't find floor region for p0 at: %f, %f\n", p0.x, p0.y);
             LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
             throw string("can't find floor region for p0");
@@ -622,7 +622,7 @@ void Location::createBoundariesForScenery() {
             LOG("can't find floor region for p3 at: %f, %f\n", p3.x, p3.y);
             LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
             throw string("can't find floor region for p3");
-        }*/
+        }
         boundary.addPoint(p0);
         boundary.addPoint(p1);
         boundary.addPoint(p2);
