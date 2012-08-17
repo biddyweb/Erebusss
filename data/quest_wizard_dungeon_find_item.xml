@@ -87,7 +87,9 @@ my efforts with the great riches to be found!
 
 <floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
 
-<scenery name="Door" image_name="door_wood" x="21.0" y="14.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="1.5"/>
+<floorregion shape="rect" rect_x="20.5" rect_y="15.0" rect_w="1.0" rect_h="1.0" />
+
+<scenery name="Door" image_name="door_wood" x="21.0" y="15.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
 
 <!-- room with orc-->
 
@@ -119,9 +121,9 @@ my efforts with the great riches to be found!
 <background image_name="background_dark"/>
 
 <floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="5.0" rect_h="12.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="14.5"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
 
-<player_start x="12.5" y="1.5"/>
+<player_start x="12.5" y="2.0"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="4.0" rect_h="2.0"/>
 <scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" w="0.8" h="0.8" blocking="true">
