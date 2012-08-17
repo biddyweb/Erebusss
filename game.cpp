@@ -669,7 +669,7 @@ void Game::showErrorDialog(const string &message) {
     this->getScreen()->enableUpdateTimer(true);
 }
 
-void Game::showInfoDialog(const string &title, const string &message) {
+/*void Game::showInfoDialog(const string &title, const string &message) {
     LOG("Game::showInfoDialog: %s\n", message.c_str());
     this->getScreen()->enableUpdateTimer(false);
     QMessageBox::information(this->getScreen()->getMainWindow(), title.c_str(), message.c_str());
@@ -683,4 +683,4 @@ bool Game::askQuestionDialog(const string &title, const string &message) {
     this->getScreen()->enableUpdateTimer(true);
     LOG("    answer is %d\n", res);
     return res == QMessageBox::Yes;
-}
+}*/

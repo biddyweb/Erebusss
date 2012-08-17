@@ -361,8 +361,8 @@ public:
     static string getDifficultyString(Difficulty difficulty);
 
     void showErrorDialog(const string &message);
-    void showInfoDialog(const string &title, const string &message);
-    bool askQuestionDialog(const string &title, const string &message);
+    /*void showInfoDialog(const string &title, const string &message);
+    bool askQuestionDialog(const string &title, const string &message);*/
 };
 
 extern Game *game_g;

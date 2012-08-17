@@ -23,6 +23,58 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
+InfoDialog::InfoDialog(const string &text, const vector<string> &buttons) {
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    QLabel *label = new QLabel(text.c_str());
+    label->setFont(game_g->getFontSmall());
+    label->setWordWrap(true);
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(label);
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        for(vector<string>::const_iterator iter = buttons.begin(); iter != buttons.end(); ++iter) {
+            const string button_text = *iter;
+            QPushButton *button = new QPushButton(button_text.c_str());
+            game_g->initButton(button);
+            h_layout->addWidget(button);
+            connect(button, SIGNAL(clicked()), this, SLOT(clicked()));
+            buttons_list.push_back(button);
+        }
+    }
+}
+
+void InfoDialog::clicked() {
+    int result = -1;
+    QPushButton *button_sender = static_cast<QPushButton *>(this->sender());
+    for(int i=0;i<buttons_list.size();i++) {
+        const QPushButton *button = buttons_list[i];
+        if( button_sender == button ) {
+            result = i;
+            break;
+        }
+    }
+    ASSERT_LOGGER(result >= 0);
+    if( result == -1 ) {
+        result = 0;
+    }
+    this->done(result);
+}
+
+int InfoDialog::exec() {
+    game_g->getScreen()->setPaused(true);
+    int result = QDialog::exec();
+    game_g->getScreen()->setPaused(false);
+    return result;
+}
+
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
     QGraphicsTextItem(text), time_expire(0), view(view) {
 
@@ -1015,7 +1067,8 @@ void TradeWindow::clickedBuy() {
     }
     else {
         LOG("not enough money\n");
-        game_g->showInfoDialog("Trade", "You do not have enough money to purchase this item.");
+        //game_g->showInfoDialog("Trade", "You do not have enough money to purchase this item.");
+        playing_gamestate->showInfoDialog("You do not have enough money to purchase this item.");
     }
 }
 
@@ -1044,7 +1097,8 @@ void TradeWindow::clickedSell() {
         player_costs.erase(player_costs.begin() + index);
     }
     else {
-        game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
+        //game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
+        playing_gamestate->showInfoDialog("This shop doesn't buy that item.");
     }
 }
 
@@ -1172,7 +1226,8 @@ void CampaignWindow::clickedMagicShop() {
 
 void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
-    game_g->showInfoDialog("Training", "This feature is not yet implemented");
+    //game_g->showInfoDialog("Training", "This feature is not yet implemented");
+    playing_gamestate->showInfoDialog("This feature is not yet implemented");
 }
 
 SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
@@ -1295,7 +1350,8 @@ void SaveGameWindow::clickedSave() {
         QString filename = list->item(index)->text();
         LOG("save as existing file: %s\n", filename.toStdString().c_str());
         if( playing_gamestate->saveGame(filename.toStdString()) ) {
-            game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+            //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+            playing_gamestate->showInfoDialog("The game has been successfully saved.");
         }
         else {
             game_g->showErrorDialog("Failed to save game!");
@@ -1315,7 +1371,8 @@ void SaveGameWindow::clickedDelete() {
     ASSERT_LOGGER(index >= 0 && index < list->count());
     if( index >= 1 ) {
         QString filename = list->item(index)->text();
-        if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
+        //if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
+        if( playing_gamestate->askQuestionDialog("Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
             LOG("delete existing file: %s\n", filename.toStdString().c_str());
             string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
             LOG("full path: %s\n", full_path.c_str());
@@ -1338,14 +1395,16 @@ void SaveGameWindow::clickedSaveNew() {
     bool ok = true;
     if( qfile.exists() ) {
         LOG("file exists!\n");
-        if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
+        //if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
+        if( !playing_gamestate->askQuestionDialog("Are you sure you wish to overwrite an existing save game file?") ) {
             LOG("user says to not save\n");
             ok = false;
         }
     }
     if( ok ) {
         if( playing_gamestate->saveGame(filename.toStdString()) ) {
-            game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+            //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+            playing_gamestate->showInfoDialog("The game has been successfully saved.");
         }
         else {
             game_g->showErrorDialog("Failed to save game!");
@@ -2812,6 +2871,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
                     bool block_visibility = parseBool(block_visibility_s.toString(), true);
+                    QStringRef is_opened_s = reader.attributes().value("is_opened");
+                    bool is_opened = parseBool(is_opened_s.toString(), true);
                     QStringRef door_s = reader.attributes().value("door");
                     bool door = parseBool(door_s.toString(), true);
                     QStringRef exit_s = reader.attributes().value("exit");
@@ -2863,6 +2924,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("scenery can't be both an exit_location and a door");
                     }
                     scenery->setBlocking(blocking, block_visibility);
+                    scenery->setOpened(is_opened);
                     if( opacity_s.length() > 0 ) {
                         float opacity = parseFloat(opacity_s.toString());
                         scenery->setOpacity(opacity);
@@ -3228,10 +3290,12 @@ void PlayingGamestate::clickedOptions() {
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
     if( c_location->hasEnemies(this) ) {
-        game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby.");
+        //game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby.");
+        this->showInfoDialog("You cannot rest here - enemies are nearby.");
         return;
     }
-    if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
+    //if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
+    if( this->askQuestionDialog("Rest until fully healed?") ) {
         int health_restore_percent = 100 - this->player->getHealthPercent();
         int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
         if( time == 0 ) {
@@ -3249,7 +3313,8 @@ void PlayingGamestate::clickedRest() {
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
     if( c_location->hasEnemies(this) ) {
-        game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
+        //game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
+        this->showInfoDialog("You cannot save here - enemies are nearby.");
         return;
     }
     new SaveGameWindow(this);
@@ -3257,6 +3322,7 @@ void PlayingGamestate::clickedSave() {
 
 void PlayingGamestate::clickedQuit() {
     LOG("clickedQuit()\n");
+    this->closeSubWindow();
     this->quitGame();
 }
 
@@ -3310,7 +3376,8 @@ void PlayingGamestate::closeAllSubWindows() {
 void PlayingGamestate::quitGame() {
     //qApp->quit();
 
-    if( game_g->askQuestionDialog("Quit", "Are you sure you wish to quit?") ) {
+    //if( game_g->askQuestionDialog("Quit", "Are you sure you wish to quit?") ) {
+    if( this->askQuestionDialog("Are you sure you wish to quit?") ) {
         GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
         game_g->pushMessage(game_message);
     }
@@ -3425,14 +3492,16 @@ void PlayingGamestate::update() {
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             this->player = NULL;
-            game_g->showInfoDialog("Game over", "You have died!");
+            //game_g->showInfoDialog("Game over", "You have died!");
+            this->showInfoDialog("Game over!\n\nYou have died!");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
     }
     if( delete_characters.size() > 0 ) {
         if( !this->quest->isCompleted() && this->quest->testIfComplete() ) {
-            game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
+            //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
+            this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
         }
     }
 }
@@ -3721,7 +3790,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     string dialog_title;
                     string dialog_text;
                     scenery->getInteractionText(&dialog_title, &dialog_text);
-                    if( game_g->askQuestionDialog(dialog_title, dialog_text) ) {
+                    /*string html_text = "<small>" + dialog_text + "</small>";
+                    if( game_g->askQuestionDialog(dialog_title, html_text) ) {
+                        scenery->interact(this);
+                    }*/
+                    if( this->askQuestionDialog(dialog_text) ) {
                         scenery->interact(this);
                     }
                 }
@@ -4005,6 +4078,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
             fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
             fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+            fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
             fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
             fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
             fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
@@ -4156,4 +4230,27 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
         throw string("Failed to find item's image");
     }
     return image_iter->second;
+}
+
+void PlayingGamestate::showInfoDialog(const string &message) {
+    LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
+    InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message);
+    this->addWidget(dialog);
+    LOG("about to exec\n");
+    dialog->exec();
+    LOG("done\n");
+    //delete dialog;
+    this->closeSubWindow();
+}
+
+bool PlayingGamestate::askQuestionDialog(const string &message) {
+    LOG("PlayingGamestate::askQuestionDialog(%s)\n", message.c_str());
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(message);
+    this->addWidget(dialog);
+    LOG("about to exec\n");
+    int result = dialog->exec();
+    LOG("askQuestionDialog returns %d\n", result);
+    //delete dialog;
+    this->closeSubWindow();
+    return result == 0;
 }

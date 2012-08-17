@@ -43,10 +43,12 @@ void Scenery::removeItem(Item *item) {
 }
 
 void Scenery::setOpened(bool opened) {
-    ASSERT_LOGGER( this->can_be_opened );
-    this->opened = opened;
-    if( this->location != NULL ) {
-        this->location->updateScenery(this);
+    if( opened != this->opened ) {
+        ASSERT_LOGGER( this->can_be_opened );
+        this->opened = opened;
+        if( this->location != NULL ) {
+            this->location->updateScenery(this);
+        }
     }
 }
 
@@ -64,19 +66,19 @@ bool Scenery::isOn(const Character *character) const {
 void Scenery::getInteractionText(string *dialog_title, string *dialog_text) const {
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
         *dialog_title = "Throne";
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\nDo you wish to sit on the throne?";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
         *dialog_title = "Throne";
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\nDo you wish to sit on the throne?";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
         *dialog_title = "Throne";
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\nDo you wish to sit on the throne?";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
         *dialog_title = "Throne";
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\nDo you wish to sit on the throne?";
+        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\n\nDo you wish to sit on the throne?";
     }
     else {
         ASSERT_LOGGER(false);
@@ -84,9 +86,10 @@ void Scenery::getInteractionText(string *dialog_title, string *dialog_text) cons
 }
 
 void Scenery::interact(PlayingGamestate *playing_gamestate) {
-    string dialog_title, result_text;
+    //string dialog_title, result_text;
+    string result_text;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
-        dialog_title = "Throne";
+        //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
             result_text = "As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!";
@@ -99,7 +102,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
-        dialog_title = "Throne";
+        //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
             result_text = "As you sit, you suddenly feel something magically appear in your hands. Gold - 50 gold pieces!";
@@ -116,7 +119,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
-        dialog_title = "Throne";
+        //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
             result_text = "As you sit, you see a flash before your eyes. You have gained great intellectual insight!";
@@ -129,7 +132,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
-        dialog_title = "Throne";
+        //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             if( playing_gamestate->getPlayer()->getHealth() < playing_gamestate->getPlayer()->getMaxHealth() ) {
                 this->interact_state = 1; // only set the state once the health benefit is used
@@ -150,7 +153,8 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
         ASSERT_LOGGER(false);
     }
 
-    game_g->showInfoDialog(dialog_title, result_text);
+    //game_g->showInfoDialog(dialog_title, result_text);
+    playing_gamestate->showInfoDialog(result_text);
 }
 
 Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height)
@@ -599,6 +603,26 @@ void Location::createBoundariesForScenery() {
         Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
         Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
         Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
+        /*if( this->findFloorRegionAt(p0) == NULL ) {
+            LOG("can't find floor region for p0 at: %f, %f\n", p0.x, p0.y);
+            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
+            throw string("can't find floor region for p0");
+        }
+        if( this->findFloorRegionAt(p1) == NULL ) {
+            LOG("can't find floor region for p1 at: %f, %f\n", p1.x, p1.y);
+            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
+            throw string("can't find floor region for p1");
+        }
+        if( this->findFloorRegionAt(p2) == NULL ) {
+            LOG("can't find floor region for p2 at: %f, %f\n", p2.x, p2.y);
+            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
+            throw string("can't find floor region for p2");
+        }
+        if( this->findFloorRegionAt(p3) == NULL ) {
+            LOG("can't find floor region for p3 at: %f, %f\n", p3.x, p3.y);
+            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
+            throw string("can't find floor region for p3");
+        }*/
         boundary.addPoint(p0);
         boundary.addPoint(p1);
         boundary.addPoint(p2);
