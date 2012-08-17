@@ -47,7 +47,7 @@ const string savegame_ext = ".xml";
 const string savegame_folder = "savegames/";
 
 const int versionMajor = 0;
-const int versionMinor = 1;
+const int versionMinor = 2;
 
 enum Difficulty {
     DIFFICULTY_EASY = 0,
