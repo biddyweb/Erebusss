@@ -19,7 +19,7 @@ QT += xml
 
 symbian:TARGET.UID3 = 0xE11B6032
 
-VERSION = 0.1
+VERSION = 0.2 # remember to update version in game.h
 
 # Smart Installer package's UID
 # This UID is from the protected range 
