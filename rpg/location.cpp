@@ -63,22 +63,21 @@ bool Scenery::isOn(const Character *character) const {
     return false;
 }
 
-void Scenery::getInteractionText(string *dialog_title, string *dialog_text) const {
+void Scenery::getInteractionText(string *dialog_text) const {
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
-        *dialog_title = "Throne";
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
-        *dialog_title = "Throne";
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
-        *dialog_title = "Throne";
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\n\nDo you wish to sit on the throne?";
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
-        *dialog_title = "Throne";
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\n\nDo you wish to sit on the throne?";
+    }
+    else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
+        *dialog_text = "An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?";
     }
     else {
         ASSERT_LOGGER(false);
@@ -147,6 +146,29 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
             result_text = "As you sit, you are suddenly gripped by a terrible pain over your entire body. Your watch in horror as old wounds open up before your eyes.";
             int damage = rollDice(10, 6, 0);
             playing_gamestate->getPlayer()->decreaseHealth(playing_gamestate, damage, false, false);
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
+        result_text = "You pray, but nothing seems to happen.";
+        if( this->interact_state == 0 ) {
+            int roll = rollDice(1, 3, 0);
+            LOG("shrine: roll a %d\n", roll);
+            this->interact_state = 1;
+            if( roll == 1 ) {
+                if( playing_gamestate->getPlayer()->getHealth() < playing_gamestate->getPlayer()->getMaxHealth() ) {
+                    result_text = "You have been blessed with healing!";
+                    playing_gamestate->getPlayer()->restoreHealth();
+                }
+            }
+            else if( roll == 2 ) {
+                result_text = "You are rewarded by the diety for your courage on this quest, with a gift of gold.";
+                int gold = rollDice(3, 6, 0);
+                playing_gamestate->getPlayer()->addGold(gold);
+            }
+            else if( roll == 3 ) {
+                result_text = "You are granted the gift of wisdom by the diety.";
+                playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
+            }
         }
     }
     else {

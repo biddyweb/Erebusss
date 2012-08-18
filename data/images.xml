@@ -29,6 +29,7 @@
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
+<image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="boulders" filename="gfx/textures/scenery/boulders.png"/>
 <image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"

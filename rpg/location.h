@@ -238,7 +238,7 @@ public:
         return this->opened;
     }
     bool isOn(const Character *character) const;
-    void getInteractionText(string *dialog_title, string *dialog_text) const;
+    void getInteractionText(string *dialog_text) const;
     void interact(PlayingGamestate *playing_gamestate);
 };
 

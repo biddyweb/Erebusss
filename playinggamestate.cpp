@@ -3740,13 +3740,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 else if( scenery->getInteractType().length() > 0 ) {
                     done = true;
                     LOG("interact_type: %s\n", scenery->getInteractType().c_str());
-                    string dialog_title;
                     string dialog_text;
-                    scenery->getInteractionText(&dialog_title, &dialog_text);
-                    /*string html_text = "<small>" + dialog_text + "</small>";
-                    if( game_g->askQuestionDialog(dialog_title, html_text) ) {
-                        scenery->interact(this);
-                    }*/
+                    scenery->getInteractionText(&dialog_text);
                     if( this->askQuestionDialog(dialog_text) ) {
                         scenery->interact(this);
                     }

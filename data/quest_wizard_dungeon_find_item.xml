@@ -120,10 +120,10 @@ my efforts with the great riches to be found!
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
+<!--<player_start x="12.5" y="2.0"/>-->
+
 <floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="5.0" rect_h="12.0"/>
 <scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
-
-<player_start x="12.5" y="2.0"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="4.0" rect_h="2.0"/>
 <scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" w="0.8" h="0.8" blocking="true">
@@ -222,8 +222,12 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
+<player_start x="12.5" y="2.0"/>
+
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
 <scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
+
+<scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.5" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
 
 </location>
 
