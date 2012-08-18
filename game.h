@@ -46,6 +46,7 @@ const string savegame_root = "savegame_";
 const string savegame_ext = ".xml";
 const string savegame_folder = "savegames/";
 
+// remember to update version in PRO file!
 const int versionMajor = 0;
 const int versionMinor = 2;
 
@@ -116,7 +117,6 @@ public:
     void setWebView(QWebView *webView);
 };
 
-//class AnimationSet : public QGraphicsItem {
 class AnimationSet {
 public:
     enum AnimationType {
@@ -168,8 +168,7 @@ class AnimationLayer {
 public:
     AnimationLayer(int size) : size(size) {
     }
-    ~AnimationLayer() {
-    }
+    ~AnimationLayer();
 
     void addAnimationSet(const string &name, const AnimationSet *animation_set) {
         //this->animation_sets[name] = animation_set;
@@ -190,11 +189,8 @@ public:
     static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
 };
 
-//class AnimatedObject : public QGraphicsPixmapItem {
 class AnimatedObject : public QGraphicsItem {
-    //AnimationLayer *animation_layer;
     vector<AnimationLayer *> animation_layers;
-    //const AnimationSet *c_animation_set;
     bool set_c_animation_name;
     string c_animation_name;
     vector<const AnimationSet *> c_animation_sets;
@@ -211,8 +207,6 @@ public:
     AnimatedObject();
     virtual ~AnimatedObject();
 
-    //void setAnimationSet(AnimationSet *animation_set);
-    //void setAnimationLayer(AnimationLayer *animation_layer);
     void addAnimationLayer(AnimationLayer *animation_layer);
     void clearAnimationLayers();
     void setAnimationSet(const string &name);

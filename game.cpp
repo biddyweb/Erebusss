@@ -107,6 +107,7 @@ AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector
 }
 
 AnimationSet::~AnimationSet() {
+    //qDebug("AnimationSet::~AnimationSet(): animation type %d, n_frames = %d", this->animation_type, this->n_frames);
 }
 
 const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) const {
@@ -145,6 +146,13 @@ AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation
     }
     AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
     return animation_set;
+}
+
+AnimationLayer::~AnimationLayer() {
+    for(map<string, const AnimationSet *>::iterator iter = this->animation_sets.begin(); iter != this->animation_sets.end(); ++iter) {
+        const AnimationSet *animation_set = iter->second;
+        delete animation_set;
+    }
 }
 
 AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
