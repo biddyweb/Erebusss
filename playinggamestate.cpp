@@ -44,6 +44,7 @@ InfoDialog::InfoDialog(const string &text, const vector<string> &buttons) {
             const string button_text = *iter;
             QPushButton *button = new QPushButton(button_text.c_str());
             game_g->initButton(button);
+            button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             h_layout->addWidget(button);
             connect(button, SIGNAL(clicked()), this, SLOT(clicked()));
             buttons_list.push_back(button);
@@ -1582,7 +1583,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         throw string("image element has no name attribute or is zero length");
                     }
                     QStringRef imagetype_s = reader.attributes().value("imagetype");
-                    LOG("image element type: %s name: %s imagetype: %s\n", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
+                    qDebug("image element type: %s name: %s imagetype: %s", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
                     QPixmap pixmap;
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0;
@@ -1594,7 +1595,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             throw string("image element has no filename attribute or is zero length");
                         }
                         QString filename = ":/" + filename_s.toString();
-                        LOG("    filename: %s\n", filename.toStdString().c_str());
+                        qDebug("    filename: %s", filename.toStdString().c_str());
                         QStringRef xpos_s = reader.attributes().value("xpos");
                         QStringRef ypos_s = reader.attributes().value("ypos");
                         QStringRef width_s = reader.attributes().value("width");
@@ -1605,7 +1606,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             ypos = parseInt(ypos_s.toString());
                             width = parseInt(width_s.toString());
                             height = parseInt(height_s.toString());
-                            LOG("    clip to: %d, %d, %d, %d\n", xpos, ypos, width, height);
+                            qDebug("    clip to: %d, %d, %d, %d", xpos, ypos, width, height);
                         }
                         pixmap = game_g->loadImage(filename.toStdString().c_str(), clip, xpos, ypos, width, height);
                     }
@@ -1654,7 +1655,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         if( imagetype_s.length() == 0 && filename_opened_s.length() != 0 ) {
                             // n.b., opened image can only be specified for loading images
                             QString filename_opened = ":/" + filename_opened_s.toString();
-                            LOG("load opened image: %s\n", filename_opened.toStdString().c_str());
+                            qDebug("load opened image: %s", filename_opened.toStdString().c_str());
                             this->scenery_opened_images[name_s.toString().toStdString()] = game_g->loadImage(filename_opened.toStdString().c_str(), clip, xpos, ypos, width, height);
                         }
                     }
@@ -1835,7 +1836,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
             {
                 if( reader.name() == "npc" ) {
                     QStringRef name_s = reader.attributes().value("name");
-                    LOG("found npc template: %s\n", name_s.toString().toStdString().c_str());
+                    qDebug("found npc template: %s", name_s.toString().toStdString().c_str());
                     QStringRef animation_name_s = reader.attributes().value("animation_name");
                     QStringRef FP_s = reader.attributes().value("FP");
                     int FP = parseInt(FP_s.toString());
@@ -1966,7 +1967,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
             {
                 if( reader.name() == "quest" ) {
                     QStringRef filename_s = reader.attributes().value("filename");
-                    LOG("found quest: %s\n", filename_s.toString().toStdString().c_str());
+                    qDebug("found quest: %s", filename_s.toString().toStdString().c_str());
                     if( filename_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("quest doesn't have filename info");
@@ -2012,13 +2013,13 @@ PlayingGamestate::~PlayingGamestate() {
     }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
         Item *item = iter->second;
-        LOG("about to delete standard item: %d\n", item);
-        LOG("    name: %s\n", item->getName().c_str());
+        qDebug("about to delete standard item: %d", item);
+        qDebug("    name: %s", item->getName().c_str());
         delete item;
     }
     for(map<string, CharacterTemplate *>::iterator iter = this->character_templates.begin(); iter != this->character_templates.end(); ++iter) {
         CharacterTemplate *character_template = iter->second;
-        LOG("about to delete character template: %d\n", character_template);
+        qDebug("about to delete character template: %d", character_template);
         delete character_template;
     }
     for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
