@@ -56,7 +56,7 @@ bool parseBool(const QString &str, bool allow_empty) {
 }
 
 QPixmap createNoise(int w, int h, float scale_u, float scale_v, const unsigned char filter_max[3], const unsigned char filter_min[3], NOISEMODE_t noisemode, int n_iterations) {
-    LOG("create noise(%d, %d, %f, %f, {%d, %d, %d}, {%d, %d, %d}, %d, %d\n", w, h, scale_u, scale_v, filter_max[0], filter_max[1], filter_max[2], filter_min[0], filter_min[1], filter_min[2], noisemode, n_iterations);
+    qDebug("create noise(%d, %d, %f, %f, {%d, %d, %d}, {%d, %d, %d}, %d, %d", w, h, scale_u, scale_v, filter_max[0], filter_max[1], filter_max[2], filter_min[0], filter_min[1], filter_min[2], noisemode, n_iterations);
     QImage image(w, h, QImage::Format_ARGB32);
     image.fill(0); // needed to initialise image!
 

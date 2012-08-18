@@ -75,7 +75,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
 }
 
 Character::~Character() {
-    LOG("Character::~Character(): %s\n", this->name.c_str());
+    qDebug("Character::~Character(): %sn", this->name.c_str());
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
     }

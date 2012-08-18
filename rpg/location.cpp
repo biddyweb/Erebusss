@@ -208,15 +208,10 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
     }
 
-    LOG("1\n");
     if( character == playing_gamestate->getPlayer() ) {
-        LOG("2\n");
         playing_gamestate->addTextEffect(text, character->getPos(), 4000);
-        LOG("3\n");
         playing_gamestate->playSound("click");
-        LOG("4\n");
     }
-    LOG("5\n");
 
     return character_affected;
 }
@@ -427,7 +422,7 @@ void Location::removeTrap(Trap *trap) {
 }
 
 void Location::createBoundariesForRegions() {
-    LOG("Location::createBoundariesForRegions()\n");
+    qDebug("Location::createBoundariesForRegions()");
     // imprint coi vertices
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -580,7 +575,7 @@ void Location::createBoundariesForRegions() {
 }
 
 void Location::createBoundariesForScenery() {
-    LOG("Location::createBoundariesForScenery()\n");
+    qDebug("Location::createBoundariesForScenery()");
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
         Scenery *scenery = *iter;
         if( !scenery->isBlocking() ) {
@@ -629,7 +624,7 @@ void Location::createBoundariesForScenery() {
         boundary.addPoint(p3);
         this->addBoundary(boundary);
     }
-    LOG("    done\n");
+    qDebug("    done");
 }
 
 void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const {
@@ -970,7 +965,7 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
 }*/
 
 vector<Vector2D> Location::calculatePathWayPoints() const {
-    LOG("Location::calculatePathWayPoints");
+    qDebug("Location::calculatePathWayPoints()");
     vector<Vector2D> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
@@ -1019,7 +1014,7 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
 }*/
 
 void Location::calculateDistanceGraph() {
-    LOG("Location::calculateDistanceGraph()\n");
+    qDebug("Location::calculateDistanceGraph()");
     int time_s = clock();
     if( this->distance_graph != NULL ) {
         delete this->distance_graph;
@@ -1057,7 +1052,7 @@ void Location::calculateDistanceGraph() {
             }
         }
     }
-    LOG("Location::calculateDistanceGraph() total time taken: %d\n", clock() - time_s);
+    qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
 }
 
 bool Location::testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const {

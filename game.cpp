@@ -162,13 +162,13 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     AnimationLayer *layer = new AnimationLayer(image.height() / N_DIRECTIONS);
     /*LOG("AnimationLayer::create: %s\n", filename);
     QPixmap image = game_g->loadImage(filename);*/
-    LOG("    loaded image\n");
+    qDebug("    loaded image");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
         AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, layer->size, animation_layer_definition.position, animation_layer_definition.n_frames);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
-    LOG("    done\n");
+    qDebug("    done");
     return layer;
 }
 
