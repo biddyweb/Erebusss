@@ -57,5 +57,6 @@
         <file>gfx/textures/scenery/table.png</file>
         <file>gfx/textures/scenery/bloodstain.png</file>
         <file>gfx/textures/scenery/bloodstain2.png</file>
+        <file>gfx/textures/floor_paved_blood.png</file>
     </qresource>
 </RCC>

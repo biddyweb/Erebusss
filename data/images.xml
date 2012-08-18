@@ -4,6 +4,7 @@
 <image type="generic" name="wall" filename="gfx/textures/wall.png"/>
 <image type="generic" name="floor_rock" filename="gfx/textures/floor_rock.png"/>
 <image type="generic" name="floor_paved" filename="gfx/textures/floor_paved.png"/>
+<image type="generic" name="floor_paved_blood" filename="gfx/textures/floor_paved_blood.png"/>
 <!--<image type="generic" name="background_dark" imagetype="perlin" max_red="10" max_green="10" max_blue="50" min_red="0" min_green="0" min_blue="0"/>-->
 <image type="generic" name="background_brown" imagetype="perlin" max_red="60" max_green="30" max_blue="00" min_red="20" min_green="10" min_blue="0"/>
 <image type="generic" name="background_dark" imagetype="perlin" max_red="40" max_green="40" max_blue="50" min_red="0" min_green="0" min_blue="0"/>
