@@ -116,7 +116,7 @@ my efforts with the great riches to be found!
 
 <location name="level_1">
 
-<floor image_name="floor_paved"/>
+<floor image_name="floor_paved_blood"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
@@ -187,14 +187,15 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 <floorregion shape="rect" rect_x="48.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="45.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
 
-<npc name="Orc" template="Orc" x="47.0" y="9.0">
+<npc name="Orc" template="Orc" x="47.0" y="10.0">
     <item name="Wizard's Cell Key" image_name="key" icon_width="0.25" weight="0"/>
 </npc>
 
+<scenery name="Table" image_name="table" x="46.0" y="8.0" size="1.2" blocking="true"/>
 <scenery name="Chest" image_name="chest" x="48.5" y="7.5" size="0.8" blocking="true">
     <gold amount="27"/>
     <item name="Book" image_name="book" icon_width="0.25" weight="1">
-This book seems to be a record of prisoners that were kept here:
+This book seems to be a record of unfortunate prisoners that were kept in this terrible place:
     </item>
 </scenery>
 
@@ -205,6 +206,24 @@ This book seems to be a record of prisoners that were kept here:
     <scenery name="Door" image_name="door_metal" x="50.25" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Blood Stain" image_name="bloodstain2" x="53.0" y="12.2" size="0.7" opacity="0.9" draw_type="background"/>
+<scenery name="Skeleton" image_name="skeleton" x="51.5" y="11.4" size="0.65" draw_type="background"/>
+<scenery name="Skeleton" image_name="skeleton" x="54.0" y="13.0" size="0.75" draw_type="background"/>
+
+<!--exit to next location-->
+
+<floorregion shape="rect" rect_x="48.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood" x="48.5" y="13.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="2.0"/>
+
+</location>
+
+<location name="level_2">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
 
 </location>
 
