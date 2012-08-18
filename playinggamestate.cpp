@@ -2553,6 +2553,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: player_start element wasn't expected here");
                     }
+                    if( done_player_start ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: duplicate player_start element");
+                    }
                     QStringRef pos_x_s = reader.attributes().value("x");
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
@@ -3750,13 +3754,15 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
         }
 
-        // nudge position due to boundaries
-        dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
-        if( dest != player->getPos() ) {
-            qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
-            player->setDestination(dest.x, dest.y, ignore_scenery);
-            if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
-                this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+        if( !done ) {
+            // nudge position due to boundaries
+            dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
+            if( dest != player->getPos() ) {
+                qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
+                player->setDestination(dest.x, dest.y, ignore_scenery);
+                if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
+                    this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+                }
             }
         }
     }
