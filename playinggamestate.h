@@ -5,6 +5,9 @@
 #include <sstream>
 using std::stringstream;
 
+#include <map>
+using std::map;
+
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
 //#include <SLES/OpenSLES.h>
@@ -13,39 +16,16 @@ using std::stringstream;
 #include <phonon/AudioOutput>
 #endif
 
-#include "game.h"
+#include "common.h"
 #include "gamestate.h"
+#include "rpg/character.h"
+#include "rpg/location.h"
 
 class MainGraphicsView;
 class Sound;
-
-class InfoDialog : public QDialog {
-    Q_OBJECT
-
-    vector<QPushButton *> buttons_list;
-
-private slots:
-    void clicked();
-
-public:
-    InfoDialog(const string &text, const vector<string> &buttons);
-    virtual ~InfoDialog() {
-    }
-
-    static InfoDialog *createInfoDialogOkay(const string &text) {
-        vector<string> buttons;
-        buttons.push_back("Okay");
-        return new InfoDialog(text, buttons);
-    }
-    static InfoDialog *createInfoDialogYesNo(const string &text) {
-        vector<string> buttons;
-        buttons.push_back("Yes");
-        buttons.push_back("No");
-        return new InfoDialog(text, buttons);
-    }
-
-    virtual int exec();
-};
+class AnimationLayer;
+class Shop;
+class Currency;
 
 class TextEffect : public QGraphicsTextItem {
     int time_expire;

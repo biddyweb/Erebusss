@@ -19,7 +19,7 @@ QT += xml
 
 symbian:TARGET.UID3 = 0xE11B6032
 
-VERSION = 0.2 # remember to update version in game.h
+VERSION = 0.2 # remember to update version in common.h
 
 # Smart Installer package's UID
 # This UID is from the protected range 
@@ -74,7 +74,8 @@ SOURCES += main.cpp mainwindow.cpp \
     playinggamestate.cpp \
     optionsgamestate.cpp \
     gamestate.cpp \
-    logiface.cpp
+    logiface.cpp \
+    infodialog.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -86,7 +87,9 @@ HEADERS += mainwindow.h \
     playinggamestate.h \
     optionsgamestate.h \
     gamestate.h \
-    logiface.h
+    logiface.h \
+    infodialog.h \
+    common.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

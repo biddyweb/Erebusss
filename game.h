@@ -1,7 +1,6 @@
 #pragma once
 
-#include "rpg/character.h"
-#include "rpg/location.h"
+#include "common.h"
 
 #include <QtGui>
 #include <QtWebKit/QWebView>
@@ -13,6 +12,9 @@
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
 #endif
+
+#include <vector>
+using std::vector;
 
 #include <queue>
 using std::queue;
@@ -36,38 +38,9 @@ class Currency;
 class Shop;
 class CharacterTemplate;
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-const bool mobile_c = true;
-#else
-const bool mobile_c = false;
-#endif
-
 const string savegame_root = "savegame_";
 const string savegame_ext = ".xml";
 const string savegame_folder = "savegames/";
-
-// remember to update version in PRO file!
-const int versionMajor = 0;
-const int versionMinor = 2;
-
-enum Difficulty {
-    DIFFICULTY_EASY = 0,
-    DIFFICULTY_MEDIUM = 1,
-    DIFFICULTY_HARD = 2,
-    N_DIFFICULTIES = 3
-};
-
-enum Direction {
-    DIRECTION_W = 0,
-    DIRECTION_NW = 1,
-    DIRECTION_N = 2,
-    DIRECTION_NE = 3,
-    DIRECTION_E = 4,
-    DIRECTION_SE = 5,
-    DIRECTION_S = 6,
-    DIRECTION_SW = 7,
-    N_DIRECTIONS = 8
-};
 
 #ifndef Q_OS_ANDROID
 class Sound {
