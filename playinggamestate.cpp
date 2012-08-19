@@ -4127,6 +4127,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
                 fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
             }
+            fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
             fprintf(file, " name=\"%s\"", character->getName().c_str());
             fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
             fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
