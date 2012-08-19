@@ -330,6 +330,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         }
         if( !this->canMove() ) {
             // can't move!
+            if( this->listener != NULL ) {
+                this->listener->characterSetAnimation(this, this->listener_data, "", false);
+            }
         }
         else {
             Vector2D dest = this->path.at(0);
