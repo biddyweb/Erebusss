@@ -283,7 +283,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             time_last_action_ms = elapsed_ms;
                             if( this->listener != NULL ) {
                                 string anim = is_ranged ? "ranged" : "attack";
-                                this->listener->characterSetAnimation(this, this->listener_data, anim);
+                                this->listener->characterSetAnimation(this, this->listener_data, anim, true);
                                 Vector2D dir = target_npc->getPos() - this->getPos();
                                 if( dist > 0.0f ) {
                                     dir.normalise();
@@ -339,29 +339,35 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             float step = (this->Sp * time_ms)/1000.0f;
             float dist = diff.magnitude();
             Vector2D new_pos = pos;
+            bool next_seg = false;
             if( step >= dist ) {
                 /*new_pos = this->dest;
                 this->setStateIdle();*/
                 new_pos = dest;
-                this->path.erase(this->path.begin());
-                if( this->path.size() == 0 ) {
-                    this->setStateIdle();
-                }
+                next_seg = true;
             }
             else {
-                /*diff_x /= dist;
-                diff_y /= dist;
-                new_pos.x += step * diff_x;
-                new_pos.y += step * diff_y;*/
                 diff /= dist;
                 new_pos += diff * step;
             }
             if( location->collideWithTransient(this, new_pos) ) {
                 // can't move - so stay where we are
                 // though we don't modify the path, so we can continue if the obstacle moves
+                if( this->listener != NULL ) {
+                    this->listener->characterSetAnimation(this, this->listener_data, "", false);
+                }
             }
             else {
+                if( this->listener != NULL ) {
+                    this->listener->characterSetAnimation(this, this->listener_data, "run", false);
+                }
                 this->setPos(new_pos.x, new_pos.y);
+                if( next_seg ) {
+                    this->path.erase(this->path.begin());
+                    if( this->path.size() == 0 ) {
+                        this->setStateIdle();
+                    }
+                }
             }
         }
     }
@@ -374,7 +380,7 @@ void Character::setStateIdle() {
     has_path = false;
     is_hitting = false;
     if( this->listener != NULL ) {
-        this->listener->characterSetAnimation(this, this->listener_data, "");
+        this->listener->characterSetAnimation(this, this->listener_data, "", false);
     }
 }
 
@@ -458,7 +464,7 @@ void Character::kill(const PlayingGamestate *playing_gamestate) {
     this->is_dead = true;
     this->time_of_death_ms = elapsed_ms;
     if( this->listener != NULL ) {
-        this->listener->characterSetAnimation(this, this->listener_data, "death");
+        this->listener->characterSetAnimation(this, this->listener_data, "death", false);
     }
     if( this->location != NULL ) {
         while( this->items.size() > 0 ) {
@@ -603,12 +609,11 @@ int Character::calculateItemsWeight() const {
 
 void Character::setPath(vector<Vector2D> &path) {
     //LOG("Character::setPath() for %s\n", this->getName().c_str());
-    bool old_has_path = this->has_path;
     this->has_path = true;
     this->path = path;
     this->is_hitting = false;
-    if( this->listener != NULL && !old_has_path ) {
-        this->listener->characterSetAnimation(this, this->listener_data, "run");
+    if( this->listener != NULL ) {
+        this->listener->characterSetAnimation(this, this->listener_data, "run", false);
     }
 }
 

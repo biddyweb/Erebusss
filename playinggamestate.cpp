@@ -3559,9 +3559,9 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
     }
 }
 
-void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name) {
+void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart) {
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
-    object->setAnimationSet(name);
+    object->setAnimationSet(name,  force_restart);
 }
 
 void PlayingGamestate::characterDeath(Character *character, void *user_data) {

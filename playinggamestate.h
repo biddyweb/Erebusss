@@ -347,7 +347,7 @@ public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
     virtual void characterMoved(Character *character, void *user_data);
-    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name);
+    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart);
     virtual void characterDeath(Character *character, void *user_data);
 
     virtual void locationAddItem(const Location *location, Item *item);

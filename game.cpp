@@ -248,8 +248,10 @@ void AnimatedObject::clearAnimationLayers() {
     this->clearStaticImage();
 }
 
-void AnimatedObject::setAnimationSet(const string &name) {
+void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
+    bool is_new = false;
     if( !this->set_c_animation_name || this->c_animation_name != name ) {
+        is_new = true;
         //qDebug("set animation set: %s", name.c_str());
         this->c_animation_sets.clear();
         for(vector<AnimationLayer *>::const_iterator iter = animation_layers.begin(); iter != animation_layers.end(); ++iter) {
@@ -262,18 +264,20 @@ void AnimatedObject::setAnimationSet(const string &name) {
             this->c_animation_sets.push_back(c_animation_set);
         }
     }
-    else {
+    /*else {
         // useful as a warning, in case we didn't intend to do this
         qDebug("reset animation set: %s", name.c_str());
+    }*/
+
+    if( is_new || force_restart ) {
+        animation_time_start_ms = 0;
+        //this->setFrame(0);
+        this->c_frame = 0;
+        this->update();
+
+        this->set_c_animation_name = true;
+        this->c_animation_name = name;
     }
-
-    animation_time_start_ms = 0;
-    //this->setFrame(0);
-    this->c_frame = 0;
-    this->update();
-
-    this->set_c_animation_name = true;
-    this->c_animation_name = name;
 }
 
 void AnimatedObject::setDirection(Direction c_direction) {

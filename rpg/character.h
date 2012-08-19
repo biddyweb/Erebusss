@@ -40,7 +40,7 @@ public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir)=0;
     virtual void characterMoved(Character *character, void *user_data)=0;
-    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name)=0;
+    virtual void characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart)=0;
     virtual void characterDeath(Character *character, void *user_data)=0;
 };
 
@@ -258,7 +258,7 @@ public:
             if( this->is_hitting ) {
                 this->is_hitting = false;
                 if( this->listener != NULL ) {
-                    this->listener->characterSetAnimation(this, this->listener_data, "");
+                    this->listener->characterSetAnimation(this, this->listener_data, "", true);
                 }
             }
         }

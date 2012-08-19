@@ -187,7 +187,7 @@ public:
 
     void addAnimationLayer(AnimationLayer *animation_layer);
     void clearAnimationLayers();
-    void setAnimationSet(const string &name);
+    void setAnimationSet(const string &name, bool force_restart);
     void setDirection(Direction c_direction);
     int getWidth() const;
     int getHeight() const;
