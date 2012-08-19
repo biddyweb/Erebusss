@@ -8,10 +8,12 @@ using std::string;
 #include <vector>
 using std::vector;
 
+class QWebView;
+
 class InfoDialog : public QDialog {
     Q_OBJECT
 
-    QTextEdit *label;
+    QWebView *label;
     vector<QPushButton *> buttons_list;
 
 private slots:

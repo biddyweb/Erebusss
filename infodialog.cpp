@@ -3,15 +3,20 @@
 #include "qt_screen.h"
 #include "logiface.h"
 
+#include <QWebFrame>
+
 InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz, bool small_buttons) {
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
     //QLabel *label = new QLabel(text.c_str());
     //label->setWordWrap(true);
-    label = new QTextEdit(text.c_str());
+    //label = new QTextEdit(text.c_str());
+    label = new QWebView();
+    game_g->setWebView(label);
+    label->setHtml(text.c_str());
     label->setFont(game_g->getFontSmall());
-    label->setReadOnly(true);
+    //label->setReadOnly(true);
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(label);
 
@@ -56,7 +61,8 @@ void InfoDialog::clicked() {
 }
 
 void InfoDialog::scrollToBottom() {
-    this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
+    //this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
+    this->label->page()->mainFrame()->setScrollBarValue(Qt::Vertical, this->label->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
 }
 
 int InfoDialog::exec() {
