@@ -2676,6 +2676,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         npc->setXP(xp);
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString(), true) );
+                        QStringRef can_talk_s = reader.attributes().value("can_talk");
+                        if( can_talk_s.length() > 0 ) {
+                            bool can_talk = parseBool(can_talk_s.toString());
+                            npc->setCanTalk(can_talk);
+                        }
                     }
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
@@ -2692,6 +2697,32 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     location->addCharacter(npc, pos_x, pos_y);
                     questXMLType = QUEST_XML_TYPE_NPC;
+                }
+                else if( reader.name() == "opening_initial") {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: opening_initial element wasn't expected here");
+                    }
+                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    npc->setTalkOpeningInitial(text.toStdString());
+                }
+                else if( reader.name() == "opening_later") {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: opening_later element wasn't expected here");
+                    }
+                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    npc->setTalkOpeningLater(text.toStdString());
+                }
+                else if( reader.name() == "talk") {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: talk element wasn't expected here");
+                    }
+                    QStringRef question_s = reader.attributes().value("question");
+                    QString question = question_s.toString();
+                    QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    npc->addTalkItem(question.toStdString(), answer.toStdString());
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ammo" || reader.name() == "currency" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
@@ -3607,6 +3638,40 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     done = true;
                     target_npc = character;
                     min_dist = dist_from_click;
+                    if( target_npc->canTalk() ) {
+                        float dist_from_player = (player->getPos() - character->getPos()).magnitude();
+                        if( dist_from_player <= talk_range_c ) {
+                            stringstream message;
+                            message << character->getName();
+                            message << ": ";
+                            message << character->getTalkOpeningInitial();
+                            message << "\n";
+                            for(;;) {
+                                vector<string> buttons;
+                                vector<string> answers;
+                                for(map<string, string>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                                    string question = iter->first;
+                                    string answer = iter->second;
+                                    buttons.push_back(question);
+                                    answers.push_back(answer);
+                                }
+                                buttons.push_back("Goodbye");
+                                InfoDialog *dialog = new InfoDialog(message.str(), buttons, false);
+                                this->addWidget(dialog);
+                                int result = dialog->exec();
+                                this->closeSubWindow();
+                                ASSERT_LOGGER(result >= 0);
+                                ASSERT_LOGGER(result < buttons.size());
+                                if( result == buttons.size()-1 ) {
+                                    break;
+                                }
+                                else {
+                                    message << answers.at(result);
+                                    message << "\n";
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -4193,10 +4258,7 @@ void PlayingGamestate::showInfoDialog(const string &message) {
     LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
     InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message);
     this->addWidget(dialog);
-    LOG("about to exec\n");
     dialog->exec();
-    LOG("done\n");
-    //delete dialog;
     this->closeSubWindow();
 }
 
@@ -4204,10 +4266,8 @@ bool PlayingGamestate::askQuestionDialog(const string &message) {
     LOG("PlayingGamestate::askQuestionDialog(%s)\n", message.c_str());
     InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(message);
     this->addWidget(dialog);
-    LOG("about to exec\n");
     int result = dialog->exec();
     LOG("askQuestionDialog returns %d\n", result);
-    //delete dialog;
     this->closeSubWindow();
     return result == 0;
 }

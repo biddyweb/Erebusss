@@ -17,20 +17,20 @@ private slots:
     void clicked();
 
 public:
-    InfoDialog(const string &text, const vector<string> &buttons);
+    InfoDialog(const string &text, const vector<string> &buttons, bool horiz);
     virtual ~InfoDialog() {
     }
 
     static InfoDialog *createInfoDialogOkay(const string &text) {
         vector<string> buttons;
         buttons.push_back("Okay");
-        return new InfoDialog(text, buttons);
+        return new InfoDialog(text, buttons, true);
     }
     static InfoDialog *createInfoDialogYesNo(const string &text) {
         vector<string> buttons;
         buttons.push_back("Yes");
         buttons.push_back("No");
-        return new InfoDialog(text, buttons);
+        return new InfoDialog(text, buttons, true);
     }
 
     virtual int exec();

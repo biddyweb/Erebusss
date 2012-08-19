@@ -9,6 +9,9 @@ using std::vector;
 #include <set>
 using std::set;
 
+#include <map>
+using std::map;
+
 #include "utils.h"
 
 class Character;
@@ -34,6 +37,7 @@ class Scenery;
 const float npc_visibility_c = 10.0f;
 const float npc_radius_c = 0.25f;
 const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
+const float talk_range_c = hit_range_c;
 
 class CharacterListener {
 public:
@@ -152,6 +156,12 @@ class Character {
 
     int xp;
     int xp_worth;
+
+    // npc talk information
+    bool can_talk;
+    string talk_opening_initial;
+    string talk_opening_later;
+    map<string, string> talk_items;
 
     Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
@@ -428,5 +438,34 @@ public:
     }
     void setXPWorth(int xp_worth) {
         this->xp_worth = xp_worth;
+    }
+
+    bool canTalk() const {
+        return this->can_talk;
+    }
+    void setCanTalk(bool can_talk) {
+        this->can_talk = can_talk;
+    }
+    string getTalkOpeningInitial() const {
+        return this->talk_opening_initial;
+    }
+    void setTalkOpeningInitial(const string &talk_opening_initial) {
+        this->talk_opening_initial = talk_opening_initial;
+    }
+    string getTalkOpeningLater() const {
+        return this->talk_opening_later;
+    }
+    void setTalkOpeningLater(const string &talk_opening_initial) {
+        this->talk_opening_later = talk_opening_later;
+    }
+    void addTalkItem(const string &question, const string &answer) {
+        this->talk_items[question] = answer;
+    }
+    string getTalkItem(const string &question) const;
+    map<string, string>::const_iterator talkItemsBegin() const {
+        return this->talk_items.begin();
+    }
+    map<string, string>::const_iterator talkItemsEnd() const {
+        return this->talk_items.end();
     }
 };

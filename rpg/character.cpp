@@ -47,7 +47,8 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0)
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
+    can_talk(false)
 {
 
 }
@@ -64,7 +65,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0)
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
+    can_talk(false)
 {
     this->animation_name = character_template.getAnimationName();
     this->initialiseHealth( character_template.getHealth() );
@@ -723,4 +725,13 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
         xp_str << change << " XP";
         playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 0, 0);
     }
+}
+
+string Character::getTalkItem(const string &question) const {
+    map<string, string>::const_iterator iter = this->talk_items.find(question);
+    if( iter == this->talk_items.end() ) {
+        ASSERT_LOGGER(false);
+        return "";
+    }
+    return iter->second;
 }

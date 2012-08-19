@@ -256,7 +256,19 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
     health="10" max_health="10"
     is_hostile="false"
     xp_worth="0"
-/>
+    can_talk="true"
+>
+<opening_initial>My goodness, how wonderful to have a visitor! It has been a long time since I have had any kind of company down here.
+</opening_initial>
+<opening_later>Hello again?
+</opening_later>
+<talk question="Who are you?">
+I am a scholar, employed by the great wizard to help in his research here.
+</talk>
+<talk question="Don't you know the wizard is long dead? It's been one hundred years...">
+No, surely not ... that is terrible news if he has died, admittedly I haven't seen him in a while. But one hundred years? It's been a while, but surely not more than a few months...
+</talk>
+</npc>
 
 </location>
 
