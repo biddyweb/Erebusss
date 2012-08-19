@@ -4,15 +4,16 @@
 #include "logiface.h"
 
 InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz) {
-    QFont font = game_g->getFontStd();
+    QFont font = game_g->getFontSmall();
     this->setFont(font);
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    QLabel *label = new QLabel(text.c_str());
-    label->setFont(game_g->getFontSmall());
-    label->setWordWrap(true);
+    //QLabel *label = new QLabel(text.c_str());
+    //label->setWordWrap(true);
+    label = new QTextEdit(text.c_str());
+    label->setReadOnly(true);
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(label);
 
@@ -53,6 +54,10 @@ void InfoDialog::clicked() {
         result = 0;
     }
     this->done(result);
+}
+
+void InfoDialog::scrollToBottom() {
+    this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
 }
 
 int InfoDialog::exec() {

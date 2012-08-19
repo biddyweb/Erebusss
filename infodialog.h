@@ -11,6 +11,7 @@ using std::vector;
 class InfoDialog : public QDialog {
     Q_OBJECT
 
+    QTextEdit *label;
     vector<QPushButton *> buttons_list;
 
 private slots:
@@ -33,5 +34,6 @@ public:
         return new InfoDialog(text, buttons, true);
     }
 
+    void scrollToBottom();
     virtual int exec();
 };
