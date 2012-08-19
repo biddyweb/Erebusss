@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
+
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 const bool mobile_c = true;
 #else
