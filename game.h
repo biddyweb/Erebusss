@@ -117,7 +117,7 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int size, int x_offset, size_t n_frames);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -137,9 +137,9 @@ public:
 
 class AnimationLayer {
     map<string, const AnimationSet *> animation_sets;
-    int size; // size of each frame image in pixels
+    int width, height; // size of each frame image in pixels
 public:
-    AnimationLayer(int size) : size(size) {
+    AnimationLayer(int size) : width(size), height(size) {
     }
     ~AnimationLayer();
 
@@ -154,8 +154,11 @@ public:
             return NULL;
         return iter->second;
     }
-    int getSize() const {
-        return this->size;
+    int getWidth() const {
+        return this->width;
+    }
+    int getHeight() const {
+        return this->height;
     }
 
     static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
@@ -163,6 +166,8 @@ public:
 };
 
 class AnimatedObject : public QGraphicsItem {
+    bool is_static_image;
+    QPixmap static_image;
     vector<AnimationLayer *> animation_layers;
     bool set_c_animation_name;
     string c_animation_name;
@@ -184,7 +189,16 @@ public:
     void clearAnimationLayers();
     void setAnimationSet(const string &name);
     void setDirection(Direction c_direction);
-    int getSize() const;
+    int getWidth() const;
+    int getHeight() const;
+    void setStaticImage(const QPixmap &static_image) {
+        this->is_static_image = true;
+        this->static_image = static_image;
+    }
+    void clearStaticImage() {
+        this->is_static_image = false;
+        this->static_image = NULL;
+    }
 };
 
 class ScrollingListWidget : public QListWidget {

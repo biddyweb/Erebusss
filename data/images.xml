@@ -28,6 +28,8 @@
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
+<image type="scenery" name="cabinet" filename="gfx/textures/scenery/cabinet.png"/>
+<image type="scenery" name="carpet" filename="gfx/textures/scenery/carpet.png"/>
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
@@ -74,5 +76,6 @@
     <animation name="ranged" start="28" length="4" type="single"/>
     <animation name="death" start="20" length="4" type="single"/>
 </image>
+<image type="npc_static" name="man" filename="gfx/textures/npcs/man.png"/>
 
 </images>

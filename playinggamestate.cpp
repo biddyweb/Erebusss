@@ -1607,6 +1607,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             this->scenery_opened_images[name_s.toString().toStdString()] = game_g->loadImage(filename_opened.toStdString().c_str(), clip, xpos, ypos, width, height);
                         }
                     }
+                    else if( type_s == "npc_static" ) {
+                        this->npc_static_images[name_s.toString().toStdString()] = pixmap;
+                    }
                     else if( type_s == "npc" ) {
                         QString name = name_s.toString(); // need to take copy of string reference
                         vector<AnimationLayerDefinition> animation_layer_definition;
@@ -1786,6 +1789,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     QStringRef name_s = reader.attributes().value("name");
                     qDebug("found npc template: %s", name_s.toString().toStdString().c_str());
                     QStringRef animation_name_s = reader.attributes().value("animation_name");
+                    QStringRef static_image_s = reader.attributes().value("static_image");
+                    bool static_image = parseBool(static_image_s.toString(), true);
                     QStringRef FP_s = reader.attributes().value("FP");
                     int FP = parseInt(FP_s.toString());
                     QStringRef BS_s = reader.attributes().value("BS");
@@ -1813,6 +1818,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                     int xp_worth = parseInt(xp_worth_s.toString());
                     CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth);
+                    character_template->setStaticImage(static_image);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -2289,8 +2295,9 @@ void PlayingGamestate::setupView() {
         this->characterUpdateGraphics(character, object);
         scene->addItem(object);
         object->setPos(character->getX(), character->getY());
-        int character_size = object->getSize();
+        int character_size = std::max(object->getWidth(), object->getHeight());
         float character_scale = 2.0f / (float)character_size;
+        qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
         //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
         object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
         object->setScale(character_scale);
@@ -2622,12 +2629,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             if( animation_name_s.length() == 0 ) {
                                 throw string("npc has no animation_name");
                             }
+                            QStringRef static_image_s = reader.attributes().value("static_image");
+                            bool static_image = parseBool(static_image_s.toString(), true);
                             QStringRef is_hostile_s = reader.attributes().value("is_hostile");
                             bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
                             npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), is_hostile);
+                            npc->setStaticImage(static_image);
                         }
                         QStringRef is_dead_s = reader.attributes().value("is_dead");
-                        npc->setDead( parseBool(is_dead_s.toString()) );
+                        npc->setDead( parseBool(is_dead_s.toString(), true) );
                         QStringRef health_s = reader.attributes().value("health");
                         QStringRef max_health_s = reader.attributes().value("max_health");
                         npc->initialiseHealth( parseInt( max_health_s.toString()) );
@@ -2662,10 +2672,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         int xp_worth = parseInt(xp_worth_s.toString());
                         npc->setXPWorth(xp_worth);
                         QStringRef xp_s = reader.attributes().value("xp");
-                        int xp = parseInt(xp_s.toString());
+                        int xp = parseInt(xp_s.toString(), true);
                         npc->setXP(xp);
                         QStringRef gold_s = reader.attributes().value("gold");
-                        npc->addGold( parseInt( gold_s.toString()) );
+                        npc->addGold( parseInt( gold_s.toString(), true) );
                     }
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
@@ -3061,16 +3071,6 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
-        //object->setPixmap( item->getImage()->getPixmap() );
-        //object->setPixmap( this->item_images[item->getName().c_str()] );
-        //object->setPixmap( this->item_images[item->getImageName().c_str()] );
-        /*map<string, QPixmap>::iterator image_iter = this->item_images.find(item->getImageName().c_str());
-        if( image_iter == this->item_images.end() ) {
-            LOG("failed to find image for item: %s\n", item->getName().c_str());
-            LOG("    image name: %s\n", item->getImageName().c_str());
-            throw string("Failed to find item's image");
-        }
-        object->setPixmap( image_iter->second );*/
         object->setPixmap( this->getItemImage( item->getImageName() ) );
         scene->addItem(object);
         /*{
@@ -3476,7 +3476,12 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         }
     }
     else {
-        object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
+        if( character->isStaticImage() ) {
+            object->setStaticImage( this->npc_static_images[ character->getAnimationName() ] );
+        }
+        else {
+            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
+        }
     }
 }
 
@@ -3580,6 +3585,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         Vector2D dest(scene_x, scene_y);
 
         bool done = false;
+        bool move = true;
         //const float click_tol_c = 0.0f;
         //const float click_tol_c = 0.5f;
         const float click_tol_npc_c = 0.25f;
@@ -3735,6 +3741,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     ASSERT_LOGGER(new_location != NULL);
                     if( new_location != NULL ) {
                         this->moveToLocation(new_location, scenery->getExitLocationPos());
+                        move = false;
                     }
                 }
                 else if( scenery->getInteractType().length() > 0 ) {
@@ -3749,7 +3756,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
         }
 
-        if( !done ) {
+        if( move ) {
             // nudge position due to boundaries
             dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
             if( dest != player->getPos() ) {

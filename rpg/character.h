@@ -53,6 +53,7 @@ class CharacterTemplate {
     int gold_min, gold_max;
     int xp_worth;
     string animation_name;
+    bool static_image;
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth);
 
@@ -102,6 +103,12 @@ public:
     string getAnimationName() const {
         return this->animation_name;
     }
+    void setStaticImage(bool static_image) {
+        this->static_image = static_image;
+    }
+    bool isStaticImage() const {
+        return this->static_image;
+    }
 };
 
 class Character {
@@ -110,6 +117,7 @@ class Character {
     bool is_ai; // not saved
     bool is_hostile;
     string animation_name; // for NPCs (player is handled separately)
+    bool static_image; // for NPCs
 
     // game data
     Location *location; // not saved
@@ -188,6 +196,12 @@ public:
     }
     string getAnimationName() const {
         return this->animation_name;
+    }
+    void setStaticImage(bool static_image) {
+        this->static_image = static_image;
+    }
+    bool isStaticImage() const {
+        return this->static_image;
     }
     void setLocation(Location *location) {
         this->location = location;

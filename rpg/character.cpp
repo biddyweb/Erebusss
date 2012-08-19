@@ -13,7 +13,7 @@
 #endif
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
-    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), animation_name(animation_name)
+    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), animation_name(animation_name), static_image(false)
 {
 }
 
@@ -38,7 +38,7 @@ const int default_natural_damageZ = -1;
 Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
-    animation_name(animation_name),
+    animation_name(animation_name), static_image(false),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
@@ -55,6 +55,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
 Character::Character(const string &name, bool is_ai, const CharacterTemplate &character_template) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
+    static_image(character_template.isStaticImage()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
@@ -141,8 +142,16 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
     bool ai_try_moving = true;
 
-    ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
+    bool are_enemies = false;
     if( target_npc != NULL ) {
+        if( this == playing_gamestate->getPlayer() )
+            are_enemies = target_npc->isHostile();
+        else
+            are_enemies = this->isHostile();
+    }
+
+    ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
+    if( target_npc != NULL && are_enemies ) {
         enum HitState {
             HITSTATE_HAS_HIT = 0,
             HITSTATE_IS_HITTING = 1,

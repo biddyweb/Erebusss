@@ -137,11 +137,11 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int size, int x_offset, size_t n_frames) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames) {
     vector<QPixmap> frames;
     for(int i=0;i<N_DIRECTIONS;i++) {
         for(size_t j=0;j<n_frames;j++) {
-            frames.push_back( image.copy(size*(x_offset+j), size*i, size, size));
+            frames.push_back( image.copy(width*(x_offset+j), height*i, width, height));
         }
     }
     AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
@@ -165,7 +165,7 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     qDebug("    loaded image");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
-        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, layer->size, animation_layer_definition.position, animation_layer_definition.n_frames);
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, layer->width, layer->height, animation_layer_definition.position, animation_layer_definition.n_frames);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
     qDebug("    done");
@@ -206,24 +206,28 @@ void AnimatedObject::advance(int phase) {
 
 QRectF AnimatedObject::boundingRect() const {
     //qDebug("boundingRect");
-    float size = static_cast<float>(this->getSize());
-    //qDebug("size = %f", size);
-    return QRectF(0.0f, 0.0f, size, size);
+    float width = static_cast<float>(this->getWidth());
+    float height = static_cast<float>(this->getHeight());
+    return QRectF(0.0f, 0.0f, width, height);
 }
 
 void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
     //qDebug("paint");
-
     /*int ms_per_frame = 100;
     int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
     int c_frame = ( time_elapsed_ms / ms_per_frame );*/
 
-    for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
-        const AnimationSet *c_animation_set = *iter;
-        const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
-        painter->drawPixmap(0, 0, pixmap);
-        //break;
+    //painter->fillRect(0, 0, 128, 128, Qt::SolidPattern); // test
+    if( this->is_static_image ) {
+        painter->drawPixmap(0, 0, this->static_image);
+    }
+    else {
+        for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
+            const AnimationSet *c_animation_set = *iter;
+            const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
+            painter->drawPixmap(0, 0, pixmap);
+        }
     }
 }
 
@@ -241,6 +245,7 @@ void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
 void AnimatedObject::clearAnimationLayers() {
     this->animation_layers.clear();
     this->c_animation_sets.clear();
+    this->clearStaticImage();
 }
 
 void AnimatedObject::setAnimationSet(const string &name) {
@@ -279,10 +284,26 @@ void AnimatedObject::setDirection(Direction c_direction) {
     }
 }
 
-int AnimatedObject::getSize() const {
-    ASSERT_LOGGER( this->animation_layers.size() > 0 );
-    const AnimationLayer *animation_layer = this->animation_layers.at(0);
-    return animation_layer->getSize();
+int AnimatedObject::getWidth() const {
+    if( this->is_static_image ) {
+        return this->static_image.width();
+    }
+    else {
+        ASSERT_LOGGER( this->animation_layers.size() > 0 );
+        const AnimationLayer *animation_layer = this->animation_layers.at(0);
+        return animation_layer->getWidth();
+    }
+}
+
+int AnimatedObject::getHeight() const {
+    if( this->is_static_image ) {
+        return this->static_image.height();
+    }
+    else {
+        ASSERT_LOGGER( this->animation_layers.size() > 0 );
+        const AnimationLayer *animation_layer = this->animation_layers.at(0);
+        return animation_layer->getHeight();
+    }
 }
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
