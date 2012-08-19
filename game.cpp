@@ -507,16 +507,9 @@ void Game::run() {
 }
 
 void Game::initButton(QPushButton *button) const {
-/*#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-    // crashes on Android?!
-    // and doesn't work on Symbian
-    // if we change this, remember to change it where we initialise gui_palette, in Game::run().
-#else*/
     button->setStyle(style);
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);
-//#endif
-    //button->setStyleSheet("QPushButton { color : red; }");
 }
 
 void Game::update() {
