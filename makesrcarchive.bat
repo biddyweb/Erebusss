@@ -32,6 +32,7 @@ copy %src%\playinggamestate.cpp %dst%
 copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
 
+copy %src%\common.h %dst%
 copy %src%\game.h %dst%
 copy %src%\gamestate.h %dst%
 copy %src%\infodialog.h %dst%
