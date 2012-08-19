@@ -1339,7 +1339,7 @@ void SaveGameWindow::clickedSave() {
         filename += "-";
         filename += QString::number(date.month());
         filename += "-";
-        filename += QString::number(date.daysInMonth());
+        filename += QString::number(date.day());
         filename += "_";
         QTime time = date_time.time();
         filename += QString::number(time.hour());
