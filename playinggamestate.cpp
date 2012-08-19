@@ -300,7 +300,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
         //this->drawBar(painter, 16, bar_y, 100, 16, fraction, Qt::darkGreen);
         this->drawBar(painter, bar_x, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkGreen);
-        if( player->getTargetNPC() != NULL ) {
+        if( player->getTargetNPC() != NULL && player->getTargetNPC()->isHostile() ) {
             const Character *enemy = player->getTargetNPC();
             //qDebug("enemy: %d", enemy);
             //qDebug("name: %s", enemy->getName().c_str());
@@ -3642,10 +3642,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                         float dist_from_player = (player->getPos() - character->getPos()).magnitude();
                         if( dist_from_player <= talk_range_c ) {
                             stringstream message;
+                            message << "<b>";
                             message << character->getName();
-                            message << ": ";
+                            message << "</b>: ";
                             message << character->getTalkOpeningInitial();
-                            message << "\n";
+                            message << "<br/>";
                             for(;;) {
                                 vector<string> buttons;
                                 vector<string> answers;
@@ -3658,6 +3659,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 buttons.push_back("Goodbye");
                                 InfoDialog *dialog = new InfoDialog(message.str(), buttons, false);
                                 this->addWidget(dialog);
+                                dialog->scrollToBottom();
                                 int result = dialog->exec();
                                 this->closeSubWindow();
                                 ASSERT_LOGGER(result >= 0);
@@ -3666,8 +3668,17 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     break;
                                 }
                                 else {
+                                    message << "<b>";
+                                    message << player->getName();
+                                    message << "</b>: ";
+                                    message << buttons.at(result);
+                                    message << "<br/>";
+
+                                    message << "<b>";
+                                    message << character->getName();
+                                    message << "</b>: ";
                                     message << answers.at(result);
-                                    message << "\n";
+                                    message << "<br/>";
                                 }
                             }
                         }
