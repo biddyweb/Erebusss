@@ -3,16 +3,14 @@
 #include "qt_screen.h"
 #include "logiface.h"
 
-InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz) {
-    QFont font = game_g->getFontSmall();
-    this->setFont(font);
-
+InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz, bool small_buttons) {
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
     //QLabel *label = new QLabel(text.c_str());
     //label->setWordWrap(true);
     label = new QTextEdit(text.c_str());
+    label->setFont(game_g->getFontSmall());
     label->setReadOnly(true);
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(label);
@@ -31,6 +29,7 @@ InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool h
             const string button_text = *iter;
             QPushButton *button = new QPushButton(button_text.c_str());
             game_g->initButton(button);
+            button->setFont(small_buttons ? game_g->getFontSmall() : game_g->getFontStd());
             button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             layout2->addWidget(button);
             connect(button, SIGNAL(clicked()), this, SLOT(clicked()));

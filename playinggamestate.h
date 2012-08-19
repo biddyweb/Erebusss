@@ -45,6 +45,12 @@ class MainGraphicsView : public QGraphicsView {
 
     PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
+    bool has_last_mouse;
+    int last_mouse_x, last_mouse_y;
+    //float kinetic_scroll_x, kinetic_scroll_y;
+    bool has_kinetic_scroll;
+    Vector2D kinetic_scroll_dir;
+    float kinetic_scroll_speed;
     //QGraphicsProxyWidget *gui_overlay_item;
     GUIOverlay *gui_overlay;
     float c_scale;
@@ -58,6 +64,7 @@ class MainGraphicsView : public QGraphicsView {
     virtual bool event(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
 
@@ -70,6 +77,7 @@ public:
         //this->gui_overlay_item = gui_overlay_item;
         this->gui_overlay = gui_overlay;
     }
+    void update();
     void setScale(float c_scale);
     void setScale(QPointF centre, float c_scale);
     float getScale() const {

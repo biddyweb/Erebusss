@@ -55,7 +55,8 @@ void TextEffect::advance(int phase) {
 }
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
-    QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
+    QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
 {
 }
 
@@ -88,7 +89,7 @@ bool MainGraphicsView::event(QEvent *event) {
     if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
         QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
         QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
-        if (touchPoints.count() == 2) {
+        if( touchPoints.count() == 2 ) {
             // determine scale factor
             const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
             const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
@@ -113,6 +114,11 @@ bool MainGraphicsView::event(QEvent *event) {
             LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
             this->setScale(zoom_centre, n_scale);
         }
+        if( touchPoints.count() > 1 ) {
+            this->has_kinetic_scroll = false;
+            // can't trust last mouse position if more that one touch!
+            this->has_last_mouse = false;
+        }
         return true;
     }
     /*else if( event->type() == QEvent::Gesture ) {
@@ -133,30 +139,34 @@ bool MainGraphicsView::event(QEvent *event) {
 
 void MainGraphicsView::mousePressEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mousePressEvent");
-    if( event->button() == Qt::LeftButton ) {
+    if( event->button() & Qt::LeftButton ) {
         this->mouse_down_x = event->x();
         this->mouse_down_y = event->y();
+        this->has_kinetic_scroll = false;
     }
 
     QGraphicsView::mousePressEvent(event);
 }
 
+// On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
+// Needs to be higher on Symbian, at least for Nokia 5800, as touching the display seems to cause it to move so much more easily.
+#if defined(Q_OS_SYMBIAN)
+const int drag_tol_c = 24;
+#else
+const int drag_tol_c = 16;
+#endif
+
 void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mouseReleaseEvent");
-    if( event->button() == Qt::LeftButton ) {
+    if( event->button() & Qt::LeftButton ) {
         int m_x = event->x();
         int m_y = event->y();
         int xdist = abs(this->mouse_down_x - m_x);
         int ydist = abs(this->mouse_down_y - m_y);
-        // On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
-        // Needs to be higher on Symbian, at least for Nokia 5800, as touching the display seems to cause it to move so much more easily.
-#if defined(Q_OS_SYMBIAN)
-        const int drag_tol_c = 24;
-#else
-        const int drag_tol_c = 16;
-#endif
         //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
         if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
+            this->has_kinetic_scroll = false;
+            this->has_last_mouse = false;
             QPointF m_scene = this->mapToScene(m_x, m_y);
             LOG("clicked: %f, %f\n", m_scene.x(), m_scene.y());
             playing_gamestate->clickedMainView(m_scene.x(), m_scene.y());
@@ -165,6 +175,47 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
     }
 
     QGraphicsView::mouseReleaseEvent(event);
+}
+
+void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
+    //qDebug("MainGraphicsView::mouseMoveEvent");
+    if( qApp->mouseButtons() & Qt::LeftButton ) {
+        //qDebug("    lmb");
+        if( this->has_last_mouse ) {
+            /*QPointF old_pos = this->mapToScene(this->last_mouse_x, this->last_mouse_y);
+            QPointF new_pos = this->mapToScene(event->x(), event->y());*/
+            QPointF old_pos(this->last_mouse_x, this->last_mouse_y);
+            QPointF new_pos = event->posF();
+            QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
+            // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
+            if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
+                int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+                diff /= (float)time_ms;
+                this->has_kinetic_scroll = true;
+                this->kinetic_scroll_dir.set(diff.x(), diff.y());
+                this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
+                this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
+                this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
+                //qDebug("    speed: %f", this->kinetic_scroll_speed);
+            }
+            else {
+                this->has_kinetic_scroll = false;
+            }
+        }
+        else {
+            this->has_kinetic_scroll = false;
+        }
+        this->has_last_mouse = true;
+        this->last_mouse_x = event->x();
+        this->last_mouse_y = event->y();
+    }
+    else {
+        this->has_last_mouse = false;
+        /*this->kinetic_scroll_x = 0.0f;
+        this->kinetic_scroll_y = 0.0f;*/
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
 }
 
 void MainGraphicsView::wheelEvent(QWheelEvent *event) {
@@ -188,6 +239,41 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
         // needed as resizing moves the position, for some reason!
         //qDebug("### %d, %d", scene()->sceneRect().x(), scene()->sceneRect().y());
         //this->gui_overlay_item->setPos( this->scene()->sceneRect().topLeft() );
+    }
+}
+
+void MainGraphicsView::update() {
+    if( (qApp->mouseButtons() & Qt::LeftButton) == 0 ) {
+        /*int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+        float speed = (4.0f * time_ms)/1000.0f;*/
+        //if( fabs(this->kinetic_scroll_x) >= 0.0f && fabs(this->kinetic_scroll_y) >= 0.0f ) {
+        if( this->has_kinetic_scroll ) {
+            int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+            //qDebug("centre was: %f, %f", centre.x(), centre.y());
+            float step = time_ms*this->kinetic_scroll_speed;
+            float move_x = step * this->kinetic_scroll_dir.x;
+            float move_y = step * this->kinetic_scroll_dir.y;
+            //qDebug("    move: %f, %f", move_x, move_y);
+
+            QPointF centre = this->mapToScene( this->rect() ).boundingRect().center();
+            QPoint centre_pixels = this->mapFromScene(centre);
+
+            //centre.setX( centre.x() + move_x );
+            //centre.setY( centre.y() + move_y );
+            centre_pixels.setX( centre_pixels.x() + move_x );
+            centre_pixels.setY( centre_pixels.y() + move_y );
+
+            centre = this->mapToScene(centre_pixels);
+            //qDebug("    now: %f, %f", centre.x(), centre.y());
+            this->centerOn(centre);
+            float decel = 0.001f * (float)time_ms;
+            this->kinetic_scroll_speed -= decel;
+            if( this->kinetic_scroll_speed <= 0.0f ) {
+                this->has_kinetic_scroll = false;
+                this->kinetic_scroll_speed = 0.0f;
+            }
+            //qDebug("    kinetic is now %f, %f", this->kinetic_scroll_x, this->kinetic_scroll_y);
+        }
     }
 }
 
@@ -3403,6 +3489,8 @@ void PlayingGamestate::update() {
         }
     }
 
+    this->view->update();
+
     // test for fog of war
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
@@ -3657,7 +3745,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     answers.push_back(answer);
                                 }
                                 buttons.push_back("Goodbye");
-                                InfoDialog *dialog = new InfoDialog(message.str(), buttons, false);
+                                InfoDialog *dialog = new InfoDialog(message.str(), buttons, false, true);
                                 this->addWidget(dialog);
                                 dialog->scrollToBottom();
                                 int result = dialog->exec();
