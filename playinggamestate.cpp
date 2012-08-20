@@ -2767,6 +2767,23 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             bool can_talk = parseBool(can_talk_s.toString());
                             npc->setCanTalk(can_talk);
                         }
+                        QStringRef has_talked_s = reader.attributes().value("has_talked");
+                        if( has_talked_s.length() > 0 ) {
+                            bool has_talked = parseBool(has_talked_s.toString());
+                            npc->setHasTalked(has_talked);
+                        }
+                        QStringRef interaction_completed_s = reader.attributes().value("interaction_completed");
+                        if( interaction_completed_s.length() > 0 ) {
+                            bool interaction_completed = parseBool(interaction_completed_s.toString());
+                            npc->setInteractionCompleted(interaction_completed);
+                        }
+                        QStringRef interaction_type_s = reader.attributes().value("interaction_type");
+                        npc->setInteractionType(interaction_type_s.toString().toStdString());
+                        QStringRef interaction_data_s = reader.attributes().value("interaction_data");
+                        npc->setInteractionData(interaction_data_s.toString().toStdString());
+                        QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
+                        int interaction_xp = parseInt(interaction_xp_s.toString(), true);
+                        npc->setInteractionXP(interaction_xp);
                     }
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
@@ -2800,6 +2817,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     npc->setTalkOpeningLater(text.toStdString());
                 }
+                else if( reader.name() == "opening_interaction_complete") {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: opening_interaction_complete element wasn't expected here");
+                    }
+                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    npc->setTalkOpeningInteractionComplete(text.toStdString());
+                }
                 else if( reader.name() == "talk") {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2807,8 +2832,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     QStringRef question_s = reader.attributes().value("question");
                     QString question = question_s.toString();
+                    QStringRef while_not_done_s = reader.attributes().value("while_not_done");
+                    bool while_not_done = parseBool(while_not_done_s.toString(), true);
+                    QStringRef objective_s = reader.attributes().value("objective");
+                    bool objective = parseBool(objective_s.toString(), true);
                     QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->addTalkItem(question.toStdString(), answer.toStdString());
+                    npc->addTalkItem(question.toStdString(), answer.toStdString(), while_not_done, objective);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ammo" || reader.name() == "currency" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
@@ -3733,16 +3762,38 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             message << "<b>";
                             message << character->getName();
                             message << "</b>: ";
-                            message << character->getTalkOpeningInitial();
+                            if( character->isInteractionCompleted() ) {
+                                message << character->getTalkOpeningInteractionComplete();
+                            }
+                            else if( !character->hasTalked() ) {
+                                message << character->getTalkOpeningInitial();
+                            }
+                            else {
+                                message << character->getTalkOpeningLater();
+                            }
                             message << "<br/>";
+                            character->setHasTalked(true);
                             for(;;) {
                                 vector<string> buttons;
-                                vector<string> answers;
-                                for(map<string, string>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                                //vector<string> answers;
+                                vector<const TalkItem *> talk_items;
+                                /*for(map<string, string>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
                                     string question = iter->first;
                                     string answer = iter->second;
                                     buttons.push_back(question);
                                     answers.push_back(answer);
+                                }*/
+                                for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                                    const TalkItem *talk_item = &*iter;
+                                    if( talk_item->while_not_done && character->isInteractionCompleted() ) {
+                                        continue;
+                                    }
+                                    if( talk_item->objective && !character->canCompleteInteraction(this) ) {
+                                        continue;
+                                    }
+                                    buttons.push_back(talk_item->question);
+                                    //answers.push_back(talk_item->answer);
+                                    talk_items.push_back(talk_item);
                                 }
                                 buttons.push_back("Goodbye");
                                 InfoDialog *dialog = new InfoDialog(message.str(), buttons, false, true);
@@ -3756,6 +3807,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     break;
                                 }
                                 else {
+                                    const TalkItem *talk_item = talk_items.at(result);
                                     message << "<b>";
                                     message << player->getName();
                                     message << "</b>: ";
@@ -3765,8 +3817,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     message << "<b>";
                                     message << character->getName();
                                     message << "</b>: ";
-                                    message << answers.at(result);
+                                    //message << answers.at(result);
+                                    message << talk_item->answer;
                                     message << "<br/>";
+                                    if( talk_item->objective ) {
+                                        character->completeInteraction(this);
+                                    }
                                 }
                             }
                         }
@@ -4152,7 +4208,32 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
             fprintf(file, " gold=\"%d\"", character->getGold());
+            fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
+            fprintf(file, " has_talked=\"%s\"", character->hasTalked() ? "true": "false");
+            fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
+            fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
+            fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
+            fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
             fprintf(file, ">\n");
+            if( character->getTalkOpeningInitial().length() > 0 ) {
+                fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
+            }
+            if( character->getTalkOpeningLater().length() > 0 ) {
+                fprintf(file, "<opening_later>%s</opening_later>", character->getTalkOpeningLater().c_str());
+            }
+            if( character->getTalkOpeningInteractionComplete().length() > 0 ) {
+                fprintf(file, "<opening_interaction_complete>%s</opening_interaction_complete>", character->getTalkOpeningInteractionComplete().c_str());
+            }
+            for(vector<TalkItem>::const_iterator iter2 = character->talkItemsBegin(); iter2 != character->talkItemsEnd(); ++iter2) {
+                const TalkItem *talk_item = &*iter2;
+                fprintf(file, "<talk");
+                fprintf(file, " question=\"%s\"", talk_item->question.c_str());
+                fprintf(file, " while_not_done=\"%s\"", talk_item->while_not_done ? "true": "false");
+                fprintf(file, " objective=\"%s\"", talk_item->objective ? "true": "false");
+                fprintf(file, ">\n");
+                fprintf(file, "%s\n", talk_item->answer.c_str());
+                fprintf(file, "</talk>\n");
+            }
             for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;
                 this->saveItem(file, item, character);

@@ -48,7 +48,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
-    can_talk(false)
+    can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
 }
@@ -66,7 +66,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
-    can_talk(false)
+    can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
     this->initialiseHealth( character_template.getHealth() );
@@ -78,7 +78,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
 }
 
 Character::~Character() {
-    qDebug("Character::~Character(): %sn", this->name.c_str());
+    qDebug("Character::~Character(): %s", this->name.c_str());
     if( this->listener != NULL ) {
         this->listener->characterDeath(this, this->listener_data);
     }
@@ -727,11 +727,44 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
     }
 }
 
-string Character::getTalkItem(const string &question) const {
+bool Character::canCompleteInteraction(PlayingGamestate *playing_gamestate) const {
+    if( this->interaction_completed )
+        return false;
+    if( this->interaction_type == "WANT_OBJECT" ) {
+        if( playing_gamestate->getPlayer()->findItem(this->interaction_data) != NULL ) {
+            return true;
+        }
+    }
+    else {
+        ASSERT_LOGGER(false);
+    }
+    return false;
+}
+
+void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
+    ASSERT_LOGGER( !this->interaction_completed );
+    if( this->interaction_type == "WANT_OBJECT" ) {
+        Item *item = playing_gamestate->getPlayer()->findItem(this->interaction_data);
+        ASSERT_LOGGER(item != NULL);
+        if( item != NULL ) {
+            playing_gamestate->getPlayer()->takeItem(item);
+            delete item;
+            if( this->interaction_xp > 0 ) {
+                playing_gamestate->getPlayer()->addXP(playing_gamestate, this->interaction_xp);
+            }
+        }
+    }
+    else {
+        ASSERT_LOGGER(false);
+    }
+    this->interaction_completed = true;
+}
+
+/*string Character::getTalkItem(const string &question) const {
     map<string, string>::const_iterator iter = this->talk_items.find(question);
     if( iter == this->talk_items.end() ) {
         ASSERT_LOGGER(false);
         return "";
     }
     return iter->second;
-}
+}*/

@@ -39,6 +39,19 @@ const float npc_radius_c = 0.25f;
 const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
 const float talk_range_c = hit_range_c;
 
+class TalkItem {
+public:
+    string question;
+    string answer;
+    bool while_not_done;
+    bool objective;
+
+    TalkItem(const string &question, const string &answer, bool while_not_done, bool objective) :
+        question(question), answer(answer), while_not_done(while_not_done), objective(objective)
+    {
+    }
+};
+
 class CharacterListener {
 public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
@@ -159,9 +172,16 @@ class Character {
 
     // npc talk information
     bool can_talk;
+    bool has_talked;
+    string interaction_type;
+    string interaction_data;
+    int interaction_xp;
+    bool interaction_completed;
     string talk_opening_initial;
     string talk_opening_later;
-    map<string, string> talk_items;
+    string talk_opening_interaction_complete;
+    //map<string, string> talk_items;
+    vector<TalkItem> talk_items;
 
     Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
@@ -446,6 +466,38 @@ public:
     void setCanTalk(bool can_talk) {
         this->can_talk = can_talk;
     }
+    bool hasTalked() const {
+        return this->has_talked;
+    }
+    void setHasTalked(bool has_talked) {
+        this->has_talked = has_talked;
+    }
+    string getInteractionType() const {
+        return this->interaction_type;
+    }
+    void setInteractionType(const string &interaction_type) {
+        this->interaction_type = interaction_type;
+    }
+    string getInteractionData() const {
+        return this->interaction_data;
+    }
+    void setInteractionData(const string &interaction_data) {
+        this->interaction_data = interaction_data;
+    }
+    int getInteractionXP() const {
+        return this->interaction_xp;
+    }
+    void setInteractionXP(int interaction_xp) {
+        this->interaction_xp = interaction_xp;
+    }
+    bool isInteractionCompleted() const {
+        return this->interaction_completed;
+    }
+    void setInteractionCompleted(bool interaction_completed) {
+        this->interaction_completed = interaction_completed;
+    }
+    bool canCompleteInteraction(PlayingGamestate *playing_gamestate) const;
+    void completeInteraction(PlayingGamestate *playing_gamestate);
     string getTalkOpeningInitial() const {
         return this->talk_opening_initial;
     }
@@ -455,10 +507,16 @@ public:
     string getTalkOpeningLater() const {
         return this->talk_opening_later;
     }
-    void setTalkOpeningLater(const string &talk_opening_initial) {
+    void setTalkOpeningLater(const string &talk_opening_later) {
         this->talk_opening_later = talk_opening_later;
     }
-    void addTalkItem(const string &question, const string &answer) {
+    string getTalkOpeningInteractionComplete() const {
+        return this->talk_opening_interaction_complete;
+    }
+    void setTalkOpeningInteractionComplete(const string &talk_opening_interaction_complete) {
+        this->talk_opening_interaction_complete = talk_opening_interaction_complete;
+    }
+    /*void addTalkItem(const string &question, const string &answer) {
         this->talk_items[question] = answer;
     }
     string getTalkItem(const string &question) const;
@@ -466,6 +524,16 @@ public:
         return this->talk_items.begin();
     }
     map<string, string>::const_iterator talkItemsEnd() const {
+        return this->talk_items.end();
+    }*/
+    void addTalkItem(const string &question, const string &answer, bool while_not_done, bool objective) {
+        TalkItem talk_item(question, answer, while_not_done, objective);
+        this->talk_items.push_back(talk_item);
+    }
+    vector<TalkItem>::const_iterator talkItemsBegin() const {
+        return this->talk_items.begin();
+    }
+    vector<TalkItem>::const_iterator talkItemsEnd() const {
         return this->talk_items.end();
     }
 };

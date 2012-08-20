@@ -250,6 +250,10 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" size="2.0" draw_type="background"/>
 <scenery name="Table" image_name="table" x="7.5" y="15.5" size="0.8" blocking="true"/>
 
+<item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2" x="6.5" y="12.0">
+necromancy blah blah
+</item>
+
 <npc name="Man" animation_name="man" static_image="true" x="6.5" y="14.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -257,16 +261,28 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
     is_hostile="false"
     xp_worth="0"
     can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Necromancy for Beginners"
+    interaction_xp="50"
 >
 <opening_initial>My goodness, how wonderful to have a visitor! It has been a long time since I have had any kind of company down here.
 </opening_initial>
 <opening_later>Hello again?
 </opening_later>
+<opening_interaction_complete>
+Thank you once again for helping me. Once I have finished researching from this book that you found for me, I will finally be able to leave this place.
+</opening_interaction_complete>
 <talk question="Who are you?">
 I am a scholar, employed by the great wizard to help in his research here.
 </talk>
 <talk question="Don't you know the wizard is long dead? It's been one hundred years...">
 No, surely not ... that is terrible news if he has died, admittedly I haven't seen him in a while. But one hundred years? It's been a while, but surely not more than a few months...
+</talk>
+<talk question="Why are you still here?" while_not_done="true">
+The wizard had set me a research task, but grew impatient at my lack of progress - he cast a spell trapping me in this room, to remain until I had completed my task. Unfortuately the answers do not lie in these books, and I am now unable to leave. Perhaps you could help me? All I need is some information on necromancy, maybe there is some resource of the subject matter you are able to bring me...
+</talk>
+<talk question="I have a book that may help you" objective="true">
+Ah, thank you! Yes that looks like it will be of most help to me.
 </talk>
 </npc>
 
