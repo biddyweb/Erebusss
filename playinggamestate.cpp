@@ -3886,55 +3886,61 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Scenery *scenery = *iter;
                 qDebug("clicked on scenery: %s", scenery->getName().c_str());
 
-                if( scenery->getNItems() > 0 ) {
-                    done = true;
-                    bool all_gold = true;
-                    for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
-                        Item *item = *iter;
-                        if( item->getType() != ITEMTYPE_CURRENCY ) {
-                            all_gold = false;
-                        }
-                        c_location->addItem(item, player->getX(), player->getY());
-                    }
-                    scenery->eraseAllItems();
-                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
-                }
-
-                if( scenery->canBeOpened() && !scenery->isOpened() ) {
-                    done = true;
-                    this->playSound("container");
-                    scenery->setOpened(true);
-                }
-
-                if( scenery->isDoor() ) {
-                    done = true;
-                    qDebug("clicked on a door");
-                    bool is_locked = false;
-                    if( scenery->isLocked() ) {
-                        // can we unlock it?
-                        is_locked = true;
-                        string unlock_item_name = scenery->getUnlockItemName();
-                        if( unlock_item_name.length() > 0 ) {
-                            //LOG("search for %s\n", unlock_item_name.c_str());
-                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                                const Item *item = *iter;
-                                //LOG("    compare to: %s\n", item->getKey().c_str());
-                                if( item->getKey() == unlock_item_name ) {
-                                    is_locked = false;
-                                }
+                bool is_locked = false;
+                if( scenery->isLocked() ) {
+                    // can we unlock it?
+                    is_locked = true;
+                    string unlock_item_name = scenery->getUnlockItemName();
+                    if( unlock_item_name.length() > 0 ) {
+                        //LOG("search for %s\n", unlock_item_name.c_str());
+                        for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                            const Item *item = *iter;
+                            //LOG("    compare to: %s\n", item->getKey().c_str());
+                            if( item->getKey() == unlock_item_name ) {
+                                is_locked = false;
                             }
                         }
-                        if( is_locked ) {
-                            this->playSound("lock");
-                            this->addTextEffect("The door is locked!", player->getPos(), 2000);
-                        }
-                        else {
-                            this->addTextEffect("You unlock the door.", player->getPos(), 2000);
-                            scenery->setLocked(false); // we'll delete the door anyway below, but just to be safe...
-                            player->addXP(this, 20);
-                        }
                     }
-                    if( !is_locked ) {
+                    if( is_locked ) {
+                        done = true;
+                        this->playSound("lock");
+                        stringstream str;
+                        str << "The " << scenery->getName() << " is locked!";
+                        this->addTextEffect(str.str(), player->getPos(), 2000);
+                    }
+                    else {
+                        stringstream str;
+                        str << "You unlock the " << scenery->getName() << ".";
+                        this->addTextEffect(str.str(), player->getPos(), 2000);
+                        scenery->setLocked(false);
+                        player->addXP(this, 20);
+                    }
+                }
+
+                if( !is_locked ) {
+                    if( scenery->getNItems() > 0 ) {
+                        done = true;
+                        bool all_gold = true;
+                        for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
+                            Item *item = *iter;
+                            if( item->getType() != ITEMTYPE_CURRENCY ) {
+                                all_gold = false;
+                            }
+                            c_location->addItem(item, player->getX(), player->getY());
+                        }
+                        scenery->eraseAllItems();
+                        this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
+                    }
+
+                    if( scenery->canBeOpened() && !scenery->isOpened() ) {
+                        done = true;
+                        this->playSound("container");
+                        scenery->setOpened(true);
+                    }
+
+                    if( scenery->isDoor() ) {
+                        done = true;
+                        qDebug("clicked on a door");
                         // open door
                         this->playSound("door");
                         c_location->removeScenery(scenery);
@@ -3942,35 +3948,35 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                         scenery = NULL;
                         ignore_scenery = NULL;
                     }
-                }
-                else if( scenery->isExit() ) {
-                    done = true;
-                    LOG("clicked on an exit\n");
-                    // exit
-                    this->playSound("door");
-                    this->closeSubWindow(); // just in case
-                    new CampaignWindow(this);
-                    game_g->getScreen()->setPaused(true);
-                    this->player->restoreHealth();
-                }
-                else if( scenery->getExitLocation().length() > 0 ) {
-                    done = true;
-                    this->playSound("door");
-                    LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
-                    Location *new_location = quest->findLocation(scenery->getExitLocation());
-                    ASSERT_LOGGER(new_location != NULL);
-                    if( new_location != NULL ) {
-                        this->moveToLocation(new_location, scenery->getExitLocationPos());
-                        move = false;
+                    else if( scenery->isExit() ) {
+                        done = true;
+                        LOG("clicked on an exit\n");
+                        // exit
+                        this->playSound("door");
+                        this->closeSubWindow(); // just in case
+                        new CampaignWindow(this);
+                        game_g->getScreen()->setPaused(true);
+                        this->player->restoreHealth();
                     }
-                }
-                else if( scenery->getInteractType().length() > 0 ) {
-                    done = true;
-                    LOG("interact_type: %s\n", scenery->getInteractType().c_str());
-                    string dialog_text;
-                    scenery->getInteractionText(&dialog_text);
-                    if( this->askQuestionDialog(dialog_text) ) {
-                        scenery->interact(this);
+                    else if( scenery->getExitLocation().length() > 0 ) {
+                        done = true;
+                        this->playSound("door");
+                        LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
+                        Location *new_location = quest->findLocation(scenery->getExitLocation());
+                        ASSERT_LOGGER(new_location != NULL);
+                        if( new_location != NULL ) {
+                            this->moveToLocation(new_location, scenery->getExitLocationPos());
+                            move = false;
+                        }
+                    }
+                    else if( scenery->getInteractType().length() > 0 ) {
+                        done = true;
+                        LOG("interact_type: %s\n", scenery->getInteractType().c_str());
+                        string dialog_text;
+                        scenery->getInteractionText(&dialog_text);
+                        if( this->askQuestionDialog(dialog_text) ) {
+                            scenery->interact(this);
+                        }
                     }
                 }
             }
