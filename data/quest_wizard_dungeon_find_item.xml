@@ -249,6 +249,12 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="3.0" rect_h="4.0"/>
 <scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" size="2.0" draw_type="background"/>
 <scenery name="Table" image_name="table" x="7.5" y="15.5" size="0.8" blocking="true"/>
+<scenery name="Cabinet" image_name="cabinet" x="5.5" y="12.5" size="0.8" blocking="true"
+    locked="true"/>
+<scenery name="Chest" image_name="chest" x="5.5" y="15.5" size="0.8" blocking="true"
+    locked="true"/>
+
+<!--<item name="Cabinet Key" image_name="key" icon_width="0.25" weight="0" x="6.5" y="13.0"/>-->
 
 <item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2" x="6.5" y="12.0">
 necromancy blah blah
