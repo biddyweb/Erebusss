@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <quests>
 
-<quest filename="data/quest_wizard_dungeon_find_item.xml"/>
 <quest filename="data/quest_kill_goblins.xml"/>
+<quest filename="data/quest_wizard_dungeon_find_item.xml"/>
 
 </quests>
