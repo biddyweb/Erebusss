@@ -137,11 +137,16 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
+    if( icon_width == 0 )
+        icon_width = width;
+    if( icon_height == 0 )
+        icon_height = height;
+    //qDebug("### %d x %d\n", icon_width, icon_height);
     vector<QPixmap> frames;
     for(int i=0;i<N_DIRECTIONS;i++) {
         for(size_t j=0;j<n_frames;j++) {
-            frames.push_back( image.copy(width*(x_offset+j), height*i, width, height));
+            frames.push_back( image.copy(width*(x_offset+j) + icon_off_x, height*i + icon_off_y, icon_width, icon_height));
         }
     }
     AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
@@ -155,26 +160,29 @@ AnimationLayer::~AnimationLayer() {
     }
 }
 
-AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height) {
     if( image.height() % N_DIRECTIONS != 0 ) {
         throw string("image height is not multiple of 8");
     }
-    AnimationLayer *layer = new AnimationLayer(image.height() / N_DIRECTIONS);
+    int stride_x = image.height() / N_DIRECTIONS;
+    int stride_y = stride_x;
+    //AnimationLayer *layer = new AnimationLayer(image.height() / N_DIRECTIONS);
+    AnimationLayer *layer = new AnimationLayer(width, height);
     /*LOG("AnimationLayer::create: %s\n", filename);
     QPixmap image = game_g->loadImage(filename);*/
     qDebug("    loaded image");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
-        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, layer->width, layer->height, animation_layer_definition.position, animation_layer_definition.n_frames);
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, stride_x, stride_y, animation_layer_definition.position, animation_layer_definition.n_frames, animation_layer_definition.off_x, animation_layer_definition.off_y, animation_layer_definition.width, animation_layer_definition.height);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
     qDebug("    done");
     return layer;
 }
 
-AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions) {
+AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height) {
     QPixmap image = game_g->loadImage(filename.c_str());
-    return create(image, animation_layer_definitions);
+    return create(image, animation_layer_definitions, width, height);
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
@@ -219,6 +227,7 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     int c_frame = ( time_elapsed_ms / ms_per_frame );*/
 
     //painter->fillRect(0, 0, 128, 128, Qt::SolidPattern); // test
+    //painter->fillRect(0, 0, this->getWidth(), this->getHeight(), Qt::SolidPattern); // test
     if( this->is_static_image ) {
         painter->drawPixmap(0, 0, this->static_image);
     }

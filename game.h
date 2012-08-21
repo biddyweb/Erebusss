@@ -117,7 +117,7 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -129,9 +129,10 @@ class AnimationLayerDefinition {
     int position;
     size_t n_frames;
     AnimationSet::AnimationType animation_type;
+    int off_x, off_y, width, height;
 public:
-    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type) :
-        name(name), position(position), n_frames(n_frames), animation_type(animation_type) {
+    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, int off_x, int off_y, int width, int height) :
+        name(name), position(position), n_frames(n_frames), animation_type(animation_type), off_x(off_x), off_y(off_y), width(width), height(height) {
     }
 };
 
@@ -139,7 +140,9 @@ class AnimationLayer {
     map<string, const AnimationSet *> animation_sets;
     int width, height; // size of each frame image in pixels
 public:
-    AnimationLayer(int size) : width(size), height(size) {
+    /*AnimationLayer(int size) : width(size), height(size) {
+    }*/
+    AnimationLayer(int width, int height) : width(width), height(height) {
     }
     ~AnimationLayer();
 
@@ -161,8 +164,8 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height);
 };
 
 class AnimatedObject : public QGraphicsItem {
