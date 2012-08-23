@@ -15,7 +15,7 @@
 <image type="item" name="leather_armour" filename="gfx/textures/items/leather_armor.png"/>
 <image type="item" name="metal_armour" filename="gfx/textures/items/metal_armor.png"/>
 <image type="item" name="arrow" filename="gfx/textures/items/arrow.png"
-    xpos="0" ypos="16" width="64" height="32"
+    xpos="0" ypos="16" width="64" height="32" expected_width="512"
     />
 
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
@@ -36,7 +36,7 @@
 <image type="scenery" name="boulders" filename="gfx/textures/scenery/boulders.png"/>
 <image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"
     filename_opened="gfx/textures/scenery/chest_opened.png"
-    xpos="6" ypos="2" width="52" height="52"
+    xpos="6" ypos="2" width="52" height="52" expected_width="64"
     />
 <image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png"
     filename_opened="gfx/textures/scenery/barrel_opened.png"
@@ -55,6 +55,7 @@
 <image type="scenery" name="table" filename="gfx/textures/scenery/table.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
+<!--
 <image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
@@ -76,6 +77,29 @@
     <animation name="ranged" start="28" length="4" type="single"/>
     <animation name="death" start="20" length="4" type="single"/>
 </image>
+-->
+<image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="20" length="3" type="single"/>
+    <animation name="ranged" start="24" length="4" type="single"/>
+    <animation name="death" start="34" length="6" type="single"/>
+</image>
+<image type="npc" name="goblin_champion" filename="gfx/textures/npcs/goblin_champion.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="20" length="3" type="single"/>
+    <animation name="ranged" start="24" length="4" type="single"/>
+    <animation name="death" start="34" length="6" type="single"/>
+</image>
+<image type="npc" name="orc" filename="gfx/textures/npcs/orc_regular_0.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <animation name="ranged" start="28" length="4" type="single"/>
+    <animation name="death" start="20" length="4" type="single"/>
+</image>
+
 <image type="npc_static" name="man" filename="gfx/textures/npcs/man.png"/>
 
 </images>

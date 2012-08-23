@@ -117,7 +117,8 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height, int expected_stride_x);
+    //static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames, float icon_off_x, float icon_off_y, float icon_width, float icon_height);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -130,8 +131,10 @@ class AnimationLayerDefinition {
     size_t n_frames;
     AnimationSet::AnimationType animation_type;
     int off_x, off_y, width, height;
+    //float off_x, off_y, width, height;
 public:
     AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, int off_x, int off_y, int width, int height) :
+    //AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, float off_x, float off_y, float width, float height) :
         name(name), position(position), n_frames(n_frames), animation_type(animation_type), off_x(off_x), off_y(off_y), width(width), height(height) {
     }
 };
@@ -164,8 +167,8 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height, int expected_stride_x);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height, int expected_stride_x);
 };
 
 class AnimatedObject : public QGraphicsItem {
@@ -331,9 +334,9 @@ public:
     string getApplicationFilename(const string &name);
     //void log(const char *text, ...);
     void log(const char *text);
-    QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height) const;
+    QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const;
     QPixmap loadImage(const string &filename) const {
-        return loadImage(filename, false, 0, 0, 0, 0);
+        return loadImage(filename, false, 0, 0, 0, 0, 0);
     }
 #ifndef Q_OS_ANDROID
     Sound *loadSound(string filename) const;
