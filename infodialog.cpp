@@ -31,10 +31,17 @@ InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool h
             layout2 = layout;
         }
 
-        for(vector<string>::const_iterator iter = buttons.begin(); iter != buttons.end(); ++iter) {
+        int index = 0;
+        for(vector<string>::const_iterator iter = buttons.begin(); iter != buttons.end(); ++iter, index++) {
             const string button_text = *iter;
             QPushButton *button = new QPushButton(button_text.c_str());
             game_g->initButton(button);
+            if( index == 0 ) {
+                button->setShortcut(QKeySequence(Qt::Key_Return));
+            }
+            else if( index == buttons.size()-1 ) {
+                button->setShortcut(QKeySequence(Qt::Key_Escape));
+            }
             button->setFont(small_buttons ? game_g->getFontSmall() : game_g->getFontStd());
             button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             layout2->addWidget(button);
