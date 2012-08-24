@@ -93,6 +93,7 @@ public:
 public slots:
     void zoomOut();
     void zoomIn();
+    void centreOnPlayer();
 };
 
 class GUIOverlay : public QWidget {

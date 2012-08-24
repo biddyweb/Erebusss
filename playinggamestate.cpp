@@ -70,6 +70,12 @@ void MainGraphicsView::zoomIn() {
     this->zoom(zoom_centre, true);
 }
 
+void MainGraphicsView::centreOnPlayer() {
+    Character *character = playing_gamestate->getPlayer();
+    AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
+    this->centerOn(object);
+}
+
 void MainGraphicsView::zoom(QPointF zoom_centre, bool in) {
     qDebug("MainGraphicsView::zoom(%d)", in);
     const float factor_c = 1.1f;
@@ -1572,6 +1578,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
             game_g->initButton(zoominButton);
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
+
+            QPushButton *centreButton = new QPushButton("O");
+            game_g->initButton(centreButton);
+            connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
+            centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            h_layout->addWidget(centreButton);
         }
     }
 
