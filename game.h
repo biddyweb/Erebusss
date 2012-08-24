@@ -117,8 +117,7 @@ public:
     //QPixmap *getFrames(Direction c_direction);
     const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height, int expected_stride_x);
-    //static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int width, int height, int x_offset, size_t n_frames, float icon_off_x, float icon_off_y, float icon_width, float icon_height);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -145,8 +144,6 @@ class AnimationLayer {
     map<string, const AnimationSet *> animation_sets;
     int width, height; // size of each frame image in pixels
 public:
-    /*AnimationLayer(int size) : width(size), height(size) {
-    }*/
     AnimationLayer(int width, int height) : width(width), height(height) {
     }
     ~AnimationLayer();
