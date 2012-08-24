@@ -3,6 +3,7 @@
 #include "qt_screen.h"
 #include "logiface.h"
 
+#include <cassert>
 #include <QWebFrame>
 
 InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz, bool small_buttons) {
