@@ -1506,6 +1506,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *statsButton = new QPushButton("Stats");
         game_g->initButton(statsButton);
+        statsButton->setToolTip("Display statistics of your character");
         statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
@@ -1513,6 +1514,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *itemsButton = new QPushButton("Items");
         game_g->initButton(itemsButton);
+        itemsButton->setToolTip("Display the items that you are carrying");
         itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
@@ -1520,12 +1522,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *spellsButton = new QPushButton("Spells");
         game_g->initButton(spellsButton);
+        spellsButton->setToolTip("Not supported yet");
         spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);
 
         QPushButton *journalButton = new QPushButton("Journal");
         game_g->initButton(journalButton);
+        journalButton->setToolTip("Displays information about your quests");
         journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
@@ -1540,18 +1544,21 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *pauseButton = new QPushButton("Pause");
         game_g->initButton(pauseButton);
+        pauseButton->setToolTip("Pause the game");
         pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
 
         QPushButton *restButton = new QPushButton("Rest");
         game_g->initButton(restButton);
+        restButton->setToolTip("Rest until you are healed");
         restButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
         game_g->initButton(optionsButton);
+        optionsButton->setToolTip("Options to save game or quit");
         optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
@@ -1571,18 +1578,21 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
             QPushButton *zoomoutButton = new QPushButton("-");
             game_g->initButton(zoomoutButton);
+            zoomoutButton->setToolTip("Zoom out");
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             h_layout->addWidget(zoomoutButton);
 
             QPushButton *zoominButton = new QPushButton("+");
             game_g->initButton(zoominButton);
+            zoominButton->setToolTip("Zoom in");
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
 
             QPushButton *centreButton = new QPushButton("O");
             game_g->initButton(centreButton);
-            connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
+            centreButton->setToolTip("Centre view on your player's location");
             centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
             h_layout->addWidget(centreButton);
         }
     }
