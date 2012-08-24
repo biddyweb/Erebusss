@@ -1748,8 +1748,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                                         LOG("error at line %d\n", reader.lineNumber());
                                         throw string("npc has unknown animation type");
                                     }
-                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, xpos, ypos, width, height) );
+                                    //animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, xpos, ypos, width, height) );
                                     //animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, frame_xpos, frame_ypos, frame_width, frame_height) );
+                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
                                 }
                                 else {
                                     LOG("error at line %d\n", reader.lineNumber());
@@ -1758,7 +1759,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             }
                         }
                         //this->animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString().c_str(), animation_layer_definition);
-                        this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, width, height, expected_width);
+                        //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, width, height, expected_width);
+                        this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, expected_width);
                     }
                     else {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -1961,27 +1963,27 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     int expected_stride_x = 128;
     //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
     //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE, off_x, off_y, width, height) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP, off_x, off_y, width, height) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE, off_x, off_y, width, height) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE, off_x, off_y, width, height) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE, off_x, off_y, width, height) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     LOG("clothes layer\n");
     int time_s = clock();
     //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
-    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, width, height, expected_stride_x);
+    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
     LOG("time to load: %d\n", clock() - time_s);
     /*LOG("head layer\n");
     string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
     AnimationLayer *head_layer = new AnimationLayer();*/
     //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
-    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, width, height, expected_stride_x);
+    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
     LOG("longsword layer\n");
-    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, width, height, expected_stride_x);
+    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
     LOG("longbow layer\n");
-    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, width, height, expected_stride_x);
+    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
     LOG("shield layer\n");
-    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, width, height, expected_stride_x);
+    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
 
     gui_overlay->setProgress(60);
     qApp->processEvents();
@@ -3769,7 +3771,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         bool move = true;
         //const float click_tol_c = 0.0f;
         //const float click_tol_c = 0.5f;
-        const float click_tol_npc_c = 0.25f;
+        //const float click_tol_npc_c = 0.25f;
+        const float click_tol_npc_c = 0.0f;
         const float click_tol_items_c = 0.0f;
         const float click_tol_scenery_c = 0.0f;
 
@@ -3782,15 +3785,23 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 continue;
             if( !character->isVisible() )
                 continue;
-            float dist_from_click = (dest - character->getPos()).magnitude();
-            /*if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
+            /*float dist_from_click = (dest - character->getPos()).magnitude();
+            if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
                 if( target_npc == NULL || dist_from_click < min_dist ) {*/
-            if( target_npc == NULL || dist_from_click < min_dist ) {
+            /*if( target_npc == NULL || dist_from_click < min_dist ) {
                 AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
-                if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {
+                if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {*/
+
+            /* For collision detection and so on, we treat the characters as being a circle of radius npc_radius_c, centred on the character position.
+             * But for clicking on an NPC, we want to allow the user to be able to click on the visible graphical area (which may be taller, for example).
+             */
+            AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
+            if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {
+                // clicked on this character
+                {
                     done = true;
                     target_npc = character;
-                    min_dist = dist_from_click;
+                    min_dist = 0.0f;
                     if( target_npc->canTalk() ) {
                         float dist_from_player = (player->getPos() - character->getPos()).magnitude();
                         if( dist_from_player <= talk_range_c ) {

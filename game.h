@@ -130,12 +130,14 @@ class AnimationLayerDefinition {
     int position;
     size_t n_frames;
     AnimationSet::AnimationType animation_type;
-    int off_x, off_y, width, height;
+    //int off_x, off_y, width, height;
     //float off_x, off_y, width, height;
 public:
-    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, int off_x, int off_y, int width, int height) :
+    //AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, int off_x, int off_y, int width, int height) :
     //AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, float off_x, float off_y, float width, float height) :
-        name(name), position(position), n_frames(n_frames), animation_type(animation_type), off_x(off_x), off_y(off_y), width(width), height(height) {
+    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type) :
+        //name(name), position(position), n_frames(n_frames), animation_type(animation_type), off_x(off_x), off_y(off_y), width(width), height(height) {
+        name(name), position(position), n_frames(n_frames), animation_type(animation_type) {
     }
 };
 
@@ -167,8 +169,8 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height, int expected_stride_x);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int width, int height, int expected_stride_x);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x);
 };
 
 class AnimatedObject : public QGraphicsItem {
