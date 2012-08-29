@@ -62,5 +62,6 @@
         <file>gfx/textures/scenery/cabinet.png</file>
         <file>gfx/textures/scenery/carpet.png</file>
         <file>gfx/textures/npcs/man.png</file>
+        <file>gfx/textures/scenery/bed.png</file>
     </qresource>
 </RCC>
