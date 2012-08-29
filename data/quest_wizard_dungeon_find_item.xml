@@ -256,10 +256,6 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 
 <!--<item name="Cabinet Key" image_name="key" icon_width="0.25" weight="0" x="6.5" y="13.0"/>-->
 
-<item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2" x="6.5" y="12.0">
-necromancy blah blah
-</item>
-
 <npc name="Man" animation_name="man" static_image="true" x="6.5" y="14.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -291,6 +287,71 @@ The wizard had set me a research task, but grew impatient at my lack of progress
 Ah, thank you! Yes that looks like it will be of most help to me.
 </talk>
 </npc>
+
+<!--east passage-->
+
+<floorregion shape="rect" rect_x="14.0" rect_y="6.0" rect_w="5.0" rect_h="1.0"/>
+
+<!--west-->
+<floorregion shape="rect" rect_x="18.0" rect_y="7.0" rect_w="1.0" rect_h="10.0"/>
+
+<!--south-->
+<floorregion shape="rect" rect_x="19.0" rect_y="16.0" rect_w="18.0" rect_h="1.0"/>
+
+<!--east-->
+<floorregion shape="rect" rect_x="37.0" rect_y="7.0" rect_w="1.0" rect_h="10.0"/>
+
+<!--north-->
+<floorregion shape="rect" rect_x="19.0" rect_y="7.0" rect_w="18.0" rect_h="1.0"/>
+<npc name="Goblin" template="Goblin" x="26.5" y="7.5"/>
+
+<!--rooms-->
+
+<!--bedroom-->
+    <floorregion shape="rect" rect_x="19.0" rect_y="9.5" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="19.5" rect_y="8.5" rect_w="4.0" rect_h="3.0"/>
+<scenery name="Bed" image_name="bed" x="22.5" y="9.5" size="1.2" blocking="true"/>
+<scenery name="Cabinet" image_name="cabinet" x="20.0" y="9.0" size="0.8" blocking="true">
+    <gold amount="43"/>
+    <item template="Gold Ring"/>
+</scenery>
+
+    <floorregion shape="rect" rect_x="19.0" rect_y="13.5" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="19.5" rect_y="12.0" rect_w="4.0" rect_h="3.5"/>
+<scenery name="Barrel" image_name="barrel" x="23.0" y="15.0" w="0.8" h="0.8" blocking="true">
+    <gold amount="3"/>
+</scenery>
+
+<!--armoury-->
+    <floorregion shape="rect" rect_x="26.0" rect_y="15.5" rect_w="1.0" rect_h="0.5"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="12.0" rect_w="5.0" rect_h="3.5"/>
+<scenery name="Crate" image_name="crate" x="28.5" y="15.0" w="0.8" h="0.8" blocking="true">
+    <item template="Long Sword"/>
+    <item template="Arrows"/>
+</scenery>
+<item template="Leather Armour" x="28.5" y="12.5"/>
+<npc name="Orc" template="Orc" x="26.0" y="12.5">
+    <item template="Leather Armour"/>
+</npc>
+
+<!--garden-->
+<floorregion shape="rect" rect_x="35.5" rect_y="8.0" rect_w="1.0" rect_h="5.0"/>
+<trap x="35.5" y="8.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="35.5" y="12.0" w="1.0" h="1.0" type="arrow"/>
+
+<floorregion shape="rect" rect_x="29.5" rect_y="13.0" rect_w="7.0" rect_h="2.5"/>
+<npc name="Goblin" template="Goblin" x="30.5" y="14.0"/>
+<npc name="Goblin" template="Goblin" x="33.5" y="15.0"/>
+<npc name="Goblin" template="Goblin" x="34.0" y="14.5"/>
+
+<!--library-->
+    <floorregion shape="rect" rect_x="31.0" rect_y="12.5" rect_w="1.0" rect_h="0.5"/>
+<floorregion shape="rect" rect_x="29.5" rect_y="8.5" rect_w="4.0" rect_h="4.0"/>
+
+<item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2" x="31.5" y="12.0">
+necromancy blah blah
+</item>
 
 </location>
 
