@@ -49,6 +49,8 @@ InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool h
             buttons_list.push_back(button);
         }
     }
+
+    this->setEnabled(true);
 }
 
 void InfoDialog::clicked() {
