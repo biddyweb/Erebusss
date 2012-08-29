@@ -461,6 +461,7 @@ void Game::run() {
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
+    QWebSettings *web_settings = QWebSettings::globalSettings();
     if( mobile_c ) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
@@ -480,17 +481,27 @@ void Game::run() {
         this->font_small.setPointSize(font_small.pointSize() - 4);
         this->font_std = new_font;
         this->font_big = new_font;
+
+        web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
+        web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
+        web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
 #else
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() - 2);
         this->font_std = new_font;
         this->font_big = new_font;
+
+        // leave web font as default
 #endif
     }
     else {
         this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
         this->font_big = QFont("Verdana", 48, QFont::Bold);
+
+        web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
+        web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize());
+        web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize());
     }
 
 /*#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
