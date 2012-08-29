@@ -51,18 +51,24 @@ OptionsGamestate::OptionsGamestate() :
 
     QPushButton *startButton = new QPushButton("Start game");
     game_g->initButton(startButton);
+    startButton->setShortcut(QKeySequence(Qt::Key_S));
+    startButton->setToolTip("Start playing a new game (S)");
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
 
     QPushButton *loadButton = new QPushButton("Load game");
     game_g->initButton(loadButton);
+    loadButton->setShortcut(QKeySequence(Qt::Key_L));
+    loadButton->setToolTip("Load a previously saved game (L)");
     loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
 
     QPushButton *optionsButton = new QPushButton("Options");
     game_g->initButton(optionsButton);
+    optionsButton->setShortcut(QKeySequence(Qt::Key_O));
+    optionsButton->setToolTip("Configure various game options (O)");
     optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(optionsButton);
     connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
@@ -71,6 +77,7 @@ OptionsGamestate::OptionsGamestate() :
     // applications don't quit on Android.
     QPushButton *quitButton = new QPushButton("Quit game");
     game_g->initButton(quitButton);
+    quitButton->setShortcut(QKeySequence(Qt::Key_Escape));
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
@@ -88,6 +95,8 @@ OptionsGamestate::OptionsGamestate() :
 
         QPushButton *offlineHelpButton = new QPushButton("Offline Help");
         game_g->initButton(offlineHelpButton);
+        offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
+        offlineHelpButton->setToolTip("View the game instructions (H)");
         //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         offlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(offlineHelpButton);
@@ -95,6 +104,7 @@ OptionsGamestate::OptionsGamestate() :
 
         QPushButton *onlineHelpButton = new QPushButton("Online Help");
         game_g->initButton(onlineHelpButton);
+        onlineHelpButton->setToolTip("Visit the game's website");
         //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         onlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(onlineHelpButton);
@@ -172,12 +182,14 @@ void OptionsGamestate::clickedStart() {
 
     QPushButton *startButton = new QPushButton("Start");
     game_g->initButton(startButton);
+    startButton->setShortcut(QKeySequence(Qt::Key_Return));
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
@@ -224,12 +236,14 @@ void OptionsGamestate::clickedLoad() {
 
     QPushButton *loadButton = new QPushButton("Load");
     game_g->initButton(loadButton);
+    loadButton->setShortcut(QKeySequence(Qt::Key_Return));
     //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
@@ -266,12 +280,14 @@ void OptionsGamestate::clickedOptions() {
 
     QPushButton *okayButton = new QPushButton("Okay");
     game_g->initButton(okayButton);
+    okayButton->setShortcut(QKeySequence(Qt::Key_Return));
     okayButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(okayButton);
     connect(okayButton, SIGNAL(clicked()), this, SLOT(clickedOptionsOkay()));
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));

@@ -508,6 +508,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     QPushButton *closeButton = new QPushButton("Continue");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
@@ -635,6 +636,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     QPushButton *closeButton = new QPushButton("Continue");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 
@@ -1064,6 +1066,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 
     QPushButton *closeButton = new QPushButton("Finish Trading");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
@@ -1214,6 +1217,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 
     QPushButton *closeButton = new QPushButton(close_text);
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedClose()));
@@ -1310,6 +1314,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
         QPushButton *saveButton = new QPushButton("Save");
         game_g->initButton(saveButton);
+        saveButton->setShortcut(QKeySequence(Qt::Key_Return));
         //saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(saveButton);
         connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
@@ -1323,6 +1328,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
@@ -1375,6 +1381,7 @@ void SaveGameWindow::clickedSave() {
 
         QPushButton *saveButton = new QPushButton("Save game");
         game_g->initButton(saveButton);
+        saveButton->setShortcut(QKeySequence(Qt::Key_Return));
         saveButton->setFont(game_g->getFontBig());
         saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         layout->addWidget(saveButton);
@@ -1382,6 +1389,7 @@ void SaveGameWindow::clickedSave() {
 
         QPushButton *closeButton = new QPushButton("Cancel");
         game_g->initButton(closeButton);
+        closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
         closeButton->setFont(game_g->getFontBig());
         closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         layout->addWidget(closeButton);
@@ -1506,7 +1514,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *statsButton = new QPushButton("Stats");
         game_g->initButton(statsButton);
-        statsButton->setToolTip("Display statistics of your character");
+        statsButton->setShortcut(QKeySequence(Qt::Key_S));
+        statsButton->setToolTip("Display statistics of your character (S)");
         statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
@@ -1514,7 +1523,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *itemsButton = new QPushButton("Items");
         game_g->initButton(itemsButton);
-        itemsButton->setToolTip("Display the items that you are carrying");
+        itemsButton->setShortcut(QKeySequence(Qt::Key_I));
+        itemsButton->setToolTip("Display the items that you are carrying (I)");
         itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
@@ -1529,7 +1539,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *journalButton = new QPushButton("Journal");
         game_g->initButton(journalButton);
-        journalButton->setToolTip("Displays information about your quests");
+        journalButton->setShortcut(QKeySequence(Qt::Key_J));
+        journalButton->setToolTip("Displays information about your quests (J)");
         journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
@@ -1544,20 +1555,23 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
         QPushButton *pauseButton = new QPushButton("Pause");
         game_g->initButton(pauseButton);
-        pauseButton->setToolTip("Pause the game");
+        pauseButton->setShortcut(QKeySequence(Qt::Key_P));
+        pauseButton->setToolTip("Pause the game (P)");
         pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
 
         QPushButton *restButton = new QPushButton("Rest");
         game_g->initButton(restButton);
-        restButton->setToolTip("Rest until you are healed");
+        restButton->setShortcut(QKeySequence(Qt::Key_R));
+        restButton->setToolTip("Rest until you are healed (R)");
         restButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
 
         QPushButton *optionsButton = new QPushButton("Options");
         game_g->initButton(optionsButton);
+        optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
         optionsButton->setToolTip("Options to save game or quit");
         optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -3254,6 +3268,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
 
+    qApp->processEvents();
+
     if( !is_savegame && quest->getInfo().length() > 0 ) {
         stringstream str;
         str << "<html><body>";
@@ -3420,6 +3436,8 @@ void PlayingGamestate::clickedOptions() {
 
     QPushButton *quitButton = new QPushButton("Quit game");
     game_g->initButton(quitButton);
+    quitButton->setShortcut(QKeySequence(Qt::Key_Q));
+    quitButton->setToolTip("Quit current game, and return to the main menu (Q)");
     quitButton->setFont(game_g->getFontBig());
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
@@ -3427,6 +3445,8 @@ void PlayingGamestate::clickedOptions() {
 
     QPushButton *saveButton = new QPushButton("Save game");
     game_g->initButton(saveButton);
+    saveButton->setShortcut(QKeySequence(Qt::Key_S));
+    saveButton->setToolTip("Save the current game (S)");
     saveButton->setFont(game_g->getFontBig());
     saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(saveButton);
@@ -3434,6 +3454,7 @@ void PlayingGamestate::clickedOptions() {
 
     QPushButton *closeButton = new QPushButton("Back to game");
     game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setFont(game_g->getFontBig());
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
@@ -3483,6 +3504,7 @@ void PlayingGamestate::clickedQuit() {
 }
 
 void PlayingGamestate::showInfoWindow(const string &html) {
+    // n.b., different to showDialogWindow, as this doesn't block and wait for an answer
     LOG("showInfoWindow()\n");
 
     game_g->getScreen()->setPaused(true);
@@ -3500,10 +3522,12 @@ void PlayingGamestate::showInfoWindow(const string &html) {
 
     QPushButton *closeButton = new QPushButton("Continue");
     game_g->initButton(closeButton);
-    closeButton->setFont(game_g->getFontBig());
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
+
+    //this->showInfoDialog(html);
 }
 
 void PlayingGamestate::closeSubWindow() {
