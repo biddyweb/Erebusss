@@ -524,6 +524,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
+    QFont font_small = game_g->getFontSmall();
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
@@ -534,36 +535,50 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
         QPushButton *viewAllButton = new QPushButton("All");
         game_g->initButton(viewAllButton);
+        viewAllButton->setFont(font_small);
+        viewAllButton->setToolTip("Display all items");
         h_layout->addWidget(viewAllButton);
         connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
 
-        QPushButton *viewWeaponsButton = new QPushButton("Weapons");
+        QPushButton *viewWeaponsButton = new QPushButton("Wpns");
         game_g->initButton(viewWeaponsButton);
+        viewWeaponsButton->setFont(font_small);
+        viewWeaponsButton->setToolTip("Display only weapons");
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
 
         QPushButton *viewAmmoButton = new QPushButton("Ammo");
         game_g->initButton(viewAmmoButton);
+        viewAmmoButton->setFont(font_small);
+        viewAmmoButton->setToolTip("Display only ammunition");
         h_layout->addWidget(viewAmmoButton);
         connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
 
         QPushButton *viewShieldsButton = new QPushButton("Shields");
         game_g->initButton(viewShieldsButton);
+        viewShieldsButton->setFont(font_small);
+        viewShieldsButton->setToolTip("Display only shields");
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
-        QPushButton *viewArmourButton = new QPushButton("Armour");
+        QPushButton *viewArmourButton = new QPushButton("Arm.");
         game_g->initButton(viewArmourButton);
+        viewArmourButton->setFont(font_small);
+        viewArmourButton->setToolTip("Display only armour");
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
 
         QPushButton *viewMagicButton = new QPushButton("Magic");
         game_g->initButton(viewMagicButton);
+        viewMagicButton->setFont(font_small);
+        viewMagicButton->setToolTip("Display only magical items");
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
 
         QPushButton *viewMiscButton = new QPushButton("Misc");
         game_g->initButton(viewMiscButton);
+        viewMiscButton->setFont(font_small);
+        viewMiscButton->setToolTip("Display only miscellaneous items");
         h_layout->addWidget(viewMiscButton);
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
     }
