@@ -63,5 +63,7 @@
         <file>gfx/textures/scenery/carpet.png</file>
         <file>gfx/textures/npcs/man.png</file>
         <file>gfx/textures/scenery/bed.png</file>
+        <file>gfx/textures/npcs/wyvern.png</file>
+        <file>gfx/textures/items/hand_mirror.png</file>
     </qresource>
 </RCC>
