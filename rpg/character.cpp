@@ -161,7 +161,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             HITSTATE_IS_NOT_HITTING = 2
         };
         HitState hit_state = HITSTATE_IS_NOT_HITTING;
-        if( elapsed_ms > time_last_action_ms + 400 && is_hitting ) {
+        const int hit_delay_c = 400;
+        //const int hit_delay_c = 4000;
+        if( elapsed_ms > time_last_action_ms + hit_delay_c && is_hitting ) {
             hit_state = HITSTATE_HAS_HIT;
         }
         else if( is_hitting ) {
