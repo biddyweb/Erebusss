@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <npcs>
 
+<!--Weapon hardcoded as natural damage: Spear-->
 <npc name="Goblin" animation_name="goblin"
     FP="7" BS="8" S="6" A="1" M="6" D="6" B="5" Sp="2"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
@@ -8,6 +9,7 @@
     xp_worth="10"
 />
 
+<!--Weapon hardcoded as natural damage: Spear-->
 <npc name="Goblin Champion" animation_name="goblin_champion"
     FP="8" BS="8" S="6" A="1" M="6" D="6" B="6" Sp="2"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
@@ -15,6 +17,7 @@
     xp_worth="12"
 />
 
+<!--Weapon hardcoded as natural damage: Battle Axe-->
 <npc name="Orc" animation_name="orc"
     FP="9" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
@@ -22,6 +25,7 @@
     xp_worth="15"
 />
 
+<!--Natural damage-->
 <npc name="Wyvern" animation_name="wyvern"
     FP="9" BS="0" S="5" A="1" M="3" D="0" B="5" Sp="4.0"
     natural_damageX="2" natural_damageY="8" natural_damageZ="0"
