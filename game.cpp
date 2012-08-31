@@ -112,6 +112,7 @@ AnimationSet::~AnimationSet() {
 
 const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) const {
     //qDebug("animation type: %d", this->animation_type);
+    //LOG("%d : type %d, frame %d\n", this, this->animation_type, c_frame);
     switch( this->animation_type ) {
     case ANIMATIONTYPE_BOUNCE:
         if( n_frames == 1 )
@@ -132,6 +133,7 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
         c_frame = c_frame % n_frames;
         break;
     }
+    //LOG("    >>> %d\n", c_frame);
 
     //qDebug("get frame %d", c_frame);
     return this->pixmaps[((int)c_direction)*n_frames + c_frame];
@@ -206,7 +208,8 @@ AnimatedObject::~AnimatedObject() {
 void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
-        int ms_per_frame = 100;
+        const int ms_per_frame = 100;
+        //const int ms_per_frame = 1000;
         //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
         int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );
@@ -285,7 +288,7 @@ void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
     }*/
 
     if( is_new || force_restart ) {
-        animation_time_start_ms = 0;
+        animation_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
         //this->setFrame(0);
         this->c_frame = 0;
         this->update();
