@@ -198,12 +198,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             if( hit_state == HITSTATE_HAS_HIT ) {
                 this->setStateIdle();
                 if( can_hit ) {
+                    ai_try_moving = false; // no point trying to move, just wait to hit again
                     int hit_roll = rollDice(2, 6, 0);
                     int stat = is_ranged ? this->BS : this->FP;
                     int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                     if( hit_roll <= mod_stat ) {
                         LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
-                        ai_try_moving = false; // no point trying to move, just wait to hit again
                         if( !target_npc->is_dead ) {
                             int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
                             if( rollDice(2, 6, 0) <= this->S ) {
@@ -232,7 +232,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         }
                     }
                     else{
-                        LOG("character %s rolled %d, missed %s\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str());
+                        LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
                     }
                 }
             }
