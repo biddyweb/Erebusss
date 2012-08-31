@@ -4,6 +4,16 @@
 <weapon name="Long Sword" image_name="longsword" weight="14"
     damageX="2" damageY="10" damageZ="0"
     animation_name="longsword"/>
+
+<weapon name="Short Sword" image_name="longsword" weight="10"
+    damageX="2" damageY="6" damageZ="0"
+    animation_name="longsword"/>
+
+<weapon name="Shortbow" image_name="longbow" weight="4"
+    damageX="2" damageY="8" damageZ="-2"
+    animation_name="longbow"
+    two_handed="true" ranged="true" ammo="Arrows"/>
+
 <weapon name="Longbow" image_name="longbow" weight="5"
     damageX="2" damageY="12" damageZ="-1"
     animation_name="longbow"
@@ -34,6 +44,8 @@ Plate armour provides excellent protection, but it is also heavy to carry.
 
 <item name="Gold Ring" image_name="ring_gold" weight="0"/>
 
+<item name="Mirror" image_name="hand_mirror" icon_width="0.25" weight="2"/>
+
 <item name="Potion of Healing" image_name="potion_red" weight="1"
     rating="4" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink">
 This potion will heal some or all of your injuries.
@@ -49,8 +61,10 @@ This potion will heal some or all of your injuries.
 <currency name="Gold" image_name="gold"/>
 
 <shop name="Armourer">
-    <purchase template="Long Sword" cost="25"/>
-    <purchase template="Longbow" cost="40"/>
+    <purchase template="Long Sword" cost="40"/>
+    <purchase template="Short Sword" cost="25"/>
+    <purchase template="Longbow" cost="60"/>
+    <purchase template="Shortbow" cost="40"/>
     <purchase template="Shield" cost="10"/>
     <purchase template="Leather Armour" cost="25"/>
     <purchase template="Chain Mail Armour" cost="50"/>
@@ -70,6 +84,8 @@ This potion will heal some or all of your injuries.
 <player_default_items>
     <player_default_item template="Long Sword"/>
     <player_default_item template="Leather Armour"/>
+    <!--<player_default_item template="Longbow"/>
+    <player_default_item template="Arrows"/>-->
 </player_default_items>
 
 </items>
