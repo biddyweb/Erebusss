@@ -129,6 +129,7 @@ int Character::modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int 
 }
 
 bool Character::update(PlayingGamestate *playing_gamestate) {
+    //LOG("Character::update() for: %s\n", this->name.c_str());
     if( this->location == NULL ) {
         return false;
     }
@@ -198,9 +199,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 this->setStateIdle();
                 if( can_hit ) {
                     int hit_roll = rollDice(2, 6, 0);
-                    int mod_FP = this->modifyStatForDifficulty(playing_gamestate, this->FP);
-                    if( hit_roll <= mod_FP ) {
-                        LOG("character %s rolled %d, hit %s\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str());
+                    int stat = is_ranged ? this->BS : this->FP;
+                    int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
+                    if( hit_roll <= mod_stat ) {
+                        LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
                         ai_try_moving = false; // no point trying to move, just wait to hit again
                         if( !target_npc->is_dead ) {
                             int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
@@ -245,17 +247,16 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
                             ammo_key = this->getCurrentWeapon()->getAmmoKey();
                             Item *item = this->findItem(ammo_key);
-                            if( item == NULL && this == playing_gamestate->getPlayer() ) {
-                                // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
-                                LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                                playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                            if( item == NULL ) {
+                                if( this == playing_gamestate->getPlayer() ) {
+                                    // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
+                                    LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                                    playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                }
+                                // for NPCs, this shouldn't happen, but put this check just in case!
                                 can_hit = false;
                                 this->armWeapon(NULL); // disarm it
                             }
-                            /*else if( item->getType() != ITEMTYPE_AMMO ) {
-                                LOG("required ammo type %s is not ammo\n", item->getName().c_str());
-                                throw string("required ammo type is not ammo");
-                            }*/
                             else {
                                 if( item->getType() != ITEMTYPE_AMMO ) {
                                     LOG("required ammo type %s is not ammo\n", item->getName().c_str());
@@ -275,6 +276,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                             LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
                                             playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
                                             this->armWeapon(NULL); // disarm it
+                                        }
+                                        else {
+                                            this->armWeapon(NULL); // disarm it (will select the best weapon to use on next hit attempt)
                                         }
                                     }
                                 }
