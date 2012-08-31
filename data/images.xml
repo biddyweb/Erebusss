@@ -76,7 +76,7 @@
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
-    <!--<animation name="ranged" start="28" length="4" type="single"/>-->
+    <animation name="ranged" start="28" length="4" type="single"/>
     <animation name="death" start="20" length="4" type="single"/>
 </image>
 <image type="npc" name="wyvern" filename="gfx/textures/npcs/wyvern.png" xpos="0" ypos="0" width="128" height="128" expected_width="128">
