@@ -94,7 +94,8 @@ string Item::getDetailedDescription() const {
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
         if( damageZ != 0 ) {
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << "+" << damageZ << "<br/>";
+            char sign = damageZ > 0 ? '+' : '-';
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << sign << abs(damageZ) << "<br/>";
         }
         else {
             str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
