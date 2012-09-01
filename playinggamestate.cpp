@@ -818,7 +818,12 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
 void ItemsWindow::setWeightLabel() {
     Character *player = this->playing_gamestate->getPlayer();
     int weight = player->calculateItemsWeight();
-    this->weightLabel->setText("Weight: " + QString::number(weight));
+    stringstream str;
+    str << "Weight: ";
+    str << weight;
+    str << " / ";
+    str << player->getCanCarryWeight();
+    this->weightLabel->setText(str.str().c_str());
 }
 
 void ItemsWindow::clickedArmWeapon() {
@@ -1641,7 +1646,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
         this->player->setProfile(8, 7, 8, 1, 6, 7, 8, 2.75f);
-        player->initialiseHealth(60);
+        //player->initialiseHealth(60);
+        player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
     }
 
@@ -3585,6 +3591,7 @@ void PlayingGamestate::update() {
         return;
     }
 
+    //qDebug("PlayingGamestate::update()");
     // scroll
     if( !mobile_c ) {
         int time_ms = game_g->getScreen()->getGameTimeFrameMS();
@@ -3667,13 +3674,16 @@ void PlayingGamestate::update() {
     }
 
     vector<Character *> delete_characters;
+    //LOG("update characters\n");
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
+        //LOG("update: %s\n", character->getName().c_str());
         if( character->update(this) ) {
             LOG("character is about to die: %s\n", character->getName().c_str());
             delete_characters.push_back(character);
         }
     }
+    //LOG("done update characters\n");
     for(vector<Character *>::iterator iter = delete_characters.begin(); iter != delete_characters.end(); ++iter) {
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
@@ -3701,6 +3711,7 @@ void PlayingGamestate::update() {
             this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
         }
     }
+    //qDebug("PlayingGamestate::update() exit");
 }
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
@@ -3804,8 +3815,10 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
 }
 
 void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart) {
+    //LOG("PlayingGamestate::characterSetAnimation(%s, %d, %s, %d)\n", character->getName().c_str(), user_data, name.c_str(), force_restart);
+    //LOG("    at %d\n", game_g->getScreen()->getGameTimeTotalMS());
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
-    object->setAnimationSet(name,  force_restart);
+    object->setAnimationSet(name, force_restart);
 }
 
 void PlayingGamestate::characterDeath(Character *character, void *user_data) {
