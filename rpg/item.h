@@ -206,9 +206,9 @@ public:
     }
     virtual Armour *clone() const; // virtual copy constructor
 
-    int getRating() const {
+    /*int getRating() const {
         return this->rating;
-    }
+    }*/
 };
 
 class Ammo : public Item {
