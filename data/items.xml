@@ -9,6 +9,10 @@
     damageX="2" damageY="6" damageZ="0"
     animation_name="longsword"/>
 
+<weapon name="Dagger" image_name="longsword" weight="5"
+    damageX="1" damageY="6" damageZ="0"
+    animation_name="longsword"/>
+
 <weapon name="Shortbow" image_name="longbow" weight="4"
     damageX="2" damageY="8" damageZ="-2"
     animation_name="longbow"
@@ -63,6 +67,7 @@ This potion will heal some or all of your injuries.
 <shop name="Armourer">
     <purchase template="Long Sword" cost="40"/>
     <purchase template="Short Sword" cost="25"/>
+    <purchase template="Dagger" cost="10"/>
     <purchase template="Longbow" cost="60"/>
     <purchase template="Shortbow" cost="40"/>
     <purchase template="Shield" cost="10"/>
