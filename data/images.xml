@@ -86,6 +86,8 @@
     <animation name="death" start="48" length="8" type="single"/>
 </image>
 
+<image type="npc_static" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
+
 <image type="npc_static" name="man" filename="gfx/textures/npcs/man.png"/>
 
 </images>

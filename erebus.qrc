@@ -65,5 +65,6 @@
         <file>gfx/textures/scenery/bed.png</file>
         <file>gfx/textures/npcs/wyvern.png</file>
         <file>gfx/textures/items/hand_mirror.png</file>
+        <file>gfx/textures/npcs/wraith.png</file>
     </qresource>
 </RCC>
