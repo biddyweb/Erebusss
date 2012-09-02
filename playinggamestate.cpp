@@ -2196,28 +2196,28 @@ void PlayingGamestate::playBackgroundMusic() {
 
 Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
+
+    QStringRef weight_s = reader.attributes().value("weight");
+    QStringRef rating_s = reader.attributes().value("rating");
+    QStringRef magical_s = reader.attributes().value("magical");
+    int weight = parseInt(weight_s.toString(), true);
+    int rating = parseInt(rating_s.toString(), true);
+    if( rating == 0 )
+        rating = 1; // so the default of 0 defaults instead to 1
+    bool magical = parseBool(magical_s.toString(), true);
+
     if( reader.name() == "item" ) {
         QStringRef name_s = reader.attributes().value("name");
         QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef icon_width_s = reader.attributes().value("icon_width");
-        QStringRef weight_s = reader.attributes().value("weight");
-        QStringRef rating_s = reader.attributes().value("rating");
-        QStringRef magical_s = reader.attributes().value("magical");
         QStringRef use_s = reader.attributes().value("use");
         QStringRef use_verb_s = reader.attributes().value("use_verb");
-        int weight = parseInt(weight_s.toString());
-        int rating = parseInt(rating_s.toString(), true);
-        if( rating == 0 )
-            rating = 1; // so the default of 0 defaults instead to 1
-        bool magical = parseBool(magical_s.toString(), true);
         item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
         if( icon_width_s.length() > 0 ) {
             float icon_width = parseFloat(icon_width_s.toString());
             //LOG("icon_width: %f\n", icon_width);
             item->setIconWidth(icon_width);
         }
-        item->setRating(rating);
-        item->setMagical(magical);
         if( use_s.length() > 0 ) {
             item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
         }
@@ -2229,7 +2229,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         //qDebug("    weapon:");
         QStringRef name_s = reader.attributes().value("name");
         QStringRef image_name_s = reader.attributes().value("image_name");
-        QStringRef weight_s = reader.attributes().value("weight");
         QStringRef animation_name_s = reader.attributes().value("animation_name");
         QStringRef two_handed_s = reader.attributes().value("two_handed");
         QStringRef ranged_s = reader.attributes().value("ranged");
@@ -2244,7 +2243,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         qDebug("    two_handed_s: %s", two_handed_s.toString().toStdString().c_str());
         qDebug("    ranged_s: %s", ranged_s.toString().toStdString().c_str());
         qDebug("    ammo_s: %s", ammo_s.toString().toStdString().c_str());*/
-        int weight = parseInt(weight_s.toString());
         bool two_handed = parseBool(two_handed_s.toString(), true);
         bool ranged = parseBool(ranged_s.toString(), true);
         int damageX = parseInt(damageX_s.toString());
@@ -2264,9 +2262,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     else if( reader.name() == "shield" ) {
         QStringRef name_s = reader.attributes().value("name");
         QStringRef image_name_s = reader.attributes().value("image_name");
-        QStringRef weight_s = reader.attributes().value("weight");
         QStringRef animation_name_s = reader.attributes().value("animation_name");
-        int weight = parseInt(weight_s.toString());
         Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
         item = shield;
         // must be done last
@@ -2278,10 +2274,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef name_s = reader.attributes().value("name");
         qDebug("    name: %s", name_s.toString().toStdString().c_str());
         QStringRef image_name_s = reader.attributes().value("image_name");
-        QStringRef weight_s = reader.attributes().value("weight");
-        QStringRef rating_s = reader.attributes().value("rating");
-        int weight = parseInt(weight_s.toString());
-        int rating = parseInt(rating_s.toString());
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
         item = armour;
         // must be done last
@@ -2313,6 +2305,10 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         item = currency;
     }
     // else ignore unknown element - leave item as NULL
+    if( item != NULL ) {
+        item->setRating(rating);
+        item->setMagical(magical);
+    }
     return item;
 }
 
