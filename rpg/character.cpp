@@ -712,7 +712,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
 }
 
 int Character::getCanCarryWeight() const {
-    return 400;
+    return 300;
     //return 10;
 }
 
