@@ -13,7 +13,7 @@
 #endif
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
-    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), animation_name(animation_name), static_image(false)
+    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
 {
 }
 
@@ -47,7 +47,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -65,7 +65,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -75,6 +75,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     }
     this->gold = character_template.getGold();
     this->xp_worth = character_template.getXPWorth();
+    this->requires_magical = character_template.requiresMagical();
 }
 
 Character::~Character() {
@@ -205,36 +206,45 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     int stat = is_ranged ? this->BS : this->FP;
                     int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                     if( hit_roll <= mod_stat ) {
-                        LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
+                        //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
                         if( !target_npc->is_dead ) {
-                            int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                            if( rollDice(2, 6, 0) <= this->S ) {
-                                LOG("    extra strong hit!\n");
-                                damage++;
+                            bool is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
+                            if( !is_magical && target_npc->requiresMagical() ) {
+                                // weapon has no effect!
+                                if( this == playing_gamestate->getPlayer() ) {
+                                    playing_gamestate->addTextEffect("Weapon has no effect!", this->getPos(), 2000, 255, 0, 0);
+                                }
                             }
-                            LOG("    damage: %d\n", damage);
-                            if( damage > 0 ) {
-                                if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
-                                    string text;
-                                    int r = rand() % 4;
-                                    if( r == 0 )
-                                        text = "Argh!";
-                                    else if( r == 1 )
-                                        text = "Ow!";
-                                    else if( r == 2 )
-                                        text = "Ouch!";
-                                    else
-                                        text = "Eek!";
-                                    playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
-                                    if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
-                                        this->addXP(playing_gamestate, target_npc->getXPWorth());
+                            else {
+                                int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
+                                if( rollDice(2, 6, 0) <= this->S ) {
+                                    //LOG("    extra strong hit!\n");
+                                    damage++;
+                                }
+                                //LOG("    damage: %d\n", damage);
+                                if( damage > 0 ) {
+                                    if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
+                                        string text;
+                                        int r = rand() % 4;
+                                        if( r == 0 )
+                                            text = "Argh!";
+                                        else if( r == 1 )
+                                            text = "Ow!";
+                                        else if( r == 2 )
+                                            text = "Ouch!";
+                                        else
+                                            text = "Eek!";
+                                        playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
+                                        if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
+                                            this->addXP(playing_gamestate, target_npc->getXPWorth());
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                     else{
-                        LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
+                        //LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
                     }
                 }
             }
@@ -252,7 +262,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             if( item == NULL ) {
                                 if( this == playing_gamestate->getPlayer() ) {
                                     // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
-                                    LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                                    //LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
                                     playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
                                 }
                                 // for NPCs, this shouldn't happen, but put this check just in case!
@@ -261,7 +271,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                             else {
                                 if( item->getType() != ITEMTYPE_AMMO ) {
-                                    LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                                    //LOG("required ammo type %s is not ammo\n", item->getName().c_str());
                                     ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
                                 }
                                 ammo = static_cast<Ammo *>(item);

@@ -1987,8 +1987,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     int gold_max = parseInt(gold_max_s.toString());
                     QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                     int xp_worth = parseInt(xp_worth_s.toString());
+                    QStringRef requires_magical_s = reader.attributes().value("requires_magical");
+                    bool requires_magical = parseBool(requires_magical_s.toString(), true);
                     CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth);
                     character_template->setStaticImage(static_image);
+                    character_template->setRequiresMagical(requires_magical);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -2848,6 +2851,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef xp_s = reader.attributes().value("xp");
                         int xp = parseInt(xp_s.toString(), true);
                         npc->setXP(xp);
+                        QStringRef requires_magical_s = reader.attributes().value("requires_magical");
+                        bool requires_magical = parseBool(requires_magical_s.toString(), true);
+                        npc->setRequiresMagical(requires_magical);
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString(), true) );
                         QStringRef can_talk_s = reader.attributes().value("can_talk");
@@ -4324,6 +4330,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
+            fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
             fprintf(file, " gold=\"%d\"", character->getGold());
             fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
             fprintf(file, " has_talked=\"%s\"", character->hasTalked() ? "true": "false");

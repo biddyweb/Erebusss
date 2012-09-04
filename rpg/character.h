@@ -69,6 +69,7 @@ class CharacterTemplate {
     int natural_damageX, natural_damageY, natural_damageZ;
     int gold_min, gold_max;
     int xp_worth;
+    bool requires_magical; // requires magical weapon to hit?
     string animation_name;
     bool static_image;
 public:
@@ -116,6 +117,12 @@ public:
     int getGold() const;
     int getXPWorth() const {
         return xp_worth;
+    }
+    void setRequiresMagical(bool requires_magical) {
+        this->requires_magical = requires_magical;
+    }
+    bool requiresMagical() const {
+        return requires_magical;
     }
     string getAnimationName() const {
         return this->animation_name;
@@ -169,6 +176,7 @@ class Character {
 
     int xp;
     int xp_worth;
+    bool requires_magical; // requires magical weapon to hit?
 
     // npc talk information
     bool can_talk;
@@ -458,6 +466,12 @@ public:
     }
     void setXPWorth(int xp_worth) {
         this->xp_worth = xp_worth;
+    }
+    bool requiresMagical() const {
+        return requires_magical;
+    }
+    void setRequiresMagical(bool requires_magical) {
+        this->requires_magical = requires_magical;
     }
 
     bool canTalk() const {
