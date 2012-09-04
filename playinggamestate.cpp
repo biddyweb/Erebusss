@@ -3512,11 +3512,11 @@ void PlayingGamestate::clickedRest() {
 
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
-    if( c_location->hasEnemies(this) ) {
+    /*if( c_location->hasEnemies(this) ) {
         //game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
         this->showInfoDialog("You cannot save here - enemies are nearby.");
         return;
-    }
+    }*/
     new SaveGameWindow(this);
 }
 
