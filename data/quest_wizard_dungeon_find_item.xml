@@ -222,25 +222,85 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
+<!--<player_start x="12.5" y="2.0"/>-->
+
+<floorregion shape="rect" rect_x="5.0" rect_y="1.0" rect_w="15.0" rect_h="2.0"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
+
+<!--north west room-->
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
+
+<npc name="Orc" template="Orc" x="1.0" y="3.0">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc" template="Orc" x="2.0" y="3.0"/>
+
+<scenery name="Crate" image_name="crate" x="4.5" y="5.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="11"/>
+</scenery>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="6.0" rect_w="2.0" rect_h="10.0"/>
+
+<!-- north east room-->
+
+<floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
+
+<floorregion shape="rect" rect_x="24.0" rect_y="6.0" rect_w="1.0" rect_h="10.0"/>
+
+<!--south west room-->
+
+<floorregion shape="rect" rect_x="0.0" rect_y="16.0" rect_w="5.0" rect_h="5.0"/>
+
+<npc name="Orc" template="Orc" x="1.0" y="20.0">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc" template="Orc" x="4.0" y="20.0">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+</npc>
+
+<!--south east room-->
+
+<floorregion shape="rect" rect_x="20.0" rect_y="16.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Rock" image_name="rock1" x="23.0" y="17.5" size="0.2"/>
+
+<npc name="Goblin" template="Goblin" x="21.0" y="20.0"/>
+<npc name="Goblin" template="Goblin" x="23.0" y="20.0"/>
+<npc name="Goblin" template="Goblin" x="20.5" y="17.0"/>
+
+<scenery name="Chest" image_name="chest" x="24.5" y="20.5" size="0.8" blocking="true">
+    <weapon name="Magic Dagger" image_name="longsword" weight="5"
+        damageX="1" damageY="6" damageZ="1"
+        animation_name="longsword"
+        magical="true"/>
+</scenery>
+
+<!--south passage-->
+
+<floorregion shape="rect" rect_x="5.0" rect_y="19.0" rect_w="15.0" rect_h="2.0"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="20.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="12.5" exit_location_y="2.0"/>
+
+</location>
+
+<location name="level_3">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
 <player_start x="12.5" y="2.0"/>
 
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
+<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
 
 <scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.5" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
 
 <!--study-->
-
-<!--
-<floorregion shape="rect" rect_x="6.0" rect_y="6.0" rect_w="5.0" rect_h="1.0"/>
-
-<floorregion shape="rect" rect_x="2.0" rect_y="1.0" rect_w="4.0" rect_h="6.0"/>
-
-<scenery name="Cabinet" image_name="cabinet" x="3.0" y="2.0" size="1.2" blocking="true">
-    <item template="Potion of Healing"/>
-    <gold amount="32"/>
-</scenery>
--->
 
 <floorregion shape="rect" rect_x="6.0" rect_y="6.0" rect_w="5.0" rect_h="1.0"/>
 
@@ -254,9 +314,7 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <scenery name="Chest" image_name="chest" x="5.5" y="15.5" size="0.8" blocking="true"
     locked="true"/>
 
-<!--<item name="Cabinet Key" image_name="key" icon_width="0.25" weight="0" x="6.5" y="13.0"/>-->
-
-<npc name="Man" animation_name="man" static_image="true" x="6.5" y="14.0"
+<npc name="Calbert" animation_name="man" static_image="true" x="6.5" y="14.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
@@ -275,7 +333,7 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 Thank you once again for helping me. Once I have finished researching from this book that you found for me, I will finally be able to leave this place.
 </opening_interaction_complete>
 <talk question="Who are you?">
-I am a scholar, employed by the great wizard to help in his research here.
+I am Calbert, a scholar, employed by the great wizard to help in his research here.
 </talk>
 <talk question="Don't you know the wizard is long dead? It's been one hundred years...">
 No, surely not ... that is terrible news if he has died, admittedly I haven't seen him in a while. But one hundred years? It's been a while, but surely not more than a few months...
@@ -316,6 +374,25 @@ Ah, thank you! Yes that looks like it will be of most help to me.
     <item template="Gold Ring"/>
 </scenery>
 
+<!--room behind mirror door-->
+<scenery name="Door" image_name="door_mirror" x="23.4999" y="10.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Hand Mirror" locked_silent="true" unlock_text="The mirror shatters before you!"
+    />
+
+    <floorregion shape="rect" rect_x="23.5" rect_y="10.0" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="8.5" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Chest" image_name="chest" x="24.5" y="9.0" size="0.8" blocking="true">
+    <weapon name="Magic Short Sword" image_name="longsword" weight="10"
+        damageX="2" damageY="6" damageZ="1"
+        animation_name="longsword"
+        magical="true"/>
+    <item template="Red Gem"/>
+    <gold amount="16"/>
+</scenery>
+
+<!--room-->
+
     <floorregion shape="rect" rect_x="19.0" rect_y="13.5" rect_w="0.5" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="19.5" rect_y="12.0" rect_w="4.0" rect_h="3.5"/>
 <scenery name="Barrel" image_name="barrel" x="23.0" y="15.0" w="0.8" h="0.8" blocking="true">
@@ -327,6 +404,11 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <floorregion shape="rect" rect_x="24.0" rect_y="12.0" rect_w="5.0" rect_h="3.5"/>
 <scenery name="Crate" image_name="crate" x="28.5" y="15.0" w="0.8" h="0.8" blocking="true">
     <item template="Long Sword"/>
+    <item template="Short Sword"/>
+    <item template="Short Sword"/>
+    <item template="Dagger"/>
+    <item template="Dagger"/>
+    <item template="Shortbow"/>
     <item template="Arrows"/>
 </scenery>
 <item template="Leather Armour" x="28.5" y="12.5"/>
@@ -341,17 +423,39 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <trap x="35.5" y="12.0" w="1.0" h="1.0" type="arrow"/>
 
 <floorregion shape="rect" rect_x="29.5" rect_y="13.0" rect_w="7.0" rect_h="2.5"/>
-<npc name="Goblin" template="Goblin" x="30.5" y="14.0"/>
-<npc name="Goblin" template="Goblin" x="33.5" y="15.0"/>
-<npc name="Goblin" template="Goblin" x="34.0" y="14.5"/>
+<npc name="Wyvern" template="Wyvern" x="30.5" y="14.0"/>
+<npc name="Wyvern" template="Wyvern" x="33.5" y="15.0"/>
+<npc name="Wyvern" template="Wyvern" x="34.0" y="14.5"/>
+
+<item name="Hand Mirror" image_name="hand_mirror" icon_width="0.25" weight="2" x="30.2" y="15.0"/>
 
 <!--library-->
     <floorregion shape="rect" rect_x="31.0" rect_y="12.5" rect_w="1.0" rect_h="0.5"/>
 <floorregion shape="rect" rect_x="29.5" rect_y="8.5" rect_w="4.0" rect_h="4.0"/>
 
-<item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2" x="31.5" y="12.0">
+<scenery name="Cabinet" image_name="cabinet" x="30.0" y="9.0" size="0.8" blocking="true">
+    <item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2">
 necromancy blah blah
-</item>
+    </item>
+</scenery>
+
+<!--shadow room-->
+<floorregion shape="rect" rect_x="38.0" rect_y="8.0" rect_w="8.0" rect_h="1.0"/>
+
+<npc name="Shadow" template="Shadow" x="45.0" y="8.5"/>
+
+    <scenery name="Door" image_name="door_wood" x="45.8" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="46.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Chest" image_name="chest" x="49.5" y="10.5" size="0.8" blocking="true">
+    <item template="Potion of Healing"/>
+    <gold amount="100"/>
+</scenery>
+
+<!--exit-->
+
+<floorregion shape="rect" rect_x="38.0" rect_y="15.0" rect_w="8.0" rect_h="1.0"/>
 
 </location>
 
