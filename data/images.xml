@@ -65,13 +65,12 @@
     <!--<animation name="ranged" start="24" length="4" type="single"/>-->
     <animation name="death" start="34" length="6" type="single"/>
 </image>
-<image type="npc" name="goblin_champion" filename="gfx/textures/npcs/goblin_champion.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+<!--<image type="npc" name="goblin_champion" filename="gfx/textures/npcs/goblin_champion.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="20" length="3" type="single"/>
-    <!--<animation name="ranged" start="24" length="4" type="single"/>-->
     <animation name="death" start="34" length="6" type="single"/>
-</image>
+</image>-->
 <image type="npc" name="orc" filename="gfx/textures/npcs/orc_regular_0.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
