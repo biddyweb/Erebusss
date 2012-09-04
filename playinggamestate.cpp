@@ -3084,6 +3084,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef locked_s = reader.attributes().value("locked");
                     bool locked = parseBool(locked_s.toString(), true);
                     QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
+                    QStringRef locked_silent_s = reader.attributes().value("locked_silent");
+                    bool locked_silent = parseBool(locked_silent_s.toString(), true);
+                    QStringRef unlock_text_s = reader.attributes().value("unlock_text");
                     float size_w = 0.0f, size_h = 0.0f;
                     QStringRef size_s = reader.attributes().value("size");
                     if( size_s.length() > 0 ) {
@@ -3179,6 +3182,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     scenery->setLocked(locked);
                     if( unlock_item_name_s.length() > 0 ) {
                         scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
+                    }
+                    scenery->setLockedSilent(locked_silent);
+                    if( unlock_text_s.length() > 0 ) {
+                        scenery->setUnlockText(unlock_text_s.toString().toStdString());
                     }
                     map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName());
                     if( image_iter != this->scenery_opened_images.end() ) {
@@ -4020,14 +4027,21 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     }
                     if( is_locked ) {
                         done = true;
-                        this->playSound("lock");
-                        stringstream str;
-                        str << "The " << scenery->getName() << " is locked!";
-                        this->addTextEffect(str.str(), player->getPos(), 2000);
+                        if( !scenery->isLockedSilent() ) {
+                            this->playSound("lock");
+                            stringstream str;
+                            str << "The " << scenery->getName() << " is locked!";
+                            this->addTextEffect(str.str(), player->getPos(), 2000);
+                        }
                     }
                     else {
                         stringstream str;
-                        str << "You unlock the " << scenery->getName() << ".";
+                        if( scenery->getUnlockText().length() == 0 ) {
+                            str << "You unlock the " << scenery->getName() << ".";
+                        }
+                        else {
+                            str << scenery->getUnlockText();
+                        }
                         this->addTextEffect(str.str(), player->getPos(), 2000);
                         scenery->setLocked(false);
                         player->addXP(this, 20);
@@ -4411,6 +4425,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
             fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
             fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+            fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
+            fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
             fprintf(file, ">");
             for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;

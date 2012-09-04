@@ -50,7 +50,9 @@ protected:
     string exit_location;
     Vector2D exit_location_pos;
     bool is_locked; // relevant only for some types, e.g., containers, doors
+    bool locked_silent;
     string unlock_item_name;
+    string unlock_text;
     DrawType draw_type;
     float opacity;
     float width, height;
@@ -144,11 +146,23 @@ public:
     bool isLocked() const {
         return this->is_locked;
     }
+    void setLockedSilent(bool locked_silent) {
+        this->locked_silent = locked_silent;
+    }
+    bool isLockedSilent() const {
+        return this->locked_silent;
+    }
     void setUnlockItemName(const string &unlock_item_name) {
         this->unlock_item_name = unlock_item_name;
     }
     string getUnlockItemName() const {
         return this->unlock_item_name;
+    }
+    void setUnlockText(const string &unlock_text) {
+        this->unlock_text = unlock_text;
+    }
+    string getUnlockText() const {
+        return this->unlock_text;
     }
     void setDrawType(DrawType draw_type) {
         this->draw_type = draw_type;
