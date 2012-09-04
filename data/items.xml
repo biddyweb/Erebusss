@@ -48,8 +48,6 @@ Plate armour provides excellent protection, but it is also heavy to carry.
 
 <item name="Gold Ring" image_name="ring_gold" weight="0"/>
 
-<item name="Mirror" image_name="hand_mirror" icon_width="0.25" weight="2"/>
-
 <item name="Potion of Healing" image_name="potion_red" weight="1"
     rating="4" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink">
 This potion will heal some or all of your injuries.
