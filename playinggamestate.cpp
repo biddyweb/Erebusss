@@ -4195,6 +4195,8 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
     fprintf(file, " rating=\"%d\"", item->getRating());
     fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
+    fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
+    fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
     // now do subclasses
     switch( item->getType() ) {
     case ITEMTYPE_GENERAL:
