@@ -19,14 +19,13 @@ bool MyApplication::event(QEvent *event) {
     if( event->type() == QEvent::ApplicationActivate ) {
         LOG("application activated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
-            game_g->getScreen()->enableUpdateTimer(true);
+            game_g->activate(true);
         }
     }
     else if( event->type() == QEvent::ApplicationDeactivate ) {
         LOG("application deactivated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
-            game_g->getScreen()->enableUpdateTimer(false);
-            game_g->getScreen()->setPaused(true); // automatically pause when application goes inactive
+            game_g->activate(false);
         }
     }
     return QApplication::event(event);

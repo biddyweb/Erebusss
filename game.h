@@ -329,6 +329,7 @@ public:
 
     void run();
     void update();
+    void activate(bool active);
     //void mouseClick(int m_x, int m_y);
     string getApplicationFilename(const string &name);
     //void log(const char *text, ...);

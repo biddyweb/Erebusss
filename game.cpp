@@ -747,3 +747,13 @@ bool Game::askQuestionDialog(const string &title, const string &message) {
     LOG("    answer is %d\n", res);
     return res == QMessageBox::Yes;
 }*/
+
+void Game::activate(bool active) {
+    this->getScreen()->enableUpdateTimer(active);
+    if( !active ) {
+        this->getScreen()->setPaused(true); // automatically pause when application goes inactive
+    }
+    if( this->gamestate != NULL ) {
+        this->gamestate->activate(active);
+    }
+}

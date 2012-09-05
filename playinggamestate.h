@@ -351,6 +351,11 @@ public:
 
     virtual void quitGame();
     virtual void update();
+    virtual void activate(bool active) {
+        if( !active ) {
+            this->saveGame("autosave.xml");
+        }
+    }
     //virtual void mouseClick(int m_x, int m_y);
 
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
