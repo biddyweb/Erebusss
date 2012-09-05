@@ -295,7 +295,7 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="12.5" y="2.0"/>
+<!--<player_start x="12.5" y="2.0"/>-->
 
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
 <scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
@@ -460,6 +460,20 @@ necromancy blah blah
 <!--exit-->
 
 <floorregion shape="rect" rect_x="38.0" rect_y="15.0" rect_w="8.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood" x="45.8" y="15.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4" exit_location_x="1.0" exit_location_y="5.5"/>
+
+</location>
+
+<location name="level_4">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="1.0" y="5.5"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
 
 </location>
 
