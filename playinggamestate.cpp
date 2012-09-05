@@ -1034,8 +1034,9 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
             int cost = 0;
             for(size_t i=0;i<items.size();i++) {
                 const Item *item2 = items.at(i);
-                if( item->getName() == item2->getName() ) {
+                if( item->getKey() == item2->getKey() || item->getBaseTemplate() == item2->getKey() ) {
                     cost = costs.at(i);
+                    cost += item->getWorthBonus();
                 }
             }
             addPlayerItem(item, cost);
@@ -2200,14 +2201,18 @@ void PlayingGamestate::playBackgroundMusic() {
 Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
 
+    QStringRef base_template_s = reader.attributes().value("base_template");
     QStringRef weight_s = reader.attributes().value("weight");
     QStringRef rating_s = reader.attributes().value("rating");
     QStringRef magical_s = reader.attributes().value("magical");
+    QStringRef worth_bonus_s = reader.attributes().value("worth_bonus");
+    QString base_template = base_template_s.toString();
     int weight = parseInt(weight_s.toString(), true);
     int rating = parseInt(rating_s.toString(), true);
     if( rating == 0 )
         rating = 1; // so the default of 0 defaults instead to 1
     bool magical = parseBool(magical_s.toString(), true);
+    int worth_bonus = parseInt(worth_bonus_s.toString(), true);
 
     if( reader.name() == "item" ) {
         QStringRef name_s = reader.attributes().value("name");
@@ -2311,6 +2316,8 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     if( item != NULL ) {
         item->setRating(rating);
         item->setMagical(magical);
+        item->setBaseTemplate(base_template.toStdString().c_str());
+        item->setWorthBonus(worth_bonus);
     }
     return item;
 }

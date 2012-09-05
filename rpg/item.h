@@ -27,6 +27,7 @@ protected:
     string name;
     string image_name;
     string description;
+    string base_template; // if non-empty, stores the standard item this is a variation of (used for Shops)
     Vector2D pos; // when stored in a Location
     void *user_data_gfx; // not saved
     float icon_width; // width of icon when drawn on screen in metres
@@ -36,6 +37,7 @@ protected:
     string use_verb;
     int rating;
     bool is_magical;
+    int worth_bonus;
 public:
     Item(const string &name, const string &image_name, int weight);
     virtual ~Item();
@@ -70,6 +72,12 @@ public:
     virtual string getName() const {
         // may be overloaded to give more descriptive names
         return this->name;
+    }
+    void setBaseTemplate(const string &base_template) {
+        this->base_template = base_template;
+    }
+    string getBaseTemplate() const {
+        return this->base_template;
     }
     void setDescription(const string &description) {
         this->description = description;
@@ -123,6 +131,12 @@ public:
     }
     bool isMagical() const {
         return this->is_magical;
+    }
+    void setWorthBonus(int worth_bonus) {
+        this->worth_bonus = worth_bonus;
+    }
+    int getWorthBonus() const {
+        return this->worth_bonus;
     }
 };
 

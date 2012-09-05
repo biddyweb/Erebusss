@@ -277,7 +277,9 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
     <weapon name="Magic Dagger" image_name="longsword" weight="5"
         damageX="1" damageY="6" damageZ="1"
         animation_name="longsword"
-        magical="true"/>
+        magical="true"
+        base_template="Dagger" worth_bonus="200"
+        />
 </scenery>
 
 <!--south passage-->
@@ -386,7 +388,9 @@ Ah, thank you! Yes that looks like it will be of most help to me.
     <weapon name="Magic Short Sword" image_name="longsword" weight="10"
         damageX="2" damageY="6" damageZ="1"
         animation_name="longsword"
-        magical="true"/>
+        magical="true"
+        base_template="Short Sword" worth_bonus="200"
+        />
     <item template="Red Gem"/>
     <gold amount="16"/>
 </scenery>
