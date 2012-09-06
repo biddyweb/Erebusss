@@ -6,9 +6,27 @@
 #include <cassert>
 #include <QWebFrame>
 
-InfoDialog::InfoDialog(const string &text, const vector<string> &buttons, bool horiz, bool small_buttons) {
+InfoDialog::InfoDialog(const string &text, const string &picture, const vector<string> &buttons, bool horiz, bool small_buttons) {
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
+
+    if( picture.length() > 0 ) {
+        /*QPicture pic;
+        if( !pic.load(picture.c_str()) ) {
+            throw string("failed to load image");
+        }*/
+        QPixmap pixmap = game_g->loadImage(picture);
+        QLabel *picture_label = new QLabel();
+        //picture_label->setPicture(pic);
+        int height = QApplication::desktop()->height();
+        int max_pic_height = height/3;
+        if( pixmap.height() > max_pic_height ) {
+            pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+        }
+        picture_label->setPixmap(pixmap);
+        layout->addWidget(picture_label);
+        layout->setAlignment(picture_label, Qt::AlignCenter);
+    }
 
     //QLabel *label = new QLabel(text.c_str());
     //label->setWordWrap(true);

@@ -415,6 +415,7 @@ public:
     QPixmap &getItemImage(const string &name);
 
     void showInfoDialog(const string &message);
+    void showInfoDialog(const string &message, const string &picture);
     bool askQuestionDialog(const string &message);
 
 public slots:

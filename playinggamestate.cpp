@@ -1647,8 +1647,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
         this->player->setProfile(8, 7, 8, 1, 6, 7, 8, 2.75f);
-        //player->initialiseHealth(60);
-        player->initialiseHealth(600); // CHEAT
+        player->initialiseHealth(60);
+        //player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
     }
 
@@ -3716,7 +3716,8 @@ void PlayingGamestate::update() {
         if( character == this->player ) {
             this->player = NULL;
             //game_g->showInfoDialog("Game over", "You have died!");
-            this->showInfoDialog("Game over!\n\nYou have died!");
+            //this->showInfoDialog("Game over!\n\nYou have died!");
+            this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
@@ -3927,7 +3928,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     talk_items.push_back(talk_item);
                                 }
                                 buttons.push_back("Goodbye");
-                                InfoDialog *dialog = new InfoDialog(message.str(), buttons, false, true);
+                                InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true);
                                 this->addWidget(dialog);
                                 dialog->scrollToBottom();
                                 int result = dialog->exec();
@@ -4585,8 +4586,12 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
 }
 
 void PlayingGamestate::showInfoDialog(const string &message) {
+    this->showInfoDialog(message, "");
+}
+
+void PlayingGamestate::showInfoDialog(const string &message, const string &picture) {
     LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
-    InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message);
+    InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message, picture);
     this->addWidget(dialog);
     dialog->exec();
     this->closeSubWindow();
