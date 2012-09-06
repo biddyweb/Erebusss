@@ -1,17 +1,22 @@
 <?xml version="1.0" ?>
 <items>
 
-<weapon name="Long Sword" image_name="longsword" weight="14"
-    damageX="2" damageY="10" damageZ="0"
+<weapon name="Dagger" image_name="longsword" weight="5"
+    damageX="1" damageY="6" damageZ="0"
     animation_name="longsword"/>
 
 <weapon name="Short Sword" image_name="longsword" weight="10"
     damageX="2" damageY="6" damageZ="0"
     animation_name="longsword"/>
 
-<weapon name="Dagger" image_name="longsword" weight="5"
-    damageX="1" damageY="6" damageZ="0"
+<weapon name="Long Sword" image_name="longsword" weight="14"
+    damageX="2" damageY="10" damageZ="0"
     animation_name="longsword"/>
+
+<weapon name="Two Handed Sword" image_name="longsword" weight="30"
+    damageX="2" damageY="12" damageZ="0"
+    animation_name="longsword"
+    two_handed="true"/>
 
 <weapon name="Shortbow" image_name="longbow" weight="4"
     damageX="2" damageY="8" damageZ="-2"
@@ -63,11 +68,12 @@ This potion will heal some or all of your injuries.
 <currency name="Gold" image_name="gold"/>
 
 <shop name="Armourer">
-    <purchase template="Long Sword" cost="40"/>
-    <purchase template="Short Sword" cost="25"/>
     <purchase template="Dagger" cost="10"/>
-    <purchase template="Longbow" cost="60"/>
+    <purchase template="Short Sword" cost="25"/>
+    <purchase template="Long Sword" cost="40"/>
+    <purchase template="Two Handed Sword" cost="80"/>
     <purchase template="Shortbow" cost="40"/>
+    <purchase template="Longbow" cost="60"/>
     <purchase template="Shield" cost="10"/>
     <purchase template="Leather Armour" cost="25"/>
     <purchase template="Chain Mail Armour" cost="50"/>
