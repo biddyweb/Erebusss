@@ -39,6 +39,40 @@ const float npc_radius_c = 0.25f;
 const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
 const float talk_range_c = hit_range_c;
 
+class Spell {
+    string name;
+    string type;
+    //int rating;
+    int rollX, rollY, rollZ;
+public:
+    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0) {
+    }
+
+    /*void setRating(int rating) {
+        this->rating = rating;
+    }
+    int getRating() const {
+        return this->rating;
+    }*/
+
+    void setRoll(int rollX, int rollY, int rollZ) {
+        this->rollX = rollX;
+        this->rollY = rollY;
+        this->rollZ = rollZ;
+    }
+    void getRoll(int *rollX, int *rollY, int *rollZ) const {
+        *rollX = this->rollX;
+        *rollY = this->rollY;
+        *rollZ = this->rollZ;
+    }
+    string getName() const {
+        return this->name;
+    }
+    string getType() const {
+        return this->type;
+    }
+};
+
 class TalkItem {
 public:
     string question;
@@ -155,8 +189,15 @@ class Character {
     vector<Vector2D> path; // not saved
     Character *target_npc; // not saved
     int time_last_action_ms; // not saved
-    bool is_hitting; // not saved
-
+    //bool is_hitting; // not saved
+    enum Action {
+        ACTION_NONE = 0,
+        ACTION_HITTING = 1,
+        ACTION_FIRING = 2,
+        ACTION_CASTING = 3
+    };
+    Action action;
+    const Spell *casting_spell;
     // default positions only relevant for NPCs that don't change locations
     bool has_default_position; // saved
     Vector2D default_position; // saved
@@ -173,6 +214,8 @@ class Character {
     Shield *current_shield;
     Armour *current_armour;
     int gold;
+
+    map<string, int> spells;
 
     int xp;
     int xp_worth;
@@ -293,8 +336,8 @@ public:
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {
             this->target_npc = target_npc;
-            if( this->is_hitting ) {
-                this->is_hitting = false;
+            if( this->action != ACTION_NONE ) {
+                this->action = ACTION_NONE;
                 if( this->listener != NULL ) {
                     this->listener->characterSetAnimation(this, this->listener_data, "", true);
                 }
@@ -453,6 +496,18 @@ public:
     int calculateItemsWeight() const;
     int getCanCarryWeight() const;
     bool canMove() const;
+    void addSpell(const string &spell, int count) {
+        this->spells[spell] = this->spells[spell] + count;
+    }
+    int getSpellCount(const string &spell) const {
+        map<string, int>::const_iterator iter = this->spells.find(spell);
+        if( iter != this->spells.end() ) {
+            return iter->second;
+        }
+        return 0;
+    }
+    void useSpell(const string &spell);
+
     int getXP() const {
         return xp;
     }

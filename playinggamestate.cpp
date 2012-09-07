@@ -323,30 +323,32 @@ void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
     qDebug("    rect %f, %f : %f, %f", text_effect->boundingRect().left(), text_effect->boundingRect().top(), text_effect->boundingRect().right(), text_effect->boundingRect().bottom());
     qDebug("    size %f x %f", text_effect_w, text_effect_h);*/
     bool set_new_y = false;
-    float new_y = -1.0f;
-    for(set<TextEffect *>::const_iterator iter = text_effects.begin(); iter != text_effects.end(); ++iter) {
-        const TextEffect *te = *iter;
-        float te_w = te->boundingRect().width() * font_scale;
-        float te_h = te->boundingRect().height() * font_scale;
-        /*if( text_effect->boundingRect().right() >= te->boundingRect().left() &&
-            text_effect->boundingRect().left() <= te->boundingRect().right() &&
-            text_effect->boundingRect().bottom() >= te->boundingRect().top() &&
-            text_effect->boundingRect().top() <= te->boundingRect().bottom() ) {*/
-        if( text_effect->x() + text_effect_w >= te->x() &&
-            text_effect->x() <= te->x() + te_w &&
-            text_effect->y() + text_effect_h >= te->y() &&
-            text_effect->y() <= te->y() + te_h ) {
-            //qDebug("    shift text effect by %f", te->boundingRect().bottom() - text_effect->y() );
-            /*qDebug("    shift text effect by %f", te->y() + te_h - text_effect->y() );
-            qDebug("    te at %f, %f", te->x(), te->y());
-            qDebug("    rect %f, %f : %f, %f", te->boundingRect().left(), te->boundingRect().top(), te->boundingRect().right(), te->boundingRect().bottom());
-            qDebug("    size %f x %f", te_w, te_h);*/
-            //text_effect->setPos( text_effect->x(), te->boundingRect().bottom() );
-            //text_effect->setPos( text_effect->x(), te->y() + te_h );
-            float this_new_y = te->y() + te_h;
-            if( !set_new_y || this_new_y > new_y ) {
-                set_new_y = true;
-                new_y = this_new_y;
+    float new_y = text_effect->y();
+    bool done = false;
+    while( !done ) {
+        done = true;
+        for(set<TextEffect *>::const_iterator iter = text_effects.begin(); iter != text_effects.end(); ++iter) {
+            const TextEffect *te = *iter;
+            float te_w = te->boundingRect().width() * font_scale;
+            float te_h = te->boundingRect().height() * font_scale;
+            if( text_effect->x() + text_effect_w > te->x() &&
+                text_effect->x() < te->x() + te_w &&
+                new_y + text_effect_h > te->y() &&
+                new_y < te->y() + te_h ) {
+                //qDebug("    shift text effect by %f", te->boundingRect().bottom() - text_effect->y() );
+                /*qDebug("    shift text effect by %f", te->y() + te_h - text_effect->y() );
+                qDebug("    te at %f, %f", te->x(), te->y());
+                qDebug("    rect %f, %f : %f, %f", te->boundingRect().left(), te->boundingRect().top(), te->boundingRect().right(), te->boundingRect().bottom());
+                qDebug("    size %f x %f", te_w, te_h);*/
+                //text_effect->setPos( text_effect->x(), te->boundingRect().bottom() );
+                //text_effect->setPos( text_effect->x(), te->y() + te_h );
+                float this_new_y = te->y() + te_h + E_TOL_LINEAR;
+                //if( !set_new_y || this_new_y > new_y )
+                {
+                    set_new_y = true;
+                    done = false;
+                    new_y = this_new_y;
+                }
             }
         }
     }
@@ -1647,8 +1649,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
         this->player->setProfile(8, 7, 8, 1, 6, 7, 8, 2.75f);
-        player->initialiseHealth(60);
-        //player->initialiseHealth(600); // CHEAT
+        //player->initialiseHealth(60);
+        player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
     }
 
@@ -2016,6 +2018,43 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     gui_overlay->setProgress(40);
     qApp->processEvents();
 
+    LOG("load Spells");
+    {
+        QFile file(":/data/spells.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open spells xml file");
+        }
+        QXmlStreamReader reader(&file);
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            if( reader.isStartElement() )
+            {
+                if( reader.name() == "spell" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    qDebug("found spell template: %s", name_s.toString().toStdString().c_str());
+                    QStringRef type_s = reader.attributes().value("type");
+                    QStringRef rollX_s = reader.attributes().value("rollX");
+                    QStringRef rollY_s = reader.attributes().value("rollY");
+                    QStringRef rollZ_s = reader.attributes().value("rollZ");
+                    int rollX = parseInt(rollX_s.toString(), true);
+                    int rollY = parseInt(rollY_s.toString(), true);
+                    int rollZ = parseInt(rollZ_s.toString(), true);
+                    Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString());
+                    spell->setRoll(rollX, rollY, rollZ);
+                    this->spells[ name_s.toString().toStdString() ] = spell;
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading npcs xml file");
+        }
+    }
+
+    gui_overlay->setProgress(60);
+    qApp->processEvents();
+
     LOG("create animation frames\n");
     LOG("load player image\n");
     vector<AnimationLayerDefinition> player_animation_layer_definition;
@@ -2046,9 +2085,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     LOG("shield layer\n");
     this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x);
 
-    gui_overlay->setProgress(60);
-    qApp->processEvents();
-
     //LOG("load floor image\n");
     //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
     //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_dirt.png");
@@ -2057,14 +2093,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     unsigned char filter_min[] = {40, 20, 10};
     builtin_images["floor"] = createNoise(128, 128, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);*/
 
-    gui_overlay->setProgress(65);
+    gui_overlay->setProgress(70);
     qApp->processEvents();
 
     //LOG("load wall image\n");
     //builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
-
-    gui_overlay->setProgress(70);
-    qApp->processEvents();
 
     LOG("load sound effects\n");
 #ifndef Q_OS_ANDROID
@@ -2939,6 +2972,16 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     bool objective = parseBool(objective_s.toString(), true);
                     QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     npc->addTalkItem(question.toStdString(), answer.toStdString(), while_not_done, objective);
+                }
+                else if( reader.name() == "spell") {
+                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: spell element wasn't expected here");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    QStringRef count_s = reader.attributes().value("count");
+                    int count = parseInt(count_s.toString());
+                    npc->addSpell(name_s.toString().toStdString(), count);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ammo" || reader.name() == "currency" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
@@ -4567,6 +4610,16 @@ Item *PlayingGamestate::cloneStandardItem(const string &name) const {
     }
     const Item *item = iter->second;
     return item->clone();
+}
+
+const Spell *PlayingGamestate::findSpell(const string &name) const {
+    map<string, Spell *>::const_iterator iter = this->spells.find(name);
+    if( iter == this->spells.end() ) {
+        LOG("can't find spell: %s\n", name.c_str());
+        throw string("Unknown spell");
+    }
+    const Spell *spell = iter->second;
+    return spell;
 }
 
 Currency *PlayingGamestate::cloneGoldItem(int value) const {

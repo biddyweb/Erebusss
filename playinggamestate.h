@@ -26,6 +26,7 @@ class Sound;
 class AnimationLayer;
 class Shop;
 class Currency;
+class Spell;
 
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
@@ -313,6 +314,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, QPixmap> builtin_images;
     map<string, QPixmap> npc_static_images;
     map<string, CharacterTemplate *> character_templates;
+    map<string, Spell *> spells;
     vector<Shop *> shops;
 #ifndef Q_OS_ANDROID
     map<string, Sound *> sound_effects;
@@ -404,6 +406,7 @@ public:
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;
     Currency *cloneGoldItem(int value) const;
+    const Spell *findSpell(const string &name) const;
 
     vector<Shop *>::const_iterator shopsBegin() const {
         return shops.begin();
