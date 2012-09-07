@@ -66,5 +66,10 @@
         <file>gfx/textures/items/hand_mirror.png</file>
         <file>gfx/textures/npcs/wraith.png</file>
         <file>gfx/scenes/death.jpg</file>
+        <file>gfx/textures/items/gem_blue.png</file>
+        <file>gfx/textures/items/gem_gold.png</file>
+        <file>gfx/textures/items/gem_green.png</file>
+        <file>gfx/textures/items/gem_white.png</file>
+        <file>data/spells.xml</file>
     </qresource>
 </RCC>
