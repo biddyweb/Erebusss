@@ -59,6 +59,10 @@ This potion will heal some or all of your injuries.
 </item>
 
 <item name="Red Gem" image_name="gem_red" icon_width="0.25" weight="1"/>
+<item name="Green Gem" image_name="gem_green" icon_width="0.25" weight="1"/>
+<item name="Blue Gem" image_name="gem_blue" icon_width="0.25" weight="1"/>
+<item name="Gold Gem" image_name="gem_gold" icon_width="0.25" weight="1"/>
+<item name="White Gem" image_name="gem_white" icon_width="0.25" weight="1"/>
 
 <item name="Skull" image_name="skull" icon_width="0.25" weight="10"/>
 
@@ -88,6 +92,10 @@ This potion will heal some or all of your injuries.
 <shop name="General Stores">
     <purchase template="Gold Ring" cost="10"/>
     <purchase template="Red Gem" cost="50"/>
+    <purchase template="Green Gem" cost="100"/>
+    <purchase template="Blue Gem" cost="150"/>
+    <purchase template="Gold Gem" cost="200"/>
+    <purchase template="White Gem" cost="250"/>
 </shop>
 
 <player_default_items>
