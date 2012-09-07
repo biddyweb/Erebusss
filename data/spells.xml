@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<spells>
+
+<spell name="Fire bolt" type="attack"
+    rollX="2" rollY="10" rollZ="0"
+    />
+
+<spell name="Heal" type="heal"
+    rollX="4" rollY="6" rollZ="0"
+    />
+
+</spells>
