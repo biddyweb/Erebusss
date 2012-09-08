@@ -96,7 +96,10 @@ OptionsGamestate::OptionsGamestate() :
         QPushButton *offlineHelpButton = new QPushButton("Offline Help");
         game_g->initButton(offlineHelpButton);
         offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         offlineHelpButton->setToolTip("View the game instructions (H)");
+#endif
         //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         offlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(offlineHelpButton);
@@ -104,7 +107,10 @@ OptionsGamestate::OptionsGamestate() :
 
         QPushButton *onlineHelpButton = new QPushButton("Online Help");
         game_g->initButton(onlineHelpButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         onlineHelpButton->setToolTip("Visit the game's website");
+#endif
         //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         onlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(onlineHelpButton);
