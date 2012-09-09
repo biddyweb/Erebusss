@@ -271,7 +271,9 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 
 <npc name="Goblin" template="Goblin" x="21.0" y="20.0"/>
 <npc name="Goblin" template="Goblin" x="23.0" y="20.0"/>
-<npc name="Goblin" template="Goblin" x="20.5" y="17.0"/>
+<npc name="Goblin Mage" template="Goblin Mage" x="20.5" y="17.0">
+    <spell name="Fire bolt" count="6"/>
+</npc>
 
 <scenery name="Chest" image_name="chest" x="24.5" y="20.5" size="0.8" blocking="true">
     <weapon name="Magic Dagger" image_name="longsword" weight="5"
@@ -454,17 +456,143 @@ necromancy blah blah
 
 <scenery name="Chest" image_name="chest" x="49.5" y="10.5" size="0.8" blocking="true">
     <item template="Potion of Healing"/>
-    <gold amount="100"/>
+    <item template="Blue Gem"/>
 </scenery>
 
 <!--exit-->
 
 <floorregion shape="rect" rect_x="38.0" rect_y="15.0" rect_w="8.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood" x="45.8" y="15.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4" exit_location_x="1.0" exit_location_y="5.5"/>
+<scenery name="Door" image_name="door_wood" x="45.8" y="15.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="1.0" exit_location_y="1.5"/>
 
 </location>
 
-<location name="level_4">
+<location name="level_4_1">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<!--<player_start x="1.0" y="1.5"/>-->
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+<scenery name="Door" image_name="door_wood" x="0.2" y="1.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
+
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_2" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+
+</location>
+
+<location name="level_4_2">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<npc name="Goblin" template="Goblin" x="1.0" y="2.5"/>
+<npc name="Goblin" template="Goblin" x="4.0" y="2.5"/>
+
+</location>
+
+<location name="level_4_3">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_6" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_7" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<npc name="Orc" template="Orc" x="4.0" y="2.0"/>
+
+</location>
+
+<location name="level_4_4">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<scenery name="Crate" image_name="crate" x="4.5" y="2.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="21"/>
+</scenery>
+
+</location>
+
+<location name="level_4_5">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<npc name="Orc" template="Orc" x="0.5" y="0.5"/>
+<npc name="Orc" template="Orc" x="4.5" y="0.5">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+</npc>
+
+</location>
+
+<location name="level_4_6">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<npc name="Orc" template="Orc" x="0.5" y="3.5"/>
+<npc name="Orc" template="Orc" x="4.5" y="3.5"/>
+
+</location>
+
+<location name="level_4_7">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+
+<npc name="Orc" template="Orc" x="0.5" y="1.5"/>
+
+</location>
+
+<location name="level_4_8">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
+<scenery name="Door" image_name="door_wood" x="4.8" y="1.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_5" exit_location_x="1.0" exit_location_y="5.5"/>
+
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
+
+</location>
+
+<location name="level_5">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -473,7 +601,7 @@ necromancy blah blah
 <player_start x="1.0" y="5.5"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
+<scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="45.0" exit_location_y="15.5"/>
 
 </location>
 
