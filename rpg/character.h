@@ -71,6 +71,7 @@ public:
     string getType() const {
         return this->type;
     }
+    void castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const;
 };
 
 class TalkItem {
@@ -507,6 +508,7 @@ public:
         return 0;
     }
     void useSpell(const string &spell);
+    void addPainTextEffect(PlayingGamestate *playing_gamestate) const;
 
     int getXP() const {
         return xp;
@@ -604,5 +606,11 @@ public:
     }
     vector<TalkItem>::const_iterator talkItemsEnd() const {
         return this->talk_items.end();
+    }
+    map<string, int>::const_iterator spellsBegin() const {
+        return this->spells.begin();
+    }
+    map<string, int>::const_iterator spellsEnd() const {
+        return this->spells.end();
     }
 };

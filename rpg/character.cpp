@@ -12,6 +12,27 @@
 #include <cassert>
 #endif
 
+void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const {
+    if( this->type == "attack" ) {
+        int damage = rollDice(rollX, rollY, rollZ);
+        if( damage > 0 ) {
+            if( target->decreaseHealth(playing_gamestate, damage, true, true) ) {
+                target->addPainTextEffect(playing_gamestate);
+                if( target->isDead() && source == playing_gamestate->getPlayer() ) {
+                    source->addXP(playing_gamestate, target->getXPWorth());
+                }
+            }
+        }
+    }
+    else if( this->type == "heal" ) {
+    }
+    else {
+        LOG("unknown spell type: %s\n", this->type.c_str());
+        ASSERT_LOGGER(false);
+    }
+    source->useSpell(this->getName());
+}
+
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
     FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
 {
@@ -235,7 +256,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 can_hit = dist <= hit_range_c;
             }
             if( hit_state == HITSTATE_HAS_HIT ) {
-                if( can_hit ) {
+                if( can_hit && !target_npc->is_dead ) {
                     ai_try_moving = false; // no point trying to move, just wait to hit again
                     if( action == ACTION_CASTING ) {
                         // make sure we still have the spell
@@ -245,7 +266,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             str << "Casts ";
                             str << spell->getName();
                             playing_gamestate->addTextEffect(str.str(), this->getPos(), 500);
-                            this->useSpell(spell->getName());
+                            spell->castOn(playing_gamestate, this, target_npc);
                         }
                     }
                     else {
@@ -254,37 +275,25 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                         if( hit_roll <= mod_stat ) {
                             //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
-                            if( !target_npc->is_dead ) {
-                                bool is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
-                                if( !is_magical && target_npc->requiresMagical() ) {
-                                    // weapon has no effect!
-                                    if( this == playing_gamestate->getPlayer() ) {
-                                        playing_gamestate->addTextEffect("Weapon has no effect!", this->getPos(), 2000, 255, 0, 0);
-                                    }
+                            bool is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
+                            if( !is_magical && target_npc->requiresMagical() ) {
+                                // weapon has no effect!
+                                if( this == playing_gamestate->getPlayer() ) {
+                                    playing_gamestate->addTextEffect("Weapon has no effect!", this->getPos(), 2000, 255, 0, 0);
                                 }
-                                else {
-                                    int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                    if( rollDice(2, 6, 0) <= this->S ) {
-                                        //LOG("    extra strong hit!\n");
-                                        damage++;
-                                    }
-                                    //LOG("    damage: %d\n", damage);
-                                    if( damage > 0 ) {
-                                        if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
-                                            string text;
-                                            int r = rand() % 4;
-                                            if( r == 0 )
-                                                text = "Argh!";
-                                            else if( r == 1 )
-                                                text = "Ow!";
-                                            else if( r == 2 )
-                                                text = "Ouch!";
-                                            else
-                                                text = "Eek!";
-                                            playing_gamestate->addTextEffect(text, target_npc->getPos(), 500);
-                                            if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
-                                                this->addXP(playing_gamestate, target_npc->getXPWorth());
-                                            }
+                            }
+                            else {
+                                int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
+                                if( rollDice(2, 6, 0) <= this->S ) {
+                                    //LOG("    extra strong hit!\n");
+                                    damage++;
+                                }
+                                //LOG("    damage: %d\n", damage);
+                                if( damage > 0 ) {
+                                    if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
+                                        target_npc->addPainTextEffect(playing_gamestate);
+                                        if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
+                                            this->addXP(playing_gamestate, target_npc->getXPWorth());
                                         }
                                     }
                                 }
@@ -455,6 +464,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     return false;
+}
+
+void Character::addPainTextEffect(PlayingGamestate *playing_gamestate) const {
+    string text;
+    int r = rand() % 4;
+    if( r == 0 )
+        text = "Argh!";
+    else if( r == 1 )
+        text = "Ow!";
+    else if( r == 2 )
+        text = "Ouch!";
+    else
+        text = "Eek!";
+    playing_gamestate->addTextEffect(text, this->getPos(), 500);
 }
 
 void Character::setStateIdle() {
