@@ -20,6 +20,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 </floorregion>
 <floorregion shape="rect" rect_x="5.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="6.0" rect_y="4.0" rect_w="5.0" rect_h="1.0" />
+
 <floorregion shape="polygon">
     <floorregion_point x="11.0" y="1.0" />
     <floorregion_point x="11.0" y="6.0" />
@@ -28,6 +29,21 @@ these vermin, and you will be rewarded with 100 gold pieces!
     <floorregion_point x="15.0" y="0.5" />
     <floorregion_point x="12.0" y="0.5" />
 </floorregion>
+
+<npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
+<npc name="Goblin Mage" template="Goblin Mage" x="15.0" y="2.0">
+    <spell name="Fire bolt" count="6"/>
+</npc>
+
+<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
+<item template="Mushroom" x="12.0" y="5.0"/>
+<scenery name="Fire" image_name="campfire" x="14.0" y="3.0" w="1.0" h="1.0"/>
+
+<scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
+    <gold amount="20"/>
+    <item template="Arrows"/>
+</scenery>
+
 <floorregion shape="rect" rect_x="16.0" rect_y="3.0" rect_w="5.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="21.0" rect_y="3.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="polygon">
@@ -69,8 +85,24 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <player_start x="1.0" y="10.5"/>
 
-<npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
-<npc name="Goblin" template="Goblin" x="15.0" y="2.0"/>
+<!--
+<gold amount="10" x="1.0" y="10.5"/>
+<gold amount="20" x="1.0" y="10.5"/>
+<gold amount="30" x="1.0" y="10.5"/>
+<gold amount="40" x="1.0" y="10.5"/>
+<gold amount="50" x="1.0" y="10.5"/>
+<gold amount="60" x="1.0" y="10.5"/>
+-->
+
+<!--
+<weapon name="Magic Dagger" image_name="longsword" weight="5"
+    damageX="1" damageY="6" damageZ="1"
+    animation_name="longsword"
+    magical="true"
+    base_template="Dagger" worth_bonus="200"
+    x="2.0" y="10.5"/>
+-->
+
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
 <npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
@@ -101,14 +133,6 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2"/>
 
-<scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
-    <gold amount="20"/>
-    <item template="Arrows"/>
-</scenery>
-
-<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
-<item template="Mushroom" x="12.0" y="5.0"/>
-<scenery name="Fire" image_name="campfire" x="14.0" y="3.0" w="1.0" h="1.0"/>
 <scenery name="Barrel" image_name="barrel" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
