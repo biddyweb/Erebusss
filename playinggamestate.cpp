@@ -4425,6 +4425,11 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, "%s\n", talk_item->answer.c_str());
                 fprintf(file, "</talk>\n");
             }
+            for(map<string, int>::const_iterator iter2 = character->spellsBegin(); iter2 != character->spellsEnd(); ++iter2) {
+                string spell_name = iter2->first;
+                int spell_count = iter2->second;
+                fprintf(file, "<spell name=\"%s\" count=\"%d\"/>\n", spell_name.c_str(), spell_count);
+            }
             for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;
                 this->saveItem(file, item, character);
