@@ -601,7 +601,7 @@ necromancy blah blah
 <player_start x="1.0" y="5.5"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="45.0" exit_location_y="15.5"/>
+<scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="4.0" exit_location_y="1.5"/>
 
 </location>
 
