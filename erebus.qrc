@@ -72,5 +72,6 @@
         <file>gfx/textures/items/gem_white.png</file>
         <file>data/spells.xml</file>
         <file>gfx/textures/scenery/teleport.png</file>
+        <file>gfx/textures/scenery/church_bell.png</file>
     </qresource>
 </RCC>

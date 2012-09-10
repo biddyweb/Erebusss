@@ -75,6 +75,14 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         }
         return true;
     }
+    else if( this->use == "ITEMUSE_MUSHROOM_SMELLY" ) {
+        int amount = rollDice(2, 6, 0);
+        LOG("    smelly mushroom harms %d\n", amount);
+        character->decreaseHealth(playing_gamestate, amount, false, false);
+        LOG("    health is now: %d\n", character->getHealth());
+        playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
+        return true;
+    }
     else {
         //LOG("Item::use() unknown item_use: %d\n", this->item_use);
         LOG("Item::use() unknown item_use: %s\n", this->use.c_str());

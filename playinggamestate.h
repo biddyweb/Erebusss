@@ -373,6 +373,8 @@ public:
     virtual void locationRemoveScenery(const Location *location, Scenery *scenery);
     virtual void locationUpdateScenery(Scenery *scenery);
 
+    virtual void locationAddCharacter(const Location *location, Character *character);
+
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
@@ -402,11 +404,15 @@ public:
         return this->c_quest_indx == this->quest_list.size()-1;
     }
     void advanceQuest();
+    Location *getCLocation() const {
+        return this->c_location;
+    }
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;
     Currency *cloneGoldItem(int value) const;
     const Spell *findSpell(const string &name) const;
+    Character *createCharacter(const string &template_name) const;
 
     vector<Shop *>::const_iterator shopsBegin() const {
         return shops.begin();

@@ -79,6 +79,9 @@ void Scenery::getInteractionText(string *dialog_text) const {
     else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
         *dialog_text = "An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?";
     }
+    else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
+        *dialog_text = "A large bell hangs here. Do you want to try ringing it?";
+    }
     else {
         ASSERT_LOGGER(false);
     }
@@ -169,6 +172,35 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
                 result_text = "You are granted the gift of wisdom by the diety.";
                 playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
             }
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
+        if( this->interact_state == 0 ) {
+            int roll = rollDice(1, 3, 0);
+            LOG("bell: roll a %d\n", roll);
+            this->interact_state = 1;
+            Character *enemy = NULL;
+            if( roll == 1 ) {
+                result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                enemy = playing_gamestate->createCharacter("Goblin");
+            }
+            else if( roll == 2 ) {
+                result_text = "You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!";
+                enemy = playing_gamestate->createCharacter("Orc");
+            }
+            else if( roll == 3 ) {
+                result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                enemy = playing_gamestate->createCharacter("Goblin Mage");
+                enemy->addSpell("Fire bolt", 6);
+            }
+
+            if( enemy != NULL ) {
+                Location *c_location = playing_gamestate->getCLocation();
+                c_location->addCharacter(enemy, this->pos.x + 2.0f, this->pos.y);
+            }
+        }
+        else {
+            result_text = "You ring the bell again, but nothing seems to happen this time.";
         }
     }
     else {
@@ -314,6 +346,10 @@ void Location::addCharacter(Character *character, float xpos, float ypos) {
     character->setLocation(this);
     character->setPos(xpos, ypos);
     this->characters.insert(character);
+
+    if( this->listener != NULL ) {
+        this->listener->locationAddCharacter(this, character);
+    }
 }
 
 void Location::removeCharacter(Character *character) {

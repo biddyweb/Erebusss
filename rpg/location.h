@@ -27,6 +27,8 @@ public:
     virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
     virtual void locationRemoveScenery(const Location *location, Scenery *scenery)=0;
     virtual void locationUpdateScenery(Scenery *scenery)=0;
+
+    virtual void locationAddCharacter(const Location *location, Character *character)=0;
 };
 
 class Scenery {

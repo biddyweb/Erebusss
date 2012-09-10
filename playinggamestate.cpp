@@ -2505,22 +2505,7 @@ void PlayingGamestate::setupView() {
     LOG("add graphics for characters");
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
-        AnimatedObject *object = new AnimatedObject();
-        this->characterUpdateGraphics(character, object);
-        scene->addItem(object);
-        object->setPos(character->getX(), character->getY());
-        int character_size = std::max(object->getWidth(), object->getHeight());
-        //const float desired_size = 2.0f;
-        const float desired_size = 1.0f;
-        float character_scale = desired_size / (float)character_size;
-        qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
-        //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
-        //object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
-        object->setTransformOriginPoint(-desired_size*64.0f/128.0f, -desired_size*92.0f/128.0f);
-        object->setScale(character_scale);
-
-        character->setListener(this, object);
-        //item->setAnimationSet("attack"); // test
+        this->locationAddCharacter(c_location, character);
     }
 
     /*{
@@ -2827,13 +2812,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             throw string("didn't expect player element to load by template");
                         }
                         // load from template
-                        CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
+                        /*CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
                         if( character_template == NULL ) {
                             LOG("error at line %d\n", reader.lineNumber());
                             LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
                             throw string("can't find character template");
                         }
-                        npc = new Character(name_s.toString().toStdString(), true, *character_template);
+                        npc = new Character(name_s.toString().toStdString(), true, *character_template);*/
+                        npc = this->createCharacter(name_s.toString().toStdString());
                     }
                     else {
                         if( reader.name() == "player" ) {
@@ -3472,6 +3458,25 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
         }
         object->update();
     }
+}
+
+void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
+    AnimatedObject *object = new AnimatedObject();
+    this->characterUpdateGraphics(character, object);
+    scene->addItem(object);
+    object->setPos(character->getX(), character->getY());
+    int character_size = std::max(object->getWidth(), object->getHeight());
+    //const float desired_size = 2.0f;
+    const float desired_size = 1.0f;
+    float character_scale = desired_size / (float)character_size;
+    qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
+    //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
+    //object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
+    object->setTransformOriginPoint(-desired_size*64.0f/128.0f, -desired_size*92.0f/128.0f);
+    object->setScale(character_scale);
+
+    character->setListener(this, object);
+    //item->setAnimationSet("attack"); // test
 }
 
 void PlayingGamestate::clickedStats() {
@@ -4625,6 +4630,17 @@ const Spell *PlayingGamestate::findSpell(const string &name) const {
     }
     const Spell *spell = iter->second;
     return spell;
+}
+
+Character *PlayingGamestate::createCharacter(const string &template_name) const {
+    map<string, CharacterTemplate *>::const_iterator iter = this->character_templates.find(template_name);
+    if( iter == this->character_templates.end() ) {
+        LOG("can't find character_templates: %s\n", template_name.c_str());
+        throw string("Unknown character_template");
+    }
+    const CharacterTemplate *character_template = iter->second;
+    Character *character = new Character(template_name, true, *character_template);
+    return character;
 }
 
 Currency *PlayingGamestate::cloneGoldItem(int value) const {
