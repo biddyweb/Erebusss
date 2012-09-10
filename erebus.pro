@@ -50,7 +50,7 @@ symbian {
 
 android {
     # phonon not supported on Android
-    //LIBS += -lOpenSLES
+    #LIBS += -lOpenSLES
 }
 else {
     QT += phonon
