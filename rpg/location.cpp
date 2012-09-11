@@ -229,37 +229,40 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     int rollD = rollDice(2, 6, 0);
     LOG("character: %s has set off trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
     string text;
-    if( rollD <= character->getDexterity() ) {
-        LOG("avoided\n");
-        // avoided!
-        if( type == "arrow" ) {
+    if( type == "arrow" ) {
+        if( rollD <= character->getDexterity() ) {
+            LOG("avoided\n");
             text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
         }
-        else if( type == "mantrap" ) {
-            text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
-        }
         else {
-            LOG("unknown trap: %s\n", type.c_str());
-            ASSERT_LOGGER(false);
-        }
-    }
-    else {
-        LOG("affected\n");
-        character_affected = true;
-        if( type == "arrow" ) {
+            LOG("affected\n");
+            character_affected = true;
             text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
             int damage = rollDice(2, 12, -1);
             character->decreaseHealth(playing_gamestate, damage, true, false);
         }
-        else if( type == "mantrap" ) {
+    }
+    else if( type == "mantrap" ) {
+        if( rollD <= character->getDexterity() ) {
+            LOG("avoided\n");
+            text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
+        }
+        else {
+            LOG("affected\n");
+            character_affected = true;
             text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
             int damage = rollDice(4, 12, 0);
             character->decreaseHealth(playing_gamestate, damage, true, false);
         }
-        else {
-            LOG("unknown trap: %s\n", type.c_str());
-            ASSERT_LOGGER(false);
-        }
+    }
+    else if( type == "death" ) {
+        character_affected = true;
+        text = "You have set off a trap!\nThe last thing you hear is a massive explosion in your ears!\nA bomb blows your body to pieces...";
+        character->kill(playing_gamestate);
+    }
+    else {
+        LOG("unknown trap: %s\n", type.c_str());
+        ASSERT_LOGGER(false);
     }
 
     if( character == playing_gamestate->getPlayer() ) {
