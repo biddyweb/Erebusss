@@ -3127,7 +3127,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef size_s = reader.attributes().value("size");
                     if( size_s.length() > 0 ) {
                         float size = parseFloat(size_s.toString());
-                        QPixmap image = this->scenery_images[image_name_s.toString().toStdString()];
+                        map<string, QPixmap>::iterator image_iter = this->scenery_images.find(image_name_s.toString().toStdString());
+                        if( image_iter == this->scenery_images.end() ) {
+                            LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
+                            LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
+                            throw string("Failed to find scenery's image");
+                        }
+                        //QPixmap image = this->scenery_images[image_name_s.toString().toStdString()];
+                        QPixmap image = image_iter->second;
                         int image_w = image.width();
                         int image_h = image.height();
                         if( image_w > image_h ) {
@@ -3369,6 +3376,7 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         float item_scale = icon_width / object->pixmap().width();
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
         object->setScale(item_scale);
+        object->setZValue(2.0f*E_TOL_LINEAR); // so items appear above DRAWTYPE_BACKGROUND Scenery
     }
 }
 
@@ -3394,7 +3402,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
             z_value += 1000.0f;
         }
         else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
-            z_value = 0.1f;
+            z_value = E_TOL_LINEAR;
         }
         object->setZValue(z_value);
         /*
