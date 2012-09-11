@@ -60,6 +60,9 @@
 <image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
+<image type="scenery" name="tile_black" imagetype="perlin" max_red="32" max_green="32" max_blue="32" min_red="0" min_green="0" min_blue="0"/>
+<image type="scenery" name="tile_white" imagetype="perlin" max_red="255" max_green="255" max_blue="255" min_red="160" min_green="160" min_blue="160"/>
+
 <image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
