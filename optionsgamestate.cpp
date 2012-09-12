@@ -177,6 +177,7 @@ void OptionsGamestate::clickedStart() {
         h_layout->addWidget(label);
 
         difficultyComboBox = new QComboBox();
+        difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
         for(int i=0;i<N_DIFFICULTIES;i++) {
             Difficulty test_difficulty = (Difficulty)i;
             difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
@@ -345,7 +346,7 @@ void OptionsGamestate::clickedOfflineHelp() {
     QPushButton *closeButton = new QPushButton("Close");
     game_g->initButton(closeButton);
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    closeButton->setFont(game_g->getFontSmall());
+    //closeButton->setFont(game_g->getFontSmall());
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
 }

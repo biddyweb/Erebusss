@@ -274,6 +274,7 @@ protected:
     string oldlogfilename;
 
     QStyle *style;
+    QFont font_scene;
     QFont font_small;
     QFont font_std;
     QFont font_big;
@@ -303,6 +304,9 @@ public:
     }
     const Screen *getScreen() const {
         return this->screen;
+    }
+    QFont getFontScene() const {
+        return this->font_scene;
     }
     QFont getFontSmall() const {
         return this->font_small;

@@ -330,6 +330,7 @@ int AnimatedObject::getHeight() const {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    this->setStyleSheet("color: black;"); // workaround for Android color bug
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -480,15 +481,23 @@ void Game::run() {
         else if( min_size < 480 ) {
             newFont.setPointSize(new_font.pointSize() - 4);
         }*/
+        /*this->font_small = QFont(new_font);
+        this->font_small.setPointSize(font_small.pointSize() - 4);*/
+        /*this->font_std = new_font;
+        this->font_big = new_font;*/
+        this->font_scene = new_font;
         this->font_small = QFont(new_font);
-        this->font_small.setPointSize(font_small.pointSize() - 4);
-        this->font_std = new_font;
-        this->font_big = new_font;
+        this->font_small.setPointSize(font_small.pointSize() + 8);
+        this->font_std = QFont(new_font);
+        this->font_std.setPointSize(font_std.pointSize() + 10);
+        this->font_big = QFont(new_font);
+        this->font_big.setPointSize(font_big.pointSize() + 14);
 
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
 #else
+        this->font_scene = new_font;
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() - 2);
         this->font_std = new_font;
@@ -498,6 +507,7 @@ void Game::run() {
 #endif
     }
     else {
+        this->font_scene = QFont("Verdana", 12);
         this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
         this->font_big = QFont("Verdana", 48, QFont::Bold);
@@ -536,6 +546,8 @@ void Game::run() {
 }
 
 void Game::initButton(QPushButton *button) const {
+    MainWindow *window = this->screen->getMainWindow();
+    button->setFont(window->font()); // needed for Android at least
     button->setStyle(style);
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);

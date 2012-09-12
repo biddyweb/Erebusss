@@ -30,7 +30,8 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setDefaultTextColor(color);
     this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
     //this->setFont(game_g->getFontStd());
-    this->setFont(game_g->getFontSmall());
+    //this->setFont(game_g->getFontSmall());
+    this->setFont(game_g->getFontScene());
 
     {
         // centre alignment - see http://www.cesarbs.org/blog/2011/05/30/aligning-text-in-qgraphicstextitem/
@@ -375,7 +376,8 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     //this->move(0, 0);
     QPainter painter(this);
-    painter.setFont( game_g->getFontSmall() );
+    //painter.setFont( game_g->getFontSmall() );
+    painter.setFont( game_g->getFontScene() );
     /*QBrush brush(QColor(255, 0, 0, 255));
     painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
     //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
