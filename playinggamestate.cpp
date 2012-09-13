@@ -2391,7 +2391,7 @@ void PlayingGamestate::setupView() {
     //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
     {
-        const float desired_width_c = 10.0f;
+        const float desired_width_c = mobile_c ? 10.0f : 20.0f;
         float initial_scale = window->width() / desired_width_c;
         LOG("width: %d\n", window->width());
         LOG("initial_scale: %f\n", initial_scale);
