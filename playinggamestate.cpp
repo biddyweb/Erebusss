@@ -1208,12 +1208,6 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
         close_text = "Finish game";
     }
     else {
-        /*QWebView *label = new QWebView();
-        game_g->setWebView(label);
-        QString html = "<html><body><p>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.</p></body></html>";
-        label->setHtml(html);
-        label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        layout->addWidget(label);*/
         QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
         label->setFont(game_g->getFontSmall());
         label->setWordWrap(true);
