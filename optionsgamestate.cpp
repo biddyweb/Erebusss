@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), difficultyComboBox(NULL), load_list(NULL), soundCheck(NULL)
+    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), load_list(NULL), soundCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -52,7 +52,10 @@ OptionsGamestate::OptionsGamestate() :
     QPushButton *startButton = new QPushButton("Start game");
     game_g->initButton(startButton);
     startButton->setShortcut(QKeySequence(Qt::Key_S));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
     startButton->setToolTip("Start playing a new game (S)");
+#endif
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
@@ -60,7 +63,10 @@ OptionsGamestate::OptionsGamestate() :
     QPushButton *loadButton = new QPushButton("Load game");
     game_g->initButton(loadButton);
     loadButton->setShortcut(QKeySequence(Qt::Key_L));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
     loadButton->setToolTip("Load a previously saved game (L)");
+#endif
     loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
@@ -68,7 +74,10 @@ OptionsGamestate::OptionsGamestate() :
     QPushButton *optionsButton = new QPushButton("Options");
     game_g->initButton(optionsButton);
     optionsButton->setShortcut(QKeySequence(Qt::Key_O));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
     optionsButton->setToolTip("Configure various game options (O)");
+#endif
     optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(optionsButton);
     connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
@@ -176,7 +185,7 @@ void OptionsGamestate::clickedStart() {
         label->setAlignment(Qt::AlignCenter);
         h_layout->addWidget(label);
 
-        difficultyComboBox = new QComboBox();
+        /*difficultyComboBox = new QComboBox();
         difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
         for(int i=0;i<N_DIFFICULTIES;i++) {
             Difficulty test_difficulty = (Difficulty)i;
@@ -184,7 +193,21 @@ void OptionsGamestate::clickedStart() {
         }
         difficultyComboBox->setCurrentIndex(1);
         difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        h_layout->addWidget(difficultyComboBox);
+        h_layout->addWidget(difficultyComboBox);*/
+
+        QVBoxLayout *v_layout = new QVBoxLayout();
+        h_layout->addLayout(v_layout);
+
+        difficultyButtonGroup = new QButtonGroup(this);
+        for(int i=0;i<N_DIFFICULTIES;i++) {
+            Difficulty test_difficulty = (Difficulty)i;
+            QRadioButton *radio = new QRadioButton( game_g->getDifficultyString(test_difficulty).c_str() );
+            v_layout->addWidget(radio);
+            difficultyButtonGroup->addButton(radio, i);
+            if( test_difficulty == DIFFICULTY_MEDIUM ) {
+                radio->setChecked(true);
+            }
+        }
     }
 
     QPushButton *startButton = new QPushButton("Start");
@@ -206,8 +229,13 @@ void OptionsGamestate::clickedStartGame() {
     LOG("OptionsGamestate::clickedStartGame()\n");
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
     //GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
-    ASSERT_LOGGER(this->difficultyComboBox->currentIndex() < (int)N_DIFFICULTIES);
-    Difficulty difficulty = (Difficulty)this->difficultyComboBox->currentIndex();
+    /*ASSERT_LOGGER(this->difficultyComboBox->currentIndex() < (int)N_DIFFICULTIES);
+    Difficulty difficulty = (Difficulty)this->difficultyComboBox->currentIndex();*/
+    int difficulty_id = this->difficultyButtonGroup->checkedId();
+    LOG("difficulty_id: %d\n", difficulty_id);
+    ASSERT_LOGGER(difficulty_id > 0);
+    ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
+    Difficulty difficulty = (Difficulty)difficulty_id;
     StartGameMessage *game_message = new StartGameMessage(difficulty);
     game_g->pushMessage(game_message);
 }

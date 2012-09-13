@@ -22,7 +22,8 @@ class OptionsGamestate : public Gamestate {
 
     QStackedWidget *main_stacked_widget;
 
-    QComboBox *difficultyComboBox;
+    //QComboBox *difficultyComboBox;
+    QButtonGroup *difficultyButtonGroup;
 
     ScrollingListWidget *load_list;
 
