@@ -25,6 +25,7 @@ void WebViewEventFilter::setWebView(QWebView *webView) {
     this->webView->installEventFilter(this);
 }
 
+// returns true to filter the event
 bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
     switch( event->type() ) {
         case QEvent::MouseButtonPress:
@@ -81,7 +82,7 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
                 }*/
                 if( filterMouseMove ) {
                     if( webView != NULL ) {
-                        // support for swype scrolling
+                        // support for swipe scrolling
                         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                         int new_mouse_x = mouseEvent->globalX();
                         int new_mouse_y = mouseEvent->globalY();
@@ -92,6 +93,9 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
                     return true;
                 }
             }
+            break;
+        case QEvent::MouseButtonDblClick:
+            return true;
             break;
         default:
             break;
