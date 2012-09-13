@@ -33,6 +33,7 @@
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
 <image type="scenery" name="carpet" filename="gfx/textures/scenery/carpet.png"/>
 <image type="scenery" name="church_bell" filename="gfx/textures/scenery/church_bell.png"/>
+<image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="boulders" filename="gfx/textures/scenery/boulders.png"/>

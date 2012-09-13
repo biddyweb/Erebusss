@@ -55,6 +55,7 @@ protected:
     bool locked_silent;
     string unlock_item_name;
     string unlock_text;
+    string confirm_text; // relevant onl for some types, e.g., doors
     DrawType draw_type;
     float opacity;
     float width, height;
@@ -165,6 +166,12 @@ public:
     }
     string getUnlockText() const {
         return this->unlock_text;
+    }
+    void setConfirmText(const string &confirm_text) {
+        this->confirm_text = confirm_text;
+    }
+    string getConfirmText() const {
+        return this->confirm_text;
     }
     void setDrawType(DrawType draw_type) {
         this->draw_type = draw_type;

@@ -3119,6 +3119,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef locked_silent_s = reader.attributes().value("locked_silent");
                     bool locked_silent = parseBool(locked_silent_s.toString(), true);
                     QStringRef unlock_text_s = reader.attributes().value("unlock_text");
+                    QStringRef confirm_text_s = reader.attributes().value("confirm_text");
                     float size_w = 0.0f, size_h = 0.0f;
                     QStringRef size_s = reader.attributes().value("size");
                     if( size_s.length() > 0 ) {
@@ -3225,6 +3226,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     scenery->setLockedSilent(locked_silent);
                     if( unlock_text_s.length() > 0 ) {
                         scenery->setUnlockText(unlock_text_s.toString().toStdString());
+                    }
+                    if( confirm_text_s.length() > 0 ) {
+                        scenery->setConfirmText(confirm_text_s.toString().toStdString());
                     }
                     map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName());
                     if( image_iter != this->scenery_opened_images.end() ) {
@@ -4070,103 +4074,110 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 Scenery *scenery = *iter;
                 qDebug("clicked on scenery: %s", scenery->getName().c_str());
 
-                bool is_locked = false;
-                if( scenery->isLocked() ) {
-                    // can we unlock it?
-                    is_locked = true;
-                    string unlock_item_name = scenery->getUnlockItemName();
-                    if( unlock_item_name.length() > 0 ) {
-                        //LOG("search for %s\n", unlock_item_name.c_str());
-                        for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                            const Item *item = *iter;
-                            //LOG("    compare to: %s\n", item->getKey().c_str());
-                            if( item->getKey() == unlock_item_name ) {
-                                is_locked = false;
-                            }
-                        }
-                    }
-                    if( is_locked ) {
-                        done = true;
-                        if( !scenery->isLockedSilent() ) {
-                            this->playSound("lock");
-                            stringstream str;
-                            str << "The " << scenery->getName() << " is locked!";
-                            this->addTextEffect(str.str(), player->getPos(), 2000);
-                        }
-                    }
-                    else {
-                        stringstream str;
-                        if( scenery->getUnlockText().length() == 0 ) {
-                            str << "You unlock the " << scenery->getName() << ".";
-                        }
-                        else {
-                            str << scenery->getUnlockText();
-                        }
-                        this->addTextEffect(str.str(), player->getPos(), 2000);
-                        scenery->setLocked(false);
-                        player->addXP(this, 20);
-                    }
+                bool confirm_ok = true;
+                if( scenery->getConfirmText().length() > 0 ) {
+                    confirm_ok = this->askQuestionDialog(scenery->getConfirmText());
                 }
 
-                if( !is_locked ) {
-                    if( scenery->getNItems() > 0 ) {
-                        done = true;
-                        bool all_gold = true;
-                        for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
-                            Item *item = *iter;
-                            if( item->getType() != ITEMTYPE_CURRENCY ) {
-                                all_gold = false;
+                if( confirm_ok ) {
+                    bool is_locked = false;
+                    if( scenery->isLocked() ) {
+                        // can we unlock it?
+                        is_locked = true;
+                        string unlock_item_name = scenery->getUnlockItemName();
+                        if( unlock_item_name.length() > 0 ) {
+                            //LOG("search for %s\n", unlock_item_name.c_str());
+                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                                const Item *item = *iter;
+                                //LOG("    compare to: %s\n", item->getKey().c_str());
+                                if( item->getKey() == unlock_item_name ) {
+                                    is_locked = false;
+                                }
                             }
-                            c_location->addItem(item, player->getX(), player->getY());
                         }
-                        scenery->eraseAllItems();
-                        this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
-                    }
-
-                    if( scenery->canBeOpened() && !scenery->isOpened() ) {
-                        done = true;
-                        this->playSound("container");
-                        scenery->setOpened(true);
-                    }
-
-                    if( scenery->isDoor() ) {
-                        done = true;
-                        qDebug("clicked on a door");
-                        // open door
-                        this->playSound("door");
-                        c_location->removeScenery(scenery);
-                        delete scenery;
-                        scenery = NULL;
-                        ignore_scenery = NULL;
-                    }
-                    else if( scenery->isExit() ) {
-                        done = true;
-                        LOG("clicked on an exit\n");
-                        // exit
-                        this->playSound("door");
-                        this->closeSubWindow(); // just in case
-                        new CampaignWindow(this);
-                        game_g->getScreen()->setPaused(true);
-                        this->player->restoreHealth();
-                    }
-                    else if( scenery->getExitLocation().length() > 0 ) {
-                        done = true;
-                        this->playSound("door");
-                        LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
-                        Location *new_location = quest->findLocation(scenery->getExitLocation());
-                        ASSERT_LOGGER(new_location != NULL);
-                        if( new_location != NULL ) {
-                            this->moveToLocation(new_location, scenery->getExitLocationPos());
-                            move = false;
+                        if( is_locked ) {
+                            done = true;
+                            if( !scenery->isLockedSilent() ) {
+                                this->playSound("lock");
+                                stringstream str;
+                                str << "The " << scenery->getName() << " is locked!";
+                                this->addTextEffect(str.str(), player->getPos(), 2000);
+                            }
+                        }
+                        else {
+                            stringstream str;
+                            if( scenery->getUnlockText().length() == 0 ) {
+                                str << "You unlock the " << scenery->getName() << ".";
+                            }
+                            else {
+                                str << scenery->getUnlockText();
+                            }
+                            this->addTextEffect(str.str(), player->getPos(), 2000);
+                            scenery->setLocked(false);
+                            player->addXP(this, 20);
                         }
                     }
-                    else if( scenery->getInteractType().length() > 0 ) {
-                        done = true;
-                        LOG("interact_type: %s\n", scenery->getInteractType().c_str());
-                        string dialog_text;
-                        scenery->getInteractionText(&dialog_text);
-                        if( this->askQuestionDialog(dialog_text) ) {
-                            scenery->interact(this);
+
+                    if( !is_locked ) {
+                        if( scenery->getNItems() > 0 ) {
+                            done = true;
+                            bool all_gold = true;
+                            for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
+                                Item *item = *iter;
+                                if( item->getType() != ITEMTYPE_CURRENCY ) {
+                                    all_gold = false;
+                                }
+                                c_location->addItem(item, player->getX(), player->getY());
+                            }
+                            scenery->eraseAllItems();
+                            this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
+                        }
+
+                        if( scenery->canBeOpened() && !scenery->isOpened() ) {
+                            done = true;
+                            this->playSound("container");
+                            scenery->setOpened(true);
+                        }
+
+                        if( scenery->isDoor() ) {
+                            done = true;
+                            qDebug("clicked on a door");
+                            // open door
+                            this->playSound("door");
+                            c_location->removeScenery(scenery);
+                            delete scenery;
+                            scenery = NULL;
+                            ignore_scenery = NULL;
+                        }
+                        else if( scenery->isExit() ) {
+                            done = true;
+                            LOG("clicked on an exit\n");
+                            // exit
+                            this->playSound("door");
+                            this->closeSubWindow(); // just in case
+                            new CampaignWindow(this);
+                            game_g->getScreen()->setPaused(true);
+                            this->player->restoreHealth();
+                        }
+                        else if( scenery->getExitLocation().length() > 0 ) {
+                            done = true;
+                            this->playSound("door");
+                            LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
+                            Location *new_location = quest->findLocation(scenery->getExitLocation());
+                            ASSERT_LOGGER(new_location != NULL);
+                            if( new_location != NULL ) {
+                                this->moveToLocation(new_location, scenery->getExitLocationPos());
+                                move = false;
+                            }
+                        }
+                        else if( scenery->getInteractType().length() > 0 ) {
+                            done = true;
+                            LOG("interact_type: %s\n", scenery->getInteractType().c_str());
+                            string dialog_text;
+                            scenery->getInteractionText(&dialog_text);
+                            if( this->askQuestionDialog(dialog_text) ) {
+                                scenery->interact(this);
+                            }
                         }
                     }
                 }
@@ -4494,6 +4505,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
             fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
             fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
+            fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
             fprintf(file, ">");
             for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;

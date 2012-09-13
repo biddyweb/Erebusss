@@ -73,5 +73,6 @@
         <file>data/spells.xml</file>
         <file>gfx/textures/scenery/teleport.png</file>
         <file>gfx/textures/scenery/church_bell.png</file>
+        <file>gfx/textures/scenery/grate.png</file>
     </qresource>
 </RCC>
