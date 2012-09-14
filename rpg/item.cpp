@@ -42,7 +42,6 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         throw string("tried to use item that can't be used");
     }
 
-    //if( this->item_use == ITEMUSE_POTION_HEALING ) {
     if( this->use == "ITEMUSE_POTION_HEALING" ) {
         int amount = rollDice(this->rating, 6, 0);
         LOG("Character: %s drinks potion of healing, heal %d\n", character->getName().c_str(), amount);
@@ -52,6 +51,14 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         if( character == playing_gamestate->getPlayer() ) {
             playing_gamestate->playSound("drink");
         }
+        return true;
+    }
+    else if( this->use == "ITEMUSE_HARM" ) {
+        int amount = rollDice(this->rating, 6, 0);
+        LOG("Character: %s uses harmful item, damage %d\n", character->getName().c_str(), amount);
+        character->decreaseHealth(playing_gamestate, amount, false, false);
+        LOG("    health is now: %d\n", character->getHealth());
+        playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
         return true;
     }
     else if( this->use == "ITEMUSE_MUSHROOM" ) {
@@ -73,14 +80,6 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
             LOG("    health is now: %d\n", character->getHealth());
             playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
         }
-        return true;
-    }
-    else if( this->use == "ITEMUSE_MUSHROOM_SMELLY" ) {
-        int amount = rollDice(2, 6, 0);
-        LOG("    smelly mushroom harms %d\n", amount);
-        character->decreaseHealth(playing_gamestate, amount, false, false);
-        LOG("    health is now: %d\n", character->getHealth());
-        playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
         return true;
     }
     else {
