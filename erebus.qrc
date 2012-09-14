@@ -74,5 +74,8 @@
         <file>gfx/textures/scenery/teleport.png</file>
         <file>gfx/textures/scenery/church_bell.png</file>
         <file>gfx/textures/scenery/grate.png</file>
+        <file>gfx/textures/items/potion_green.png</file>
+        <file>gfx/textures/items/potion_blue.png</file>
+        <file>gfx/textures/npcs/zombie.png</file>
     </qresource>
 </RCC>

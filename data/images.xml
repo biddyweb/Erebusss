@@ -22,6 +22,8 @@
 <image type="item" name="hand_mirror" filename="gfx/textures/items/hand_mirror.png"/>
 <image type="item" name="key" filename="gfx/textures/items/key.png"/>
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
+<image type="item" name="potion_green" filename="gfx/textures/items/potion_green.png"/>
+<image type="item" name="potion_blue" filename="gfx/textures/items/potion_blue.png"/>
 <image type="item" name="skull" filename="gfx/textures/items/skull.png"/>
 <image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
 <image type="item" name="mushroom" filename="gfx/textures/items/mushroom.png"/>
@@ -89,6 +91,14 @@
     <animation name="run" start="8" length="8" type="loop"/>
     <animation name="attack" start="16" length="8" type="single"/>
     <animation name="death" start="48" length="8" type="single"/>
+</image>
+<image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <!--<animation name="ranged" start="16" length="4" type="single"/>-->
+    <!--<animation name="death" start="22" length="6" type="single"/>-->
+    <animation name="death" start="28" length="8" type="single"/>
 </image>
 
 <image type="npc_static" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
