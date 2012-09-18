@@ -8,6 +8,7 @@
 <!--<image type="generic" name="background_dark" imagetype="perlin" max_red="10" max_green="10" max_blue="50" min_red="0" min_green="0" min_blue="0"/>-->
 <image type="generic" name="background_brown" imagetype="perlin" max_red="60" max_green="30" max_blue="00" min_red="20" min_green="10" min_blue="0"/>
 <image type="generic" name="background_dark" imagetype="perlin" max_red="40" max_green="40" max_blue="50" min_red="0" min_green="0" min_blue="0"/>
+<image type="generic" name="background_black" imagetype="perlin" max_red="16" max_green="16" max_blue="24" min_red="0" min_green="0" min_blue="0"/>
 
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
@@ -19,6 +20,10 @@
     />
 
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
+<image type="item" name="gem_green" filename="gfx/textures/items/gem_green.png"/>
+<image type="item" name="gem_blue" filename="gfx/textures/items/gem_blue.png"/>
+<image type="item" name="gem_white" filename="gfx/textures/items/gem_white.png"/>
+<image type="item" name="gem_gold" filename="gfx/textures/items/gem_gold.png"/>
 <image type="item" name="hand_mirror" filename="gfx/textures/items/hand_mirror.png"/>
 <image type="item" name="key" filename="gfx/textures/items/key.png"/>
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
