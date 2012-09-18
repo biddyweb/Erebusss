@@ -10,7 +10,7 @@
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.0" y="2.0"/>-->
+<player_start x="32.0" y="2.0"/>
 
 <!--main room-->
 
@@ -771,14 +771,15 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 
 <floorregion shape="rect" rect_x="2.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
 
-<scenery name="Door" image_name="door_metal" x="2.5" y="5.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="2.5" y="5.5" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Maze Key"/>
 
 <!--Maze area-->
 
 <floorregion shape="rect" rect_x="2.0" rect_y="6.0" rect_w="1.0" rect_h="10.0"/>
 
-<player_start x="2.5" y="6.5"/>
+<!--<player_start x="2.5" y="2.5"/>-->
+<!--<player_start x="2.5" y="6.5"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="3.0" y="10.0"/>
@@ -788,6 +789,122 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 </floorregion>
 
 <floorregion shape="rect" rect_x="3.0" rect_y="11.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="11.0" rect_w="2.0" rect_h="1.0"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="11.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_space" exit_location_x="20.0" exit_location_y="20.0"/>
+
+</location>
+
+<location name="level_space" type="outdoors">
+
+<floor image_name="floor_paved"/>
+<background image_name="background_black"/>
+
+<!--<player_start x="20.0" y="20.0"/>-->
+
+<floorregion shape="rect" rect_x="18.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="18.0" rect_y="10.0" rect_w="4.0" rect_h="4.0"/>
+
+<npc name="Orc" template="Orc" x="19.0" y="12.0">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Wyvern" template="Wyvern" x="25.0" y="12.0"/>
+
+<!--west side-->
+
+<floorregion shape="polygon">
+    <floorregion_point x="18.0" y="18.0"/>
+    <floorregion_point x="10.0" y="14.0"/>
+    <floorregion_point x="10.0" y="15.0"/>
+    <floorregion_point x="18.0" y="19.0"/>
+</floorregion>
+
+<floorregion shape="rect" rect_x="7.0" rect_y="13.0" rect_w="3.0" rect_h="3.0"/>
+
+<npc name="Orc" template="Orc" x="7.5" y="13.5">
+    <item template="Leather Armour"/>
+</npc>
+
+<floorregion shape="rect" rect_x="8.0" rect_y="16.0" rect_w="1.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="7.0" rect_y="24.0" rect_w="3.0" rect_h="3.0"/>
+
+<npc name="Orc" template="Orc" x="7.5" y="26.5">
+    <item template="Shortbow"/>
+    <item template="Arrows"/>
+    <item template="Red Gem"/>
+</npc>
+
+<floorregion shape="polygon">
+    <floorregion_point x="18.0" y="21.0"/>
+    <floorregion_point x="10.0" y="25.0"/>
+    <floorregion_point x="10.0" y="26.0"/>
+    <floorregion_point x="18.0" y="22.0"/>
+</floorregion>
+
+<!--west platform-->
+
+<floorregion shape="polygon">
+    <floorregion_point x="8.0" y="22.0"/>
+    <floorregion_point x="8.0" y="18.0"/>
+    <floorregion_point x="4.0" y="19.0"/>
+    <floorregion_point x="4.0" y="21.0"/>
+</floorregion>
+
+<scenery name="Teleport" image_name="teleport" x="5.0" y="20.0" size="1.0" blocking="true" block_visibility="true" exit_location="level_6" exit_location_x="1.5" exit_location_y="11.5"/>
+
+<!--east side-->
+
+<floorregion shape="polygon">
+    <floorregion_point x="22.0" y="19.0"/>
+    <floorregion_point x="30.0" y="15.0"/>
+    <floorregion_point x="30.0" y="14.0"/>
+    <floorregion_point x="22.0" y="18.0"/>
+</floorregion>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="13.0" rect_w="3.0" rect_h="3.0"/>
+
+<npc name="Goblin Champion" template="Goblin Champion" x="32.5" y="13.5"/>
+
+<floorregion shape="rect" rect_x="31.0" rect_y="16.0" rect_w="1.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="24.0" rect_w="3.0" rect_h="3.0"/>
+
+<npc name="Goblin Champion" template="Goblin Champion" x="32.5" y="26.5"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="31.5" y="26.5"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="22.0" y="22.0"/>
+    <floorregion_point x="30.0" y="26.0"/>
+    <floorregion_point x="30.0" y="25.0"/>
+    <floorregion_point x="22.0" y="21.0"/>
+</floorregion>
+
+<!--east platform-->
+
+<floorregion shape="rect" rect_x="32.0" rect_y="19.5" rect_w="6.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="38.0" rect_y="18.0" rect_w="6.0" rect_h="4.0"/>
+<npc name="Goblin Mage" template="Goblin Mage" x="43.5" y="20.0">
+    <spell name="Fire bolt" count="8"/>
+</npc>
+<npc name="Goblin Champion" template="Goblin Champion" x="42.5" y="19.0"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="42.5" y="21.0"/>
+<npc name="Wyvern" template="Wyvern" x="42.5" y="22.0"/>
+
+<scenery name="Chest" image_name="chest" x="43.5" y="18.5" size="0.8" blocking="true">
+    <item template="Potion of Healing"/>
+    <item template="Green Gem"/>
+    <gold amount="100"/>
+    <weapon name="Magic Long Sword" image_name="longsword" weight="12"
+        damageX="2" damageY="10" damageZ="2"
+        animation_name="longsword"
+        magical="true"
+        base_template="Long Sword" worth_bonus="300"
+        />
+</scenery>
 
 </location>
 

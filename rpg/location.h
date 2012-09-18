@@ -17,6 +17,7 @@ class PlayingGamestate;
 class Quest;
 
 // source types for boundaries
+const int SOURCETYPE_FLOOR = 0;
 const int SOURCETYPE_SCENERY = 1;
 
 class LocationListener {
@@ -403,9 +404,14 @@ public:
         INTERSECTTYPE_MOVE = 0, // include scenery that is blocking
         INTERSECTTYPE_VISIBILITY = 1 // include scenery that blocks visibility
     };
+    enum Type {
+        TYPE_INDOORS = 0,
+        TYPE_OUTDOORS = 1
+    };
 
 protected:
     string name;
+    Type type;
     LocationListener *listener;
     void *listener_data;
 
@@ -424,7 +430,7 @@ protected:
     set<Trap *> traps;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
 
     vector<Vector2D> calculatePathWayPoints() const;
 
@@ -435,6 +441,12 @@ public:
 
     string getName() const {
         return this->name;
+    }
+    void setType(Type type) {
+        this->type = type;
+    }
+    Type getType() const {
+        return this->type;
     }
     void setWallImageName(const string &wall_image_name) {
         this->wall_image_name = wall_image_name;
@@ -548,7 +560,7 @@ public:
     void createBoundariesForScenery();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
     //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
     Vector2D nudgeToFreeSpace(Vector2D pos, float width) const;
 

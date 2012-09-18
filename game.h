@@ -289,6 +289,7 @@ protected:
     queue<GameMessage *> message_queue;
 
     bool sound_enabled;
+    bool lighting_enabled;
 
 private slots:
 /*#ifndef Q_OS_ANDROID
@@ -349,6 +350,10 @@ public:
         return this->sound_enabled;
     }
     void setSoundEnabled(bool sound_enabled);
+    bool isLightingEnabled() const {
+        return this->lighting_enabled;
+    }
+    void setLightingEnabled(bool lighting_enabled);
     static string getDifficultyString(Difficulty difficulty);
 
     void showErrorDialog(const string &message);

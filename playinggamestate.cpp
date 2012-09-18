@@ -249,6 +249,58 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
     }
 }
 
+void MainGraphicsView::paintEvent(QPaintEvent *event) {
+    QGraphicsView::paintEvent(event);
+
+    if( !game_g->isLightingEnabled() ) {
+        return;
+    }
+    QPainter painter(this->viewport());
+    //painter.fillRect(0, 0, this->width(), this->height(), QColor(255, 0, 0, 127));
+    /*int xpos = this->width()/2;
+    int ypos = this->height()/2;*/
+    //painter.setPen(Qt::NoPen);
+    //painter.setBrush(QBrush(QColor(255, 0, 0, 127)));
+    const float size_c = 8.0f;
+    Character *player = this->playing_gamestate->getPlayer();
+    if( player == NULL ) {
+        return;
+    }
+    QPoint point = this->mapFromScene(player->getX(), player->getY());
+    QPoint point_x = this->mapFromScene(player->getX() + size_c, player->getY());
+    QPoint point_y = this->mapFromScene(player->getX(), player->getY() + size_c);
+    int size_x = point_x.x() - point.x();
+    int size_y = point_y.y() - point.y();
+    int radius = std::max(size_x, size_y);
+
+    /*const int alpha = 127;
+    const int size_c = 512;
+    QRadialGradient radialGrad(point.x(), point.y(), size_c/2);
+    radialGrad.setColorAt(0.0, QColor(255, 255, 127, alpha));
+    radialGrad.setColorAt(1.0, Qt::transparent);
+    //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+    //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+    painter.setCompositionMode(QPainter::CompositionMode_ColorDodge);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(radialGrad);
+    painter.drawEllipse(point, size_c, size_c);*/
+
+    const int alpha = 200;
+    QPixmap pixmap(this->width(), this->height());
+    pixmap.fill(Qt::transparent);
+    QRadialGradient radialGrad(point.x(), point.y(), radius);
+    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+    QPainter painter2(&pixmap);
+    painter2.setPen(Qt::NoPen);
+    //painter2.setBrush(radialGrad);
+    //painter2.setCompositionMode(QPainter::CompositionMode_Source); // needed so that we overwrite the alpha channel
+    //painter2.setBrush(QBrush(QColor(255, 0, 0, 0)));
+    //painter2.drawEllipse(point, size_c, size_c);
+    painter2.fillRect(0, 0, this->width(), this->height(), radialGrad);
+    painter.drawPixmap(0, 0, pixmap);
+}
+
 void MainGraphicsView::update() {
     if( (qApp->mouseButtons() & Qt::LeftButton) == 0 ) {
         /*int time_ms = game_g->getScreen()->getGameTimeFrameMS();
@@ -2000,6 +2052,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         int natural_damageZ = parseInt(natural_damageZ_s.toString());
                         character_template->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
                     }
+                    QStringRef can_fly_s = reader.attributes().value("can_fly");
+                    bool can_fly = parseBool(can_fly_s.toString(), true);
+                    character_template->setCanFly(can_fly);
                     this->character_templates[ name_s.toString().toStdString() ] = character_template;
                 }
             }
@@ -2400,12 +2455,13 @@ void PlayingGamestate::setupView() {
 
     int pixels_per_unit = 64;
     float scale = 1.0f/(float)pixels_per_unit;
-    //QBrush floor_brush(builtin_images["floor"]);
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
     floor_brush.setTransform(QTransform::fromScale(scale, scale));
-    //QBrush wall_brush(builtin_images["wall"]);
-    QBrush wall_brush(builtin_images[c_location->getWallImageName()]);
-    wall_brush.setTransform(QTransform::fromScale(scale, scale));
+    QBrush wall_brush;
+    if( c_location->getWallImageName().length() > 0 ) {
+        wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
+        wall_brush.setTransform(QTransform::fromScale(scale, scale));
+    }
 
     QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
     background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
@@ -2443,9 +2499,11 @@ void PlayingGamestate::setupView() {
             wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
             wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
             wall_polygon.push_back(QPointF(p1.x, p1.y));
-            QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
-            wall_item->setPen(Qt::NoPen);
-            wall_item->setBrush(wall_brush);
+            if( c_location->getWallImageName().length() > 0 ) {
+                QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
+                wall_item->setPen(Qt::NoPen);
+                wall_item->setBrush(wall_brush);
+            }
         }
     }
 #ifdef DEBUG_SHOW_PATH
@@ -2503,6 +2561,31 @@ void PlayingGamestate::setupView() {
         Character *character = *iter;
         this->locationAddCharacter(c_location, character);
     }
+
+    /*const int size_c = 256;
+    const int alpha = 255;
+    QRadialGradient radialGrad(size_c/2, size_c/2, size_c/2);
+    radialGrad.setColorAt(0.0, QColor(255, 255, 255, alpha));
+    radialGrad.setColorAt(1.0, Qt::transparent);
+    //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+    //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+    QPixmap pixmap(size_c, size_c);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(Qt::NoPen);
+    painter.setBrush(radialGrad);
+    painter.drawEllipse(0, 0, size_c, size_c);
+    painter.end();
+
+    AnimatedObject *object = static_cast<AnimatedObject *>(player->getListenerData());
+    //QGraphicsPixmapItem *light_source = scene->addPixmap(pixmap);
+    QGraphicsPixmapItem *light_source = new QGraphicsPixmapItem(pixmap);
+    light_source->setParentItem(object);
+    const float scale_c = 8.0f;
+    light_source->setPos(object->getWidth()/2-size_c*scale_c/2, object->getHeight()/2-size_c*scale_c/2);
+    light_source->setScale(scale_c);
+    //light_source->setOpacity(0.5f);
+    light_source->setZValue(10000.0f);*/
 
     /*{
         TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
@@ -2639,7 +2722,21 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: duplicate location name");
                     }
+                    QStringRef type_s = reader.attributes().value("type");
                     location = new Location(name_s.toString().toStdString());
+                    if( type_s.length() > 0 ) {
+                        if( type_s.toString() == "indoors" ) {
+                            location->setType(Location::TYPE_INDOORS);
+                        }
+                        else if( type_s.toString() == "outdoors" ) {
+                            location->setType(Location::TYPE_OUTDOORS);
+                        }
+                        else {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("unknown type: %s\n", type_s.toString().toStdString().c_str());
+                            throw string("unexpected quest xml: location has unknown type");
+                        }
+                    }
                     quest->addLocation(location);
                 }
                 else if( reader.name() == "floor" ) {
@@ -2867,6 +2964,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             int natural_damageZ = parseInt(natural_damageX_s.toString());
                             npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
                         }
+                        QStringRef can_fly_s = reader.attributes().value("can_fly");
+                        bool can_fly = parseBool(can_fly_s.toString(), true);
+                        npc->setCanFly(can_fly);
                         QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                         int xp_worth = parseInt(xp_worth_s.toString());
                         npc->setXPWorth(xp_worth);
@@ -3322,9 +3422,6 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         else if( loc->getFloorImageName().length() == 0 ) {
             throw string("Location doesn't define floor image name");
         }
-        else if( loc->getWallImageName().length() == 0 ) {
-            throw string("Location doesn't define wall image name");
-        }
 
         loc->createBoundariesForRegions();
         loc->createBoundariesForScenery();
@@ -3708,7 +3805,7 @@ void PlayingGamestate::update() {
             else if( dist <= npc_visibility_c ) {
                 // check line of sight
                 Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false) ) {
                     is_visible = true;
                 }
             }
@@ -4143,7 +4240,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             done = true;
                             qDebug("clicked on a door");
                             // open door
-                            this->playSound("door");
+                            if( scenery->getName() == "Door" ) {
+                                this->playSound("door");
+                            }
                             c_location->removeScenery(scenery);
                             delete scenery;
                             scenery = NULL;
@@ -4153,7 +4252,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             done = true;
                             LOG("clicked on an exit\n");
                             // exit
-                            this->playSound("door");
+                            if( scenery->getName() == "Door" ) {
+                                this->playSound("door");
+                            }
                             this->closeSubWindow(); // just in case
                             new CampaignWindow(this);
                             game_g->getScreen()->setPaused(true);
@@ -4161,7 +4262,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                         }
                         else if( scenery->getExitLocation().length() > 0 ) {
                             done = true;
-                            this->playSound("door");
+                            if( scenery->getName() == "Door" ) {
+                                this->playSound("door");
+                            }
                             LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
                             Location *new_location = quest->findLocation(scenery->getExitLocation());
                             ASSERT_LOGGER(new_location != NULL);
@@ -4364,7 +4467,19 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     for(vector<Location *>::const_iterator iter_loc = quest->locationsBegin(); iter_loc != quest->locationsEnd(); ++iter_loc) {
         const Location *location = *iter_loc;
 
-        fprintf(file, "<location name=\"%s\">\n\n", location->getName().c_str());
+        string type_str;
+        switch( location->getType() ) {
+        case Location::TYPE_INDOORS:
+            type_str = "indoors";
+            break;
+        case Location::TYPE_OUTDOORS:
+            type_str = "outdoors";
+            break;
+        default:
+            ASSERT_LOGGER(false);
+            break;
+        }
+        fprintf(file, "<location name=\"%s\" type=\"%s\">\n\n", location->getName().c_str(), type_str.c_str());
 
         LOG("save location images\n");
         fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
@@ -4415,6 +4530,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
             fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
+            fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
             fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");

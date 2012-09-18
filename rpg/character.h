@@ -102,6 +102,7 @@ class CharacterTemplate {
     int health_min, health_max;
     bool has_natural_damage;
     int natural_damageX, natural_damageY, natural_damageZ;
+    bool can_fly;
     int gold_min, gold_max;
     int xp_worth;
     bool requires_magical; // requires magical weapon to hit?
@@ -148,6 +149,12 @@ public:
         *natural_damageX = this->natural_damageX;
         *natural_damageY = this->natural_damageY;
         *natural_damageZ = this->natural_damageZ;
+    }
+    void setCanFly(bool can_fly) {
+        this->can_fly = can_fly;
+    }
+    bool canFly() const {
+        return this->can_fly;
     }
     int getGold() const;
     int getXPWorth() const {
@@ -209,6 +216,7 @@ class Character {
     int health;
     int max_health;
     int natural_damageX, natural_damageY, natural_damageZ;
+    bool can_fly;
 
     set<Item *> items;
     Weapon *current_weapon;
@@ -447,6 +455,12 @@ public:
         *natural_damageX = this->natural_damageX;
         *natural_damageY = this->natural_damageY;
         *natural_damageZ = this->natural_damageZ;
+    }
+    void setCanFly(bool can_fly) {
+        this->can_fly = can_fly;
+    }
+    bool canFly() const {
+        return this->can_fly;
     }
 
     const Weapon *getCurrentWeapon() const {

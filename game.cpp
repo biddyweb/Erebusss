@@ -18,6 +18,13 @@ Game *game_g = NULL;
 
 const QString sound_enabled_key_c = "sound_enabled";
 const int default_sound_enabled_c = true;
+const QString lighting_enabled_key_c = "lighting_enabled";
+// lighting defaults to false on Symbian, as risk of being slow on older phones without GPUs
+#if defined(Q_OS_SYMBIAN)
+const int default_lighting_enabled_c = false;
+#else
+const int default_lighting_enabled_c = true;
+#endif
 
 void WebViewEventFilter::setWebView(QWebView *webView) {
     qDebug("setWebView");
@@ -334,7 +341,7 @@ int AnimatedObject::getHeight() const {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    this->setStyleSheet("color: black;"); // workaround for Android color bug
+    this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -355,7 +362,7 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     saved_y = event->y();
 }
 
-Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c) {
+Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c), lighting_enabled(default_lighting_enabled_c) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
@@ -374,6 +381,15 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     }
     else {
         this->sound_enabled = sound_enabled_i != 0;
+    }
+
+    int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings lighting_enabled not ok, set to default");
+        this->lighting_enabled = default_lighting_enabled_c;
+    }
+    else {
+        this->lighting_enabled = lighting_enabled_i != 0;
     }
 
     /*int difficulty_i = settings->value(difficulty_key_c, default_difficulty_c).toInt(&ok);
@@ -725,6 +741,11 @@ Sound *Game::loadSound(string filename) const {
 void Game::setSoundEnabled(bool sound_enabled) {
     this->sound_enabled = sound_enabled;
     this->settings->setValue(sound_enabled_key_c, sound_enabled ? 1 : 0);
+}
+
+void Game::setLightingEnabled(bool lighting_enabled) {
+    this->lighting_enabled = lighting_enabled;
+    this->settings->setValue(lighting_enabled_key_c, lighting_enabled ? 1 : 0);
 }
 
 string Game::getDifficultyString(Difficulty difficulty) {

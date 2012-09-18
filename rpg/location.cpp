@@ -290,7 +290,7 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
 }
 
 Location::Location(const string &name) :
-    name(name), listener(NULL), listener_data(NULL),
+    name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
     distance_graph(NULL)
 {
 }
@@ -581,6 +581,7 @@ void Location::createBoundariesForRegions() {
         FloorRegion *start_floor_region = c_floor_region;
         int start_indx = c_indx;
         Polygon2D boundary;
+        boundary.setSourceType((int)SOURCETYPE_FLOOR);
         // first point actually added as last point at end
         for(;;) {
             int n_indx = (c_indx+1) % c_floor_region->getNPoints();
@@ -849,7 +850,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
         /*if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
@@ -864,6 +865,11 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
                 continue;
             }
         }
+        else if( boundary->getSourceType() == (int)SOURCETYPE_FLOOR ) {
+            if( this->type == TYPE_OUTDOORS && ( flying || intersect_type == INTERSECTTYPE_VISIBILITY ) ) {
+                continue;
+            }
+        }
         if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
             continue;
         }
@@ -875,7 +881,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery) const {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const {
     //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
     bool done = false;
     bool hit = false;
@@ -899,7 +905,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
     //float ymax = dv_length + width;
     float ymax = dv_length;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, find_earliest, start, end, du, dv, width, xmin, xmax, ymin, ymax, intersect_type, ignore_one_scenery);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, find_earliest, start, end, du, dv, width, xmin, xmax, ymin, ymax, intersect_type, ignore_one_scenery, flying);
 
     if( hit ) {
         *hit_pos = start + dv * hit_dist;
@@ -1060,7 +1066,7 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
                 // test we get get to the way point
                 // important to use E_TOL_LINEAR for the width, otherwise can cause problems for scenery right next to the wall
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL, false) ) {
                     path_way_points.push_back( path_way_point );
                 }
             }
@@ -1105,7 +1111,7 @@ void Location::calculateDistanceGraph() {
                 hit = false;
             }
             else {
-                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL);
+                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL, false);
             }
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
@@ -1122,7 +1128,7 @@ bool Location::testVisibility(Vector2D pos, const FloorRegion *floor_region, siz
     // test we get get to the way point
     Vector2D hit_pos;
     // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
-    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL) ) {
+    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, point, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL, false) ) {
         return true;
     }
     return false;

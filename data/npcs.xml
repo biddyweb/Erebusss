@@ -38,6 +38,7 @@
     FP="9" BS="0" S="5" A="1" M="3" D="0" B="5" Sp="4.0"
     natural_damageX="2" natural_damageY="8" natural_damageZ="0"
     health_min="30" health_max="35" gold_min="0" gold_max="0"
+    can_fly="true"
     xp_worth="20"
 />
 

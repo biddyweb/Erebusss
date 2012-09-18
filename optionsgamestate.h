@@ -28,6 +28,7 @@ class OptionsGamestate : public Gamestate {
     ScrollingListWidget *load_list;
 
     QCheckBox *soundCheck;
+    QCheckBox *lightingCheck;
 
 #ifndef Q_OS_ANDROID
     Sound *music;

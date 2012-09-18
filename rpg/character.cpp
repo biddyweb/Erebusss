@@ -34,7 +34,7 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 }
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
-    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
+    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
 {
 }
 
@@ -68,6 +68,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    can_fly(false),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -86,6 +87,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    can_fly(character_template.canFly()),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -241,7 +243,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 if( dist <= npc_visibility_c ) {
                     // check line of sight
                     Vector2D hit_pos;
-                    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, target_npc->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL) ) {
+                    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, target_npc->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, this->can_fly) ) {
                         can_hit = true;
                     }
                     else {
@@ -737,7 +739,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
     vector<Vector2D> new_path;
 
     Vector2D hit_pos;
-    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery) ) {
+    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, this->can_fly) ) {
         // easy
         //LOG("easy\n");
         new_path.push_back(dest);
@@ -768,7 +770,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
                     hit = false;
                 }
                 else {
-                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL);
+                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL, this->can_fly);
                 }
                 if( !hit ) {
                     v_A->addNeighbour(j, dist);
@@ -799,7 +801,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
             if( new_path.size() >= 2 ) {
                 p0 = new_path.at( new_path.size() - 2 );
             }
-            if( location->intersectSweptSquareWithBoundaries(&hit_pos, true, p0, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL) ) {
+            if( location->intersectSweptSquareWithBoundaries(&hit_pos, true, p0, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, this->can_fly) ) {
                 new_path[ new_path.size() - 1 ] = hit_pos;
             }
         }

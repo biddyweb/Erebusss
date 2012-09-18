@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), load_list(NULL), soundCheck(NULL)
+    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -313,6 +313,10 @@ void OptionsGamestate::clickedOptions() {
     soundCheck->setChecked(game_g->isSoundEnabled());
     layout->addWidget(soundCheck);
 
+    lightingCheck = new QCheckBox("Lighting Effects");
+    lightingCheck->setChecked(game_g->isLightingEnabled());
+    layout->addWidget(lightingCheck);
+
     QPushButton *okayButton = new QPushButton("Okay");
     game_g->initButton(okayButton);
     okayButton->setShortcut(QKeySequence(Qt::Key_Return));
@@ -344,6 +348,11 @@ void OptionsGamestate::clickedOptionsOkay() {
             }
         }
 #endif
+    }
+
+    bool new_lighting_enabled = lightingCheck->isChecked();
+    if( new_lighting_enabled != game_g->isLightingEnabled() ) {
+        game_g->setLightingEnabled(new_lighting_enabled);
     }
 
     this->closeAllSubWindows();
