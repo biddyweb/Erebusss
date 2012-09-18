@@ -2761,15 +2761,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: wall element wasn't expected here");
                     }
                     QStringRef image_name_s = reader.attributes().value("image_name");
-                    if( image_name_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: wall element has no image_name attribute");
-                    }
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: wall element outside of location");
                     }
-                    location->setWallImageName(image_name_s.toString().toStdString());
+                    if( image_name_s.length() > 0 ) {
+                        location->setWallImageName(image_name_s.toString().toStdString());
+                    }
                 }
                 else if( reader.name() == "background" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
