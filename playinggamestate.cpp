@@ -2153,6 +2153,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     LOG("load sound effects\n");
 #ifndef Q_OS_ANDROID
     //if( !mobile_c )
+    if( game_g->isSoundEnabled() )
     {
         this->sound_effects["click"] = game_g->loadSound(":/sound/click_short.wav");
         this->sound_effects["coin"] = game_g->loadSound(":/sound/coin.wav");
