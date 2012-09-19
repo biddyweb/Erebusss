@@ -341,7 +341,9 @@ int AnimatedObject::getHeight() const {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+#if defined(Q_OS_ANDROID)
     this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug
+#endif
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -695,9 +697,11 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
             width *= ratio;
             height *= ratio;
         }
-        reader.setClipRect(QRect(xpos, ypos, width, height));
+        if( xpos > 0 || ypos > 0 || width < actual_width || height < reader.size().height() ) {
+            reader.setClipRect(QRect(xpos, ypos, width, height));
+        }
     }
-    QImage image = reader.read();
+    /*QImage image = reader.read();
     if( image.isNull() ) {
         LOG("failed to read image: %s\n", filename.c_str());
         LOG("error: %d\n", reader.error());
@@ -706,7 +710,8 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
         error << "Failed to load image: " << filename;
         throw error.str();
     }
-    QPixmap pixmap = QPixmap::fromImage(image);
+    QPixmap pixmap = QPixmap::fromImage(image);*/
+    QPixmap pixmap = QPixmap::fromImageReader(&reader);
     if( pixmap.isNull() ) {
         LOG("failed to convert image to pixmap: %s\n", filename.c_str());
         throw string("Failed to convert image to pixmap");
