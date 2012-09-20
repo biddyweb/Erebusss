@@ -426,27 +426,16 @@ GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *vi
 void GUIOverlay::paintEvent(QPaintEvent *event) {
     //qDebug("GUIOverlay::paintEvent()");
 
-    //this->move(0, 0);
     QPainter painter(this);
-    //painter.setFont( game_g->getFontSmall() );
     painter.setFont( game_g->getFontScene() );
-    /*QBrush brush(QColor(255, 0, 0, 255));
-    painter.fillRect(QRectF(QPointF(0, 0), this->size()), brush);*/
-    //qDebug("%d, %d\n", view->rect().width(), view->rect().height());
-    /*painter.setPen(Qt::green);
-    painter.drawText(16, 16, "test blah blah blah 123");*/
     if( playing_gamestate->getPlayer() != NULL ) {
         float bar_x = 16.0f/640.0f;
         float bar_y = 32.0f/360.0f;
         float text_y = bar_y - 4.0f/360.0f;
-        //int bar_y = 32;
-        //int text_y = bar_y - 4;
         const Character *player = playing_gamestate->getPlayer();
         painter.setPen(Qt::white);
-        //painter.drawText(16.0f, text_y, player->getName().c_str());
         painter.drawText(bar_x*width(), text_y*height(), player->getName().c_str());
         float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
-        //this->drawBar(painter, 16, bar_y, 100, 16, fraction, Qt::darkGreen);
         this->drawBar(painter, bar_x, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkGreen);
         if( player->getTargetNPC() != NULL && player->getTargetNPC()->isHostile() ) {
             const Character *enemy = player->getTargetNPC();
@@ -454,10 +443,8 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
             //qDebug("name: %s", enemy->getName().c_str());
             float bar_x2 = 132.0f/640.0f;
             painter.setPen(Qt::white);
-            //painter.drawText(132, text_y, enemy->getName().c_str());
             painter.drawText(bar_x2*width(), text_y*height(), enemy->getName().c_str());
             fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
-            //this->drawBar(painter, 132, bar_y, 100, 16, fraction, Qt::darkRed);
             this->drawBar(painter, bar_x2, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkRed);
         }
     }
@@ -496,6 +483,7 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
     painter.drawRect(x, y, width-1, height-1);
     painter.fillRect(x2, y2, width2, height2, brush_bg);
     painter.fillRect(x2, y2, width2*fraction, height2, brush_fg);
+    painter.setOpacity(1.0f);
 }
 
 /*void GUIOverlayItem::advance(int phase) {
