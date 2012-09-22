@@ -56,6 +56,9 @@ class MainGraphicsView : public QGraphicsView {
     GUIOverlay *gui_overlay;
     float c_scale;
     set<TextEffect *> text_effects;
+    QPixmap lighting_pixmap;
+    bool calculated_lighting_pixmap_scaled;
+    QPixmap lighting_pixmap_scaled;
 
     const static float min_zoom_c;
     const static float max_zoom_c;

@@ -22,6 +22,8 @@
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
+const int darkness_alpha = 200;
+
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
@@ -57,8 +59,24 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f)
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap_scaled(false)
 {
+    if( game_g->isLightingEnabled() )
+    {
+        const int res_c = 256;
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad(res_c/2, res_c/2, res_c/2);
+        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        radialGrad.setColorAt(1.0, QColor(0, 0, 0, darkness_alpha));
+        QPainter painter2(&pixmap);
+        painter2.setPen(Qt::NoPen);
+        painter2.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter2.end();
+
+        this->lighting_pixmap = pixmap;
+    }
+
 }
 
 void MainGraphicsView::zoomOut() {
@@ -285,7 +303,7 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
     painter.setBrush(radialGrad);
     painter.drawEllipse(point, size_c, size_c);*/
 
-    const int alpha = 200;
+    /*const int alpha = 200;
     QPixmap pixmap(this->width(), this->height());
     pixmap.fill(Qt::transparent);
     QRadialGradient radialGrad(point.x(), point.y(), radius);
@@ -298,7 +316,65 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
     //painter2.setBrush(QBrush(QColor(255, 0, 0, 0)));
     //painter2.drawEllipse(point, size_c, size_c);
     painter2.fillRect(0, 0, this->width(), this->height(), radialGrad);
-    painter.drawPixmap(0, 0, pixmap);
+    painter.drawPixmap(0, 0, pixmap);*/
+
+    /*const int alpha = 200;
+    QRadialGradient radialGrad(point.x(), point.y(), radius);
+    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+    painter.setPen(Qt::NoPen);
+    painter.fillRect(0, 0, this->width(), this->height(), radialGrad);*/
+    //painter.fillRect(0, 0, this->width(), this->height(), QBrush(QColor(0, 0, 0, alpha)));
+
+    /*
+    //const int alpha = 200;
+    const int alpha = 255;
+    const int res_c = 32;
+    QPixmap pixmap(res_c, res_c);
+    pixmap.fill(Qt::transparent);
+    QRadialGradient radialGrad(res_c/2, res_c/2, res_c);
+    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+    //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 255));
+    //radialGrad.setColorAt(1.0, QColor(0, 0, 0, 255));
+    QPainter painter2(&pixmap);
+    painter2.setPen(Qt::NoPen);
+    painter2.fillRect(0, 0, res_c, res_c, radialGrad);
+    painter2.end();
+    pixmap = pixmap.scaledToWidth(2*radius);
+    //qDebug("%d, %d, %d", point.x(), point.y(), radius);
+    painter.drawPixmap(point.x() - radius, point.y() - radius, pixmap);
+    //painter.drawPixmap(point.x(), point.y(), pixmap);
+    //painter.drawPixmap(0, 0, pixmap);
+    */
+
+    //qDebug("### %f, %f", player->getX(), player->getY());
+    //qDebug("### radius = %d", radius);
+    //this->calculated_lighting_pixmap_scaled = false;
+    if( !this->calculated_lighting_pixmap_scaled ) {
+        this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
+        this->calculated_lighting_pixmap_scaled = true;
+    }
+    //qDebug("%d, %d, %d", point.x(), point.y(), radius);
+    int sx = point.x() - radius;
+    int sy = point.y() - radius;
+    painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
+    QBrush brush(QColor(0, 0, 0, darkness_alpha));
+    if( sx > 0 ) {
+        painter.fillRect(0, 0, sx, this->height(), brush);
+    }
+    if( sx + 2*radius < this->width() ) {
+        painter.fillRect(sx + 2*radius, 0, this->width() - sx - 2*radius, this->height(), brush);
+    }
+    if( sy > 0 ) {
+        painter.fillRect(sx, 0, 2*radius, sy, brush);
+    }
+    if( sy + 2*radius < this->height() ) {
+        painter.fillRect(sx, sy + 2*radius, 2*radius, this->height() - sy - 2*radius, brush);
+    }
+
+    //painter.drawPixmap(point.x(), point.y(), pixmap);
+    //painter.drawPixmap(0, 0, pixmap);
 }
 
 void MainGraphicsView::update() {
@@ -338,6 +414,7 @@ void MainGraphicsView::update() {
 
 void MainGraphicsView::setScale(float c_scale) {
     LOG("MainGraphicsView::setScale(%f)\n", c_scale);
+    this->calculated_lighting_pixmap_scaled = false;
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);
     this->c_scale = std::max(this->c_scale, min_zoom_c);
@@ -347,6 +424,7 @@ void MainGraphicsView::setScale(float c_scale) {
 
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
+    this->calculated_lighting_pixmap_scaled = false;
     float old_scale = this->c_scale;
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);
