@@ -78,11 +78,12 @@ class TalkItem {
 public:
     string question;
     string answer;
+    string action;
     bool while_not_done;
     bool objective;
 
-    TalkItem(const string &question, const string &answer, bool while_not_done, bool objective) :
-        question(question), answer(answer), while_not_done(while_not_done), objective(objective)
+    TalkItem(const string &question, const string &answer, const string &action, bool while_not_done, bool objective) :
+        question(question), answer(answer), action(action), while_not_done(while_not_done), objective(objective)
     {
     }
 };
@@ -611,8 +612,8 @@ public:
     map<string, string>::const_iterator talkItemsEnd() const {
         return this->talk_items.end();
     }*/
-    void addTalkItem(const string &question, const string &answer, bool while_not_done, bool objective) {
-        TalkItem talk_item(question, answer, while_not_done, objective);
+    void addTalkItem(const string &question, const string &answer, const string &action, bool while_not_done, bool objective) {
+        TalkItem talk_item(question, answer, action, while_not_done, objective);
         this->talk_items.push_back(talk_item);
     }
     vector<TalkItem>::const_iterator talkItemsBegin() const {

@@ -2900,6 +2900,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                         npc = new Character(name_s.toString().toStdString(), true, *character_template);*/
                         npc = this->createCharacter(name_s.toString().toStdString());
+                        QStringRef is_hostile_s = reader.attributes().value("is_hostile");
+                        bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
+                        npc->setHostile(is_hostile);
                     }
                     else {
                         if( reader.name() == "player" ) {
@@ -2965,29 +2968,31 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         npc->setRequiresMagical(requires_magical);
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString(), true) );
-                        QStringRef can_talk_s = reader.attributes().value("can_talk");
-                        if( can_talk_s.length() > 0 ) {
-                            bool can_talk = parseBool(can_talk_s.toString());
-                            npc->setCanTalk(can_talk);
-                        }
-                        QStringRef has_talked_s = reader.attributes().value("has_talked");
-                        if( has_talked_s.length() > 0 ) {
-                            bool has_talked = parseBool(has_talked_s.toString());
-                            npc->setHasTalked(has_talked);
-                        }
-                        QStringRef interaction_completed_s = reader.attributes().value("interaction_completed");
-                        if( interaction_completed_s.length() > 0 ) {
-                            bool interaction_completed = parseBool(interaction_completed_s.toString());
-                            npc->setInteractionCompleted(interaction_completed);
-                        }
-                        QStringRef interaction_type_s = reader.attributes().value("interaction_type");
-                        npc->setInteractionType(interaction_type_s.toString().toStdString());
-                        QStringRef interaction_data_s = reader.attributes().value("interaction_data");
-                        npc->setInteractionData(interaction_data_s.toString().toStdString());
-                        QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
-                        int interaction_xp = parseInt(interaction_xp_s.toString(), true);
-                        npc->setInteractionXP(interaction_xp);
                     }
+
+                    QStringRef can_talk_s = reader.attributes().value("can_talk");
+                    if( can_talk_s.length() > 0 ) {
+                        bool can_talk = parseBool(can_talk_s.toString());
+                        npc->setCanTalk(can_talk);
+                    }
+                    QStringRef has_talked_s = reader.attributes().value("has_talked");
+                    if( has_talked_s.length() > 0 ) {
+                        bool has_talked = parseBool(has_talked_s.toString());
+                        npc->setHasTalked(has_talked);
+                    }
+                    QStringRef interaction_completed_s = reader.attributes().value("interaction_completed");
+                    if( interaction_completed_s.length() > 0 ) {
+                        bool interaction_completed = parseBool(interaction_completed_s.toString());
+                        npc->setInteractionCompleted(interaction_completed);
+                    }
+                    QStringRef interaction_type_s = reader.attributes().value("interaction_type");
+                    npc->setInteractionType(interaction_type_s.toString().toStdString());
+                    QStringRef interaction_data_s = reader.attributes().value("interaction_data");
+                    npc->setInteractionData(interaction_data_s.toString().toStdString());
+                    QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
+                    int interaction_xp = parseInt(interaction_xp_s.toString(), true);
+                    npc->setInteractionXP(interaction_xp);
+
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
                         float default_pos_x = parseFloat(pos_x_s.toString());
@@ -3035,12 +3040,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     QStringRef question_s = reader.attributes().value("question");
                     QString question = question_s.toString();
+                    QStringRef action_s = reader.attributes().value("action");
+                    QString action = action_s.toString();
                     QStringRef while_not_done_s = reader.attributes().value("while_not_done");
                     bool while_not_done = parseBool(while_not_done_s.toString(), true);
                     QStringRef objective_s = reader.attributes().value("objective");
                     bool objective = parseBool(objective_s.toString(), true);
                     QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->addTalkItem(question.toStdString(), answer.toStdString(), while_not_done, objective);
+                    npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), while_not_done, objective);
                 }
                 else if( reader.name() == "spell") {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
@@ -4055,18 +4062,21 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 vector<string> buttons;
                                 //vector<string> answers;
                                 vector<const TalkItem *> talk_items;
-                                for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
-                                    const TalkItem *talk_item = &*iter;
-                                    if( talk_item->while_not_done && character->isInteractionCompleted() ) {
-                                        continue;
+                                if( !character->isHostile() ) {
+                                    // being hostile means the character has become hostile whilst talking, so now the only thing left is to say Goodbye!
+                                    for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                                        const TalkItem *talk_item = &*iter;
+                                        if( talk_item->while_not_done && character->isInteractionCompleted() ) {
+                                            continue;
+                                        }
+                                        if( talk_item->objective && !character->canCompleteInteraction(this) ) {
+                                            continue;
+                                        }
+                                        buttons.push_back(talk_item->question);
+                                        //answers.push_back(talk_item->answer);
+                                        talk_items.push_back(talk_item);
                                     }
-                                    if( talk_item->objective && !character->canCompleteInteraction(this) ) {
-                                        continue;
-                                    }
-                                    buttons.push_back(talk_item->question);
-                                    //answers.push_back(talk_item->answer);
-                                    talk_items.push_back(talk_item);
-                                }
+                            }
                                 buttons.push_back("Goodbye");
                                 InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true);
                                 this->addWidget(dialog);
@@ -4094,6 +4104,15 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                     message << "<br/>";
                                     if( talk_item->objective ) {
                                         character->completeInteraction(this);
+                                    }
+                                    if( talk_item->action.length() > 0 ) {
+                                        if( talk_item->action == "SET_HOSTILE") {
+                                            character->setHostile(true);
+                                        }
+                                        else {
+                                            LOG("character %s, talk item %s has unknown action: %s\n", character->getName().c_str(), talk_item->question.c_str(), talk_item->action.c_str());
+                                            ASSERT_LOGGER(false);
+                                        }
                                     }
                                 }
                             }
