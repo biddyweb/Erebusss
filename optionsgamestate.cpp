@@ -309,9 +309,11 @@ void OptionsGamestate::clickedOptions() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
+#ifndef Q_OS_ANDROID
     soundCheck = new QCheckBox("Sound");
     soundCheck->setChecked(game_g->isSoundEnabled());
     layout->addWidget(soundCheck);
+#endif
 
     lightingCheck = new QCheckBox("Lighting Effects");
     lightingCheck->setChecked(game_g->isLightingEnabled());
@@ -335,10 +337,10 @@ void OptionsGamestate::clickedOptions() {
 void OptionsGamestate::clickedOptionsOkay() {
     LOG("OptionsGamestate::clickedOptionsOkay");
 
+#ifndef Q_OS_ANDROID
     bool new_sound_enabled = soundCheck->isChecked();
     if( new_sound_enabled != game_g->isSoundEnabled() ) {
         game_g->setSoundEnabled(new_sound_enabled);
-#ifndef Q_OS_ANDROID
         if( music != NULL ) {
             if( new_sound_enabled ) {
                 this->music->play();
@@ -347,8 +349,8 @@ void OptionsGamestate::clickedOptionsOkay() {
                 this->music->pause();
             }
         }
-#endif
     }
+#endif
 
     bool new_lighting_enabled = lightingCheck->isChecked();
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {
