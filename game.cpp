@@ -19,14 +19,7 @@ Game *game_g = NULL;
 const QString sound_enabled_key_c = "sound_enabled";
 const int default_sound_enabled_c = true;
 const QString lighting_enabled_key_c = "lighting_enabled";
-// lighting defaults to false on Android and Symbian, due to performance
-#if defined(Q_OS_SYMBIAN)
-const int default_lighting_enabled_c = false;
-#elif defined(Q_OS_ANDROID)
-const int default_lighting_enabled_c = false;
-#else
 const int default_lighting_enabled_c = true;
-#endif
 
 void WebViewEventFilter::setWebView(QWebView *webView) {
     qDebug("setWebView");
