@@ -2997,8 +2997,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             bool static_image = parseBool(static_image_s.toString(), true);
                             QStringRef is_hostile_s = reader.attributes().value("is_hostile");
                             bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
-                            npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), is_hostile);
+
+                            npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), true);
                             npc->setStaticImage(static_image);
+                            npc->setHostile(is_hostile);
                         }
                         QStringRef is_dead_s = reader.attributes().value("is_dead");
                         npc->setDead( parseBool(is_dead_s.toString(), true) );
@@ -4639,6 +4641,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 const TalkItem *talk_item = &*iter2;
                 fprintf(file, "<talk");
                 fprintf(file, " question=\"%s\"", talk_item->question.c_str());
+                fprintf(file, " action=\"%s\"", talk_item->action.c_str());
                 fprintf(file, " while_not_done=\"%s\"", talk_item->while_not_done ? "true": "false");
                 fprintf(file, " objective=\"%s\"", talk_item->objective ? "true": "false");
                 fprintf(file, ">\n");
