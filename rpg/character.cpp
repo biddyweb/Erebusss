@@ -153,7 +153,7 @@ int Character::modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int 
 }
 
 bool Character::update(PlayingGamestate *playing_gamestate) {
-    //LOG("Character::update() for: %s\n", this->name.c_str());
+    //qDebug("Character::update() for: %s", this->name.c_str());
     if( this->location == NULL ) {
         return false;
     }
