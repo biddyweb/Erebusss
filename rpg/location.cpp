@@ -224,8 +224,7 @@ bool Trap::isSetOff(const Character *character) const {
     return false;
 }
 
-bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) const {
-    bool character_affected = false;
+void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) const {
     int rollD = rollDice(2, 6, 0);
     LOG("character: %s has set off trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
     string text;
@@ -236,18 +235,20 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
         else {
             LOG("affected\n");
-            character_affected = true;
             text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
             int damage = rollDice(2, 12, rating-1);
             character->decreaseHealth(playing_gamestate, damage, true, true);
         }
     }
     else if( type == "darts" ) {
-        LOG("affected\n");
-        character_affected = true;
         text = "You have set off a trap!\nDarts shoot out from the wall, hitting you multiple times!";
         int damage = rollDice(rating+1, 12, 0);
         character->decreaseHealth(playing_gamestate, damage, true, true);
+    }
+    else if( type == "acid" ) {
+        text = "You have set off a trap!\nA painful acid shoots out from jets in the walls,\nburning your flesh!";
+        int damage = rollDice(4, 20, rating);
+        character->decreaseHealth(playing_gamestate, damage, false, true);
     }
     else if( type == "mantrap" ) {
         if( rollD + difficulty <= character->getDexterity() ) {
@@ -256,14 +257,12 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
         else {
             LOG("affected\n");
-            character_affected = true;
             text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
             int damage = rollDice(4, 12, rating);
             character->decreaseHealth(playing_gamestate, damage, true, false);
         }
     }
     else if( type == "death" ) {
-        character_affected = true;
         text = "You have set off a trap!\nThe last thing you hear is a massive explosion in your ears!\nA bomb blows your body to pieces...";
         character->kill(playing_gamestate);
     }
@@ -276,8 +275,6 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         playing_gamestate->addTextEffect(text, character->getPos(), 4000);
         playing_gamestate->playSound("click");
     }
-
-    return character_affected;
 }
 
 void FloorRegion::insertPoint(size_t indx, Vector2D point) {
