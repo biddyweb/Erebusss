@@ -3424,7 +3424,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float size_w = parseFloat(size_w_s.toString());
                     QStringRef size_h_s = reader.attributes().value("h");
                     float size_h = parseFloat(size_h_s.toString());
+                    QStringRef rating_s = reader.attributes().value("rating");
+                    int rating = parseInt(rating_s.toString(), true);
+                    QStringRef difficulty_s = reader.attributes().value("difficulty");
+                    int difficulty = parseInt(difficulty_s.toString(), true);
                     Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
+                    trap->setRating(rating);
+                    trap->setDifficulty(difficulty);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: trap element outside of location");
@@ -4732,6 +4738,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " type=\"%s\"", trap->getType().c_str());
             fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
             fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
+            fprintf(file, " difficulty=\"%d\"", trap->getDifficulty());
+            fprintf(file, " rating=\"%d\"", trap->getRating());
             fprintf(file, " />\n");
         }
         fprintf(file, "\n");

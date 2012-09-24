@@ -272,6 +272,8 @@ protected:
     string type;
     Vector2D pos; // pos in Location (for top-left)
     float width, height;
+    int rating;
+    int difficulty;
 
 public:
     Trap(const string &type, float width, float height);
@@ -301,6 +303,18 @@ public:
     }
     float getHeight() const {
         return this->height;
+    }
+    void setRating(int rating) {
+        this->rating = rating;
+    }
+    int getRating() const {
+        return this->rating;
+    }
+    void setDifficulty(int diffculty) {
+        this->difficulty = difficulty;
+    }
+    int getDifficulty() const {
+        return this->difficulty;
     }
 
     bool isSetOff(const Character *character) const;

@@ -211,7 +211,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
     playing_gamestate->showInfoDialog(result_text);
 }
 
-Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height)
+Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height), rating(0), difficulty(0)
 {
 }
 
@@ -230,7 +230,7 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     LOG("character: %s has set off trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
     string text;
     if( type == "arrow" ) {
-        if( rollD <= character->getDexterity() ) {
+        if( rollD + difficulty <= character->getDexterity() ) {
             LOG("avoided\n");
             text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
         }
@@ -238,12 +238,19 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
             LOG("affected\n");
             character_affected = true;
             text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
-            int damage = rollDice(2, 12, -1);
-            character->decreaseHealth(playing_gamestate, damage, true, false);
+            int damage = rollDice(2, 12, rating-1);
+            character->decreaseHealth(playing_gamestate, damage, true, true);
         }
     }
+    else if( type == "darts" ) {
+        LOG("affected\n");
+        character_affected = true;
+        text = "You have set off a trap!\nDarts shoot out from the wall, hitting you multiple times!";
+        int damage = rollDice(rating+1, 12, 0);
+        character->decreaseHealth(playing_gamestate, damage, true, true);
+    }
     else if( type == "mantrap" ) {
-        if( rollD <= character->getDexterity() ) {
+        if( rollD + difficulty <= character->getDexterity() ) {
             LOG("avoided\n");
             text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
         }
@@ -251,7 +258,7 @@ bool Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
             LOG("affected\n");
             character_affected = true;
             text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
-            int damage = rollDice(4, 12, 0);
+            int damage = rollDice(4, 12, rating);
             character->decreaseHealth(playing_gamestate, damage, true, false);
         }
     }
