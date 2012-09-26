@@ -1041,6 +1041,7 @@ void ItemsWindow::clickedUseItem() {
     if( item->useItem(this->playing_gamestate, player) ) {
         // item is deleted
         player->takeItem(item);
+        delete item;
         item = NULL;
         this->itemIsDeleted(index);
     }
