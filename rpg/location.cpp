@@ -246,9 +246,17 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         character->decreaseHealth(playing_gamestate, damage, true, true);
     }
     else if( type == "acid" ) {
-        text = "You have set off a trap!\nA painful acid shoots out from jets in the walls,\nburning your flesh!";
-        int damage = rollDice(4, 20, rating);
-        character->decreaseHealth(playing_gamestate, damage, false, true);
+        if( character->getCurrentShield() != NULL ) {
+            text = "You have set off a trap!\nAcid shoots out from jets in the walls!\nYour shield protects you, but is destroyed in the process.";
+            Item *item = character->getCurrentShield();
+            character->takeItem(item);
+            delete item;
+        }
+        else {
+            text = "You have set off a trap!\nA painful acid shoots out from jets in the walls,\nburning your flesh!";
+            int damage = rollDice(4, 20, rating);
+            character->decreaseHealth(playing_gamestate, damage, false, true);
+        }
     }
     else if( type == "mantrap" ) {
         if( rollD + difficulty <= character->getDexterity() ) {
