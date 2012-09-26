@@ -260,7 +260,7 @@ void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
         throw string("AnimatedObject::addAnimationLayer received NULL animated_layer");
     }
     this->animation_layers.push_back(animation_layer);
-    const AnimationSet *c_animation_set = animation_layer->getAnimationSet("");
+    const AnimationSet *c_animation_set = animation_layer->getAnimationSet(this->set_c_animation_name ? this->c_animation_name : "");
     this->c_animation_sets.push_back(c_animation_set);
     //this->setFrame(0);
     this->update();
