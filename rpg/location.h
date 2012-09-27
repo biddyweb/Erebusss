@@ -262,8 +262,8 @@ public:
         return this->opened;
     }
     bool isOn(const Character *character) const;
-    void getInteractionText(string *dialog_text) const;
-    void interact(PlayingGamestate *playing_gamestate);
+    vector<string> getInteractionText(string *dialog_text) const;
+    void interact(PlayingGamestate *playing_gamestate, int option);
 };
 
 class Trap {

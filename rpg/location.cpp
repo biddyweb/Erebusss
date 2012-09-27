@@ -63,31 +63,62 @@ bool Scenery::isOn(const Character *character) const {
     return false;
 }
 
-void Scenery::getInteractionText(string *dialog_text) const {
+vector<string> Scenery::getInteractionText(string *dialog_text) const {
+    vector<string> options;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?";
+        options.push_back("Yes, sit on the throne.");
+        options.push_back("No.");
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\n\nDo you wish to sit on the throne?";
+        options.push_back("Yes, sit on the throne.");
+        options.push_back("No.");
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\n\nDo you wish to sit on the throne?";
+        options.push_back("Yes, sit on the throne.");
+        options.push_back("No.");
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
         *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\n\nDo you wish to sit on the throne?";
+        options.push_back("Yes, sit on the throne.");
+        options.push_back("No.");
     }
     else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
         *dialog_text = "An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?";
+        options.push_back("Yes, pray.");
+        options.push_back("No.");
     }
     else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
         *dialog_text = "A large bell hangs here. Do you want to try ringing it?";
+        options.push_back("Yes, ring the bell.");
+        options.push_back("No.");
+    }
+    else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY" ) {
+        *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.";
+        options.push_back("Okay");
+    }
+    else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER" ) {
+        if( this->interact_state == 0 ) {
+            *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, suddenly the shape of a figure appears! It speaks, in a quiet, drawn out voice - \"Please...,\" it begs to you, \"End my suffering\".\n\nYou see that the glass chamber has a panel at the bottom with two buttons, red and green. You could press one - although you could also try smashing the glass.";
+            options.push_back("Press the red button.");
+            options.push_back("Press the green button.");
+            options.push_back("Smash the glass.");
+            options.push_back("Leave the creature to suffer.");
+        }
+        else {
+            *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.";
+            options.push_back("Okay");
+        }
     }
     else {
         ASSERT_LOGGER(false);
     }
+    return options;
 }
 
-void Scenery::interact(PlayingGamestate *playing_gamestate) {
+void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     //string dialog_title, result_text;
     string result_text;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
@@ -201,6 +232,33 @@ void Scenery::interact(PlayingGamestate *playing_gamestate) {
         }
         else {
             result_text = "You ring the bell again, but nothing seems to happen this time.";
+        }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY" ) {
+        ASSERT_LOGGER(false);
+    }
+    else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER" ) {
+        if( this->interact_state == 0 ) {
+            this->interact_state = 1;
+            if( option == 0 ) {
+                result_text = "The chamber flashes red. You hear a sudden but short scream from within, then it is over. At last, you have put the poor creature to rest.";
+                playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
+            }
+            else if( option == 1 ) {
+                result_text = "You hear strange whirring sounds. After some moments, the chambers starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature's screams. Eventually the sounds subside, and it seem the creature is dead.\n\nYou have at least granted its wish, though you wonder if there was a better way to do it.";
+            }
+            else if( option == 2 ) {
+                result_text = "You smash the glass, and liquid drains out. Some of it spatters on you, causing you pain! The creature also screams as this happens, but then it seems the poor creature has died. At last, you have put the poor creature to rest.";
+                int damage = rollDice(4, 10, 0);
+                playing_gamestate->getPlayer()->decreaseHealth(playing_gamestate, damage, false, false);
+                playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
+            }
+            else {
+                ASSERT_LOGGER(false);
+            }
+        }
+        else {
+            ASSERT_LOGGER(false);
         }
     }
     else {
