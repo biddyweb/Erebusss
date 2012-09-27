@@ -10,7 +10,7 @@
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.0" y="2.0"/>
+<!--<player_start x="32.0" y="2.0"/>-->
 
 <!--main room-->
 
@@ -424,9 +424,9 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <!--garden-->
 <floorregion shape="rect" rect_x="35.5" rect_y="8.0" rect_w="1.0" rect_h="5.0"/>
-<trap x="35.5" y="8.0" w="1.0" h="1.0" type="arrow"/>
-<trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow"/>
-<trap x="35.5" y="12.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="35.5" y="8.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
+<trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
+<trap x="35.5" y="12.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 
 <floorregion shape="rect" rect_x="29.5" rect_y="13.0" rect_w="7.0" rect_h="2.5"/>
 <npc name="Wyvern" template="Wyvern" x="30.5" y="14.0"/>
@@ -608,7 +608,7 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="5.0" rect_y="5.0" rect_w="6.0" rect_h="6.0"/>
 
-<scenery name="Bell" image_name="church_bell" x="8.0" y="8.0" size="1.0" blocking="true"  interact_type="INTERACT_TYPE_BELL"/>
+<scenery name="Bell" image_name="church_bell" x="8.0" y="8.0" size="1.0" blocking="true" interact_type="INTERACT_TYPE_BELL"/>
 
 <!--zombie route-->
 
@@ -619,7 +619,7 @@ necromancy blah blah
     <floorregion_point x="15.0" y="0.0" />
 </floorregion>
 
-<trap x="12.0" y="3.0" w="1.0" h="1.0" type="arrow"/>
+<trap x="12.0" y="3.0" w="1.0" h="1.0" type="darts" rating="1"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
 
@@ -668,6 +668,8 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <scenery name="Tile" image_name="tile_white" x="11.5" y="10.5" size="1.0" draw_type="background"/>
 <scenery name="Tile" image_name="tile_black" x="12.5" y="10.5" size="1.0" draw_type="background"/>
 <scenery name="Tile" image_name="tile_white" x="13.5" y="10.5" size="1.0" draw_type="background"/>
+
+<item template="Chess Piece (Knight)" x="11.5" y="10.5"/>
 
 <floorregion shape="rect" rect_x="13.0" rect_y="11.0" rect_w="3.0" rect_h="1.0"/>
 <scenery name="Tile" image_name="tile_black" x="13.5" y="11.5" size="1.0" draw_type="background"/>
@@ -719,7 +721,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <trap x="15.0" y="16.0" w="1.0" h="1.0" type="death"/>
 <scenery name="Tile" image_name="tile_black" x="14.5" y="16.5" size="1.0" draw_type="background"/>
 <scenery name="Tile" image_name="tile_white" x="15.5" y="16.5" size="1.0" draw_type="background"/>
-
+/
 <floorregion shape="rect" rect_x="14.0" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
 <scenery name="Tile" image_name="tile_white" x="14.5" y="17.5" size="1.0" draw_type="background"/>
 
@@ -727,6 +729,59 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 
 <!--exit of chessboard-->
 <floorregion shape="rect" rect_x="16.0" rect_y="18.0" rect_w="4.0" rect_h="1.0"/>
+
+<player_start x="16.5" y="18.5"/>
+
+<floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Painting" image_name="painting_sword" x="22.0" y="18.0" size="0.5" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
+
+<npc name="Shadow" template="Shadow" x="22.5" y="20.5"/>
+
+    <floorregion shape="rect" rect_x="25.0" rect_y="18.0" rect_w="0.5" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="25.25" y="18.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<floorregion shape="rect" rect_x="25.5" rect_y="18.0" rect_w="3.0" rect_h="2.0"/>
+
+<npc name="Goblin" x="28.0" y="18.5"
+    template="Goblin"
+    is_hostile="false"
+    can_talk="true"
+>
+<opening_initial>Grk! Ug crakkle, spat.
+</opening_initial>
+<opening_later>Grk?
+</opening_later>
+<talk question="Prepare to die, you evil creature!" action="SET_HOSTILE">
+Gakk!
+</talk>
+</npc>
+
+<floorregion shape="rect" rect_x="24.0" rect_y="10.0" rect_w="1.0" rect_h="8.0"/>
+<trap x="24.0" y="16.0" w="1.0" h="1.0" type="acid"/>
+
+    <scenery name="Door" image_name="door_wood" x="24.5" y="10.2" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="5.0" rect_h="5.0"/>
+
+<npc name="Orc" template="Orc" x="23.0" y="7.0"/>
+
+    <floorregion shape="rect" rect_x="27.0" rect_y="7.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="28.0" rect_y="5.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="28.7" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
+
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="30.2" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
+
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="31.7" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER"/>
+
+<scenery name="Blood Stain" image_name="bloodstain" x="28.9" y="9.2" size="0.7" opacity="0.9" draw_type="background"/>
+
+<npc name="Zombie" template="Zombie" x="31.0" y="9.0"/>
+
+<scenery name="Table" image_name="table" x="32.0" y="9.0" size="1.2" blocking="true">
+    <item name="Book" image_name="book" icon_width="0.25" weight="1">
+Experiments.
+    </item>
+</scenery>
 
 </location>
 
@@ -776,7 +831,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 
 <!--Maze area-->
 
-<floorregion shape="rect" rect_x="2.0" rect_y="6.0" rect_w="1.0" rect_h="10.0"/>
+<floorregion shape="rect" rect_x="2.0" rect_y="6.0" rect_w="1.0" rect_h="11.0"/>
 
 <!--<player_start x="2.5" y="2.5"/>-->
 <!--<player_start x="2.5" y="6.5"/>-->
@@ -787,11 +842,27 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
     <floorregion_point x="8.0" y="6.0"/>
     <floorregion_point x="8.0" y="5.0"/>
 </floorregion>
+<floorregion shape="rect" rect_x="8.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="8.0" rect_y="6.0" rect_w="1.0" rect_h="3.0"/>
 
 <floorregion shape="rect" rect_x="3.0" rect_y="11.0" rect_w="5.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="1.0" rect_h="4.0"/>
+<scenery name="Door" image_name="door_metal" x="5.5" y="15.8" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    locked="true"/>
+
+<floorregion shape="rect" rect_x="7.0" rect_y="10.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="12.0" rect_y="6.0" rect_w="1.0" rect_h="10.0"/>
+
+<floorregion shape="rect" rect_x="7.0" rect_y="12.0" rect_w="4.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="10.0" rect_y="13.0" rect_w="1.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="7.0" rect_y="14.0" rect_w="3.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="7.0" rect_y="15.0" rect_w="1.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="11.0" rect_w="2.0" rect_h="1.0"/>
 <scenery name="Teleport" image_name="teleport" x="0.5" y="11.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_space" exit_location_x="20.0" exit_location_y="20.0"/>
+
+<floorregion shape="rect" rect_x="1.0" rect_y="17.0" rect_w="10.0" rect_h="1.0"/>
 
 </location>
 

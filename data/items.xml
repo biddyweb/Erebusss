@@ -58,6 +58,10 @@ Plate armour provides excellent protection, but it is also heavy to carry.
 This potion will heal some or all of your injuries.
 </item>
 
+<item name="Chess Piece (Knight)" image_name="chess_knight" icon_width="0.25" weight="0">
+A small wooden chess piece, the Knight.
+</item>
+
 <item name="Red Gem" image_name="gem_red" icon_width="0.25" weight="1"/>
 <item name="Green Gem" image_name="gem_green" icon_width="0.25" weight="1"/>
 <item name="Blue Gem" image_name="gem_blue" icon_width="0.25" weight="1"/>
@@ -101,6 +105,8 @@ This potion will heal some or all of your injuries.
 <player_default_items>
     <player_default_item template="Long Sword"/>
     <player_default_item template="Leather Armour"/>
+    <!--<player_default_item template="Shield"/>-->
+    <player_default_item template="Potion of Healing"/>
     <!--<player_default_item template="Longbow"/>
     <player_default_item template="Arrows"/>-->
 </player_default_items>

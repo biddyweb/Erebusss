@@ -19,6 +19,7 @@
     xpos="0" ypos="16" width="64" height="32" expected_width="512"
     />
 
+<image type="item" name="chess_knight" filename="gfx/textures/items/chess_knight.png"/>
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
 <image type="item" name="gem_green" filename="gfx/textures/items/gem_green.png"/>
 <image type="item" name="gem_blue" filename="gfx/textures/items/gem_blue.png"/>
@@ -40,6 +41,7 @@
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
 <image type="scenery" name="carpet" filename="gfx/textures/scenery/carpet.png"/>
 <image type="scenery" name="church_bell" filename="gfx/textures/scenery/church_bell.png"/>
+<image type="scenery" name="experimental_chamber" filename="gfx/textures/scenery/experimental_chamber.png"/>
 <image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
@@ -63,6 +65,7 @@
 <image type="scenery" name="door_mirror" imagetype="perlin" max_red="200" max_green="200" max_blue="220" min_red="160" min_green="160" min_blue="160"/>
 <!--<image type="scenery" name="door_wood" filename="gfx/textures/door_wood.png"/>-->
 <image type="scenery" name="fog_red" imagetype="perlin" max_red="150" max_green="0" max_blue="0" min_red="40" min_green="0" min_blue="0"/>
+<image type="scenery" name="painting_sword" filename="gfx/textures/scenery/scenery_painting_sword.png"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>
 <image type="scenery" name="table" filename="gfx/textures/scenery/table.png"/>
 <image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png"/>
