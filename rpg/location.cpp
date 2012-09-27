@@ -112,6 +112,9 @@ vector<string> Scenery::getInteractionText(string *dialog_text) const {
             options.push_back("Okay");
         }
     }
+    else if( this->interact_type == "INTERACT_TYPE_PAINTING_SHATTER" ) {
+        // no options - go straight to interaction
+    }
     else {
         ASSERT_LOGGER(false);
     }
@@ -120,7 +123,7 @@ vector<string> Scenery::getInteractionText(string *dialog_text) const {
 
 void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     //string dialog_title, result_text;
-    string result_text;
+    string result_text, picture;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
         //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
@@ -261,12 +264,23 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             ASSERT_LOGGER(false);
         }
     }
+    else if( this->interact_type == "INTERACT_TYPE_PAINTING_SHATTER" ) {
+        if( playing_gamestate->getPlayer()->getCurrentWeapon() != NULL ) {
+            Item *item = playing_gamestate->getPlayer()->getCurrentWeapon();
+            result_text = "As you cast your eyes on the painting, there is suddenly a smashing sound, and to your amazement, your " + item->getName() + " shatters!";
+            playing_gamestate->getPlayer()->takeItem(item);
+            delete item;
+        }
+        else {
+            result_text = "You look at the interesting painting.";
+        }
+        picture = ":/gfx/scenes/painting_sword.jpg";
+    }
     else {
         ASSERT_LOGGER(false);
     }
 
-    //game_g->showInfoDialog(dialog_title, result_text);
-    playing_gamestate->showInfoDialog(result_text);
+    playing_gamestate->showInfoDialog(result_text, picture);
 }
 
 Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height), rating(0), difficulty(0)

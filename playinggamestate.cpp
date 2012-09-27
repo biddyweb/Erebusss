@@ -4371,15 +4371,21 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             LOG("interact_type: %s\n", scenery->getInteractType().c_str());
                             string dialog_text;
                             vector<string> options = scenery->getInteractionText(&dialog_text);
-                            //if( this->askQuestionDialog(dialog_text) ) {
-                            //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
-                            InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false);
-                            this->addWidget(dialog);
-                            int result = dialog->exec();
-                            LOG("scenery iteraction dialog returns %d\n", result);
-                            this->closeSubWindow();
-                            if( result != options.size()-1 ) {
-                                scenery->interact(this, result);
+                            if( options.size() == 0 ) {
+                                // auto-interact
+                                scenery->interact(this, 0);
+                            }
+                            else {
+                                //if( this->askQuestionDialog(dialog_text) ) {
+                                //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
+                                InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false);
+                                this->addWidget(dialog);
+                                int result = dialog->exec();
+                                LOG("scenery iteraction dialog returns %d\n", result);
+                                this->closeSubWindow();
+                                if( result != options.size()-1 ) {
+                                    scenery->interact(this, result);
+                                }
                             }
                         }
                     }
