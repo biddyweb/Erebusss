@@ -342,6 +342,10 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
             character->decreaseHealth(playing_gamestate, damage, true, false);
         }
     }
+    else if( type == "gas" ) {
+        text = "You have set off a trap!\nGas shoots from jets in the wall, and suddenly you find you are paralysed!";
+        character->paralyse((rating+1)*1000);
+    }
     else if( type == "death" ) {
         text = "You have set off a trap!\nThe last thing you hear is a massive explosion in your ears!\nA bomb blows your body to pieces...";
         character->kill(playing_gamestate);

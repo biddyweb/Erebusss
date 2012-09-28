@@ -208,8 +208,8 @@ class Character {
     Action action;
     const Spell *casting_spell;
     // default positions only relevant for NPCs that don't change locations
-    bool has_default_position; // saved
-    Vector2D default_position; // saved
+    bool has_default_position;
+    Vector2D default_position;
 
     // rpg data
     int FP, BS, S, A, M, D, B;
@@ -218,6 +218,8 @@ class Character {
     int max_health;
     int natural_damageX, natural_damageY, natural_damageZ;
     bool can_fly;
+    bool is_paralysed;
+    int paralysed_until;
 
     set<Item *> items;
     Weapon *current_weapon;
@@ -330,6 +332,13 @@ public:
     }
     bool isVisible() const {
         return this->is_visible;
+    }
+    void paralyse(int time_ms);
+    bool isParalysed() const {
+        return this->is_paralysed;
+    }
+    int getParalysedUntil() const {
+        return this->paralysed_until;
     }
     /*void setDestination(float xdest, float ydest) {
         bool old_has_destination = this->has_destination;

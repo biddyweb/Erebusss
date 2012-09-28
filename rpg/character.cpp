@@ -69,6 +69,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
+    is_paralysed(false), paralysed_until(0),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -88,6 +89,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
+    is_paralysed(false), paralysed_until(0),
     current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -170,6 +172,15 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             return true; // now remove from location/scene and delete character
         }
         return false;
+    }
+
+    if( this->is_paralysed ) {
+        if( elapsed_ms >= this->paralysed_until ) {
+            this->is_paralysed = false;
+        }
+        else {
+            return false;
+        }
     }
 
     bool ai_try_moving = true;
@@ -714,6 +725,13 @@ int Character::calculateItemsWeight() const {
         weight += item->getWeight();
     }
     return weight;
+}
+
+void Character::paralyse(int time_ms) {
+    this->setStateIdle();
+    this->is_paralysed = true;
+    this->paralysed_until = game_g->getScreen()->getGameTimeTotalMS() + time_ms;
+    //qDebug("%d, %d", paralysed_until, time_ms);
 }
 
 void Character::setPath(vector<Vector2D> &path) {

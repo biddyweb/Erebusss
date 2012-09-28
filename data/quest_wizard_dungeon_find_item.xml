@@ -733,6 +733,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <player_start x="16.5" y="18.5"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
+<trap x="20.0" y="18.0" w="1.0" h="1.0" type="gas" rating="4"/>
 
 <scenery name="Painting" image_name="painting_sword" x="22.0" y="18.0" size="0.5" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
 

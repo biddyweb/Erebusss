@@ -3038,6 +3038,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef can_fly_s = reader.attributes().value("can_fly");
                         bool can_fly = parseBool(can_fly_s.toString(), true);
                         npc->setCanFly(can_fly);
+                        QStringRef is_paralysed_s = reader.attributes().value("is_paralysed");
+                        bool is_paralysed = parseBool(is_paralysed_s.toString(), true);
+                        if( is_paralysed ) {
+                            QStringRef paralysed_time_s = reader.attributes().value("paralysed_time");
+                            int paralysed_time = parseInt(paralysed_time_s.toString());
+                            npc->paralyse(paralysed_time);
+                        }
                         QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                         int xp_worth = parseInt(xp_worth_s.toString());
                         npc->setXPWorth(xp_worth);
@@ -4087,7 +4094,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         game_g->getScreen()->setPaused(false);
     }
 
-    if( player != NULL && !player->isDead() ) {
+    if( player != NULL && !player->isDead() && !player->isParalysed() ) {
         //player->setPos(scene_x, scene_y);
 
         Vector2D dest(scene_x, scene_y);
@@ -4637,6 +4644,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
             fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
+            fprintf(file, " is_paralysed=\"%s\"", character->isParalysed() ? "true": "false");
+            fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
             fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
