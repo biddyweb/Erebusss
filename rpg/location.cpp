@@ -248,7 +248,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
                 playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
             }
             else if( option == 1 ) {
-                result_text = "You hear strange whirring sounds. After some moments, the chambers starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature's screams. Eventually the sounds subside, and it seem the creature is dead.\n\nYou have at least granted its wish, though you wonder if there was a better way to do it.";
+                result_text = "You hear strange whirring sounds. After some moments, the chamber starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature's screams. Eventually the sounds subside, and it seem the creature is dead.\n\nYou have at least granted its wish, though you wonder if there was a better way to do it.";
             }
             else if( option == 2 ) {
                 result_text = "You smash the glass, and liquid drains out. Some of it spatters on you, causing you pain! The creature also screams as this happens, but then it seems the poor creature has died. At last, you have put the poor creature to rest.";
