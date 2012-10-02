@@ -63,10 +63,10 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
 {
     if( game_g->isLightingEnabled() )
     {
-        const int res_c = 256;
+        const int res_c = 255;
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad(res_c/2, res_c/2, res_c/2);
+        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
         radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
         radialGrad.setColorAt(1.0, QColor(0, 0, 0, darkness_alpha));
         QPainter painter2(&pixmap);
@@ -352,25 +352,30 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
     //qDebug("### radius = %d", radius);
     //this->calculated_lighting_pixmap_scaled = false;
     if( !this->calculated_lighting_pixmap_scaled ) {
+        //qDebug("scale pixmap");
         this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
         this->calculated_lighting_pixmap_scaled = true;
     }
+    /*qDebug("lighting_pixmap_scaled size %d x %d", lighting_pixmap_scaled.width(), lighting_pixmap_scaled.height());
+    ASSERT_LOGGER( lighting_pixmap_scaled.width() == 2*radius );*/
     //qDebug("%d, %d, %d", point.x(), point.y(), radius);
-    int sx = point.x() - radius;
-    int sy = point.y() - radius;
+    // note, sometimes the radius value may fluctuate even if we haven't zoomed in or out (due to rounding issues), which is why we should use the lighting_pixmap_scaled width, rather than radius, when doing the drawing
+    int pixmap_width = lighting_pixmap_scaled.width();
+    int sx = point.x() - pixmap_width/2;
+    int sy = point.y() - pixmap_width/2;
     painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
     QBrush brush(QColor(0, 0, 0, darkness_alpha));
     if( sx > 0 ) {
         painter.fillRect(0, 0, sx, this->height(), brush);
     }
-    if( sx + 2*radius < this->width() ) {
-        painter.fillRect(sx + 2*radius, 0, this->width() - sx - 2*radius, this->height(), brush);
+    if( sx + pixmap_width < this->width() ) {
+        painter.fillRect(sx + pixmap_width, 0, this->width() - sx - pixmap_width, this->height(), brush);
     }
     if( sy > 0 ) {
-        painter.fillRect(sx, 0, 2*radius, sy, brush);
+        painter.fillRect(sx, 0, pixmap_width, sy, brush);
     }
-    if( sy + 2*radius < this->height() ) {
-        painter.fillRect(sx, sy + 2*radius, 2*radius, this->height() - sy - 2*radius, brush);
+    if( sy + pixmap_width < this->height() ) {
+        painter.fillRect(sx, sy + pixmap_width, pixmap_width, this->height() - sy - pixmap_width, brush);
     }
 
     //painter.drawPixmap(point.x(), point.y(), pixmap);
