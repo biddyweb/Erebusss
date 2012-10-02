@@ -477,8 +477,8 @@ necromancy blah blah
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 <scenery name="Door" image_name="door_wood" x="0.2" y="1.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
 
-<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_2" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" exit_location="level_4_2" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
 
 </location>
 
@@ -490,8 +490,8 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Goblin" template="Goblin" x="1.0" y="2.5"/>
 <npc name="Goblin" template="Goblin" x="4.0" y="2.5"/>
@@ -506,8 +506,8 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_6" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_7" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="0.5" size="1.0" blocking="true" exit_location="level_4_6" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="2.5" size="1.0" blocking="true" exit_location="level_4_7" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Orc" template="Orc" x="4.0" y="2.0"/>
 
@@ -521,8 +521,8 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <scenery name="Crate" image_name="crate" x="4.5" y="2.5" w="0.8" h="0.8" blocking="true">
     <gold amount="21"/>
@@ -538,8 +538,8 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_4" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Orc" template="Orc" x="0.5" y="0.5"/>
 <npc name="Orc" template="Orc" x="4.5" y="0.5">
@@ -557,8 +557,8 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
-<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_8" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Orc" template="Orc" x="0.5" y="3.5"/>
 <npc name="Orc" template="Orc" x="4.5" y="3.5"/>
@@ -573,7 +573,7 @@ necromancy blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Orc" template="Orc" x="0.5" y="1.5"/>
 
@@ -588,7 +588,7 @@ necromancy blah blah
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 <scenery name="Door" image_name="door_wood" x="4.8" y="1.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_5" exit_location_x="1.0" exit_location_y="5.5"/>
 
-<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
 
 </location>
 
@@ -721,7 +721,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <trap x="15.0" y="16.0" w="1.0" h="1.0" type="death"/>
 <scenery name="Tile" image_name="tile_black" x="14.5" y="16.5" size="1.0" draw_type="background"/>
 <scenery name="Tile" image_name="tile_white" x="15.5" y="16.5" size="1.0" draw_type="background"/>
-/
+
 <floorregion shape="rect" rect_x="14.0" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
 <scenery name="Tile" image_name="tile_white" x="14.5" y="17.5" size="1.0" draw_type="background"/>
 
@@ -730,7 +730,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <!--exit of chessboard-->
 <floorregion shape="rect" rect_x="16.0" rect_y="18.0" rect_w="4.0" rect_h="1.0"/>
 
-<player_start x="16.5" y="18.5"/>
+<!--<player_start x="16.5" y="18.5"/>-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
 <trap x="20.0" y="18.0" w="1.0" h="1.0" type="gas" rating="4"/>
@@ -791,10 +791,10 @@ Experiments.
 <floorregion shape="rect" rect_x="17.0" rect_y="28.0" rect_w="7.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="12.0" rect_y="28.0" rect_w="5.0" rect_h="4.0"/>
-<scenery name="Teleport" image_name="teleport" x="12.5" y="30.0" size="1.0" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="2.5" exit_location_y="2.5"/>
+<scenery name="Teleport" image_name="teleport" x="12.5" y="30.0" size="1.0" blocking="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="25.0"/>
 
 <floorregion shape="rect" rect_x="24.0" rect_y="28.0" rect_w="5.0" rect_h="4.0"/>
-<scenery name="Teleport" image_name="teleport" x="28.5" y="30.0" size="1.0" blocking="true" block_visibility="true" exit_location="level_future" exit_location_x="2.5" exit_location_y="2.5"/>
+<scenery name="Teleport" image_name="teleport" x="28.5" y="30.0" size="1.0" blocking="true" exit_location="level_future" exit_location_x="22.5" exit_location_y="20.5"/>
 <scenery name="Cabinet" image_name="cabinet" x="28.5" y="28.5" size="0.8" blocking="true">
     <item name="Journal" image_name="book" icon_width="0.25" weight="1">
 I have discovered an amazing secret! ...
@@ -805,11 +805,70 @@ I have discovered an amazing secret! ...
 
 <location name="level_past">
 
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
+
+<player_start x="25.0" y="25.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true"/>
+
+<scenery name="Building" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="building" exit_location_x="2.0" exit_location_y="3.0"/>
+
+<scenery name="Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true"/>
+
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true"/>
+
+<npc name="Peasant" animation_name="peasant_man" static_image="true" x="22.0" y="23.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>How amazing to once again have visitors through the gate! I hope you are not like those who travelled here before...
+</opening_initial>
+<opening_later>Hello again?
+</opening_later>
+<talk question="There have been earlier visitors through the gate?">
+Yes, and still they remain. I was just a child when it happened, almost forty years ago. Evil creatures of the like that we have never seen before. They burned down our homes and took what little wealth we had, before forcing us to build them a lair. Now they come back to the village once a year, to take captives - who knows for what dreadful purpose.
+</talk>
+<talk question="Where are these visitors?">
+If you really want to go there, they live in a dug out cave to the north. Though I do not recommend it.
+</talk>
+<talk question="How can I get back through the gate?">
+I don't know that. We know of nothing of how such powerful magic works - just that there seems to be no way to use it.
+</talk>
+</npc>
+
+<npc name="Peasant" animation_name="peasant_woman" static_image="true" x="30.0" y="29.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello.
+</opening_initial>
+<opening_later>Hello.
+</opening_later>
+</npc>
+
+</location>
+
+<location name="building">
+
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood" x="2.0" y="3.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
 
 </location>
 
@@ -819,7 +878,22 @@ I have discovered an amazing secret! ...
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="5.0" rect_h="3.0"/>
+
+<!--<player_start x="22.5" y="20.5"/>-->
+
+<scenery name="Teleport" image_name="teleport" x="22.5" y="22.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="27.0" exit_location_y="30.0"/>
+
+<floorregion shape="rect" rect_x="22.0" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="19.0" rect_y="18.0" rect_w="7.0" rect_h="1.0"/>
+
+<scenery name="Door" image_name="door_metal" x="22.5" y="18.2" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    locked="true"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="26.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>
 
 </location>
 
@@ -898,7 +972,7 @@ I have discovered an amazing secret! ...
 <floorregion shape="rect" rect_x="7.0" rect_y="15.0" rect_w="1.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="11.0" rect_w="2.0" rect_h="1.0"/>
-<scenery name="Teleport" image_name="teleport" x="0.5" y="11.5" size="1.0" blocking="true" block_visibility="true" exit_location="level_space" exit_location_x="20.0" exit_location_y="20.0"/>
+<scenery name="Teleport" image_name="teleport" x="0.5" y="11.5" size="1.0" blocking="true" exit_location="level_space" exit_location_x="20.0" exit_location_y="20.0"/>
 
 <floorregion shape="rect" rect_x="1.0" rect_y="17.0" rect_w="10.0" rect_h="1.0"/>
 
@@ -962,7 +1036,7 @@ I have discovered an amazing secret! ...
     <floorregion_point x="4.0" y="21.0"/>
 </floorregion>
 
-<scenery name="Teleport" image_name="teleport" x="5.0" y="20.0" size="1.0" blocking="true" block_visibility="true" exit_location="level_6" exit_location_x="1.5" exit_location_y="11.5"/>
+<scenery name="Teleport" image_name="teleport" x="5.0" y="20.0" size="1.0" blocking="true" exit_location="level_6" exit_location_x="1.5" exit_location_y="11.5"/>
 
 <!--east side-->
 
