@@ -343,7 +343,7 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
     }
     else if( type == "gas" ) {
-        text = "You have set off a trap!\nGas shoots from jets in the wall, and suddenly you find you are paralysed!";
+        text = "You have set off a trap!\nGas shoots from jets in the wall,\nand suddenly you find you are paralysed!";
         character->paralyse((rating+1)*1000);
     }
     else if( type == "death" ) {
