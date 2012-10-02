@@ -81,5 +81,11 @@
         <file>gfx/textures/items/chess_knight.png</file>
         <file>gfx/textures/scenery/scenery_painting_sword.png</file>
         <file>gfx/scenes/painting_sword.jpg</file>
+        <file>gfx/textures/grass.png</file>
+        <file>gfx/textures/scenery/building.png</file>
+        <file>gfx/textures/npcs/peasant_man.png</file>
+        <file>gfx/textures/npcs/peasant_woman.png</file>
+        <file>gfx/textures/scenery/hut.png</file>
+        <file>gfx/textures/scenery/stairsdown_outdoors.png</file>
     </qresource>
 </RCC>
