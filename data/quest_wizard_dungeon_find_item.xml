@@ -811,7 +811,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true"/>
 
@@ -819,7 +819,7 @@ I have discovered an amazing secret! ...
 
 <scenery name="Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true"/>
 
-<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true"/>
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="5.0" exit_location_y="28.0"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="22.0" y="23.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -869,6 +869,53 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Door" image_name="door_wood" x="2.0" y="3.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
+
+</location>
+
+<location name="cave">
+
+<floor image_name="floor_rock"/>
+<wall image_name="wall"/>
+<background image_name="background_brown"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="3.0" y="31.0" />
+    <floorregion_point x="7.0" y="31.0" />
+    <floorregion_point x="8.0" y="30.0" />
+    <floorregion_point x="6.0" y="26.0" />
+    <floorregion_point x="4.0" y="26.0" />
+    <floorregion_point x="2.0" y="30.0" />
+</floorregion>
+
+<!--<player_start x="5.0" y="28.0"/>-->
+<player_start x="16.0" y="23.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="11.0"/>
+
+<floorregion shape="rect" rect_x="4.0" rect_y="16.0" rect_w="2.0" rect_h="10.0" />
+
+<npc name="Goblin" template="Goblin" x="4.5" y="17.0"/>
+<npc name="Orc" template="Orc" x="5.5" y="17.5">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+</npc>
+
+<floorregion shape="rect" rect_x="6.0" rect_y="16.0" rect_w="5.0" rect_h="2.0" />
+
+<floorregion shape="rect" rect_x="10.0" rect_y="12.0" rect_w="1.0" rect_h="4.0" />
+
+<floorregion shape="rect" rect_x="11.0" rect_y="16.0" rect_w="1.0" rect_h="6.0" />
+
+<floorregion shape="rect" rect_x="11.0" rect_y="22.0" rect_w="4.0" rect_h="1.0" />
+
+<floorregion shape="rect" rect_x="15.0" rect_y="22.0" rect_w="4.0" rect_h="4.0" />
+
+<scenery name="Crate" image_name="crate" x="15.5" y="25.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="25"/>
+</scenery>
+
+<scenery name="Fire" image_name="campfire" x="17.0" y="24.0" w="1.0" h="1.0"/>
 
 </location>
 
