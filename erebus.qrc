@@ -87,5 +87,7 @@
         <file>gfx/textures/npcs/peasant_woman.png</file>
         <file>gfx/textures/scenery/hut.png</file>
         <file>gfx/textures/scenery/stairsdown_outdoors.png</file>
+        <file>gfx/textures/scenery/stairsdown_indoors.png</file>
+        <file>gfx/textures/scenery/stairsup_indoors.png</file>
     </qresource>
 </RCC>

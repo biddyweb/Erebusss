@@ -55,6 +55,8 @@
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>
 <image type="scenery" name="stairsdown_outdoors" filename="gfx/textures/scenery/stairsdown_outdoors.png"/>
+<image type="scenery" name="stairsdown_indoors" filename="gfx/textures/scenery/stairsdown_indoors.png"/>
+<image type="scenery" name="stairsup_indoors" filename="gfx/textures/scenery/stairsup_indoors.png"/>
 <image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
