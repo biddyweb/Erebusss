@@ -112,6 +112,8 @@ class GUIOverlay : public QWidget {
     bool display_progress;
     int  progress_percent;
 
+    float fps;
+
     void drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color);
 public:
     GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view);
@@ -125,6 +127,9 @@ public:
     }
     void unsetProgress() {
         this->display_progress = false;
+    }
+    void setFPS(float fps) {
+        this->fps = fps;
     }
 };
 

@@ -268,118 +268,126 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
+    QElapsedTimer timer;
+    timer.start();
+
     QGraphicsView::paintEvent(event);
 
-    if( !game_g->isLightingEnabled() ) {
-        return;
-    }
-    QPainter painter(this->viewport());
-    //painter.fillRect(0, 0, this->width(), this->height(), QColor(255, 0, 0, 127));
-    /*int xpos = this->width()/2;
-    int ypos = this->height()/2;*/
-    //painter.setPen(Qt::NoPen);
-    //painter.setBrush(QBrush(QColor(255, 0, 0, 127)));
-    const float size_c = 8.0f;
-    Character *player = this->playing_gamestate->getPlayer();
-    if( player == NULL ) {
-        return;
-    }
-    QPoint point = this->mapFromScene(player->getX(), player->getY());
-    QPoint point_x = this->mapFromScene(player->getX() + size_c, player->getY());
-    QPoint point_y = this->mapFromScene(player->getX(), player->getY() + size_c);
-    int size_x = point_x.x() - point.x();
-    int size_y = point_y.y() - point.y();
-    int radius = std::max(size_x, size_y);
+    if( game_g->isLightingEnabled() ) {
+        QPainter painter(this->viewport());
+        //painter.fillRect(0, 0, this->width(), this->height(), QColor(255, 0, 0, 127));
+        /*int xpos = this->width()/2;
+        int ypos = this->height()/2;*/
+        //painter.setPen(Qt::NoPen);
+        //painter.setBrush(QBrush(QColor(255, 0, 0, 127)));
+        const float size_c = 8.0f;
+        Character *player = this->playing_gamestate->getPlayer();
+        if( player == NULL ) {
+            return;
+        }
+        QPoint point = this->mapFromScene(player->getX(), player->getY());
+        QPoint point_x = this->mapFromScene(player->getX() + size_c, player->getY());
+        QPoint point_y = this->mapFromScene(player->getX(), player->getY() + size_c);
+        int size_x = point_x.x() - point.x();
+        int size_y = point_y.y() - point.y();
+        int radius = std::max(size_x, size_y);
 
-    /*const int alpha = 127;
-    const int size_c = 512;
-    QRadialGradient radialGrad(point.x(), point.y(), size_c/2);
-    radialGrad.setColorAt(0.0, QColor(255, 255, 127, alpha));
-    radialGrad.setColorAt(1.0, Qt::transparent);
-    //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-    //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-    painter.setCompositionMode(QPainter::CompositionMode_ColorDodge);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(radialGrad);
-    painter.drawEllipse(point, size_c, size_c);*/
+        /*const int alpha = 127;
+        const int size_c = 512;
+        QRadialGradient radialGrad(point.x(), point.y(), size_c/2);
+        radialGrad.setColorAt(0.0, QColor(255, 255, 127, alpha));
+        radialGrad.setColorAt(1.0, Qt::transparent);
+        //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+        painter.setCompositionMode(QPainter::CompositionMode_ColorDodge);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(radialGrad);
+        painter.drawEllipse(point, size_c, size_c);*/
 
-    /*const int alpha = 200;
-    QPixmap pixmap(this->width(), this->height());
-    pixmap.fill(Qt::transparent);
-    QRadialGradient radialGrad(point.x(), point.y(), radius);
-    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-    QPainter painter2(&pixmap);
-    painter2.setPen(Qt::NoPen);
-    //painter2.setBrush(radialGrad);
-    //painter2.setCompositionMode(QPainter::CompositionMode_Source); // needed so that we overwrite the alpha channel
-    //painter2.setBrush(QBrush(QColor(255, 0, 0, 0)));
-    //painter2.drawEllipse(point, size_c, size_c);
-    painter2.fillRect(0, 0, this->width(), this->height(), radialGrad);
-    painter.drawPixmap(0, 0, pixmap);*/
+        /*const int alpha = 200;
+        QPixmap pixmap(this->width(), this->height());
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad(point.x(), point.y(), radius);
+        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+        QPainter painter2(&pixmap);
+        painter2.setPen(Qt::NoPen);
+        //painter2.setBrush(radialGrad);
+        //painter2.setCompositionMode(QPainter::CompositionMode_Source); // needed so that we overwrite the alpha channel
+        //painter2.setBrush(QBrush(QColor(255, 0, 0, 0)));
+        //painter2.drawEllipse(point, size_c, size_c);
+        painter2.fillRect(0, 0, this->width(), this->height(), radialGrad);
+        painter.drawPixmap(0, 0, pixmap);*/
 
-    /*const int alpha = 200;
-    QRadialGradient radialGrad(point.x(), point.y(), radius);
-    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-    painter.setPen(Qt::NoPen);
-    painter.fillRect(0, 0, this->width(), this->height(), radialGrad);*/
-    //painter.fillRect(0, 0, this->width(), this->height(), QBrush(QColor(0, 0, 0, alpha)));
+        /*const int alpha = 200;
+        QRadialGradient radialGrad(point.x(), point.y(), radius);
+        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+        painter.setPen(Qt::NoPen);
+        painter.fillRect(0, 0, this->width(), this->height(), radialGrad);*/
+        //painter.fillRect(0, 0, this->width(), this->height(), QBrush(QColor(0, 0, 0, alpha)));
 
-    /*
-    //const int alpha = 200;
-    const int alpha = 255;
-    const int res_c = 32;
-    QPixmap pixmap(res_c, res_c);
-    pixmap.fill(Qt::transparent);
-    QRadialGradient radialGrad(res_c/2, res_c/2, res_c);
-    radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-    radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-    //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 255));
-    //radialGrad.setColorAt(1.0, QColor(0, 0, 0, 255));
-    QPainter painter2(&pixmap);
-    painter2.setPen(Qt::NoPen);
-    painter2.fillRect(0, 0, res_c, res_c, radialGrad);
-    painter2.end();
-    pixmap = pixmap.scaledToWidth(2*radius);
-    //qDebug("%d, %d, %d", point.x(), point.y(), radius);
-    painter.drawPixmap(point.x() - radius, point.y() - radius, pixmap);
-    //painter.drawPixmap(point.x(), point.y(), pixmap);
-    //painter.drawPixmap(0, 0, pixmap);
-    */
+        /*
+        //const int alpha = 200;
+        const int alpha = 255;
+        const int res_c = 32;
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad(res_c/2, res_c/2, res_c);
+        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+        //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 255));
+        //radialGrad.setColorAt(1.0, QColor(0, 0, 0, 255));
+        QPainter painter2(&pixmap);
+        painter2.setPen(Qt::NoPen);
+        painter2.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter2.end();
+        pixmap = pixmap.scaledToWidth(2*radius);
+        //qDebug("%d, %d, %d", point.x(), point.y(), radius);
+        painter.drawPixmap(point.x() - radius, point.y() - radius, pixmap);
+        //painter.drawPixmap(point.x(), point.y(), pixmap);
+        //painter.drawPixmap(0, 0, pixmap);
+        */
 
-    //qDebug("### %f, %f", player->getX(), player->getY());
-    //qDebug("### radius = %d", radius);
-    //this->calculated_lighting_pixmap_scaled = false;
-    if( !this->calculated_lighting_pixmap_scaled ) {
-        //qDebug("scale pixmap");
-        this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
-        this->calculated_lighting_pixmap_scaled = true;
-    }
-    /*qDebug("lighting_pixmap_scaled size %d x %d", lighting_pixmap_scaled.width(), lighting_pixmap_scaled.height());
-    ASSERT_LOGGER( lighting_pixmap_scaled.width() == 2*radius );*/
-    //qDebug("%d, %d, %d", point.x(), point.y(), radius);
-    // note, sometimes the radius value may fluctuate even if we haven't zoomed in or out (due to rounding issues), which is why we should use the lighting_pixmap_scaled width, rather than radius, when doing the drawing
-    int pixmap_width = lighting_pixmap_scaled.width();
-    int sx = point.x() - pixmap_width/2;
-    int sy = point.y() - pixmap_width/2;
-    painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
-    QBrush brush(QColor(0, 0, 0, darkness_alpha));
-    if( sx > 0 ) {
-        painter.fillRect(0, 0, sx, this->height(), brush);
-    }
-    if( sx + pixmap_width < this->width() ) {
-        painter.fillRect(sx + pixmap_width, 0, this->width() - sx - pixmap_width, this->height(), brush);
-    }
-    if( sy > 0 ) {
-        painter.fillRect(sx, 0, pixmap_width, sy, brush);
-    }
-    if( sy + pixmap_width < this->height() ) {
-        painter.fillRect(sx, sy + pixmap_width, pixmap_width, this->height() - sy - pixmap_width, brush);
+        //qDebug("### %f, %f", player->getX(), player->getY());
+        //qDebug("### radius = %d", radius);
+        //this->calculated_lighting_pixmap_scaled = false;
+        if( !this->calculated_lighting_pixmap_scaled ) {
+            //qDebug("scale pixmap");
+            this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
+            this->calculated_lighting_pixmap_scaled = true;
+        }
+        /*qDebug("lighting_pixmap_scaled size %d x %d", lighting_pixmap_scaled.width(), lighting_pixmap_scaled.height());
+        ASSERT_LOGGER( lighting_pixmap_scaled.width() == 2*radius );*/
+        //qDebug("%d, %d, %d", point.x(), point.y(), radius);
+        // note, sometimes the radius value may fluctuate even if we haven't zoomed in or out (due to rounding issues), which is why we should use the lighting_pixmap_scaled width, rather than radius, when doing the drawing
+        int pixmap_width = lighting_pixmap_scaled.width();
+        int sx = point.x() - pixmap_width/2;
+        int sy = point.y() - pixmap_width/2;
+        painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
+        QBrush brush(QColor(0, 0, 0, darkness_alpha));
+        if( sx > 0 ) {
+            painter.fillRect(0, 0, sx, this->height(), brush);
+        }
+        if( sx + pixmap_width < this->width() ) {
+            painter.fillRect(sx + pixmap_width, 0, this->width() - sx - pixmap_width, this->height(), brush);
+        }
+        if( sy > 0 ) {
+            painter.fillRect(sx, 0, pixmap_width, sy, brush);
+        }
+        if( sy + pixmap_width < this->height() ) {
+            painter.fillRect(sx, sy + pixmap_width, pixmap_width, this->height() - sy - pixmap_width, brush);
+        }
+
+        //painter.drawPixmap(point.x(), point.y(), pixmap);
+        //painter.drawPixmap(0, 0, pixmap);
     }
 
-    //painter.drawPixmap(point.x(), point.y(), pixmap);
-    //painter.drawPixmap(0, 0, pixmap);
+    int time_ms = timer.elapsed();
+    if( time_ms > 0 ) {
+        float fps = 1000.0f/(float)time_ms;
+        this->gui_overlay->setFPS(fps);
+    }
 }
 
 void MainGraphicsView::update() {
@@ -501,7 +509,7 @@ void MainGraphicsView::removeTextEffect(TextEffect *text_effect) {
 }
 
 GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
-    QWidget(view), playing_gamestate(playing_gamestate)
+    QWidget(view), playing_gamestate(playing_gamestate), fps(-1.0f)
 {
     //this->setAttribute(Qt::WA_NoSystemBackground);
 }
@@ -542,12 +550,12 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         qDebug(">>> draw progress: %d", this->progress_percent);
     }
 
-    /*{
-        // DEBUG ONLY
+    if( this->fps >= 0.0f )
+    {
         painter.setPen(Qt::red);
-        float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
+        //float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
         painter.drawText(8, height() - 16, QString::number(fps));
-    }*/
+    }
 }
 
 void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {
