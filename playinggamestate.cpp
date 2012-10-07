@@ -2995,7 +2995,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             throw string("can't find character template");
                         }
                         npc = new Character(name_s.toString().toStdString(), true, *character_template);*/
-                        npc = this->createCharacter(name_s.toString().toStdString());
+                        npc = this->createCharacter(template_s.toString().toStdString());
                         QStringRef is_hostile_s = reader.attributes().value("is_hostile");
                         bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
                         npc->setHostile(is_hostile);
