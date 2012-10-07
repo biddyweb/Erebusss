@@ -962,7 +962,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 </scenery>
 
 <floorregion shape="rect" rect_x="11.0" rect_y="12.0" rect_w="5.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood" x="15.8" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="16.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 </location>
 
