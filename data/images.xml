@@ -21,6 +21,7 @@
     />
 
 <image type="item" name="chess_knight" filename="gfx/textures/items/chess_knight.png"/>
+<image type="item" name="clockwork" filename="gfx/textures/items/clockwork.png"/>
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
 <image type="item" name="gem_green" filename="gfx/textures/items/gem_green.png"/>
 <image type="item" name="gem_blue" filename="gfx/textures/items/gem_blue.png"/>
