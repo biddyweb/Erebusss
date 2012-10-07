@@ -375,7 +375,7 @@ public:
     virtual void characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart);
     virtual void characterDeath(Character *character, void *user_data);
 
-    virtual void locationAddItem(const Location *location, Item *item);
+    virtual void locationAddItem(const Location *location, Item *item, bool visible);
     virtual void locationRemoveItem(const Location *location, Item *item);
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery);

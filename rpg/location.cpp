@@ -433,6 +433,17 @@ FloorRegion *Location::findFloorRegionAt(Vector2D pos) {
     return result;
 }
 
+vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
+    vector<FloorRegion *> result_floor_regions;
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        if( floor_region->pointInsideConvex(pos) ) {
+            result_floor_regions.push_back(floor_region);
+        }
+    }
+    return result_floor_regions;
+}
+
 void Location::addCharacter(Character *character, float xpos, float ypos) {
     character->setLocation(this);
     character->setPos(xpos, ypos);
@@ -477,7 +488,7 @@ void Location::addItem(Item *item, float xpos, float ypos) {
     floor_region->addItem(item);
 
     if( this->listener != NULL ) {
-        this->listener->locationAddItem(this, item);
+        this->listener->locationAddItem(this, item, floor_region->isVisible());
     }
 }
 
@@ -505,17 +516,54 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
     scenery->setPos(xpos, ypos);
     this->scenerys.insert(scenery);
 
-    FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
+    /*FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
     if( floor_region == NULL ) {
         LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
         throw string("failed to find floor region for scenery");
     }
-    /*LOG("scenery at %f, %f added to floor region:\n", scenery->getX(), scenery->getY());
-    for(size_t i=0;i<floor_region->getNPoints();i++) {
-        Vector2D p = floor_region->getPoint(i);
-        LOG("    %d: %f, %f\n", i, p.x, p.y);
+    floor_region->addScenery(scenery);*/
+    vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
+    if( floor_regions.size() == 0 ) {
+        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+        throw string("failed to find floor region for scenery");
+    }
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        floor_region->addScenery(scenery);
+    }
+    /*set<FloorRegion *> all_floor_regions;
+    for(int i=0;i<5;i++) {
+        Vector2D pos = scenery->getPos();
+        if( i == 1 ) {
+            pos.x -= 0.5f*scenery->getWidth();
+            pos.y -= 0.5f*scenery->getHeight();
+        }
+        else if( i == 2 ) {
+            pos.x += 0.5f*scenery->getWidth();
+            pos.y -= 0.5f*scenery->getHeight();
+        }
+        else if( i == 3 ) {
+            pos.x += 0.5f*scenery->getWidth();
+            pos.y += 0.5f*scenery->getHeight();
+        }
+        else if( i == 4 ) {
+            pos.x -= 0.5f*scenery->getWidth();
+            pos.y += 0.5f*scenery->getHeight();
+        }
+        vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(pos);
+        if( floor_regions.size() == 0 && i == 0 ) {
+            LOG("failed to find floor region for scenery %s at %f, %f (i = %d)\n", scenery->getName().c_str(), scenery->getX(), scenery->getY(), i);
+            throw string("failed to find floor region for scenery");
+        }
+        for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
+            FloorRegion *floor_region = *iter;
+            all_floor_regions.insert(floor_region);
+        }
+    }
+    for(set<FloorRegion *>::iterator iter = all_floor_regions.begin(); iter != all_floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        floor_region->addScenery(scenery);
     }*/
-    floor_region->addScenery(scenery);
 
     if( this->listener != NULL ) {
         this->listener->locationAddScenery(this, scenery);
@@ -1222,6 +1270,7 @@ bool Location::testVisibility(Vector2D pos, const FloorRegion *floor_region, siz
     return false;
 }
 
+#if 0
 void Location::initVisibility(Vector2D pos) {
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -1239,6 +1288,7 @@ void Location::initVisibility(Vector2D pos) {
         }
     }
 }
+#endif
 
 vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     //LOG("Location::updateVisibility for %f, %f\n", pos.x, pos.y);

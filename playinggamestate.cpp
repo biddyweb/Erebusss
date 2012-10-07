@@ -2560,6 +2560,7 @@ void PlayingGamestate::setupView() {
         }
         QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
         floor_region->setUserGfxData(item);
+        item->setVisible(false); // default to false, visibility is checked afterwards
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
                 continue;
@@ -2629,7 +2630,7 @@ void PlayingGamestate::setupView() {
     LOG("add graphics for items\n");
     for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
         Item *item = *iter;
-        this->locationAddItem(c_location, item);
+        this->locationAddItem(c_location, item, false);
     }
     LOG("add graphics for scenery");
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
@@ -2676,12 +2677,15 @@ void PlayingGamestate::setupView() {
     //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
 
     LOG("init visibility\n");
-    c_location->initVisibility(player->getPos());
+    //c_location->initVisibility(player->getPos());
+    c_location->updateVisibility(player->getPos());
+    // n.b., we look through all the regions rather than just those updated, so that this works when loading a game (as then, other floor regions may have been previously set to be visible)
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
         FloorRegion *floor_region = c_location->getFloorRegion(i);
-        this->updateVisibilityForFloorRegion(floor_region);
+        if( floor_region->isVisible() ) {
+            this->updateVisibilityForFloorRegion(floor_region);
+        }
     }
-
 }
 
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
@@ -3557,7 +3561,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("done\n");
 }
 
-void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
+void PlayingGamestate::locationAddItem(const Location *location, Item *item, bool visible) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
@@ -3575,6 +3579,7 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item) {
         object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
         object->setScale(item_scale);
         object->setZValue(2.0f*E_TOL_LINEAR); // so items appear above DRAWTYPE_BACKGROUND Scenery
+        object->setVisible(visible);
     }
 }
 
@@ -3593,6 +3598,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         scenery->setUserGfxData(object);
         this->locationUpdateScenery(scenery);
         object->setOpacity(scenery->getOpacity());
+        object->setVisible(false); // default to false, visibility is checked afterwards
         scene->addItem(object);
         object->setPos(scenery->getX(), scenery->getY());
         float z_value = object->pos().y();
@@ -4428,7 +4434,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 }
 
 void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region) {
-    QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+    /*QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
     gfx_item->setVisible( floor_region->isVisible() );
     for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
@@ -4442,6 +4448,25 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
         QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
         if( gfx_item2 != NULL ) {
             gfx_item2->setVisible( floor_region->isVisible() );
+        }
+    }*/
+    ASSERT_LOGGER( floor_region->isVisible() );
+    if( floor_region->isVisible() ) {
+        QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+        gfx_item->setVisible( true );
+        for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
+            Scenery *scenery = *iter;
+            QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+            if( gfx_item2 != NULL ) {
+                gfx_item2->setVisible( true );
+            }
+        }
+        for(set<Item *>::iterator iter = floor_region->itemsBegin(); iter != floor_region->itemsEnd(); ++iter) {
+            Item *item = *iter;
+            QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+            if( gfx_item2 != NULL ) {
+                gfx_item2->setVisible( true );
+            }
         }
     }
 }

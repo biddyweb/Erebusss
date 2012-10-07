@@ -22,7 +22,7 @@ const int SOURCETYPE_SCENERY = 1;
 
 class LocationListener {
 public:
-    virtual void locationAddItem(const Location *location, Item *item)=0;
+    virtual void locationAddItem(const Location *location, Item *item, bool visible)=0;
     virtual void locationRemoveItem(const Location *location, Item *item)=0;
 
     virtual void locationAddScenery(const Location *location, Scenery *scenery)=0;
@@ -333,7 +333,7 @@ protected:
     vector<int> temp_marks; // should match points array
     void *user_data_gfx;
 
-    set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing
+    set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing (note that scenerys may be in more than one FloorRegion)
     set<Item *> items; // stored here as well as the Location, for visibility testing
 
 public:
@@ -492,6 +492,7 @@ public:
     }
     void calculateSize(float *w, float *h) const;
     FloorRegion *findFloorRegionAt(Vector2D pos);
+    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos);
 
     void addBoundary(Polygon2D boundary) {
         this->boundaries.push_back(boundary);
@@ -583,7 +584,9 @@ public:
         return this->distance_graph;
     }
 
+#if 0
     void initVisibility(Vector2D pos);
+#endif
     vector<FloorRegion *> updateVisibility(Vector2D pos);
 };
 
