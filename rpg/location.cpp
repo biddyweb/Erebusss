@@ -1315,6 +1315,16 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
                 }
             }
         }
+        if( !floor_region->isVisible() ) {
+            // also test centre point
+            Vector2D centre_pos = floor_region->findCentre();
+            Vector2D hit_pos;
+            // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
+            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, centre_pos, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL, false) ) {
+                floor_region->setVisible(true);
+                update_floor_regions.push_back(floor_region);
+            }
+        }
     }
     return update_floor_regions;
 }
