@@ -206,6 +206,7 @@ public:
     int getSourceType() const {
         return this->source_type;
     }
+    Vector2D findCentre() const;
     Vector2D offsetInwards(size_t indx, float dist) const;
 
     bool pointInsideConvex(Vector2D pvec) const;

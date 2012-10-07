@@ -91,6 +91,16 @@ Vector2D Polygon2D::offsetInwards(size_t indx, float dist) const {
     return point;
 }
 
+Vector2D Polygon2D::findCentre() const {
+    Vector2D centre;
+    for(size_t j=0;j<this->getNPoints();j++) {
+        Vector2D pos = this->getPoint(j);
+        centre += pos;
+    }
+    centre /= this->getNPoints();
+    return centre;
+}
+
 bool Polygon2D::pointInsideConvex(Vector2D pvec) const {
     int sign = 0;
     for(size_t j=0;j<this->getNPoints();j++) {
