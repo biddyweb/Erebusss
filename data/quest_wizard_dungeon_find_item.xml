@@ -901,21 +901,68 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <item template="Arrows"/>
 </npc>
 
-<floorregion shape="rect" rect_x="6.0" rect_y="16.0" rect_w="5.0" rect_h="2.0" />
+<floorregion shape="rect" rect_x="6.0" rect_y="16.0" rect_w="5.0" rect_h="2.0"/>
 
-<floorregion shape="rect" rect_x="10.0" rect_y="12.0" rect_w="1.0" rect_h="4.0" />
+<floorregion shape="rect" rect_x="10.0" rect_y="12.0" rect_w="1.0" rect_h="4.0"/>
 
-<floorregion shape="rect" rect_x="11.0" rect_y="16.0" rect_w="1.0" rect_h="6.0" />
+<floorregion shape="rect" rect_x="11.0" rect_y="16.0" rect_w="1.0" rect_h="6.0"/>
 
-<floorregion shape="rect" rect_x="11.0" rect_y="22.0" rect_w="4.0" rect_h="1.0" />
+<floorregion shape="rect" rect_x="11.0" rect_y="22.0" rect_w="4.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="15.0" rect_y="22.0" rect_w="4.0" rect_h="4.0" />
+<floorregion shape="rect" rect_x="15.0" rect_y="22.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Crate" image_name="crate" x="15.5" y="25.5" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
 
 <scenery name="Fire" image_name="campfire" x="17.0" y="24.0" w="1.0" h="1.0"/>
+
+<!-- -->
+
+<floorregion shape="rect" rect_x="26.0" rect_y="12.0" rect_w="6.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="28.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="28.5" y="12.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<floorregion shape="rect" rect_x="26.0" rect_y="7.0" rect_w="5.0" rect_h="4.0"/>
+
+<npc name="Orc" template="Orc" x="28.0" y="8.0">
+    <item template="Leather Armour"/>
+</npc>
+
+<floorregion shape="rect" rect_x="22.0" rect_y="11.0" rect_w="4.0" rect_h="4.0"/>
+    <scenery name="Door" image_name="door_wood" x="26.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<npc name="Goblin" template="Goblin" x="25.5" y="11.5"/>
+
+<floorregion shape="rect" rect_x="21.0" rect_y="12.5" rect_w="1.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="21.5" y="13.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="16.0" rect_y="10.0" rect_w="5.0" rect_h="5.0"/>
+<scenery name="Barrel" image_name="barrel" x="16.5" y="14.5" w="0.8" h="0.8" blocking="true">
+    <gold amount="12"/>
+</scenery>
+<scenery name="Table" image_name="table" x="20.5" y="14.5" size="0.8" blocking="true"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="18.5" y="12.5">
+    <item template="Leather Armour"/>
+</npc>
+
+<floorregion shape="rect" rect_x="18.0" rect_y="15.0" rect_w="1.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="18.5" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="16.0" rect_y="16.0" rect_w="5.0" rect_h="3.0"/>
+<scenery name="Crate" image_name="crate" x="16.5" y="18.5" w="0.8" h="0.8" blocking="true">
+    <item template="Long Sword"/>
+    <item template="Long Sword"/>
+    <item template="Short Sword"/>
+    <item template="Short Sword"/>
+    <item template="Shield"/>
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+</scenery>
+
+<floorregion shape="rect" rect_x="11.0" rect_y="12.0" rect_w="5.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="15.8" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 </location>
 
