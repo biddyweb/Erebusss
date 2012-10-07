@@ -917,7 +917,97 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Fire" image_name="campfire" x="17.0" y="24.0" w="1.0" h="1.0"/>
 
-<!-- -->
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="25.0" />
+    <floorregion_point x="19.0" y="26.0" />
+    <floorregion_point x="24.0" y="27.0" />
+    <floorregion_point x="27.0" y="26.0" />
+    <floorregion_point x="27.0" y="25.0" />
+    <floorregion_point x="22.0" y="24.5" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="27.0" rect_y="25.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="27.0" rect_y="24.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="20.0" rect_y="19.5" rect_w="8.0" rect_h="4.5"/>
+    <scenery name="Door" image_name="door_wood" x="27.5" y="24.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Bed" image_name="bed" x="21.0" y="20.5" size="1.2" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="23.0" y="20.5" size="1.2" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="26.0" y="20.5" size="1.2" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="21.0" y="22.5" size="1.2" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="23.0" y="22.5" size="1.2" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="25.0" y="22.5" size="1.2" blocking="true"/>
+
+<scenery name="Crate" image_name="crate" x="27.5" y="20.1" w="0.8" h="0.8" blocking="true">
+    <gold amount="23"/>
+    <item template="Green Gem"/>
+    <item template="Gold Ring"/>
+</scenery>
+
+<npc name="Goblin" template="Goblin" x="21.0" y="21.5"/>
+<npc name="Goblin" template="Goblin" x="23.0" y="21.5"/>
+<npc name="Orc" template="Orc" x="27.0" y="21.5"/>
+
+<floorregion shape="rect" rect_x="32.0" rect_y="12.0" rect_w="1.0" rect_h="14.0"/>
+
+<floorregion shape="rect" rect_x="33.0" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="34.0" rect_y="25.0" rect_w="3.0" rect_h="3.0"/>
+    <scenery name="Door" image_name="door_wood" x="33.0" y="25.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Orc Warlord's Key"
+    />
+
+<npc name="Peasant" animation_name="peasant_man" static_image="true" x="36.0" y="25.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Thank you for freeing us!
+</opening_initial>
+<talk question="Who are you?">
+I am a peasant from the nearby village, but I was captured by the Goblins attacking our village, and brought back here, where I have been kept prisoner ever since.
+</talk>
+</npc>
+
+<npc name="Peasant" animation_name="peasant_woman" static_image="true" x="35.5" y="26.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Thank you for freeing us!
+</opening_initial>
+<talk question="Who are you?">
+I am a peasant from the nearby village, but I was captured by the Goblins attacking our village, and brought back here, where I have been kept prisoner ever since.
+</talk>
+</npc>
+
+<npc name="Peasant" animation_name="peasant_woman" static_image="true" x="36.4" y="27.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Thank you for freeing us!
+</opening_initial>
+<talk question="Who are you?">
+I am a peasant from the nearby village, but I was captured by the Goblins attacking our village, and brought back here, where I have been kept prisoner ever since.
+</talk>
+</npc>
 
 <floorregion shape="rect" rect_x="26.0" rect_y="12.0" rect_w="6.0" rect_h="1.0"/>
 
@@ -928,6 +1018,11 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <npc name="Orc" template="Orc" x="28.0" y="8.0">
     <item template="Leather Armour"/>
 </npc>
+
+<floorregion shape="rect" rect_x="28.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="28.5" y="13.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Orc Warlord's Key"/>
+<floorregion shape="rect" rect_x="27.0" rect_y="14.0" rect_w="3.0" rect_h="4.0"/>
 
 <floorregion shape="rect" rect_x="22.0" rect_y="11.0" rect_w="4.0" rect_h="4.0"/>
     <scenery name="Door" image_name="door_wood" x="26.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -963,6 +1058,45 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <floorregion shape="rect" rect_x="11.0" rect_y="12.0" rect_w="5.0" rect_h="1.0"/>
     <scenery name="Door" image_name="door_wood" x="16.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<!--route to Orc Warlord-->
+
+<floorregion shape="rect" rect_x="33.0" rect_y="17.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="39.0" y="14.0" />
+    <floorregion_point x="38.0" y="15.0" />
+    <floorregion_point x="38.0" y="20.0" />
+    <floorregion_point x="39.0" y="21.0" />
+    <floorregion_point x="44.0" y="21.0" />
+    <floorregion_point x="45.0" y="20.0" />
+    <floorregion_point x="45.0" y="15.0" />
+    <floorregion_point x="44.0" y="14.0" />
+</floorregion>
+    <scenery name="Door" image_name="door_wood" x="16.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Throne" image_name="throne" x="41.5" y="17.5" size="0.8" blocking="true"/>
+
+<npc name="Orc Warlord" template="Orc Champion" x="43.0" y="17.5">
+    <item name="Orc Warlord's Key" image_name="key" icon_width="0.25" weight="0"/>
+</npc>
+
+<npc name="Orc Champion" template="Orc Champion" x="44.0" y="19.0"/>
+
+<npc name="Orc" template="Orc" x="40.0" y="15.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+
+<floorregion shape="rect" rect_x="45.0" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
+    <scenery name="Door" image_name="door_wood" x="45.0" y="17.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="46.0" rect_y="16.0" rect_w="3.0" rect_h="3.0"/>
+
+<scenery name="Chest" image_name="chest" x="48.5" y="17.5" size="0.8" blocking="true">
+    <item template="Potion of Healing"/>
+    <gold amount="100"/>
+</scenery>
 
 </location>
 
