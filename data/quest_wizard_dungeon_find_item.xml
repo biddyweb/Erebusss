@@ -730,7 +730,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <!--exit of chessboard-->
 <floorregion shape="rect" rect_x="16.0" rect_y="18.0" rect_w="4.0" rect_h="1.0"/>
 
-<!--<player_start x="16.5" y="18.5"/>-->
+<player_start x="16.5" y="18.5"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
 <trap x="20.0" y="18.0" w="1.0" h="1.0" type="gas" rating="4"/>
@@ -784,6 +784,18 @@ Experiments.
     </item>
 </scenery>
 
+<floorregion shape="rect" rect_x="25.0" rect_y="22.0" rect_w="11.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="23.0" rect_w="1.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="27.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="35.0" rect_y="23.0" rect_w="1.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="35.0" rect_y="27.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Stairs" image_name="stairsdown_indoors" x="37.5" y="29.5" size="2.0" blocking="true" exit_location="level_6" exit_location_x="38.5" exit_location_y="14.0"/>
+
 <!--time travel portals-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="23.0" rect_w="1.0" rect_h="5.0"/>
@@ -813,7 +825,12 @@ I have discovered an amazing secret! ...
 
 <!--<player_start x="25.0" y="25.0"/>-->
 
-<scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true"/>
+<!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
+A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
+</item>-->
+
+<scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
+    locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true"/>
 
 <scenery name="Building" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="building" exit_location_x="2.0" exit_location_y="3.0"/>
 
@@ -888,7 +905,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 </floorregion>
 
 <!--<player_start x="5.0" y="28.0"/>-->
-<player_start x="16.0" y="23.0"/>
+<!--<player_start x="16.0" y="23.0"/>-->
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="11.0"/>
 
@@ -963,6 +980,15 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <scenery name="Door" image_name="door_wood" x="33.0" y="25.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Orc Warlord's Key"
     />
+
+<scenery name="Crate" image_name="crate" x="34.5" y="27.5" w="0.8" h="0.8" blocking="true">
+    <item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50">
+A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter.
+    </item>
+    <item name="Journal" image_name="book" icon_width="0.25" weight="1">
+This book appears to be a journal kept by ...
+    </item>
+</scenery>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="36.0" y="25.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1203,6 +1229,12 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 <scenery name="Teleport" image_name="teleport" x="0.5" y="11.5" size="1.0" blocking="true" exit_location="level_space" exit_location_x="20.0" exit_location_y="20.0"/>
 
 <floorregion shape="rect" rect_x="1.0" rect_y="17.0" rect_w="10.0" rect_h="1.0"/>
+
+<!-- from stairs down route -->
+
+<floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
 </location>
 
