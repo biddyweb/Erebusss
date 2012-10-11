@@ -435,6 +435,8 @@ protected:
     string floor_image_name;
     string background_image_name;
 
+    unsigned char lighting_min;
+
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries;
 
@@ -479,6 +481,12 @@ public:
     }
     string getBackgroundImageName() const {
         return this->background_image_name;
+    }
+    void setLightingMin(unsigned char lighting_min) {
+        this->lighting_min = lighting_min;
+    }
+    unsigned char getLightingMin() const {
+        return this->lighting_min;
     }
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {

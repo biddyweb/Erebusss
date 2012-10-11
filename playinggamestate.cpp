@@ -22,8 +22,6 @@
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
-const int darkness_alpha = 200;
-
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
@@ -59,24 +57,8 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap_scaled(false)
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), darkness_alpha(0)
 {
-    if( game_g->isLightingEnabled() )
-    {
-        const int res_c = 255;
-        QPixmap pixmap(res_c, res_c);
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-        radialGrad.setColorAt(1.0, QColor(0, 0, 0, darkness_alpha));
-        QPainter painter2(&pixmap);
-        painter2.setPen(Qt::NoPen);
-        painter2.fillRect(0, 0, res_c, res_c, radialGrad);
-        painter2.end();
-
-        this->lighting_pixmap = pixmap;
-    }
-
 }
 
 void MainGraphicsView::zoomOut() {
@@ -273,13 +255,8 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
 
     QGraphicsView::paintEvent(event);
 
-    if( game_g->isLightingEnabled() ) {
+    if( game_g->isLightingEnabled() && this->calculated_lighting_pixmap ) {
         QPainter painter(this->viewport());
-        //painter.fillRect(0, 0, this->width(), this->height(), QColor(255, 0, 0, 127));
-        /*int xpos = this->width()/2;
-        int ypos = this->height()/2;*/
-        //painter.setPen(Qt::NoPen);
-        //painter.setBrush(QBrush(QColor(255, 0, 0, 127)));
         const float size_c = 8.0f;
         Character *player = this->playing_gamestate->getPlayer();
         if( player == NULL ) {
@@ -292,63 +269,6 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         int size_y = point_y.y() - point.y();
         int radius = std::max(size_x, size_y);
 
-        /*const int alpha = 127;
-        const int size_c = 512;
-        QRadialGradient radialGrad(point.x(), point.y(), size_c/2);
-        radialGrad.setColorAt(0.0, QColor(255, 255, 127, alpha));
-        radialGrad.setColorAt(1.0, Qt::transparent);
-        //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-        //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-        painter.setCompositionMode(QPainter::CompositionMode_ColorDodge);
-        painter.setPen(Qt::NoPen);
-        painter.setBrush(radialGrad);
-        painter.drawEllipse(point, size_c, size_c);*/
-
-        /*const int alpha = 200;
-        QPixmap pixmap(this->width(), this->height());
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad(point.x(), point.y(), radius);
-        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-        QPainter painter2(&pixmap);
-        painter2.setPen(Qt::NoPen);
-        //painter2.setBrush(radialGrad);
-        //painter2.setCompositionMode(QPainter::CompositionMode_Source); // needed so that we overwrite the alpha channel
-        //painter2.setBrush(QBrush(QColor(255, 0, 0, 0)));
-        //painter2.drawEllipse(point, size_c, size_c);
-        painter2.fillRect(0, 0, this->width(), this->height(), radialGrad);
-        painter.drawPixmap(0, 0, pixmap);*/
-
-        /*const int alpha = 200;
-        QRadialGradient radialGrad(point.x(), point.y(), radius);
-        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-        painter.setPen(Qt::NoPen);
-        painter.fillRect(0, 0, this->width(), this->height(), radialGrad);*/
-        //painter.fillRect(0, 0, this->width(), this->height(), QBrush(QColor(0, 0, 0, alpha)));
-
-        /*
-        //const int alpha = 200;
-        const int alpha = 255;
-        const int res_c = 32;
-        QPixmap pixmap(res_c, res_c);
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad(res_c/2, res_c/2, res_c);
-        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
-        radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
-        //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 255));
-        //radialGrad.setColorAt(1.0, QColor(0, 0, 0, 255));
-        QPainter painter2(&pixmap);
-        painter2.setPen(Qt::NoPen);
-        painter2.fillRect(0, 0, res_c, res_c, radialGrad);
-        painter2.end();
-        pixmap = pixmap.scaledToWidth(2*radius);
-        //qDebug("%d, %d, %d", point.x(), point.y(), radius);
-        painter.drawPixmap(point.x() - radius, point.y() - radius, pixmap);
-        //painter.drawPixmap(point.x(), point.y(), pixmap);
-        //painter.drawPixmap(0, 0, pixmap);
-        */
-
         //qDebug("### %f, %f", player->getX(), player->getY());
         //qDebug("### radius = %d", radius);
         //this->calculated_lighting_pixmap_scaled = false;
@@ -360,6 +280,7 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         /*qDebug("lighting_pixmap_scaled size %d x %d", lighting_pixmap_scaled.width(), lighting_pixmap_scaled.height());
         ASSERT_LOGGER( lighting_pixmap_scaled.width() == 2*radius );*/
         //qDebug("%d, %d, %d", point.x(), point.y(), radius);
+        //qDebug("darkness_alpha = %d", darkness_alpha);
         // note, sometimes the radius value may fluctuate even if we haven't zoomed in or out (due to rounding issues), which is why we should use the lighting_pixmap_scaled width, rather than radius, when doing the drawing
         int pixmap_width = lighting_pixmap_scaled.width();
         int sx = point.x() - pixmap_width/2;
@@ -387,6 +308,27 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
     if( time_ms > 0 ) {
         float fps = 1000.0f/(float)time_ms;
         this->gui_overlay->setFPS(fps);
+    }
+}
+
+void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
+    LOG("MainGraphicsView::createLightingMap(): lighting_min = %d\n", lighting_min);
+    this->darkness_alpha = (unsigned char)(255 - (int)lighting_min);
+    if( game_g->isLightingEnabled() )
+    {
+        const int res_c = 255;
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+        radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
+        radialGrad.setColorAt(1.0, QColor(0, 0, 0, darkness_alpha));
+        QPainter painter2(&pixmap);
+        painter2.setPen(Qt::NoPen);
+        painter2.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter2.end();
+
+        this->calculated_lighting_pixmap = true;
+        this->lighting_pixmap = pixmap;
     }
 }
 
@@ -2518,6 +2460,7 @@ void PlayingGamestate::setupView() {
     // set up the view on the RPG world
     MainWindow *window = game_g->getScreen()->getMainWindow();
 
+    view->createLightingMap(this->c_location->getLightingMin());
     view->centerOn(player->getPos().x, player->getPos().y);
 
     const float offset_y = 0.5f;
@@ -2808,6 +2751,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: duplicate location name");
                     }
                     QStringRef type_s = reader.attributes().value("type");
+                    QStringRef lighting_min_s = reader.attributes().value("lighting_min");
                     location = new Location(name_s.toString().toStdString());
                     if( type_s.length() > 0 ) {
                         if( type_s.toString() == "indoors" ) {
@@ -2821,6 +2765,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             LOG("unknown type: %s\n", type_s.toString().toStdString().c_str());
                             throw string("unexpected quest xml: location has unknown type");
                         }
+                    }
+                    if( lighting_min_s.length() > 0 ) {
+                        int lighting_min = parseInt(lighting_min_s.toString());
+                        if( lighting_min < 0 || lighting_min > 255 ) {
+                            LOG("unknown type: %s\n", type_s.toString().toStdString().c_str());
+                            LOG("invalid lighting_min: %f\n", lighting_min);
+                            throw string("unexpected quest xml: location has invalid lighting_min");
+                        }
+                        location->setLightingMin(static_cast<unsigned char>(lighting_min));
                     }
                     quest->addLocation(location);
                 }
@@ -4630,7 +4583,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             ASSERT_LOGGER(false);
             break;
         }
-        fprintf(file, "<location name=\"%s\" type=\"%s\">\n\n", location->getName().c_str(), type_str.c_str());
+        fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
 
         LOG("save location images\n");
         fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());

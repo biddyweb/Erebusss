@@ -379,7 +379,7 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
 
 Location::Location(const string &name) :
     name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
-    distance_graph(NULL)
+    distance_graph(NULL), lighting_min(55)
 {
 }
 
