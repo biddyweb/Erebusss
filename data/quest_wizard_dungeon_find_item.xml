@@ -815,7 +815,7 @@ I have discovered an amazing secret! ...
 
 </location>
 
-<location name="level_past">
+<location name="level_past" lighting_min="160">
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -823,7 +823,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<!--<player_start x="25.0" y="25.0"/>-->
+<player_start x="25.0" y="25.0"/>
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -1238,7 +1238,7 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
-<player_start x="38.5" y="14.0"/>
+<!--<player_start x="38.5" y="14.0"/>-->
 
 <npc name="Minotaur" template="Minotaur" x="39.5" y="15.0"/>
 
