@@ -103,12 +103,20 @@
     <animation name="ranged" start="28" length="4" type="single"/>
     <animation name="death" start="20" length="4" type="single"/>
 </image>
+
+<image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="128">
+    <animation name="" start="0" length="8" type="loop"/>
+    <animation name="run" start="8" length="8" type="loop"/>
+    <animation name="attack" start="16" length="8" type="single"/>
+    <animation name="death" start="48" length="8" type="single"/>
+</image>
 <image type="npc" name="wyvern" filename="gfx/textures/npcs/wyvern.png" xpos="0" ypos="0" width="128" height="128" expected_width="128">
     <animation name="" start="0" length="8" type="loop"/>
     <animation name="run" start="8" length="8" type="loop"/>
     <animation name="attack" start="16" length="8" type="single"/>
     <animation name="death" start="48" length="8" type="single"/>
 </image>
+
 <image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
@@ -117,13 +125,10 @@
     <!--<animation name="death" start="22" length="6" type="single"/>-->
     <animation name="death" start="28" length="8" type="single"/>
 </image>
-
 <image type="npc_static" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
 
 <image type="npc_static" name="man" filename="gfx/textures/npcs/man.png"/>
-
 <image type="npc_static" name="peasant_man" filename="gfx/textures/npcs/peasant_man.png"/>
-
 <image type="npc_static" name="peasant_woman" filename="gfx/textures/npcs/peasant_woman.png"/>
 
 </images>

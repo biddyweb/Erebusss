@@ -41,6 +41,14 @@
     xp_worth="20"
 />
 
+<!--Weapon hardcoded as natural damage: Two anded Axe-->
+<npc name="Minotaur" animation_name="minotaur"
+    FP="10" BS="4" S="9" A="1" M="7" D="7" B="6" Sp="2.5"
+    natural_damageX="2" natural_damageY="12" natural_damageZ="0"
+    health_min="50" health_max="60" gold_min="0" gold_max="0"
+    xp_worth="50"
+/>
+
 <!--Natural damage-->
 <npc name="Wyvern" animation_name="wyvern"
     FP="9" BS="0" S="5" A="1" M="3" D="0" B="5" Sp="4.0"
