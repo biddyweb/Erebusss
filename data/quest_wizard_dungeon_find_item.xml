@@ -823,7 +823,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -1238,24 +1238,25 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
-<!--<player_start x="38.5" y="14.0"/>-->
-
-<npc name="Minotaur" template="Minotaur" x="39.5" y="15.0"/>
+<player_start x="38.5" y="14.0"/>
 
 <floorregion shape="rect" rect_x="32.5" rect_y="15.5" rect_w="2.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="32.5" rect_y="16.5" rect_w="1.0" rect_h="1.5"/>
 <floorregion shape="rect" rect_x="33.5" rect_y="17.0" rect_w="6.5" rect_h="1.0"/>
+<trap x="36.5" y="17.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="8.0"/>
 <floorregion shape="rect" rect_x="38.0" rect_y="10.0" rect_w="2.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="31.0" rect_y="14.0" rect_w="3.5" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="31.0" rect_y="15.0" rect_w="1.0" rect_h="4.5"/>
 <floorregion shape="rect" rect_x="32.0" rect_y="18.5" rect_w="9.5" rect_h="1.0"/>
+<trap x="39.0" y="18.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <floorregion shape="rect" rect_x="41.5" rect_y="9.5" rect_w="1.0" rect_h="10.0"/>
 <floorregion shape="rect" rect_x="32.5" rect_y="8.5" rect_w="10.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="36.5" rect_y="11.0" rect_w="1.0" rect_h="0.5"/>
 <floorregion shape="rect" rect_x="30.5" rect_y="10.0" rect_w="7.0" rect_h="1.0"/>
+<trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <floorregion shape="rect" rect_x="30.5" rect_y="8.5" rect_w="1.0" rect_h="1.5"/>
 
 <floorregion shape="rect" rect_x="25.5" rect_y="11.5" rect_w="9.0" rect_h="1.0"/>
@@ -1265,12 +1266,14 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 <npc name="Goblin Champion" template="Goblin Champion" x="29.5" y="14.5"/>
 
 <floorregion shape="rect" rect_x="25.5" rect_y="12.5" rect_w="1.0" rect_h="4.0"/>
+<trap x="25.5" y="14.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <floorregion shape="rect" rect_x="26.5" rect_y="15.5" rect_w="4.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="29.5" rect_y="16.5" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="25.5" rect_y="17.5" rect_w="5.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="29.0" rect_y="7.0" rect_w="1.0" rect_h="4.5"/>
 <floorregion shape="rect" rect_x="30.0" rect_y="7.0" rect_w="14.0" rect_h="1.0"/>
+<trap x="37.0" y="7.0" w="1.0" h="1.0" type="arrow" difficulty="2" rating="5"/>
 <floorregion shape="rect" rect_x="43.0" rect_y="8.0" rect_w="1.0" rect_h="13.0"/>
 <floorregion shape="rect" rect_x="30.0" rect_y="20.0" rect_w="13.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="28.0" rect_y="21.0" rect_w="3.0" rect_h="1.0"/>
@@ -1297,9 +1300,20 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
     <scenery name="Door" image_name="door_metal" x="19.0" y="20.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="16.5" rect_y="10.5" rect_w="5.5" rect_h="8.5"/>
 
+<!--<player_start x="19.0" y="19.5"/>-->
+
+<npc name="Minotaur" template="Minotaur" x="19.25" y="14.75">
+    <item name="Minotaur's Key" image_name="key" icon_width="0.25" weight="0"/>
+</npc>
+
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Minotaur's Key"/>
 <floorregion shape="rect" rect_x="17.5" rect_y="22.0" rect_w="3.0" rect_h="3.0"/>
+
+<scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
+    <gold amount="150"/>
+</scenery>
 
 </location>
 
