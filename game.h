@@ -100,24 +100,23 @@ public:
 
 protected:
     AnimationType animation_type;
+    unsigned int n_dimensions;
     size_t n_frames;
-    //QPixmap *pixmaps; // array of length N_DIRECTIONS * n_frames
-    vector<QPixmap> pixmaps; // vector of length N_DIRECTIONS * n_frames
+    vector<QPixmap> pixmaps; // vector of length n_dimensions * n_frames
     /*QRectF bounding_rect;
 
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);*/
 public:
-    AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length N_DIRECTIONS * n_frames
+    AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length n_dimensions * n_frames
     virtual ~AnimationSet();
 
     size_t getNFrames() const {
         return this->n_frames;
     }
-    //QPixmap *getFrames(Direction c_direction);
-    const QPixmap &getFrame(Direction c_direction, size_t c_frame) const;
+    const QPixmap &getFrame(unsigned int c_dimension, size_t c_frame) const;
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -166,8 +165,8 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions);
 };
 
 class AnimatedObject : public QGraphicsItem {
@@ -177,7 +176,7 @@ class AnimatedObject : public QGraphicsItem {
     bool set_c_animation_name;
     string c_animation_name;
     vector<const AnimationSet *> c_animation_sets;
-    Direction c_direction;
+    unsigned int c_dimension;
     size_t c_frame;
     int animation_time_start_ms;
 
@@ -193,7 +192,7 @@ public:
     void addAnimationLayer(AnimationLayer *animation_layer);
     void clearAnimationLayers();
     void setAnimationSet(const string &name, bool force_restart);
-    void setDirection(Direction c_direction);
+    void setDimension(unsigned int c_dimension);
     int getWidth() const;
     int getHeight() const;
     void setStaticImage(const QPixmap &static_image) {

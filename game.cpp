@@ -105,9 +105,9 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
     return false;
 }
 
-AnimationSet::AnimationSet(AnimationType animation_type, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_frames(n_frames), pixmaps(pixmaps) {
-    if( pixmaps.size() != N_DIRECTIONS * n_frames ) {
-        LOG("AnimationSet error: pixmaps size %d, n_frames %d, N_DIRECTIONS %d\n", pixmaps.size(), n_frames, N_DIRECTIONS);
+AnimationSet::AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_dimensions(n_dimensions), n_frames(n_frames), pixmaps(pixmaps) {
+    if( pixmaps.size() != n_dimensions * n_frames ) {
+        LOG("AnimationSet error: pixmaps size %d, n_frames %d, n_dimensions %d\n", pixmaps.size(), n_frames, n_dimensions);
         throw string("AnimationSet has incorrect pixmaps size");
     }
 }
@@ -116,7 +116,7 @@ AnimationSet::~AnimationSet() {
     //qDebug("AnimationSet::~AnimationSet(): animation type %d, n_frames = %d", this->animation_type, this->n_frames);
 }
 
-const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) const {
+const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) const {
     //qDebug("animation type: %d", this->animation_type);
     //LOG("%d : type %d, frame %d\n", this, this->animation_type, c_frame);
     switch( this->animation_type ) {
@@ -142,22 +142,22 @@ const QPixmap &AnimationSet::getFrame(Direction c_direction, size_t c_frame) con
     //LOG("    >>> %d\n", c_frame);
 
     //qDebug("get frame %d", c_frame);
-    return this->pixmaps[((int)c_direction)*n_frames + c_frame];
+    return this->pixmaps[c_dimension*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
     if( icon_width == 0 )
         icon_width = stride_x;
     if( icon_height == 0 )
         icon_height = stride_y;
     //qDebug("### %d x %d\n", icon_width, icon_height);
     vector<QPixmap> frames;
-    for(int i=0;i<N_DIRECTIONS;i++) {
+    for(int i=0;i<n_dimensions;i++) {
         for(size_t j=0;j<n_frames;j++) {
             frames.push_back( image.copy(stride_x*(x_offset+j) + icon_off_x, stride_y*i + icon_off_y, icon_width, icon_height));
         }
     }
-    AnimationSet *animation_set = new AnimationSet(animation_type, n_frames, frames);
+    AnimationSet *animation_set = new AnimationSet(animation_type, n_dimensions, n_frames, frames);
     return animation_set;
 }
 
@@ -168,11 +168,11 @@ AnimationLayer::~AnimationLayer() {
     }
 }
 
-AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x) {
-    if( image.height() % N_DIRECTIONS != 0 ) {
-        throw string("image height is not multiple of 8");
+AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions) {
+    if( image.height() % n_dimensions != 0 ) {
+        throw string("image height is not multiple of n_dimensions");
     }
-    int stride_x = image.height() / N_DIRECTIONS;
+    int stride_x = image.height() / n_dimensions;
     int stride_y = stride_x;
     if( expected_stride_x != stride_x ) {
         float ratio = ((float)stride_x)/(float)expected_stride_x;
@@ -187,20 +187,20 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     qDebug("    loaded image");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
-        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, stride_x, stride_y, animation_layer_definition.position, animation_layer_definition.n_frames, off_x, off_y, width, height);
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, stride_x, stride_y, animation_layer_definition.position, n_dimensions, animation_layer_definition.n_frames, off_x, off_y, width, height);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
     qDebug("    done");
     return layer;
 }
 
-AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x) {
+AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions) {
     QPixmap image = game_g->loadImage(filename.c_str());
-    return create(image, animation_layer_definitions, off_x, off_y, width, height, expected_stride_x);
+    return create(image, animation_layer_definitions, off_x, off_y, width, height, expected_stride_x, n_dimensions);
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
-    set_c_animation_name(false), c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0)
+    set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0)
 {
 }
 
@@ -245,7 +245,7 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     else {
         for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
             const AnimationSet *c_animation_set = *iter;
-            const QPixmap &pixmap = c_animation_set->getFrame(c_direction, c_frame);
+            const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
             painter->drawPixmap(0, 0, pixmap);
         }
     }
@@ -300,9 +300,9 @@ void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
     }
 }
 
-void AnimatedObject::setDirection(Direction c_direction) {
-    if( this->c_direction != c_direction ) {
-        this->c_direction = c_direction;
+void AnimatedObject::setDimension(unsigned int c_dimension) {
+    if( this->c_dimension != c_dimension ) {
+        this->c_dimension = c_dimension;
         //this->setFrame(0);
         this->update();
     }

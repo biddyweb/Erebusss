@@ -18,15 +18,3 @@ enum Difficulty {
     DIFFICULTY_HARD = 2,
     N_DIFFICULTIES = 3
 };
-
-enum Direction {
-    DIRECTION_W = 0,
-    DIRECTION_NW = 1,
-    DIRECTION_N = 2,
-    DIRECTION_NE = 3,
-    DIRECTION_E = 4,
-    DIRECTION_SE = 5,
-    DIRECTION_S = 6,
-    DIRECTION_SW = 7,
-    N_DIRECTIONS = 8
-};
