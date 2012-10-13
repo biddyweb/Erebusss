@@ -1845,14 +1845,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             height = 128;
                             expected_width = 128;
                         }
-                        /*QStringRef frame_xpos_s = reader.attributes().value("frame_xpos");
-                        QStringRef frame_ypos_s = reader.attributes().value("frame_ypos");
-                        QStringRef frame_width_s = reader.attributes().value("frame_width");
-                        QStringRef frame_height_s = reader.attributes().value("frame_height");
-                        float frame_xpos = parseFloat(frame_xpos_s.toString(), true);
-                        float frame_ypos = parseFloat(frame_ypos_s.toString(), true);
-                        float frame_width = parseFloat(frame_width_s.toString(), true);
-                        float frame_height = parseFloat(frame_height_s.toString(), true);*/
                         while( !reader.atEnd() && !reader.hasError() && !(reader.isEndElement() && reader.name() == "image") ) {
                             reader.readNext();
                             if( reader.isStartElement() )
@@ -1878,8 +1870,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                                         LOG("error at line %d\n", reader.lineNumber());
                                         throw string("npc has unknown animation type");
                                     }
-                                    //animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, xpos, ypos, width, height) );
-                                    //animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, frame_xpos, frame_ypos, frame_width, frame_height) );
                                     animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
                                 }
                                 else {
@@ -1888,8 +1878,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                                 }
                             }
                         }
-                        //this->animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString().c_str(), animation_layer_definition);
-                        //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, width, height, expected_width);
                         this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, expected_width);
                     }
                     else {
