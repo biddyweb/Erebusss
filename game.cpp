@@ -202,10 +202,6 @@ AnimationLayer *AnimationLayer::create(const string &filename, const vector<Anim
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
     set_c_animation_name(false), c_direction(DIRECTION_E), c_frame(0), animation_time_start_ms(0)
 {
-    for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
-        const AnimationSet *c_animation_set = *iter;
-        delete c_animation_set;
-    }
 }
 
 AnimatedObject::~AnimatedObject() {
