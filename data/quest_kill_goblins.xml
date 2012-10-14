@@ -37,7 +37,7 @@ these vermin, and you will be rewarded with 100 gold pieces!
 
 <scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
-<scenery name="Fire" image_name="campfire" x="14.0" y="3.0" w="1.0" h="1.0"/>
+<scenery name="Fire" image_name="fire" x="14.0" y="3.0" w="1.0" h="1.0" blockin="true"/>
 
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>

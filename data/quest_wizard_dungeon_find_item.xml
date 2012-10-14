@@ -823,7 +823,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -1324,7 +1324,7 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 <floor image_name="floor_paved"/>
 <background image_name="background_black"/>
 
-<!--<player_start x="20.0" y="20.0"/>-->
+<player_start x="20.0" y="20.0"/>
 
 <floorregion shape="rect" rect_x="18.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>
 
@@ -1429,6 +1429,8 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
         base_template="Long Sword" worth_bonus="300"
         />
 </scenery>
+
+<scenery name="Fire" image_name="fire" x="43.5" y="21.0" size="1.0" blocking="true"/>
 
 </location>
 
