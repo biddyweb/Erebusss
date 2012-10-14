@@ -1752,10 +1752,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     QString imagetype = imagetype_s.toString();
                     qDebug("image element type: %s name: %s imagetype: %s", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
                     QString filename;
-                    QString filename_opened;
                     QPixmap pixmap;
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
+                    int stride_x = 0;
                     if( imagetype_s.length() == 0 ) {
                         // load file
                         QStringRef filename_s = reader.attributes().value("filename");
@@ -1765,8 +1765,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         }
                         filename = filename_s.toString();
                         qDebug("    filename: %s", filename.toStdString().c_str());
-                        QStringRef filename_opened_s = reader.attributes().value("filename_opened");
-                        filename_opened = filename_opened_s.toString();
                         QStringRef xpos_s = reader.attributes().value("xpos");
                         QStringRef ypos_s = reader.attributes().value("ypos");
                         QStringRef width_s = reader.attributes().value("width");
@@ -1788,6 +1786,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                             else {
                                 expected_width = 128;
                             }
+                        }
+
+                        QStringRef stride_x_s = reader.attributes().value("stride_x");
+                        if( stride_x_s.length() > 0 ) {
+                            stride_x = parseInt(stride_x_s.toString());
+                        }
+                        else {
+                            stride_x = 128;
                         }
                         // image loaded later
                         /*QString filename_qt = ":/" + filename;
@@ -1903,16 +1909,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         if( animation_layer_definition.size() > 0 ) {
                             //qDebug("create scenery_animation_layers: %s", name.toStdString().c_str());
                             //this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, 64, 72, 64, 72, 1);
-                            this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, width, height, expected_width, 1);
+                            this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
                         }
                         else {
                             this->scenery_images[name.toStdString()] = pixmap;
-                            if( imagetype.length() == 0 && filename_opened.length() != 0 ) {
-                                // n.b., opened image can only be specified for loading images, and with no animations
-                                QString filename_opened_qt = ":/" + filename_opened;
-                                qDebug("load opened image: %s", filename_opened_qt.toStdString().c_str());
-                                this->scenery_opened_images[name.toStdString()] = game_g->loadImage(filename_opened_qt.toStdString().c_str(), clip, xpos, ypos, width, height, expected_width);
-                            }
                         }
                     }
                     /*else if( type == "npc_static" ) {
@@ -1921,7 +1921,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     else if( type == "npc" ) {
                         if( animation_layer_definition.size() > 0 ) {
                             //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, expected_width, expected_width, N_DIRECTIONS);
-                            this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, 128, 128, expected_width, N_DIRECTIONS);
+                            this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
                         }
                         else {
                             this->npc_static_images[name.toStdString()] = pixmap;
@@ -3436,9 +3436,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( confirm_text_s.length() > 0 ) {
                         scenery->setConfirmText(confirm_text_s.toString().toStdString());
                     }
-                    map<string, QPixmap>::iterator opened_image_iter = this->scenery_opened_images.find(scenery->getImageName());
-                    if( opened_image_iter != this->scenery_opened_images.end() ) {
-                        scenery->setCanBeOpened(true);
+                    if( is_animation ) {
+                        map<string, AnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
+                        if( animation_iter != this->scenery_animation_layers.end() ) {
+                            const AnimationLayer *animation_layer = animation_iter->second;
+                            if( animation_layer->getAnimationSet("opened") != NULL ) {
+                                scenery->setCanBeOpened(true);
+                            }
+                        }
                     }
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
@@ -3665,35 +3670,32 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
 }
 
 void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
+    //qDebug("### update for: %s", scenery->getName().c_str());
     //AnimatedObject *object = new AnimatedObject();
     //this->characterUpdateGraphics(character, object);
     if( scenery->isAnimation() ) {
+        //qDebug("animation");
         AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData());
         object->clearAnimationLayers();
         //qDebug("update scenery: %s", scenery->getName().c_str());
         object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()] );
+        if( scenery->isOpened() ) {
+            object->setAnimationSet("opened", true);
+        }
+        else {
+            object->setAnimationSet("", true);
+        }
     }
     else {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         if( object != NULL ) {
-            bool done = false;
-            if( scenery->isOpened() ) {
-                map<string, QPixmap>::iterator image_iter = this->scenery_opened_images.find(scenery->getImageName());
-                if( image_iter != this->scenery_opened_images.end() ) {
-                    done = true;
-                    object->setPixmap( image_iter->second );
-                }
+            map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName());
+            if( image_iter == this->scenery_images.end() ) {
+                LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
+                LOG("    image name: %s\n", scenery->getImageName().c_str());
+                throw string("Failed to find scenery's image");
             }
-            if( !done ) {
-                map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName());
-                if( image_iter == this->scenery_images.end() ) {
-                    LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
-                    LOG("    image name: %s\n", scenery->getImageName().c_str());
-                    throw string("Failed to find scenery's image");
-                }
-                done = true;
-                object->setPixmap( image_iter->second );
-            }
+            object->setPixmap( image_iter->second );
             object->update();
         }
     }

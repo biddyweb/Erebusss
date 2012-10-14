@@ -16,11 +16,8 @@
         <file>data/items.xml</file>
         <file>data/images.xml</file>
         <file>gfx/textures/scenery/barrel.png</file>
-        <file>gfx/textures/scenery/barrel_opened.png</file>
         <file>gfx/textures/scenery/chest.png</file>
-        <file>gfx/textures/scenery/chest_opened.png</file>
         <file>gfx/textures/scenery/crate.png</file>
-        <file>gfx/textures/scenery/crate_opened.png</file>
         <file>data/npcs.xml</file>
         <file>gfx/textures/npcs/goblin.png</file>
         <file>gfx/textures/npcs/orc_regular_0.png</file>

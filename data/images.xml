@@ -61,18 +61,21 @@
 <image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
-<image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png"
-    filename_opened="gfx/textures/scenery/barrel_opened.png"
-    />
+<image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png" width="64" height="64" stride_x="64" expected_width="128">
+    <animation name="" start="0" length="1" type="loop"/>
+    <animation name="opened" start="1" length="1" type="loop"/>
+</image>
 <image type="scenery" name="chest" filename="gfx/textures/scenery/chest.png"
-    filename_opened="gfx/textures/scenery/chest_opened.png"
-    xpos="6" ypos="2" width="52" height="52" expected_width="64"
-    />
-<image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png"
-    filename_opened="gfx/textures/scenery/crate_opened.png"
-    />
+    xpos="6" ypos="2" width="52" height="52" stride_x="64" expected_width="128">
+    <animation name="" start="0" length="1" type="loop"/>
+    <animation name="opened" start="1" length="1" type="loop"/>
+</image>
+<image type="scenery" name="crate" filename="gfx/textures/scenery/crate.png" width="64" height="64" stride_x="64" expected_width="128">
+    <animation name="" start="0" length="1" type="loop"/>
+    <animation name="opened" start="1" length="1" type="loop"/>
+</image>
 
-<image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" expected_width="512">
+<image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
 </image>
 
