@@ -17,8 +17,8 @@ using std::swap;
 #include <cassert>
 #endif
 
-Scenery::Scenery(const string &name, const string &image_name, float width, float height) :
-    location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
+Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height) :
+    location(NULL), name(name), image_name(image_name), is_animation(is_animation), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), width(width), height(height),
     action_last_time(0), action_delay(0), action_value(0),
     interact_state(0),

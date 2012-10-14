@@ -91,5 +91,6 @@
         <file>gfx/textures/scenery/stairsup_indoors.png</file>
         <file>gfx/textures/items/clockwork.png</file>
         <file>gfx/textures/npcs/minotaur.png</file>
+        <file>gfx/textures/scenery/fire.png</file>
     </qresource>
 </RCC>

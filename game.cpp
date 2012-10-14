@@ -168,18 +168,23 @@ AnimationLayer::~AnimationLayer() {
     }
 }
 
-AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions) {
+AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
     if( image.height() % n_dimensions != 0 ) {
         throw string("image height is not multiple of n_dimensions");
     }
-    int stride_x = image.height() / n_dimensions;
-    int stride_y = stride_x;
-    if( expected_stride_x != stride_x ) {
-        float ratio = ((float)stride_x)/(float)expected_stride_x;
+    //int stride_x = expected_stride_x;
+    //int stride_y = image.height() / n_dimensions;
+    //if( expected_stride_y != stride_y ) {
+    if( expected_total_width != image.width() ) {
+        //float ratio = ((float)stride_y)/(float)expected_stride_y;
+        float ratio = ((float)image.width())/(float)expected_total_width;
         width *= ratio;
         height *= ratio;
         off_x *= ratio;
         off_y *= ratio;
+        stride_x *= ratio;
+        stride_y *= ratio;
+        qDebug("ratio: %f\n", ratio);
     }
     AnimationLayer *layer = new AnimationLayer(width, height);
     /*LOG("AnimationLayer::create: %s\n", filename);
@@ -194,9 +199,10 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     return layer;
 }
 
-AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions) {
+AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
     QPixmap image = game_g->loadImage(filename.c_str());
-    return create(image, animation_layer_definitions, off_x, off_y, width, height, expected_stride_x, n_dimensions);
+    //return create(image, animation_layer_definitions, off_x, off_y, width, height, expected_stride_x, expected_stride_y, n_dimensions);
+    return create(image, animation_layer_definitions, off_x, off_y, width, height,stride_x, stride_y, expected_total_width, n_dimensions);
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
@@ -680,6 +686,7 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     // need to use QImageReader - QPixmap::load doesn't work on large images on Symbian!
     QImageReader reader(filename.c_str());
     if( clip ) {
+        //qDebug("clipping");
         int actual_width = reader.size().width();
         if( actual_width != expected_width ) {
             float ratio = ((float)actual_width)/(float)expected_width;
@@ -705,6 +712,8 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     QPixmap pixmap = QPixmap::fromImageReader(&reader);
     if( pixmap.isNull() ) {
         LOG("failed to convert image to pixmap: %s\n", filename.c_str());
+        LOG("image reader error: %d\n", reader.error());
+        LOG("image reader error string: %s\n", reader.errorString().toStdString().c_str());
         throw string("Failed to convert image to pixmap");
     }
     return pixmap;

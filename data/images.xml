@@ -72,6 +72,10 @@
     filename_opened="gfx/textures/scenery/crate_opened.png"
     />
 
+<image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" expected_width="512">
+    <animation name="" start="0" length="8" type="loop"/>
+</image>
+
 <!--<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>-->
 <image type="scenery" name="door_wood" imagetype="perlin" max_red="150" max_green="75" max_blue="0" min_red="40" min_green="20" min_blue="0"/>
 <image type="scenery" name="door_metal" imagetype="perlin" max_red="150" max_green="150" max_blue="150" min_red="40" min_green="40" min_blue="40"/>
@@ -83,7 +87,7 @@
 <image type="scenery" name="tile_black" imagetype="perlin" max_red="32" max_green="32" max_blue="32" min_red="0" min_green="0" min_blue="0"/>
 <image type="scenery" name="tile_white" imagetype="perlin" max_red="255" max_green="255" max_blue="255" min_red="160" min_green="160" min_blue="160"/>
 
-<image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+<image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="6144">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="20" length="3" type="single"/>
@@ -96,7 +100,7 @@
     <animation name="attack" start="20" length="3" type="single"/>
     <animation name="death" start="34" length="6" type="single"/>
 </image>-->
-<image type="npc" name="orc" filename="gfx/textures/npcs/orc_regular_0.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+<image type="npc" name="orc" filename="gfx/textures/npcs/orc_regular_0.png" xpos="32" ypos="40" width="64" height="64" expected_width="4096">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
@@ -104,20 +108,20 @@
     <animation name="death" start="20" length="4" type="single"/>
 </image>
 
-<image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="128">
+<image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="8192">
     <animation name="" start="0" length="8" type="loop"/>
     <animation name="run" start="8" length="8" type="loop"/>
     <animation name="attack" start="16" length="8" type="single"/>
     <animation name="death" start="48" length="8" type="single"/>
 </image>
-<image type="npc" name="wyvern" filename="gfx/textures/npcs/wyvern.png" xpos="0" ypos="0" width="128" height="128" expected_width="128">
+<image type="npc" name="wyvern" filename="gfx/textures/npcs/wyvern.png" expected_width="7168">
     <animation name="" start="0" length="8" type="loop"/>
     <animation name="run" start="8" length="8" type="loop"/>
     <animation name="attack" start="16" length="8" type="single"/>
     <animation name="death" start="48" length="8" type="single"/>
 </image>
 
-<image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
+<image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="5632">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
@@ -125,10 +129,10 @@
     <!--<animation name="death" start="22" length="6" type="single"/>-->
     <animation name="death" start="28" length="8" type="single"/>
 </image>
-<image type="npc_static" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
+<image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
 
-<image type="npc_static" name="man" filename="gfx/textures/npcs/man.png"/>
-<image type="npc_static" name="peasant_man" filename="gfx/textures/npcs/peasant_man.png"/>
-<image type="npc_static" name="peasant_woman" filename="gfx/textures/npcs/peasant_woman.png"/>
+<image type="npc" name="man" filename="gfx/textures/npcs/man.png"/>
+<image type="npc" name="peasant_man" filename="gfx/textures/npcs/peasant_man.png"/>
+<image type="npc" name="peasant_woman" filename="gfx/textures/npcs/peasant_woman.png"/>
 
 </images>

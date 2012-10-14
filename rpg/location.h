@@ -44,6 +44,7 @@ protected:
     Location *location; // not saved
     string name;
     string image_name;
+    bool is_animation; // not saved
     Vector2D pos; // pos in Location (for centre)
     void *user_data_gfx; // not saved
 
@@ -77,7 +78,7 @@ protected:
     string popup_text; // not saved at the moment
 
 public:
-    Scenery(const string &name, const string &image_name, float width, float height);
+    Scenery(const string &name, const string &image_name, bool is_animation, float width, float height);
     virtual ~Scenery() {
     }
 
@@ -101,6 +102,9 @@ public:
     }
     string getImageName() const {
         return this->image_name;
+    }
+    bool isAnimation() const {
+        return this->is_animation;
     }
     void setUserGfxData(void *user_data_gfx) {
         this->user_data_gfx = user_data_gfx;

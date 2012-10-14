@@ -111,6 +111,9 @@ public:
     AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length n_dimensions * n_frames
     virtual ~AnimationSet();
 
+    unsigned int getNDimensions() const {
+        return this->n_dimensions;
+    }
     size_t getNFrames() const {
         return this->n_frames;
     }
@@ -165,8 +168,8 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int expected_stride_x, unsigned int n_dimensions);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
 };
 
 class AnimatedObject : public QGraphicsItem {
