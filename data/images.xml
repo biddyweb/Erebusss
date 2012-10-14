@@ -58,7 +58,9 @@
 <image type="scenery" name="stairsdown_outdoors" filename="gfx/textures/scenery/stairsdown_outdoors.png"/>
 <image type="scenery" name="stairsdown_indoors" filename="gfx/textures/scenery/stairsdown_indoors.png"/>
 <image type="scenery" name="stairsup_indoors" filename="gfx/textures/scenery/stairsup_indoors.png"/>
-<image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png"/>
+<image type="scenery" name="teleport" filename="gfx/textures/scenery/teleport.png" width="358" height="196" stride_x="358" expected_width="1432">
+    <animation name="" start="0" length="4" type="loop"/>
+</image>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 
 <image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png" width="64" height="64" stride_x="64" expected_width="128">
@@ -77,6 +79,10 @@
 
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
+</image>
+
+<image type="scenery" name="tree2" filename="gfx/textures/scenery/tree2.png" width="144" height="130" stride_x="144" expected_width="576">
+    <animation name="" start="0" length="4" type="loop"/>
 </image>
 
 <!--<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>-->

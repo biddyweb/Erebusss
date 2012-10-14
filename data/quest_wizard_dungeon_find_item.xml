@@ -823,7 +823,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<!--<player_start x="25.0" y="25.0"/>-->
+<player_start x="25.0" y="25.0"/>
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -839,6 +839,12 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 <scenery name="Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true"/>
 
 <scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="5.0" exit_location_y="28.0"/>
+
+<scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="27.0" y="33.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="3.0"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="22.0" y="23.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1324,7 +1330,7 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 <floor image_name="floor_paved"/>
 <background image_name="background_black"/>
 
-<player_start x="20.0" y="20.0"/>
+<!--<player_start x="20.0" y="20.0"/>-->
 
 <floorregion shape="rect" rect_x="18.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>
 

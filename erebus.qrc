@@ -89,5 +89,6 @@
         <file>gfx/textures/items/clockwork.png</file>
         <file>gfx/textures/npcs/minotaur.png</file>
         <file>gfx/textures/scenery/fire.png</file>
+        <file>gfx/textures/scenery/tree2.png</file>
     </qresource>
 </RCC>
