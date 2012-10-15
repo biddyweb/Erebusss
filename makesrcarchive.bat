@@ -9,7 +9,6 @@ copy %src%\makesrcarchive.bat %dst%
 copy %src%\makesymbianfolder.bat %dst%
 copy %src%\makeandroidfolder.bat %dst%
 copy %src%\erebus_source.txt %dst%
-copy %src%\erebus.html %dst%
 
 copy %src%\erebus.pro %dst%
 copy %src%\deployment.pri %dst%
@@ -17,8 +16,6 @@ copy %src%\erebus.qrc %dst%
 copy %src%\erebus.ico %dst%
 copy %src%\resource.rc %dst%
 copy %src%\erebus.svg %dst%
-
-copy %src%\gpl.txt %dst%
 
 copy %src%\game.cpp %dst%
 copy %src%\gamestate.cpp %dst%
@@ -55,6 +52,9 @@ copy %src%\rpg\location.h %dst%\rpg
 copy %src%\rpg\utils.h %dst%\rpg
 
 REM also copy data folders, as Linux users won't have downloaded the Windows binary archive!
+
+mkdir %dst%\docs\
+copy %src%\docs\ %dst%\docs\
 
 mkdir %dst%\data\
 copy %src%\data\ %dst%\data\

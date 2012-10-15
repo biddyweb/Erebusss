@@ -1,0 +1,4 @@
+http://opengameart.org/content/flare
+
+Also see that already downloaded to Vision3_content in flarecompatible/ folder.
+

@@ -587,7 +587,7 @@ void Game::update() {
                 StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
-                string qt_filename = ":/" + c_quest_info.getFilename();
+                string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
                 playing_gamestate->loadQuest(qt_filename, false);
                 this->getScreen()->getMainWindow()->unsetCursor();
                 break;

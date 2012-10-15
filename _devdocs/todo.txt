@@ -1,0 +1,558 @@
+We need to switch to not using resource files - starting to do with for gfx.
+This is because it no longer compiles on Necessitas or Symbian (even with lores) with the Minotaur (and other, for Symbian) graphics.
+
+>>> 0.2 HIGH * Needs testing on Android and Symbian.
+
+== Roadmap ==
+
+* Prototype showing basic engine with player movement (including collision
+  detection, pathfinding), AI, being able to attack, kill and be killed.
+  The idea being a prototype to show if such a game is technically feasible
+  and within my abilities.
+* Prototype showing basic playable version: combat, items (including different
+  weapons, as well as ranged combat with line-of-sight), win condition for the
+  quest. The focus should be on making something that's fun to play asap
+  (to avoid the risk that we spend ages programming something, which then ends
+  up being boring to play, no matter what features we try to add to it).
+
+0.1 Will be source code and Windows binary only, unadvertised.
+
+0.2(?) Will be Windows binary with Linux source compile support, advertised on Freecode and Open Game Art.
+
+1.0 Full release all platforms.
+
+Initial releases for Windows, Linux and Symbian will be on my webpage and via
+Freecode, but not on Ovi store. Also advertise on OGA. Idea is to get some
+initial feedback, without launching an unfinished version on Ovi (where we have
+risk of getting poor reviews if we release too early, which would adversely
+affect future rating even if improved versions are released!)
+
+First release on Ovi doesn't have to be the finished version, but should be a
+fully playable version with all the basic important features implemented, and
+with a few quests supplied. Future versions will add features to make it
+better, and more quests to extend the playtime length. First Ovi release will
+be numbered as version 1.0.
+
+HIGH * Maybe upload earlier Android versions to http://f-droid.org store - this doesn't have ratings (so don't have to worry about negative
+responses on early versions), and is geared towards open source, so more likely to find people interested in this?
+
+HIGH * Keep track of memory usage, especially on Symbian!:
+With memory leak fix, on 20120818:
+-> Symbian memory free:
+-> 40.5MB on main menu
+-> 10.7MB when starting first quest
+-> 37.9MB upon return to main menu.
+With memory leak fix, on 20120821:
+-> Windows memory in use:
+-> 18760K on main menu
+-> 90852K when starting first quest
+-> 29784K upon return to main menu
+-> Android memory in use:
+-> 53MB on main menu
+-> 166MB when starting first quest
+-> 54MB upon return to main menu
+With cropped graphics, on 20120824:
+-> Windows memory in use:
+-> 18116K on main menu
+-> 62328K when starting first quest
+-> 23272K upon return to main menu
+-> Android memory in use:
+-> 50MB on main menu
+-> 83MB when starting first quest
+-> 55MB upon return to main menu
+-> Symbian memory free:
+-> 43.5MB before starting
+-> 35.9MB on main menu
+-> 24.5MB when starting first quest
+-> 32.9MB upon return to main menu
+With removal of ranged animation, on 20120829:
+-> Windows memory in use:
+-> 18704K on main menu
+-> 60836K when starting first quest
+-> 27704K upon return to main menu
+-> Android memory in use:
+-> 50MB on main menu
+-> 81MB when starting first quest
+-> 55MB upon return to main menu
+-> Symbian memory free:
+-> 37.0MB before starting
+-> 31.0MB on main menu
+-> 26.3MB when starting first quest
+-> 28.3MB upon return to main menu
+
+== Bugs ==
+
+>>> 0.2 HIGH * HTMLViews don't have wordwrap on Android!
+MEDIUM * Buttons seem grayed out on Ubuntu?
+HIGH * Scrolling by moving mouse to size of screen doesn't work in Ubuntu, at least in VM.
+INFO * Symbian now fails to compile with high resolution graphics (both on netbook and laptop), problem that resource file is too large? This could be a problem when even the low resolution graphics become too large! See http://www.developer.nokia.com/Community/Discussion/showthread.php?196978-section-.rodata-00109a80-gt-0066b807-overlaps-section-.data-00400000-gt-00400003
+1.0 HIGH * Does Symbian work better, or use less memory, if we don't store images in rc?
+MEDIUM * Sometimes (in the large room with mushrooms etc at least) enemies and/or player don't hit each other, even though they're right next to each other?!
+MEDIUM * On Symbian phone, problem that we move the view even with just a touch? The drag tolerance means we can still click, but does seem a bit annoying behaviour still.
+
+== General ==
+
+HIGH * Is memory usage reduced on Symbian if we don't use CacheBackground? (Though check effect on performance - on Android it can make frame rate twice as fast!)
+>>> 0.2 HIGH * Documentation about options, lighting effects, with note to disable if too slow.
+>>> 0.2 HIGH * Test speed with lighting effects on netbook.
+1.0 HIGH * Visibility of scenery shouldn't depend on visibility of floor regions, but should be done directly, as with NPCs? Fix problems of door visibility.
+HIGH * Display message on startup, warning that it's a beta version, for now?
+LOW * Display message when no save games available to load?
+MEDIUM * has_destination, is_dead should be absorbed into a action enum state, with a single int for time of that state? Setting these states should also set the animation types.
+1.0 HIGH * where is log file stored on Symbian and Android? Android should make special folder, similar to Gigalomania?
+-> Note that on Windows, it's stored in %LOCALAPPDATA% - can we make it in %APPDATA% instead (though only if it's one of the Qt standard paths)?
+1.0 HIGH * Android version should make special folder for save game files, like Gigalomania, so they aren't deleted on reinstall? Or is there a better way to do this for Android?
+-> http://stackoverflow.com/questions/3673410/android-possible-to-preserve-data-when-upgrading-app claims that user data isn't deleted on upgrade, only uninstall - so probably okay as it is, though I have problem with testing that deploying a new version does an uninstall first.
+-> it would still be useful to save elsewhere though, in case users need to send me a save game file for debugging.
+1.0 HIGH * should only load images needed for a particular quest, to reduce
+memory requirements and loading times.
+-> And one-off images like for popup window should be loaded and deleted on the fly.
+HIGH * More scenery interaction should be defined in xml? This would allow one effect of Shrine to be to receive an object.
+HIGH * Autosave option, and autosave on idle, and change location?
+-> Done for idle.
+HIGH * Allow player to enter name, or select a random predefined one? Character generation, and/or a choice of pre-defined characters.
+>>> 0.2 HIGH * In-game donate link option?
+
+== RPG ==
+
+>>> 0.2 HIGH * Do we give quest reward (e.g., 100gp)?
+1.0 HIGH * Wandering monsters (defined per-location) - random chance of attacked, when resting.
+-> Needs code to be able to find a nearby free location to place monster.
+-> Allow multiple to be defined, with one picked at random.
+MEDIUM * Make gold in current location disappear if left on ground, if player rests? Though need to be careful about if we intentionally want to have gold lying round?
+HIGH * Luck?
+MEDIUM * Fatigue?
+MEDIUM * Should we subdivide the floor regions into smaller tiles, to help with fog of war?
+MEDIUM * Allow graphic images for scenery to be larger than the actual scenery size? Useful for things like chests (or for more extreme example, things like trees or pillars).
+MEDIUM * Journal - add more to it!
+HIGH * Spells?
+-> Display particle system when casting a spell.
+-> Display graphic for firing attack spell, which also means taking time for the spell to hit (as well as the casting time) rather than it being instant.
+--> Then use similar code for a delay in ranged attacks, even if we aren't displaying a graphic? Or maybe we should add the code for drawing arrows too?
+-> Improve AI for picking a spell to cast.
+MEDIUM * Magic system for player as well as enemies.
+HIGH * different kinds of arrows etc - requires us to use a separate string for the key, to allow us to give them different names, but still to recognise them all as being types of arrows.
+-> Also needs user to be able to select a preference for which kind of ammo to use.
+MEDIUM * choice of items to pick up when multiple.
+HIGH * Improved stats/combat rules/etc
+-> Do FP modifiers for weapons.
+-> multiple attacks - or rather different attack rates? We probably want to keep things to integer ratios though, to make things easier to compare.
+-> Do we need to tweak things? E.g., both player and NPCs die quickly at the moment.
+-> What will happen at higher experience levels? We can increase FP in line with NPC increases, so on average the hit rates remain level. But damage is indicated by weapons, so can only increase as player finds better (magical) weapons.
+--> One way round this is that NPC weapons should start rubbish, and gradually increase, to mirror an increase in the Player's End. But NPC End shouldn't increase so dramatically - otherwise things will either be quick to kill in lower levels, or take ages to kill at later levels.
+--> Another way round this is that at lower levels, the Player and NPC hardly ever hit. E.g., by saying that the roll also has to be >= 14 in order to count as a hit.
+HIGH * Trap difficulty to affect dexterity roll.
+HIGH * Trap rating to add extra damage.
+MEDIUM * more weapons?
+-> Be careful of memory usage on Symbian Nokia 5800, due to adding in extra animations.
+->  Add spear and staff (both should use "staff" animation layer) (though Goblin should still not have this as an actual weapon, as would just be annoying to have lots of weapons that are mostly useless to the player).
+MEDIUM * throwing weapons?
+MEDIUM * range for ranged weapons
+MEDIUM * display moving image for ammo?
+MEDIUM * merging and splitting of ammo items?
+HIGH * more potions, e.g., ones that give bonus for a certain time.
+MEDIUM * weight of longbow?
+HIGH * Note about how long we rest for (and maybe have some concept of time in general?)
+-> Time should also note when leaving the dungeon to rest, buy items, train.
+MEDIUM * At the moment, scenery can either block or not block for movement, but all allow us to see through (for fog of war tests) and fire arrows through. Conceivably we also want:
+-> Types that block movement and visibility/firing arrows (e.g., large furniture).
+-> This should be implemented with Scenery methods that ask whether it blocks, etc, so that we can use an enum internally, but potentially make this more general in future.
+-> Do we want types that allow movement but block visibility? Probably - but we need to be careful: we still need to create boundaries for the purposes of line of sight checking, but we need to make sure these are ignored when creating the path way points?
+-> Probably best to block for now - keep the options as separate enums so it can be in principle allowed, but throw an error.
+HIGH * Training, or XP levels?
+HIGH * More text for win screen.
+MEDIUM * Don't reveal value of gems unless successful Gem Lore roll, when skills added.
+
+Monsters list:
+- Goblin (done)
+- Goblin Champion (done)
+- Orc
+- Orc Champion
+- Hobgoblin (use same gfx as goblin, but larger size?)
+- Skeleton
+- Zombie (done)
+-> random chance of disease, can be healed by potion or between adventures?
+- Mummy
+- Shadow (done)
+- Lesser Wraith
+-> should have chance of paralyse on hit?
+- Greater Wraith
+-> should have chance of paralyse on hit?
+- Demons?
+- Spider
+-> random chance of poison - repeatedly causes damage, for a period of time (fairly short, mainly for the duration of the combat)
+
+Traps list:
+- Arrow (done), causes damage of an arrow + rating value.
+- Poison darts (done), causes (rating+1)*D12 damage + rating value, no chance to avoid.
+- Mantrap (done), causes 4D12+rating damage (shield no help).
+- Explosion (done), causes instant death, no chance to avoid.
+- Poisonous gas (done), that paralyses for several seconds, no chance to avoid.
+- Acid (done), that causes 4D20+rating damage (armour no help), no chance to avoid. If player has a shield, then the shield is destroyed instead.
+
+== Testing ==
+
+HIGH * Tests for pathfinding.
+HIGH * Tests for intersection sweep test.
+HIGH * Performance tests for the above.
+HIGH * Tests for load/saving games, including:
+-> Journal containing <> characters (i.e., invalid XML).
+
+== Graphics ==
+
+1.0 HIGH * "Space" level should show bricks alongside the "lower" side of the floor regions, to give a more 3D look.
+HIGH * Bones/Skeleton clutter from Flare (dungeon tileset, in Flare 17.1)?
+1.0 HIGH * More floor graphics?
+-> http://opengameart.org/content/metalstone-textures
+-> http://opengameart.org/content/pietextureset
+HIGH * Replace all scenery objects with AnimatedObject, using static_image for the non-animated ones.
+HIGH * Don't need AnimatedObjected static_image as a separate thing, can just do as an animation with 1 dimension and 1 frame now?
+MEDIUM * Add more animation graphics from FLARE (clothing, male/female, weapons) when we drop Symbian port.
+HIGH * Display a particle system effect when attacked by Shadow?
+HIGH * Anything we can use from http://andorstrail.com/ ( http://code.google.com/p/andors-trail/ , http://f-droid.org/repository/browse/?fdcategory=Games&fdid=com.gpl.rpg.AndorsTrail&fdpage=1 )
+-> no good for animations (there are none!), but maybe for the static graphics?
+LOW * Use the animation for the static_image NPCs?
+LOW * is it worth having different graphics for the different armour types? Probably not, due to memory limits on mobiles.
+HIGH * Have a bouncing up-and-down for the Shadow (for static image NPCs, at least).
+HIGH * Specify player animation images in xml.
+MEDIUM * Should walls be drawn to not be top-down, but slanted, to be consistent with the main sprites?
+1.0 HIGH * Picture for when player completes quest? And completes all quests? And more?
+Walking man at http://forums.gibberlings3.net/index.php?showtopic=20190&st=0&p=200518&#entry200518 / http://forum.freegamedev.net/viewtopic.php?f=6&t=3013 ?
+HIGH * Fix non-soft shadows on the containers.
+
+NPC Shaman: http://commons.wikimedia.org/wiki/File:Elvish-shaman.png
+NPC Ghost: http://commons.wikimedia.org/wiki/File:Undead-ghost.png
+NPC Wizard: http://opengameart.org/content/wizard-0
+NPC Treeman: http://opengameart.org/content/treeman
+NPC Goggles man: http://opengameart.org/content/mysterious-man
+NPC Woman: http://opengameart.org/content/red-saga
+
+Item cup (use the 2D preview): http://opengameart.org/content/cup
+Item mug (use the 2D preview): http://opengameart.org/content/ceramic-bear-mug
+Item jar (use the 2D preview): http://opengameart.org/content/netted-jar
+Item cultery/dinnerware (use the 2D preview): http://opengameart.org/content/dinnerware
+
+Scenery well (use the 2D preview): http://opengameart.org/content/covered-well
+-> or http://opengameart.org/content/wishing-well
+
+Torches
+
+http://opengameart.org/content/fortress-backgroundstoryboard-image or http://opengameart.org/content/oil-painting-landscapes ?
+http://opengameart.org/content/miscellaneous-concept-art ?
+http://opengameart.org/content/12-medieval-signs ?
+
+Stairs with carpet: http://opengameart.org/content/variation-on-cbs-dungeon-stairs
+
+http://commons.wikimedia.org/wiki/Category:Sprites ?
+
+Infinity Engine mods?
+http://www.gemrb.org/wiki/doku.php?id=newgame:newgame
+http://www.shsforums.net/forum/389-modding/
+
+http://www.vassalengine.org mods?
+
+Any data for http://en.wikipedia.org/wiki/WorldForge ?
+Widelands?
+
+Cards from http://wtactics.org/ ?
+
+Scrolls - http://opengameart.org/content/elemental-scrolls
+Bed - http://opengameart.org/content/bed-low-poly
+
+http://openclipart.org/ ?
+
+Tent, fire - http://opengameart.org/content/coastal-tent-buildings-and-animated-signal-fire-unknown-horizons-2d
+Tents - http://opengameart.org/content/tents-hunter-lumberjack-pavilion-storage-unknown-horizons-2d
+
+Table - http://opengameart.org/content/table-and-chair-set
+
+http://www.allacrost.org ?
+-> Downloaded; nothing particularly obvious of use.
+
+Any from Battle for Wesnoth, including enemies/NPCs we can use with static images?
+
+Pics from http://opengameart.org/content/wtactics to use as paintings that can be viewed?
+
+See games at http://libregamewiki.org/List_of_games / http://libregamewiki.org/Category:Role-playing_games ?:
+
+https://github.com/frusen/Dawn/wiki
+-> Downloaded.
+-> Plenty to use! Including NPC/enemy animations, though need to convert into a single image file.
+-> Use: Stones
+
+Anything from http://opengameart.org/content/dungeon-crawl-32x32-tiles ?
+
+== Sound effects ==
+
+All sound effects should be Wav, PCM Signed 16-bit mono.
+
+MEDIUM * in-game background music should loop! (discordance.ogg)
+1.0 HIGH * Sound for Android (Open SLES? Will require Android 2.3, but this is okay.)
+-> See https://groups.google.com/forum/#!topic/android-qt/_88gI8H1IAM and http://mobilepearls.com/labs/native-android-api/opensles/index.html
+-> http://audioprograming.wordpress.com/2012/03/03/android-audio-streaming-with-opensl-es-and-the-ndk/
+-> If we release without this, make sure we disable the sound option on Android!
+-> Also see code from https://groups.google.com/forum/?fromgroups#!topic/android-qt/rpPa_W6PF1Y ?
+HIGH * Sound enabled option should also be available in game too.
+
+DONE * drinking potions
+DONE * combat: taking a swing
+HIGH * combat: being hit
+-> pain1.wav, but what about female/NPCs/monsters? See FLARE?
+MEDIUM * something different firing ranged weapons? Using same as hand-to-hand combat for now.
+DONE * setting off traps
+HIGH * picking up or dropping items?
+DONE * picking up money.
+DONE * arming a weapon.
+DONE * putting on armour.
+DONE * opening containers
+HIGH * walking? http://opengameart.org/content/footsteps-leather-cloth-armor ? Or what did we use for Dungeon?
+-> or foot3.wav from Conquests? Or see FLARE?
+-> need to fix looping problem!
+DONE * opening journal.
+DONE * opening doors.
+DONE * unlocking doors (and containers when we support that).
+MEDIUM * eating (e.g., mushrooms)
+MEDIUM * see what sound effects FLARE has?
+HIGH * sound effects and music should be defined in xml?
+HIGH * music? See:
+background (bit annoying?) - http://opengameart.org/content/searching
+DONE background (good) - http://opengameart.org/content/discordance
+background (bit too distracting?) - http://opengameart.org/content/temple-of-the-maker
+background (good if we have non-dungeon scenes?) - http://opengameart.org/content/radakan-mist-forest
+DONE music for intro/character generation/campaign windows? - http://opengameart.org/content/no-more-magic
+MEDIUM * Using teleports.
+MEDIUM * Going through the "mirror" door (broken glass effect).
+
+== User interface ==
+
+MEDIUM * More tooltips?
+HIGH * Double-click to zoom in or out to pre-defined zoom levels?
+MEDIUM * Buttons have white text on Symbian, when they should be black!
+MEDIUM * Code to position the text below to avoid overwriting also shouldn't move it off-screen!
+MEDIUM * Kinetic scrolling would be nice for items list.
+MEDIUM * "kinetic"-like scroll for drag on html views?
+HIGH * Hard to select moving enemies to hit with ranged weapons? Maybe have an auto fire-at-will?
+-> similarly, if we are blocked by an enemy, switch to hitting them instead?
+MEDIUM * Improve stats window.
+MEDIUM * Better choice of font?
+MEDIUM * On phone, can we make all side buttons the same width, even when using Fixed?
+
+== Movement ==
+
+HIGH * no need to include concave corners for way points on outer boundary.
+HIGH * test cope with wall corners less than 90 degrees, and greater than 270 degrees.
+-> for path finding, we need two points inserted on the greater than 270 degree corners.
+HIGH * way of getting round dynamic obstacles (i.e., enemies)? Something simpler than Dijkstra's, e.g., a local method?
+-> Similarly, to help multiple enemies attack the player all at once, rather than getting stuck behind each other?
+MEDIUM * Should it be possible for user to click to move to a place not yet revealed/explored?
+HIGH * Can we speed up intersection sweep test by spotting that we don't need to do anything if start and end are in same floor region? (Do after we have performance tests.)
+
+== AI ==
+
+HIGH * For NPCs, should have code to select best weapon (including making sure we have ammo, and seeing if a non-ranged weapon is better if player is within hit range) before deciding to hit
+-> For has_hit state, is_ranged flag must be stored, rather dependent on current weapon!
+HIGH * Ranged weapons should be modelled like we would for spells - we should model the moving ammo (even if it isn't drawn), and the time to hit depends on the speed and distance, but is independent of the time to reload
+-> Though both with spells and ranged weapons, we want a period before the spell is cast or the weapon is fired, which can be done similarly to the hitting code
+HIGH * NPCs should drink any potions they have, at appropriate times.
+
+== Performance ==
+
+>>> 0.2 HIGH * Can we get better performance by reducing QPainter setOpacity calls, e.g., use alpha channel directly - see http://techbase.kde.org/Development/Tutorials/Graphics/Performance .
+MEDIUM * Improve performance for fog of war for floor regions - only test for points if the adjacent floor region is visible.
+HIGH * Performance tests?
+
+== Architecture ==
+
+MEDIUM * Move more things into XML, e.g., scenery interaction behaviour, traps behaviour. In particular, shouldn't hardcode things like items, enemies (e.g., the Bell scenery interaction) in the code.
+MEDIUM * Effect of healing potion should be stored in item XML as the rollX/Y/Z, as with Spells?
+MEDIUM * Should scenery types be defined first separately in a scenery.xml file?
+LOW * Graph::shortestPath() should return vector of Vector2D instead of vector of GraphVertex *?
+MEDIUM * combine common code in Character::setDestination() and Location::calculateDistanceGraph() to do with filling in edges between vertices.
+MEDIUM * zero warnings
+MEDIUM * Character class should use a user_data_gfx like Item, instead of listener data?
+MEDIUM * combine Screen and MainWindow into a single class, making Screen a subclass of a QMainWindow?
+MEDIUM * check that floor points aren't coi.
+INFO * Now that we automatically calculate the boundaries, is it a problem that the first boundary might not be the outer one? Not sure if we were relying on this or not - needs testing...
+HIGH * Improve game loop timing - e.g., calling update with fixed time step.
+-> This is also important if we allow traps that aren't "used up" - as currently the trap is activated once per move step, which would currently vary if the frame rate varies!
+HIGH * Should check for collisions with "transient" items always be a swept rather than point, to avoid risk of fast objects moving through NPCs?
+MEDIUM * Should scenery graphics items in the scene be children of their floor region graphics item? Would make handling visibility easier.
+HIGH * Code related to rules should be an RPGEngine class?
+HIGH * Default character types should be in XML, with initial items.
+MEDIUM * Does it matter that we don't return exact collision hit_dist when we intersect with the end circle?
+
+== Help ==
+
+HIGH * For Nokia Store at least, we need About with version number and my name; for licensing purposes, we should also make sure the readme is distributed, and can be viewed in game.
+HIGH * Instructions
+HIGH * Tutorial?
+
+== 1. Kill Goblins ==
+
+>>> Replace skull item with bones? (And Wizard's skull can be the item to retrieve in next quest)
+-> Bone from http://opengameart.org/content/pixel-art-femur
+
+== 2. Investigate dungeon of long dead wizard, to find item ==
+
+>>> The missing teleporter machinary should be used up when "unlocking" the teleporter!
+>>> Past Teleporter should display text that indicates it's not working!
+>>> Give a name to the wizard; flesh out scholar's answers.
+>>> Flesh out the Necromancy book.
+>>> Implement book near skeleton: warn of a cursed level where all items and scenery are bad, except for one, which is identified in the book
+>>> Finish writing the prisoner's journal.
+>>> Finish writing the guardroom prisoner journal.
+>>> Torture chamber - add: torture equipment? (scenery and items), journal documenting that torture took place (don't need to quote!)
+>>> Put book in cabinet of bedroom?
+>>> Put more books in cabinet of library.
+-> Including books with details of history (although obviously not within last 100 years).
+* Put various alchemy ingredients in the lower left room (south of bedroom) - required later on?
+>>> Add plants, trees etc scenery to the garden.
+>>> Hide wyvern eggs in the plants.
+>>> Add random traps to the garden - powerful enough to kill?
+
+* Teleporter level:
+1: 2 or 3
+2: 4 or 5; 2 goblins
+3: 6 or 7; orc
+4: 3 or 1; crate with gold
+5: 4 or 8; orc and orc archer
+6: 8 or 5; 2 orcs
+7: 3; orc
+8: 1, exit
+
+* Cursed level (where all items and scenery are bad, except for one, which is identified in the book - see above). Also with:
+>>> Add book to cabinet near zombie room, detailing experiments of creating zombies.
+>>> Book in room with experimental chambers, should detail experiments.
+* More cursed items - or should they be on another level?
+>>> Flesh out journal to describe time travel, in book in Cabinet next to Future teleport.
+
+* Past:
+-> 600 years to past.
+-> Village to kill an Orc Warlord.
+>>> Add details of quest, plus money for doing so.
+>>> XP for rescuing prisoners.
+>>> More buildings, including Inn, and shops to buy things
+>>> Books with more clues as to being in past.
+>>> Locked room in caves, should have journal that was taken from one of the prisoners - need to flesh this out.
+
+* Future:
+-> 600 years to future.
+-> Hardened window, outside reveals post war scene
+-> Bookcase with books, on history, and science; journal; newspapers on war.
+-> Nuclear bunker? Dead person?
+
+* Maze level, minotaur:
+* Spider? - http://opengameart.org/content/spider-flare-sprite-sheets
+* Ghost NPC, do some task to gain XP - e.g., returning his or her bones?
+* Crypts, can be searched. Some should be trapped instead! (use existing code/XML format for traps)
+* Room to the east should have chest with item, that's needed to enter the Minotaur room.
+* Put the quest item into the chest in the room to the south, plus magic item.
+* Add quest completion condition.
+* Add scenery to minotaur room - clutter, animated torch, skulls/bones.
+* Add lores version of minotaur.
+* Allow NPCs to have different sizes? Though problem for collision detection - but we can make the image larger even without changing collision detection?
+-> Make minotaur larger.
+
+>>> 0.2 HIGH Debug setting that means doors automatically unlocked.
+
+* General:
+
+* More reward items, e.g., potions, rings, statuette, necklaces.
+* More red herring items (see graphics items listed above).
+* Heavy item that's just near worthless.
+* Transition between some levels should be by stairs.
+* Troll statue?
+-> http://opengameart.org/content/trolls
+
+>>> 0.2 HIGH * Check weights of books, and other objects created in-place?
+
+== Later quests ideas ==
+
+Have the level we wrote for "Dungeon"? After the Necromancer quest?
+
+3. Zombies - link into next quest:
+4. Kill necromancer.
+-> Turns out to be the wizard, resurrected due to botched ritual with the skull.
+5. Rescue someone.
+-> Orc prison camp?
+-> Kill Orc Warlord?
+6. Kill vampire?
+7. Demonic portal opened.
+-> Demonic prison.
+-> Witches.
+-> Plague.
+
+* Wishing well.
+* Inquisition?
+* More side-quests!
+* Side-quest to rid house/place of some enemy.
+* Magic items that give bonuses - need to use sparingly?
+* Magic doughnuts, restore health when eaten.
+* Item that if carried results in being attacked?
+* Upon entering a room, alarm raised - all enemies in location have increased fighting ability.
+* Timed events, e.g., full moon gives extra strength to undead.
+* Item which when picked up makes a statue in the room come to life? Or summons a monster?
+* Offered food by an NPC - bad effect.
+* Pool which restores health, or gives other bonuses?
+* Two pools (or something else?), one gives bonus, the other is cursed, but make it so the player can get info about it - e.g., from an NPC, or book, or something elsewhere in the quest.
+* Shrine to leave offering - not doing so or not giving enough conjures up an enemy, or trap?
+* Tomb
+* NPC to bribe, or attack, to get through somewhere?
+* NPC imprisoned.
+* Injured NPC?
+* Interact with scenery through pop up windows, menus, text
+* Boudica-like legend
+* Poisoned trapped chest, can't be avoided, but has 100 gold.
+* Ideas from Talisman etc
+  - http://talisman.edwebb.net/
+  - http://www.talismanisland.com/expansions.htm
+  - http://www.talismanwiki.com
+* NPC who appears friendly, but is a monster with illusion.
+* Illusion of chained prisoner, actually a monster (Stealer of Souls, p379)
+* NPC will attack unless paid money (e.g., guard asking for a bribe, or bandit asking for money).
+HIGH * And trapped containers! (And remember sound effect for trap.)
+HIGH * Switches? See lever in Flare dungeon tileset.
+
+Ideas from http://fightingfantasy.eamped.com/ ?
+and http://www.fightingfantasy.org/
+
+== Rules ==
+
+http://wiki.rpg.net/index.php/Open_Game_Systems
+http://livingfree.wikidot.com/list-of-libre-games
+http://chroniclesgame.wordpress.com/download-section/
+
+== Deployment ==
+
+1.0 HIGH * Test different Android resolutions - also decide what minimum resolution we recommend, and document this.
+1.0 HIGH * Should we be using resource files for the graphics, or deploy the files directly, as with music?
+1.0 HIGH * Needs proper Nokia-assigned Ovi UID!
+1.0 HIGH * Sort out installation and icon etc for Linux.
+1.0 HIGH * Need to set Android version and code version.
+HIGH * Rules should be released under open gaming licence?
+1.0 HIGH * webpage / documentation.
+1.0 HIGH * Test:
+DONE -> Windows 8 release preview VM (works fine even without installing files - though can't get any sound to work, even with codec - neither ogg nor wavs work - even though sound does seem to work in the VM).
+DONE -> Windows XP VM (worked fine with VC 2008 runtime).
+-> My Windows 7 desktop with the VC runtime libraries uninstalled.
+1.0 HIGH * Check licences are all listed and correct!
+
+== Rules for versioning/upgrading ==
+
+* Each quest should be identifed by its filename, which must not change once released!
+
+* Adding new quests at the end of current quests - fine.
+* Inserting new quests - okay, existing save games will just play on from their current position. This should be discouraged, as it means such players won't ever play the new quest, until they start a new game!
+* Renaming/removing quests - not allowed, as players won't be able to load existing games (theoretically we could allow it, but we'd have no idea as to what is the next quest to play; plus it would be a problem if ever we wanted to make it so that changeable data like FloorRegions aren't stored in the save game file).
+
+== Playtesting ==
+
+As of 20120829:
+
+First quest took 4 minutes. Player stats:
+XP 97
+Gold 269 (didn't buy or sell anything)
+
+== Release ==
+
+* Make sure player health not initialised to CHEAT level (in playinggamestate.cpp - search for initialiseHealth)

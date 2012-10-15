@@ -6,26 +6,26 @@
 android {
     # no music on Android, to reduce file size
     # sound not yet supported on Android
-    dir1.source = gfx
-    file1.source = .
-    file1.files = erebus.html
-    DEPLOYMENTFOLDERS += dir1 file1
+    dir1.source = data
+    dir2.source = docs
+    dir3.source = gfx
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3
 }
 else:symbian {
     # no music on Symbian, to reduce file size
-    dir1.source = gfx
-    dir2.source = sound
-    file1.source = .
-    file1.files = erebus.html
-    DEPLOYMENTFOLDERS += dir1 dir2 file1
+    dir1.source = data
+    dir2.source = docs
+    dir3.source = gfx
+    dir4.source = sound
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4
 }
 else {
-    dir1.source = gfx
-    dir2.source = sound
-    dir3.source = music
-    file1.source = .
-    file1.files = erebus.html
-    DEPLOYMENTFOLDERS += dir1 dir2 dir3 file1
+    dir1.source = data
+    dir2.source = docs
+    dir3.source = gfx
+    dir4.source = sound
+    dir5.source = music
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5
 }
 
 QT += webkit
@@ -111,8 +111,8 @@ include(deployment.pri)
 qtcAddDeployment()
 
 OTHER_FILES += \
-    _docs/todo.txt \
-    _docs/design.odt \
+    _devdocs/todo.txt \
+    _devdocs/design.odt \
     data/items.xml \
     data/images.xml \
     android/AndroidManifest.xml \
@@ -153,7 +153,7 @@ OTHER_FILES += \
     data/quest_kill_goblins.xml \
     data/quest_wizard_dungeon_find_item.xml \
     data/spells.xml \
-    erebus.html
+    docs/erebus.html
 
 RESOURCES += \
     erebus.qrc

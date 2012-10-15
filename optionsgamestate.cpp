@@ -378,7 +378,7 @@ void OptionsGamestate::clickedOfflineHelp() {
 
     QWebView *help = new QWebView();
     game_g->setWebView(help);
-    help->setUrl(QUrl(QString(DEPLOYMENT_PATH) + "erebus.html"));
+    help->setUrl(QUrl(QString(DEPLOYMENT_PATH) + "docs/erebus.html"));
     help->show();
     layout->addWidget(help);
 

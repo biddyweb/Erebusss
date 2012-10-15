@@ -1330,7 +1330,7 @@ void CampaignWindow::clickedClose() {
             LOG("move onto next quest\n");
             playing_gamestate->advanceQuest();
             const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
-            string qt_filename = ":/" + c_quest_info.getFilename();
+            string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
             LOG("move onto next quest: %s\n", c_quest_info.getFilename().c_str());
             playing_gamestate->loadQuest(qt_filename, false);
         }
@@ -1726,7 +1726,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     LOG("load images\n");
     {
-        QFile file(":/data/images.xml");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/images.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open images xml file");
         }
@@ -1948,7 +1948,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     LOG("load items\n");
     {
-        QFile file(":/data/items.xml");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/items.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open items xml file");
         }
@@ -2056,7 +2056,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     LOG("load NPCs\n");
     {
-        QFile file(":/data/npcs.xml");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/npcs.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open npcs xml file");
         }
@@ -2130,7 +2130,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     LOG("load Spells");
     {
-        QFile file(":/data/spells.xml");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/spells.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open spells xml file");
         }
@@ -2222,7 +2222,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     LOG("load quests\n");
 
     {
-        QFile file(":/data/quests.xml");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quests xml file");
         }
