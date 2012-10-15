@@ -5,13 +5,18 @@
 DEPLOYMENTFOLDERS = # file1 dir1
 android {
     # no music on Android, to reduce file size
+    dir2.source = gfx
+    DEPLOYMENTFOLDERS += dir2
 }
 else:symbian {
     # no music on Symbian, to reduce file size
+    dir2.source = gfx
+    DEPLOYMENTFOLDERS += dir2
 }
 else {
     dir1.source = music
-    DEPLOYMENTFOLDERS += dir1
+    dir2.source = gfx
+    DEPLOYMENTFOLDERS += dir1 dir2
 }
 
 QT += webkit

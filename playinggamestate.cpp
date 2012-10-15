@@ -1874,15 +1874,16 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                     }
 
                     if( filename.length() > 0 ) {
-                        QString filename_qt = ":/" + filename;
+                        //QString filename_qt = ":/" + filename;
+                        QString qt_filename = DEPLOYMENT_PATH + filename;
                         if( animation_layer_definition.size() > 0 ) {
                             qDebug("load with animations");
                             // clipping is done on a per-frame basis, for animation
-                            pixmap = game_g->loadImage(filename_qt.toStdString());
+                            pixmap = game_g->loadImage(qt_filename.toStdString());
                         }
                         else {
                             qDebug("load image");
-                            pixmap = game_g->loadImage(filename_qt.toStdString(), clip, xpos, ypos, width, height, expected_width);
+                            pixmap = game_g->loadImage(qt_filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
                         }
                     }
                     if( !clip && animation_layer_definition.size() > 0 ) {
@@ -2179,34 +2180,23 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
     LOG("clothes layer\n");
     int time_s = clock();
-    //AnimationLayer *clothes_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png");
-    this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["clothes"] = AnimationLayer::create(":/gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["clothes"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     LOG("time to load: %d\n", clock() - time_s);
-    /*LOG("head layer\n");
-    string head_layer_filename = ":/gfx/textures/isometric_hero/male_head1.png";
-    AnimationLayer *head_layer = new AnimationLayer();*/
-    //AnimationLayer *head_layer = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png");
-    this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["head"] = AnimationLayer::create(":/gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["head"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     LOG("longsword layer\n");
-    this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["longsword"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     LOG("longbow layer\n");
-    this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["longbow"] = AnimationLayer::create(":/gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     LOG("shield layer\n");
-    this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-
-    //LOG("load floor image\n");
-    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_paved.png");
-    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_dirt.png");
-    //builtin_images["floor"] = game_g->loadImage(":/gfx/textures/floor_rock.png");
-    /*unsigned char filter_max[] = {80, 40, 20};
-    unsigned char filter_min[] = {40, 20, 10};
-    builtin_images["floor"] = createNoise(128, 128, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);*/
+    //this->animation_layers["shield"] = AnimationLayer::create(":/gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
 
     gui_overlay->setProgress(70);
     qApp->processEvents();
-
-    //LOG("load wall image\n");
-    //builtin_images["wall"] = game_g->loadImage(":/gfx/textures/wall.png");
 
     LOG("load sound effects\n");
 #ifndef Q_OS_ANDROID
@@ -4006,7 +3996,8 @@ void PlayingGamestate::update() {
             this->player = NULL;
             //game_g->showInfoDialog("Game over", "You have died!");
             //this->showInfoDialog("Game over!\n\nYou have died!");
-            this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
+            //this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
+            this->showInfoDialog("Game over!\n\nYou have died!", string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }

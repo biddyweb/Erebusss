@@ -8,6 +8,12 @@ const bool mobile_c = true;
 const bool mobile_c = false;
 #endif
 
+#if defined(Q_OS_ANDROID)
+#define DEPLOYMENT_PATH "assets:/"
+#else
+#define DEPLOYMENT_PATH ""
+#endif
+
 // remember to update version in PRO file!
 const int versionMajor = 0;
 const int versionMinor = 2;

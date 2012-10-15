@@ -1,32 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>gfx/textures/floor_paved.png</file>
-        <file>gfx/textures/isometric_hero/clothes.png</file>
-        <file>gfx/textures/isometric_hero/male_head1.png</file>
-        <file>gfx/textures/isometric_hero/longsword.png</file>
-        <file>gfx/textures/items/longsword.png</file>
-        <file>gfx/textures/items/leather_armor.png</file>
-        <file>gfx/textures/items/gold.png</file>
-        <file>gfx/textures/isometric_hero/shield.png</file>
-        <file>gfx/textures/items/shield.png</file>
-        <file>gfx/textures/isometric_hero/longbow.png</file>
-        <file>gfx/textures/items/longbow.png</file>
-        <file>gfx/textures/items/arrow.png</file>
-        <file>gfx/textures/items/potion_red.png</file>
         <file>data/items.xml</file>
         <file>data/images.xml</file>
-        <file>gfx/textures/scenery/barrel.png</file>
-        <file>gfx/textures/scenery/chest.png</file>
-        <file>gfx/textures/scenery/crate.png</file>
         <file>data/npcs.xml</file>
-        <file>gfx/textures/npcs/goblin.png</file>
-        <file>gfx/textures/npcs/orc_regular_0.png</file>
-        <file>gfx/textures/items/gem_red.png</file>
-        <file>gfx/textures/items/ring_gold.png</file>
-        <file>gfx/textures/wall.png</file>
-        <file>gfx/textures/items/metal_armor.png</file>
-        <file>gfx/textures/items/key.png</file>
-        <file>gfx/textures/items/skull.png</file>
         <file>data/quest_kill_goblins.xml</file>
         <file>data/quests.xml</file>
         <file>sound/door.wav</file>
@@ -39,56 +15,8 @@
         <file>sound/container.wav</file>
         <file>sound/turn_page.wav</file>
         <file>sound/lock.wav</file>
-        <file>gfx/textures/scenery/rock1.png</file>
-        <file>gfx/textures/floor_dirt.png</file>
-        <file>gfx/textures/scenery/campfire.png</file>
-        <file>gfx/textures/floor_rock.png</file>
-        <file>gfx/textures/scenery/boulders.png</file>
-        <file>gfx/textures/items/mushroom.png</file>
         <file>_docs/erebus.html</file>
         <file>data/quest_wizard_dungeon_find_item.xml</file>
-        <file>gfx/textures/scenery/skeleton.png</file>
-        <file>gfx/textures/items/book.png</file>
-        <file>gfx/textures/scenery/throne.png</file>
-        <file>gfx/textures/scenery/table.png</file>
-        <file>gfx/textures/scenery/bloodstain.png</file>
-        <file>gfx/textures/scenery/bloodstain2.png</file>
-        <file>gfx/textures/floor_paved_blood.png</file>
-        <file>gfx/textures/scenery/shrine.png</file>
-        <file>gfx/textures/scenery/cabinet.png</file>
-        <file>gfx/textures/scenery/carpet.png</file>
-        <file>gfx/textures/npcs/man.png</file>
-        <file>gfx/textures/scenery/bed.png</file>
-        <file>gfx/textures/npcs/wyvern.png</file>
-        <file>gfx/textures/items/hand_mirror.png</file>
-        <file>gfx/textures/npcs/wraith.png</file>
-        <file>gfx/scenes/death.jpg</file>
-        <file>gfx/textures/items/gem_blue.png</file>
-        <file>gfx/textures/items/gem_gold.png</file>
-        <file>gfx/textures/items/gem_green.png</file>
-        <file>gfx/textures/items/gem_white.png</file>
         <file>data/spells.xml</file>
-        <file>gfx/textures/scenery/teleport.png</file>
-        <file>gfx/textures/scenery/church_bell.png</file>
-        <file>gfx/textures/scenery/grate.png</file>
-        <file>gfx/textures/items/potion_green.png</file>
-        <file>gfx/textures/items/potion_blue.png</file>
-        <file>gfx/textures/npcs/zombie.png</file>
-        <file>gfx/textures/scenery/experimental_chamber.png</file>
-        <file>gfx/textures/items/chess_knight.png</file>
-        <file>gfx/textures/scenery/scenery_painting_sword.png</file>
-        <file>gfx/scenes/painting_sword.jpg</file>
-        <file>gfx/textures/grass.png</file>
-        <file>gfx/textures/scenery/building.png</file>
-        <file>gfx/textures/npcs/peasant_man.png</file>
-        <file>gfx/textures/npcs/peasant_woman.png</file>
-        <file>gfx/textures/scenery/hut.png</file>
-        <file>gfx/textures/scenery/stairsdown_outdoors.png</file>
-        <file>gfx/textures/scenery/stairsdown_indoors.png</file>
-        <file>gfx/textures/scenery/stairsup_indoors.png</file>
-        <file>gfx/textures/items/clockwork.png</file>
-        <file>gfx/textures/npcs/minotaur.png</file>
-        <file>gfx/textures/scenery/fire.png</file>
-        <file>gfx/textures/scenery/tree2.png</file>
     </qresource>
 </RCC>

@@ -18,7 +18,10 @@ copy %dllsrc%\QtWebKit4.dll %dst%
 copy %dllsrc%\QtXml4.dll %dst%
 copy %dllsrc%\phonon4.dll %dst%
 
-mkdir %dst%\music\
-copy %src%\music\ %dst%\music\
+mkdir %dst%\gfx
+xcopy %src%\gfx %dst%\gfx /E /Y
+
+mkdir %dst%\music
+xcopy %src%\music %dst%\music /E /Y
 
 REM exit
