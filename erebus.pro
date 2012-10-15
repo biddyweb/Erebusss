@@ -2,21 +2,30 @@
 # by adapting the examples below.
 # file1.source = myfile
 # dir1.source = mydir
-DEPLOYMENTFOLDERS = # file1 dir1
+#DEPLOYMENTFOLDERS = # file1 dir1
 android {
     # no music on Android, to reduce file size
-    dir2.source = gfx
-    DEPLOYMENTFOLDERS += dir2
+    # sound not yet supported on Android
+    dir1.source = gfx
+    file1.source = .
+    file1.files = erebus.html
+    DEPLOYMENTFOLDERS += dir1 file1
 }
 else:symbian {
     # no music on Symbian, to reduce file size
-    dir2.source = gfx
-    DEPLOYMENTFOLDERS += dir2
+    dir1.source = gfx
+    dir2.source = sound
+    file1.source = .
+    file1.files = erebus.html
+    DEPLOYMENTFOLDERS += dir1 dir2 file1
 }
 else {
-    dir1.source = music
-    dir2.source = gfx
-    DEPLOYMENTFOLDERS += dir1 dir2
+    dir1.source = gfx
+    dir2.source = sound
+    dir3.source = music
+    file1.source = .
+    file1.files = erebus.html
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 file1
 }
 
 QT += webkit
@@ -142,9 +151,9 @@ OTHER_FILES += \
     data/npcs.xml \
     data/quests.xml \
     data/quest_kill_goblins.xml \
-    _docs/erebus.html \
     data/quest_wizard_dungeon_find_item.xml \
-    data/spells.xml
+    data/spells.xml \
+    erebus.html
 
 RESOURCES += \
     erebus.qrc

@@ -9,8 +9,7 @@ copy %src%\makesrcarchive.bat %dst%
 copy %src%\makesymbianfolder.bat %dst%
 copy %src%\makeandroidfolder.bat %dst%
 copy %src%\erebus_source.txt %dst%
-mkdir %dst%\_docs\
-copy %src%\_docs\erebus.html %dst%\_docs\
+copy %src%\erebus.html %dst%
 
 copy %src%\erebus.pro %dst%
 copy %src%\deployment.pri %dst%
