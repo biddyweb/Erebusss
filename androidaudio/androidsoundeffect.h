@@ -1,10 +1,6 @@
 #ifndef ANDROIDSOUNDEFFECT_H
 #define ANDROIDSOUNDEFFECT_H
 
-#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
-
-#if defined(Q_OS_ANDROID)
-
 #include <QObject>
 #include <QDebug>
 #include <QString>
@@ -37,7 +33,5 @@ private:
 
     friend class AndroidAudio;
 };
-
-#endif
 
 #endif // ANDROIDSOUNDEFFECT_H

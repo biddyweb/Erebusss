@@ -1,10 +1,6 @@
 #ifndef ANDROIDAUDIO_H
 #define ANDROIDAUDIO_H
 
-#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
-
-#if defined(Q_OS_ANDROID)
-
 #include <QObject>
 #include <QMap>
 
@@ -52,7 +48,5 @@ private:
     int32_t mSoundCount;
 
 };
-
-#endif
 
 #endif // ANDROIDAUDIO_H
