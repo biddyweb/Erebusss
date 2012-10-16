@@ -1,6 +1,8 @@
 #ifndef ANDROIDAUDIO_H
 #define ANDROIDAUDIO_H
 
+// modified from https://groups.google.com/forum/?fromgroups=#!topic/android-qt/rpPa_W6PF1Y , by Adam Pigg
+
 #include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
 // n.b., need to faff around with #includes here, so it compiles on both Android and other platforms, even though we only need this file for Android
