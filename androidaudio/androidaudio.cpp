@@ -8,10 +8,13 @@
 #include <QDebug>
 
 AndroidAudio::AndroidAudio(QObject *parent) :
-    QObject(parent), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mSounds(), mSoundCount(0), mPlayerObject(NULL)
+    QObject(parent), sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mSounds(), mSoundCount(0), mPlayerObject(NULL)
 {
-    createEngine();
-    startSoundPlayer();
+    if( createEngine() ) {
+        if( startSoundPlayer() ) {
+            sound_ok = true;
+        }
+    }
 }
 
 AndroidAudio::~AndroidAudio()
@@ -25,33 +28,54 @@ AndroidAudio::~AndroidAudio()
 }
 
 // create the engine and output mix objects
-void AndroidAudio::createEngine()
+bool AndroidAudio::createEngine()
 {
     SLresult result;
 
     // create engine
     result = slCreateEngine(&mEngineObject, 0, NULL, 0, NULL, NULL);
     Q_ASSERT(SL_RESULT_SUCCESS == result);
+    if( result != SL_RESULT_SUCCESS ) {
+        qDebug("slCreateEngine failed");
+        return false;
+    }
 
     // realize the engine
     result = (*mEngineObject)->Realize(mEngineObject, SL_BOOLEAN_FALSE);
     Q_ASSERT(SL_RESULT_SUCCESS == result);
+    if( result != SL_RESULT_SUCCESS ) {
+        qDebug("engine Realize failed");
+        return false;
+    }
 
     // get the engine interface, which is needed in order to create other objects
     result = (*mEngineObject)->GetInterface(mEngineObject, SL_IID_ENGINE, &mEngineEngine);
     Q_ASSERT(SL_RESULT_SUCCESS == result);
+    if( result != SL_RESULT_SUCCESS ) {
+        qDebug("failed to get engine interface");
+        return false;
+    }
 
     // create output mix
     const SLInterfaceID ids[] = {};
     const SLboolean req[] = {};
     result = (*mEngineEngine)->CreateOutputMix(mEngineEngine, &mOutputMixObject, 0, ids, req);
     Q_ASSERT(SL_RESULT_SUCCESS == result);
+    if( result != SL_RESULT_SUCCESS ) {
+        qDebug("failed to create output mix");
+        return false;
+    }
 
     // realize the output mix
     result = (*mOutputMixObject)->Realize(mOutputMixObject, SL_BOOLEAN_FALSE);
-    Q_ASSERT(SL_RESULT_SUCCESS == result);  
+    Q_ASSERT(SL_RESULT_SUCCESS == result);
+    if( result != SL_RESULT_SUCCESS ) {
+        qDebug("failed to realize output mix");
+        return false;
+    }
 
     qDebug() << "Created Android Audio Engine";
+    return true;
 }
 
 void AndroidAudio::destroyEngine()
@@ -87,7 +111,7 @@ void AndroidAudio::registerSound(const QString& path, const QString& name)
     qDebug() << "registerSound:loaded";
 }
 
-void AndroidAudio::startSoundPlayer()
+bool AndroidAudio::startSoundPlayer()
 {
     qDebug() << "Starting Sound Player";
 
@@ -102,7 +126,8 @@ void AndroidAudio::startSoundPlayer()
     SLDataFormat_PCM lDataFormat;
     lDataFormat.formatType = SL_DATAFORMAT_PCM;
     lDataFormat.numChannels = 2;
-    lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+    //lDataFormat.samplesPerSec = SL_SAMPLINGRATE_44_1;
+    lDataFormat.samplesPerSec = SL_SAMPLINGRATE_22_05; // for some reason, samples play too high pitched when using SL_SAMPLINGRATE_44_1?!
     lDataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16;
     lDataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
     lDataFormat.channelMask = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
@@ -129,29 +154,55 @@ void AndroidAudio::startSoundPlayer()
 
     lRes = (*mEngineEngine)->CreateAudioPlayer(mEngineEngine, &mPlayerObject, &lDataSource, &lDataSink, lSoundPlayerIIDCount, lSoundPlayerIIDs, lSoundPlayerReqs);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to create audio player");
+        return false;
+    }
 
     qDebug() << "Created Sound Player";
 
     lRes = (*mPlayerObject)->Realize(mPlayerObject, SL_BOOLEAN_FALSE);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to realize sound player");
+        return false;
+    }
 
     qDebug() << "Realised Sound Player";
     lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_PLAY, &mPlayerPlay);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to get player interface");
+        return false;
+    }
 
     lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_BUFFERQUEUE, &mPlayerQueue);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to get player queue interface");
+        return false;
+    }
 
     lRes = (*mPlayerPlay)->SetPlayState(mPlayerPlay, SL_PLAYSTATE_PLAYING);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to set player state");
+        return false;
+    }
 
     qDebug() << "Created Buffer Player";
+    return true;
 }
 
 void AndroidAudio::playSound(const QString& name)
 {
     SLresult lRes;
     SLuint32 lPlayerState;
+
+    if( !sound_ok ) {
+        qDebug("sound engine not available");
+        return;
+    }
 
     AndroidSoundEffect* sound = mSounds[name];
 
@@ -175,6 +226,7 @@ void AndroidAudio::playSound(const QString& name)
         //Play the new sound
         (*mPlayerQueue)->Enqueue(mPlayerQueue, lBuffer, lLength);
         Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+
     }
 }
 

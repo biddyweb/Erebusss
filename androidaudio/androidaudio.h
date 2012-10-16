@@ -41,9 +41,11 @@ public slots:
     void freeSound(const QString& name);
 
 private:
-    void createEngine();
+    bool createEngine();
     void destroyEngine();
-    void startSoundPlayer();
+    bool startSoundPlayer();
+
+    bool sound_ok;
 
     // engine interfaces
     SLObjectItf mEngineObject;
