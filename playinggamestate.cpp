@@ -2202,20 +2202,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     //if( !mobile_c )
     if( game_g->isSoundEnabled() )
     {
-/*#ifndef Q_OS_ANDROID
-        this->sound_effects["click"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/click_short.wav");
-        this->sound_effects["coin"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/coin.wav");
-        this->sound_effects["container"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/container.wav");
-        this->sound_effects["door"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/door.wav");
-        this->sound_effects["drink"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/bubble2.wav");
-        this->sound_effects["lock"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/lock.wav");
-        this->sound_effects["swing"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/swing2.wav");
-        this->sound_effects["turn_page"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
-        this->sound_effects["weapon_unsheath"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
-        this->sound_effects["wear_armour"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
-#else
-        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav")
-#endif*/
         game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
         game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav");
         game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav");
@@ -2226,6 +2212,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
         game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
         game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
+        // remember to call freeSound in the PlayingGamestate destructor!
     }
 
     gui_overlay->setProgress(90);
@@ -2303,6 +2290,19 @@ PlayingGamestate::~PlayingGamestate() {
     for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
         Shop *shop = *iter;
         delete shop;
+    }
+    if( game_g->isSoundEnabled() )
+    {
+        game_g->freeSound("click");
+        game_g->freeSound("coin");
+        game_g->freeSound("container");
+        game_g->freeSound("door");
+        game_g->freeSound("drink");
+        game_g->freeSound("lock");
+        game_g->freeSound("swing");
+        game_g->freeSound("turn_page");
+        game_g->freeSound("weapon_unsheath");
+        game_g->freeSound("wear_armour");
     }
     LOG("done\n");
 }
