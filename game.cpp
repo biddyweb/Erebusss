@@ -736,7 +736,7 @@ void Game::loadSound(const string &id, const string &filename) {
     Sound *sound = new Sound(mediaObject, audioOutput);
     this->sound_effects[id] = sound;
 #else
-    androidAudio.registerSound(id.c_str(), filename.c_str());
+    androidAudio.registerSound(filename.c_str(), id.c_str());
 #endif
 }
 
@@ -772,7 +772,7 @@ void Game::playSound(const string &sound_effect) {
         }
     }
 #else
-    androidAudio.playSound(soundeffect.c_str());
+    androidAudio.playSound(sound_effect.c_str());
 #endif
 }
 

@@ -19,7 +19,7 @@ OptionsGamestate::OptionsGamestate() :
     optionsGamestate = this;
 
 //#ifndef Q_OS_ANDROID
-    this->music = NULL;
+    //this->music = NULL;
     if( !mobile_c ) {
         /*music = new Phonon::MediaObject(qApp);
         connect(music, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));

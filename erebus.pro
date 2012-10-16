@@ -5,11 +5,11 @@
 #DEPLOYMENTFOLDERS = # file1 dir1
 android {
     # no music on Android, to reduce file size
-    # sound not yet supported on Android
     dir1.source = data
     dir2.source = docs
     dir3.source = gfx
-    DEPLOYMENTFOLDERS += dir1 dir2 dir3
+    dir4.source = sound
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4
 }
 else:symbian {
     # no music on Symbian, to reduce file size
@@ -64,7 +64,7 @@ symbian {
 
 android {
     # phonon not supported on Android
-    #LIBS += -lOpenSLES
+    LIBS += -lOpenSLES
 }
 else {
     QT += phonon
