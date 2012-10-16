@@ -488,6 +488,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);*/
         const float x_off = 16.0f/640.0f;
         const float hgt = 64.0f/360.0f;
+        painter.drawText(x_off*width(), (100.0f/360.0f)*height(), "Please wait...");
         this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
         qDebug(">>> draw progress: %d", this->progress_percent);
     }
@@ -3299,9 +3300,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef exit_location_s = reader.attributes().value("exit_location");
                     QStringRef locked_s = reader.attributes().value("locked");
                     bool locked = parseBool(locked_s.toString(), true);
-                    QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
                     QStringRef locked_silent_s = reader.attributes().value("locked_silent");
                     bool locked_silent = parseBool(locked_silent_s.toString(), true);
+                    QStringRef locked_text_s = reader.attributes().value("locked_text");
+                    QStringRef locked_used_up_s = reader.attributes().value("locked_used_up");
+                    bool locked_used_up = parseBool(locked_used_up_s.toString(), true);
+                    QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
                     QStringRef unlock_text_s = reader.attributes().value("unlock_text");
                     QStringRef confirm_text_s = reader.attributes().value("confirm_text");
                     float size_w = 0.0f, size_h = 0.0f;
@@ -3422,10 +3426,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y));
                     }
                     scenery->setLocked(locked);
+                    scenery->setLockedSilent(locked_silent);
+                    if( locked_text_s.length() > 0 ) {
+                        scenery->setLockedText(locked_text_s.toString().toStdString());
+                    }
+                    scenery->setLockedUsedUp(locked_used_up);
                     if( unlock_item_name_s.length() > 0 ) {
                         scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
                     }
-                    scenery->setLockedSilent(locked_silent);
                     if( unlock_text_s.length() > 0 ) {
                         scenery->setUnlockText(unlock_text_s.toString().toStdString());
                     }
@@ -4327,10 +4335,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                         // can we unlock it?
                         is_locked = true;
                         string unlock_item_name = scenery->getUnlockItemName();
+                        Item *item = NULL;
                         if( unlock_item_name.length() > 0 ) {
-                            //LOG("search for %s\n", unlock_item_name.c_str());
-                            for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                                const Item *item = *iter;
+                            qDebug("search for %s", unlock_item_name.c_str());
+                            for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                                item = *iter;
                                 //LOG("    compare to: %s\n", item->getKey().c_str());
                                 if( item->getKey() == unlock_item_name ) {
                                     is_locked = false;
@@ -4341,12 +4350,18 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             done = true;
                             if( !scenery->isLockedSilent() ) {
                                 this->playSound("lock");
+                            }
+                            if( scenery->getLockedText().length() == 0 ) {
                                 stringstream str;
                                 str << "The " << scenery->getName() << " is locked!";
                                 this->addTextEffect(str.str(), player->getPos(), 2000);
                             }
+                            else if( scenery->getLockedText() != "none" ) {
+                                this->addTextEffect(scenery->getLockedText(), player->getPos(), 2000);
+                            }
                         }
                         else {
+                            ASSERT_LOGGER(item != NULL);
                             stringstream str;
                             if( scenery->getUnlockText().length() == 0 ) {
                                 str << "You unlock the " << scenery->getName() << ".";
@@ -4356,6 +4371,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             }
                             this->addTextEffect(str.str(), player->getPos(), 2000);
                             scenery->setLocked(false);
+                            qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
+                            if( scenery->isLockedUsedUp() ) {
+                                player->takeItem(item);
+                                delete item;
+                                item = NULL;
+                            }
                             player->addXP(this, 20);
                         }
                     }
@@ -4798,8 +4819,10 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
             fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
             fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
-            fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
             fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
+            fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
+            fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
+            fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
             fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
             fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
             fprintf(file, ">");

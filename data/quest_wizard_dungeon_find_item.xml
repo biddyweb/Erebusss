@@ -380,7 +380,7 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <!--room behind mirror door-->
 <scenery name="Door" image_name="door_mirror" x="23.4999" y="10.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Hand Mirror" locked_silent="true" unlock_text="The mirror shatters before you!"
+    locked="true" unlocked_by_template="Hand Mirror" locked_silent="true" locked_text="none" unlock_text="The mirror shatters before you!"
     />
 
     <floorregion shape="rect" rect_x="23.5" rect_y="10.0" rect_w="0.5" rect_h="1.0"/>
@@ -830,7 +830,7 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 </item>-->
 
 <scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
-    locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true"/>
+    locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true" locked_text="The teleporter does not seem to function!" locked_used_up="true"/>
 
 <scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true"/>
 

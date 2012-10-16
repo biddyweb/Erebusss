@@ -54,7 +54,9 @@ protected:
     string exit_location;
     Vector2D exit_location_pos;
     bool is_locked; // relevant only for some types, e.g., containers, doors
-    bool locked_silent;
+    bool locked_silent; // whether sample is played when trying to unlock
+    string locked_text;
+    bool locked_used_up;
     string unlock_item_name;
     string unlock_text;
     string confirm_text; // relevant onl for some types, e.g., doors
@@ -159,6 +161,18 @@ public:
     }
     bool isLockedSilent() const {
         return this->locked_silent;
+    }
+    void setLockedText(const string &locked_text) {
+        this->locked_text = locked_text;
+    }
+    string getLockedText() const {
+        return this->locked_text;
+    }
+    void setLockedUsedUp(bool locked_used_up) {
+        this->locked_used_up = locked_used_up;
+    }
+    bool isLockedUsedUp() const {
+        return this->locked_used_up;
     }
     void setUnlockItemName(const string &unlock_item_name) {
         this->unlock_item_name = unlock_item_name;
