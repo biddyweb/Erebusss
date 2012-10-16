@@ -473,6 +473,13 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 }
 
 Game::~Game() {
+#ifndef Q_OS_ANDROID
+    for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
+        Sound *sound = iter->second;
+        delete sound;
+    }
+#endif
+
     if( style != NULL ) {
         delete style;
     }
@@ -719,17 +726,21 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     return pixmap;
 }
 
+void Game::loadSound(const string &id, const string &filename) {
 #ifndef Q_OS_ANDROID
-Sound *Game::loadSound(string filename) const {
     Phonon::MediaObject *mediaObject = new Phonon::MediaObject(qApp);
     //connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
     mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
     Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
     Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);
     Sound *sound = new Sound(mediaObject, audioOutput);
-    return sound;
+    this->sound_effects[id] = sound;
+#else
+    androidAudio.registerSound(id.c_str(), filename.c_str());
+#endif
 }
 
+#ifndef Q_OS_ANDROID
 /*void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const {
     qDebug("Game::mediaStateChanged(%d, %d)", newstate, oldstate);
     if( newstate == Phonon::ErrorState ) {
@@ -742,6 +753,40 @@ Sound *Game::loadSound(string filename) const {
     }
 }*/
 #endif
+
+void Game::playSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    qDebug("play sound: %s\n", sound_effect.c_str());
+    if( game_g->isSoundEnabled() ) {
+        Sound *sound = this->sound_effects[sound_effect];
+        ASSERT_LOGGER(sound != NULL);
+        if( sound != NULL ) {
+            if( sound->state() == Phonon::PlayingState ) {
+                qDebug("    already playing");
+            }
+            else {
+                //sound->stop();
+                sound->seek(0);
+                sound->play();
+            }
+        }
+    }
+#else
+    androidAudio.playSound(soundeffect.c_str());
+#endif
+}
+
+void Game::pauseSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    qDebug("pause sound: %s\n", sound_effect.c_str());
+    // n.b., need to allow pausing even if sound not enabled (so we can disable sound, then pause music)
+    Sound *sound = this->sound_effects[sound_effect];
+    ASSERT_LOGGER(sound != NULL);
+    if( sound != NULL ) {
+        sound->pause();
+    }
+#endif
+}
 
 void Game::setSoundEnabled(bool sound_enabled) {
     this->sound_enabled = sound_enabled;

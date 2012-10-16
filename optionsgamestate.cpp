@@ -18,7 +18,7 @@ OptionsGamestate::OptionsGamestate() :
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
 
-#ifndef Q_OS_ANDROID
+//#ifndef Q_OS_ANDROID
     this->music = NULL;
     if( !mobile_c ) {
         /*music = new Phonon::MediaObject(qApp);
@@ -26,12 +26,14 @@ OptionsGamestate::OptionsGamestate() :
         music->setCurrentSource(Phonon::MediaSource("music/no_more_magic.ogg"));
         Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
         Phonon::Path audioPath = Phonon::createPath(music, audioOutput);*/
-        music = game_g->loadSound("music/no_more_magic.ogg");
+        /*music = game_g->loadSound("music/no_more_magic.ogg");
         if( game_g->isSoundEnabled() ) {
             music->play();
-        }
+        }*/
+        game_g->loadSound("music_intro", "music/no_more_magic.ogg");
+        game_g->playSound("music_intro");
     }
-#endif
+//#endif
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     QFont font = game_g->getFontBig();
@@ -135,11 +137,12 @@ OptionsGamestate::~OptionsGamestate() {
     VI_GraphicsEnvironment *genv = game_g->getGraphicsEnvironment();
     game_g->getGraphicsEnvironment()->setPanel(NULL); // as the main panel is now destroyed
     */
-#ifndef Q_OS_ANDROID
+/*#ifndef Q_OS_ANDROID
     if( music != NULL ) {
         delete music;
     }
-#endif
+#endif*/
+    game_g->pauseSound("music_intro");
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();
@@ -341,13 +344,19 @@ void OptionsGamestate::clickedOptionsOkay() {
     bool new_sound_enabled = soundCheck->isChecked();
     if( new_sound_enabled != game_g->isSoundEnabled() ) {
         game_g->setSoundEnabled(new_sound_enabled);
-        if( music != NULL ) {
+        /*if( music != NULL ) {
             if( new_sound_enabled ) {
                 this->music->play();
             }
             else {
                 this->music->pause();
             }
+        }*/
+        if( new_sound_enabled ) {
+            game_g->playSound("music_intro");
+        }
+        else {
+            game_g->pauseSound("music_intro");
         }
     }
 #endif

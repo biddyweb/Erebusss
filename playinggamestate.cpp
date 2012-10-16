@@ -2199,10 +2199,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     qApp->processEvents();
 
     LOG("load sound effects\n");
-#ifndef Q_OS_ANDROID
     //if( !mobile_c )
     if( game_g->isSoundEnabled() )
     {
+/*#ifndef Q_OS_ANDROID
         this->sound_effects["click"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/click_short.wav");
         this->sound_effects["coin"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/coin.wav");
         this->sound_effects["container"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/container.wav");
@@ -2213,8 +2213,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         this->sound_effects["turn_page"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
         this->sound_effects["weapon_unsheath"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
         this->sound_effects["wear_armour"] = game_g->loadSound(string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
+#else
+        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav")
+#endif*/
+        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
     }
-#endif
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
@@ -2292,12 +2295,6 @@ PlayingGamestate::~PlayingGamestate() {
         Shop *shop = *iter;
         delete shop;
     }
-#ifndef Q_OS_ANDROID
-    for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
-        Sound *sound = iter->second;
-        delete sound;
-    }
-#endif
     LOG("done\n");
 }
 
@@ -2323,12 +2320,12 @@ float PlayingGamestate::getDifficultyModifier() const {
 void PlayingGamestate::playBackgroundMusic() {
     // needed for looping
     qDebug("PlayingGamestate::playBackgroundMusic()");
-#ifndef Q_OS_ANDROID
+/*#ifndef Q_OS_ANDROID
     if( game_g->isSoundEnabled() ) {
         this->sound_effects["background"]->stop();
         this->sound_effects["background"]->play();
     }
-#endif
+#endif*/
 }
 
 Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
@@ -4892,7 +4889,7 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
 }
 
 void PlayingGamestate::playSound(const string &sound_effect) {
-#ifndef Q_OS_ANDROID
+/*#ifndef Q_OS_ANDROID
     qDebug("play sound: %s\n", sound_effect.c_str());
     if( game_g->isSoundEnabled() ) {
         Sound *sound = this->sound_effects[sound_effect];
@@ -4908,7 +4905,8 @@ void PlayingGamestate::playSound(const string &sound_effect) {
             }
         }
     }
-#endif
+#endif*/
+    game_g->playSound(sound_effect);
 }
 
 void PlayingGamestate::advanceQuest() {

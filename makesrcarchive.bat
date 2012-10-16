@@ -51,6 +51,13 @@ copy %src%\rpg\item.h %dst%\rpg
 copy %src%\rpg\location.h %dst%\rpg
 copy %src%\rpg\utils.h %dst%\rpg
 
+mkdir %dst%\androidaudio\
+
+copy %src%\androidaudio\androidaudio.cpp %dst%\androidaudio
+copy %src%\androidaudio\androidaudio.h %dst%\androidaudio
+copy %src%\androidaudio\androidsoundeffect.cpp %dst%\androidaudio
+copy %src%\androidaudio\androidsoundeffect.h %dst%\androidaudio
+
 REM also copy data folders, as Linux users won't have downloaded the Windows binary archive!
 
 mkdir %dst%\docs\

@@ -22,7 +22,6 @@ using std::map;
 #include "rpg/location.h"
 
 class MainGraphicsView;
-class Sound;
 class AnimationLayer;
 class Shop;
 class Currency;
@@ -340,9 +339,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, CharacterTemplate *> character_templates;
     map<string, Spell *> spells;
     vector<Shop *> shops;
-#ifndef Q_OS_ANDROID
-    map<string, Sound *> sound_effects;
-#endif
 
     Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);

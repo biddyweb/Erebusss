@@ -7,7 +7,7 @@
 
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
-//#include <SLES/OpenSLES.h>
+#include "androidaudio/androidaudio.h"
 #else
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
@@ -269,6 +269,12 @@ class Game : public QObject {
     Q_OBJECT
 
 protected:
+#ifndef Q_OS_ANDROID
+    map<string, Sound *> sound_effects;
+#else
+    AndroidAudio androidAudio;
+#endif
+
     QSettings *settings;
 
     string application_path;
@@ -345,9 +351,9 @@ public:
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0, 0);
     }
-#ifndef Q_OS_ANDROID
-    Sound *loadSound(string filename) const;
-#endif
+    void loadSound(const string &id, const string &filename);
+    void playSound(const string &sound_effect);
+    void pauseSound(const string &sound_effect);
     bool isSoundEnabled() const {
         return this->sound_enabled;
     }

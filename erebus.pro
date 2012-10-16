@@ -89,7 +89,9 @@ SOURCES += main.cpp mainwindow.cpp \
     optionsgamestate.cpp \
     gamestate.cpp \
     logiface.cpp \
-    infodialog.cpp
+    infodialog.cpp \
+    androidaudio/androidsoundeffect.cpp \
+    androidaudio/androidaudio.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -103,7 +105,9 @@ HEADERS += mainwindow.h \
     gamestate.h \
     logiface.h \
     infodialog.h \
-    common.h
+    common.h \
+    androidaudio/androidsoundeffect.h \
+    androidaudio/androidaudio.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
