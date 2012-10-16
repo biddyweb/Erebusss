@@ -2216,7 +2216,16 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 #else
         game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav")
 #endif*/
+        game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
+        game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav");
+        game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav");
+        game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav");
+        game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav");
+        game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav");
+        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");
         game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
+        game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
+        game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
     }
 
     gui_overlay->setProgress(90);

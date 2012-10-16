@@ -1,7 +1,14 @@
 #ifndef ANDROIDAUDIO_H
 #define ANDROIDAUDIO_H
 
+#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
+
+// n.b., need to faff around with #includes here, so it compiles on both Android and other platforms, even though we only need this file for Android
+
 #include <QObject>
+
+#if defined(Q_OS_ANDROID)
+
 #include <QMap>
 
 #include "androidsoundeffect.h"
@@ -13,9 +20,12 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+#endif
+
 class AndroidAudio : public QObject
 {
     Q_OBJECT
+#if defined(Q_OS_ANDROID)
 public:
     explicit AndroidAudio(QObject *parent = 0);
     ~AndroidAudio();
@@ -46,7 +56,7 @@ private:
 
     QMap<QString, AndroidSoundEffect*> mSounds;
     int32_t mSoundCount;
-
+#endif
 };
 
 #endif // ANDROIDAUDIO_H

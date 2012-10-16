@@ -3,9 +3,7 @@
 #include <QtGui>
 
 // Phonon not supported on Qt Android
-#ifdef Q_OS_ANDROID
-//#include <SLES/OpenSLES.h>
-#else
+#ifndef Q_OS_ANDROID
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
 #endif
@@ -13,7 +11,7 @@
 #include "gamestate.h"
 
 class ScrollingListWidget;
-class Sound;
+//class Sound;
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
@@ -30,9 +28,9 @@ class OptionsGamestate : public Gamestate {
     QCheckBox *soundCheck;
     QCheckBox *lightingCheck;
 
-#ifndef Q_OS_ANDROID
+/*#ifndef Q_OS_ANDROID
     Sound *music;
-#endif
+#endif*/
 
 private slots:
     void clickedStart();
