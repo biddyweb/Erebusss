@@ -354,6 +354,7 @@ public:
     void loadSound(const string &id, const string &filename);
     void playSound(const string &sound_effect);
     void pauseSound(const string &sound_effect);
+    void freeSound(const string &sound_effect);
     bool isSoundEnabled() const {
         return this->sound_enabled;
     }

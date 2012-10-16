@@ -36,6 +36,7 @@ public slots:
 
     void registerSound(const QString& path, const QString &name);
     void playSound(const QString& name);
+    void freeSound(const QString& name);
 
 private:
     void createEngine();

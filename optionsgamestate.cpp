@@ -142,7 +142,7 @@ OptionsGamestate::~OptionsGamestate() {
         delete music;
     }
 #endif*/
-    game_g->pauseSound("music_intro");
+    game_g->freeSound("music_intro");
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();

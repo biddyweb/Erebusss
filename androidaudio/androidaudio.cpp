@@ -178,4 +178,14 @@ void AndroidAudio::playSound(const QString& name)
     }
 }
 
+void AndroidAudio::freeSound(const QString& name)
+{
+    AndroidSoundEffect* sound = mSounds[name];
+
+    if( sound ) {
+        mSounds.erase( mSounds.find(name) );
+        delete sound;
+    }
+}
+
 #endif

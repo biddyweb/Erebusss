@@ -786,6 +786,19 @@ void Game::pauseSound(const string &sound_effect) {
         sound->pause();
     }
 #endif
+    // not yet supported on Android
+}
+
+void Game::freeSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    Sound *sound = this->sound_effects[sound_effect];
+    if( sound != NULL ) {
+        this->sound_effects.erase( this->sound_effects.find(sound_effect) );
+        delete sound;
+    }
+#else
+    androidAudio.freeSound(sound_effect.c_str());
+#endif
 }
 
 void Game::setSoundEnabled(bool sound_enabled) {
