@@ -433,6 +433,22 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <npc name="Wyvern" template="Wyvern" x="33.5" y="15.0"/>
 <npc name="Wyvern" template="Wyvern" x="34.0" y="14.5"/>
 
+<player_start x="33.0" y="15.0"/>
+
+<scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="1.0"/>
+
+<scenery name="Tree" image_name="tree2" x="36.0" y="15.0" size="1.0"/>
+
+<scenery name="Plant" image_name="plant" x="29.75" y="13.25" size="0.5"/>
+
+<scenery name="Plant" image_name="plant" x="32.0" y="15.25" size="0.5"/>
+
+<scenery name="Plant" image_name="plant" x="34.0" y="14.5" size="0.5"/>
+
+<item template="Wyvern Egg" x="32.25" y="15.25"/>
+
+<item template="Wyvern Egg" x="33.75" y="14.75"/>
+
 <item name="Hand Mirror" image_name="hand_mirror" icon_width="0.25" weight="2" x="30.2" y="15.0"/>
 
 <!--library-->
@@ -441,7 +457,7 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <scenery name="Cabinet" image_name="cabinet" x="30.0" y="9.0" size="0.8" blocking="true">
     <item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2">
-necromancy blah blah
+This old and heavy tome describes the black arts of Necromancy.
     </item>
 </scenery>
 
@@ -823,7 +839,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...

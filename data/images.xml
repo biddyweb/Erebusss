@@ -22,6 +22,7 @@
 
 <image type="item" name="chess_knight" filename="gfx/textures/items/chess_knight.png"/>
 <image type="item" name="clockwork" filename="gfx/textures/items/clockwork.png"/>
+<image type="item" name="egg" filename="gfx/textures/items/egg.png"/>
 <image type="item" name="gem_red" filename="gfx/textures/items/gem_red.png"/>
 <image type="item" name="gem_green" filename="gfx/textures/items/gem_green.png"/>
 <image type="item" name="gem_blue" filename="gfx/textures/items/gem_blue.png"/>
@@ -52,6 +53,7 @@
 <image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
 <image type="scenery" name="hut" filename="gfx/textures/scenery/hut.png"/>
 <image type="scenery" name="painting_sword" filename="gfx/textures/scenery/scenery_painting_sword.png"/>
+<image type="scenery" name="plant" filename="gfx/textures/scenery/plant.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>

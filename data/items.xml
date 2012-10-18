@@ -68,6 +68,8 @@ A small wooden chess piece, the Knight.
 <item name="Gold Gem" image_name="gem_gold" icon_width="0.25" weight="1"/>
 <item name="White Gem" image_name="gem_white" icon_width="0.25" weight="1"/>
 
+<item name="Wyvern Egg" image_name="egg" icon_width="0.25" weight="1"/>
+
 <item name="Skull" image_name="skull" icon_width="0.25" weight="10"/>
 
 <item name="Mushroom" image_name="mushroom" icon_width="0.25" weight="0"
@@ -100,6 +102,7 @@ A small wooden chess piece, the Knight.
     <purchase template="Blue Gem" cost="150"/>
     <purchase template="Gold Gem" cost="200"/>
     <purchase template="White Gem" cost="250"/>
+    <purchase template="Wyvern Egg" cost="30"/>
 </shop>
 
 <player_default_items>
