@@ -22,8 +22,20 @@ Scenery::Scenery(const string &name, const string &image_name, bool is_animation
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), locked_silent(false), locked_used_up(false), unlock_xp(20), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), width(width), height(height),
     action_last_time(0), action_delay(0), action_value(0),
     interact_state(0),
-    can_be_opened(false), opened(false)
+    can_be_opened(false), opened(false),
+    trap(NULL)
 {
+}
+
+Scenery::~Scenery() {
+    for(set<Item *>::iterator iter = items.begin(); iter != items.end(); ++iter) {
+        Item *item = *iter;
+        delete item;
+    }
+    if( trap != NULL ) {
+        delete trap;
+    }
+
 }
 
 void Scenery::setBlocking(bool is_blocking, bool blocks_visibility) {
@@ -283,11 +295,26 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     playing_gamestate->showInfoDialog(result_text, picture);
 }
 
-Trap::Trap(const string &type, float width, float height) : type(type), width(width), height(height), rating(0), difficulty(0)
+void Scenery::setTrap(Trap *trap) {
+    if( this->trap != NULL ) {
+        delete this->trap;
+    }
+    this->trap = trap;
+}
+
+Trap::Trap(const string &type) : type(type), has_position(false), width(-1.0f), height(-1.0f), rating(0), difficulty(0)
+{
+}
+
+Trap::Trap(const string &type, float width, float height) : type(type), has_position(true), width(width), height(height), rating(0), difficulty(0)
 {
 }
 
 bool Trap::isSetOff(const Character *character) const {
+    ASSERT_LOGGER( has_position );
+    if( !has_position ) {
+        return false;
+    }
     Vector2D ch_pos = character->getPos();
     if( ch_pos.x >= this->pos.x && ch_pos.x <= this->pos.x + this->width &&
             ch_pos.y >= this->pos.y && ch_pos.y <= this->pos.y + this->height ) {

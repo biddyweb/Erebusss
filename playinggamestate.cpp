@@ -3461,31 +3461,39 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
                 else if( reader.name() == "trap" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: trap element wasn't expected here");
                     }
                     QStringRef type_s = reader.attributes().value("type");
-                    QStringRef pos_x_s = reader.attributes().value("x");
-                    float pos_x = parseFloat(pos_x_s.toString());
-                    QStringRef pos_y_s = reader.attributes().value("y");
-                    float pos_y = parseFloat(pos_y_s.toString());
-                    QStringRef size_w_s = reader.attributes().value("w");
-                    float size_w = parseFloat(size_w_s.toString());
-                    QStringRef size_h_s = reader.attributes().value("h");
-                    float size_h = parseFloat(size_h_s.toString());
                     QStringRef rating_s = reader.attributes().value("rating");
                     int rating = parseInt(rating_s.toString(), true);
                     QStringRef difficulty_s = reader.attributes().value("difficulty");
                     int difficulty = parseInt(difficulty_s.toString(), true);
-                    Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
-                    trap->setRating(rating);
-                    trap->setDifficulty(difficulty);
-                    if( location == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: trap element outside of location");
+                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
+                        Trap *trap = new Trap(type_s.toString().toStdString());
+                        trap->setRating(rating);
+                        trap->setDifficulty(difficulty);
+                        scenery->setTrap(trap);
                     }
-                    location->addTrap(trap, pos_x, pos_y);
+                    else {
+                        QStringRef pos_x_s = reader.attributes().value("x");
+                        float pos_x = parseFloat(pos_x_s.toString());
+                        QStringRef pos_y_s = reader.attributes().value("y");
+                        float pos_y = parseFloat(pos_y_s.toString());
+                        QStringRef size_w_s = reader.attributes().value("w");
+                        float size_w = parseFloat(size_w_s.toString());
+                        QStringRef size_h_s = reader.attributes().value("h");
+                        float size_h = parseFloat(size_h_s.toString());
+                        Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
+                        trap->setRating(rating);
+                        trap->setDifficulty(difficulty);
+                        if( location == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected quest xml: trap element outside of location");
+                        }
+                        location->addTrap(trap, pos_x, pos_y);
+                    }
                 }
             }
             else if( reader.isEndElement() ) {
@@ -4354,6 +4362,14 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
 
                 if( confirm_ok ) {
+                    if( scenery->getTrap() != NULL ) {
+                        scenery->getTrap()->setOff(this, player);
+                        scenery->setTrap(NULL);
+                        if( player->isDead() ) {
+                            break;
+                        }
+                    }
+
                     bool is_locked = false;
                     if( scenery->isLocked() ) {
                         // can we unlock it?
@@ -4490,7 +4506,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
         }
 
-        if( move ) {
+        if( move && !player->isDead() ) {
             // nudge position due to boundaries
             dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
             if( dest != player->getPos() ) {

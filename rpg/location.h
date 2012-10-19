@@ -12,6 +12,7 @@ using std::string;
 class Character;
 class Item;
 class Scenery;
+class Trap;
 class Location;
 class PlayingGamestate;
 class Quest;
@@ -77,13 +78,13 @@ protected:
     bool can_be_opened;
     bool opened;
     set<Item *> items;
+    Trap *trap;
 
     string popup_text; // not saved at the moment
 
 public:
     Scenery(const string &name, const string &image_name, bool is_animation, float width, float height);
-    virtual ~Scenery() {
-    }
+    virtual ~Scenery();
 
     void setLocation(Location *location) {
         this->location = location;
@@ -289,18 +290,24 @@ public:
     bool isOn(const Character *character) const;
     vector<string> getInteractionText(string *dialog_text) const;
     void interact(PlayingGamestate *playing_gamestate, int option);
+    void setTrap(Trap *trap);
+    Trap *getTrap() const {
+        return this->trap;
+    }
 };
 
 class Trap {
 protected:
     //Location *location;
     string type;
+    bool has_position;
     Vector2D pos; // pos in Location (for top-left)
     float width, height;
     int rating;
     int difficulty;
 
 public:
+    Trap(const string &type);
     Trap(const string &type, float width, float height);
     virtual ~Trap() {
     }
