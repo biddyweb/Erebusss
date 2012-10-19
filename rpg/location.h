@@ -59,7 +59,8 @@ protected:
     bool locked_used_up;
     string unlock_item_name;
     string unlock_text;
-    string confirm_text; // relevant onl for some types, e.g., doors
+    int unlock_xp;
+    string confirm_text; // relevant only for some types, e.g., doors
     DrawType draw_type;
     float opacity;
     float width, height;
@@ -185,6 +186,12 @@ public:
     }
     string getUnlockText() const {
         return this->unlock_text;
+    }
+    void setUnlockXP(int unlock_xp) {
+        this->unlock_xp = unlock_xp;
+    }
+    int getUnlockXP() const {
+        return this->unlock_xp;
     }
     void setConfirmText(const string &confirm_text) {
         this->confirm_text = confirm_text;

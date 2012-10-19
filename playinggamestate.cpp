@@ -3083,6 +3083,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
                     int interaction_xp = parseInt(interaction_xp_s.toString(), true);
                     npc->setInteractionXP(interaction_xp);
+                    QStringRef shop_s = reader.attributes().value("shop");
+                    if( shop_s.length() > 0 ) {
+                        npc->setShop(shop_s.toString().toStdString());
+                    }
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
@@ -3307,6 +3311,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     bool locked_used_up = parseBool(locked_used_up_s.toString(), true);
                     QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
                     QStringRef unlock_text_s = reader.attributes().value("unlock_text");
+                    QStringRef unlock_xp_s = reader.attributes().value("unlock_xp");
                     QStringRef confirm_text_s = reader.attributes().value("confirm_text");
                     float size_w = 0.0f, size_h = 0.0f;
                     QStringRef size_s = reader.attributes().value("size");
@@ -3436,6 +3441,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( unlock_text_s.length() > 0 ) {
                         scenery->setUnlockText(unlock_text_s.toString().toStdString());
+                    }
+                    if( unlock_xp_s.length() > 0 ) {
+                        int unlock_xp = parseInt(unlock_xp_s.toString());
+                        scenery->setUnlockXP(unlock_xp);
                     }
                     if( confirm_text_s.length() > 0 ) {
                         scenery->setConfirmText(confirm_text_s.toString().toStdString());
@@ -4021,6 +4030,7 @@ void PlayingGamestate::update() {
             //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
             this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
         }
+
     }
     //qDebug("PlayingGamestate::update() exit");
 }
@@ -4187,9 +4197,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     done = true;
                     target_npc = character;
                     min_dist = 0.0f;
-                    if( target_npc->canTalk() ) {
-                        float dist_from_player = (player->getPos() - character->getPos()).magnitude();
-                        if( dist_from_player <= talk_range_c ) {
+                    float dist_from_player = (player->getPos() - character->getPos()).magnitude();
+                    if( dist_from_player <= talk_range_c ) {
+                        if( target_npc->canTalk() ) {
                             stringstream message;
                             message << "<b>";
                             message << character->getName();
@@ -4262,6 +4272,20 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                         }
                                     }
                                 }
+                            }
+                        }
+                        else if( character->getShop().length() > 0 ) {
+                            const Shop *shop = NULL;
+                            for(vector<Shop *>::const_iterator iter = this->shopsBegin(); iter != this->shopsEnd() && shop==NULL; ++iter) {
+                                const Shop *this_shop = *iter;
+                                if( this_shop->getName() == character->getShop() ) {
+                                    shop = this_shop;
+                                }
+                            }
+                            ASSERT_LOGGER(shop != NULL);
+                            if( shop != NULL ) {
+                                LOG("visit shop: %s\n", shop->getName().c_str());
+                                new TradeWindow(this, shop->getItems(), shop->getCosts());
                             }
                         }
                     }
@@ -4377,7 +4401,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 delete item;
                                 item = NULL;
                             }
-                            player->addXP(this, 20);
+                            player->addXP(this, scenery->getUnlockXP());
                         }
                     }
 
@@ -4741,6 +4765,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
             fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
             fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
+            fprintf(file, " shop=\"%s\"", character->getShop().c_str());
             fprintf(file, ">\n");
             if( character->getTalkOpeningInitial().length() > 0 ) {
                 fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
@@ -4824,6 +4849,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
             fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
             fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
+            fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
             fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
             fprintf(file, ">");
             for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {

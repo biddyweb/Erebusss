@@ -245,6 +245,8 @@ class Character {
     string talk_opening_interaction_complete;
     //map<string, string> talk_items;
     vector<TalkItem> talk_items;
+    // shopkeepers
+    string shop;
 
     Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
@@ -636,5 +638,11 @@ public:
     }
     map<string, int>::const_iterator spellsEnd() const {
         return this->spells.end();
+    }
+    void setShop(const string &shop) {
+        this->shop = shop;
+    }
+    string getShop() const {
+        return this->shop;
     }
 };
