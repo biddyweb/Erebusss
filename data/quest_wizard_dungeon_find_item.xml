@@ -933,9 +933,12 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="2.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="2.0" rect_y="0.0" rect_w="3.0" rect_h="4.0"/>
 
-<scenery name="Door" image_name="door_wood" x="2.0" y="3.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
+<scenery name="Door" image_name="door_wood" x="2.5" y="3.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
 
 </location>
 
@@ -961,7 +964,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <location name="general_stores">
 
-<floor image_name="floor_paved"/>
+<floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
@@ -981,7 +984,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <location name="peasant_hut">
 
-<floor image_name="floor_paved"/>
+<floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
@@ -1441,6 +1444,14 @@ This book appears to be a journal kept by ...
 <npc name="Minotaur" template="Minotaur" x="19.25" y="14.75">
     <item name="Minotaur's Key" image_name="key" icon_width="0.25" weight="0"/>
 </npc>
+
+<scenery name="Tree" image_name="tree2" x="17.5" y="11.0" size="1.0"/>
+
+<scenery name="Plant" image_name="plant" x="21.1" y="12.25" size="0.5"/>
+
+<scenery name="Plant" image_name="plant" x="20.8" y="18.0" size="0.5"/>
+
+<scenery name="Plant" image_name="plant" x="17.3" y="17.5" size="0.5"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
     <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
