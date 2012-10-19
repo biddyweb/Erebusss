@@ -839,7 +839,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -1460,6 +1460,30 @@ This book appears to be a journal kept by ...
 
 <scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
     <gold amount="150"/>
+</scenery>
+
+<!--tombs-->
+
+<floorregion shape="rect" rect_x="15.0" rect_y="21.0" rect_w="1.0" rect_h="6.0"/>
+
+<floorregion shape="rect" rect_x="8.0" rect_y="27.0" rect_w="8.0" rect_h="4.0"/>
+
+<player_start x="15.5" y="25.0"/>
+
+<scenery name="Tomb" image_name="tomb" x="10.0" y="29.0" size="1.0" blocking="true">
+    <trap type="acid" rating="8"/>
+</scenery>
+
+<scenery name="Tomb" image_name="tomb" x="12.0" y="29.0" size="1.0" blocking="true">
+    <armour name="Magical Leather Armour" image_name="leather_armour" weight="100"
+        rating="3" magical="true"
+        base_template="Leather Armour" worth_bonus="50">
+This leather armour is blessed, offering greater protection.
+    </armour>
+</scenery>
+
+<scenery name="Tomb" image_name="tomb" x="14.0" y="29.0" size="1.0" blocking="true">
+    <gold amount="20"/>
 </scenery>
 
 </location>
