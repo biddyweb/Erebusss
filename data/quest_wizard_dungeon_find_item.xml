@@ -433,7 +433,7 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <npc name="Wyvern" template="Wyvern" x="33.5" y="15.0"/>
 <npc name="Wyvern" template="Wyvern" x="34.0" y="14.5"/>
 
-<player_start x="33.0" y="15.0"/>
+<!--<player_start x="33.0" y="15.0"/>-->
 
 <scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="1.0"/>
 
@@ -837,9 +837,9 @@ I have discovered an amazing secret! ...
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="25.0"/>
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="25.0" y="25.0"/>-->
+<player_start x="25.0" y="25.0"/>
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -850,9 +850,21 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true"/>
 
-<scenery name="Building" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="building" exit_location_x="2.0" exit_location_y="3.0"/>
+<scenery name="Inn" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="inn" exit_location_x="2.0" exit_location_y="3.0"/>
 
-<scenery name="Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true"/>
+<scenery name="Armourer" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="1.0" exit_location_y="1.5"/>
+
+<scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="1.5"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="35.0" y="31.0" size="2.5" blocking="true" block_visibility="true" exit_location="peasant_hut" exit_location_x="1.0" exit_location_y="1.5"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="29.0" y="37.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="34.0" y="36.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="38.0" y="35.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Mage's Tent" image_name="tent" x="20.0" y="43.0" size="2.5" blocking="true" block_visibility="true" exit_location="mage_tent" exit_location_x="1.0" exit_location_y="1.5"/>
 
 <scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="5.0" exit_location_y="28.0"/>
 
@@ -874,7 +886,7 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 </opening_initial>
 <opening_later>Hello again?
 </opening_later>
-<talk question="There have been earlier visitors through the gate?">
+<talk question="There have been earlier visitors through the 'gate'?">
 Yes, and still they remain. I was just a child when it happened, almost forty years ago. Evil creatures of the like that we have never seen before. They burned down our homes and took what little wealth we had, before forcing us to build them a lair. Now they come back to the village once a year, to take captives - who knows for what dreadful purpose.
 </talk>
 <talk question="Where are these visitors?">
@@ -899,9 +911,23 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 </opening_later>
 </npc>
 
+<npc name="Peasant" animation_name="peasant_woman" static_image="true" x="24.0" y="35.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello.
+</opening_initial>
+<opening_later>Hello.
+</opening_later>
+</npc>
+
 </location>
 
-<location name="building">
+<location name="inn">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -910,6 +936,92 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Door" image_name="door_wood" x="2.0" y="3.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
+
+</location>
+
+<location name="armourer">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="1.0" y="1.9" w="1.0" h="0.2" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="31.0" exit_location_y="24.75"/>
+
+<npc name="Shopkeeper" animation_name="man" static_image="true" x="2.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Armourer"/>
+
+</location>
+
+<location name="general_stores">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="1.0" y="1.9" w="1.0" h="0.2" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="28.75"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="1.2"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="General Stores"/>
+
+</location>
+
+<location name="peasant_hut">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="1.0" y="1.9" w="1.0" h="0.2" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="32.75"/>
+
+<npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="1.2"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello.
+</opening_initial>
+<opening_later>Hello.
+</opening_later>
+</npc>
+
+</location>
+
+<location name="mage_tent">
+
+<floor image_name="floor_dirt"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="1.0" y="1.9" w="1.0" h="0.2" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="44.75"/>
+
+<npc name="Shopkeeper" animation_name="man" static_image="true" x="2.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Magic Shop"/>
 
 </location>
 
@@ -1002,17 +1114,8 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <floorregion shape="rect" rect_x="34.0" rect_y="25.0" rect_w="3.0" rect_h="3.0"/>
     <scenery name="Door" image_name="door_wood" x="33.0" y="25.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Orc Warlord's Key"
+    locked="true" unlocked_by_template="Orc Warlord's Key" unlock_xp="80"
     />
-
-<scenery name="Crate" image_name="crate" x="34.5" y="27.5" w="0.8" h="0.8" blocking="true">
-    <item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50">
-A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter.
-    </item>
-    <item name="Journal" image_name="book" icon_width="0.25" weight="1">
-This book appears to be a journal kept by ...
-    </item>
-</scenery>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="36.0" y="25.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1073,6 +1176,15 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
     <scenery name="Door" image_name="door_wood" x="28.5" y="13.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Orc Warlord's Key"/>
 <floorregion shape="rect" rect_x="27.0" rect_y="14.0" rect_w="3.0" rect_h="4.0"/>
+
+<scenery name="Crate" image_name="crate" x="27.5" y="17.5" w="0.8" h="0.8" blocking="true">
+    <item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50">
+A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter.
+    </item>
+    <item name="Journal" image_name="book" icon_width="0.25" weight="1">
+This book appears to be a journal kept by ...
+    </item>
+</scenery>
 
 <floorregion shape="rect" rect_x="22.0" rect_y="11.0" rect_w="4.0" rect_h="4.0"/>
     <scenery name="Door" image_name="door_wood" x="26.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
