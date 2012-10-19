@@ -69,6 +69,7 @@
 </image>
 <image type="scenery" name="tent" filename="gfx/textures/scenery/tent.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
+<image type="scenery" name="tomb" filename="gfx/textures/scenery/tomb.png"/>
 <image type="scenery" name="tree2" filename="gfx/textures/scenery/tree2.png" width="144" height="130" stride_x="144" expected_width="576">
     <animation name="" start="0" length="4" type="loop"/>
 </image>
