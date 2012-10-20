@@ -21,6 +21,7 @@
     xpos="0" ypos="16" width="64" height="32" expected_width="512"
     />
 
+<image type="item" name="casket" filename="gfx/textures/items/casket.png"/>
 <image type="item" name="chess_knight" filename="gfx/textures/items/chess_knight.png"/>
 <image type="item" name="clockwork" filename="gfx/textures/items/clockwork.png"/>
 <image type="item" name="egg" filename="gfx/textures/items/egg.png"/>
@@ -143,6 +144,7 @@
 </image>
 <image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
 
+<image type="npc" name="ghost" filename="gfx/textures/npcs/ghost.png"/>
 <image type="npc" name="man" filename="gfx/textures/npcs/man.png"/>
 <image type="npc" name="peasant_man" filename="gfx/textures/npcs/peasant_man.png"/>
 <image type="npc" name="peasant_woman" filename="gfx/textures/npcs/peasant_woman.png"/>

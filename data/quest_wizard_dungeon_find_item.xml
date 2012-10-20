@@ -1371,6 +1371,18 @@ This book appears to be a journal kept by ...
 
 <floorregion shape="rect" rect_x="1.0" rect_y="17.0" rect_w="10.0" rect_h="1.0"/>
 
+<floorregion shape="rect" rect_x="6.0" rect_y="18.0" rect_w="1.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="2.0" rect_y="22.0" rect_w="8.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="9.0" rect_y="20.0" rect_w="1.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="2.0" rect_y="20.0" rect_w="1.0" rect_h="2.0"/>
+
+<item name="Ghost's Bones" image_name="casket" icon_width="0.25" weight="10" x="2.5" y="20.5">
+Inside this casket are a collection of bones.
+</item>
+
 <!-- from stairs down route -->
 
 <floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="5.0"/>
@@ -1485,6 +1497,42 @@ This leather armour is blessed, offering greater protection.
 <scenery name="Tomb" image_name="tomb" x="14.0" y="29.0" size="1.0" blocking="true">
     <gold amount="20"/>
 </scenery>
+
+<floorregion shape="rect" rect_x="7.0" rect_y="28.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="4.0" rect_y="27.0" rect_w="3.0" rect_h="4.0"/>
+
+<npc name="Ghost" animation_name="ghost" static_image="true" x="4.9" y="28.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Ghost's Bones"
+    interaction_xp="75"
+>
+<opening_initial>You can see me? Don't be afraid!
+</opening_initial>
+<opening_later>Woo!
+</opening_later>
+<opening_interaction_complete>
+. Thank you once again for helping me. Once I have finished researching from this book that you found for me, I will finally be able to leave this place.
+</opening_interaction_complete>
+<talk question="Are you ... a ghost?">
+I guess you could say that ... for some reason I have been trapped here as a spirit, wandering these passageways for many years, unable to pass onto the plane of death.
+</talk>
+<talk question="How did you die?">
+I would rather not talk about that ... it is too terrible to mention.
+</talk>
+<talk question="Is there anything I can do?" while_not_done="true">
+Perhaps you can find my bones. I have tried searching for them, but without luck. Maybe if they were returned to me, I might be able to finally leave this plane of existence.
+</talk>
+<talk question="I have found your bones" objective="true">
+Thank you! Now I feel no longer bound to this terrible place. You should leave too, while you still can!
+</talk>
+</npc>
 
 </location>
 
