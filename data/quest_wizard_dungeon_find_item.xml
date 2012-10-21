@@ -619,7 +619,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="1.0" y="5.5"/>
+<!--<player_start x="1.0" y="5.5"/>-->
 
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
 <scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="4.0" exit_location_y="1.5"/>
@@ -839,11 +839,13 @@ I have discovered an amazing secret! ...
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
-<background image_name="background_dark"/>
+<background image_name="background_green"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="25.0" y="25.0"/>-->
+<floorregion shape="rect" rect_x="15.0" rect_y="0.0" rect_w="8.0" rect_h="10.0"/>
+
+<player_start x="25.0" y="25.0"/>
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -854,9 +856,9 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true"/>
 
-<scenery name="Inn" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="inn" exit_location_x="2.0" exit_location_y="3.0"/>
+<scenery name="Armourer" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0"/>
 
-<scenery name="Armourer" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="1.0" exit_location_y="1.5"/>
+<scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
 <scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="1.5"/>
 
@@ -870,7 +872,7 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Mage's Tent" image_name="tent" x="20.0" y="43.0" size="2.5" blocking="true" block_visibility="true" exit_location="mage_tent" exit_location_x="1.0" exit_location_y="1.5"/>
 
-<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="11.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="5.0" exit_location_y="28.0"/>
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="1.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="5.0" exit_location_y="28.0"/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -931,7 +933,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 </location>
 
-<location name="inn">
+<location name="armourer">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -944,18 +946,6 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
 
-</location>
-
-<location name="armourer">
-
-<floor image_name="floor_paved"/>
-<wall image_name="wall"/>
-<background image_name="background_dark"/>
-
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
-
-<scenery name="Door" image_name="door_wood" x="1.0" y="1.9" w="1.0" h="0.2" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="31.0" exit_location_y="24.75"/>
-
 <npc name="Shopkeeper" animation_name="man" static_image="true" x="2.5" y="1.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -963,6 +953,8 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true"/>
 
 </location>
 
@@ -1050,7 +1042,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <!--<player_start x="5.0" y="28.0"/>-->
 <!--<player_start x="16.0" y="23.0"/>-->
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="11.0"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="1.0"/>
 
 <floorregion shape="rect" rect_x="4.0" rect_y="16.0" rect_w="2.0" rect_h="10.0" />
 
