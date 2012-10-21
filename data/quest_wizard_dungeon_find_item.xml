@@ -614,7 +614,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="1.0" y="5.5"/>-->
+<player_start x="1.0" y="5.5"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
 <scenery name="Door" image_name="door_wood" x="0.2" y="5.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="4.0" exit_location_y="1.5"/>
@@ -672,8 +672,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <floorregion shape="rect" rect_x="0.0" rect_y="15.0" rect_w="3.0" rect_h="3.0"/>
 
 <scenery name="Barrel" image_name="barrel" x="0.5" y="17.5" w="0.8" h="0.8" blocking="true">
-    <gold amount="9"/>
-    <item template="Dagger"/>
+    <trap type="acid" rating="4"/>
 </scenery>
 
 <scenery name="Trapdoor" image_name="grate" x="1.5" y="16.5" w="0.5" h="0.5" exit_location="level_6" exit_location_x="1.0" exit_location_y="1.0" confirm_text="There is a trapdoor in this room. Do you want to drop down into the room below?" draw_type="background"/>
@@ -1389,7 +1388,7 @@ Inside this casket are a collection of bones.
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
-<player_start x="38.5" y="14.0"/>
+<!--<player_start x="38.5" y="14.0"/>-->
 
 <floorregion shape="rect" rect_x="32.5" rect_y="15.5" rect_w="2.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="32.5" rect_y="16.5" rect_w="1.0" rect_h="1.5"/>
@@ -1480,6 +1479,13 @@ A small bronze statuette of a humanoid bull-like creature.
 <scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
     <gold amount="150"/>
 </scenery>
+
+<floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="17.5" rect_y="26.0" rect_w="3.0" rect_h="3.0"/>
+
+<!--<player_start x="19.0" y="25.5"/>-->
+
+<scenery name="Teleport" image_name="teleport" x="19.0" y="28.0" size="1.0" blocking="true" exit_location="entrance" exit_location_x="46.0" exit_location_y="11.0"/>
 
 <!--tombs-->
 
