@@ -8,9 +8,10 @@
 <image type="generic" name="floor_paved" filename="gfx/textures/floor_paved.png"/>
 <image type="generic" name="floor_paved_blood" filename="gfx/textures/floor_paved_blood.png"/>
 <!--<image type="generic" name="background_dark" imagetype="perlin" max_red="10" max_green="10" max_blue="50" min_red="0" min_green="0" min_blue="0"/>-->
-<image type="generic" name="background_brown" imagetype="perlin" max_red="60" max_green="30" max_blue="00" min_red="20" min_green="10" min_blue="0"/>
+<image type="generic" name="background_brown" imagetype="perlin" max_red="60" max_green="30" max_blue="0" min_red="20" min_green="10" min_blue="0"/>
 <image type="generic" name="background_dark" imagetype="perlin" max_red="40" max_green="40" max_blue="50" min_red="0" min_green="0" min_blue="0"/>
 <image type="generic" name="background_black" imagetype="perlin" max_red="16" max_green="16" max_blue="24" min_red="0" min_green="0" min_blue="0"/>
+<image type="generic" name="background_green" imagetype="perlin" max_red="160" max_green="180" max_blue="110" min_red="100" min_green="128" min_blue="48"/>
 
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
