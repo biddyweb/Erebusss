@@ -1482,6 +1482,8 @@ Inside this casket are a collection of bones.
 
 <player_start x="15.5" y="25.0"/>
 
+<npc name="Giant Spider" template="Giant Spider" x="9.0" y="29.0"/>
+
 <scenery name="Tomb" image_name="tomb" x="10.0" y="29.0" size="1.0" blocking="true">
     <trap type="acid" rating="8"/>
 </scenery>
