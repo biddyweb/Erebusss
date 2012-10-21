@@ -3936,9 +3936,11 @@ void PlayingGamestate::update() {
 
     //qDebug("PlayingGamestate::update()");
     // scroll
+    bool scrolled = false;
+    int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+    float speed = (4.0f * time_ms)/1000.0f;
     if( !mobile_c ) {
-        int time_ms = game_g->getScreen()->getGameTimeFrameMS();
-        float speed = (4.0f * time_ms)/1000.0f;
+        // scroll due to mouse at edge of screen
         int m_x = QCursor::pos().x();
         int m_y = QCursor::pos().y();
         int screen_width = QApplication::desktop()->width();
@@ -3949,18 +3951,50 @@ void PlayingGamestate::update() {
         if( m_x <= 0 ) {
             centre.setX( centre.x() - speed );
             this->view->centerOn(centre);
+            scrolled = true;
         }
         else if( m_x >= screen_width-1 ) {
             centre.setX( centre.x() + speed );
             this->view->centerOn(centre);
+            scrolled = true;
         }
         if( m_y <= 0 ) {
             centre.setY( centre.y() - speed );
             this->view->centerOn(centre);
+            scrolled = true;
         }
         else if( m_y >= screen_height-1 ) {
             centre.setY( centre.y() + speed );
             this->view->centerOn(centre);
+            scrolled = true;
+        }
+    }
+    if( !scrolled ) {
+        // scroll due to player near the edge
+        QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
+        if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
+            const int wid = 32;
+            QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
+            if( player_pos.x() < wid ) {
+                centre.setX( centre.x() - speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            else if( player_pos.x() >= this->view->width() - wid ) {
+                centre.setX( centre.x() + speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            if( player_pos.y() < wid ) {
+                centre.setY( centre.y() - speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            else if( player_pos.y() >= this->view->height() - wid ) {
+                centre.setY( centre.y() + speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
         }
     }
 
