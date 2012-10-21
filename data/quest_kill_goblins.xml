@@ -142,7 +142,7 @@
 </scenery>
 
 <scenery name="Chest" image_name="chest" x="19.0" y="7.5" w="0.8" h="0.8" blocking="true">
-    <gold amount="100"/>
+    <gold amount="50"/>
     <item template="Potion of Healing"/>
     <item template="Gold Ring"/>
 </scenery>
