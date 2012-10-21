@@ -1389,7 +1389,7 @@ Inside this casket are a collection of bones.
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
-<!--<player_start x="38.5" y="14.0"/>-->
+<player_start x="38.5" y="14.0"/>
 
 <floorregion shape="rect" rect_x="32.5" rect_y="15.5" rect_w="2.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="32.5" rect_y="16.5" rect_w="1.0" rect_h="1.5"/>
@@ -1415,6 +1415,12 @@ Inside this casket are a collection of bones.
 <floorregion shape="rect" rect_x="27.0" rect_y="13.0" rect_w="3.0" rect_h="2.0"/>
 
 <npc name="Goblin Champion" template="Goblin Champion" x="29.5" y="14.5"/>
+
+<scenery name="Chest" image_name="chest" x="27.5" y="14.5" size="0.8" blocking="true">
+    <item name="Bull Statuette" image_name="bull_statuette" icon_width="0.25" weight="10">
+A small bronze statuette of a humanoid bull-like creature.
+    </item>
+</scenery>
 
 <floorregion shape="rect" rect_x="25.5" rect_y="12.5" rect_w="1.0" rect_h="4.0"/>
 <trap x="25.5" y="14.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
@@ -1448,7 +1454,8 @@ Inside this casket are a collection of bones.
 <floorregion shape="rect" rect_x="15.0" rect_y="20.0" rect_w="8.5" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_metal" x="19.0" y="20.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_metal" x="19.0" y="20.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Bull Statuette" unlock_text="The bull statuette that you carry shakes..."/>
 <floorregion shape="rect" rect_x="16.5" rect_y="10.5" rect_w="5.5" rect_h="8.5"/>
 
 <!--<player_start x="19.0" y="19.5"/>-->
@@ -1480,7 +1487,7 @@ Inside this casket are a collection of bones.
 
 <floorregion shape="rect" rect_x="8.0" rect_y="27.0" rect_w="8.0" rect_h="4.0"/>
 
-<player_start x="15.5" y="25.0"/>
+<!--<player_start x="15.5" y="25.0"/>-->
 
 <npc name="Giant Spider" template="Giant Spider" x="9.0" y="29.0"/>
 

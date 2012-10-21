@@ -21,6 +21,7 @@
     xpos="0" ypos="16" width="64" height="32" expected_width="512"
     />
 
+<image type="item" name="bull_statuette" filename="gfx/textures/items/bull_statuette.png"/>
 <image type="item" name="casket" filename="gfx/textures/items/casket.png"/>
 <image type="item" name="chess_knight" filename="gfx/textures/items/chess_knight.png"/>
 <image type="item" name="clockwork" filename="gfx/textures/items/clockwork.png"/>
