@@ -633,8 +633,9 @@ public:
 class QuestObjective {
     string type;
     string arg1;
+    int gold;
 public:
-    QuestObjective(const string &type, const string &arg1);
+    QuestObjective(const string &type, const string &arg1, int gold);
 
     bool testIfComplete(const Quest *quest) const;
     const string &getType() const {
@@ -643,12 +644,16 @@ public:
     const string &getArg1() const {
         return arg1;
     }
+    int getGold() const {
+        return gold;
+    }
 };
 
 class Quest {
     QuestObjective *quest_objective;
     vector<Location *> locations;
     string info;
+    string completed_text;
     bool is_completed;
 public:
     Quest();
@@ -667,6 +672,12 @@ public:
     }
     string getInfo() const {
         return this->info;
+    }
+    void setCompletedText(const string &completed_text) {
+        this->completed_text = completed_text;
+    }
+    string getCompletedText() const {
+        return this->completed_text;
     }
     vector<Location *>::iterator locationsBegin() {
         return this->locations.begin();

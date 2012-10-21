@@ -488,6 +488,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);*/
         const float x_off = 16.0f/640.0f;
         const float hgt = 64.0f/360.0f;
+        painter.setPen(Qt::white);
         painter.drawText(x_off*width(), (100.0f/360.0f)*height(), "Please wait...");
         this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
         qDebug(">>> draw progress: %d", this->progress_percent);
@@ -2737,6 +2738,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     LOG("quest info: %s\n", info.toStdString().c_str());
                     quest->setInfo(info.toStdString());
                 }
+                else if( reader.name() == "completed_text" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: completed_text element wasn't expected here");
+                    }
+                    QString completed_text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    LOG("quest completed_text: %s\n", completed_text.toStdString().c_str());
+                    quest->setCompletedText(completed_text.toStdString());
+                }
                 else if( reader.name() == "journal" ) {
                     if( !is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2947,7 +2957,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                 else if( reader.name() == "quest_objective" ) {
                     QStringRef type_s = reader.attributes().value("type");
                     QStringRef arg1_s = reader.attributes().value("arg1");
-                    QuestObjective *quest_objective = new QuestObjective(type_s.toString().toStdString(), arg1_s.toString().toStdString());
+                    QStringRef gold_s = reader.attributes().value("gold");
+                    int gold = parseInt(gold_s.toString());
+                    QuestObjective *quest_objective = new QuestObjective(type_s.toString().toStdString(), arg1_s.toString().toStdString(), gold);
                     this->quest->setQuestObjective(quest_objective);
                 }
                 else if( reader.name() == "quest_info" ) {
@@ -3380,7 +3392,21 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("scenery can't be both an exit_location and a door");
                     }
+
+                    if( is_animation ) {
+                        map<string, AnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
+                        if( animation_iter != this->scenery_animation_layers.end() ) {
+                            const AnimationLayer *animation_layer = animation_iter->second;
+                            if( animation_layer->getAnimationSet("opened") != NULL ) {
+                                scenery->setCanBeOpened(true);
+                            }
+                        }
+                    }
+
                     scenery->setBlocking(blocking, block_visibility);
+                    if( is_opened && !scenery->canBeOpened() ) {
+                        LOG("trying to set is_opened on scenery that can't be opened: %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+                    }
                     scenery->setOpened(is_opened);
                     if( opacity_s.length() > 0 ) {
                         float opacity = parseFloat(opacity_s.toString());
@@ -3448,15 +3474,6 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( confirm_text_s.length() > 0 ) {
                         scenery->setConfirmText(confirm_text_s.toString().toStdString());
-                    }
-                    if( is_animation ) {
-                        map<string, AnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
-                        if( animation_iter != this->scenery_animation_layers.end() ) {
-                            const AnimationLayer *animation_layer = animation_iter->second;
-                            if( animation_layer->getAnimationSet("opened") != NULL ) {
-                                scenery->setCanBeOpened(true);
-                            }
-                        }
                     }
                     questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
@@ -4462,6 +4479,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 this->playSound("door");
                             }
                             this->closeSubWindow(); // just in case
+                            if( this->getQuest()->isCompleted() ) {
+                                int gold = this->getQuest()->getQuestObjective()->getGold();
+                                this->player->addGold(gold);
+                                this->showInfoDialog(this->getQuest()->getCompletedText());
+                            }
                             new CampaignWindow(this);
                             game_g->getScreen()->setPaused(true);
                             this->player->restoreHealth();
@@ -4898,14 +4920,20 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 
         fprintf(file, "</location>\n\n");
     }
+
     const QuestObjective *quest_objective = this->getQuest()->getQuestObjective();
     if( quest_objective != NULL ) {
         LOG("save quest objective\n");
         fprintf(file, "<quest_objective");
         fprintf(file, " type=\"%s\"", quest_objective->getType().c_str());
         fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
+        fprintf(file, " gold=\"%d\"", quest_objective->getGold());
         fprintf(file, " />");
     }
+    fprintf(file, "\n");
+
+    LOG("save quest completed text\n");
+    fprintf(file, "<completed_text>%s</completed_text>\n", this->getQuest()->getCompletedText().c_str());
     fprintf(file, "\n");
 
     LOG("save current quest info\n");

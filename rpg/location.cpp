@@ -1356,7 +1356,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     return update_floor_regions;
 }
 
-QuestObjective::QuestObjective(const string &type, const string &arg1) : type(type), arg1(arg1) {
+QuestObjective::QuestObjective(const string &type, const string &arg1, int gold) : type(type), arg1(arg1), gold(gold) {
 }
 
 bool QuestObjective::testIfComplete(const Quest *quest) const {

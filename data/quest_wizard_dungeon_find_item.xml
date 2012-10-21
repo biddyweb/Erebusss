@@ -4,6 +4,11 @@
 <info>
 </info>
 
+<completed_text>
+</completed_text>
+
+<quest_objective type="kill" arg1="all_hostile" gold="250"/>
+
 <location name="entrance">
 
 <floor image_name="floor_paved"/>
@@ -1665,7 +1670,5 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <scenery name="Fire" image_name="fire" x="43.5" y="21.0" size="1.0" blocking="true"/>
 
 </location>
-
-<quest_objective type="kill" arg1="all_hostile"/>
 
 </quest>
