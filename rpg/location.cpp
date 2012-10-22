@@ -1359,7 +1359,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
 QuestObjective::QuestObjective(const string &type, const string &arg1, int gold) : type(type), arg1(arg1), gold(gold) {
 }
 
-bool QuestObjective::testIfComplete(const Quest *quest) const {
+bool QuestObjective::testIfComplete(const PlayingGamestate *playing_gamestate, const Quest *quest) const {
     bool complete = false;
     if( type == "kill" ) {
         if( arg1 == "all_hostile" ) {
@@ -1377,6 +1377,11 @@ bool QuestObjective::testIfComplete(const Quest *quest) const {
         else {
             LOG("unknown arg1: %s\n", arg1.c_str());
             ASSERT_LOGGER(false);
+        }
+    }
+    else if( type == "find_item" ) {
+        if( playing_gamestate->getPlayer()->findItem(arg1) ) {
+            complete = true;
         }
     }
     else {
@@ -1413,10 +1418,9 @@ Location *Quest::findLocation(const string &name) {
     return NULL;
 }
 
-bool Quest::testIfComplete() {
-    ASSERT_LOGGER( !is_completed ); // if already complete, shouldn't be asking
+bool Quest::testIfComplete(const PlayingGamestate *playing_gamestate) {
     if( quest_objective != NULL ) {
-        this->is_completed = quest_objective->testIfComplete(this);
+        this->is_completed = quest_objective->testIfComplete(playing_gamestate, this);
         return this->is_completed;
     }
     return false;

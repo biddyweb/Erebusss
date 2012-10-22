@@ -4085,13 +4085,16 @@ void PlayingGamestate::update() {
         }
     }
     if( delete_characters.size() > 0 ) {
-        if( !this->quest->isCompleted() && this->quest->testIfComplete() ) {
-            //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
-            this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
-        }
-
+        this->checkQuestComplete();
     }
     //qDebug("PlayingGamestate::update() exit");
+}
+
+void PlayingGamestate::checkQuestComplete() {
+    if( !this->quest->isCompleted() && this->quest->testIfComplete(this) ) {
+        //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
+        this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
+    }
 }
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
@@ -4375,6 +4378,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     this->playSound("coin");
                 }
                 player->pickupItem(picked_item);
+                this->checkQuestComplete();
             }
         }
 
@@ -4513,6 +4517,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 this->playSound("door");
                             }
                             this->closeSubWindow(); // just in case
+                            this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
                             if( this->getQuest()->isCompleted() ) {
                                 int gold = this->getQuest()->getQuestObjective()->getGold();
                                 this->player->addGold(gold);

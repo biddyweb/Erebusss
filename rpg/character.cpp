@@ -126,6 +126,18 @@ Item *Character::findItem(const string &key) {
     return NULL;
 }
 
+const Item *Character::findItem(const string &key) const {
+    //qDebug("Character::findItem(%s)", key.c_str());
+    for(set<Item *>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        const Item *item = *iter;
+        //qDebug("    compare to: %s", item->getKey().c_str());
+        if( item->getKey() == key )
+            return item;
+    }
+    //qDebug("    not found");
+    return NULL;
+}
+
 bool Character::useAmmo(Ammo *ammo) {
     // n.b., must be an item owned by Character!
     bool used_up = false;

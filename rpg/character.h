@@ -248,7 +248,6 @@ class Character {
     // shopkeepers
     string shop;
 
-    Item *findItem(const string &key);
     bool useAmmo(Ammo *ammo);
     int getNaturalDamage() const;
 
@@ -515,6 +514,8 @@ public:
     set<Item *>::const_iterator itemsEnd() const {
         return this->items.end();
     }
+    Item *findItem(const string &key);
+    const Item *findItem(const string &key) const;
     int getGold() const {
         return this->gold;
     }

@@ -637,7 +637,7 @@ class QuestObjective {
 public:
     QuestObjective(const string &type, const string &arg1, int gold);
 
-    bool testIfComplete(const Quest *quest) const;
+    bool testIfComplete(const PlayingGamestate *playing_gamestate, const Quest *quest) const;
     const string &getType() const {
         return type;
     }
@@ -695,7 +695,7 @@ public:
     bool isCompleted() const {
         return this->is_completed;
     }
-    bool testIfComplete();
+    bool testIfComplete(const PlayingGamestate *playing_gamestate);
     void setCompleted(bool is_completed) {
         this->is_completed = is_completed;
     }

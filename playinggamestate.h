@@ -379,6 +379,7 @@ public:
         }
     }
     //virtual void mouseClick(int m_x, int m_y);
+    void checkQuestComplete();
 
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
     virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
