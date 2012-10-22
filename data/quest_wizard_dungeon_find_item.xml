@@ -7,7 +7,7 @@
 <completed_text>
 </completed_text>
 
-<quest_objective type="kill" arg1="all_hostile" gold="250"/>
+<quest_objective type="find_item" arg1="Wizard's Skull" gold="250"/>
 
 <location name="entrance">
 
@@ -15,7 +15,7 @@
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.0" y="2.0"/>-->
+<player_start x="32.0" y="2.0"/>
 
 <!--main room-->
 
@@ -36,7 +36,6 @@
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="37.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" w="0.8" h="0.8" blocking="true">
     <gold amount="7"/>
@@ -59,6 +58,7 @@
 
 <!--eastern rooms, goblins-->
     <floorregion shape="rect" rect_x="37.0" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
+    <scenery name="Door" image_name="door_wood" x="37.25" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="37.5" rect_y="3.0" rect_w="8.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="9.0" rect_w="5.0" rect_h="4.0" />
@@ -164,6 +164,10 @@ my efforts with the great riches to be found!
 <scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
 <item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
 This is a small book, containing some notes. The writing is barely legible, and gets worse towards the end. You read some of the entries:
+
+I have been sentenced to five months in prison, to be served in the mage's dungeon.
+
+...
 
 I don't know how long I have been kept here, locked up in this tiny cell.
 </item>
@@ -845,7 +849,7 @@ I have discovered an amazing secret! ...
 
 <floorregion shape="rect" rect_x="15.0" rect_y="0.0" rect_w="8.0" rect_h="10.0"/>
 
-<player_start x="25.0" y="25.0"/>
+<!--<player_start x="25.0" y="25.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -1475,6 +1479,7 @@ A small bronze statuette of a humanoid bull-like creature.
 
 <scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
     <gold amount="150"/>
+    <item name="Wizard's Skull" image_name="skull" icon_width="0.25" weight="10"/>
 </scenery>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
