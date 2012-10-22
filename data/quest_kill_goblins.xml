@@ -133,7 +133,9 @@
 <scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="20.0" y="11.25" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
-<item template="Skull" x="8.5" y="7.0"/>
+<!--<item template="Skull" x="8.5" y="7.0"/>-->
+
+<scenery name="Rock" image_name="rock1" x="8.5" y="7.1" size="0.2"/>
 
 <scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2"/>
 
