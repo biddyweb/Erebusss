@@ -115,6 +115,18 @@ public:
     }
     int getIntProperty(const string &key) const;
     float getFloatProperty(const string &key) const;
+    map<string, int>::const_iterator intPropertiesBegin() const {
+        return this->int_properties.begin();
+    }
+    map<string, int>::const_iterator intPropertiesEnd() const {
+        return this->int_properties.end();
+    }
+    map<string, float>::const_iterator floatPropertiesBegin() const {
+        return this->float_properties.begin();
+    }
+    map<string, float>::const_iterator floatPropertiesEnd() const {
+        return this->float_properties.end();
+    }
 
     // convenient wrapper to set all properties
     void set(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
@@ -474,7 +486,7 @@ public:
         return 0.25f;
     }*/
 
-    int getFP() const {
+    /*int getFP() const {
         //return this->FP;
         //return this->profile.FP;
         return this->profile.getIntProperty(profile_key_FP_c);
@@ -513,19 +525,46 @@ public:
         //return this->Sp;
         //return this->profile.Sp;
         return this->profile.getFloatProperty(profile_key_Sp_c);
+    }*/
+    const Profile *getBaseProfile() const {
+        return &this->profile;
     }
-    void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
-        /*this->FP = FP;
+    int getBaseProfileIntProperty(const string &key) const {
+        return this->profile.getIntProperty(key);
+    }
+    float getBaseProfileFloatProperty(const string &key) const {
+        return this->profile.getFloatProperty(key);
+    }
+    int getProfileIntProperty(const string &key) const {
+        return this->getBaseProfileIntProperty(key);
+    }
+    float getProfileFloatProperty(const string &key) const {
+        return this->getBaseProfileFloatProperty(key);
+    }
+    void changeBaseProfileIntProperty(const string &key, int change) {
+        int value = this->profile.getIntProperty(key);
+        value += change;
+        this->profile.setIntProperty(key, value);
+    }
+    void changeBaseProfileFloatProperty(const string &key, float change) {
+        float value = this->profile.getFloatProperty(key);
+        value += change;
+        this->profile.setFloatProperty(key, value);
+    }
+    /*void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->FP = FP;
         this->BS = BS;
         this->S = S;
         this->A = A;
         this->M = M;
         this->D = D;
         this->B = B;
-        this->Sp = Sp;*/
+        this->Sp = Sp;
+    }*/
+    void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->profile.set(FP, BS, S, A, M, D, B, Sp);
     }
-    void changeBaseFP(int change) {
+    /*void changeBaseFP(int change) {
         //this->profile.FP += change;
         int base = this->profile.getIntProperty(profile_key_FP_c);
         base += change;
@@ -572,7 +611,7 @@ public:
         int base = this->profile.getFloatProperty(profile_key_Sp_c);
         base += change;
         this->profile.setFloatProperty(profile_key_Sp_c, base);
-    }
+    }*/
     /*void setFP(int FP) {
         this->FP = FP;
     }

@@ -143,7 +143,8 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             result_text = "As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!";
             //int FP = playing_gamestate->getPlayer()->getFP();
             //playing_gamestate->getPlayer()->setFP( FP + 1 );
-            playing_gamestate->getPlayer()->changeBaseFP(1);
+            //playing_gamestate->getPlayer()->changeBaseFP(1);
+            playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_FP_c, 1);
         }
         else {
             result_text = "As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.\nThen everything goes dark...";
@@ -174,7 +175,8 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             result_text = "As you sit, you see a flash before your eyes. You have gained great intellectual insight!";
             //int M = playing_gamestate->getPlayer()->getMind();
             //playing_gamestate->getPlayer()->setMind( M + 1 );
-            playing_gamestate->getPlayer()->changeBaseM(1);
+            //playing_gamestate->getPlayer()->changeBaseM(1);
+            playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_M_c, 1);
         }
         else {
             result_text = "As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!\nYour adventure ends here.";
@@ -330,7 +332,8 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     LOG("character: %s has set off trap at %f, %f roll %d\n", character->getName().c_str(), this->getX(), this->getY(), rollD);
     string text;
     if( type == "arrow" ) {
-        if( rollD + difficulty <= character->getDexterity() ) {
+        //if( rollD + difficulty <= character->getDexterity() ) {
+        if( rollD + difficulty <= character->getBaseProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
             text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
         }
@@ -360,7 +363,8 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
     }
     else if( type == "mantrap" ) {
-        if( rollD + difficulty <= character->getDexterity() ) {
+        //if( rollD + difficulty <= character->getDexterity() ) {
+        if( rollD + difficulty <= character->getBaseProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
             text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
         }

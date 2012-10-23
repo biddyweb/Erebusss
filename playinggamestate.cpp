@@ -554,14 +554,23 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += Game::getDifficultyString(this->playing_gamestate->getDifficulty()).c_str();
     html += "<br/>";
 
-    html += "<b>Fighting Prowess:</b> " + QString::number(player->getFP()) + "<br/>";
+    /*html += "<b>Fighting Prowess:</b> " + QString::number(player->getFP()) + "<br/>";
     html += "<b>Bow Skill:</b> " + QString::number(player->getBS()) + "<br/>";
     html += "<b>Strength:</b> " + QString::number(player->getStrength()) + "<br/>";
     html += "<b>Attacks:</b> " + QString::number(player->getAttacks()) + "<br/>";
     html += "<b>Mind:</b> " + QString::number(player->getMind()) + "<br/>";
     html += "<b>Dexterity:</b> " + QString::number(player->getDexterity()) + "<br/>";
     html += "<b>Bravery:</b> " + QString::number(player->getBravery()) + "<br/>";
-    html += "<b>Speed:</b> " + QString::number(player->getSpeed()) + "<br/>";
+    html += "<b>Speed:</b> " + QString::number(player->getSpeed()) + "<br/>";*/
+
+    html += "<b>Fighting Prowess:</b> " + QString::number(player->getProfileIntProperty(profile_key_FP_c)) + "<br/>";
+    html += "<b>Bow Skill:</b> " + QString::number(player->getProfileIntProperty(profile_key_BS_c)) + "<br/>";
+    html += "<b>Strength:</b> " + QString::number(player->getProfileIntProperty(profile_key_S_c)) + "<br/>";
+    html += "<b>Attacks:</b> " + QString::number(player->getProfileIntProperty(profile_key_A_c)) + "<br/>";
+    html += "<b>Mind:</b> " + QString::number(player->getProfileIntProperty(profile_key_M_c)) + "<br/>";
+    html += "<b>Dexterity:</b> " + QString::number(player->getProfileIntProperty(profile_key_D_c)) + "<br/>";
+    html += "<b>Bravery:</b> " + QString::number(player->getProfileIntProperty(profile_key_B_c)) + "<br/>";
+    html += "<b>Speed:</b> " + QString::number(player->getProfileFloatProperty(profile_key_Sp_c)) + "<br/>";
 
     html += "<b>Health:</b> ";
     if( player->getHealth() < player->getMaxHealth() ) {
@@ -4816,14 +4825,24 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             }
             fprintf(file, " health=\"%d\"", character->getHealth());
             fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
-            fprintf(file, " FP=\"%d\"", character->getFP());
+            /*fprintf(file, " FP=\"%d\"", character->getFP());
             fprintf(file, " BS=\"%d\"", character->getBS());
             fprintf(file, " S=\"%d\"", character->getStrength());
             fprintf(file, " A=\"%d\"", character->getAttacks());
             fprintf(file, " M=\"%d\"", character->getMind());
             fprintf(file, " D=\"%d\"", character->getDexterity());
             fprintf(file, " B=\"%d\"", character->getBravery());
-            fprintf(file, " Sp=\"%f\"", character->getSpeed());
+            fprintf(file, " Sp=\"%f\"", character->getSpeed());*/
+            for(map<string, int>::const_iterator iter = character->getBaseProfile()->intPropertiesBegin(); iter != character->getBaseProfile()->intPropertiesEnd(); ++iter) {
+                string key = iter->first;
+                int value = iter->second;
+                fprintf(file, " %s=\"%d\"", key.c_str(), value);
+            }
+            for(map<string, float>::const_iterator iter = character->getBaseProfile()->floatPropertiesBegin(); iter != character->getBaseProfile()->floatPropertiesEnd(); ++iter) {
+                string key = iter->first;
+                float value = iter->second;
+                fprintf(file, " %s=\"%f\"", key.c_str(), value);
+            }
             int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
             character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
             fprintf(file, " natural_damageX=\"%d\"", natural_damageX);

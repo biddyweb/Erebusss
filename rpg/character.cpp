@@ -320,7 +320,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     }
                     else {
                         int hit_roll = rollDice(2, 6, 0);
-                        int stat = is_ranged ? this->getBS() : this->getFP();
+                        //int stat = is_ranged ? this->getBS() : this->getFP();
+                        int stat = this->getBaseProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
                         int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                         if( hit_roll <= mod_stat ) {
                             //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
@@ -333,7 +334,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                             else {
                                 int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                if( rollDice(2, 6, 0) <= this->getStrength() ) {
+                                //if( rollDice(2, 6, 0) <= this->getStrength() ) {
+                                if( rollDice(2, 6, 0) <= this->getBaseProfileIntProperty(profile_key_S_c) ) {
                                     //LOG("    extra strong hit!\n");
                                     damage++;
                                 }
@@ -476,7 +478,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             Vector2D diff = dest - this->pos;
             int time_ms = game_g->getScreen()->getGameTimeFrameMS();
             //float step = 0.002f * time_ms;
-            float step = (this->getSpeed() * time_ms)/1000.0f;
+            //float step = (this->getSpeed() * time_ms)/1000.0f;
+            float step = (this->getBaseProfileFloatProperty(profile_key_Sp_c) * time_ms)/1000.0f;
             float dist = diff.magnitude();
             Vector2D new_pos = pos;
             bool next_seg = false;
@@ -861,13 +864,13 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
         }
         this->setPath(new_path);
     }
-
 }
 
 int Character::getCanCarryWeight() const {
     //return 300;
     //return 10;
-    return 250 + 10 * this->getStrength();
+    //return 250 + 10 * this->getStrength();
+    return 250 + 10 * this->getBaseProfileIntProperty(profile_key_S_c);
 }
 
 bool Character::canMove() const {
