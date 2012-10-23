@@ -12,6 +12,28 @@
 #include <cassert>
 #endif
 
+Profile::Profile(const CharacterTemplate &character_template) {
+    *this = *character_template.getProfile();
+}
+
+int Profile::getIntProperty(const string &key) const {
+    map<string, int>::const_iterator iter = this->int_properties.find(key);
+    ASSERT_LOGGER( iter != this->int_properties.end() );
+    if( iter == this->int_properties.end() ) {
+        return 0;
+    }
+    return iter->second;
+}
+
+float Profile::getFloatProperty(const string &key) const {
+    map<string, float>::const_iterator iter = this->float_properties.find(key);
+    ASSERT_LOGGER( iter != this->float_properties.end() );
+    if( iter == this->float_properties.end() ) {
+        return 0;
+    }
+    return iter->second;
+}
+
 void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const {
     if( this->type == "attack" ) {
         int damage = rollDice(rollX, rollY, rollZ);
@@ -34,7 +56,8 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 }
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
-    FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
+    //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
 {
 }
 
@@ -65,7 +88,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false),
-    FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
+    //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
@@ -85,7 +108,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false),
-    FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
+    //FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
+    profile(character_template),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
@@ -296,7 +320,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     }
                     else {
                         int hit_roll = rollDice(2, 6, 0);
-                        int stat = is_ranged ? this->BS : this->FP;
+                        int stat = is_ranged ? this->getBS() : this->getFP();
                         int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                         if( hit_roll <= mod_stat ) {
                             //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
@@ -309,7 +333,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                             else {
                                 int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                if( rollDice(2, 6, 0) <= this->S ) {
+                                if( rollDice(2, 6, 0) <= this->getStrength() ) {
                                     //LOG("    extra strong hit!\n");
                                     damage++;
                                 }
@@ -452,7 +476,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             Vector2D diff = dest - this->pos;
             int time_ms = game_g->getScreen()->getGameTimeFrameMS();
             //float step = 0.002f * time_ms;
-            float step = (this->Sp * time_ms)/1000.0f;
+            float step = (this->getSpeed() * time_ms)/1000.0f;
             float dist = diff.magnitude();
             Vector2D new_pos = pos;
             bool next_seg = false;
@@ -843,7 +867,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
 int Character::getCanCarryWeight() const {
     //return 300;
     //return 10;
-    return 250 + 10 * this->S;
+    return 250 + 10 * this->getStrength();
 }
 
 bool Character::canMove() const {
@@ -857,6 +881,7 @@ bool Character::canMove() const {
 void Character::useSpell(const string &spell) {
     map<string, int>::iterator iter = this->spells.find(spell);
     ASSERT_LOGGER( iter != this->spells.end() );
+    ASSERT_LOGGER( iter->second > 0 );
     iter->second--;
 }
 

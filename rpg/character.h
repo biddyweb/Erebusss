@@ -15,6 +15,7 @@ using std::map;
 #include "utils.h"
 
 class Character;
+class CharacterTemplate;
 class PlayingGamestate;
 class Item;
 class Weapon;
@@ -23,6 +24,28 @@ class Armour;
 class Ammo;
 class Location;
 class Scenery;
+
+/*class Value {
+    enum Type {
+        TYPE_INT = 0,
+        TYPE_FLOAT = 1
+    };
+    Type type;
+    int value_int;
+    float value_float;
+public:
+    Value() : type(TYPE_INT), value_int(0), value_float(0.0f) {
+    }
+
+    void setInt(int value) {
+        this->type = TYPE_INT;
+        this->value_int = value;
+    }
+    void setFloat(float value) {
+        this->type = TYPE_FLOAT;
+        this->value_float = value;
+    }
+};*/
 
 /** The visibility range - how far the player and NPCs can see. This should be
   * used for every possible action, such as ranged attacks, spells. For NPCs
@@ -38,6 +61,73 @@ const float npc_visibility_c = 10.0f;
 const float npc_radius_c = 0.25f;
 const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
 const float talk_range_c = hit_range_c;
+
+/*class Profile {
+public:
+    int FP, BS, S, A, M, D, B;
+    float Sp;
+
+    Profile() : FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0) {
+    }
+    Profile(const CharacterTemplate &character_template);
+    Profile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) : FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp) {
+    }
+
+    void set(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->FP = FP;
+        this->BS = BS;
+        this->S = S;
+        this->A = A;
+        this->M = M;
+        this->D = D;
+        this->B = B;
+        this->Sp = Sp;
+    }
+};*/
+
+const string profile_key_FP_c = "FP";
+const string profile_key_BS_c = "BS";
+const string profile_key_S_c = "S";
+const string profile_key_A_c = "A";
+const string profile_key_M_c = "M";
+const string profile_key_D_c = "D";
+const string profile_key_B_c = "B";
+const string profile_key_Sp_c = "Sp";
+
+class Profile {
+    map<string, int> int_properties;
+    map<string, float> float_properties;
+public:
+
+    Profile() {
+        // create dummy profile - should call set() before reading any of the properties
+    }
+    Profile(const CharacterTemplate &character_template);
+    Profile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->set(FP, BS, S, A, M, D, B, Sp);
+    }
+
+    void setIntProperty(const string &key, int value) {
+        this->int_properties[key] = value;
+    }
+    void setFloatProperty(const string &key, int value) {
+        this->float_properties[key] = value;
+    }
+    int getIntProperty(const string &key) const;
+    float getFloatProperty(const string &key) const;
+
+    // convenient wrapper to set all properties
+    void set(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->setIntProperty(profile_key_FP_c, FP);
+        this->setIntProperty(profile_key_BS_c, BS);
+        this->setIntProperty(profile_key_S_c, S);
+        this->setIntProperty(profile_key_A_c, A);
+        this->setIntProperty(profile_key_M_c, M);
+        this->setIntProperty(profile_key_D_c, S);
+        this->setIntProperty(profile_key_B_c, B);
+        this->setFloatProperty(profile_key_Sp_c, Sp);
+    }
+};
 
 class Spell {
     string name;
@@ -98,8 +188,9 @@ public:
 };
 
 class CharacterTemplate {
-    int FP, BS, S, A, M, D, B;
-    float Sp;
+    /*int FP, BS, S, A, M, D, B;
+    float Sp;*/
+    Profile profile;
     int health_min, health_max;
     bool has_natural_damage;
     int natural_damageX, natural_damageY, natural_damageZ;
@@ -112,30 +203,41 @@ class CharacterTemplate {
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth);
 
-    int getFP() const {
-        return this->FP;
+    const Profile *getProfile() const {
+        return &this->profile;
+    }
+    /*int getFP() const {
+        //return this->FP;
+        return this->profile.FP;
     }
     int getBS() const {
-        return this->BS;
+        //return this->BS;
+        return this->profile.BS;
     }
     int getStrength() const {
-        return this->S;
+        //return this->S;
+        return this->profile.S;
     }
     int getAttacks() const {
-        return this->A;
+        //return this->A;
+        return this->profile.A;
     }
     int getMind() const {
-        return this->M;
+        //return this->M;
+        return this->profile.M;
     }
     int getDexterity() const {
-        return this->D;
+        //return this->D;
+        return this->profile.D;
     }
     int getBravery() const {
-        return this->B;
+        //return this->B;
+        return this->profile.B;
     }
     float getSpeed() const {
-        return this->Sp;
-    }
+        return this->profile.Sp;
+        //return this->Sp;
+    }*/
     int getHealth() const;
     void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
         this->has_natural_damage = true;
@@ -212,8 +314,9 @@ class Character {
     Vector2D default_position;
 
     // rpg data
-    int FP, BS, S, A, M, D, B;
-    float Sp;
+    //int FP, BS, S, A, M, D, B;
+    //float Sp;
+    Profile profile;
     int health;
     int max_health;
     int natural_damageX, natural_damageY, natural_damageZ;
@@ -371,17 +474,106 @@ public:
         return 0.25f;
     }*/
 
+    int getFP() const {
+        //return this->FP;
+        //return this->profile.FP;
+        return this->profile.getIntProperty(profile_key_FP_c);
+    }
+    int getBS() const {
+        //return this->BS;
+        //return this->profile.BS;
+        return this->profile.getIntProperty(profile_key_BS_c);
+    }
+    int getStrength() const {
+        //return this->S;
+        //return this->profile.S;
+        return this->profile.getIntProperty(profile_key_S_c);
+    }
+    int getAttacks() const {
+        //return this->A;
+        //return this->profile.A;
+        return this->profile.getIntProperty(profile_key_A_c);
+    }
+    int getMind() const {
+        //return this->M;
+        //return this->profile.M;
+        return this->profile.getIntProperty(profile_key_M_c);
+    }
+    int getDexterity() const {
+        //return this->D;
+        //return this->profile.D;
+        return this->profile.getIntProperty(profile_key_D_c);
+    }
+    int getBravery() const {
+        //return this->B;
+        //return this->profile.B;
+        return this->profile.getIntProperty(profile_key_B_c);
+    }
+    float getSpeed() const {
+        //return this->Sp;
+        //return this->profile.Sp;
+        return this->profile.getFloatProperty(profile_key_Sp_c);
+    }
     void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
-        this->FP = FP;
+        /*this->FP = FP;
         this->BS = BS;
         this->S = S;
         this->A = A;
         this->M = M;
         this->D = D;
         this->B = B;
-        this->Sp = Sp;
+        this->Sp = Sp;*/
+        this->profile.set(FP, BS, S, A, M, D, B, Sp);
     }
-    void setFP(int FP) {
+    void changeBaseFP(int change) {
+        //this->profile.FP += change;
+        int base = this->profile.getIntProperty(profile_key_FP_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_FP_c, base);
+    }
+    void changeBaseBS(int change) {
+        //this->profile.BS += change;
+        int base = this->profile.getIntProperty(profile_key_BS_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_BS_c, base);
+    }
+    void changeBaseS(int change) {
+        //this->profile.S += change;
+        int base = this->profile.getIntProperty(profile_key_S_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_S_c, base);
+    }
+    void changeBaseA(int change) {
+        //this->profile.A += change;
+        int base = this->profile.getIntProperty(profile_key_A_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_A_c, base);
+    }
+    void changeBaseM(int change) {
+        //this->profile.M += change;
+        int base = this->profile.getIntProperty(profile_key_M_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_M_c, base);
+    }
+    void changeBaseD(int change) {
+        //this->profile.D += change;
+        int base = this->profile.getIntProperty(profile_key_D_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_D_c, base);
+    }
+    void changeBaseB(int change) {
+        //this->profile.B += change;
+        int base = this->profile.getIntProperty(profile_key_B_c);
+        base += change;
+        this->profile.setIntProperty(profile_key_B_c, base);
+    }
+    void changeBaseSp(float change) {
+        //this->profile.Sp += change;
+        int base = this->profile.getFloatProperty(profile_key_Sp_c);
+        base += change;
+        this->profile.setFloatProperty(profile_key_Sp_c, base);
+    }
+    /*void setFP(int FP) {
         this->FP = FP;
     }
     int getFP() const {
@@ -425,7 +617,7 @@ public:
     }
     float getSpeed() const {
         return this->Sp;
-    }
+    }*/
     int modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const;
     void initialiseHealth(int max_health) {
         if( max_health <= 0 ) {
