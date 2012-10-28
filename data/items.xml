@@ -53,9 +53,29 @@ Plate armour provides excellent protection, but it is also heavy to carry.
 
 <item name="Gold Ring" image_name="ring_gold" weight="0"/>
 
-<item name="Potion of Healing" image_name="potion_red" weight="1"
+<item name="Potion of Healing" image_name="potion_green" weight="1"
     rating="4" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink">
 This potion will heal some or all of your injuries.
+</item>
+
+<item name="Potion of Combat" image_name="potion_green" weight="1"
+    arg1_s="FP" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
+This potion will grant the drinker improved fighting prowess for a limted time.
+</item>
+
+<item name="Potion of Archery" image_name="potion_green" weight="1"
+    arg1_s="BS" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
+This potion will grant the drinker an improved ability with bows for a limted time.
+</item>
+
+<item name="Potion of Strength" image_name="potion_red" weight="1"
+    arg1_s="S" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
+This potion will grant the drinker improved strength for a limted time.
+</item>
+
+<item name="Potion of Speed" image_name="potion_blue" weight="1"
+    arg1_s="Sp" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
+This potion will grant the drinker greater movement for a limted time.
 </item>
 
 <item name="Chess Piece (Knight)" image_name="chess_knight" icon_width="0.25" weight="0">
@@ -92,7 +112,11 @@ A small wooden chess piece, the Knight.
 </shop>
 
 <shop name="Magic Shop">
-    <purchase template="Potion of Healing" cost="50"/>
+    <purchase template="Potion of Healing" cost="100"/>
+    <purchase template="Potion of Combat" cost="200"/>
+    <purchase template="Potion of Archery" cost="150"/>
+    <purchase template="Potion of Strength" cost="150"/>
+    <purchase template="Potion of Speed" cost="200"/>
 </shop>
 
 <shop name="General Stores">
@@ -109,7 +133,7 @@ A small wooden chess piece, the Knight.
     <player_default_item template="Long Sword"/>
     <player_default_item template="Leather Armour"/>
     <!--<player_default_item template="Shield"/>-->
-    <player_default_item template="Potion of Healing"/>
+    <!--<player_default_item template="Potion of Healing"/>-->
     <!--<player_default_item template="Longbow"/>
     <player_default_item template="Arrows"/>-->
 </player_default_items>
