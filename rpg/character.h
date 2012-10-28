@@ -115,6 +115,8 @@ public:
     }
     int getIntProperty(const string &key) const;
     float getFloatProperty(const string &key) const;
+    bool hasIntProperty(const string &key) const;
+    bool hasFloatProperty(const string &key) const;
     map<string, int>::const_iterator intPropertiesBegin() const {
         return this->int_properties.begin();
     }
@@ -292,6 +294,20 @@ public:
     }
 };
 
+class ProfileEffect {
+    Profile profile;
+    int expires_ms;
+public:
+    ProfileEffect(const Profile &profile, int duration_ms);
+
+    const Profile *getProfile() const {
+        return &this->profile;
+    }
+    int getExpiresMS() const {
+        return this->expires_ms;
+    }
+};
+
 class Character {
     // basic info
     string name;
@@ -335,6 +351,8 @@ class Character {
     bool can_fly;
     bool is_paralysed;
     int paralysed_until;
+
+    vector<ProfileEffect> profile_effects;
 
     set<Item *> items;
     Weapon *current_weapon;
@@ -529,18 +547,6 @@ public:
     const Profile *getBaseProfile() const {
         return &this->profile;
     }
-    int getBaseProfileIntProperty(const string &key) const {
-        return this->profile.getIntProperty(key);
-    }
-    float getBaseProfileFloatProperty(const string &key) const {
-        return this->profile.getFloatProperty(key);
-    }
-    int getProfileIntProperty(const string &key) const {
-        return this->getBaseProfileIntProperty(key);
-    }
-    float getProfileFloatProperty(const string &key) const {
-        return this->getBaseProfileFloatProperty(key);
-    }
     void changeBaseProfileIntProperty(const string &key, int change) {
         int value = this->profile.getIntProperty(key);
         value += change;
@@ -550,6 +556,20 @@ public:
         float value = this->profile.getFloatProperty(key);
         value += change;
         this->profile.setFloatProperty(key, value);
+    }
+    int getBaseProfileIntProperty(const string &key) const {
+        return this->profile.getIntProperty(key);
+    }
+    float getBaseProfileFloatProperty(const string &key) const {
+        return this->profile.getFloatProperty(key);
+    }
+    int getProfileIntProperty(const string &key) const;
+    float getProfileFloatProperty(const string &key) const;
+    bool hasBaseProfileIntProperty(const string &key) const {
+        return this->profile.hasIntProperty(key);
+    }
+    bool hasBaseProfileFloatProperty(const string &key) const {
+        return this->profile.hasFloatProperty(key);
     }
     /*void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->FP = FP;
@@ -657,6 +677,18 @@ public:
     float getSpeed() const {
         return this->Sp;
     }*/
+    void addProfileEffect(const ProfileEffect &profile_effect) {
+        this->profile_effects.push_back(profile_effect);
+    }
+    vector<ProfileEffect>::const_iterator profileEffectsBegin() const {
+        return this->profile_effects.begin();
+    }
+    vector<ProfileEffect>::const_iterator profileEffectsEnd() const {
+        return this->profile_effects.end();
+    }
+    void expireProfileEffects() {
+        this->profile_effects.clear();
+    }
     int modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const;
     void initialiseHealth(int max_health) {
         if( max_health <= 0 ) {

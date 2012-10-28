@@ -18,7 +18,6 @@ Profile::Profile(const CharacterTemplate &character_template) {
 
 int Profile::getIntProperty(const string &key) const {
     map<string, int>::const_iterator iter = this->int_properties.find(key);
-    ASSERT_LOGGER( iter != this->int_properties.end() );
     if( iter == this->int_properties.end() ) {
         return 0;
     }
@@ -27,11 +26,26 @@ int Profile::getIntProperty(const string &key) const {
 
 float Profile::getFloatProperty(const string &key) const {
     map<string, float>::const_iterator iter = this->float_properties.find(key);
-    ASSERT_LOGGER( iter != this->float_properties.end() );
     if( iter == this->float_properties.end() ) {
         return 0;
     }
     return iter->second;
+}
+
+bool Profile::hasIntProperty(const string &key) const {
+    map<string, int>::const_iterator iter = this->int_properties.find(key);
+    if( iter == this->int_properties.end() ) {
+        return false;
+    }
+    return true;
+}
+
+bool Profile::hasFloatProperty(const string &key) const {
+    map<string, float>::const_iterator iter = this->float_properties.find(key);
+    if( iter == this->float_properties.end() ) {
+        return false;
+    }
+    return true;
 }
 
 void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const {
@@ -73,6 +87,10 @@ int CharacterTemplate::getGold() const {
         return gold_min;
     int r = rand() % (gold_max - gold_min + 1);
     return gold_min + r;
+}
+
+ProfileEffect::ProfileEffect(const Profile &profile, int duration_ms) : profile(profile), expires_ms(0) {
+    this->expires_ms = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
 }
 
 const int default_natural_damageX = 1;
@@ -180,6 +198,28 @@ bool Character::useAmmo(Ammo *ammo) {
     return used_up;
 }
 
+int Character::getProfileIntProperty(const string &key) const {
+    qDebug("key: %s", key.c_str());
+    int value = this->getBaseProfileIntProperty(key);
+    for(vector<ProfileEffect>::const_iterator iter = this->profile_effects.begin(); iter != this->profile_effects.end(); ++iter) {
+        const ProfileEffect &profile_effect = *iter;
+        int effect_bonus = profile_effect.getProfile()->getIntProperty(key);
+        qDebug("    increase by %d\n", effect_bonus);
+        value += effect_bonus;
+    }
+    return value;
+}
+
+float Character::getProfileFloatProperty(const string &key) const {
+    float value = this->getBaseProfileFloatProperty(key);
+    for(vector<ProfileEffect>::const_iterator iter = this->profile_effects.begin(); iter != this->profile_effects.end(); ++iter) {
+        const ProfileEffect &profile_effect = *iter;
+        float effect_bonus = profile_effect.getProfile()->getFloatProperty(key);
+        value += effect_bonus;
+    }
+    return value;
+}
+
 int Character::modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const {
     if( this == playing_gamestate->getPlayer() ) {
         value = (int)(value * playing_gamestate->getDifficultyModifier() + 0.5f);
@@ -202,6 +242,17 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     const int time_to_cast_c = 2000;
 
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+
+    // expire profile effects
+    // count backwards, so we can delete
+    // careful of unsigned size_t! see http://stackoverflow.com/questions/665745/whats-the-best-way-to-do-a-reverse-for-loop-with-an-unsigned-index
+    for(size_t i=profile_effects.size();i-->0;) {
+        const ProfileEffect &profile_effect = profile_effects[i];
+        if( elapsed_ms >= profile_effect.getExpiresMS() ) {
+            LOG("%s: effect %d expires: %d, %d\n", this->name.c_str(), i, profile_effect.getExpiresMS(), elapsed_ms);
+            profile_effects.erase(profile_effects.begin() + i);
+        }
+    }
 
     if( is_dead ) {
         if( elapsed_ms > time_of_death_ms + time_to_die_c ) {
@@ -321,7 +372,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     else {
                         int hit_roll = rollDice(2, 6, 0);
                         //int stat = is_ranged ? this->getBS() : this->getFP();
-                        int stat = this->getBaseProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
+                        int stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
                         int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
                         if( hit_roll <= mod_stat ) {
                             //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
@@ -335,7 +386,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             else {
                                 int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
                                 //if( rollDice(2, 6, 0) <= this->getStrength() ) {
-                                if( rollDice(2, 6, 0) <= this->getBaseProfileIntProperty(profile_key_S_c) ) {
+                                if( rollDice(2, 6, 0) <= this->getProfileIntProperty(profile_key_S_c) ) {
                                     //LOG("    extra strong hit!\n");
                                     damage++;
                                 }
@@ -479,7 +530,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             int time_ms = game_g->getScreen()->getGameTimeFrameMS();
             //float step = 0.002f * time_ms;
             //float step = (this->getSpeed() * time_ms)/1000.0f;
-            float step = (this->getBaseProfileFloatProperty(profile_key_Sp_c) * time_ms)/1000.0f;
+            float step = (this->getProfileFloatProperty(profile_key_Sp_c) * time_ms)/1000.0f;
             float dist = diff.magnitude();
             Vector2D new_pos = pos;
             bool next_seg = false;
@@ -793,7 +844,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
 
     Vector2D dest(xdest, ydest);
 
-    vector<Vector2D> new_path;
+    /*vector<Vector2D> new_path;
 
     Vector2D hit_pos;
     if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, this->can_fly) ) {
@@ -863,6 +914,12 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
             }
         }
         this->setPath(new_path);
+    }*/
+
+    vector<Vector2D> new_path = location->calculatePathTo(this->pos, dest, ignore_scenery, this->can_fly);
+    if( new_path.size() > 0 ) {
+        //LOG("set path\n");
+        this->setPath(new_path);
     }
 }
 
@@ -870,7 +927,7 @@ int Character::getCanCarryWeight() const {
     //return 300;
     //return 10;
     //return 250 + 10 * this->getStrength();
-    return 250 + 10 * this->getBaseProfileIntProperty(profile_key_S_c);
+    return 250 + 10 * this->getProfileIntProperty(profile_key_S_c);
 }
 
 bool Character::canMove() const {

@@ -177,6 +177,7 @@ class StatsWindow : public QWidget {
 
     PlayingGamestate *playing_gamestate;
 
+    QString writeStat(const string &visual_name, const string &stat_key, bool is_float) const;
 private slots:
 
 public:

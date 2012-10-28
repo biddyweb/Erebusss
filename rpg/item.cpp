@@ -12,7 +12,7 @@ using std::stringstream;
 
 Item::Item(const string &name, const string &image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), icon_width(0.5f), weight(weight),
-    /*item_use(ITEMUSE_NONE), */rating(1), is_magical(false), worth_bonus(0)
+   arg1(0), arg2(0), rating(1), is_magical(false), worth_bonus(0)
 {
 }
 
@@ -47,6 +47,28 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         LOG("Character: %s drinks potion of healing, heal %d\n", character->getName().c_str(), amount);
         character->increaseHealth( amount );
         LOG("    health is now: %d\n", character->getHealth());
+        playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
+        if( character == playing_gamestate->getPlayer() ) {
+            playing_gamestate->playSound("drink");
+        }
+        return true;
+    }
+    else if( this->use == "ITEMUSE_POTION_EFFECT" ) {
+        // arg1_s gives statistic affect, rating gives increase, arg1 gives time in ms
+        LOG("Character: %s drinks potion, change %s by %d for %d\n", character->getName().c_str(), this->arg1_s.c_str(), this->rating, this->arg1);
+        Profile potion_profile;
+        if( character->hasBaseProfileIntProperty(this->arg1_s) ) {
+            potion_profile.setIntProperty(this->arg1_s, this->rating);
+        }
+        else if( character->hasBaseProfileFloatProperty(this->arg1_s) ) {
+            potion_profile.setFloatProperty(this->arg1_s, static_cast<float>(this->rating));
+        }
+        else {
+            LOG("### unknown property type!\n");
+            ASSERT_LOGGER(false);
+        }
+        ProfileEffect profile_effect(potion_profile, this->arg1);
+        character->addProfileEffect(profile_effect);
         playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
         if( character == playing_gamestate->getPlayer() ) {
             playing_gamestate->playSound("drink");

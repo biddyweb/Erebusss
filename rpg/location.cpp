@@ -333,7 +333,7 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     string text;
     if( type == "arrow" ) {
         //if( rollD + difficulty <= character->getDexterity() ) {
-        if( rollD + difficulty <= character->getBaseProfileIntProperty(profile_key_D_c) ) {
+        if( rollD + difficulty <= character->getProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
             text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
         }
@@ -364,7 +364,7 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     }
     else if( type == "mantrap" ) {
         //if( rollD + difficulty <= character->getDexterity() ) {
-        if( rollD + difficulty <= character->getBaseProfileIntProperty(profile_key_D_c) ) {
+        if( rollD + difficulty <= character->getProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
             text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
         }
@@ -500,9 +500,24 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
         const Character *character = *iter;
         if( character->isHostile() ) {
             // n.b., we don't use the visibility test - so it isn't sufficient to just be out of sight, but we also need to be a sufficient distance
+            // we care about the distance by path, rather than euclidean distance - but we can check the euclidean distance first as a quick check
             float dist = (character->getPos() - playing_gamestate->getPlayer()->getPos()).magnitude();
             if( dist <= npc_visibility_c ) {
-                has_enemies = true;
+                vector<Vector2D> new_path = this->calculatePathTo(character->getPos(), playing_gamestate->getPlayer()->getPos(), NULL, character->canFly());
+                if( new_path.size() > 0 ) {
+                    float dist = 0.0f;
+                    Vector2D last_pos = character->getPos();
+                    for(vector<Vector2D>::const_iterator iter = new_path.begin(); iter != new_path.end(); ++iter) {
+                        Vector2D pos = *iter;
+                        dist += (pos - last_pos).magnitude();
+                        last_pos = pos;
+                        if( dist > npc_visibility_c )
+                            break;
+                    }
+                    if( dist <= npc_visibility_c ) {
+                        has_enemies = true;
+                    }
+                }
             }
         }
     }
@@ -1289,6 +1304,81 @@ void Location::calculateDistanceGraph() {
         }
     }
     qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
+}
+
+vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Scenery *ignore_scenery, bool can_fly) const {
+    vector<Vector2D> new_path;
+
+    Vector2D hit_pos;
+    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, can_fly) ) {
+        // easy
+        //LOG("easy\n");
+        new_path.push_back(dest);
+    }
+    else {
+        //LOG("    calculate path\n");
+        const Graph *distance_graph = this->getDistanceGraph();
+        Graph *graph = distance_graph->clone();
+
+        size_t n_old_vertices = graph->getNVertices();
+        GraphVertex start_vertex(src, NULL);
+        GraphVertex end_vertex(dest, NULL);
+        size_t start_index = graph->addVertex(start_vertex);
+        size_t end_index = graph->addVertex(end_vertex);
+
+        // n.b., don't need to check for link between start_vertex and end_vertex, as this code path is only for where we can't walk directly between the start and end!
+        for(size_t i=0;i<n_old_vertices;i++) {
+            GraphVertex *v_A = graph->getVertex(i);
+            Vector2D A = v_A->getPos();
+            for(size_t j=n_old_vertices;j<graph->getNVertices();j++) {
+                GraphVertex *v_B = graph->getVertex(j);
+                Vector2D B = v_B->getPos();
+                Vector2D hit_pos;
+                float dist = (A - B).magnitude();
+                bool hit = false;
+                if( dist <= E_TOL_LINEAR ) {
+                    // needed for coi way points?
+                    hit = false;
+                }
+                else {
+                    hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL, can_fly);
+                }
+                if( !hit ) {
+                    v_A->addNeighbour(j, dist);
+                    v_B->addNeighbour(i, dist);
+                }
+            }
+        }
+
+        vector<GraphVertex *> shortest_path = graph->shortestPath(start_index, end_index);
+        if( shortest_path.size() == 0 ) {
+            // can't reach destination (or already at it)
+            //LOG("    can't reach destination (or already at it)\n");
+        }
+        else {
+            for(vector<GraphVertex *>::const_iterator iter = shortest_path.begin(); iter != shortest_path.end(); ++iter) {
+                const GraphVertex *vertex = *iter;
+                new_path.push_back(vertex->getPos());
+            }
+        }
+
+        delete graph;
+    }
+
+    if( new_path.size() > 0 ) {
+        //LOG("set path\n");
+        if( ignore_scenery != NULL ) {
+            Vector2D p0 = src;
+            if( new_path.size() >= 2 ) {
+                p0 = new_path.at( new_path.size() - 2 );
+            }
+            if( this->intersectSweptSquareWithBoundaries(&hit_pos, true, p0, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, can_fly) ) {
+                new_path[ new_path.size() - 1 ] = hit_pos;
+            }
+        }
+    }
+
+    return new_path;
 }
 
 bool Location::testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const {

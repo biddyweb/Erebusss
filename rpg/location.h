@@ -623,6 +623,7 @@ public:
     const Graph *getDistanceGraph() const {
         return this->distance_graph;
     }
+    vector<Vector2D> calculatePathTo(Vector2D src, Vector2D dest, const Scenery *ignore_scenery, bool can_fly) const;
 
 #if 0
     void initVisibility(Vector2D pos);

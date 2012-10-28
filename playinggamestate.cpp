@@ -536,7 +536,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 {
     playing_gamestate->addWidget(this);
 
-    Character *player = playing_gamestate->getPlayer();
+    const Character *player = playing_gamestate->getPlayer();
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -563,14 +563,22 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += "<b>Bravery:</b> " + QString::number(player->getBravery()) + "<br/>";
     html += "<b>Speed:</b> " + QString::number(player->getSpeed()) + "<br/>";*/
 
-    html += "<b>Fighting Prowess:</b> " + QString::number(player->getProfileIntProperty(profile_key_FP_c)) + "<br/>";
+    /*html += "<b>Fighting Prowess:</b> " + QString::number(player->getProfileIntProperty(profile_key_FP_c)) + "<br/>";
     html += "<b>Bow Skill:</b> " + QString::number(player->getProfileIntProperty(profile_key_BS_c)) + "<br/>";
     html += "<b>Strength:</b> " + QString::number(player->getProfileIntProperty(profile_key_S_c)) + "<br/>";
     html += "<b>Attacks:</b> " + QString::number(player->getProfileIntProperty(profile_key_A_c)) + "<br/>";
     html += "<b>Mind:</b> " + QString::number(player->getProfileIntProperty(profile_key_M_c)) + "<br/>";
     html += "<b>Dexterity:</b> " + QString::number(player->getProfileIntProperty(profile_key_D_c)) + "<br/>";
     html += "<b>Bravery:</b> " + QString::number(player->getProfileIntProperty(profile_key_B_c)) + "<br/>";
-    html += "<b>Speed:</b> " + QString::number(player->getProfileFloatProperty(profile_key_Sp_c)) + "<br/>";
+    html += "<b>Speed:</b> " + QString::number(player->getProfileFloatProperty(profile_key_Sp_c)) + "<br/>";*/
+    html += this->writeStat("Fighting Prowess", profile_key_FP_c, false);
+    html += this->writeStat("Bow Skill", profile_key_BS_c, false);
+    html += this->writeStat("Strength", profile_key_S_c, false);
+    html += this->writeStat("Attacks", profile_key_A_c, false);
+    html += this->writeStat("Mind", profile_key_M_c, false);
+    html += this->writeStat("Dexterity", profile_key_D_c, false);
+    html += this->writeStat("Bravery", profile_key_B_c, false);
+    html += this->writeStat("Speed", profile_key_Sp_c, true);
 
     html += "<b>Health:</b> ";
     if( player->getHealth() < player->getMaxHealth() ) {
@@ -599,6 +607,27 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
+}
+
+QString StatsWindow::writeStat(const string &visual_name, const string &stat_key, bool is_float) const {
+    const Character *player = playing_gamestate->getPlayer();
+    int stat = is_float ? player->getProfileFloatProperty(stat_key) : player->getProfileIntProperty(stat_key);
+    int base_stat = is_float ? player->getBaseProfileFloatProperty(stat_key) : player->getBaseProfileIntProperty(stat_key);
+    QString html = "<b>";
+    html += visual_name.c_str();
+    html += ":</b> ";
+    if( stat > base_stat ) {
+        html += "<font color=\"#00ff00\">";
+    }
+    else if( stat < base_stat ) {
+        html += "<font color=\"#ff0000\">";
+    }
+    html += QString::number(stat);
+    if( stat != base_stat ) {
+        html += "</font>";
+    }
+    html += "<br/>";
+    return html;
 }
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
@@ -2352,12 +2381,17 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
 
     QStringRef base_template_s = reader.attributes().value("base_template");
+    QStringRef arg1_s = reader.attributes().value("arg1");
+    QStringRef arg2_s = reader.attributes().value("arg2");
+    QStringRef arg1_s_s = reader.attributes().value("arg1_s");
     QStringRef weight_s = reader.attributes().value("weight");
     QStringRef rating_s = reader.attributes().value("rating");
     QStringRef magical_s = reader.attributes().value("magical");
     QStringRef worth_bonus_s = reader.attributes().value("worth_bonus");
     QString base_template = base_template_s.toString();
     int weight = parseInt(weight_s.toString(), true);
+    int arg1 = parseInt(arg1_s.toString(), true);
+    int arg2 = parseInt(arg2_s.toString(), true);
     int rating = parseInt(rating_s.toString(), true);
     if( rating == 0 )
         rating = 1; // so the default of 0 defaults instead to 1
@@ -2464,6 +2498,9 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     }
     // else ignore unknown element - leave item as NULL
     if( item != NULL ) {
+        item->setArg1(arg1);
+        item->setArg2(arg2);
+        item->setArg1s(arg1_s_s.toString().toStdString());
         item->setRating(rating);
         item->setMagical(magical);
         item->setBaseTemplate(base_template.toStdString().c_str());
@@ -3852,6 +3889,7 @@ void PlayingGamestate::clickedRest() {
             time = 1;
         }
         this->player->restoreHealth();
+        this->player->expireProfileEffects();
         stringstream str;
         str << "Rested for " << time << " hour";
         if( time > 1 )
@@ -3862,11 +3900,11 @@ void PlayingGamestate::clickedRest() {
 
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
-    /*if( c_location->hasEnemies(this) ) {
+    if( c_location->hasEnemies(this) ) {
         //game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
         this->showInfoDialog("You cannot save here - enemies are nearby.");
         return;
-    }*/
+    }
     new SaveGameWindow(this);
 }
 
@@ -4535,6 +4573,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             new CampaignWindow(this);
                             game_g->getScreen()->setPaused(true);
                             this->player->restoreHealth();
+                            this->player->expireProfileEffects();
                         }
                         else if( scenery->getExitLocation().length() > 0 ) {
                             done = true;
@@ -4668,6 +4707,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, " weight=\"%d\"", item->getWeight());
     fprintf(file, " use=\"%s\"", item->getUse().c_str());
     fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
+    fprintf(file, " arg1=\"%d\"", item->getArg1());
+    fprintf(file, " arg2=\"%d\"", item->getArg2());
+    fprintf(file, " arg1_s=\"%s\"", item->getArg1s().c_str());
     fprintf(file, " rating=\"%d\"", item->getRating());
     fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
     fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());

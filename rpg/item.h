@@ -35,6 +35,8 @@ protected:
 
     string use;
     string use_verb;
+    int arg1, arg2; // used for "use"
+    string arg1_s; // used for "use"
     int rating;
     bool is_magical;
     int worth_bonus;
@@ -119,6 +121,24 @@ public:
     void setUse(const string &use, const string &use_verb) {
         this->use = use;
         this->use_verb = use_verb;
+    }
+    void setArg1(int arg1) {
+        this->arg1 = arg1;
+    }
+    int getArg1() const {
+        return this->arg1;
+    }
+    void setArg2(int arg2) {
+        this->arg2 = arg2;
+    }
+    int getArg2() const {
+        return this->arg2;
+    }
+    void setArg1s(const string &arg1_s) {
+        this->arg1_s = arg1_s;
+    }
+    string getArg1s() const {
+        return this->arg1_s;
     }
     void setRating(int rating) {
         this->rating = rating;
