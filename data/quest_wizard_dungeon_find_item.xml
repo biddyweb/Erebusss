@@ -33,6 +33,9 @@
 
 <scenery name="Table" image_name="table" x="35.0" y="2.5" size="0.8" blocking="true"/>
 
+<!--<item template="Potion of Strength" x="32.0" y="3.0"/>
+<item template="Potion of Speed" x="32.0" y="4.0"/>-->
+
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
@@ -104,7 +107,7 @@ my efforts with the great riches to be found!
 
 <npc name="Orc" template="Orc" x="27.0" y="12.0"/>
 <scenery name="Chest" image_name="chest" x="28.0" y="11.0" size="0.8" blocking="true">
-    <item template="Potion of Healing"/>
+    <item template="Potion of Combat"/>
     <gold amount="53"/>
 </scenery>
 
@@ -480,7 +483,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <floorregion shape="rect" rect_x="46.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Chest" image_name="chest" x="49.5" y="10.5" size="0.8" blocking="true">
-    <item template="Potion of Healing"/>
+    <item template="Potion of Speed"/>
     <item template="Blue Gem"/>
 </scenery>
 
@@ -1653,7 +1656,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <npc name="Wyvern" template="Wyvern" x="42.5" y="22.0"/>
 
 <scenery name="Chest" image_name="chest" x="43.5" y="18.5" size="0.8" blocking="true">
-    <item template="Potion of Healing"/>
+    <item template="Potion of Archery"/>
     <item template="Green Gem"/>
     <gold amount="100"/>
     <weapon name="Magic Long Sword" image_name="longsword" weight="12"
