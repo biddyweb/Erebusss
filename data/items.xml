@@ -98,25 +98,25 @@ A small wooden chess piece, the Knight.
 <currency name="Gold" image_name="gold"/>
 
 <shop name="Armourer">
-    <purchase template="Dagger" cost="10"/>
-    <purchase template="Short Sword" cost="25"/>
-    <purchase template="Long Sword" cost="40"/>
-    <purchase template="Two Handed Sword" cost="80"/>
-    <purchase template="Shortbow" cost="40"/>
-    <purchase template="Longbow" cost="60"/>
-    <purchase template="Shield" cost="10"/>
-    <purchase template="Leather Armour" cost="25"/>
-    <purchase template="Chain Mail Armour" cost="50"/>
-    <purchase template="Plate Armour" cost="200"/>
+    <purchase template="Dagger" cost="15"/>
+    <purchase template="Short Sword" cost="30"/>
+    <purchase template="Long Sword" cost="50"/>
+    <purchase template="Two Handed Sword" cost="100"/>
+    <purchase template="Shortbow" cost="50"/>
+    <purchase template="Longbow" cost="100"/>
+    <purchase template="Shield" cost="40"/>
+    <purchase template="Leather Armour" cost="30"/>
+    <purchase template="Chain Mail Armour" cost="100"/>
+    <purchase template="Plate Armour" cost="500"/>
     <purchase template="Arrows" cost="30"/>
 </shop>
 
 <shop name="Magic Shop">
-    <purchase template="Potion of Healing" cost="100"/>
-    <purchase template="Potion of Combat" cost="200"/>
-    <purchase template="Potion of Archery" cost="150"/>
-    <purchase template="Potion of Strength" cost="150"/>
-    <purchase template="Potion of Speed" cost="200"/>
+    <purchase template="Potion of Healing" cost="150"/>
+    <purchase template="Potion of Combat" cost="250"/>
+    <purchase template="Potion of Archery" cost="200"/>
+    <purchase template="Potion of Strength" cost="200"/>
+    <purchase template="Potion of Speed" cost="250"/>
 </shop>
 
 <shop name="General Stores">
