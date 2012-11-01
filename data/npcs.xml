@@ -14,7 +14,7 @@
     FP="5" BS="6" S="4" A="1" M="7" D="6" B="5" Sp="1.5"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
     health_min="14" health_max="18" gold_min="10" gold_max="12"
-    xp_worth="12"
+    xp_worth="15"
 />
 
 <!--Weapon hardcoded as natural damage: Spear-->
@@ -22,7 +22,7 @@
     FP="8" BS="8" S="6" A="1" M="6" D="6" B="6" Sp="2"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
     health_min="22" health_max="25" gold_min="6" gold_max="10"
-    xp_worth="12"
+    xp_worth="15"
 />
 
 <!--Weapon hardcoded as natural damage: Battle Axe-->
@@ -30,7 +30,7 @@
     FP="9" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="25" health_max="30" gold_min="8" gold_max="12"
-    xp_worth="15"
+    xp_worth="20"
 />
 
 <!--Weapon hardcoded as natural damage: Battle Axe-->
@@ -38,7 +38,7 @@
     FP="10" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="30" health_max="35" gold_min="12" gold_max="16"
-    xp_worth="20"
+    xp_worth="25"
 />
 
 <!--Weapon hardcoded as natural damage: Two anded Axe-->
@@ -46,7 +46,7 @@
     FP="10" BS="4" S="9" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="12" natural_damageZ="0"
     health_min="50" health_max="60" gold_min="0" gold_max="0"
-    xp_worth="50"
+    xp_worth="100"
 />
 
 <!--Natural damage-->
@@ -55,7 +55,7 @@
     natural_damageX="2" natural_damageY="8" natural_damageZ="0"
     health_min="30" health_max="35" gold_min="0" gold_max="0"
     can_fly="true"
-    xp_worth="20"
+    xp_worth="40"
 />
 
 <!--Natural damage-->
@@ -63,14 +63,14 @@
     FP="8" BS="0" S="5" A="1" M="8" D="0" B="8" Sp="1.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="1"
     health_min="35" health_max="40" gold_min="0" gold_max="0"
-    xp_worth="30"
+    xp_worth="50"
     requires_magical="true"
 />
 
 <npc name="Zombie" animation_name="zombie"
     FP="7" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"
     health_min="30" health_max="40" gold_min="0" gold_max="0"
-    xp_worth="10"
+    xp_worth="20"
 />
 
 <!--Natural damage-->
@@ -78,7 +78,7 @@
     FP="6" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
     natural_damageX="3" natural_damageY="10" natural_damageZ="0"
     health_min="25" health_max="30" gold_min="0" gold_max="0"
-    xp_worth="40"
+    xp_worth="80"
 />
 
 </npcs>
