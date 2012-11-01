@@ -110,7 +110,7 @@ public:
     void setIntProperty(const string &key, int value) {
         this->int_properties[key] = value;
     }
-    void setFloatProperty(const string &key, int value) {
+    void setFloatProperty(const string &key, float value) {
         this->float_properties[key] = value;
     }
     int getIntProperty(const string &key) const;
@@ -137,7 +137,7 @@ public:
         this->setIntProperty(profile_key_S_c, S);
         this->setIntProperty(profile_key_A_c, A);
         this->setIntProperty(profile_key_M_c, M);
-        this->setIntProperty(profile_key_D_c, S);
+        this->setIntProperty(profile_key_D_c, D);
         this->setIntProperty(profile_key_B_c, B);
         this->setFloatProperty(profile_key_Sp_c, Sp);
     }
@@ -362,6 +362,7 @@ class Character {
 
     map<string, int> spells;
 
+    int level;
     int xp;
     int xp_worth;
     bool requires_magical; // requires magical weapon to hit?
@@ -500,50 +501,7 @@ public:
     Character *getTargetNPC() const {
         return this->target_npc;
     }
-    /*float getRadius() const {
-        return 0.25f;
-    }*/
 
-    /*int getFP() const {
-        //return this->FP;
-        //return this->profile.FP;
-        return this->profile.getIntProperty(profile_key_FP_c);
-    }
-    int getBS() const {
-        //return this->BS;
-        //return this->profile.BS;
-        return this->profile.getIntProperty(profile_key_BS_c);
-    }
-    int getStrength() const {
-        //return this->S;
-        //return this->profile.S;
-        return this->profile.getIntProperty(profile_key_S_c);
-    }
-    int getAttacks() const {
-        //return this->A;
-        //return this->profile.A;
-        return this->profile.getIntProperty(profile_key_A_c);
-    }
-    int getMind() const {
-        //return this->M;
-        //return this->profile.M;
-        return this->profile.getIntProperty(profile_key_M_c);
-    }
-    int getDexterity() const {
-        //return this->D;
-        //return this->profile.D;
-        return this->profile.getIntProperty(profile_key_D_c);
-    }
-    int getBravery() const {
-        //return this->B;
-        //return this->profile.B;
-        return this->profile.getIntProperty(profile_key_B_c);
-    }
-    float getSpeed() const {
-        //return this->Sp;
-        //return this->profile.Sp;
-        return this->profile.getFloatProperty(profile_key_Sp_c);
-    }*/
     const Profile *getBaseProfile() const {
         return &this->profile;
     }
@@ -571,112 +529,9 @@ public:
     bool hasBaseProfileFloatProperty(const string &key) const {
         return this->profile.hasFloatProperty(key);
     }
-    /*void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
-        this->FP = FP;
-        this->BS = BS;
-        this->S = S;
-        this->A = A;
-        this->M = M;
-        this->D = D;
-        this->B = B;
-        this->Sp = Sp;
-    }*/
     void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->profile.set(FP, BS, S, A, M, D, B, Sp);
     }
-    /*void changeBaseFP(int change) {
-        //this->profile.FP += change;
-        int base = this->profile.getIntProperty(profile_key_FP_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_FP_c, base);
-    }
-    void changeBaseBS(int change) {
-        //this->profile.BS += change;
-        int base = this->profile.getIntProperty(profile_key_BS_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_BS_c, base);
-    }
-    void changeBaseS(int change) {
-        //this->profile.S += change;
-        int base = this->profile.getIntProperty(profile_key_S_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_S_c, base);
-    }
-    void changeBaseA(int change) {
-        //this->profile.A += change;
-        int base = this->profile.getIntProperty(profile_key_A_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_A_c, base);
-    }
-    void changeBaseM(int change) {
-        //this->profile.M += change;
-        int base = this->profile.getIntProperty(profile_key_M_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_M_c, base);
-    }
-    void changeBaseD(int change) {
-        //this->profile.D += change;
-        int base = this->profile.getIntProperty(profile_key_D_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_D_c, base);
-    }
-    void changeBaseB(int change) {
-        //this->profile.B += change;
-        int base = this->profile.getIntProperty(profile_key_B_c);
-        base += change;
-        this->profile.setIntProperty(profile_key_B_c, base);
-    }
-    void changeBaseSp(float change) {
-        //this->profile.Sp += change;
-        int base = this->profile.getFloatProperty(profile_key_Sp_c);
-        base += change;
-        this->profile.setFloatProperty(profile_key_Sp_c, base);
-    }*/
-    /*void setFP(int FP) {
-        this->FP = FP;
-    }
-    int getFP() const {
-        return this->FP;
-    }
-    void setBS(int BS) {
-        this->BS = BS;
-    }
-    int getBS() const {
-        return this->BS;
-    }
-    void setStrength(int S) {
-        this->S = S;
-    }
-    int getStrength() const {
-        return this->S;
-    }
-    int getAttacks() const {
-        return this->A;
-    }
-    void setMind(int M) {
-        this->M = M;
-    }
-    int getMind() const {
-        return this->M;
-    }
-    void setDexterity(int D) {
-        this->D = D;
-    }
-    int getDexterity() const {
-        return this->D;
-    }
-    void setBravery(int B) {
-        this->B = B;
-    }
-    int getBravery() const {
-        return this->B;
-    }
-    void setSpeed(float Sp) {
-        this->Sp = Sp;
-    }
-    float getSpeed() const {
-        return this->Sp;
-    }*/
     void addProfileEffect(const ProfileEffect &profile_effect) {
         this->profile_effects.push_back(profile_effect);
     }
@@ -800,6 +655,12 @@ public:
     void useSpell(const string &spell);
     void addPainTextEffect(PlayingGamestate *playing_gamestate) const;
 
+    int getLevel() const {
+        return level;
+    }
+    void setLevel(int level) {
+        this->level = level;
+    }
     int getXP() const {
         return xp;
     }
@@ -808,6 +669,8 @@ public:
         this->xp = xp;
     }
     void addXP(PlayingGamestate *playing_gamestate, int change);
+    void advanceLevel(PlayingGamestate *playing_gamestate);
+    int getXPForNextLevel() const;
     int getXPWorth() const {
         return xp_worth;
     }

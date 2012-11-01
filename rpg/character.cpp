@@ -111,7 +111,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -952,6 +952,49 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
         xp_str << change << " XP";
         playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 0, 0);
     }
+    int next_level_xp = this->getXPForNextLevel();
+    if( xp >= next_level_xp ) {
+        // we only advance one level at any given increase
+        this->advanceLevel(playing_gamestate);
+    }
+}
+
+void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
+    if( level % 3 == 1 ) {
+        this->changeBaseProfileIntProperty(profile_key_FP_c, 1);
+        this->changeBaseProfileIntProperty(profile_key_M_c, 1);
+    }
+    else if( level % 3 == 2 ) {
+        this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
+        this->changeBaseProfileIntProperty(profile_key_B_c, 1);
+    }
+    else if( level % 3 == 0 ) {
+        this->changeBaseProfileIntProperty(profile_key_S_c, 1);
+        this->changeBaseProfileIntProperty(profile_key_D_c, 1);
+    }
+    qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
+    this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.1f);
+    qDebug("speed is now: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
+    int health_bonus = rollDice(1, 6, 0);
+    this->max_health += health_bonus;
+    this->increaseHealth(health_bonus);
+
+    this->level++;
+    if( this == playing_gamestate->getPlayer() ) {
+        LOG("player advances to level %d (xp %d)\n", level, xp);
+        stringstream xp_str;
+        xp_str << "Advanced to level " << level << "!";
+        playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 255, 0);
+    }
+}
+
+int Character::getXPForNextLevel() const {
+    //int value = 100;
+    int value = 10;
+    for(int i=0;i<level-1;i++) {
+        value *= 2;
+    }
+    return value;
 }
 
 bool Character::canCompleteInteraction(PlayingGamestate *playing_gamestate) const {

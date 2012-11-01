@@ -593,7 +593,8 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += QString::number(player->getMaxHealth());
     html += "<br/>";
 
-    html += "<b>XP:</b> " + QString::number(player->getXP()) + "<br/>";
+    html += "<b>Level:</b> " + QString::number(player->getLevel()) + "<br/>";
+    html += "<b>XP:</b> " + QString::number(player->getXP()) + " (" + QString::number(player->getXPForNextLevel()) + " required for next level.)<br/>";
 
     html += "</body></html>";
 
@@ -611,20 +612,36 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
 QString StatsWindow::writeStat(const string &visual_name, const string &stat_key, bool is_float) const {
     const Character *player = playing_gamestate->getPlayer();
-    int stat = is_float ? player->getProfileFloatProperty(stat_key) : player->getProfileIntProperty(stat_key);
-    int base_stat = is_float ? player->getBaseProfileFloatProperty(stat_key) : player->getBaseProfileIntProperty(stat_key);
     QString html = "<b>";
     html += visual_name.c_str();
     html += ":</b> ";
-    if( stat > base_stat ) {
-        html += "<font color=\"#00ff00\">";
+    if( is_float ) {
+        float stat = player->getProfileFloatProperty(stat_key);
+        float base_stat = player->getBaseProfileFloatProperty(stat_key);
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
     }
-    else if( stat < base_stat ) {
-        html += "<font color=\"#ff0000\">";
-    }
-    html += QString::number(stat);
-    if( stat != base_stat ) {
-        html += "</font>";
+    else {
+        int stat = player->getProfileIntProperty(stat_key);
+        int base_stat = player->getBaseProfileIntProperty(stat_key);
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
     }
     html += "<br/>";
     return html;
@@ -3106,12 +3123,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             int paralysed_time = parseInt(paralysed_time_s.toString());
                             npc->paralyse(paralysed_time);
                         }
-                        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
-                        int xp_worth = parseInt(xp_worth_s.toString());
-                        npc->setXPWorth(xp_worth);
+                        QStringRef level_s = reader.attributes().value("level");
+                        int level = parseInt(level_s.toString(), true);
+                        npc->setLevel(level);
                         QStringRef xp_s = reader.attributes().value("xp");
                         int xp = parseInt(xp_s.toString(), true);
                         npc->setXP(xp);
+                        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
+                        int xp_worth = parseInt(xp_worth_s.toString());
+                        npc->setXPWorth(xp_worth);
                         QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                         bool requires_magical = parseBool(requires_magical_s.toString(), true);
                         npc->setRequiresMagical(requires_magical);
@@ -4893,6 +4913,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
             fprintf(file, " is_paralysed=\"%s\"", character->isParalysed() ? "true": "false");
             fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+            fprintf(file, " level=\"%d\"", character->getLevel());
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
             fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
