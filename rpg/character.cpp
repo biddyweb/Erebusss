@@ -972,9 +972,9 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
         this->changeBaseProfileIntProperty(profile_key_S_c, 1);
         this->changeBaseProfileIntProperty(profile_key_D_c, 1);
     }
-    qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
+    //qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
     this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.1f);
-    qDebug("speed is now: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
+    //qDebug("speed is now: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
     int health_bonus = rollDice(1, 6, 0);
     this->max_health += health_bonus;
     this->increaseHealth(health_bonus);
@@ -989,8 +989,8 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
 }
 
 int Character::getXPForNextLevel() const {
-    //int value = 100;
-    int value = 10;
+    int value = 100;
+    //int value = 10;
     for(int i=0;i<level-1;i++) {
         value *= 2;
     }
