@@ -29,7 +29,7 @@
 <npc name="Orc" animation_name="orc"
     FP="9" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
-    health_min="25" health_max="30" gold_min="8" gold_max="12"
+    health_min="30" health_max="35" gold_min="8" gold_max="12"
     xp_worth="20"
 />
 
@@ -37,7 +37,7 @@
 <npc name="Orc Champion" animation_name="orc"
     FP="10" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
-    health_min="30" health_max="35" gold_min="12" gold_max="16"
+    health_min="40" health_max="45" gold_min="12" gold_max="16"
     xp_worth="25"
 />
 
@@ -67,17 +67,19 @@
     requires_magical="true"
 />
 
+<!--Natural damage-->
 <npc name="Zombie" animation_name="zombie"
-    FP="7" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"
-    health_min="30" health_max="40" gold_min="0" gold_max="0"
+    FP="8" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"
+    natural_damageX="1" natural_damageY="4" natural_damageZ="0"
+    health_min="40" health_max="50" gold_min="0" gold_max="0"
     xp_worth="20"
 />
 
 <!--Natural damage-->
 <npc name="Giant Spider" animation_name="spider"
-    FP="6" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
+    FP="7" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
     natural_damageX="3" natural_damageY="10" natural_damageZ="0"
-    health_min="25" health_max="30" gold_min="0" gold_max="0"
+    health_min="50" health_max="60" gold_min="0" gold_max="0"
     xp_worth="80"
 />
 
