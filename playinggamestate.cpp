@@ -1776,7 +1776,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     if( !is_savegame ) {
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
-        this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.75f);
+        //this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.75f);
+        this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         player->initialiseHealth(60);
         //player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
