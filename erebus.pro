@@ -157,7 +157,8 @@ OTHER_FILES += \
     data/quest_kill_goblins.xml \
     data/quest_wizard_dungeon_find_item.xml \
     data/spells.xml \
-    docs/erebus.html
+    docs/erebus.html \
+    _devdocs/rules.odt
 
 RESOURCES += \
     erebus.qrc
