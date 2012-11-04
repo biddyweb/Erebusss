@@ -4148,21 +4148,24 @@ void PlayingGamestate::update() {
             //this->showInfoDialog("Game over!\n\nYou have died!");
             //this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
             this->showInfoDialog("Game over!\n\nYou have died!", string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
+            //qDebug("send game message: GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
     }
-    if( delete_characters.size() > 0 ) {
+    if( this->player != NULL && delete_characters.size() > 0 ) {
         this->checkQuestComplete();
     }
     //qDebug("PlayingGamestate::update() exit");
 }
 
 void PlayingGamestate::checkQuestComplete() {
+    qDebug("PlayingGamestate::checkQuestComplete()");
     if( !this->quest->isCompleted() && this->quest->testIfComplete(this) ) {
         //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
         this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
     }
+    //qDebug("PlayingGamestate::checkQuestComplete() end");
 }
 
 void PlayingGamestate::characterUpdateGraphics(const Character *character, void *user_data) {
