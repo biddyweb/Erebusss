@@ -87,6 +87,17 @@
     <floorregion shape="rect" rect_x="10.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
 <floorregion shape="rect" rect_x="7.5" rect_y="11.5" rect_w="3.0" rect_h="3.0" />
 
+<floorregion shape="rect" rect_x="6.0" rect_y="16.0" rect_w="1.0" rect_h="5.0" />
+<floorregion shape="rect" rect_x="6.0" rect_y="21.0" rect_w="5.0" rect_h="1.0" />
+
+<floorregion shape="rect" rect_x="11.0" rect_y="21.0" rect_w="4.0" rect_h="4.0" />
+<npc name="Goblin" template="Goblin" x="13.0" y="24.0"/>
+<gold amount="11" x="11.5" y="24.5"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="24.0" rect_w="6.5" rect_h="1.0" />
+
+<floorregion shape="rect" rect_x="21.5" rect_y="16.0" rect_w="1.0" rect_h="9.0" />
+
 <player_start x="1.0" y="10.5"/>
 
 <!--
@@ -110,24 +121,25 @@
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
 <npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
-<npc name="Goblin Champion" template="Goblin Champion" x="8.0" y="8.0">
+<npc name="Goblin" template="Goblin" x="8.0" y="8.0">
     <item template="Leather Armour"/>
     <item template="Red Gem"/>
 </npc>
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
-<npc name="Orc" template="Orc" x="16.0" y="8.0">
+<npc name="Goblin Champion" template="Goblin Champion" x="16.0" y="8.0">
     <item template="Leather Armour"/>
-    <item name="Orc's Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Goblin's Key" image_name="key" icon_width="0.25" weight="0"/>
 </npc>
+<npc name="Goblin" template="Goblin" x="16.0" y="9.0"/>
 
 <scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
 
 <scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="12.25" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="10.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Orc's Key"/>
+    locked="true" unlocked_by_template="Goblin's Key"/>
 <scenery name="Door" image_name="door_wood" x="14.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="17.75" y="13.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="20.0" y="14.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
