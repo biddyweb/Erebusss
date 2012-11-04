@@ -1339,7 +1339,8 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
         close_text = "Finish game";
     }
     else {
-        QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
+        //QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
+        QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, and sell any wares that you have.");
         label->setFont(game_g->getFontSmall());
         label->setWordWrap(true);
         label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1356,11 +1357,11 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
             connect(shopButton, SIGNAL(clicked()), this, SLOT(clickedShop()));
         }
 
-        QPushButton *trainingButton = new QPushButton("Training");
+        /*QPushButton *trainingButton = new QPushButton("Training");
         game_g->initButton(trainingButton);
         //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         layout->addWidget(trainingButton);
-        connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));
+        connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));*/
 
         close_text = playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest";
     }
@@ -1419,11 +1420,11 @@ void CampaignWindow::clickedMagicShop() {
     LOG("CampaignWindow::clickedMagicShop()\n");
 }*/
 
-void CampaignWindow::clickedTraining() {
+/*void CampaignWindow::clickedTraining() {
     LOG("CampaignWindow::clickedTraining()\n");
     //game_g->showInfoDialog("Training", "This feature is not yet implemented");
     playing_gamestate->showInfoDialog("This feature is not yet implemented");
-}
+}*/
 
 SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL), edit(NULL)
@@ -1775,9 +1776,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     if( !is_savegame ) {
         LOG("create player\n");
         this->player = new Character("Warrior", "", false);
-        this->player->setProfile(8, 7, 8, 1, 6, 7, 8, 2.75f);
-        //player->initialiseHealth(60);
-        player->initialiseHealth(600); // CHEAT
+        this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.75f);
+        player->initialiseHealth(60);
+        //player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
     }
 

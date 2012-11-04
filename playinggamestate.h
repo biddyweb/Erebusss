@@ -279,7 +279,7 @@ class CampaignWindow : public QWidget {
 private slots:
     void clickedClose();
     void clickedShop();
-    void clickedTraining();
+    //void clickedTraining();
 
 public:
     CampaignWindow(PlayingGamestate *playing_gamestate);
