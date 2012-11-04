@@ -1464,6 +1464,7 @@ QuestObjective::QuestObjective(const string &type, const string &arg1, int gold)
 }
 
 bool QuestObjective::testIfComplete(const PlayingGamestate *playing_gamestate, const Quest *quest) const {
+    ASSERT_LOGGER( playing_gamestate->getPlayer() != NULL );
     bool complete = false;
     if( type == "kill" ) {
         if( arg1 == "all_hostile" ) {
