@@ -144,7 +144,11 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             //int FP = playing_gamestate->getPlayer()->getFP();
             //playing_gamestate->getPlayer()->setFP( FP + 1 );
             //playing_gamestate->getPlayer()->changeBaseFP(1);
-            playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_FP_c, 1);
+            //playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_FP_c, 1);
+            Profile profile;
+            profile.setIntProperty(profile_key_FP_c, 1);
+            ProfileEffect profile_effect(profile, 3*60*1000);
+            playing_gamestate->getPlayer()->addProfileEffect(profile_effect);
         }
         else {
             result_text = "As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.\nThen everything goes dark...";
@@ -176,7 +180,11 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             //int M = playing_gamestate->getPlayer()->getMind();
             //playing_gamestate->getPlayer()->setMind( M + 1 );
             //playing_gamestate->getPlayer()->changeBaseM(1);
-            playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_M_c, 1);
+            //playing_gamestate->getPlayer()->changeBaseProfileIntProperty(profile_key_M_c, 1);
+            Profile profile;
+            profile.setIntProperty(profile_key_M_c, 1);
+            ProfileEffect profile_effect(profile, 3*60*1000);
+            playing_gamestate->getPlayer()->addProfileEffect(profile_effect);
         }
         else {
             result_text = "As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!\nYour adventure ends here.";
