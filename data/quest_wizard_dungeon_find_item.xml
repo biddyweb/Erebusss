@@ -49,8 +49,25 @@
     <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
-<npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
+<npc name="Goblin" template="Goblin" x="22.5" y="6.0">
+    <item template="Leather Armour"/>
+</npc>
 <npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
+
+<!--orcs-->
+
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="7.0" rect_h="1.0" />
+<floorregion shape="rect" rect_x="11.0" rect_y="9.0" rect_w="4.0" rect_h="3.0" />
+
+<npc name="Orc" template="Orc" x="12.0" y="9.5"/>
+<npc name="Orc" template="Orc" x="13.0" y="9.5"/>
+<npc name="Orc" template="Orc" x="12.0" y="11.0"/>
+
+<floorregion shape="rect" rect_x="8.0" rect_y="10.0" rect_w="3.0" rect_h="1.0" />
+
+<scenery name="Chest" image_name="chest" x="8.5" y="10.5" size="0.8" blocking="true">
+    <item template="Potion of Combat"/>
+</scenery>
 
 <!--southern route, poisonous fog-->
 <floorregion shape="rect" rect_x="32.0" rect_y="6.0" rect_w="1.0" rect_h="8.0" />
@@ -66,7 +83,7 @@
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="9.0" rect_w="5.0" rect_h="4.0" />
 <npc name="Goblin" template="Goblin" x="45.0" y="10.0"/>
-<npc name="Goblin" template="Goblin" x="48.0" y="10.0"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="48.0" y="10.0"/>
 <npc name="Goblin" template="Goblin" x="48.0" y="12.0"/>
 
 <scenery name="Skeleton" image_name="skeleton" x="47.0" y="12.0" size="0.7" draw_type="background"/>
@@ -107,8 +124,7 @@ my efforts with the great riches to be found!
 
 <npc name="Orc" template="Orc" x="27.0" y="12.0"/>
 <scenery name="Chest" image_name="chest" x="28.0" y="11.0" size="0.8" blocking="true">
-    <item template="Potion of Combat"/>
-    <gold amount="53"/>
+    <gold amount="25"/>
 </scenery>
 
 <!-- room with chairs-->
@@ -151,7 +167,9 @@ my efforts with the great riches to be found!
 <floorregion shape="rect" rect_x="15.0" rect_y="12.0" rect_w="20.0" rect_h="1.0"/>
 <trap x="19.0" y="12.0" w="1.0" h="1.0" type="arrow"/>
 <floorregion shape="rect" rect_x="24.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
-<npc name="Goblin" template="Goblin" x="24.5" y="11.5"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="24.5" y="11.5">
+    <item template="Leather Armour"/>
+</npc>
 
 <!--cells-->
 
@@ -282,7 +300,7 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <scenery name="Rock" image_name="rock1" x="23.0" y="17.5" size="0.2"/>
 
 <npc name="Goblin" template="Goblin" x="21.0" y="20.0"/>
-<npc name="Goblin" template="Goblin" x="23.0" y="20.0"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="23.0" y="20.0"/>
 <npc name="Goblin Mage" template="Goblin Mage" x="20.5" y="17.0">
     <spell name="Fire bolt" count="6"/>
 </npc>
@@ -377,7 +395,7 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <!--north-->
 <floorregion shape="rect" rect_x="19.0" rect_y="7.0" rect_w="18.0" rect_h="1.0"/>
-<npc name="Goblin" template="Goblin" x="26.5" y="7.5"/>
+<npc name="Orc" template="Orc" x="26.5" y="7.5"/>
 
 <!--rooms-->
 
@@ -1053,7 +1071,9 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <floorregion shape="rect" rect_x="4.0" rect_y="16.0" rect_w="2.0" rect_h="10.0" />
 
-<npc name="Goblin" template="Goblin" x="4.5" y="17.0"/>
+<npc name="Orc" template="Orc" x="4.5" y="17.0">
+    <item template="Chain Mail Armour"/>
+</npc>
 <npc name="Orc" template="Orc" x="5.5" y="17.5">
     <item template="Longbow"/>
     <item template="Arrows"/>
@@ -1110,9 +1130,13 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <item template="Gold Ring"/>
 </scenery>
 
-<npc name="Goblin" template="Goblin" x="21.0" y="21.5"/>
-<npc name="Goblin" template="Goblin" x="23.0" y="21.5"/>
-<npc name="Orc" template="Orc" x="27.0" y="21.5"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="21.0" y="21.5"/>
+<npc name="Orc" template="Orc" x="23.0" y="21.5">
+    <item template="Leather Armour"/>
+</npc>
+<npc name="Orc" template="Orc" x="27.0" y="21.5">
+    <item template="Leather Armour"/>
+</npc>
 
 <floorregion shape="rect" rect_x="32.0" rect_y="12.0" rect_w="1.0" rect_h="14.0"/>
 
@@ -1175,7 +1199,7 @@ I am a peasant from the nearby village, but I was captured by the Goblins attack
 <floorregion shape="rect" rect_x="26.0" rect_y="7.0" rect_w="5.0" rect_h="4.0"/>
 
 <npc name="Orc" template="Orc" x="28.0" y="8.0">
-    <item template="Leather Armour"/>
+    <item template="Chain Mail Armour"/>
 </npc>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
@@ -1195,7 +1219,7 @@ This book appears to be a journal kept by ...
 <floorregion shape="rect" rect_x="22.0" rect_y="11.0" rect_w="4.0" rect_h="4.0"/>
     <scenery name="Door" image_name="door_wood" x="26.0" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
-<npc name="Goblin" template="Goblin" x="25.5" y="11.5"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="25.5" y="11.5"/>
 
 <floorregion shape="rect" rect_x="21.0" rect_y="12.5" rect_w="1.0" rect_h="1.0"/>
     <scenery name="Door" image_name="door_wood" x="21.5" y="13.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -1247,9 +1271,12 @@ This book appears to be a journal kept by ...
 
 <npc name="Orc Warlord" template="Orc Champion" x="43.0" y="17.5">
     <item name="Orc Warlord's Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item template="Chain Mail Armour"/>
 </npc>
 
-<npc name="Orc Champion" template="Orc Champion" x="44.0" y="19.0"/>
+<npc name="Orc Champion" template="Orc Champion" x="44.0" y="19.0">
+    <item template="Chain Mail Armour"/>
+</npc>
 
 <npc name="Orc" template="Orc" x="40.0" y="15.0">
     <item template="Longbow"/>
@@ -1417,7 +1444,9 @@ Inside this casket are a collection of bones.
 <floorregion shape="rect" rect_x="28.0" rect_y="12.5" rect_w="1.0" rect_h="0.5"/>
 <floorregion shape="rect" rect_x="27.0" rect_y="13.0" rect_w="3.0" rect_h="2.0"/>
 
-<npc name="Goblin Champion" template="Goblin Champion" x="29.5" y="14.5"/>
+<npc name="Orc Champion" template="Orc Champion" x="29.5" y="14.5">
+    <item template="Chain Mail Armour"/>
+</npc>
 
 <scenery name="Chest" image_name="chest" x="27.5" y="14.5" size="0.8" blocking="true">
     <item name="Bull Statuette" image_name="bull_statuette" icon_width="0.25" weight="10">
