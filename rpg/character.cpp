@@ -132,7 +132,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), xp(0), xp_worth(0), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
