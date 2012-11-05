@@ -48,7 +48,7 @@ Chain mail armour provides decent protection, whilst not being too heavy.
 Plate armour provides excellent protection, but it is also heavy to carry.
 </armour>
 
-<ammo name="Arrows" image_name="arrow" projectile_image_name="arrow"
+<ammo name="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
     amount="20"/>
 
 <item name="Gold Ring" image_name="ring_gold" weight="0"/>
