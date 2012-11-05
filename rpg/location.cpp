@@ -223,12 +223,12 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             }
             else if( roll == 2 ) {
                 result_text = "You are rewarded by the diety for your courage on this quest, with a gift of gold.";
-                int gold = rollDice(3, 6, 0);
+                int gold = rollDice(3, 10, 0);
                 playing_gamestate->getPlayer()->addGold(gold);
             }
             else if( roll == 3 ) {
                 result_text = "You are granted the gift of wisdom by the diety.";
-                playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
+                playing_gamestate->getPlayer()->addXP(playing_gamestate, 30);
             }
         }
     }
