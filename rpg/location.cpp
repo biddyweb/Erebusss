@@ -580,8 +580,8 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
     floor_region->addScenery(scenery);*/
     vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
     if( floor_regions.size() == 0 ) {
-        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-        throw string("failed to find floor region for scenery");
+        LOG("add: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+        throw string("add: failed to find floor region for scenery");
     }
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -643,12 +643,21 @@ void Location::removeScenery(Scenery *scenery) {
     scenery->setLocation(NULL);
     this->scenerys.erase(scenery);
 
-    FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
+    /*FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
     if( floor_region == NULL ) {
         LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
         throw string("failed to find floor region for scenery");
     }
-    floor_region->removeScenery(scenery);
+    floor_region->removeScenery(scenery);*/
+    vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
+    if( floor_regions.size() == 0 ) {
+        LOG("remove: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+        throw string("remove: failed to find floor region for scenery");
+    }
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        floor_region->removeScenery(scenery);
+    }
 
     if( this->listener != NULL ) {
         this->listener->locationRemoveScenery(this, scenery);
@@ -1422,7 +1431,7 @@ void Location::initVisibility(Vector2D pos) {
 #endif
 
 vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
-    //LOG("Location::updateVisibility for %f, %f\n", pos.x, pos.y);
+    //qDebug("Location::updateVisibility for %f, %f", pos.x, pos.y);
     vector<FloorRegion *> update_floor_regions;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -1457,6 +1466,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
             }
         }
     }
+    //qDebug("Location::updateVisibility done");
     return update_floor_regions;
 }
 
