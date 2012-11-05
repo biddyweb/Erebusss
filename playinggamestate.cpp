@@ -2674,13 +2674,13 @@ void PlayingGamestate::setupView() {
         Item *item = *iter;
         this->locationAddItem(c_location, item, false);
     }
-    LOG("add graphics for scenery");
+    LOG("add graphics for scenery\n");
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
         this->locationAddScenery(c_location, scenery);
     }
 
-    LOG("add graphics for characters");
+    LOG("add graphics for characters\n");
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         this->locationAddCharacter(c_location, character);
@@ -2728,6 +2728,7 @@ void PlayingGamestate::setupView() {
             this->updateVisibilityForFloorRegion(floor_region);
         }
     }
+    LOG("done\n");
 }
 
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
@@ -3711,6 +3712,7 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
 }
 
 void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
+    //qDebug("PlayingGamestate::locationAddScenery(%d, %d)", location, scenery);
     if( this->c_location == location ) {
         QGraphicsItem *object = NULL;
         if( scenery->isAnimation() ) {
@@ -3719,6 +3721,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         else {
             object = new QGraphicsPixmapItem();
         }
+        //qDebug("set gfx data %d", object);
         scenery->setUserGfxData(object);
         this->locationUpdateScenery(scenery);
         object->setOpacity(scenery->getOpacity());
@@ -4671,25 +4674,39 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
             gfx_item2->setVisible( floor_region->isVisible() );
         }
     }*/
+    //qDebug("updateVisibilityForFloorRegion");
     ASSERT_LOGGER( floor_region->isVisible() );
     if( floor_region->isVisible() ) {
+        //qDebug("floor_region %d", floor_region);
         QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+        //qDebug("gfx_item %d", gfx_item);
+        ASSERT_LOGGER(gfx_item != NULL);
         gfx_item->setVisible( true );
+        //qDebug("do sceneries");
         for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
             Scenery *scenery = *iter;
+            //qDebug("scenery %d", scenery);
+            //qDebug("    %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+            //qDebug("    at %f, %f", scenery->getX(), scenery->getY());
             QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+            //qDebug("gfx_item2 %d", gfx_item2);
             if( gfx_item2 != NULL ) {
                 gfx_item2->setVisible( true );
             }
         }
+        //qDebug("do items");
         for(set<Item *>::iterator iter = floor_region->itemsBegin(); iter != floor_region->itemsEnd(); ++iter) {
             Item *item = *iter;
+            //qDebug("item %d", item);
             QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+            //qDebug("gfx_item2 %d", gfx_item2);
             if( gfx_item2 != NULL ) {
                 gfx_item2->setVisible( true );
             }
         }
+        //qDebug("ping");
     }
+    //qDebug("updateVisibilityForFloorRegion done");
 }
 
 void PlayingGamestate::updateVisibility(Vector2D pos) {
