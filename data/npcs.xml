@@ -70,7 +70,7 @@
 <!--Natural damage-->
 <npc name="Zombie" animation_name="zombie"
     FP="8" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"
-    natural_damageX="1" natural_damageY="4" natural_damageZ="0"
+    natural_damageX="1" natural_damageY="6" natural_damageZ="0"
     health_min="40" health_max="50" gold_min="0" gold_max="0"
     xp_worth="20"
 />
