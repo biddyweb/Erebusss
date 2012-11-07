@@ -1092,7 +1092,10 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
     float dv_length = dv.magnitude();
     if( dv_length == 0.0f ) {
         LOG("Location::intersectSweptSquareWithBoundaries received equal start and end\n");
-        throw string("Location::intersectSweptSquareWithBoundaries received equal start and end");
+    }
+    ASSERT_LOGGER(dv_length != 0.0f);
+    if( dv_length == 0.0f ) {
+        return false;
     }
     dv /= dv_length;
     Vector2D du = dv.perpendicularYToX();
@@ -1460,7 +1463,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
             Vector2D centre_pos = floor_region->findCentre();
             Vector2D hit_pos;
             // use E_TOL_LINEAR, to avoid line of sight slipping between two adjacent items
-            if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, centre_pos, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL, false) ) {
+            if( pos == centre_pos || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, centre_pos, E_TOL_LINEAR, INTERSECTTYPE_VISIBILITY, NULL, false) ) {
                 floor_region->setVisible(true);
                 update_floor_regions.push_back(floor_region);
             }
