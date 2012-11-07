@@ -3112,8 +3112,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
                         if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
                             int natural_damageX = parseInt(natural_damageX_s.toString());
-                            int natural_damageY = parseInt(natural_damageX_s.toString());
-                            int natural_damageZ = parseInt(natural_damageX_s.toString());
+                            int natural_damageY = parseInt(natural_damageY_s.toString());
+                            int natural_damageZ = parseInt(natural_damageZ_s.toString());
                             npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
                         }
                         QStringRef can_fly_s = reader.attributes().value("can_fly");
