@@ -1620,6 +1620,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
 
+    srand( clock() );
+
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
