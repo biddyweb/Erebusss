@@ -199,12 +199,12 @@ bool Character::useAmmo(Ammo *ammo) {
 }
 
 int Character::getProfileIntProperty(const string &key) const {
-    qDebug("key: %s", key.c_str());
+    //qDebug("key: %s", key.c_str());
     int value = this->getBaseProfileIntProperty(key);
     for(vector<ProfileEffect>::const_iterator iter = this->profile_effects.begin(); iter != this->profile_effects.end(); ++iter) {
         const ProfileEffect &profile_effect = *iter;
         int effect_bonus = profile_effect.getProfile()->getIntProperty(key);
-        qDebug("    increase by %d\n", effect_bonus);
+        //qDebug("    increase by %d\n", effect_bonus);
         value += effect_bonus;
     }
     return value;
@@ -370,12 +370,19 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         }
                     }
                     else {
-                        int hit_roll = rollDice(2, 6, 0);
-                        //int stat = is_ranged ? this->getBS() : this->getFP();
+                        /*int hit_roll = rollDice(2, 6, 0);
                         int stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
                         int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
-                        if( hit_roll <= mod_stat ) {
-                            //LOG("character %s rolled %d, hit %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
+                        qDebug("character %s rolled %d / %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_stat, target_npc->getName().c_str(), is_ranged);
+                        if( hit_roll <= mod_stat ) {*/
+                        int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
+                        int d_stat = this->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
+                        int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
+                        int mod_d_stat = this->modifyStatForDifficulty(playing_gamestate, d_stat);
+                        int hit_roll = rollDice(2, 6, -7);
+                        qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
+                        if( hit_roll + mod_a_stat > mod_d_stat ) {
+                            qDebug("    hit");
                             bool is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
                             if( !is_magical && target_npc->requiresMagical() ) {
                                 // weapon has no effect!
@@ -387,10 +394,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
                                 //if( rollDice(2, 6, 0) <= this->getStrength() ) {
                                 if( rollDice(2, 6, 0) <= this->getProfileIntProperty(profile_key_S_c) ) {
-                                    //LOG("    extra strong hit!\n");
+                                    qDebug("    extra strong hit!");
                                     damage++;
                                 }
-                                //LOG("    damage: %d\n", damage);
+                                qDebug("    damage %d", damage);
                                 if( damage > 0 ) {
                                     if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
                                         target_npc->addPainTextEffect(playing_gamestate);
@@ -625,6 +632,7 @@ void Character::setStateIdle() {
 }*/
 
 int Character::getNaturalDamage() const {
+    qDebug("    natural damage: %d, %d, %d", natural_damageX, natural_damageY, natural_damageZ);
     int roll = rollDice(natural_damageX, natural_damageY, natural_damageZ);
     return roll;
 }
