@@ -298,7 +298,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         else {
             result_text = "You look at the interesting painting.";
         }
-        picture = ":/gfx/scenes/painting_sword.jpg";
+        picture = "gfx/scenes/painting_sword.jpg";
     }
     else {
         ASSERT_LOGGER(false);
