@@ -1538,6 +1538,7 @@ A small bronze statuette of a humanoid bull-like creature.
 <scenery name="Tomb" image_name="tomb" x="12.0" y="29.0" size="1.0" blocking="true">
     <armour name="Magical Leather Armour" image_name="leather_armour" weight="100"
         rating="3" magical="true"
+        min_strength="6"
         base_template="Leather Armour" worth_bonus="50">
 This leather armour is blessed, offering greater protection.
     </armour>
@@ -1690,6 +1691,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
     <gold amount="100"/>
     <weapon name="Magic Long Sword" image_name="longsword" weight="12"
         damageX="2" damageY="10" damageZ="2"
+        min_strength="7"
         animation_name="longsword"
         magical="true"
         base_template="Long Sword" worth_bonus="300"
