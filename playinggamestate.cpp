@@ -2499,7 +2499,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
         QStringRef amount_s = reader.attributes().value("amount");
         int amount = parseInt(amount_s.toString());
-        Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), amount);
+        Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), weight, amount);
         item = ammo;
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);

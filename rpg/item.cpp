@@ -198,8 +198,8 @@ Armour *Armour::clone() const {
     return new Armour(*this);
 }
 
-Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int amount) :
-    Item(name, image_name, 0), projectile_image_name(projectile_image_name), amount(amount)
+Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount) :
+    Item(name, image_name, weight), projectile_image_name(projectile_image_name), amount(amount)
 {
 }
 

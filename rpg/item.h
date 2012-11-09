@@ -249,7 +249,7 @@ class Ammo : public Item {
     string projectile_image_name;
     int amount;
 public:
-    Ammo(const string &name, const string &image_name, const string &projectile_image_name, int amount);
+    Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount);
     virtual ~Ammo() {
     }
 
