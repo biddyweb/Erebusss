@@ -130,6 +130,9 @@ string Item::getDetailedDescription() const {
             str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
         }
         str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
+        if( weapon->getMinStrength() > 0 ) {
+            str << "<b>Min Strength:</b> " << weapon->getMinStrength() << "<br/>";
+        }
         str << "<b>Ranged?:</b> " << (weapon->isRanged() ? "Yes" : "No") << "<br/>";
         if( weapon->isRanged() ) {
             str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
@@ -137,11 +140,14 @@ string Item::getDetailedDescription() const {
     }
     else if( this->getType() == ITEMTYPE_SHIELD ) {
         str << "<b>Type:</b> Shield<br/>";
-        //const Shield *shield = static_cast<const Shield *>(item);
+        //const Shield *shield = static_cast<const Shield *>(this);
     }
     else if( this->getType() == ITEMTYPE_ARMOUR ) {
         str << "<b>Type:</b> Armour<br/>";
-        //const Armour *armour = static_cast<const Armour *>(item);
+        const Armour *armour = static_cast<const Armour *>(this);
+        if( armour->getMinStrength() > 0 ) {
+            str << "<b>Min Strength:</b> " << armour->getMinStrength() << "<br/>";
+        }
     }
     else if( this->getType() == ITEMTYPE_AMMO ) {
         str << "<b>Type:</b> Ammo<br/>";
@@ -166,7 +172,8 @@ string Item::getDetailedDescription() const {
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), is_ranged(false), requires_ammo(false),
-    damageX(damageX), damageY(damageY), damageZ(damageZ)
+    damageX(damageX), damageY(damageY), damageZ(damageZ),
+    min_strength(0)
 {
 }
 
@@ -189,7 +196,8 @@ Shield *Shield::clone() const {
 }
 
 Armour::Armour(const string &name, const string &image_name, int weight, int rating) :
-    Item(name, image_name, weight)
+    Item(name, image_name, weight),
+    min_strength(0)
 {
     this->rating = rating;
 }

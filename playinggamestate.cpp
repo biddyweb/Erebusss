@@ -1783,6 +1783,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         player->initialiseHealth(60);
         //player->initialiseHealth(600); // CHEAT
         player->addGold( rollDice(2, 6, 10) );
+        //player->addGold( 1000 ); // CHEAT
     }
 
     LOG("load images\n");
@@ -2449,6 +2450,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef damageX_s = reader.attributes().value("damageX");
         QStringRef damageY_s = reader.attributes().value("damageY");
         QStringRef damageZ_s = reader.attributes().value("damageZ");
+        QStringRef min_strength_s = reader.attributes().value("min_strength");
         /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
         qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
         qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
@@ -2461,6 +2463,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         int damageX = parseInt(damageX_s.toString());
         int damageY = parseInt(damageY_s.toString());
         int damageZ = parseInt(damageZ_s.toString());
+        int min_strength = parseInt(min_strength_s.toString(), true);
         Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString(), damageX, damageY, damageZ);
         item = weapon;
         weapon->setTwoHanded(two_handed);
@@ -2468,6 +2471,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         if( ammo_s.length() > 0 ) {
             weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
         }
+        weapon->setMinStrength(min_strength);
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
         weapon->setDescription(description.toStdString());
@@ -2487,8 +2491,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef name_s = reader.attributes().value("name");
         qDebug("    name: %s", name_s.toString().toStdString().c_str());
         QStringRef image_name_s = reader.attributes().value("image_name");
+        QStringRef min_strength_s = reader.attributes().value("min_strength");
+        int min_strength = parseInt(min_strength_s.toString(), true);
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
         item = armour;
+        armour->setMinStrength(min_strength);
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
         armour->setDescription(description.toStdString());
@@ -4651,8 +4658,11 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             if( dest != player->getPos() ) {
                 qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
                 player->setDestination(dest.x, dest.y, ignore_scenery);
-                if( player->calculateItemsWeight() > player->getCanCarryWeight() ) {
+                if( player->carryingTooMuch() ) {
                     this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+                }
+                else if( player->tooWeakForArmour() ) {
+                    this->addTextEffect("The armour you are wearing is\ntoo heavy for you to move!", player->getPos(), 2000);
                 }
             }
         }
@@ -4773,6 +4783,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         fprintf(file, " damageX=\"%d\"", damageX);
         fprintf(file, " damageY=\"%d\"", damageY);
         fprintf(file, " damageZ=\"%d\"", damageZ);
+        if( weapon->getMinStrength() > 0 ) {
+            fprintf(file, " min_strength=\"%d\"", weapon->getMinStrength());
+        }
         if( weapon->getRequiresAmmo() ) {
             fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
         }
@@ -4793,6 +4806,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     case ITEMTYPE_ARMOUR:
     {
         const Armour *armour = static_cast<const Armour *>(item);
+        if( armour->getMinStrength() > 0 ) {
+            fprintf(file, " min_strength=\"%d\"", armour->getMinStrength());
+        }
         if( character != NULL && armour == character->getCurrentArmour() ) {
             fprintf(file, " current_armour=\"true\"");
         }

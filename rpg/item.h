@@ -167,6 +167,7 @@ class Weapon : public Item {
     bool requires_ammo;
     string ammo_key;
     int damageX, damageY, damageZ;
+    int min_strength;
 public:
     Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ);
     virtual ~Weapon() {
@@ -209,6 +210,12 @@ public:
         *damageZ = this->damageZ;
     }
     int getDamage() const;
+    void setMinStrength(int min_strength) {
+        this->min_strength = min_strength;
+    }
+    int getMinStrength() const {
+        return this->min_strength;
+    }
 };
 
 class Shield : public Item {
@@ -230,6 +237,7 @@ public:
 
 class Armour : public Item {
     //int rating;
+    int min_strength;
 public:
     Armour(const string &name, const string &image_name, int weight, int rating);
     virtual ~Armour() {
@@ -243,6 +251,12 @@ public:
     /*int getRating() const {
         return this->rating;
     }*/
+    void setMinStrength(int min_strength) {
+        this->min_strength = min_strength;
+    }
+    int getMinStrength() const {
+        return this->min_strength;
+    }
 };
 
 class Ammo : public Item {

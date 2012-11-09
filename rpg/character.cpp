@@ -452,6 +452,14 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     ammo = static_cast<Ammo *>(item);
                                 }
                             }
+                            if( can_hit && this->tooWeakForWeapon() ) {
+                                can_hit = false;
+                                if( this == playing_gamestate->getPlayer() ) {
+                                    playing_gamestate->addTextEffect("You are not strong enough to use this weapon!", this->getPos(), 1000);
+                                    this->armWeapon(NULL); // disarm it
+                                }
+                            }
+
                             if( can_hit ) {
                                 if( ammo != NULL ) {
                                     // ammo will be deleted if used up!
@@ -754,6 +762,10 @@ void Character::addItem(Item *item, bool auto_arm) {
     if( auto_arm && this->current_weapon == NULL && item->getType() == ITEMTYPE_WEAPON ) {
         // automatically arm weapon
         this->armWeapon( static_cast<Weapon *>(item) );
+        if( this->tooWeakForWeapon() ) {
+            // too heavy to use, need to disarm again!
+            this->armWeapon(NULL);
+        }
     }
     if( auto_arm && this->current_shield == NULL && item->getType() == ITEMTYPE_SHIELD ) {
         // automatically arm shield
@@ -762,6 +774,10 @@ void Character::addItem(Item *item, bool auto_arm) {
     if( auto_arm && this->current_armour == NULL && item->getType() == ITEMTYPE_ARMOUR ) {
         // automatically wear aromur
         this->wearArmour( static_cast<Armour *>(item) );
+        if( this->tooWeakForArmour() ) {
+            // too heavy to wear, need to disarm again!
+            this->wearArmour(NULL);
+        }
     }
 }
 
@@ -938,9 +954,33 @@ int Character::getCanCarryWeight() const {
     return 250 + 10 * this->getProfileIntProperty(profile_key_S_c);
 }
 
+bool Character::carryingTooMuch() const {
+    if( this->calculateItemsWeight() > this->getCanCarryWeight() ) {
+        return true;
+    }
+    return false;
+}
+
+bool Character::tooWeakForArmour() const {
+    if( this->getCurrentArmour() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentArmour()->getMinStrength() ) {
+        return true;
+    }
+    return false;
+}
+
+bool Character::tooWeakForWeapon() const {
+    if( this->getCurrentWeapon() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentWeapon()->getMinStrength() ) {
+        return true;
+    }
+    return false;
+}
+
 bool Character::canMove() const {
     bool can_move = true;
-    if( can_move && this->calculateItemsWeight() > this->getCanCarryWeight() ) {
+    if( can_move && this->carryingTooMuch() ) {
+        can_move = false;
+    }
+    if( can_move && this->getCurrentArmour() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentArmour()->getMinStrength() ) {
         can_move = false;
     }
     return can_move;

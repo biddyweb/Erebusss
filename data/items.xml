@@ -11,10 +11,12 @@
 
 <weapon name="Long Sword" image_name="longsword" weight="14"
     damageX="2" damageY="10" damageZ="0"
+    min_strength="7"
     animation_name="longsword"/>
 
 <weapon name="Two Handed Sword" image_name="longsword" weight="30"
     damageX="2" damageY="12" damageZ="0"
+    min_strength="8"
     animation_name="longsword"
     two_handed="true"/>
 
@@ -25,6 +27,7 @@
 
 <weapon name="Longbow" image_name="longbow" weight="5"
     damageX="2" damageY="12" damageZ="-1"
+    min_strength="6"
     animation_name="longbow"
     two_handed="true" ranged="true" ammo="Arrows"/>
 
@@ -34,18 +37,21 @@ A shield provides additional protection, but prevents the use of two-handed weap
 </shield>
 
 <armour name="Leather Armour" image_name="leather_armour" weight="100"
+    min_strength="6"
     rating="2">
 Simple lightweight armour, that provides basic protection.
 </armour>
 
 <armour name="Chain Mail Armour" image_name="metal_armour" weight="150"
+    min_strength="7"
     rating="4">
 Chain mail armour provides decent protection, whilst not being too heavy.
 </armour>
 
 <armour name="Plate Armour" image_name="metal_armour" weight="200"
+    min_strength="8"
     rating="6">
-Plate armour provides excellent protection, but it is also heavy to carry.
+Plate armour provides excellent protection, but it is also heavy to carry and wear.
 </armour>
 
 <ammo name="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"

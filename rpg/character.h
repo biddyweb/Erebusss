@@ -641,6 +641,9 @@ public:
     void addGold(int change);
     int calculateItemsWeight() const;
     int getCanCarryWeight() const;
+    bool carryingTooMuch() const;
+    bool tooWeakForArmour() const;
+    bool tooWeakForWeapon() const;
     bool canMove() const;
     void addSpell(const string &spell, int count) {
         this->spells[spell] = this->spells[spell] + count;
