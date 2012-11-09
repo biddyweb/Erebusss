@@ -4864,6 +4864,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         return false;
     }
 
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+
     const int savegame_version = 1;
 
     fprintf(file, "<?xml version=\"1.0\" ?>\n");
@@ -5112,6 +5114,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 
     fclose(file);
 
+    game_g->getScreen()->getMainWindow()->unsetCursor();
     return true;
 }
 
