@@ -77,10 +77,10 @@
 
 <!--Natural damage-->
 <npc name="Giant Spider" animation_name="spider"
-    FP="7" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
-    natural_damageX="3" natural_damageY="10" natural_damageZ="0"
+    FP="8" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
+    natural_damageX="3" natural_damageY="10" natural_damageZ="10"
     health_min="50" health_max="60" gold_min="0" gold_max="0"
-    xp_worth="30"
+    xp_worth="40"
 />
 
 </npcs>
