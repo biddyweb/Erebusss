@@ -177,11 +177,11 @@ my efforts with the great riches to be found!
 
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key"/>
+    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key"/>
+    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
 <scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
 <item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
 This is a small book, containing some notes. The writing is barely legible, and gets worse towards the end. You read some of the entries:
@@ -195,16 +195,16 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key"/>
+    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
 <scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" size="0.7" opacity="0.9" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key"/>
+    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key"/>
+    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
 <item template="Skull" x="40.5" y="10.3"/>
 <gold amount="4" x="40.6" y="10.5"/>
 
@@ -1602,6 +1602,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
     <item template="Arrows"/>
 </npc>
 <npc name="Wyvern" template="Wyvern" x="25.0" y="12.0"/>
+<npc name="Wyvern" template="Wyvern" x="15.0" y="28.0"/>
 
 <!--west side-->
 
