@@ -218,7 +218,7 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 <floorregion shape="rect" rect_x="45.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
 
 <npc name="Orc" template="Orc" x="47.0" y="10.0">
-    <item name="Wizard's Cell Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Wizard's Cell Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 
 <scenery name="Table" image_name="table" x="46.0" y="8.0" size="1.2" blocking="true"/>
@@ -1270,7 +1270,7 @@ This book appears to be a journal kept by ...
 <scenery name="Throne" image_name="throne" x="41.5" y="17.5" size="0.8" blocking="true"/>
 
 <npc name="Orc Warlord" template="Orc Champion" x="43.0" y="17.5">
-    <item name="Orc Warlord's Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Orc Warlord's Key" image_name="key" icon_width="0.5" weight="0"/>
     <item template="Chain Mail Armour"/>
 </npc>
 
@@ -1347,7 +1347,7 @@ This book appears to be a journal kept by ...
 <floorregion shape="rect" rect_x="11.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Crate" image_name="crate" x="11.5" y="3.5" w="0.8" h="0.8" blocking="true">
-    <item name="Maze Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Maze Key" image_name="key" icon_width="0.5" weight="0"/>
 </scenery>
 
 <scenery name="Crate" image_name="crate" x="14.5" y="3.5" w="0.8" h="0.8" blocking="true">
@@ -1493,7 +1493,7 @@ A small bronze statuette of a humanoid bull-like creature.
 <!--<player_start x="19.0" y="19.5"/>-->
 
 <npc name="Minotaur" template="Minotaur" x="19.25" y="14.75">
-    <item name="Minotaur's Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Minotaur's Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 
 <scenery name="Tree" image_name="tree2" x="17.5" y="11.0" size="1.0"/>
@@ -1561,7 +1561,7 @@ This leather armour is blessed, offering greater protection.
     can_talk="true"
     interaction_type="WANT_OBJECT"
     interaction_data="Ghost's Bones"
-    interaction_xp="75"
+    interaction_xp="30"
 >
 <opening_initial>You can see me? Don't be afraid!
 </opening_initial>
