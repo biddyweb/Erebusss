@@ -349,6 +349,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
+    void saveTrap(FILE *file, const Trap *trap) const;
 
 private slots:
     void clickedStats();

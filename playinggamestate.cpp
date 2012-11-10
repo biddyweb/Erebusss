@@ -4853,6 +4853,16 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, "\n");
 }
 
+void PlayingGamestate::saveTrap(FILE *file, const Trap *trap) const {
+    fprintf(file, "<trap");
+    fprintf(file, " type=\"%s\"", trap->getType().c_str());
+    fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
+    fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
+    fprintf(file, " difficulty=\"%d\"", trap->getDifficulty());
+    fprintf(file, " rating=\"%d\"", trap->getRating());
+    fprintf(file, " />\n");
+}
+
 bool PlayingGamestate::saveGame(const string &filename) const {
     LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
     string full_path = game_g->getApplicationFilename(savegame_folder + filename);
@@ -5057,6 +5067,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 const Item *item = *iter2;
                 this->saveItem(file, item);
             }
+            if( scenery->getTrap() != NULL ) {
+                this->saveTrap(file, scenery->getTrap());
+            }
             fprintf(file, "</scenery>\n");
         }
         fprintf(file, "\n");
@@ -5071,13 +5084,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         LOG("save traps\n");
         for(set<Trap *>::const_iterator iter = location->trapsBegin(); iter != location->trapsEnd(); ++iter) {
             const Trap *trap = *iter;
-            fprintf(file, "<trap");
-            fprintf(file, " type=\"%s\"", trap->getType().c_str());
-            fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
-            fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
-            fprintf(file, " difficulty=\"%d\"", trap->getDifficulty());
-            fprintf(file, " rating=\"%d\"", trap->getRating());
-            fprintf(file, " />\n");
+            this->saveTrap(file, trap);
         }
         fprintf(file, "\n");
 
