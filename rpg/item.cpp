@@ -161,9 +161,19 @@ string Item::getDetailedDescription() const {
     }
     str << "</p>";
     if( this->getDescription().length() > 0 ) {
-        str << "<pre>";
+        /*str << "<pre>";
         str << this->getDescription();
-        str << "</pre>";
+        str << "</pre>";*/
+        QString desc = this->getDescription().c_str();
+        //desc.replace(" ", "&nbsp;"); // commented out as causes text to no longer word-wrap!
+        desc.replace("\n", "<br/>");
+        str << desc.toStdString();
+        /*str << "initial text<br/>initial text with new line<br/>";
+        //str << this->getDescription();
+        QString desc = this->getDescription().c_str();
+        //desc.replace(" ", "&nbsp;");
+        desc.replace("\n", "<br/>");
+        str << desc.toStdString();*/
     }
     str << "</body></html>";
     return str.str();
