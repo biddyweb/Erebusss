@@ -1498,18 +1498,18 @@ void SaveGameWindow::clickedSave() {
         QString filename = QString(savegame_root.c_str());
         QDateTime date_time = QDateTime::currentDateTime();
         QDate date = date_time.date();
-        filename += QString::number(date.year());
+        filename += QString("%1").arg(QString::number(date.year()), 2, QChar('0'));
         filename += "-";
-        filename += QString::number(date.month());
+        filename += QString("%1").arg(QString::number(date.month()), 2, QChar('0'));
         filename += "-";
-        filename += QString::number(date.day());
+        filename += QString("%1").arg(QString::number(date.day()), 2, QChar('0'));
         filename += "_";
         QTime time = date_time.time();
-        filename += QString::number(time.hour());
+        filename += QString("%1").arg(QString::number(time.hour()), 2, QChar('0'));
         filename += "-";
-        filename += QString::number(time.minute());
+        filename += QString("%1").arg(QString::number(time.minute()), 2, QChar('0'));
         filename += "-";
-        filename += QString::number(time.second());
+        filename += QString("%1").arg(QString::number(time.second()), 2, QChar('0'));
         //filename += date_time.toString();
 
         QWidget *subwindow = new QWidget();
