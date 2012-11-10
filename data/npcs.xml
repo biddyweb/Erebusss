@@ -41,11 +41,11 @@
     xp_worth="15"
 />
 
-<!--Weapon hardcoded as natural damage: Two Handed Axe-->
+<!--Weapon hardcoded as natural damage: Two Handed Axe +1-->
 <npc name="Minotaur" animation_name="minotaur"
-    FP="10" BS="4" S="9" A="1" M="7" D="7" B="6" Sp="2.5"
-    natural_damageX="2" natural_damageY="12" natural_damageZ="0"
-    health_min="50" health_max="60" gold_min="0" gold_max="0"
+    FP="10" BS="4" S="10" A="1" M="7" D="7" B="6" Sp="2.5"
+    natural_damageX="2" natural_damageY="12" natural_damageZ="1"
+    health_min="70" health_max="80" gold_min="0" gold_max="0"
     xp_worth="50"
 />
 
