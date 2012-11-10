@@ -130,7 +130,7 @@
 
 <npc name="Goblin Champion" template="Goblin Champion" x="16.0" y="8.0">
     <item template="Leather Armour"/>
-    <item name="Goblin's Key" image_name="key" icon_width="0.25" weight="0"/>
+    <item name="Goblin's Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 <npc name="Goblin" template="Goblin" x="16.0" y="9.0"/>
 
