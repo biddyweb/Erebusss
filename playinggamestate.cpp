@@ -2402,23 +2402,24 @@ void PlayingGamestate::playBackgroundMusic() {
 Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
 
-    QStringRef base_template_s = reader.attributes().value("base_template");
-    QStringRef arg1_s = reader.attributes().value("arg1");
-    QStringRef arg2_s = reader.attributes().value("arg2");
-    QStringRef arg1_s_s = reader.attributes().value("arg1_s");
-    QStringRef weight_s = reader.attributes().value("weight");
-    QStringRef rating_s = reader.attributes().value("rating");
-    QStringRef magical_s = reader.attributes().value("magical");
-    QStringRef worth_bonus_s = reader.attributes().value("worth_bonus");
-    QString base_template = base_template_s.toString();
-    int weight = parseInt(weight_s.toString(), true);
-    int arg1 = parseInt(arg1_s.toString(), true);
-    int arg2 = parseInt(arg2_s.toString(), true);
-    int rating = parseInt(rating_s.toString(), true);
+    QStringRef base_template_sr = reader.attributes().value("base_template");
+    QStringRef arg1_sr = reader.attributes().value("arg1");
+    QStringRef arg2_sr = reader.attributes().value("arg2");
+    QStringRef arg1_s_sr = reader.attributes().value("arg1_s");
+    QStringRef weight_sr = reader.attributes().value("weight");
+    QStringRef rating_sr = reader.attributes().value("rating");
+    QStringRef magical_sr = reader.attributes().value("magical");
+    QStringRef worth_bonus_sr = reader.attributes().value("worth_bonus");
+    QString base_template = base_template_sr.toString();
+    int weight = parseInt(weight_sr.toString(), true);
+    int arg1 = parseInt(arg1_sr.toString(), true);
+    int arg2 = parseInt(arg2_sr.toString(), true);
+    QString arg1_s = arg1_s_sr.toString();
+    int rating = parseInt(rating_sr.toString(), true);
     if( rating == 0 )
         rating = 1; // so the default of 0 defaults instead to 1
-    bool magical = parseBool(magical_s.toString(), true);
-    int worth_bonus = parseInt(worth_bonus_s.toString(), true);
+    bool magical = parseBool(magical_sr.toString(), true);
+    int worth_bonus = parseInt(worth_bonus_sr.toString(), true);
 
     if( reader.name() == "item" ) {
         QStringRef name_s = reader.attributes().value("name");
@@ -2526,12 +2527,13 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     }
     // else ignore unknown element - leave item as NULL
     if( item != NULL ) {
+        // remember not to use the string regs here, as no longer value!
         item->setArg1(arg1);
         item->setArg2(arg2);
-        item->setArg1s(arg1_s_s.toString().toStdString());
+        item->setArg1s(arg1_s.toStdString());
         item->setRating(rating);
         item->setMagical(magical);
-        item->setBaseTemplate(base_template.toStdString().c_str());
+        item->setBaseTemplate(base_template.toStdString());
         item->setWorthBonus(worth_bonus);
     }
     return item;
