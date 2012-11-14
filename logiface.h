@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 // lightweight file for logging, to avoid files having to include game.h just for logging
 
 void log(const char *text, ...);

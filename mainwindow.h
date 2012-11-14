@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include <QtGui/QMainWindow>
 
 class MainWindow : public QMainWindow

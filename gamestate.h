@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include <QObject>
 
 class Gamestate : public QObject {

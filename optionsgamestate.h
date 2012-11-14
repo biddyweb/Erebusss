@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include <QtGui>
 
 // Phonon not supported on Qt Android
