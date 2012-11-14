@@ -25,7 +25,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.0" y="2.0"/>-->
+<player_start x="32.0" y="2.0"/>
 
 <!--main room-->
 
@@ -1348,7 +1348,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
 
 <floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="5.0" rect_h="4.0"/>
 
-<player_start x="22.5" y="20.5"/>
+<!--<player_start x="22.5" y="20.5"/>-->
 
 <scenery name="Teleport" image_name="teleport" x="22.5" y="22.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="27.0" exit_location_y="30.0"/>
 
