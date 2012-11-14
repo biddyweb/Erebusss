@@ -1360,11 +1360,21 @@ Further away, the landscape is formed by fields and trees, with occasional build
 </scenery>
 
 <scenery name="Cabinet" image_name="cabinet" x="21.0" y="20.5" size="0.8" blocking="true">
-    <item name="A History" image_name="book" icon_width="0.25" weight="1">
-This old and heavy tome describes the black arts of Necromancy.
+    <item name="Rise of the Steam Age" image_name="book" icon_width="0.25" weight="2">
+This seems to be a kind of history book, detailing the progress that has been made in recent years. It talks of a thing called "science", which seems to be a means to develop amazing devices that seem magical to you. Together with harnessing the use of steam, great machines have been constructed, far more powerful than anything that can be done by a man on his own.
+
+Later chapters in the book talk of a unification of science, steam and magic, and how this has enabled the creation of even more advancements. The book shows great flying machines, long distance communication devices, as well as destructive and explosive weapons.
     </item>
     <item name="News Paper" image_name="book" icon_width="0.25" weight="1">
+This is a collection of papers, with printed text that claims to describe "news" events. The paper feels old, the text faded. The main story talks about a recently started war, referring to deaths of tens of thousands even in single events - already it seems a war on a scale that you have never seen.
 
+Reading through the details, it seems that wars are no longer fought with sword and cavalry, but with devices that cause explosions, perhaps similar to cannons of your time, but far more refined and powerful. Great transportation devices are also in use, on land, sea and even in the air.
+
+Magic still plays a part, with groups of highly trained wizards being used to focus their energies against the enemy.
+
+A notice in the paper also calls upon all able-bodied men and women to report for service, or face imprisonment.
+
+There seems to be no information on the cause of the war, or who the enemy is.
     </item>
 </scenery>
 
