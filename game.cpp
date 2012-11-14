@@ -450,14 +450,15 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 #elif defined(Q_WS_MAEMO_5)
     // must be before __linux, as Maemo/Meego also defines __linux
     LOG("Platform: Maemo/Meego\n");
+#elif defined(Q_OS_ANDROID)
+    // must be before __linux, as Android also defines __linux
+    LOG("Platform: Android\n");
 #elif __linux
     LOG("Platform: Linux\n");
 #elif defined(__APPLE__) && defined(__MACH__)
     LOG("Platform: MacOS X\n");
 #elif defined(Q_OS_SYMBIAN)
     LOG("Platform: Symbian\n");
-#elif defined(Q_OS_ANDROID)
-    LOG("Platform: Android\n")
 #else
     LOG("Platform: UNKNOWN\n");
 #endif
