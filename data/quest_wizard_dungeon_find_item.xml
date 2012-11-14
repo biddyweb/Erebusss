@@ -1,13 +1,25 @@
 <?xml version="1.0" ?>
 <quest>
 
-<info>
+<info>As thanks for the success in your recent quest, the village elders invite you to a banquet.
+
+After congratulating you on your recent quest, they say they have summoned you here to learn something of a more important nature.
+
+Over one hundred years ago, nearby lived a powerful mage named Vespar. He lived in an underground dungeon. Few were allowed into his home, which was rumoured to hold great secrets and power, though he often communicated with the nearby villages.
+
+But then, one hundred years ago, all contact was lost, and furthermore, no one was able to find the entrance to his dungeon. Even those who had been there before were unable to find it. Some said they had just forgotten, whilst others said some magic had caused the dungeon to have been concealed, or destroyed.
+
+Recently a villager from one of the nearby villages stumbled across a doorway in the mountains to an underground location. He did not venture far, hearing the sounds of dreadful creatures that now inhabited it, but I managed to bring back various documents and artefacts he found in the first room, which scholars identified as belonging to the great mage Vespar.
+
+Since then, various adventurers have set off from the other villages to explore, with varying degrees of success. Our scholars however have learnt some additional information. We know that the mage died one hundred years ago, and our own wizards have detected that a source of magic lies buried deep within the dungeons. This is, in fact, Vespar's skull, which seems to somehow be still blessed with his magic.
+
+We would like you to enter his dungeon, and retrieve the skull, lest it falls into the hands of evil. We will reward you with three hundred gold pieces. You will also have plenty of opportunity to find other treasures within the dungeons, which you are welcome to keep for yourself.
 </info>
 
-<completed_text>
+<completed_text>The village elders are most pleased that you have succeeded in your quest. They take the mage's skull from you, and give you your reward of three hundred gold pieces.
 </completed_text>
 
-<quest_objective type="find_item" arg1="Wizard's Skull" gold="250"/>
+<quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
 
 <location name="entrance">
 
@@ -33,8 +45,8 @@
 
 <scenery name="Table" image_name="table" x="35.0" y="2.5" size="0.8" blocking="true"/>
 
-<!--<item template="Potion of Strength" x="32.0" y="3.0"/>
-<item template="Potion of Speed" x="32.0" y="4.0"/>-->
+<!--<item template="Potion of Combat" x="32.0" y="3.0"/>
+<item template="Potion of Archery" x="32.0" y="4.0"/>-->
 
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -88,23 +100,19 @@
 
 <scenery name="Skeleton" image_name="skeleton" x="47.0" y="12.0" size="0.7" draw_type="background"/>
 <item name="Book" x="46.5" y="12.2" image_name="book" icon_width="0.25" weight="1">
-The book appears to be a journal of some kind - you read some of the most
-recent entries:
+The book appears to be a journal of some kind - you read some of the most recent entries:
 
-27th - I have decide to explore the dungeons of the long dead wizard, in search
-of the great treasure rumoured to be found in there.
+27th - I have decide to explore the dungeons of the long dead wizard, in search of the great treasure rumoured to be found in there.
 
 ...
 
-28th - I have received some useful advice, from an old adventurer who once
-tried to explore the wizard's lair. She told me of a cursed level - every item
-and offering there brings nothing but misery and harm, except for one single
-blessing.
+28th - I have received some useful advice, from an old adventurer who once tried to explore the wizard's lair. She told me of a cursed level - every item and offering there brings nothing but misery and harm, except for two teleporters, which she claimed allowed her to travel through time. I am not sure if I believe it myself, being such an amazing claim.
+
+She also warned me of a great beast lurking in the lower levels - perhaps one created by the wizard himself, which she wonders if it was his undoing.
 
 ...
 
-30th - Today I set out on my quest, confident that I will soon be rewarded for
-my efforts with the great riches to be found!
+30th - Today I set out on my quest, confident that I will soon be rewarded for my efforts with the great riches to be found!
 </item>
 <scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
 
@@ -177,34 +185,42 @@ my efforts with the great riches to be found!
 
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
+    locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
+    locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
 <item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
 This is a small book, containing some notes. The writing is barely legible, and gets worse towards the end. You read some of the entries:
 
-I have been sentenced to five months in prison, to be served in the mage's dungeon.
+I have been sentenced to five months in prison, to be served in the mage's dungeon. I managed to smuggle these scraps of paper with me, which I now use to record my ordeal. I have been locked up in this tiny cell, the only light comes from a small hole in the iron door.
 
 ...
 
-I don't know how long I have been kept here, locked up in this tiny cell.
+I have heard terrible rumours of this place, and I don't know what fate awaits me. Every so often, I hear the most terrible screams.
+
+...
+
+Every so often, food is passed through a slot in the door. Though it barely passes as edible, I have no choice to keep off the hunger. I have had no contact with anyone. With no way to judge the time, I don't know how long I have been kept here.
+
+...
+
+Food is no longer given to me. I note that I no longer hear any noises - whether the terrible screams, or anything else. I have tried banging on the door, shouting for help, but there is no response. I do not know whether this is some form of torture, or if I have been forgotten, left to starve.
 </item>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
+    locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" size="0.7" opacity="0.9" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
+    locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Wizard's Cell Key" unlock_xp="10"/>
+    locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <item template="Skull" x="40.5" y="10.3"/>
 <gold amount="4" x="40.6" y="10.5"/>
 
@@ -218,14 +234,29 @@ I don't know how long I have been kept here, locked up in this tiny cell.
 <floorregion shape="rect" rect_x="45.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
 
 <npc name="Orc" template="Orc" x="47.0" y="10.0">
-    <item name="Wizard's Cell Key" image_name="key" icon_width="0.5" weight="0"/>
+    <item name="Vespar's Cell Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 
 <scenery name="Table" image_name="table" x="46.0" y="8.0" size="1.2" blocking="true"/>
 <scenery name="Chest" image_name="chest" x="48.5" y="7.5" size="0.8" blocking="true">
     <gold amount="27"/>
     <item name="Book" image_name="book" icon_width="0.25" weight="1">
-This book seems to be a record of unfortunate prisoners that were kept in this terrible place:
+This book seems to be a record of unfortunate prisoners that were kept in this terrible place. You glance at some of the entries:
+
+C21 - This prisoner has been possessed by demonic forces. Use whatever means necessary to extract the evil.
+
+...
+
+D9 - Sentenced to five months for stealing food products.
+
+...
+
+D64 - Sentenced to one year for unspecified crimes. Sentenced extended indefinitely, due to prisoner's uncooperative behaviour. We have increased the frequency and severity of torture to see if it has any effect.
+
+...
+
+F43 - Suspected of witchcraft, sent here until the prisoner confesses his crime. Approved for use of torture.
+
     </item>
 </scenery>
 
@@ -238,6 +269,12 @@ This book seems to be a record of unfortunate prisoners that were kept in this t
 <scenery name="Blood Stain" image_name="bloodstain2" x="53.0" y="12.2" size="0.7" opacity="0.9" draw_type="background"/>
 <scenery name="Skeleton" image_name="skeleton" x="51.5" y="11.4" size="0.65" draw_type="background"/>
 <scenery name="Skeleton" image_name="skeleton" x="54.0" y="13.0" size="0.75" draw_type="background"/>
+
+<scenery name="Chest" image_name="chest" x="55.0" y="11.5" size="0.8" blocking="true">
+    <item name="Book" image_name="book" icon_width="0.25" weight="1">
+This book seems to be a record of grisly torture that took place in this room. You skim through, catching details of terrible tortures that were applied on the unfortunates here. Everything is written in a methodical manner, with seemingly no sympathy for the victims. You quickly shut the book in horror.
+    </item>
+</scenery>
 
 <!--exit to next location-->
 
@@ -688,7 +725,11 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
     <scenery name="Door" image_name="door_wood" x="16.5" y="2.25" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="15.0" rect_y="2.5" rect_w="3.0" rect_h="2.0"/>
 
-<scenery name="Cabinet" image_name="cabinet" x="15.5" y="3.0" size="0.8" blocking="true"/>
+<scenery name="Cabinet" image_name="cabinet" x="15.5" y="3.0" size="0.8" blocking="true">
+    <item name="Book" image_name="book" icon_width="0.25" weight="1">
+This is a heavy book, that starts talking about the subject matter of the dead, and the arts of necromancy. You skim to the later pages, and find records of experiments. They refer to unfortunate subjects - prisoners who were sent here for various petty or dubious crimes - placed in chambers, with the aim of not permanently killing them, but to reanimate them as creatures of undead. From the descriptions and illustrations, you recognise these creatures as zombies. It is believed that such beings can be created from the dead with powerful magic from necromancers, though it seems that the wizard was experimenting with a more mechanical means to manufacture such monsters, for who knows what purpose.
+    </item>
+</scenery>
 
 <!--trapdoor route-->
 
@@ -824,9 +865,9 @@ Gakk!
 <npc name="Zombie" template="Zombie" x="31.0" y="9.0"/>
 
 <scenery name="Table" image_name="table" x="32.0" y="9.0" size="1.2" blocking="true">
-    <item name="Book" image_name="book" icon_width="0.25" weight="1">
+<!--    <item name="Book" image_name="book" icon_width="0.25" weight="1">
 Experiments.
-    </item>
+    </item>-->
 </scenery>
 
 <floorregion shape="rect" rect_x="25.0" rect_y="22.0" rect_w="11.0" rect_h="1.0"/>
@@ -854,7 +895,9 @@ Experiments.
 <scenery name="Teleport" image_name="teleport" x="28.5" y="30.0" size="1.0" blocking="true" exit_location="level_future" exit_location_x="22.5" exit_location_y="20.5"/>
 <scenery name="Cabinet" image_name="cabinet" x="28.5" y="28.5" size="0.8" blocking="true">
     <item name="Journal" image_name="book" icon_width="0.25" weight="1">
-I have discovered an amazing secret! ...
+"I have discovered an amazing secret!" begins this journal. It details, in an excited tone, the discovery that use of magical teleporters, with appropriate modifications, can be used to send the traveller not just through space, but through time.
+
+The journal claims that each of the nearby teleporters is linked to a different point in time, one to six hundred years in the past, the other to six hundred years in the future.
     </item>
 </scenery>
 
@@ -1212,7 +1255,11 @@ I am a peasant from the nearby village, but I was captured by the Orcs attacking
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter.
     </item>
     <item name="Journal" image_name="book" icon_width="0.25" weight="1">
-This book appears to be a journal kept by ...
+This book appears to be a journal kept by one of the villagers who was kept prisoner here. It tells of how they were captured one day by a collection of monsters in a raid upon their village. Others were slain, including close family and friends, and their houses burned down
+
+They were bound, blindfolded, and taken away, to be placed in a small cell that appeared to be in some underground cave.
+
+Every so often, one of the prisoners was taken away, never to be returned.
     </item>
 </scenery>
 
@@ -1511,7 +1558,7 @@ A small bronze statuette of a humanoid bull-like creature.
 
 <scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
     <gold amount="150"/>
-    <item name="Wizard's Skull" image_name="skull" icon_width="0.25" weight="10"/>
+    <item name="Vespar's Skull" image_name="skull" icon_width="0.25" weight="10"/>
 </scenery>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
