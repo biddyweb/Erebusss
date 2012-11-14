@@ -120,3 +120,14 @@ QPixmap createNoise(int w, int h, float scale_u, float scale_v, const unsigned c
     ASSERT_LOGGER( !pixmap.isNull() );
     return pixmap;
 }
+
+void convertToHTML(QString &string) {
+    //string.replace(" ", "&nbsp;"); // commented out as causes text to no longer word-wrap!
+    string.replace("\n", "<br/>");
+}
+
+string convertToHTML(const string &str) {
+    QString q_str(str.c_str());
+    convertToHTML(q_str);
+    return q_str.toStdString();
+}

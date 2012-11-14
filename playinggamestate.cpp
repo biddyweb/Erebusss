@@ -1095,6 +1095,7 @@ void ItemsWindow::clickedInfo() {
     }
     const Item *item = list_items.at(index);
     string info = item->getDetailedDescription();
+    info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
 }
 
@@ -1314,6 +1315,7 @@ void TradeWindow::clickedInfo() {
 
     const Item *selected_item = items.at(index);
     string info = selected_item->getDetailedDescription();
+    info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
 }
 
@@ -1782,14 +1784,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         player->initialiseHealth(60);
         //player->initialiseHealth(600); // CHEAT
-        player->addGold( rollDice(2, 6, 10) );
+        //player->addGold( rollDice(2, 6, 10) );
+        player->addGold( 333 ); // CHEAT, simulate start of quest 2
+        player->setXP(68); // CHEAT, simulate start of quest 2
         //player->addGold( 1000 ); // CHEAT
     }
 
     LOG("load images\n");
     {
-        QFile file(QString(DEPLOYMENT_PATH) + "data/images.xml");
+        QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";
+        QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            qDebug("failed to open: %s", filename.toStdString().c_str());
             throw string("Failed to open images xml file");
         }
         QXmlStreamReader reader(&file);
@@ -3676,15 +3682,17 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     qApp->processEvents();
 
     if( !is_savegame && quest->getInfo().length() > 0 ) {
+        string quest_info = quest->getInfo();
+        quest_info = convertToHTML(quest_info);
         stringstream str;
         str << "<html><body>";
         str << "<h1>Quest</h1>";
-        str << "<p>" << quest->getInfo() << "</p>";
+        str << "<p>" << quest_info << "</p>";
         str << "</body></html>";
         this->showInfoWindow(str.str());
 
         this->journal_ss << "<p><b>Quest Details</b></p>";
-        this->journal_ss << "<p>" << quest->getInfo() << "</p>";
+        this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
     LOG("View is transformed? %d\n", view->isTransformed());
@@ -3951,7 +3959,7 @@ void PlayingGamestate::clickedQuit() {
 }
 
 void PlayingGamestate::showInfoWindow(const string &html) {
-    // n.b., different to showDialogWindow, as this doesn't block and wait for an answer
+    // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
     LOG("showInfoWindow()\n");
 
     game_g->getScreen()->setPaused(true);
@@ -4607,7 +4615,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             if( this->getQuest()->isCompleted() ) {
                                 int gold = this->getQuest()->getQuestObjective()->getGold();
                                 this->player->addGold(gold);
-                                this->showInfoDialog(this->getQuest()->getCompletedText());
+                                string completed_text = this->getQuest()->getCompletedText();
+                                completed_text = convertToHTML(completed_text);
+                                this->showInfoDialog(completed_text);
                             }
                             new CampaignWindow(this);
                             game_g->getScreen()->setPaused(true);

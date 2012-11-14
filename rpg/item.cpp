@@ -164,10 +164,11 @@ string Item::getDetailedDescription() const {
         /*str << "<pre>";
         str << this->getDescription();
         str << "</pre>";*/
-        QString desc = this->getDescription().c_str();
+        /*QString desc = this->getDescription().c_str();
         //desc.replace(" ", "&nbsp;"); // commented out as causes text to no longer word-wrap!
         desc.replace("\n", "<br/>");
-        str << desc.toStdString();
+        str << desc.toStdString();*/
+        str << this->getDescription();
         /*str << "initial text<br/>initial text with new line<br/>";
         //str << this->getDescription();
         QString desc = this->getDescription().c_str();
