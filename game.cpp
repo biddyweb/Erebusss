@@ -511,6 +511,7 @@ void Game::run() {
         this->font_small.setPointSize(font_small.pointSize() - 4);*/
         /*this->font_std = new_font;
         this->font_big = new_font;*/
+        qDebug("setting up fonts for Android");
         this->font_scene = new_font;
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() + 8);
@@ -523,6 +524,7 @@ void Game::run() {
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
 #else
+        qDebug("setting up fonts for non-Android mobile");
         this->font_scene = new_font;
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() - 2);
@@ -533,6 +535,7 @@ void Game::run() {
 #endif
     }
     else {
+        qDebug("setting up fonts for non-mobile");
         this->font_scene = QFont("Verdana", 12);
         this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
