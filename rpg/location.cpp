@@ -1509,6 +1509,26 @@ bool QuestObjective::testIfComplete(const PlayingGamestate *playing_gamestate, c
     return complete;
 }
 
+void QuestObjective::completeQuest(PlayingGamestate *playing_gamestate) const {
+    Character *player = playing_gamestate->getPlayer();
+    player->addGold(this->gold);
+
+    if( type == "kill" ) {
+    }
+    else if( type == "find_item" ) {
+        Item *item = player->findItem(arg1);
+        ASSERT_LOGGER(item != NULL);
+        if( item != NULL ) {
+            player->takeItem(item);
+            delete item;
+        }
+    }
+    else {
+        LOG("unknown type: %s\n", type.c_str());
+        ASSERT_LOGGER(false);
+    }
+}
+
 Quest::Quest() : quest_objective(NULL), is_completed(false) {
 }
 

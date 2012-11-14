@@ -4622,8 +4622,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             this->closeSubWindow(); // just in case
                             this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
                             if( this->getQuest()->isCompleted() ) {
-                                int gold = this->getQuest()->getQuestObjective()->getGold();
-                                this->player->addGold(gold);
+                                this->getQuest()->getQuestObjective()->completeQuest(this);
+                                /*int gold = this->getQuest()->getQuestObjective()->getGold();
+                                this->player->addGold(gold);*/
                                 string completed_text = this->getQuest()->getCompletedText();
                                 completed_text = convertToHTML(completed_text);
                                 this->showInfoDialog(completed_text);

@@ -646,6 +646,7 @@ public:
     QuestObjective(const string &type, const string &arg1, int gold);
 
     bool testIfComplete(const PlayingGamestate *playing_gamestate, const Quest *quest) const;
+    void completeQuest(PlayingGamestate *playing_gamestate) const;
     const string &getType() const {
         return type;
     }
