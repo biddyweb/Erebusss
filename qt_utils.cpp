@@ -131,3 +131,14 @@ string convertToHTML(const string &str) {
     convertToHTML(q_str);
     return q_str.toStdString();
 }
+
+bool stringAnyNonWhitespace(const string &str) {
+    bool any = false;
+    for(int i=0;i<str.length() && !any;i++) {
+        char ch = str.at(i);
+        if( ch != '\n' && ch != '\r' && !isspace(ch) ) {
+            any = true;
+        }
+    }
+    return any;
+}

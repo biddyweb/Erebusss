@@ -3642,6 +3642,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
             }
+            else {
+                if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
+                    QStringRef text = reader.text();
+                    if( stringAnyNonWhitespace(text.toString().toStdString()) ) {
+                        //LOG("### : %s\n", text.toString().toStdString().c_str());
+                        scenery->setDescription(text.toString().toStdString());
+                    }
+                }
+            }
         }
         if( reader.hasError() ) {
             LOG("error at line %d\n", reader.lineNumber());
@@ -4659,6 +4668,12 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                                 }
                             }
                         }
+                        else if( scenery->getDescription().length() > 0 ) {
+                            done = true;
+                            string description = scenery->getDescription();
+                            description = convertToHTML(description);
+                            this->showInfoDialog(description);
+                        }
                     }
                 }
             }
@@ -5081,6 +5096,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             }
             if( scenery->getTrap() != NULL ) {
                 this->saveTrap(file, scenery->getTrap());
+            }
+            if( scenery->getDescription().length() > 0 ) {
+                fprintf(file, "%s", scenery->getDescription().c_str());
             }
             fprintf(file, "</scenery>\n");
         }

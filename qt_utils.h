@@ -24,3 +24,4 @@ QPixmap createNoise(int w, int h, float scale_u, float scale_v, const unsigned c
 
 //void convertToHTML(QString &string);
 string convertToHTML(const string &str);
+bool stringAnyNonWhitespace(const string &str);

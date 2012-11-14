@@ -80,7 +80,8 @@ protected:
     set<Item *> items;
     Trap *trap;
 
-    string popup_text; // not saved at the moment
+    string popup_text; // not saved at the moment (only set internally by the engine)
+    string description;
 
 public:
     Scenery(const string &name, const string &image_name, bool is_animation, float width, float height);
@@ -118,6 +119,12 @@ public:
     }
     string getPopupText() const {
         return this->popup_text;
+    }
+    void setDescription(const string &description) {
+        this->description = description;
+    }
+    string getDescription() const {
+        return this->description;
     }
     void setBlocking(bool is_blocking, bool blocks_visibility);
     bool isBlocking() const {
