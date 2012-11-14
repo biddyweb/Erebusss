@@ -1,19 +1,17 @@
 <?xml version="1.0" ?>
 <quest>
 
-<info>As thanks for the success in your recent quest, the village elders invite you to a banquet.
-
-After congratulating you on your recent quest, they say they have summoned you here to learn something of a more important nature.
+<info>As thanks for the success in your recent quest, the village elders invite you to a banquet. After congratulating you on your recent quest, they say they have summoned you here to learn something of a more important nature.
 
 Over one hundred years ago, nearby lived a powerful mage named Vespar. He lived in an underground dungeon. Few were allowed into his home, which was rumoured to hold great secrets and power, though he often communicated with the nearby villages.
 
 But then, one hundred years ago, all contact was lost, and furthermore, no one was able to find the entrance to his dungeon. Even those who had been there before were unable to find it. Some said they had just forgotten, whilst others said some magic had caused the dungeon to have been concealed, or destroyed.
 
-Recently a villager from one of the nearby villages stumbled across a doorway in the mountains to an underground location. He did not venture far, hearing the sounds of dreadful creatures that now inhabited it, but I managed to bring back various documents and artefacts he found in the first room, which scholars identified as belonging to the great mage Vespar.
+Recently a villager from one of the nearby villages stumbled across a doorway in the mountains to an underground location. He did not venture far, hearing the sounds of dreadful creatures that now inhabited it, but he managed to bring back various documents and artefacts he found in the first room, which scholars identified as belonging to the great mage Vespar.
 
-Since then, various adventurers have set off from the other villages to explore, with varying degrees of success. Our scholars however have learnt some additional information. We know that the mage died one hundred years ago, and our own wizards have detected that a source of magic lies buried deep within the dungeons. This is, in fact, Vespar's skull, which seems to somehow be still blessed with his magic.
+Since then, various adventurers have set off from the other villages to explore, with varying degrees of success. The scholars of your village however have learnt some additional information. They know that the mage died one hundred years ago, and your village's own wizards have detected that a source of magic lies buried deep within the dungeons. This is, in fact, Vespar's skull, which seems to somehow be still blessed with his magic.
 
-We would like you to enter his dungeon, and retrieve the skull, lest it falls into the hands of evil. We will reward you with three hundred gold pieces. You will also have plenty of opportunity to find other treasures within the dungeons, which you are welcome to keep for yourself.
+The village elders ask you to enter his dungeon, and retrieve the skull, lest it falls into the hands of evil. They will reward you with three hundred gold pieces. You will also have plenty of opportunity to find other treasures within the dungeons, which you are welcome to keep for yourself.
 </info>
 
 <completed_text>The village elders are most pleased that you have succeeded in your quest. They take the mage's skull from you, and give you your reward of three hundred gold pieces.
@@ -27,7 +25,7 @@ We would like you to enter his dungeon, and retrieve the skull, lest it falls in
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.0" y="2.0"/>
+<!--<player_start x="32.0" y="2.0"/>-->
 
 <!--main room-->
 
@@ -404,9 +402,9 @@ This book seems to be a record of grisly torture that took place in this room. Y
 Thank you once again for helping me. Once I have finished researching from this book that you found for me, I will finally be able to leave this place.
 </opening_interaction_complete>
 <talk question="Who are you?">
-I am Calbert, a scholar, employed by the great wizard to help in his research here.
+I am Calbert, a scholar, employed by the great wizard Vespar to help in his research here.
 </talk>
-<talk question="Don't you know the wizard is long dead? It's been one hundred years...">
+<talk question="Don't you know Vespar is long dead? It's been one hundred years...">
 No, surely not ... that is terrible news if he has died, admittedly I haven't seen him in a while. But one hundred years? It's been a while, but surely not more than a few months...
 </talk>
 <talk question="Why are you still here?" while_not_done="true">
@@ -1348,11 +1346,27 @@ Every so often, one of the prisoners was taken away, never to be returned.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="5.0" rect_h="3.0"/>
+<floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="5.0" rect_h="4.0"/>
 
-<!--<player_start x="22.5" y="20.5"/>-->
+<player_start x="22.5" y="20.5"/>
 
 <scenery name="Teleport" image_name="teleport" x="22.5" y="22.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="27.0" exit_location_y="30.0"/>
+
+<scenery name="Window" image_name="door_mirror" x="22.5" y="23.9" w="1.0" h="0.2" blocking="true" block_visibility="true">You look outside the window, to see a scene of death and destruction. It seems you are high up in a large building, looking out over a large flat area, that is covered with decaying bodies that have now rotten away to partial skeletons. Most of them seem to be wearing some kind of strange armour.
+
+You can also see large strange iron contraptions around the place, that appear to be damaged beyond repair. Some of them have wheels, though made of a material that looks alien to you.
+
+Further away, the landscape is formed by fields and trees, with occasional buildings, but many fires are dotted around the landscape, and most of the buildings look damaged. The trees look burned black, with no leaves. There is no sign of life that you see.
+</scenery>
+
+<scenery name="Cabinet" image_name="cabinet" x="21.0" y="20.5" size="0.8" blocking="true">
+    <item name="A History" image_name="book" icon_width="0.25" weight="1">
+This old and heavy tome describes the black arts of Necromancy.
+    </item>
+    <item name="News Paper" image_name="book" icon_width="0.25" weight="1">
+
+    </item>
+</scenery>
 
 <floorregion shape="rect" rect_x="22.0" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
 
