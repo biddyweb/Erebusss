@@ -1,6 +1,8 @@
-#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
+//#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
+#include "../common.h" // need this to get Q_OS_ANDROID #define, as well as WANT_ANDROID_SOUND
 
 #if defined(Q_OS_ANDROID)
+#ifdef WANT_ANDROID_SOUND
 
 #include "androidsoundeffect.h"
 #include <QFile>
@@ -60,4 +62,5 @@ bool AndroidSoundEffect::unload()
     return true;
 }
 
+#endif
 #endif

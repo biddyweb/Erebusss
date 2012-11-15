@@ -8,6 +8,10 @@ const bool mobile_c = true;
 const bool mobile_c = false;
 #endif
 
+#ifdef Q_OS_ANDROID
+#define WANT_ANDROID_SOUND // comment out to disable sound on Android (means can be built without OpenSLES)
+#endif
+
 #if defined(Q_OS_ANDROID)
 #define DEPLOYMENT_PATH "assets:/"
 #else

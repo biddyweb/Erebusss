@@ -1,13 +1,17 @@
 #pragma once
 
-#include "common.h"
+#include "common.h" // needed for WANT_ANDROID_SOUND, among other things
 
 #include <QtGui>
 #include <QtWebKit/QWebView>
 
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
+
+#ifdef WANT_ANDROID_SOUND
 #include "androidaudio/androidaudio.h"
+#endif
+
 #else
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
@@ -272,7 +276,11 @@ protected:
 #ifndef Q_OS_ANDROID
     map<string, Sound *> sound_effects;
 #else
+
+#ifdef WANT_ANDROID_SOUND
     AndroidAudio androidAudio;
+#endif
+
 #endif
 
     QSettings *settings;
