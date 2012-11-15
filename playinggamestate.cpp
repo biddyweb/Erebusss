@@ -4643,6 +4643,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             Location *new_location = quest->findLocation(scenery->getExitLocation());
                             ASSERT_LOGGER(new_location != NULL);
                             if( new_location != NULL ) {
+                                this->autoSave();
                                 this->moveToLocation(new_location, scenery->getExitLocationPos());
                                 move = false;
                             }

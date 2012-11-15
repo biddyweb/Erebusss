@@ -340,6 +340,9 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void updateVisibility(Vector2D pos);
     void moveToLocation(Location *location, Vector2D pos);
     void setupView();
+    void autoSave() {
+        this->saveGame("autosave.xml");
+    }
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
@@ -370,9 +373,10 @@ public:
     virtual void quitGame();
     virtual void update();
     virtual void activate(bool active) {
-        if( !active ) {
-            this->saveGame("autosave.xml");
-        }
+        // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
+        /*if( !active ) {
+            this->autoSave();
+        }*/
     }
     //virtual void mouseClick(int m_x, int m_y);
     void checkQuestComplete();
