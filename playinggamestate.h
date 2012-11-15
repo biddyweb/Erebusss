@@ -10,14 +10,6 @@ using std::stringstream;
 #include <map>
 using std::map;
 
-// Phonon not supported on Qt Android
-#ifdef Q_OS_ANDROID
-//#include <SLES/OpenSLES.h>
-#else
-#include <phonon/MediaObject>
-#include <phonon/AudioOutput>
-#endif
-
 #include "common.h"
 #include "gamestate.h"
 #include "rpg/character.h"

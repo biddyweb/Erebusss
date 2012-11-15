@@ -4,12 +4,6 @@
 
 #include <QtGui>
 
-// Phonon not supported on Qt Android
-#ifndef Q_OS_ANDROID
-#include <phonon/MediaObject>
-#include <phonon/AudioOutput>
-#endif
-
 #include "gamestate.h"
 
 class ScrollingListWidget;
