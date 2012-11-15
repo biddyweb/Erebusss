@@ -104,7 +104,7 @@ OptionsGamestate::OptionsGamestate() :
         titleLabel->setFont(game_g->getFontStd());
         h_layout->addWidget(titleLabel);
 
-        QPushButton *offlineHelpButton = new QPushButton("Offline Help");
+        QPushButton *offlineHelpButton = new QPushButton("Offline help");
         game_g->initButton(offlineHelpButton);
         offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
 #ifndef Q_OS_ANDROID
@@ -116,7 +116,7 @@ OptionsGamestate::OptionsGamestate() :
         h_layout->addWidget(offlineHelpButton);
         connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
 
-        QPushButton *onlineHelpButton = new QPushButton("Online Help");
+        QPushButton *onlineHelpButton = new QPushButton("Online help");
         game_g->initButton(onlineHelpButton);
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
