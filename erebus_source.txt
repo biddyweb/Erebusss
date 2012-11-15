@@ -21,10 +21,10 @@ This should then produce the executable file erebus. To run, type:
 
 The Linux version has been tested on Ubuntu 12.04 Precise Pangolin 32-bit.
 
-Windows etc
-===========
+Windows
+=======
 
-Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt.nokia.com/products/qt-sdk ). This should also work for Linux and OS X (note that OS X is untested).
+Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt.nokia.com/products/qt-sdk ). This has been tested on Windows 7. This should also work for Linux.
 
 Symbian
 =======
@@ -34,12 +34,18 @@ Use Qt SDK with Qt Creator to compile for Symbian ( http://qt.nokia.com/products
 Android
 =======
 
-Use necessitas to compile for Android ( http://sourceforge.net/p/necessitas/home/necessitas/ ).
+Use necessitas to compile for Android ( http://sourceforge.net/p/necessitas/home/necessitas/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 7.
+
+Other platforms
+===============
+
+It would be possible to compile Erebus on any other platform that Qt supports, though this is untested. See http://qt.nokia.com/products/qt-sdk .
 
 History
 =======
 
-0.1 - first release.
+0.2 - Switched to using Necessitas alpha 4 for Android.
+0.1 - First release.
 
 General
 =======
@@ -48,4 +54,4 @@ The source code is released under the GPL v2 or later.
 
 Please contact me if you have suggestions, bug fixes or whatever: mark dot harman at ntlworld dot com .
 
-Mark Harman 21 July 2012
+Mark Harman 15 November 2012
