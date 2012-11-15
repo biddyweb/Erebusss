@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <quest>
 
-<info>As thanks for the success in your recent quest, the village elders invite you to a banquet. After congratulating you on your recent quest, they say they have summoned you here to learn something of a more important nature.
+<info>As thanks for the success in your recent quest, the village elders invite you to a banquet. After congratulating you, they say they have summoned you here to learn something of a more important nature.
 
 Over one hundred years ago, nearby lived a powerful mage named Vespar. He lived in an underground dungeon. Few were allowed into his home, which was rumoured to hold great secrets and power, though he often communicated with the nearby villages.
 
@@ -269,8 +269,8 @@ F43 - Suspected of witchcraft, sent here until the prisoner confesses his crime.
 <scenery name="Skeleton" image_name="skeleton" x="54.0" y="13.0" size="0.75" draw_type="background"/>
 
 <scenery name="Chest" image_name="chest" x="55.0" y="11.5" size="0.8" blocking="true">
-    <item name="Book" image_name="book" icon_width="0.25" weight="1">
-This book seems to be a record of grisly torture that took place in this room. You skim through, catching details of terrible tortures that were applied on the unfortunates here. Everything is written in a methodical manner, with seemingly no sympathy for the victims. You quickly shut the book in horror.
+    <item name="Torture Journal" image_name="book" icon_width="0.25" weight="1">
+This journal seems to be a record of grisly torture that took place in this room. You skim through, catching details of terrible tortures that were applied on the unfortunates here. Everything is written in a methodical manner, with seemingly no sympathy for the victims. You quickly shut the book in horror.
     </item>
 </scenery>
 
