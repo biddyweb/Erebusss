@@ -547,6 +547,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             //float step = (this->getSpeed() * time_ms)/1000.0f;
             float step = (this->getProfileFloatProperty(profile_key_Sp_c) * time_ms)/1000.0f;
             float dist = diff.magnitude();
+            diff /= dist;
             Vector2D new_pos = pos;
             bool next_seg = false;
             if( step >= dist ) {
@@ -556,14 +557,36 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 next_seg = true;
             }
             else {
-                diff /= dist;
                 new_pos += diff * step;
             }
             if( location->collideWithTransient(this, new_pos) ) {
-                // can't move - so stay where we are
-                // though we don't modify the path, so we can continue if the obstacle moves
-                if( this->listener != NULL ) {
-                    this->listener->characterSetAnimation(this, this->listener_data, "", false);
+                Vector2D perp = diff.perpendicularYToX();
+                Vector2D p1 = pos + perp * step;
+                Vector2D p2 = pos - perp * step;
+
+                Vector2D hit_pos;
+                if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, p1, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, this->can_fly) &&
+                        !location->collideWithTransient(this, p1) ) {
+                    // managed to avoid obstacle
+                    if( this->listener != NULL ) {
+                        this->listener->characterSetAnimation(this, this->listener_data, "run", false);
+                    }
+                    this->setPos(p1.x, p1.y);
+                }
+                else if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, p2, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, this->can_fly) &&
+                        !location->collideWithTransient(this, p2) ) {
+                    // managed to avoid obstacle
+                    if( this->listener != NULL ) {
+                        this->listener->characterSetAnimation(this, this->listener_data, "run", false);
+                    }
+                    this->setPos(p2.x, p2.y);
+                }
+                else {
+                    // can't move - so stay where we are
+                    // though we don't modify the path, so we can continue if the obstacle moves
+                    if( this->listener != NULL ) {
+                        this->listener->characterSetAnimation(this, this->listener_data, "", false);
+                    }
                 }
             }
             else {
