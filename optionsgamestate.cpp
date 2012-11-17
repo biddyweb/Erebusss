@@ -273,32 +273,40 @@ void OptionsGamestate::clickedLoad() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    load_list = new ScrollingListWidget();
-    if( !mobile_c ) {
-        QFont list_font = load_list->font();
-        list_font.setPointSize( list_font.pointSize() + 8 );
-        load_list->setFont(list_font);
-    }
-    layout->addWidget(load_list);
-    load_list->setSelectionMode(QAbstractItemView::SingleSelection);
-
     QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
     QStringList filter;
     filter << "*" + QString( savegame_ext.c_str() );
     QStringList files = dir.entryList(filter);
-    for(int i=0;i<files.size();i++) {
-        const QString &file = files.at(i);
-        load_list->addItem(file);
+    if( files.size() > 0 ) {
+        load_list = new ScrollingListWidget();
+        if( !mobile_c ) {
+            QFont list_font = load_list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            load_list->setFont(list_font);
+        }
+        layout->addWidget(load_list);
+        load_list->setSelectionMode(QAbstractItemView::SingleSelection);
+
+        for(int i=0;i<files.size();i++) {
+            const QString &file = files.at(i);
+            load_list->addItem(file);
+        }
+
+        load_list->setCurrentRow(0);
+
+        QPushButton *loadButton = new QPushButton("Load");
+        game_g->initButton(loadButton);
+        loadButton->setShortcut(QKeySequence(Qt::Key_Return));
+        //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(loadButton);
+        connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
+
     }
-
-    load_list->setCurrentRow(0);
-
-    QPushButton *loadButton = new QPushButton("Load");
-    game_g->initButton(loadButton);
-    loadButton->setShortcut(QKeySequence(Qt::Key_Return));
-    //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(loadButton);
-    connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
+    else {
+        QLabel *label = new QLabel("No save game files\navailable");
+        label->setAlignment(Qt::AlignCenter);
+        layout->addWidget(label);
+    }
 
     QPushButton *closeButton = new QPushButton("Cancel");
     game_g->initButton(closeButton);
@@ -310,8 +318,9 @@ void OptionsGamestate::clickedLoad() {
 
 void OptionsGamestate::clickedLoadGame() {
     LOG("OptionsGamestate::clickedLoadGame()\n");
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
-    //GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD);
+    if( load_list == NULL ) {
+        return;
+    }
     int index = load_list->currentRow();
     LOG("clicked index %d\n", index);
     if( index == -1 ) {
@@ -321,6 +330,7 @@ void OptionsGamestate::clickedLoadGame() {
     QString filename = this->load_list->item(index)->text();
     LoadGameMessage *game_message = new LoadGameMessage(filename.toStdString());
     game_g->pushMessage(game_message);
+    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 }
 
 void OptionsGamestate::clickedOptions() {
