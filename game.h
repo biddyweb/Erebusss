@@ -187,6 +187,7 @@ class AnimatedObject : public QGraphicsItem {
     unsigned int c_dimension;
     size_t c_frame;
     int animation_time_start_ms;
+    bool bounce; // whether to bounce up and down
 
     virtual void advance(int phase);
     virtual QRectF boundingRect() const;
@@ -210,6 +211,9 @@ public:
     void clearStaticImage() {
         this->is_static_image = false;
         this->static_image = NULL;
+    }
+    void setBounce(bool bounce) {
+        this->bounce = bounce;
     }
 };
 

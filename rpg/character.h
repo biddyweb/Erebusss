@@ -214,6 +214,7 @@ class CharacterTemplate {
     bool requires_magical; // requires magical weapon to hit?
     string animation_name;
     bool static_image;
+    bool bounce;
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth);
 
@@ -292,6 +293,12 @@ public:
     bool isStaticImage() const {
         return this->static_image;
     }
+    void setBounce(bool bounce) {
+        this->bounce = bounce;
+    }
+    bool isBounce() const {
+        return this->bounce;
+    }
 };
 
 class ProfileEffect {
@@ -315,6 +322,7 @@ class Character {
     bool is_hostile;
     string animation_name; // for NPCs (player is handled separately)
     bool static_image; // for NPCs
+    bool bounce;
 
     // game data
     Location *location; // not saved
@@ -430,6 +438,12 @@ public:
     }
     bool isStaticImage() const {
         return this->static_image;
+    }
+    void setBounce(bool bounce) {
+        this->bounce = bounce;
+    }
+    bool isBounce() const {
+        return this->bounce;
     }
     void setLocation(Location *location) {
         this->location = location;

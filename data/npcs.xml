@@ -59,7 +59,7 @@
 />
 
 <!--Natural damage-->
-<npc name="Shadow" animation_name="wraith" static_image="true"
+<npc name="Shadow" animation_name="wraith" static_image="true" bounce="true"
     FP="8" BS="0" S="5" A="1" M="8" D="0" B="8" Sp="1.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="1"
     health_min="35" health_max="40" gold_min="0" gold_max="0"

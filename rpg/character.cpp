@@ -71,7 +71,7 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
     //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false), bounce(false)
 {
 }
 
@@ -100,7 +100,7 @@ const int default_natural_damageZ = -1;
 Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
-    animation_name(animation_name), static_image(false),
+    animation_name(animation_name), static_image(false), bounce(false),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
@@ -121,6 +121,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     static_image(character_template.isStaticImage()),
+    bounce(character_template.isBounce()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),

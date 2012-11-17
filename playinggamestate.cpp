@@ -2144,6 +2144,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
                     QStringRef animation_name_s = reader.attributes().value("animation_name");
                     QStringRef static_image_s = reader.attributes().value("static_image");
                     bool static_image = parseBool(static_image_s.toString(), true);
+                    QStringRef bounce_s = reader.attributes().value("bounce");
+                    bool bounce = parseBool(bounce_s.toString(), true);
                     QStringRef FP_s = reader.attributes().value("FP");
                     int FP = parseInt(FP_s.toString());
                     QStringRef BS_s = reader.attributes().value("BS");
@@ -2174,6 +2176,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
                     bool requires_magical = parseBool(requires_magical_s.toString(), true);
                     CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth);
                     character_template->setStaticImage(static_image);
+                    character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
@@ -3099,11 +3102,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             }
                             QStringRef static_image_s = reader.attributes().value("static_image");
                             bool static_image = parseBool(static_image_s.toString(), true);
+                            QStringRef bounce_s = reader.attributes().value("bounce");
+                            bool bounce = parseBool(bounce_s.toString(), true);
                             QStringRef is_hostile_s = reader.attributes().value("is_hostile");
                             bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
 
                             npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), true);
                             npc->setStaticImage(static_image);
+                            npc->setBounce(bounce);
                             npc->setHostile(is_hostile);
                         }
                         QStringRef is_dead_s = reader.attributes().value("is_dead");
@@ -3845,6 +3851,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
 
 void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
     AnimatedObject *object = new AnimatedObject();
+    object->setBounce( character->isBounce() );
     this->characterUpdateGraphics(character, object);
     scene->addItem(object);
     object->setPos(character->getX(), character->getY());

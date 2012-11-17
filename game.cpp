@@ -206,7 +206,7 @@ AnimationLayer *AnimationLayer::create(const string &filename, const vector<Anim
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
-    set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0)
+    set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false)
 {
 }
 
@@ -245,14 +245,22 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
 
     //painter->fillRect(0, 0, 128, 128, Qt::SolidPattern); // test
     //painter->fillRect(0, 0, this->getWidth(), this->getHeight(), Qt::SolidPattern); // test
+    int off_y = 0;
+    if( this->bounce ) {
+        const int scale = 4;
+        int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
+        off_y = (int)(sin( (((float)time_elapsed_ms)*2.0*M_PI)/1000.0f ) * scale);
+        off_y -= scale/2;
+    }
+
     if( this->is_static_image ) {
-        painter->drawPixmap(0, 0, this->static_image);
+        painter->drawPixmap(0, off_y, this->static_image);
     }
     else {
         for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
             const AnimationSet *c_animation_set = *iter;
             const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
-            painter->drawPixmap(0, 0, pixmap);
+            painter->drawPixmap(0, off_y, pixmap);
         }
     }
 }
