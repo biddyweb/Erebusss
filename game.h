@@ -41,6 +41,7 @@ class Item;
 class Currency;
 class Shop;
 class CharacterTemplate;
+class Character;
 
 const string savegame_root = "savegame_";
 const string savegame_ext = ".xml";
@@ -249,12 +250,16 @@ public:
 
 class StartGameMessage : public GameMessage {
     Difficulty difficulty;
+    size_t player_type;
 public:
-    StartGameMessage(Difficulty difficulty) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty) {
+    StartGameMessage(Difficulty difficulty, size_t player_type) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty), player_type(player_type) {
     }
 
     Difficulty getDifficulty() const {
         return this->difficulty;
+    }
+    size_t getPlayerType() const {
+        return this->player_type;
     }
 };
 
@@ -306,6 +311,10 @@ protected:
 
     bool sound_enabled;
     bool lighting_enabled;
+
+    vector<string> player_types;
+
+    void createPlayerNames();
 
 private slots:
 /*#ifndef Q_OS_ANDROID
@@ -372,6 +381,14 @@ public:
     }
     void setLightingEnabled(bool lighting_enabled);
     static string getDifficultyString(Difficulty difficulty);
+
+    size_t getNPlayerTypes() const {
+        return player_types.size();
+    }
+    string getPlayerType(size_t i) const {
+        return player_types.at(i);
+    }
+    Character *createPlayer(size_t i) const;
 
     void showErrorDialog(const string &message);
     /*void showInfoDialog(const string &title, const string &message);

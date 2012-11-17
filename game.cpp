@@ -152,7 +152,7 @@ AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation
         icon_height = stride_y;
     //qDebug("### %d x %d\n", icon_width, icon_height);
     vector<QPixmap> frames;
-    for(int i=0;i<n_dimensions;i++) {
+    for(unsigned int i=0;i<n_dimensions;i++) {
         for(size_t j=0;j<n_frames;j++) {
             frames.push_back( image.copy(stride_x*(x_offset+j) + icon_off_x, stride_y*i + icon_off_y, icon_width, icon_height));
         }
@@ -471,6 +471,8 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
             LOG("failed to create savegame_path!\n");
         }
     }
+
+    this->createPlayerNames();
 }
 
 Game::~Game() {
@@ -591,11 +593,11 @@ void Game::update() {
             switch( message->getGameMessageType() ) {
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING:
             {
+                StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(false);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType());
                 gamestate = playing_gamestate;
-                StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
                 string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
@@ -607,7 +609,7 @@ void Game::update() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0);
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
@@ -839,6 +841,49 @@ string Game::getDifficultyString(Difficulty difficulty) {
     }
     ASSERT_LOGGER(false);
     return "";
+}
+
+void Game::createPlayerNames() {
+    this->player_types.push_back("Barbarian");
+    this->player_types.push_back("Elf");
+    this->player_types.push_back("Ranger");
+    this->player_types.push_back("Warrior");
+}
+
+Character *Game::createPlayer(size_t i) const {
+    ASSERT_LOGGER(i < this->getNPlayerTypes() );
+    Character *character = new Character(player_types.at(i), "", false);
+    if( i == 0 ) {
+        // barbarian
+        character->setProfile(7, 6, 8, 1, 5, 5, 8, 1.8f);
+        character->initialiseHealth(65);
+    }
+    else if( i == 1 ) {
+        // elf
+        character->setProfile(6, 8, 6, 1, 8, 7, 8, 2.25f);
+        character->initialiseHealth(50);
+    }
+    else if( i == 2 ) {
+        // ranger
+        character->setProfile(6, 8, 7, 1, 7, 8, 6, 2.2f);
+        character->initialiseHealth(50);
+    }
+    else if( i == 3 ) {
+        // warrior
+        character->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
+        character->initialiseHealth(60);
+    }
+    else {
+        ASSERT_LOGGER(false);
+    }
+
+    //character->initialiseHealth(600); // CHEAT
+    character->addGold( rollDice(2, 6, 10) );
+    //character->addGold( 333 ); // CHEAT, simulate start of quest 2
+    //character->setXP(68); // CHEAT, simulate start of quest 2
+    //character->addGold( 1000 ); // CHEAT
+
+    return character;
 }
 
 void Game::showErrorDialog(const string &message) {

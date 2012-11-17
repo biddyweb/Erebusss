@@ -18,6 +18,7 @@ class OptionsGamestate : public Gamestate {
 
     //QComboBox *difficultyComboBox;
     QButtonGroup *difficultyButtonGroup;
+    QComboBox *characterComboBox;
 
     ScrollingListWidget *load_list;
 

@@ -359,7 +359,7 @@ private slots:
     void playBackgroundMusic();
 
 public:
-    PlayingGamestate(bool is_savegame);
+    PlayingGamestate(bool is_savegame, size_t player_type);
     virtual ~PlayingGamestate();
 
     float getDifficultyModifier() const;

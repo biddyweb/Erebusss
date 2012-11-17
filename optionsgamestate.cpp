@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
+    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -184,6 +184,24 @@ void OptionsGamestate::clickedStart() {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
+        QLabel *label = new QLabel("Character: ");
+        label->setAlignment(Qt::AlignCenter);
+        h_layout->addWidget(label);
+
+        characterComboBox = new QComboBox();
+        //characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+        for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
+            characterComboBox->addItem(game_g->getPlayerType(i).c_str());
+        }
+        characterComboBox->setCurrentIndex(0);
+        characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(characterComboBox);
+    }
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
         QLabel *label = new QLabel("Difficulty: ");
         label->setAlignment(Qt::AlignCenter);
         h_layout->addWidget(label);
@@ -239,7 +257,10 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(difficulty_id > 0);
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
     Difficulty difficulty = (Difficulty)difficulty_id;
-    StartGameMessage *game_message = new StartGameMessage(difficulty);
+    ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
+    ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
+
+    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex());
     game_g->pushMessage(game_message);
 }
 

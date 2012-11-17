@@ -1615,7 +1615,7 @@ void SaveGameWindow::clickedSaveNew() {
     playing_gamestate->closeAllSubWindows();
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
     difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
 {
@@ -1779,7 +1779,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
 
     if( !is_savegame ) {
         LOG("create player\n");
-        this->player = new Character("Warrior", "", false);
+        /*this->player = new Character("Warrior", "", false);
         //this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.75f);
         this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         player->initialiseHealth(60);
@@ -1788,6 +1788,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         player->addGold( 333 ); // CHEAT, simulate start of quest 2
         player->setXP(68); // CHEAT, simulate start of quest 2
         //player->addGold( 1000 ); // CHEAT
+        */
+        this->player = game_g->createPlayer(player_type);
     }
 
     LOG("load images\n");
@@ -2027,6 +2029,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
         };
         ItemsXMLType itemsXMLType = ITEMS_XML_TYPE_NONE;
         Shop *shop = NULL;
+        string player_default_type;
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
             reader.readNext();
@@ -2066,13 +2069,15 @@ PlayingGamestate::PlayingGamestate(bool is_savegame) :
                         throw string("unexpected items xml: player_default_items element wasn't expected here");
                     }
                     itemsXMLType = ITEMS_XML_TYPE_PLAYER_DEFAULT;
+                    QStringRef type_s = reader.attributes().value("type");
+                    player_default_type = type_s.toString().toStdString();
                 }
                 else if( reader.name() == "player_default_item" ) {
                     if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected items xml: player_default_item element wasn't expected here");
                     }
-                    if( !is_savegame ) {
+                    if( !is_savegame && player_default_type == player->getName() ) {
                         QStringRef template_s = reader.attributes().value("template");
                         if( template_s.length() == 0 ) {
                             LOG("error at line %d\n", reader.lineNumber());
