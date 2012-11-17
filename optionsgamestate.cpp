@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), /*difficultyComboBox(NULL),*/ difficultyButtonGroup(NULL), characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
+    main_stacked_widget(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -189,11 +189,12 @@ void OptionsGamestate::clickedStart() {
         h_layout->addWidget(label);
 
         characterComboBox = new QComboBox();
-        //characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+        characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+        characterComboBox->setFont(game_g->getFontBig());
         for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
             characterComboBox->addItem(game_g->getPlayerType(i).c_str());
         }
-        characterComboBox->setCurrentIndex(0);
+        characterComboBox->setCurrentIndex(3); // select Warrior
         characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(characterComboBox);
     }
@@ -206,17 +207,18 @@ void OptionsGamestate::clickedStart() {
         label->setAlignment(Qt::AlignCenter);
         h_layout->addWidget(label);
 
-        /*difficultyComboBox = new QComboBox();
+        difficultyComboBox = new QComboBox();
         difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+        difficultyComboBox->setFont(game_g->getFontBig());
         for(int i=0;i<N_DIFFICULTIES;i++) {
             Difficulty test_difficulty = (Difficulty)i;
             difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
         }
         difficultyComboBox->setCurrentIndex(1);
         difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        h_layout->addWidget(difficultyComboBox);*/
+        h_layout->addWidget(difficultyComboBox);
 
-        QVBoxLayout *v_layout = new QVBoxLayout();
+        /*QVBoxLayout *v_layout = new QVBoxLayout();
         h_layout->addLayout(v_layout);
 
         difficultyButtonGroup = new QButtonGroup(this);
@@ -228,7 +230,7 @@ void OptionsGamestate::clickedStart() {
             if( test_difficulty == DIFFICULTY_MEDIUM ) {
                 radio->setChecked(true);
             }
-        }
+        }*/
     }
 
     QPushButton *startButton = new QPushButton("Start");
@@ -249,10 +251,8 @@ void OptionsGamestate::clickedStart() {
 void OptionsGamestate::clickedStartGame() {
     LOG("OptionsGamestate::clickedStartGame()\n");
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
-    //GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
-    /*ASSERT_LOGGER(this->difficultyComboBox->currentIndex() < (int)N_DIFFICULTIES);
-    Difficulty difficulty = (Difficulty)this->difficultyComboBox->currentIndex();*/
-    int difficulty_id = this->difficultyButtonGroup->checkedId();
+    //int difficulty_id = this->difficultyButtonGroup->checkedId();
+    int difficulty_id = this->difficultyComboBox->currentIndex();
     LOG("difficulty_id: %d\n", difficulty_id);
     ASSERT_LOGGER(difficulty_id > 0);
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
