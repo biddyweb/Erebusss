@@ -143,6 +143,9 @@ A small wooden chess piece, the Knight.
     <player_default_item template="Shortbow"/>
     <player_default_item template="Arrows"/>
 </player_default_items>
+<player_default_items type="Halfling">
+    <player_default_item template="Short Sword"/>
+</player_default_items>
 <player_default_items type="Ranger">
     <player_default_item template="Short Sword"/>
     <player_default_item template="Shortbow"/>

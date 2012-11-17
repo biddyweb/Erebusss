@@ -194,7 +194,7 @@ void OptionsGamestate::clickedStart() {
         for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
             characterComboBox->addItem(game_g->getPlayerType(i).c_str());
         }
-        characterComboBox->setCurrentIndex(3); // select Warrior
+        characterComboBox->setCurrentIndex(4); // select Warrior
         characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(characterComboBox);
     }

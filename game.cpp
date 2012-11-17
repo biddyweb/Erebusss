@@ -846,6 +846,7 @@ string Game::getDifficultyString(Difficulty difficulty) {
 void Game::createPlayerNames() {
     this->player_types.push_back("Barbarian");
     this->player_types.push_back("Elf");
+    this->player_types.push_back("Halfling");
     this->player_types.push_back("Ranger");
     this->player_types.push_back("Warrior");
 }
@@ -864,11 +865,16 @@ Character *Game::createPlayer(size_t i) const {
         character->initialiseHealth(50);
     }
     else if( i == 2 ) {
+        // halfling
+        character->setProfile(6, 7, 5, 1, 7, 9, 7, 1.8f);
+        character->initialiseHealth(40);
+    }
+    else if( i == 3 ) {
         // ranger
         character->setProfile(6, 8, 7, 1, 7, 8, 6, 2.2f);
         character->initialiseHealth(50);
     }
-    else if( i == 3 ) {
+    else if( i == 4 ) {
         // warrior
         character->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         character->initialiseHealth(60);
