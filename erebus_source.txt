@@ -34,7 +34,7 @@ Use Qt SDK with Qt Creator to compile for Symbian ( http://qt.nokia.com/products
 Android
 =======
 
-Use necessitas to compile for Android ( http://sourceforge.net/p/necessitas/home/necessitas/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 7. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
+Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 7. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
 
 Other platforms
 ===============
