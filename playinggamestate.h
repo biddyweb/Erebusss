@@ -51,6 +51,7 @@ class MainGraphicsView : public QGraphicsView {
 
     PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
+    bool single_left_mouse_down; // if left mouse button is down, and not a multitouch operation
     bool has_last_mouse;
     int last_mouse_x, last_mouse_y;
     //float kinetic_scroll_x, kinetic_scroll_y;
@@ -72,7 +73,7 @@ class MainGraphicsView : public QGraphicsView {
 
     void zoom(QPointF zoom_centre, bool in);
 
-    virtual bool event(QEvent *event);
+    virtual bool viewportEvent(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
