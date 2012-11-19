@@ -57,7 +57,7 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), darkness_alpha(0)
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0)
 {
 }
 
@@ -286,20 +286,26 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         //qDebug("### %f, %f", player->getX(), player->getY());
         //qDebug("### radius = %d", radius);
         //this->calculated_lighting_pixmap_scaled = false;
-        if( !this->calculated_lighting_pixmap_scaled ) {
+        // using the scaled lighting pixmap is slightly faster than dynamically drawing at a different size
+        // but we have a delay on how often to rescale the lighting pixmap, to avoid the performance being very slow when zooming!
+        if( !this->calculated_lighting_pixmap_scaled && game_g->getScreen()->getGameTimeTotalMS() > lasttime_calculated_lighting_pixmap_scaled_ms + 1000 ) {
+            this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS();
             //qDebug("scale pixmap");
             this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
             this->calculated_lighting_pixmap_scaled = true;
         }
-        /*qDebug("lighting_pixmap_scaled size %d x %d", lighting_pixmap_scaled.width(), lighting_pixmap_scaled.height());
-        ASSERT_LOGGER( lighting_pixmap_scaled.width() == 2*radius );*/
         //qDebug("%d, %d, %d", point.x(), point.y(), radius);
         //qDebug("darkness_alpha = %d", darkness_alpha);
         // note, sometimes the radius value may fluctuate even if we haven't zoomed in or out (due to rounding issues), which is why we should use the lighting_pixmap_scaled width, rather than radius, when doing the drawing
-        int pixmap_width = lighting_pixmap_scaled.width();
+        int pixmap_width = this->calculated_lighting_pixmap_scaled ? lighting_pixmap_scaled.width() : 2*radius;
         int sx = point.x() - pixmap_width/2;
         int sy = point.y() - pixmap_width/2;
-        painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
+        if( this->calculated_lighting_pixmap_scaled ) {
+            painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
+        }
+        else {
+            painter.drawPixmap(sx, sy, pixmap_width, pixmap_width, lighting_pixmap);
+        }
         QBrush brush(QColor(0, 0, 0, darkness_alpha));
         if( sx > 0 ) {
             painter.fillRect(0, 0, sx, this->height(), brush);
@@ -313,9 +319,6 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         if( sy + pixmap_width < this->height() ) {
             painter.fillRect(sx, sy + pixmap_width, pixmap_width, this->height() - sy - pixmap_width, brush);
         }
-
-        //painter.drawPixmap(point.x(), point.y(), pixmap);
-        //painter.drawPixmap(0, 0, pixmap);
     }
 
     int time_ms = timer.elapsed();
@@ -330,7 +333,7 @@ void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
     this->darkness_alpha = (unsigned char)(255 - (int)lighting_min);
     if( game_g->isLightingEnabled() )
     {
-        const int res_c = 255;
+        const int res_c = 127;
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
         QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
@@ -384,6 +387,7 @@ void MainGraphicsView::update() {
 void MainGraphicsView::setScale(float c_scale) {
     LOG("MainGraphicsView::setScale(%f)\n", c_scale);
     this->calculated_lighting_pixmap_scaled = false;
+    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);
     this->c_scale = std::max(this->c_scale, min_zoom_c);
@@ -394,6 +398,7 @@ void MainGraphicsView::setScale(float c_scale) {
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
     this->calculated_lighting_pixmap_scaled = false;
+    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     float old_scale = this->c_scale;
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);

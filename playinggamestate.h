@@ -65,6 +65,7 @@ class MainGraphicsView : public QGraphicsView {
     bool calculated_lighting_pixmap;
     QPixmap lighting_pixmap;
     bool calculated_lighting_pixmap_scaled;
+    int lasttime_calculated_lighting_pixmap_scaled_ms;
     QPixmap lighting_pixmap_scaled;
     unsigned char darkness_alpha;
 
