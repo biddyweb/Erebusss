@@ -319,6 +319,7 @@ protected:
     vector<string> player_types;
 
     void createPlayerNames();
+    void runTest(const string &filename, int test_id);
 
 private slots:
 /*#ifndef Q_OS_ANDROID
@@ -364,6 +365,7 @@ public:
     void run();
     void update();
     void activate(bool active);
+    void runTests();
     //void mouseClick(int m_x, int m_y);
     string getApplicationFilename(const string &name);
     //void log(const char *text, ...);

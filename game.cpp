@@ -585,6 +585,142 @@ void Game::run() {
     }
 }
 
+enum TestID {
+    TEST_PATHFINDING_0 = 0,
+    TEST_PATHFINDING_1 = 1,
+    TEST_PATHFINDING_2 = 2,
+    TEST_PATHFINDING_3 = 3,
+    TEST_PATHFINDING_4 = 4,
+    N_TESTS = 5
+};
+
+/**
+  TEST_PATHFINDING_0 - find a path
+  TEST_PATHFINDING_1 - find a path
+  TEST_PATHFINDING_2 - can't find a path as no route available
+  TEST_PATHFINDING_3 - can't find a path, as start isn't in valid floor region
+  TEST_PATHFINDING_4 - can't find a path, as destination isn't in valid floor region
+  */
+
+void Game::runTest(const string &filename, int test_id) {
+    LOG(">>> Run Test: %d\n", test_id);
+    ASSERT_LOGGER(test_id >= 0);
+    ASSERT_LOGGER(test_id < N_TESTS);
+
+    FILE *testfile = fopen(filename.c_str(), "at+");
+    if( testfile == NULL ) {
+        LOG("### FAILED to open/create %s\n", filename.c_str());
+        return;
+    }
+    fprintf(testfile, "%d,", test_id);
+
+    bool ok = true;
+
+    try {
+        if( test_id == TEST_PATHFINDING_0 || test_id == TEST_PATHFINDING_1 || test_id == TEST_PATHFINDING_2 || test_id == TEST_PATHFINDING_3 || test_id == TEST_PATHFINDING_4 ) {
+            Location location("");
+
+            {
+                FloorRegion *floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+            }
+            if( test_id != TEST_PATHFINDING_2 )
+            {
+                FloorRegion *floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
+                location.addFloorRegion(floor_region);
+            }
+            {
+                FloorRegion *floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+            }
+
+            location.createBoundariesForRegions();
+            location.createBoundariesForScenery();
+            location.calculateDistanceGraph();
+
+            Vector2D src, dest;
+            int expected_points = 0;
+            if( test_id == TEST_PATHFINDING_0 || test_id == TEST_PATHFINDING_2 ) {
+                src = Vector2D(1.0f, 1.0f);
+                dest = Vector2D(13.0f, 2.0f);
+                expected_points = test_id == TEST_PATHFINDING_0 ? 3 : 0;
+            }
+            else if( test_id == TEST_PATHFINDING_1 ) {
+                src = Vector2D(4.0f, 4.0f);
+                dest = Vector2D(13.0f, 2.0f);
+                expected_points = 3;
+            }
+            else if( test_id == TEST_PATHFINDING_3 ) {
+                src = Vector2D(1.0f, 5.0f);
+                dest = Vector2D(13.0f, 2.0f);
+                expected_points = 0;
+            }
+            else if( test_id == TEST_PATHFINDING_4 ) {
+                src = Vector2D(1.0f, 1.0f);
+                dest = Vector2D(15.0f, 2.0f);
+                expected_points = 0;
+            }
+            else {
+                ASSERT_LOGGER(false);
+            }
+            vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+
+            LOG("path has %d points\n", path.size());
+            for(size_t i=0;i<path.size();i++) {
+                Vector2D point = path.at(i);
+                LOG("    %d : %f, %f\n", i, point.x, point.y);
+            }
+
+            if( path.size() != expected_points ) {
+                throw string("Unexpected number of path points");
+            }
+            else if( path.size() > 0 && path.at( path.size()-1 ) != dest ) {
+                throw string("Unexpected end of path");
+            }
+        }
+        else {
+            ASSERT_LOGGER(false);
+        }
+
+        fprintf(testfile, "PASSED\n");
+    }
+    catch(const string &str) {
+        LOG("ERROR: %s\n", str.c_str());
+        fprintf(testfile, "FAILED,%s\n", str.c_str());
+        ok = false;
+    }
+
+    if( ok ) {
+        LOG("<<< TEST %d PASSED\n", test_id);
+    }
+    else {
+        LOG("<<< TEST %d FAILED", test_id);
+    }
+
+    fclose(testfile);
+}
+
+void Game::runTests() {
+    string filename = "test_results.csv";
+    {
+        FILE *testfile = fopen(filename.c_str(), "wt+");
+        if( testfile == NULL ) {
+            LOG("### FAILED to open/create %s\n", filename.c_str());
+            return;
+        }
+        time_t time_val;
+        time(&time_val);
+        fprintf(testfile, "%s\n", ctime(&time_val));
+        fprintf(testfile, "TEST,RESULT\n");
+        fclose(testfile);
+    }
+
+    for(int i=0;i<N_TESTS;i++) {
+        runTest(filename, i);
+    }
+
+}
+
 void Game::initButton(QPushButton *button) const {
     MainWindow *window = this->screen->getMainWindow();
     button->setFont(window->font()); // needed for Android at least

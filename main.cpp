@@ -37,5 +37,6 @@ int main(int argc, char *argv[])
 
     Game game;
     game.run();
+    //game.runTests();
     return 0;
 }
