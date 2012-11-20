@@ -714,7 +714,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
-        QPushButton *viewArmourButton = new QPushButton("Arm.");
+        QPushButton *viewArmourButton = new QPushButton("Arm");
         game_g->initButton(viewArmourButton);
         viewArmourButton->setFont(font_small);
         viewArmourButton->setToolTip("Display only armour");
