@@ -267,6 +267,32 @@ public:
     }
 };
 
+class ItemsPickerWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+
+    QListWidget *list;
+    vector<Item *> items;
+
+    QListWidget *player_list;
+    vector<Item *> player_items;
+
+    void addGroundItem(const Item *item);
+    void addPlayerItem(Item *item);
+    void refreshPlayerItems();
+
+private slots:
+    void clickedPickUp();
+    void clickedDrop();
+    void clickedInfo();
+
+public:
+    ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items);
+    virtual ~ItemsPickerWindow() {
+    }
+};
+
 class CampaignWindow : public QWidget {
     Q_OBJECT
 

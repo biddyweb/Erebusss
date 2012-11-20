@@ -1338,6 +1338,179 @@ void TradeWindow::clickedInfo() {
     playing_gamestate->showInfoWindow(info);
 }
 
+ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items) :
+    playing_gamestate(playing_gamestate), list(NULL), items(items), player_list(NULL)
+{
+    playing_gamestate->addWidget(this);
+
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *groundLabel = new QLabel("Items to pick up:");
+        h_layout->addWidget(groundLabel);
+
+        QLabel *playerLabel = new QLabel("Your items:");
+        h_layout->addWidget(playerLabel);
+    }
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        list = new ScrollingListWidget();
+        if( !mobile_c ) {
+            QFont list_font = list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            list->setFont(list_font);
+        }
+        {
+            QFontMetrics fm(list->font());
+            int icon_size = fm.height();
+            list->setIconSize(QSize(icon_size, icon_size));
+        }
+        h_layout->addWidget(list);
+        for(size_t i=0;i<items.size();i++) {
+            const Item *item = items.at(i);
+            this->addGroundItem(item);
+        }
+        connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(clickedPickUp()));
+
+        player_list = new ScrollingListWidget();
+        if( !mobile_c ) {
+            QFont list_font = player_list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            player_list->setFont(list_font);
+        }
+        {
+            QFontMetrics fm(player_list->font());
+            int icon_size = fm.height();
+            player_list->setIconSize(QSize(icon_size, icon_size));
+        }
+        h_layout->addWidget(player_list);
+        this->refreshPlayerItems();
+    }
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *pickUpButton = new QPushButton("Pick Up");
+        game_g->initButton(pickUpButton);
+        h_layout->addWidget(pickUpButton);
+        connect(pickUpButton, SIGNAL(clicked()), this, SLOT(clickedPickUp()));
+
+        QPushButton *dropButton = new QPushButton("Drop");
+        game_g->initButton(dropButton);
+        h_layout->addWidget(dropButton);
+        connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDrop()));
+
+        QPushButton *infoButton = new QPushButton("Info");
+        game_g->initButton(infoButton);
+        h_layout->addWidget(infoButton);
+        connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
+    }
+
+    QPushButton *closeButton = new QPushButton("Close");
+    game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
+}
+
+void ItemsPickerWindow::addGroundItem(const Item *item) {
+    QString item_str = QString(item->getName().c_str());
+    QListWidgetItem *list_item = new QListWidgetItem(item_str);
+    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    list_item->setIcon(icon);
+    list->addItem(list_item);
+    // n.b., don't add to items list - should already be there, or otherwise caller should add it manually
+}
+
+void ItemsPickerWindow::addPlayerItem(Item *item) {
+    QString item_str = QString(item->getName().c_str());
+    QListWidgetItem *list_item = new QListWidgetItem(item_str);
+    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    list_item->setIcon(icon);
+    player_list->addItem(list_item);
+    player_items.push_back(item);
+}
+
+void ItemsPickerWindow::refreshPlayerItems() {
+    player_list->clear();
+    player_items.clear();
+    Character *player = playing_gamestate->getPlayer();
+    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        addPlayerItem(item);
+    }
+}
+
+void ItemsPickerWindow::clickedPickUp() {
+    LOG("ItemsPickerWindow::clickedPickUp()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < items.size() );
+
+    Item *selected_item = items.at(index);
+    Character *player = playing_gamestate->getPlayer();
+    LOG("player picks up: %s\n", selected_item->getName().c_str());
+    player->pickupItem(selected_item);
+    this->refreshPlayerItems();
+
+    items.erase(items.begin() + index);
+    delete list->takeItem(index);
+
+    playing_gamestate->checkQuestComplete();
+}
+
+void ItemsPickerWindow::clickedDrop() {
+    LOG("ItemsPickerWindow::clickedDrop()\n");
+
+    int index = player_list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < player_items.size() );
+
+    Item *selected_item = player_items.at(index);
+    LOG("player drops: %s\n", selected_item->getName().c_str());
+    Character *player = playing_gamestate->getPlayer();
+    player->dropItem(selected_item);
+    player_items.erase(player_items.begin() + index);
+    delete player_list->takeItem(index);
+
+    items.push_back(selected_item);
+    this->addGroundItem(selected_item);
+}
+
+void ItemsPickerWindow::clickedInfo() {
+    LOG("ItemsPickerWindow::clickedInfo()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < items.size() );
+
+    const Item *selected_item = items.at(index);
+    string info = selected_item->getDetailedDescription();
+    info = convertToHTML(info);
+    playing_gamestate->showInfoWindow(info);
+}
+
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate)
 {
@@ -1662,6 +1835,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     view->setBackgroundBrush(QBrush(Qt::black));
     view->setFrameStyle(QFrame::NoFrame);
     view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
+    view->setCursor(Qt::OpenHandCursor);
     //view->grabGesture(Qt::PinchGesture);
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
@@ -2646,30 +2820,50 @@ void PlayingGamestate::setupView() {
         QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
         floor_region->setUserGfxData(item);
         item->setVisible(false); // default to false, visibility is checked afterwards
-        for(size_t j=0;j<floor_region->getNPoints();j++) {
-            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
-                continue;
-            }
-            size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
-            Vector2D p0 = floor_region->getPoint(j);
-            Vector2D p1 = floor_region->getPoint(n_j);
-            Vector2D dp = p1 - p0;
-            float dp_length = dp.magnitude();
-            if( dp_length == 0.0f ) {
-                continue;
-            }
-            dp /= dp_length;
-            Vector2D normal_into_wall = - dp.perpendicularYToX();
-            QPolygonF wall_polygon;
-            float wall_dist = 0.1f;
-            wall_polygon.push_back(QPointF(p0.x, p0.y));
-            wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
-            wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
-            wall_polygon.push_back(QPointF(p1.x, p1.y));
-            if( c_location->getWallImageName().length() > 0 ) {
+        if( c_location->getWallImageName().length() > 0 ) {
+            for(size_t j=0;j<floor_region->getNPoints();j++) {
+                if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
+                    continue;
+                }
+                size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
+                Vector2D p0 = floor_region->getPoint(j);
+                Vector2D p1 = floor_region->getPoint(n_j);
+                Vector2D dp = p1 - p0;
+                float dp_length = dp.magnitude();
+                if( dp_length == 0.0f ) {
+                    continue;
+                }
+                dp /= dp_length;
+                Vector2D normal_into_wall = - dp.perpendicularYToX();
+                QPolygonF wall_polygon;
+                const float wall_dist = 0.1f;
+                wall_polygon.push_back(QPointF(p0.x, p0.y));
+                wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
+                wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
+                wall_polygon.push_back(QPointF(p1.x, p1.y));
                 QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
                 wall_item->setPen(Qt::NoPen);
                 wall_item->setBrush(wall_brush);
+
+                /*if( fabs(normal_into_wall.y) > E_TOL_LINEAR ) {
+                    const float wall_height = 0.5f;
+                    QPolygonF wall_polygon_3d;
+                    if( normal_into_wall.y < 0.0f ) {
+                        wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                        wall_polygon_3d.push_back(QPointF(p0.x, p0.y - wall_height));
+                        wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
+                        wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                        QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
+                        wall_item_3d->setPen(Qt::NoPen);
+                        wall_item_3d->setBrush(wall_brush);
+                    }
+                    else {
+                        //wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                        //wall_polygon_3d.push_back(QPointF(p0.x, p0.y + wall_height));
+                        //wall_polygon_3d.push_back(QPointF(p1.x, p1.y + wall_height));
+                        //wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                    }
+                }*/
             }
         }
     }
@@ -4491,27 +4685,43 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         if( !done ) {
             // search for clicking on an item
-            Item *picked_item = NULL;
+            vector<Item *> pickup_items;
+            //Item *picked_item = NULL;
             for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
                 Item *item = *iter;
                 float icon_width = item->getIconWidth();
                 float dist_from_click = (dest - item->getPos()).magnitude();
                 float dist_from_player = (player->getPos() - item->getPos()).magnitude();
                 if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
-                    if( picked_item == NULL || dist_from_click < min_dist ) {
+                    /*if( picked_item == NULL || dist_from_click < min_dist ) {
                         done = true;
                         picked_item = item;
                         min_dist = dist_from_click;
-                    }
+                    }*/
+                    done = true;
+                    min_dist = dist_from_click;
+                    pickup_items.push_back(item);
                 }
             }
-            if( picked_item != NULL ) {
+            /*if( picked_item != NULL ) {
                 this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
                 if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
                     this->playSound("coin");
                 }
                 player->pickupItem(picked_item);
                 this->checkQuestComplete();
+            }*/
+            if( pickup_items.size() == 1 ) {
+                Item *picked_item = pickup_items.at(0);
+                this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
+                if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
+                    this->playSound("coin");
+                }
+                player->pickupItem(picked_item);
+                this->checkQuestComplete();
+            }
+            else if( pickup_items.size() > 1 ) {
+                new ItemsPickerWindow(this, pickup_items);
             }
         }
 
