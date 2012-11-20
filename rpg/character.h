@@ -656,6 +656,7 @@ public:
     int calculateItemsWeight() const;
     int getCanCarryWeight() const;
     bool carryingTooMuch() const;
+    string getWeightString() const;
     bool tooWeakForArmour() const;
     bool tooWeakForWeapon() const;
     bool canMove() const;

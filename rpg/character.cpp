@@ -993,6 +993,16 @@ bool Character::carryingTooMuch() const {
     return false;
 }
 
+string Character::getWeightString() const {
+    int weight = this->calculateItemsWeight();
+    stringstream str;
+    str << "Weight: ";
+    str << weight;
+    str << " / ";
+    str << this->getCanCarryWeight();
+    return str.str();
+}
+
 bool Character::tooWeakForArmour() const {
     if( this->getCurrentArmour() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentArmour()->getMinStrength() ) {
         return true;

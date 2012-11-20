@@ -211,7 +211,6 @@ class ItemsWindow : public QWidget {
     void refreshList();
     void changeView(ViewType view_type);
     QString getItemString(const Item *item) const;
-    //void setWeightLabel(int weight);
     void setWeightLabel();
     void itemIsDeleted(size_t index);
 
@@ -244,6 +243,7 @@ class TradeWindow : public QWidget {
     PlayingGamestate *playing_gamestate;
 
     QLabel *goldLabel;
+    QLabel *weightLabel;
 
     QListWidget *list;
     const vector<const Item *> &items;
@@ -255,6 +255,7 @@ class TradeWindow : public QWidget {
 
     void addPlayerItem(Item *item, int buy_cost);
     void updateGoldLabel();
+    void setWeightLabel();
 
 private slots:
     void clickedBuy();
@@ -278,9 +279,12 @@ class ItemsPickerWindow : public QWidget {
     QListWidget *player_list;
     vector<Item *> player_items;
 
+    QLabel *weightLabel;
+
     void addGroundItem(const Item *item);
     void addPlayerItem(Item *item);
     void refreshPlayerItems();
+    void setWeightLabel();
 
 private slots:
     void clickedPickUp();

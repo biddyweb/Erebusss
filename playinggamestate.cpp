@@ -768,7 +768,6 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         weightLabel = new QLabel(""); // label set in setWeightLabel()
         //weightLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(weightLabel);
-        //this->setWeightLabel(weight);
         this->setWeightLabel();
     }
 
@@ -964,19 +963,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     }
 }
 
-/*void ItemsWindow::setWeightLabel(int weight) {
-    this->weightLabel->setText("Weight: " + QString::number(weight));
-}*/
-
 void ItemsWindow::setWeightLabel() {
     Character *player = this->playing_gamestate->getPlayer();
-    int weight = player->calculateItemsWeight();
-    stringstream str;
-    str << "Weight: ";
-    str << weight;
-    str << " / ";
-    str << player->getCanCarryWeight();
-    this->weightLabel->setText(str.str().c_str());
+    string weight_str = player->getWeightString();
+    this->weightLabel->setText(weight_str.c_str());
 }
 
 void ItemsWindow::clickedArmWeapon() {
@@ -1132,7 +1122,7 @@ void ItemsWindow::itemIsDeleted(size_t index) {
 }
 
 TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs) :
-    playing_gamestate(playing_gamestate), goldLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
+    playing_gamestate(playing_gamestate), goldLabel(NULL), weightLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
 {
     playing_gamestate->addWidget(this);
 
@@ -1155,6 +1145,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         goldLabel = new QLabel("");
         h_layout->addWidget(goldLabel);
         this->updateGoldLabel();
+
+        weightLabel = new QLabel("");
+        h_layout->addWidget(weightLabel);
+        this->setWeightLabel();
     }
 
     {
@@ -1252,6 +1246,12 @@ void TradeWindow::updateGoldLabel() {
     goldLabel->setText("Gold: " + QString::number( player->getGold() ));
 }
 
+void TradeWindow::setWeightLabel() {
+    Character *player = this->playing_gamestate->getPlayer();
+    string weight_str = player->getWeightString();
+    this->weightLabel->setText(weight_str.c_str());
+}
+
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     buy_cost *= 0.5f;
     QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
@@ -1282,6 +1282,7 @@ void TradeWindow::clickedBuy() {
         this->updateGoldLabel();
         Item *item = playing_gamestate->cloneStandardItem(selected_item->getKey());
         player->addItem(item);
+        this->setWeightLabel();
         this->addPlayerItem(item, cost);
         list->setCurrentRow(-1);
     }
@@ -1311,6 +1312,7 @@ void TradeWindow::clickedSell() {
         this->updateGoldLabel();
         player->takeItem(selected_item);
         delete selected_item;
+        this->setWeightLabel();
         QListWidgetItem *list_item = player_list->takeItem(index);
         delete list_item;
         player_items.erase(player_items.begin() + index);
@@ -1339,7 +1341,7 @@ void TradeWindow::clickedInfo() {
 }
 
 ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items) :
-    playing_gamestate(playing_gamestate), list(NULL), items(items), player_list(NULL)
+    playing_gamestate(playing_gamestate), list(NULL), items(items), player_list(NULL), weightLabel(NULL)
 {
     playing_gamestate->addWidget(this);
 
@@ -1348,6 +1350,23 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
+
+    /*{
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *label = new QLabel("What would you like to buy?");
+        label->setWordWrap(true);
+        h_layout->addWidget(label);
+
+        goldLabel = new QLabel("");
+        h_layout->addWidget(goldLabel);
+        this->updateGoldLabel();
+
+        weightLabel = new QLabel("");
+        h_layout->addWidget(weightLabel);
+        this->setWeightLabel();
+    }*/
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -1396,6 +1415,10 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
         h_layout->addWidget(player_list);
         this->refreshPlayerItems();
     }
+
+    weightLabel = new QLabel("");
+    layout->addWidget(weightLabel);
+    this->setWeightLabel();
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -1466,6 +1489,7 @@ void ItemsPickerWindow::clickedPickUp() {
     Character *player = playing_gamestate->getPlayer();
     LOG("player picks up: %s\n", selected_item->getName().c_str());
     player->pickupItem(selected_item);
+    this->setWeightLabel();
     this->refreshPlayerItems();
 
     items.erase(items.begin() + index);
@@ -1488,6 +1512,7 @@ void ItemsPickerWindow::clickedDrop() {
     LOG("player drops: %s\n", selected_item->getName().c_str());
     Character *player = playing_gamestate->getPlayer();
     player->dropItem(selected_item);
+    this->setWeightLabel();
     player_items.erase(player_items.begin() + index);
     delete player_list->takeItem(index);
 
@@ -1509,6 +1534,12 @@ void ItemsPickerWindow::clickedInfo() {
     string info = selected_item->getDetailedDescription();
     info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
+}
+
+void ItemsPickerWindow::setWeightLabel() {
+    Character *player = this->playing_gamestate->getPlayer();
+    string weight_str = player->getWeightString();
+    this->weightLabel->setText(weight_str.c_str());
 }
 
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
