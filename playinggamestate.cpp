@@ -1488,6 +1488,9 @@ void ItemsPickerWindow::clickedPickUp() {
     Item *selected_item = items.at(index);
     Character *player = playing_gamestate->getPlayer();
     LOG("player picks up: %s\n", selected_item->getName().c_str());
+    if( selected_item->getType() == ITEMTYPE_CURRENCY ) {
+        this->playing_gamestate->playSound("coin");
+    }
     player->pickupItem(selected_item);
     this->setWeightLabel();
     this->refreshPlayerItems();
