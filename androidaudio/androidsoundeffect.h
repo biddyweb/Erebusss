@@ -43,7 +43,7 @@ public slots:
 
 private:
     char* mBuffer;
-    off_t mLength;
+    int mLength;
 
     QString mPath;
 
