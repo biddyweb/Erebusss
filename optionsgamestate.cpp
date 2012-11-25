@@ -399,7 +399,6 @@ void OptionsGamestate::clickedOptionsOkay() {
 void OptionsGamestate::clickedOnlineHelp() {
     LOG("OptionsGamestate::clickedOnlineHelp\n");
     QDesktopServices::openUrl(QUrl("http://homepage.ntlworld.com/mark.harman/erebus.html"));
-    //this->activateWindow(); // needed for Android at least
 }
 
 void OptionsGamestate::clickedOfflineHelp() {
