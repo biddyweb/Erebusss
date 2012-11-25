@@ -3,15 +3,13 @@
 
 // modified from https://groups.google.com/forum/?fromgroups=#!topic/android-qt/rpPa_W6PF1Y , by Adam Pigg
 
-//#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
-#include "../common.h" // need this to get Q_OS_ANDROID #define, as well as WANT_ANDROID_SOUND
+#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
 // n.b., need to faff around with #includes here, so it compiles on both Android and other platforms, even though we only need this file for Android
 
 #include <QObject>
 
 #if defined(Q_OS_ANDROID)
-#ifdef WANT_ANDROID_SOUND
 
 #include <QMap>
 
@@ -25,13 +23,11 @@
 #include <android/asset_manager_jni.h>
 
 #endif
-#endif
 
 class AndroidAudio : public QObject
 {
     Q_OBJECT
 #if defined(Q_OS_ANDROID)
-#ifdef WANT_ANDROID_SOUND
 public:
     explicit AndroidAudio(QObject *parent = 0);
     ~AndroidAudio();
@@ -40,9 +36,8 @@ signals:
 
 public slots:
 
-    void registerSound(const QString& path, const QString &name);
-    void playSound(const QString& name);
-    void freeSound(const QString& name);
+    void playSound(const AndroidSoundEffect *sound);
+    AndroidSoundEffect *loadSound(const QString &filename);
 
 private:
     bool createEngine();
@@ -63,8 +58,6 @@ private:
     SLPlayItf mPlayerPlay;
     SLBufferQueueItf mPlayerQueue;
 
-    QMap<QString, AndroidSoundEffect*> mSounds;
-#endif
 #endif
 };
 

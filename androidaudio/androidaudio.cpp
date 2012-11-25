@@ -1,8 +1,6 @@
-//#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
-#include "../common.h" // need this to get Q_OS_ANDROID #define, as well as WANT_ANDROID_SOUND
+#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
 #if defined(Q_OS_ANDROID)
-#ifdef WANT_ANDROID_SOUND
 
 #include "androidaudio.h"
 #include "androidsoundeffect.h"
@@ -10,7 +8,7 @@
 #include <QDebug>
 
 AndroidAudio::AndroidAudio(QObject *parent) :
-    QObject(parent), sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mSounds(), mPlayerObject(NULL)
+    QObject(parent), sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mPlayerObject(NULL)
 {
     if( createEngine() ) {
         if( startSoundPlayer() ) {
@@ -23,7 +21,6 @@ AndroidAudio::~AndroidAudio()
 {
     destroyEngine();
 
-    qDeleteAll(mSounds);
 }
 
 // create the engine and output mix objects
@@ -91,28 +88,21 @@ void AndroidAudio::destroyEngine()
         (*mPlayerObject)->Destroy(mPlayerObject);
     }
 
-    for (int i = 0; i < mSounds.size(); ++i) {
-        mSounds.values().at(i)->unload();
-    }
-
     qDebug() << "Destroyed Android Audio Engine";
 }
 
-void AndroidAudio::registerSound(const QString& path, const QString& name)
-{
-    qDebug() << "registerSound:" << path << name;
-    AndroidSoundEffect *lSound = new AndroidSoundEffect(path, this);
-    qDebug() << "registerSound:created";
-
-    qDebug() << "registerSound:loading";
-    if( lSound->load() ) {
-        qDebug() << "registerSound:loaded";
-        mSounds[name] = lSound;
+AndroidSoundEffect *AndroidAudio::loadSound(const QString &filename) {
+    if( !sound_ok ) {
+        qDebug("sound engine not available");
+        return NULL;
     }
-    else {
-        qDebug() << "registerSound:failed";
-        delete lSound;
+    AndroidSoundEffect *sound = new AndroidSoundEffect(filename, this);
+    if( !sound->load() ) {
+        qDebug() << "failed to load sound";
+        delete sound;
+        sound = NULL;
     }
+    return sound;
 }
 
 bool AndroidAudio::startSoundPlayer()
@@ -198,8 +188,7 @@ bool AndroidAudio::startSoundPlayer()
     return true;
 }
 
-void AndroidAudio::playSound(const QString& name)
-{
+void AndroidAudio::playSound(const AndroidSoundEffect *sound) {
     SLresult lRes;
     SLuint32 lPlayerState;
 
@@ -208,10 +197,7 @@ void AndroidAudio::playSound(const QString& name)
         return;
     }
 
-    AndroidSoundEffect* sound = mSounds[name];
-
     if (!sound) {
-        qDebug() << "No such sound:" << name;
         return;
     }
     //Get the current state of the player
@@ -234,15 +220,4 @@ void AndroidAudio::playSound(const QString& name)
     }
 }
 
-void AndroidAudio::freeSound(const QString& name)
-{
-    AndroidSoundEffect* sound = mSounds[name];
-
-    if( sound ) {
-        mSounds.erase( mSounds.find(name) );
-        delete sound;
-    }
-}
-
-#endif
 #endif

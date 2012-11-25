@@ -1,8 +1,6 @@
-//#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
-#include "../common.h" // need this to get Q_OS_ANDROID #define, as well as WANT_ANDROID_SOUND
+#include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
 #if defined(Q_OS_ANDROID)
-#ifdef WANT_ANDROID_SOUND
 
 #include "androidsoundeffect.h"
 #include <QFile>
@@ -14,7 +12,7 @@ AndroidSoundEffect::AndroidSoundEffect(const QString& path, QObject *parent) :
 
 AndroidSoundEffect::~AndroidSoundEffect()
 {
-
+    this->unload();
 }
 
 bool AndroidSoundEffect::load()
@@ -133,9 +131,8 @@ bool AndroidSoundEffect::unload()
 {
     delete[] mBuffer;
     mBuffer = NULL;
-    //mLength = 0;
+    mLength = 0;
     return true;
 }
 
-#endif
 #endif

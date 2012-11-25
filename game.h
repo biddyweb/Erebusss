@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h" // needed for WANT_ANDROID_SOUND, among other things
+#include "common.h"
 
 #include <QtGui>
 #include <QtWebKit/QWebView>
@@ -8,9 +8,7 @@
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
 
-#ifdef WANT_ANDROID_SOUND
 #include "androidaudio/androidaudio.h"
-#endif
 
 #else
 #include <phonon/MediaObject>
@@ -75,6 +73,8 @@ public:
         return this->mediaObject->state();
     }
 };
+#else
+typedef AndroidSoundEffect Sound;
 #endif
 
 class WebViewEventFilter : public QObject {
@@ -282,14 +282,10 @@ class Game : public QObject {
     Q_OBJECT
 
 protected:
-#ifndef Q_OS_ANDROID
     map<string, Sound *> sound_effects;
-#else
 
-#ifdef WANT_ANDROID_SOUND
+#ifdef Q_OS_ANDROID
     AndroidAudio androidAudio;
-#endif
-
 #endif
 
     QSettings *settings;
@@ -320,11 +316,6 @@ protected:
 
     void createPlayerNames();
     void runTest(const string &filename, int test_id);
-
-private slots:
-/*#ifndef Q_OS_ANDROID
-    void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const;
-#endif*/
 
 public:
     Game();
