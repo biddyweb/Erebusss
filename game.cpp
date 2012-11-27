@@ -911,7 +911,6 @@ void Game::playSound(const string &sound_effect) {
     qDebug("play sound: %s\n", sound_effect.c_str());
     if( game_g->isSoundEnabled() ) {
         Sound *sound = this->sound_effects[sound_effect];
-        ASSERT_LOGGER(sound != NULL);
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
             if( sound->state() == Phonon::PlayingState ) {
@@ -923,7 +922,7 @@ void Game::playSound(const string &sound_effect) {
                 sound->play();
             }
 #else
-            androidAudio.playSound(sound;
+            androidAudio.playSound(sound);
 #endif
         }
     }
