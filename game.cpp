@@ -506,22 +506,6 @@ void Game::run() {
     if( mobile_c ) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
-        /*
-        // make work better on Android phones with crappy resolution
-        // these settings determined by experimenting with emulator...
-        int min_size = min(QApplication::desktop()->width(), QApplication::desktop()->height());
-        qDebug("current font size: %d", new_font.pointSize());
-        qDebug("min_size: %d", min_size);
-        if( min_size < 320 ) {
-            newFont.setPointSize(new_font.pointSize() - 6);
-        }
-        else if( min_size < 480 ) {
-            newFont.setPointSize(new_font.pointSize() - 4);
-        }*/
-        /*this->font_small = QFont(new_font);
-        this->font_small.setPointSize(font_small.pointSize() - 4);*/
-        /*this->font_std = new_font;
-        this->font_big = new_font;*/
         qDebug("setting up fonts for Android");
         this->font_scene = new_font;
         this->font_small = QFont(new_font);
