@@ -756,6 +756,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     this->refreshList();
 
     connect(list, SIGNAL(currentRowChanged(int)), this, SLOT(changedSelectedItem(int)));
+    connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(clickedInfo()));
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
