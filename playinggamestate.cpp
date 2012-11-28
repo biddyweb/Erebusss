@@ -1999,10 +1999,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
     view->setGUIOverlay(gui_overlay);
 
+    LOG("display UI\n");
     gui_overlay->setProgress(0);
     qApp->processEvents();
+    qApp->processEvents(); // need to call this twice to get window to update, on Windows at least, for some reason?
 
     // create RPG data
+    LOG("create RPG data\n");
 
     if( !is_savegame ) {
         LOG("create player\n");
