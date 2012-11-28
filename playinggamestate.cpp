@@ -4887,6 +4887,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             if( scenery->getName() == "Door" ) {
                                 this->playSound("door");
                             }
+                            this->addTextEffect("Opening door...", scenery->getPos(), 1000);
+                            qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
                             c_location->removeScenery(scenery);
                             delete scenery;
                             scenery = NULL;
