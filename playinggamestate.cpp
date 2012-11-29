@@ -5192,7 +5192,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
     fprintf(file, "\n");
 
-    LOG("save locations\n");
+    qDebug("save locations");
     for(vector<Location *>::const_iterator iter_loc = quest->locationsBegin(); iter_loc != quest->locationsEnd(); ++iter_loc) {
         const Location *location = *iter_loc;
 
@@ -5210,7 +5210,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         }
         fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
 
-        LOG("save location images\n");
+        qDebug("save location images");
         fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
         fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
         fprintf(file, "<wall image_name=\"%s\"/>\n", location->getWallImageName().c_str());
@@ -5227,7 +5227,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         }
         fprintf(file, "\n");
 
-        LOG("save player and npcs\n");
+        qDebug("save player and npcs");
         for(set<Character *>::const_iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
             const Character *character = *iter;
             if( player == character )
@@ -5322,12 +5322,12 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, "\n");
 
         if( location == c_location ) {
-            LOG("save player additional info\n");
+            qDebug("save player additional info");
             fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
             fprintf(file, "\n");
         }
 
-        LOG("save scenery\n");
+        qDebug("save scenery");
         for(set<Scenery *>::const_iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
             const Scenery *scenery = *iter;
             fprintf(file, "<scenery");
@@ -5384,14 +5384,14 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         }
         fprintf(file, "\n");
 
-        LOG("save items\n");
+        qDebug("save items");
         for(set<Item *>::const_iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
             const Item *item = *iter;
             this->saveItem(file, item);
         }
         fprintf(file, "\n");
 
-        LOG("save traps\n");
+        qDebug("save traps");
         for(set<Trap *>::const_iterator iter = location->trapsBegin(); iter != location->trapsEnd(); ++iter) {
             const Trap *trap = *iter;
             this->saveTrap(file, trap);
@@ -5403,7 +5403,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 
     const QuestObjective *quest_objective = this->getQuest()->getQuestObjective();
     if( quest_objective != NULL ) {
-        LOG("save quest objective\n");
+        qDebug("save quest objective");
         fprintf(file, "<quest_objective");
         fprintf(file, " type=\"%s\"", quest_objective->getType().c_str());
         fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
@@ -5412,15 +5412,15 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     }
     fprintf(file, "\n");
 
-    LOG("save quest completed text\n");
+    qDebug("save quest completed text");
     fprintf(file, "<completed_text>%s</completed_text>\n", this->getQuest()->getCompletedText().c_str());
     fprintf(file, "\n");
 
-    LOG("save current quest info\n");
+    qDebug("save current quest info");
     fprintf(file, "<quest_info complete=\"%s\"/>\n", this->getQuest()->isCompleted() ? "true" : "false");
     fprintf(file, "\n");
 
-    LOG("save journal\n");
+    qDebug("save journal");
     fprintf(file, "<journal>\n");
     QByteArray encoded = QUrl::toPercentEncoding(this->journal_ss.str().c_str(), QByteArray(), "<>");
     fprintf(file, "%s", encoded.data());
