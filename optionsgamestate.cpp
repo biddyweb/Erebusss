@@ -398,7 +398,7 @@ void OptionsGamestate::clickedOptionsOkay() {
 
 void OptionsGamestate::clickedOnlineHelp() {
     LOG("OptionsGamestate::clickedOnlineHelp\n");
-    QDesktopServices::openUrl(QUrl("http://homepage.ntlworld.com/mark.harman/erebus.html"));
+    QDesktopServices::openUrl(QUrl("http://erebusrpg.sourceforge.net/"));
 }
 
 void OptionsGamestate::clickedOfflineHelp() {
