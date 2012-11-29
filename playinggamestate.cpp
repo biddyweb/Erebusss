@@ -2812,7 +2812,7 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
 }
 
 void PlayingGamestate::setupView() {
-    LOG("PlayingGamestate::setupView()\n");
+    qDebug("PlayingGamestate::setupView()");
     // set up the view on the RPG world
     MainWindow *window = game_g->getScreen()->getMainWindow();
 
@@ -3017,19 +3017,19 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     game_g->getScreen()->setPaused(true);
 
     if( this->player != NULL && this->player->getLocation() != NULL ) {
-        LOG("remove player from location\n");
+        qDebug("remove player from location\n");
         this->player->getLocation()->removeCharacter(this->player);
         this->player->setListener(NULL, NULL);
     }
     if( this->quest != NULL ) {
-        LOG("delete previous quest...\n");
+        qDebug("delete previous quest...\n");
         delete this->quest;
     }
     // delete any items from previous quests
     view->clear();
     //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
 
-    LOG("create new quest\n");
+    qDebug("create new quest\n");
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
 
@@ -3054,10 +3054,6 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         Scenery *scenery = NULL;
         Character *npc = NULL;
         FloorRegion *floor_region = NULL;
-        /*const QuestInfo &c_quest_info = this->quest_list.at(c_quest_indx);
-        QString qt_filename = ":/" + QString(c_quest_info.getFilename().c_str());
-        LOG("load quest: %s\n", qt_filename.toStdString().c_str());
-        QFile file(qt_filename);*/
         QFile file(filename.c_str());
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
@@ -3078,7 +3074,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: info element wasn't expected here");
                     }
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    LOG("quest info: %s\n", info.toStdString().c_str());
+                    qDebug("quest info: %s\n", info.toStdString().c_str());
                     quest->setInfo(info.toStdString());
                 }
                 else if( reader.name() == "completed_text" ) {
@@ -3087,7 +3083,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: completed_text element wasn't expected here");
                     }
                     QString completed_text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    LOG("quest completed_text: %s\n", completed_text.toStdString().c_str());
+                    qDebug("quest completed_text: %s\n", completed_text.toStdString().c_str());
                     quest->setCompletedText(completed_text.toStdString());
                 }
                 else if( reader.name() == "journal" ) {
@@ -3114,12 +3110,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: game element wasn't expected here");
                     }
                     QStringRef difficulty_s = reader.attributes().value("difficulty");
-                    LOG("read difficulty: %s\n", difficulty_s.toString().toStdString().c_str());
+                    qDebug("read difficulty: %s\n", difficulty_s.toString().toStdString().c_str());
                     for(int i=0;i<N_DIFFICULTIES;i++) {
                         Difficulty test_difficulty = (Difficulty)i;
                         if( difficulty_s.toString().toStdString() == Game::getDifficultyString(test_difficulty) ) {
                             this->difficulty = test_difficulty;
-                            LOG("    set difficulty to: %d\n", difficulty);
+                            qDebug("    set difficulty to: %d\n", difficulty);
                             break;
                         }
                     }
@@ -3131,7 +3127,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("unexpected quest xml: location element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
-                    LOG("read location: %s\n", name_s.toString().toStdString().c_str());
+                    qDebug("read location: %s\n", name_s.toString().toStdString().c_str());
                     if( quest->findLocation(name_s.toString().toStdString()) != NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: duplicate location name");
@@ -3224,7 +3220,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         float rect_w = parseFloat(rect_w_s.toString());
                         QStringRef rect_h_s = reader.attributes().value("rect_h");
                         float rect_h = parseFloat(rect_h_s.toString());
-                        //LOG("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
+                        //qDebug("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
                         questXMLType = QUEST_XML_TYPE_FLOORREGION;
                         floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
                         // will be added to location when doing the end floorregion element
@@ -3269,7 +3265,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float point_x = parseFloat(point_x_s.toString());
                     QStringRef point_y_s = reader.attributes().value("y");
                     float point_y = parseFloat(point_y_s.toString());
-                    LOG("found boundary point: %f, %f\n", point_x, point_y);
+                    qDebug("found boundary point: %f, %f\n", point_x, point_y);
                     boundary.addPoint(Vector2D(point_x, point_y));
                 }*/
                 else if( reader.name() == "player_start" ) {
@@ -3288,7 +3284,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( player == NULL ) {
                         throw string("encountered player_start element, but player not yet defined");
                     }
-                    LOG("player starts at %f, %f\n", pos_x, pos_y);
+                    qDebug("player starts at %f, %f", pos_x, pos_y);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: player_start element outside of location");
@@ -3754,7 +3750,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
                     scenery->setBlocking(blocking, block_visibility);
                     if( is_opened && !scenery->canBeOpened() ) {
-                        LOG("trying to set is_opened on scenery that can't be opened: %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+                        qDebug("trying to set is_opened on scenery that can't be opened: %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
                     }
                     scenery->setOpened(is_opened);
                     if( opacity_s.length() > 0 ) {
@@ -3909,7 +3905,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                 if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                     QStringRef text = reader.text();
                     if( stringAnyNonWhitespace(text.toString().toStdString()) ) {
-                        //LOG("### : %s\n", text.toString().toStdString().c_str());
+                        //qDebug("### : %s", text.toString().toStdString().c_str());
                         scenery->setDescription(text.toString().toStdString());
                     }
                 }
@@ -3928,7 +3924,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
     for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
         Location *loc = *iter;
-        LOG("process location: %s\n", loc->getName().c_str());
+        qDebug("process location: %s", loc->getName().c_str());
         if( loc->getBackgroundImageName().length() == 0 ) {
             throw string("Location doesn't define background image name");
         }
@@ -3967,7 +3963,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
-    LOG("View is transformed? %d\n", view->isTransformed());
+    qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
 }
 
