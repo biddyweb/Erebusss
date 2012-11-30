@@ -1400,6 +1400,9 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
             const Item *item = items.at(i);
             this->addGroundItem(item);
         }
+        if( items.size() > 0 ) {
+            list->setCurrentRow(0);
+        }
         connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(clickedPickUp()));
 
         player_list = new ScrollingListWidget();
@@ -1912,12 +1915,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
-        QPushButton *spellsButton = new QPushButton("Spells");
+        /*QPushButton *spellsButton = new QPushButton("Spells");
         game_g->initButton(spellsButton);
         spellsButton->setToolTip("Not supported yet");
         spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        v_layout->addWidget(spellsButton);
+        v_layout->addWidget(spellsButton);*/
 
         QPushButton *journalButton = new QPushButton("Journal");
         game_g->initButton(journalButton);
