@@ -4922,7 +4922,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                             Location *new_location = quest->findLocation(scenery->getExitLocation());
                             ASSERT_LOGGER(new_location != NULL);
                             if( new_location != NULL ) {
+#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
                                 this->autoSave();
+#endif
                                 this->moveToLocation(new_location, scenery->getExitLocationPos());
                                 move = false;
                             }
