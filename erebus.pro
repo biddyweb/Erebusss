@@ -31,7 +31,10 @@ else {
 QT += webkit
 QT += xml
 
-symbian:TARGET.UID3 = 0xE11B6032
+# Test UID only:
+#symbian:TARGET.UID3 = 0xE11B6032
+# For use with Nokia Ovi Store only:
+symbian:TARGET.UID3 = 0x2006dbd2
 
 VERSION = 0.2 # remember to update version in common.h
 
@@ -158,7 +161,8 @@ OTHER_FILES += \
     data/quest_wizard_dungeon_find_item.xml \
     data/spells.xml \
     docs/erebus.html \
-    _devdocs/rules.odt
+    _devdocs/rules.odt \
+    data/quest_necromancer.xml
 
 RESOURCES += \
     erebus.qrc

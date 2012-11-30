@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<quest>
+
+<info>After completing your previous quest, you retire with your riches to take a much needed break. You can now afford luxuries that you never had before - a large house, exquisite foods, fine clothes. A year passes by peacefully.
+
+You should have noticed the warning signs sooner, but they seemed isolated incidents at first. Late on one summer evening whilst walking along a country road, you saw what looked like a grinning skeleton behind some trees, but before you could investigate closer, whatever it was had vanished, and you passed it off as a trick of the light.
+
+...
+
+News has been received from other villages of a spreading evil across the land - the dead are rising from their graves, say the reports, and some villages have completely fallen under the control of undead legions.
+
+Many suspect the work of a necromancer to be the cause, and fear that a great army of undead will soon sweep across the land.
+
+You are eager to do what you can to help.
+</info>
+
+<completed_text>
+</completed_text>
+
+<quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
+
+<location name="entrance">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="1.0" y="1.0"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
+
+</location>
+
+</quest>
