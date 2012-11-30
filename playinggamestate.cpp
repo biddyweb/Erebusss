@@ -4758,6 +4758,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             }
             else if( pickup_items.size() > 1 ) {
                 new ItemsPickerWindow(this, pickup_items);
+                game_g->getScreen()->setPaused(true);
             }
         }
 
