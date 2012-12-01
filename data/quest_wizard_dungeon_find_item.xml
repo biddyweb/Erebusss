@@ -114,7 +114,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 </item>
 <scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
 
-<!-- southern passage-->
+<!--southern passage-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
 
@@ -122,7 +122,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 <scenery name="Door" image_name="door_wood" x="21.0" y="15.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
 
-<!-- room with orc-->
+<!--room with orc-->
 
     <floorregion shape="rect" rect_x="26.5" rect_y="13.5" rect_w="1.0" rect_h="0.5" />
 <floorregion shape="rect" rect_x="25.0" rect_y="10.0" rect_w="4.0" rect_h="3.5" />
@@ -133,7 +133,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
     <gold amount="25"/>
 </scenery>
 
-<!-- room with chairs-->
+<!--room with chairs-->
 
 <floorregion shape="rect" rect_x="35.0" rect_y="12.0" rect_w="6.0" rect_h="5.0" />
 <scenery name="Door" image_name="door_wood" x="35.0" y="14.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -308,7 +308,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="0.0" rect_y="6.0" rect_w="2.0" rect_h="10.0"/>
 
-<!-- north east room-->
+<!--north east room-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
 
@@ -862,11 +862,13 @@ Gakk!
 
 <npc name="Zombie" template="Zombie" x="31.0" y="9.0"/>
 
+<!--<player_start x="33.0" y="9.0"/>-->
+
 <scenery name="Table" image_name="table" x="32.0" y="9.0" size="1.2" blocking="true">
+</scenery>
 <!--    <item name="Book" image_name="book" icon_width="0.25" weight="1">
 Experiments.
     </item>-->
-</scenery>
 
 <floorregion shape="rect" rect_x="25.0" rect_y="22.0" rect_w="11.0" rect_h="1.0"/>
 
@@ -1484,7 +1486,7 @@ There seems to be no information on the cause of the war, or who the enemy is.
 Inside this casket are a collection of bones.
 </item>
 
-<!-- from stairs down route -->
+<!--from stairs down route-->
 
 <floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="5.0"/>
 
