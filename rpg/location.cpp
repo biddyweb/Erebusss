@@ -347,34 +347,33 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         }
         else {
             LOG("affected\n");
-            text = "You have set off a trap!\nAn arrow shoots out from the wall and hits you!";
+            text = "You have set off a trap!\nAn arrow shoots out from the\nwall and hits you!";
             int damage = rollDice(2, 12, rating-1);
             character->decreaseHealth(playing_gamestate, damage, true, true);
         }
     }
     else if( type == "darts" ) {
-        text = "You have set off a trap!\nDarts shoot out from the wall, hitting you multiple times!";
+        text = "You have set off a trap!\nDarts shoot out from the wall,\nhitting you multiple times!";
         int damage = rollDice(rating+1, 12, 0);
         character->decreaseHealth(playing_gamestate, damage, true, true);
     }
     else if( type == "acid" ) {
         if( character->getCurrentShield() != NULL ) {
-            text = "You have set off a trap!\nAcid shoots out from jets in the walls!\nYour shield protects you, but is destroyed in the process.";
+            text = "You have set off a trap!\nAcid shoots out from jets in the walls!\nYour shield protects you,\nbut is destroyed in the process.";
             Item *item = character->getCurrentShield();
             character->takeItem(item);
             delete item;
         }
         else {
-            text = "You have set off a trap!\nA painful acid shoots out from jets in the walls,\nburning your flesh!";
+            text = "You have set off a trap!\nA painful acid shoots out\nfrom jets in the walls,\nburning your flesh!";
             int damage = rollDice(4, 20, rating);
             character->decreaseHealth(playing_gamestate, damage, false, true);
         }
     }
     else if( type == "mantrap" ) {
-        //if( rollD + difficulty <= character->getDexterity() ) {
         if( rollD + difficulty <= character->getProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
-            text = "You manage to avoid the vicious bite of a mantrap that\nyou spot laying on the ground!";
+            text = "You manage to avoid the\nvicious bite of a mantrap that\nyou spot laying on the ground!";
         }
         else {
             LOG("affected\n");
@@ -388,7 +387,7 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         character->paralyse((rating+1)*1000);
     }
     else if( type == "death" ) {
-        text = "You have set off a trap!\nThe last thing you hear is a massive explosion in your ears!\nA bomb blows your body to pieces...";
+        text = "You have set off a trap!\nThe last thing you hear is a\nmassive explosion in your ears!\nA bomb blows your body to pieces...";
         character->kill(playing_gamestate);
     }
     else {
