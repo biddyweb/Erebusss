@@ -503,6 +503,9 @@ void Game::run() {
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
     QWebSettings *web_settings = QWebSettings::globalSettings();
+    int screen_w = QApplication::desktop()->width();
+    int screen_h = QApplication::desktop()->height();
+    LOG("resolution %d x %d\n", screen_w, screen_h);
     if( mobile_c ) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
@@ -520,7 +523,15 @@ void Game::run() {
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
 #else
         qDebug("setting up fonts for non-Android mobile");
-        this->font_scene = new_font;
+        if( screen_w == 640 && screen_h == 480 ) {
+            // hackery for Nokia E6 - almost all Symbian^1 phones or later are 640x360, but things don't look right with the E6, which is 640x480
+            LOG("Nokia E6 font hackery\n");
+            this->font_scene = QFont(new_font);
+            this->font_scene.setPointSize(font_scene.pointSize() - 2);
+        }
+        else {
+            this->font_scene = new_font;
+        }
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() - 2);
         this->font_std = new_font;
