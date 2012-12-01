@@ -502,6 +502,12 @@ void Game::run() {
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
+    {
+        QPalette palette = window->palette();
+        palette.setColor(QPalette::Window, Qt::black);
+        palette.setColor(QPalette::WindowText, Qt::gray);
+        window->setPalette(palette);
+    }
     QWebSettings *web_settings = QWebSettings::globalSettings();
     int screen_w = QApplication::desktop()->width();
     int screen_h = QApplication::desktop()->height();
@@ -562,8 +568,7 @@ void Game::run() {
     QPixmap gui_pixmap_buttons = createNoise(256, 256, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
     this->gui_brush_buttons.setTexture(gui_pixmap_buttons);
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
-    //this->gui_palette.setBrush(QPalette::WindowText, QBrush(Qt::red)); // needed for Symbian at least
-    //this->gui_palette.setBrush(QPalette::WindowText, gui_brush_buttons);
+    this->gui_palette.setColor(QPalette::ButtonText, Qt::black);
 //#endif
 
     gamestate = new OptionsGamestate();
