@@ -346,9 +346,7 @@ int AnimatedObject::getHeight() const {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-#if defined(Q_OS_ANDROID)
-    this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug
-#endif
+    this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug, also needed for Symbian
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
