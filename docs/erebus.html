@@ -13,7 +13,7 @@
 
 <hr>
 
-<p>Erebus is an open source Role Playing Game, for PCs, smartphones and tablets.</p>
+<p>Erebus is an Open Source RPG (Role-Playing Game), for PCs, smartphones and tablets.</p>
 
 <p>This game is a work in progress.</p>
 
@@ -51,7 +51,7 @@
 <li><p>For <b>Windows</b>,
 <!--<a href="">download the
 installer</a>-->
-<a href="http://launchpad.net/erebus/trunk/0.1/+download/erebus.zip">download the
+<a href="http://launchpad.net/erebus/trunk/0.2/+download/erebus.zip">download the
 binary archive</a>. <!--On Windows 8, you may get warnings about this being untrusted
 - this is simply Microsoft's warnings that complain about any software that isn't
 from their own "store" or from a large company.--> <b>If you get an error when
@@ -68,7 +68,7 @@ Software Centre (however it takes a few weeks for the latest version to appear, 
 For other Linux distributions, you have to compile from the source.</p></li>
 -->
 
-<li><p>The <a href="http://launchpad.net/erebus/trunk/0.1/+download/erebussrc.zip">source code is
+<li><p>The <a href="http://launchpad.net/erebus/trunk/0.2/+download/erebussrc.zip">source code is
 available</a>, released under the <a href="http://www.gnu.org/copyleft/gpl.html">GPL v3 or
 later</a>. For <b>Linux</b>, you need to compile from the source. Please see the file erebus_source.txt (in the source archive) for details on how to
 compile. Future versions will have binaries available for Ubuntu.</p></li>
@@ -125,7 +125,7 @@ through Paypal below (Paypal account not required). Thanks!</p>
 <li><a href="#leavingthedungeon">Leaving the dungeon</a></li>
 <!--<li><a href="#credits">Credits etc</a></li>-->
 <li><a href="#contact">Contacting me (bugs etc)</a></li>
-<!--<li><a href="#helpwanted">Help wanted!</a></li>-->
+<li><a href="#helpwanted">Help wanted!</a></li>
 <li><a href="#history">History</a></li>
 <li><a href="#licences">Licences</a></li>
 </ul>
@@ -432,12 +432,27 @@ onto any new quests that have been added).</p>
 </ul>
 </p>
 
-<!--<a name="helpwanted">-->
+<p><a name="helpwanted"><b>Help wanted!</b></p>
+
+<p>If you would like to contribute to Erebus, there are various ways you can help:<ul>
+<li><b>Graphics artists</b> - More graphics (scenery, NPCs and so on) would be useful to have. Please contact me if you want info on the expected graphics/animation formats, or what sort of images would be useful.</li>
+<li><b>Musicians</b> - It would be useful to have background music for the game. More sound effects are also welcome!</li>
+<li><b>Porting</b> - Feel free to port Erebus to other platforms - it should be easy to port to any OS that supports Qt. If code changes are required, if you send me the files I can integrate them into the main source (please check the Git repository on Sourceforge for the latest version to work with).</li>
+<li><b>Tell people about it!</b> - If you like the game, then please feel free to tell other people about it, on your blog/Twitter/website/etc :)</li>
+<li><b>Give me a nice rating :)</b> (On Nokia/Android stores, or other hosting sites...)</li>
+<li><b>Videos</b> - videos of the gameplay (e.g., on YouTube) would be useful to have, partly to help raise awareness, and also to act as gameplay tutorials.</li>
+</ul>
+Any content for Erebus must be releaed under a Free/Open Source compatible licence (e.g., <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>) for me to be able to use it.</p>
 
 <p><a name="history"><b>History</b></p>
 
 <pre>
-Version 0.2 (Work In Progress)
+Version 0.3 (Work in progress)
+
+FIXED   Rock scenery texture was sometimes drawn above player.
+UPDATED Improved rock scenery texture.
+
+Version 0.2 (2012/12/01)
 
 FIXED   Fixed crash on exit for Ubuntu.
 FIXED   Major memory leak when exiting a game.
@@ -512,7 +527,7 @@ following files:<ul>
 <li>npcs/man.png - from http://opengameart.org/content/wandering-vendor-npc , by TiZiana, under LGPL 2, LGPL 3 or <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>npcs/orc_regular_0.png - from http://opengameart.org/content/orc-flare-sprite-sheets , by John Harvey and Clint Bellanger, under GPL 2, GPL 3 or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
 <li>npcs/spider_giant.png - from http://opengameart.org/content/spider-flare-sprite-sheets , by Wciow and John.d.h, under GPL v2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
-<li>npcs/wraith.png - from http://commons.wikimedia.org/wiki/File:Undead-shadow.png / <a href="http://www.wesnoth.org/">Battle for Wesnoth</a>, under GPL 2 or later.<li>
+<li>npcs/wraith.png - from http://commons.wikimedia.org/wiki/File:Undead-shadow.png / <a href="http://www.wesnoth.org/">Battle for Wesnoth</a>, under GPL 2 or later.</li>
 <li>scenery/building.png - from http://opengameart.org/content/medieval-building-tiles , by Clint Bellanger, under GPL v2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> or later (also uses texture by Sindwiller).</li>
 <li>scenery/cabinet.png - from http://commons.wikimedia.org/wiki/File:Bookcase_(Ferapontov).jpg , by shakko, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
 <li>scenery/carpet.png - from http://commons.wikimedia.org/wiki/File:Alpan_xal%C3%A7as%C4%B1_2.jpg , CC0 (Public Domain).</li>
@@ -521,7 +536,8 @@ following files:<ul>
 <li>scenery/door_metal.png - from http://opengameart.org/content/3-burningwell-door-textures-high-resolution , by qubodup, CC0 (Public Domain).</li>
 <li>scenery/grate.png - from http://opengameart.org/content/metal-grate-texture , by Luke / Rust Ltd, under CC0 (Public Domain).</li>
 <li>scenery/plant.png - from FLARE (Clint Bellanger, CC BY-SA 3.0), also credited to apricot.blender.org under CC BY 3.0 or later ( http://opengameart.org/content/low-poly-plants ).</li>
-<li>scenery/rock.png - from http://opengameart.org/content/isometric-64x64-outside-tileset, by Yar, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
+<!--<li>scenery/rock.png - from http://opengameart.org/content/isometric-64x64-outside-tileset , by Yar, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>-->
+<li>scenery/rock.png - from http://opengameart.org/content/rocks , by Écrivain, under CC0 (Public Domain).</li>
 <li>scenery/scenery_painting_sword.png, scenes/painting_sword.jpg - from http://opengameart.org/content/erode , by unrealsmoker, under GPL 2 or GPL 3.</li>
 <li>scenery/shrine.png - from <a href="http://opengameart.org/content/23-high-res-graveyard-texture-photos">http://opengameart.org/content/23-high-res-graveyard-texture-photos</a> , by bart, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
 <li>scenery/skeleton.png - from http://openclipart.org/detail/1258/skeleton-by-johnny_automatic , by johnny_automatic, CC0 (Public Domain).</li>
