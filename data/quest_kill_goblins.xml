@@ -42,6 +42,7 @@
 <scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
 <scenery name="Fire" image_name="fire" x="14.0" y="3.0" w="1.0" h="1.0" blocking="true"/>
+<scenery name="Rock" image_name="rock1" x="14.5" y="5.7" size="0.2" draw_type="background"/>
 
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">
     <gold amount="20"/>
@@ -147,9 +148,9 @@
 
 <!--<item template="Skull" x="8.5" y="7.0"/>-->
 
-<scenery name="Rock" image_name="rock1" x="8.5" y="7.1" size="0.2"/>
+<scenery name="Rock" image_name="rock1" x="8.5" y="7.1" size="0.2" draw_type="background"/>
 
-<scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2"/>
+<scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2" draw_type="background"/>
 
 <scenery name="Barrel" image_name="barrel" x="15.5" y="14.0" w="0.8" h="0.8" blocking="true">
     <gold amount="25"/>

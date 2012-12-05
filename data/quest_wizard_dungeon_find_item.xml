@@ -37,9 +37,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
     <floorregion_point x="37.0" y="3.0" />
     <floorregion_point x="35.0" y="1.0" />
 </floorregion>
-<scenery name="Rock" image_name="rock1" x="31.0" y="1.5" size="0.2"/>
-<scenery name="Rock" image_name="rock1" x="35.0" y="5.3" size="0.2"/>
-<scenery name="Rock" image_name="rock1" x="36.2" y="2.5" size="0.2"/>
+<scenery name="Rock" image_name="rock1" x="31.0" y="1.5" size="0.2" draw_type="background"/>
+<scenery name="Rock" image_name="rock1" x="35.0" y="5.3" size="0.2" draw_type="background"/>
+<scenery name="Rock" image_name="rock1" x="36.2" y="2.5" size="0.2" draw_type="background"/>
 
 <scenery name="Table" image_name="table" x="35.0" y="2.5" size="0.8" blocking="true"/>
 
@@ -112,7 +112,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 30th - Today I set out on my quest, confident that I will soon be rewarded for my efforts with the great riches to be found!
 </item>
-<scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2"/>
+<scenery name="Rock" image_name="rock1" x="46.5" y="11.0" size="0.2" draw_type="background"/>
 
 <!--southern passage-->
 
@@ -332,7 +332,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="20.0" rect_y="16.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Rock" image_name="rock1" x="23.0" y="17.5" size="0.2"/>
+<scenery name="Rock" image_name="rock1" x="23.0" y="17.5" size="0.2" draw_type="background"/>
 
 <npc name="Goblin" template="Goblin" x="21.0" y="20.0"/>
 <npc name="Goblin Champion" template="Goblin Champion" x="23.0" y="20.0"/>
