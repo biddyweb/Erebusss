@@ -59,6 +59,10 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
     /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0)
 {
+    for(int i=0;i<N_KEYS;i++) {
+        this->key_down[i] = false;
+    }
+    this->grabKeyboard();
 }
 
 void MainGraphicsView::zoomOut() {
@@ -249,6 +253,71 @@ void MainGraphicsView::wheelEvent(QWheelEvent *event) {
         else if( event->delta() < 0 ) {
             this->zoom(zoom_centre, false);
         }
+    }
+}
+
+bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
+    bool done = false;
+
+    switch( event->key() ) {
+    case Qt::Key_4:
+    case Qt::Key_Left:
+    case Qt::Key_A:
+        this->key_down[KEY_L] = down;
+        done = true;
+        break;
+    case Qt::Key_6:
+    case Qt::Key_Right:
+    case Qt::Key_D:
+        this->key_down[KEY_R] = down;
+        done = true;
+        break;
+    case Qt::Key_8:
+    case Qt::Key_Up:
+    case Qt::Key_W:
+        this->key_down[KEY_U] = down;
+        done = true;
+        break;
+    case Qt::Key_2:
+    case Qt::Key_Down:
+    case Qt::Key_S:
+        this->key_down[KEY_D] = down;
+        done = true;
+        break;
+    case Qt::Key_7:
+        this->key_down[KEY_LU] = down;
+        done = true;
+        break;
+    case Qt::Key_9:
+        this->key_down[KEY_RU] = down;
+        done = true;
+        break;
+    case Qt::Key_1:
+        this->key_down[KEY_LD] = down;
+        done = true;
+        break;
+    case Qt::Key_3:
+        this->key_down[KEY_RD] = down;
+        done = true;
+        break;
+    }
+
+    return done;
+}
+
+void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
+    //qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
+    bool done = handleKey(event, true);
+    if( !done ) {
+        QGraphicsView::keyPressEvent(event);
+    }
+}
+
+void MainGraphicsView::keyReleaseEvent(QKeyEvent *event) {
+    //qDebug("MainGraphicsView::keyReleaseEvent: %d", event->key());
+    bool done = handleKey(event, false);
+    if( !done ) {
+        QGraphicsView::keyReleaseEvent(event);
     }
 }
 
@@ -1899,8 +1968,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
         QPushButton *statsButton = new QPushButton("Stats");
         game_g->initButton(statsButton);
-        statsButton->setShortcut(QKeySequence(Qt::Key_S));
-        statsButton->setToolTip("Display statistics of your character (S)");
+        statsButton->setShortcut(QKeySequence(Qt::Key_F1));
+        statsButton->setToolTip("Display statistics of your character (F1)");
         statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
@@ -1908,8 +1977,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
         QPushButton *itemsButton = new QPushButton("Items");
         game_g->initButton(itemsButton);
-        itemsButton->setShortcut(QKeySequence(Qt::Key_I));
-        itemsButton->setToolTip("Display the items that you are carrying (I)");
+        itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
+        itemsButton->setToolTip("Display the items that you are carrying (F2)");
         itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
@@ -1924,8 +1993,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
         QPushButton *journalButton = new QPushButton("Journal");
         game_g->initButton(journalButton);
-        journalButton->setShortcut(QKeySequence(Qt::Key_J));
-        journalButton->setToolTip("Displays information about your quests (J)");
+        journalButton->setShortcut(QKeySequence(Qt::Key_F3));
+        journalButton->setToolTip("Displays information about your quests (F3)");
         journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
@@ -2016,13 +2085,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         //this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.75f);
         this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         player->initialiseHealth(60);
-        //player->initialiseHealth(600); // CHEAT
         //player->addGold( rollDice(2, 6, 10) );
         player->addGold( 333 ); // CHEAT, simulate start of quest 2
         player->setXP(68); // CHEAT, simulate start of quest 2
         //player->addGold( 1000 ); // CHEAT
         */
         this->player = game_g->createPlayer(player_type);
+        this->player->initialiseHealth(600); // CHEAT
     }
 
     LOG("load images\n");
@@ -4336,7 +4405,7 @@ void PlayingGamestate::update() {
         // scroll due to player near the edge
         QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
         if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
-            const int wid = 32;
+            const int wid = 64;
             QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
             if( player_pos.x() < wid ) {
                 centre.setX( centre.x() - speed );
@@ -4358,6 +4427,52 @@ void PlayingGamestate::update() {
                 this->view->centerOn(centre);
                 scrolled = true;
             }
+        }
+    }
+
+    // update due to keyboard input
+    {
+        bool moved = false;
+        Vector2D dest = player->getPos();
+        const float step = 0.25f;
+        if( this->view->keyDown(MainGraphicsView::KEY_L) ) {
+            moved = true;
+            dest.x -= step;
+        }
+        else if( this->view->keyDown(MainGraphicsView::KEY_R) ) {
+            moved = true;
+            dest.x += step;
+        }
+        if( this->view->keyDown(MainGraphicsView::KEY_U) ) {
+            moved = true;
+            dest.y -= step;
+        }
+        else if( this->view->keyDown(MainGraphicsView::KEY_D) ) {
+            moved = true;
+            dest.y += step;
+        }
+        if( this->view->keyDown(MainGraphicsView::KEY_LU) ) {
+            moved = true;
+            dest.x -= step;
+            dest.y -= step;
+        }
+        else if( this->view->keyDown(MainGraphicsView::KEY_RU) ) {
+            moved = true;
+            dest.x += step;
+            dest.y -= step;
+        }
+        else if( this->view->keyDown(MainGraphicsView::KEY_LD) ) {
+            moved = true;
+            dest.x -= step;
+            dest.y += step;
+        }
+        else if( this->view->keyDown(MainGraphicsView::KEY_RD) ) {
+            moved = true;
+            dest.x += step;
+            dest.y += step;
+        }
+        if( moved ) {
+            this->requestPlayerMove(dest, NULL);
         }
     }
 
@@ -4966,18 +5081,22 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         }
 
         if( move && !player->isDead() ) {
-            // nudge position due to boundaries
-            dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
-            if( dest != player->getPos() ) {
-                qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
-                player->setDestination(dest.x, dest.y, ignore_scenery);
-                if( player->carryingTooMuch() ) {
-                    this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
-                }
-                else if( player->tooWeakForArmour() ) {
-                    this->addTextEffect("The armour you are wearing is\ntoo heavy for you to move!", player->getPos(), 2000);
-                }
-            }
+            this->requestPlayerMove(dest, ignore_scenery);
+        }
+    }
+}
+
+void PlayingGamestate::requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery) {
+    // nudge position due to boundaries
+    dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
+    if( dest != player->getPos() ) {
+        qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
+        player->setDestination(dest.x, dest.y, ignore_scenery);
+        if( player->carryingTooMuch() ) {
+            this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+        }
+        else if( player->tooWeakForArmour() ) {
+            this->addTextEffect("The armour you are wearing is\ntoo heavy for you to move!", player->getPos(), 2000);
         }
     }
 }

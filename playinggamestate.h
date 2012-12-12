@@ -49,6 +49,20 @@ class GUIOverlay;
 class MainGraphicsView : public QGraphicsView {
     Q_OBJECT
 
+public:
+    enum KeyCode {
+        KEY_L = 0,
+        KEY_R = 1,
+        KEY_U = 2,
+        KEY_D = 3,
+        KEY_LU = 4,
+        KEY_RU = 5,
+        KEY_LD = 6,
+        KEY_RD = 7,
+        N_KEYS = 8
+    };
+
+private:
     PlayingGamestate *playing_gamestate;
     int mouse_down_x, mouse_down_y;
     bool single_left_mouse_down; // if left mouse button is down, and not a multitouch operation
@@ -69,6 +83,10 @@ class MainGraphicsView : public QGraphicsView {
     QPixmap lighting_pixmap_scaled;
     unsigned char darkness_alpha;
 
+    bool key_down[N_KEYS];
+
+    bool handleKey(const QKeyEvent *event, bool down);
+
     const static float min_zoom_c;
     const static float max_zoom_c;
 
@@ -79,6 +97,8 @@ class MainGraphicsView : public QGraphicsView {
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void wheelEvent(QWheelEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
+    virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void paintEvent(QPaintEvent *event);
 
@@ -103,6 +123,9 @@ public:
     void clear() {
         this->scene()->clear();
         this->text_effects.clear();
+    }
+    bool keyDown(KeyCode code) {
+        return this->key_down[(int)code];
     }
 
 public slots:
@@ -375,6 +398,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void autoSave() {
         this->saveGame("autosave.xml");
     }
+    void requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery);
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
