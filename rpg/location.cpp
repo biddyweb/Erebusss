@@ -466,7 +466,7 @@ FloorRegion *Location::findFloorRegionAt(Vector2D pos) {
     FloorRegion *result = NULL;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && result==NULL; ++iter) {
         FloorRegion *floor_region = *iter;
-        if( floor_region->pointInsideConvex(pos) ) {
+        if( floor_region->pointInside(pos) ) {
             result = floor_region;
         }
     }
@@ -477,7 +477,7 @@ vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
     vector<FloorRegion *> result_floor_regions;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
-        if( floor_region->pointInsideConvex(pos) ) {
+        if( floor_region->pointInside(pos) ) {
             result_floor_regions.push_back(floor_region);
         }
     }

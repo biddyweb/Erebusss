@@ -209,7 +209,7 @@ public:
     Vector2D findCentre() const;
     Vector2D offsetInwards(size_t indx, float dist) const;
 
-    bool pointInsideConvex(Vector2D pvec) const;
+    bool pointInside(Vector2D pvec) const;
 };
 
 class Graph;

@@ -101,7 +101,28 @@ Vector2D Polygon2D::findCentre() const {
     return centre;
 }
 
-bool Polygon2D::pointInsideConvex(Vector2D pvec) const {
+bool Polygon2D::pointInside(Vector2D pvec) const {
+    bool c = false;
+    for(int i=0,j=this->getNPoints()-1;i<this->getNPoints();j=i++) {
+        Vector2D pi = points.at(i);
+        Vector2D pj = points.at(j);
+        // first exclude case where the pvec lies on the polygon boundary
+        if( (pvec.x-pi.x)*(pj.y-pi.y) == (pj.x-pi.x)*(pvec.y-pi.y) ) {
+            // lies on line, but need to test extent
+            if( (pvec.x >= pi.x && pvec.x <= pj.x) || (pvec.x >= pj.x && pvec.x <= pi.x) ) {
+                if( (pvec.y >= pi.y && pvec.y <= pj.y) || (pvec.y >= pj.y && pvec.y <= pi.y) ) {
+                    c = true;
+                    break;
+                }
+            }
+        }
+        if( ( (pi.y > pvec.y) != (pj.y > pvec.y) ) && (pvec.x < (pj.x-pi.x) * (pvec.y-pi.y) / (pj.y-pi.y) + pi.x) ) {
+            c = !c;
+        }
+    }
+    return c;
+
+    /*
     int sign = 0;
     for(size_t j=0;j<this->getNPoints();j++) {
         int p_j = j==0 ? this->getNPoints()-1 : j-1;
@@ -126,10 +147,27 @@ bool Polygon2D::pointInsideConvex(Vector2D pvec) const {
         int this_sign = (sin_angle > 0.0f) ? 1 : -1;
         if( sign == 0 )
             sign = this_sign;
-        else if( this_sign != sign )
+        else if( this_sign != sign ) {
+            if( c ) {
+                for(size_t i=0;i<this->getNPoints();i++) {
+                    qDebug("%d: %f, %f", i, this->points.at(i).x, this->points.at(i).y);
+                }
+                qDebug("test: %f, %f", pvec.x, pvec.y);
+            }
+            ASSERT_LOGGER( !c );
             return false;
+        }
     }
+
+    if( !c ) {
+        for(size_t i=0;i<this->getNPoints();i++) {
+            qDebug("%d: %f, %f", i, this->points.at(i).x, this->points.at(i).y);
+        }
+        qDebug("test: %f, %f", pvec.x, pvec.y);
+    }
+    ASSERT_LOGGER( c );
     return true;
+    */
 }
 
 GraphVertex *GraphVertex::getNeighbour(Graph *graph, float *distance, size_t i) const {
