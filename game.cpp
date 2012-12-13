@@ -589,7 +589,19 @@ enum TestID {
     TEST_PATHFINDING_2 = 2,
     TEST_PATHFINDING_3 = 3,
     TEST_PATHFINDING_4 = 4,
-    N_TESTS = 5
+    TEST_POINTINPOLYGON_0 = 5,
+    TEST_POINTINPOLYGON_1 = 6,
+    TEST_POINTINPOLYGON_2 = 7,
+    TEST_POINTINPOLYGON_3 = 8,
+    TEST_POINTINPOLYGON_4 = 9,
+    TEST_POINTINPOLYGON_5 = 10,
+    TEST_POINTINPOLYGON_6 = 11,
+    TEST_POINTINPOLYGON_7 = 12,
+    TEST_POINTINPOLYGON_8 = 13,
+    TEST_POINTINPOLYGON_9 = 14,
+    TEST_POINTINPOLYGON_10 = 15,
+    TEST_POINTINPOLYGON_11 = 16,
+    N_TESTS = 17
 };
 
 /**
@@ -598,6 +610,18 @@ enum TestID {
   TEST_PATHFINDING_2 - can't find a path as no route available
   TEST_PATHFINDING_3 - can't find a path, as start isn't in valid floor region
   TEST_PATHFINDING_4 - can't find a path, as destination isn't in valid floor region
+  TEST_POINTINPOLYGON_0 - tests that a point is inside a convex polygon (triangle)
+  TEST_POINTINPOLYGON_1 - tests that a point is on a convex polygon (triangle)
+  TEST_POINTINPOLYGON_2 - tests that a point is not inside a convex polygon (triangle)
+  TEST_POINTINPOLYGON_3 - tests that a point is inside a convex polygon (quadrilateral)
+  TEST_POINTINPOLYGON_4 - tests that a point is on a convex polygon (quadrilateral)
+  TEST_POINTINPOLYGON_5 - tests that a point is not inside a convex polygon (quadrilateral)
+  TEST_POINTINPOLYGON_6 - tests that a point is inside a concave polygon (quadrilateral)
+  TEST_POINTINPOLYGON_7 - tests that a point is on a concave polygon (quadrilateral)
+  TEST_POINTINPOLYGON_8 - tests that a point is not inside a concave polygon (quadrilateral)
+  TEST_POINTINPOLYGON_9 - tests that a point is inside a concave polygon (L-shape)
+  TEST_POINTINPOLYGON_10 - tests that a point is on a concave polygon (L-shape)
+  TEST_POINTINPOLYGON_11 - tests that a point is not inside a concave polygon (L-shape)
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -659,7 +683,7 @@ void Game::runTest(const string &filename, int test_id) {
                 expected_points = 0;
             }
             else {
-                ASSERT_LOGGER(false);
+                throw string("missing case for this test_id");
             }
             vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
 
@@ -676,8 +700,109 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("Unexpected end of path");
             }
         }
+        else if( test_id == TEST_POINTINPOLYGON_0 || test_id == TEST_POINTINPOLYGON_1 || test_id == TEST_POINTINPOLYGON_2 ) {
+            Polygon2D poly;
+            poly.addPoint(Vector2D(-1.0f, -1.0f));
+            poly.addPoint(Vector2D(0.5f, -1.1f));
+            poly.addPoint(Vector2D(-0.1f, 0.8f));
+            Vector2D test_pt;
+            bool exp_inside = false;
+            if( test_id == TEST_POINTINPOLYGON_0 ) {
+                test_pt.set(0.0f, -1.05f);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_1 ) {
+                test_pt.set(0.5f, -1.1f);
+                exp_inside = true;
+            }
+            else {
+                test_pt.set(0.0f, -1.1f);
+                exp_inside = false;
+            }
+            bool inside = poly.pointInside(test_pt);
+            if( inside != exp_inside ) {
+                throw string("failed point inside polygon test");
+            }
+        }
+        else if( test_id == TEST_POINTINPOLYGON_3 || test_id == TEST_POINTINPOLYGON_4 || test_id == TEST_POINTINPOLYGON_5 ) {
+            Polygon2D poly;
+            poly.addPoint(Vector2D(-1.0f, -1.0f));
+            poly.addPoint(Vector2D(0.5f, -1.1f));
+            poly.addPoint(Vector2D(0.5f, 0.8f));
+            poly.addPoint(Vector2D(-1.1f, 0.8f));
+            Vector2D test_pt;
+            bool exp_inside = false;
+            if( test_id == TEST_POINTINPOLYGON_3 ) {
+                test_pt.set(0.49f, 0.75f);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_4 ) {
+                test_pt.set(0.5f, 0.1f);
+                exp_inside = true;
+            }
+            else {
+                test_pt.set(0.51f, 0.75f);
+                exp_inside = false;
+            }
+            bool inside = poly.pointInside(test_pt);
+            if( inside != exp_inside ) {
+                throw string("failed point inside polygon test");
+            }
+        }
+        else if( test_id == TEST_POINTINPOLYGON_6 || test_id == TEST_POINTINPOLYGON_7 || test_id == TEST_POINTINPOLYGON_8 ) {
+            Polygon2D poly;
+            poly.addPoint(Vector2D(-1.0f, -1.0f));
+            poly.addPoint(Vector2D(1.0f, -1.0f));
+            poly.addPoint(Vector2D(1.0f, 1.0f));
+            poly.addPoint(Vector2D(0.9f, -0.9f));
+            Vector2D test_pt;
+            bool exp_inside = false;
+            if( test_id == TEST_POINTINPOLYGON_6 ) {
+                test_pt.set(0.91f, -0.91f);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_7 ) {
+                test_pt.set(0.95f, 0.05f);
+                exp_inside = true;
+            }
+            else {
+                test_pt.set(0.8f, -0.89f);
+                exp_inside = false;
+            }
+            bool inside = poly.pointInside(test_pt);
+            if( inside != exp_inside ) {
+                throw string("failed point inside polygon test");
+            }
+        }
+        else if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ) {
+            Polygon2D poly;
+            poly.addPoint(Vector2D(0.0f, 0.0f));
+            poly.addPoint(Vector2D(0.0f, 3.0f));
+            poly.addPoint(Vector2D(2.0f, 3.0f));
+            poly.addPoint(Vector2D(2.0f, 2.0f));
+            poly.addPoint(Vector2D(1.0f, 2.0f));
+            poly.addPoint(Vector2D(1.0f, 0.0f));
+            Vector2D test_pt;
+            bool exp_inside = false;
+            if( test_id == TEST_POINTINPOLYGON_9 ) {
+                test_pt.set(0.5f, 2.5f);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_10 ) {
+                test_pt.set(0.5f, 0.0f);
+                exp_inside = true;
+            }
+            else {
+                test_pt.set(1.1f, 0.0f);
+                exp_inside = false;
+            }
+            bool inside = poly.pointInside(test_pt);
+            if( inside != exp_inside ) {
+                throw string("failed point inside polygon test");
+            }
+        }
         else {
-            ASSERT_LOGGER(false);
+            throw string("unknown test");
         }
 
         fprintf(testfile, "PASSED\n");
