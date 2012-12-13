@@ -101,6 +101,14 @@
     <floorregion shape="rect" rect_x="19.6" rect_y="11.0" rect_w="0.8" rect_h="0.5" />
 <floorregion shape="rect" rect_x="15.0" rect_y="7.0" rect_w="5.5" rect_h="4.0" />
 
+<npc name="Goblin Champion" template="Goblin Champion" x="16.0" y="9.0">
+    <item template="Leather Armour"/>
+    <item name="Goblin's Key" image_name="key" icon_width="0.5" weight="0"/>
+</npc>
+<npc name="Goblin" template="Goblin" x="16.0" y="10.0"/>
+
+<scenery name="Big Boulder" image_name="bigboulder" x="16.0" y="8.0" size="0.58" blocking="true"/>
+
     <floorregion shape="rect" rect_x="12.0" rect_y="10.1" rect_w="0.5" rect_h="0.8" />
 <floorregion shape="rect" rect_x="12.5" rect_y="7.5" rect_w="2.0" rect_h="3.5" />
 
@@ -113,6 +121,7 @@
 <floorregion shape="rect" rect_x="11.0" rect_y="21.0" rect_w="4.0" rect_h="4.0" />
 <npc name="Goblin" template="Goblin" x="13.0" y="24.0"/>
 <gold amount="11" x="11.5" y="24.5"/>
+<scenery name="Boulders" image_name="boulders" x="14.0" y="21.8" size="0.56" blocking="true"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="24.0" rect_w="6.5" rect_h="1.0" />
 
@@ -142,12 +151,6 @@
 <npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
-
-<npc name="Goblin Champion" template="Goblin Champion" x="16.0" y="8.0">
-    <item template="Leather Armour"/>
-    <item name="Goblin's Key" image_name="key" icon_width="0.5" weight="0"/>
-</npc>
-<npc name="Goblin" template="Goblin" x="16.0" y="9.0"/>
 
 <scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
 
