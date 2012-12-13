@@ -2910,20 +2910,24 @@ void PlayingGamestate::setupView() {
         view->setScale(initial_scale);
     }
 
-    int pixels_per_unit = 64;
-    float scale = 1.0f/(float)pixels_per_unit;
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
-    floor_brush.setTransform(QTransform::fromScale(scale, scale));
     QBrush wall_brush;
-    if( c_location->getWallImageName().length() > 0 ) {
-        wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
-        wall_brush.setTransform(QTransform::fromScale(scale, scale));
-    }
+    {
+        /*int pixels_per_unit = 128;
+        float scale = 4.0f/(float)pixels_per_unit;*/
+        float scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
+        floor_brush.setTransform(QTransform::fromScale(scale, scale));
+        if( c_location->getWallImageName().length() > 0 ) {
+            wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
+            wall_brush.setTransform(QTransform::fromScale(scale, scale));
+        }
 
-    QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
-    background_brush.setTransform(QTransform::fromScale(2.0f*scale, 2.0f*scale));
-    view->setBackgroundBrush(background_brush);
-    //view->setBackgroundBrush(QBrush(Qt::white));
+        float background_scale = 1.0f/32.0f;
+        QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
+        background_brush.setTransform(QTransform::fromScale(background_scale, background_scale));
+        view->setBackgroundBrush(background_brush);
+        //view->setBackgroundBrush(QBrush(Qt::white));
+    }
 
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
         FloorRegion *floor_region = c_location->getFloorRegion(i);
@@ -5396,6 +5400,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             }
             int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
             character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
+
             fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
             fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
