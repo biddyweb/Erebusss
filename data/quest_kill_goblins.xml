@@ -27,10 +27,18 @@
 
 <floorregion shape="polygon">
     <floorregion_point x="11.0" y="1.0" />
-    <floorregion_point x="11.0" y="6.0" />
-    <floorregion_point x="16.0" y="6.0" />
+    <floorregion_point x="10.5" y="2.5" />
+    <floorregion_point x="11.0" y="4.0" />
+    <floorregion_point x="11.0" y="5.0" />
+    <floorregion_point x="11.5" y="6.0" />
+    <floorregion_point x="13.5" y="6.5" />
+    <floorregion_point x="15.5" y="6.0" />
+    <floorregion_point x="16.0" y="5.0" />
+    <floorregion_point x="16.0" y="3.0" />
+    <floorregion_point x="16.5" y="2.5" />
     <floorregion_point x="16.0" y="1.0" />
     <floorregion_point x="15.0" y="0.5" />
+    <floorregion_point x="13.5" y="0.0" />
     <floorregion_point x="12.0" y="0.5" />
 </floorregion>
 
@@ -40,6 +48,8 @@
 </npc>
 
 <scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="14.0" y="1.5" size="0.56" blocking="true"/>
+<scenery name="Big Boulder" image_name="bigboulder" x="13.0" y="1.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
 <scenery name="Fire" image_name="fire" x="14.0" y="3.0" w="1.0" h="1.0" blocking="true"/>
 <scenery name="Rock" image_name="rock1" x="14.5" y="5.7" size="0.2" draw_type="background"/>
