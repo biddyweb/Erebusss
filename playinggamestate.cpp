@@ -300,6 +300,11 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
         this->key_down[KEY_RD] = down;
         done = true;
         break;
+    case Qt::Key_PageDown:
+    case Qt::Key_PageUp:
+        // we don't need to record these keys, but we set done to true, so that it isn't processed by the QGraphicsView
+        done = true;
+        break;
     }
 
     return done;
