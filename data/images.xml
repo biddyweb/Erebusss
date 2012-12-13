@@ -45,9 +45,11 @@
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
 <image type="scenery" name="bed" filename="gfx/textures/scenery/bed.png"/>
+<image type="scenery" name="bigboulder" filename="gfx/textures/scenery/bigboulder.png"/>
 <image type="scenery" name="bloodstain" filename="gfx/textures/scenery/bloodstain.png"/>
 <image type="scenery" name="bloodstain2" filename="gfx/textures/scenery/bloodstain2.png"/>
 <image type="scenery" name="boulders" filename="gfx/textures/scenery/boulders.png"/>
+<image type="scenery" name="boulders2" filename="gfx/textures/scenery/boulders2.png"/>
 <image type="scenery" name="building" filename="gfx/textures/scenery/building.png"/>
 <image type="scenery" name="cabinet" filename="gfx/textures/scenery/cabinet.png"/>
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
