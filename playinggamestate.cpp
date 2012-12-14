@@ -300,6 +300,13 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
         this->key_down[KEY_RD] = down;
         done = true;
         break;
+    case Qt::Key_Space:
+    case Qt::Key_Enter:
+        done = true;
+        if( down ) {
+            this->playing_gamestate->actionCommand();
+        }
+        break;
     case Qt::Key_PageDown:
     case Qt::Key_PageUp:
         // we don't need to record these keys, but we set done to true, so that it isn't processed by the QGraphicsView
@@ -311,7 +318,7 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
 }
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
-    //qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
+    qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
     bool done = handleKey(event, true);
     if( !done ) {
         QGraphicsView::keyPressEvent(event);
@@ -2051,18 +2058,21 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
             QPushButton *zoomoutButton = new QPushButton("-");
             game_g->initButton(zoomoutButton);
+            zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
             zoomoutButton->setToolTip("Zoom out");
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             h_layout->addWidget(zoomoutButton);
 
             QPushButton *zoominButton = new QPushButton("+");
             game_g->initButton(zoominButton);
+            zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
             zoominButton->setToolTip("Zoom in");
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
 
             QPushButton *centreButton = new QPushButton("O");
             game_g->initButton(centreButton);
+            centreButton->setShortcut(QKeySequence(Qt::Key_C));
             centreButton->setToolTip("Centre view on your player's location");
             centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
@@ -4182,6 +4192,7 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     AnimatedObject *object = new AnimatedObject();
     object->setBounce( character->isBounce() );
     this->characterUpdateGraphics(character, object);
+    this->characterTurn(character, object);
     scene->addItem(object);
     object->setPos(character->getX(), character->getY());
     int character_size = std::max(object->getWidth(), object->getHeight());
@@ -4344,6 +4355,8 @@ void PlayingGamestate::closeSubWindow() {
         subwindow->deleteLater();
         if( n_stacked_widgets == 2 ) {
             game_g->getScreen()->setPaused(false);
+            this->view->setEnabled(true);
+            this->view->grabKeyboard();
         }
     }
 }
@@ -4356,6 +4369,8 @@ void PlayingGamestate::closeAllSubWindows() {
         subwindow->deleteLater();
     }
     game_g->getScreen()->setPaused(false);
+    this->view->setEnabled(true);
+    this->view->grabKeyboard();
 }
 
 void PlayingGamestate::quitGame() {
@@ -4441,44 +4456,53 @@ void PlayingGamestate::update() {
 
     // update due to keyboard input
     {
+        // n.b., we need to call setDirection() on the player, so that the direction still gets set even if the player can't move in that direction (e.g., blocked by NPC or scenery) - needed to we can still do Action on that NPC or scenery!
         bool moved = false;
         Vector2D dest = player->getPos();
         const float step = 0.25f;
         if( this->view->keyDown(MainGraphicsView::KEY_L) ) {
             moved = true;
             dest.x -= step;
+            this->player->setDirection(Vector2D(-1.0f, 0.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_R) ) {
             moved = true;
             dest.x += step;
+            this->player->setDirection(Vector2D(1.0f, 0.0f));
         }
         if( this->view->keyDown(MainGraphicsView::KEY_U) ) {
             moved = true;
             dest.y -= step;
+            this->player->setDirection(Vector2D(0.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_D) ) {
             moved = true;
             dest.y += step;
+            this->player->setDirection(Vector2D(0.0f, 1.0f));
         }
         if( this->view->keyDown(MainGraphicsView::KEY_LU) ) {
             moved = true;
             dest.x -= step;
             dest.y -= step;
+            this->player->setDirection(Vector2D(-1.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_RU) ) {
             moved = true;
             dest.x += step;
             dest.y -= step;
+            this->player->setDirection(Vector2D(1.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_LD) ) {
             moved = true;
             dest.x -= step;
             dest.y += step;
+            this->player->setDirection(Vector2D(-1.0f, 1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_RD) ) {
             moved = true;
             dest.x += step;
             dest.y += step;
+            this->player->setDirection(Vector2D(1.0f, 1.0f));
         }
         if( moved ) {
             this->requestPlayerMove(dest, NULL);
@@ -4613,8 +4637,9 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
     }
 }
 
-void PlayingGamestate::characterTurn(const Character *character, void *user_data, Vector2D dir) {
+void PlayingGamestate::characterTurn(const Character *character, void *user_data) {
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
+    Vector2D dir = character->getDirection();
     float angle = atan2(dir.y, dir.x);
     if( angle < 0.0f )
         angle += (float)(2.0*M_PI);
@@ -4642,7 +4667,8 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         }*/
         QPointF dir = new_pos - old_pos;
         Vector2D vdir(dir.x(), dir.y());
-        this->characterTurn(character, user_data, vdir);
+        character->setDirection(vdir);
+        //this->characterTurn(character, user_data, vdir);
 
         if( character == this->player ) {
             // handle popup text
@@ -4704,6 +4730,394 @@ void PlayingGamestate::characterDeath(Character *character, void *user_data) {
     qDebug("PlayingGamestate::mouseClick(%d, %d)", m_x, m_y);
 }*/
 
+void PlayingGamestate::clickedOnNPC(Character *character) {
+    // should be called when clicking, even if character is NULL
+    if( character != NULL ) {
+        float dist_from_player = (player->getPos() - character->getPos()).magnitude();
+        if( dist_from_player <= talk_range_c ) {
+            if( character->canTalk() ) {
+                stringstream message;
+                message << "<b>";
+                message << character->getName();
+                message << "</b>: ";
+                if( character->isInteractionCompleted() ) {
+                    message << character->getTalkOpeningInteractionComplete();
+                }
+                else if( !character->hasTalked() ) {
+                    message << character->getTalkOpeningInitial();
+                }
+                else {
+                    message << character->getTalkOpeningLater();
+                }
+                message << "<br/>";
+                character->setHasTalked(true);
+                for(;;) {
+                    vector<string> buttons;
+                    //vector<string> answers;
+                    vector<const TalkItem *> talk_items;
+                    if( !character->isHostile() ) {
+                        // being hostile means the character has become hostile whilst talking, so now the only thing left is to say Goodbye!
+                        for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                            const TalkItem *talk_item = &*iter;
+                            if( talk_item->while_not_done && character->isInteractionCompleted() ) {
+                                continue;
+                            }
+                            if( talk_item->objective && !character->canCompleteInteraction(this) ) {
+                                continue;
+                            }
+                            buttons.push_back(talk_item->question);
+                            //answers.push_back(talk_item->answer);
+                            talk_items.push_back(talk_item);
+                        }
+                }
+                    buttons.push_back("Goodbye");
+                    InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true);
+                    this->addWidget(dialog);
+                    dialog->scrollToBottom();
+                    int result = dialog->exec();
+                    this->closeSubWindow();
+                    ASSERT_LOGGER(result >= 0);
+                    ASSERT_LOGGER(result < buttons.size());
+                    if( result == buttons.size()-1 ) {
+                        break;
+                    }
+                    else {
+                        const TalkItem *talk_item = talk_items.at(result);
+                        message << "<b>";
+                        message << player->getName();
+                        message << "</b>: ";
+                        message << buttons.at(result);
+                        message << "<br/>";
+
+                        message << "<b>";
+                        message << character->getName();
+                        message << "</b>: ";
+                        //message << answers.at(result);
+                        message << talk_item->answer;
+                        message << "<br/>";
+                        if( talk_item->objective ) {
+                            character->completeInteraction(this);
+                        }
+                        if( talk_item->action.length() > 0 ) {
+                            if( talk_item->action == "SET_HOSTILE") {
+                                character->setHostile(true);
+                            }
+                            else {
+                                LOG("character %s, talk item %s has unknown action: %s\n", character->getName().c_str(), talk_item->question.c_str(), talk_item->action.c_str());
+                                ASSERT_LOGGER(false);
+                            }
+                        }
+                    }
+                }
+            }
+            else if( character->getShop().length() > 0 ) {
+                const Shop *shop = NULL;
+                for(vector<Shop *>::const_iterator iter = this->shopsBegin(); iter != this->shopsEnd() && shop==NULL; ++iter) {
+                    const Shop *this_shop = *iter;
+                    if( this_shop->getName() == character->getShop() ) {
+                        shop = this_shop;
+                    }
+                }
+                ASSERT_LOGGER(shop != NULL);
+                if( shop != NULL ) {
+                    LOG("visit shop: %s\n", shop->getName().c_str());
+                    new TradeWindow(this, shop->getItems(), shop->getCosts());
+                }
+            }
+        }
+    }
+    player->setTargetNPC(character); // n.b., if no NPC selected, we therefore set to NULL
+}
+
+bool PlayingGamestate::handleClickForItems(Vector2D dest) {
+    qDebug("PlayingGamestate::handleClickForItems");
+    bool done = false;
+    float min_dist = 0.0f;
+    const float click_tol_items_c = 0.0f;
+    // search for clicking on an item
+    vector<Item *> pickup_items;
+    for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        float icon_width = item->getIconWidth();
+        float dist_from_click = (dest - item->getPos()).magnitude();
+        float dist_from_player = (player->getPos() - item->getPos()).magnitude();
+        if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
+            done = true;
+            min_dist = dist_from_click;
+            pickup_items.push_back(item);
+        }
+    }
+    if( pickup_items.size() == 1 ) {
+        Item *picked_item = pickup_items.at(0);
+        this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
+        if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
+            this->playSound("coin");
+        }
+        player->pickupItem(picked_item);
+        this->checkQuestComplete();
+    }
+    else if( pickup_items.size() > 1 ) {
+        new ItemsPickerWindow(this, pickup_items);
+        game_g->getScreen()->setPaused(true);
+    }
+    return done;
+}
+
+bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys) {
+    bool done = false;
+    for(vector<Scenery *>::const_iterator iter = clicked_scenerys.begin(); iter != clicked_scenerys.end() && !done; ++iter) {
+        Scenery *scenery = *iter;
+        qDebug("clicked on scenery: %s", scenery->getName().c_str());
+
+        bool confirm_ok = true;
+        if( scenery->getConfirmText().length() > 0 ) {
+            confirm_ok = this->askQuestionDialog(scenery->getConfirmText());
+        }
+
+        if( confirm_ok ) {
+            if( scenery->getTrap() != NULL ) {
+                scenery->getTrap()->setOff(this, player);
+                scenery->setTrap(NULL);
+                if( player->isDead() ) {
+                    break;
+                }
+            }
+
+            bool is_locked = false;
+            if( scenery->isLocked() ) {
+                // can we unlock it?
+                is_locked = true;
+                string unlock_item_name = scenery->getUnlockItemName();
+                Item *item = NULL;
+                if( unlock_item_name.length() > 0 ) {
+                    qDebug("search for %s", unlock_item_name.c_str());
+                    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                        item = *iter;
+                        //LOG("    compare to: %s\n", item->getKey().c_str());
+                        if( item->getKey() == unlock_item_name ) {
+                            is_locked = false;
+                        }
+                    }
+                }
+                if( is_locked ) {
+                    done = true;
+                    if( !scenery->isLockedSilent() ) {
+                        this->playSound("lock");
+                    }
+                    if( scenery->getLockedText().length() == 0 ) {
+                        stringstream str;
+                        str << "The " << scenery->getName() << " is locked!";
+                        this->addTextEffect(str.str(), player->getPos(), 2000);
+                    }
+                    else if( scenery->getLockedText() != "none" ) {
+                        this->addTextEffect(scenery->getLockedText(), player->getPos(), 2000);
+                    }
+                }
+                else {
+                    ASSERT_LOGGER(item != NULL);
+                    stringstream str;
+                    if( scenery->getUnlockText().length() == 0 ) {
+                        str << "You unlock the " << scenery->getName() << ".";
+                    }
+                    else {
+                        str << scenery->getUnlockText();
+                    }
+                    this->addTextEffect(str.str(), player->getPos(), 2000);
+                    scenery->setLocked(false);
+                    qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
+                    if( scenery->isLockedUsedUp() ) {
+                        player->takeItem(item);
+                        delete item;
+                        item = NULL;
+                    }
+                    player->addXP(this, scenery->getUnlockXP());
+                }
+            }
+
+            if( !is_locked ) {
+                if( scenery->getNItems() > 0 ) {
+                    done = true;
+                    bool all_gold = true;
+                    for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
+                        Item *item = *iter;
+                        if( item->getType() != ITEMTYPE_CURRENCY ) {
+                            all_gold = false;
+                        }
+                        c_location->addItem(item, player->getX(), player->getY());
+                    }
+                    scenery->eraseAllItems();
+                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
+                }
+
+                if( scenery->canBeOpened() && !scenery->isOpened() ) {
+                    done = true;
+                    this->playSound("container");
+                    scenery->setOpened(true);
+                }
+
+                if( scenery->isDoor() ) {
+                    done = true;
+                    qDebug("clicked on a door");
+                    // open door
+                    if( scenery->getName() == "Door" ) {
+                        this->playSound("door");
+                    }
+                    this->addTextEffect("Opening door...", scenery->getPos(), 1000);
+                    qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
+                    c_location->removeScenery(scenery);
+                    delete scenery;
+                    scenery = NULL;
+                    *ignore_scenery = NULL;
+                }
+                else if( scenery->isExit() ) {
+                    done = true;
+                    LOG("clicked on an exit\n");
+                    // exit
+                    if( scenery->getName() == "Door" ) {
+                        this->playSound("door");
+                    }
+                    this->closeSubWindow(); // just in case
+                    this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
+                    if( this->getQuest()->isCompleted() ) {
+                        this->getQuest()->getQuestObjective()->completeQuest(this);
+                        /*int gold = this->getQuest()->getQuestObjective()->getGold();
+                        this->player->addGold(gold);*/
+                        string completed_text = this->getQuest()->getCompletedText();
+                        completed_text = convertToHTML(completed_text);
+                        this->showInfoDialog(completed_text);
+                    }
+                    new CampaignWindow(this);
+                    game_g->getScreen()->setPaused(true);
+                    this->player->restoreHealth();
+                    this->player->expireProfileEffects();
+                }
+                else if( scenery->getExitLocation().length() > 0 ) {
+                    done = true;
+                    if( scenery->getName() == "Door" ) {
+                        this->playSound("door");
+                    }
+                    LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
+                    Location *new_location = quest->findLocation(scenery->getExitLocation());
+                    ASSERT_LOGGER(new_location != NULL);
+                    if( new_location != NULL ) {
+#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
+                        this->autoSave();
+#endif
+                        this->moveToLocation(new_location, scenery->getExitLocationPos());
+                        *move = false;
+                    }
+                }
+                else if( scenery->getInteractType().length() > 0 ) {
+                    done = true;
+                    LOG("interact_type: %s\n", scenery->getInteractType().c_str());
+                    string dialog_text;
+                    vector<string> options = scenery->getInteractionText(&dialog_text);
+                    if( options.size() == 0 ) {
+                        // auto-interact
+                        scenery->interact(this, 0);
+                    }
+                    else {
+                        //if( this->askQuestionDialog(dialog_text) ) {
+                        //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
+                        InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false);
+                        this->addWidget(dialog);
+                        int result = dialog->exec();
+                        LOG("scenery iteraction dialog returns %d\n", result);
+                        this->closeSubWindow();
+                        if( result != options.size()-1 ) {
+                            scenery->interact(this, result);
+                        }
+                    }
+                }
+                else if( scenery->getDescription().length() > 0 ) {
+                    done = true;
+                    string description = scenery->getDescription();
+                    description = convertToHTML(description);
+                    this->showInfoDialog(description);
+                }
+            }
+        }
+    }
+    return done;
+}
+
+bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest) {
+    // search for clicking on a scenery
+    const float click_tol_scenery_c = 0.0f;
+    vector<Scenery *> clicked_scenerys;
+    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+        Scenery *scenery = *iter;
+        Vector2D scenery_pos = scenery->getPos();
+        float scenery_width = scenery->getWidth();
+        float scenery_height = scenery->getHeight();
+        float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
+        //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
+        if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
+            // clicked on or near this scenery
+            *ignore_scenery = scenery;
+        }
+        if( dist_from_click <= click_tol_scenery_c ) {
+            // clicked on this scenery
+            float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
+            //LOG("    player_dist : %f", player_dist);
+            if( player_dist <= npc_radius_c + 0.5f ) {
+                clicked_scenerys.push_back(scenery);
+            }
+        }
+    }
+
+    bool done = clickedOnScenerys(move, ignore_scenery, clicked_scenerys);
+    return done;
+}
+
+void PlayingGamestate::actionCommand() {
+    qDebug("PlayingGamestate::actionCommand()");
+    if( game_g->getScreen()->isPaused() ) {
+        game_g->getScreen()->setPaused(false);
+    }
+
+    if( player != NULL && !player->isDead() && !player->isParalysed() ) {
+        bool done = false;
+        Vector2D forward_dest = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
+
+        // search for NPC
+        {
+            float min_dist = 0.0f;
+            Character *target_npc = NULL;
+            for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+                Character *character = *iter;
+                if( character == player )
+                    continue;
+                if( !character->isVisible() )
+                    continue;
+                float dist_from_click = (forward_dest - character->getPos()).magnitude();
+                if( dist_from_click <= npc_radius_c ) {
+                    if( target_npc == NULL || dist_from_click < min_dist ) {
+                        // clicked on this character
+                        done = true;
+                        target_npc = character;
+                        min_dist = dist_from_click;
+                    }
+                }
+            }
+            this->clickedOnNPC(target_npc); // call even if target_npc is NULL
+        }
+
+        if( !done ) {
+            bool move = false;
+            Scenery *ignore_scenery = NULL;
+            done = handleClickForScenerys(&move, &ignore_scenery, forward_dest);
+        }
+
+        if( !done ) {
+            // We do items last, unlike with mouse click, so that the player can still do other things even if standing over items.
+            // If the player wants to force picking up items, they can do that via a separate shortcut
+            done = handleClickForItems( player->getPos() );
+        }
+
+    }
+}
+
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     if( game_g->getScreen()->isPaused() ) {
         game_g->getScreen()->setPaused(false);
@@ -4719,374 +5133,48 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         //const float click_tol_c = 0.0f;
         //const float click_tol_c = 0.5f;
         //const float click_tol_npc_c = 0.25f;
-        const float click_tol_npc_c = 0.0f;
-        const float click_tol_items_c = 0.0f;
-        const float click_tol_scenery_c = 0.0f;
 
         // search for clicking on an NPC
-        float min_dist = 0.0f;
-        Character *target_npc = NULL;
-        for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
-            Character *character = *iter;
-            if( character == player )
-                continue;
-            if( !character->isVisible() )
-                continue;
-            /*float dist_from_click = (dest - character->getPos()).magnitude();
-            if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
-                if( target_npc == NULL || dist_from_click < min_dist ) {*/
-            /*if( target_npc == NULL || dist_from_click < min_dist ) {
+        {
+            const float click_tol_npc_c = 0.0f;
+            float min_dist = 0.0f;
+            Character *target_npc = NULL;
+            for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+                Character *character = *iter;
+                if( character == player )
+                    continue;
+                if( !character->isVisible() )
+                    continue;
+                /*float dist_from_click = (dest - character->getPos()).magnitude();
+                if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
+                    if( target_npc == NULL || dist_from_click < min_dist ) {*/
+                /*if( target_npc == NULL || dist_from_click < min_dist ) {
+                    AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
+                    if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {*/
+
+                /* For collision detection and so on, we treat the characters as being a circle of radius npc_radius_c, centred on the character position.
+                 * But for clicking on an NPC, we want to allow the user to be able to click on the visible graphical area (which may be taller, for example).
+                 */
                 AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
-                if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {*/
-
-            /* For collision detection and so on, we treat the characters as being a circle of radius npc_radius_c, centred on the character position.
-             * But for clicking on an NPC, we want to allow the user to be able to click on the visible graphical area (which may be taller, for example).
-             */
-            AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
-            if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {
-                // clicked on this character
-                {
-                    done = true;
-                    target_npc = character;
-                    min_dist = 0.0f;
-                    float dist_from_player = (player->getPos() - character->getPos()).magnitude();
-                    if( dist_from_player <= talk_range_c ) {
-                        if( target_npc->canTalk() ) {
-                            stringstream message;
-                            message << "<b>";
-                            message << character->getName();
-                            message << "</b>: ";
-                            if( character->isInteractionCompleted() ) {
-                                message << character->getTalkOpeningInteractionComplete();
-                            }
-                            else if( !character->hasTalked() ) {
-                                message << character->getTalkOpeningInitial();
-                            }
-                            else {
-                                message << character->getTalkOpeningLater();
-                            }
-                            message << "<br/>";
-                            character->setHasTalked(true);
-                            for(;;) {
-                                vector<string> buttons;
-                                //vector<string> answers;
-                                vector<const TalkItem *> talk_items;
-                                if( !character->isHostile() ) {
-                                    // being hostile means the character has become hostile whilst talking, so now the only thing left is to say Goodbye!
-                                    for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
-                                        const TalkItem *talk_item = &*iter;
-                                        if( talk_item->while_not_done && character->isInteractionCompleted() ) {
-                                            continue;
-                                        }
-                                        if( talk_item->objective && !character->canCompleteInteraction(this) ) {
-                                            continue;
-                                        }
-                                        buttons.push_back(talk_item->question);
-                                        //answers.push_back(talk_item->answer);
-                                        talk_items.push_back(talk_item);
-                                    }
-                            }
-                                buttons.push_back("Goodbye");
-                                InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true);
-                                this->addWidget(dialog);
-                                dialog->scrollToBottom();
-                                int result = dialog->exec();
-                                this->closeSubWindow();
-                                ASSERT_LOGGER(result >= 0);
-                                ASSERT_LOGGER(result < buttons.size());
-                                if( result == buttons.size()-1 ) {
-                                    break;
-                                }
-                                else {
-                                    const TalkItem *talk_item = talk_items.at(result);
-                                    message << "<b>";
-                                    message << player->getName();
-                                    message << "</b>: ";
-                                    message << buttons.at(result);
-                                    message << "<br/>";
-
-                                    message << "<b>";
-                                    message << character->getName();
-                                    message << "</b>: ";
-                                    //message << answers.at(result);
-                                    message << talk_item->answer;
-                                    message << "<br/>";
-                                    if( talk_item->objective ) {
-                                        character->completeInteraction(this);
-                                    }
-                                    if( talk_item->action.length() > 0 ) {
-                                        if( talk_item->action == "SET_HOSTILE") {
-                                            character->setHostile(true);
-                                        }
-                                        else {
-                                            LOG("character %s, talk item %s has unknown action: %s\n", character->getName().c_str(), talk_item->question.c_str(), talk_item->action.c_str());
-                                            ASSERT_LOGGER(false);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else if( character->getShop().length() > 0 ) {
-                            const Shop *shop = NULL;
-                            for(vector<Shop *>::const_iterator iter = this->shopsBegin(); iter != this->shopsEnd() && shop==NULL; ++iter) {
-                                const Shop *this_shop = *iter;
-                                if( this_shop->getName() == character->getShop() ) {
-                                    shop = this_shop;
-                                }
-                            }
-                            ASSERT_LOGGER(shop != NULL);
-                            if( shop != NULL ) {
-                                LOG("visit shop: %s\n", shop->getName().c_str());
-                                new TradeWindow(this, shop->getItems(), shop->getCosts());
-                            }
-                        }
+                if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {
+                    // clicked on this character
+                    {
+                        done = true;
+                        target_npc = character;
+                        min_dist = 0.0f;
                     }
                 }
             }
+            this->clickedOnNPC(target_npc); // call even if target_npc is NULL
         }
-        player->setTargetNPC(target_npc); // n.b., if no NPC selected, we therefore set to NULL
 
         if( !done ) {
-            // search for clicking on an item
-            vector<Item *> pickup_items;
-            //Item *picked_item = NULL;
-            for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
-                Item *item = *iter;
-                float icon_width = item->getIconWidth();
-                float dist_from_click = (dest - item->getPos()).magnitude();
-                float dist_from_player = (player->getPos() - item->getPos()).magnitude();
-                if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
-                    /*if( picked_item == NULL || dist_from_click < min_dist ) {
-                        done = true;
-                        picked_item = item;
-                        min_dist = dist_from_click;
-                    }*/
-                    done = true;
-                    min_dist = dist_from_click;
-                    pickup_items.push_back(item);
-                }
-            }
-            /*if( picked_item != NULL ) {
-                this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
-                if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
-                    this->playSound("coin");
-                }
-                player->pickupItem(picked_item);
-                this->checkQuestComplete();
-            }*/
-            if( pickup_items.size() == 1 ) {
-                Item *picked_item = pickup_items.at(0);
-                this->addTextEffect(picked_item->getName(), player->getPos(), 2000);
-                if( picked_item->getType() == ITEMTYPE_CURRENCY ) {
-                    this->playSound("coin");
-                }
-                player->pickupItem(picked_item);
-                this->checkQuestComplete();
-            }
-            else if( pickup_items.size() > 1 ) {
-                new ItemsPickerWindow(this, pickup_items);
-                game_g->getScreen()->setPaused(true);
-            }
+            done = handleClickForItems(dest);
         }
 
         Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
         if( !done ) {
-            // search for clicking on a scenery
-            vector<Scenery *> clicked_scenerys;
-            for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
-                Scenery *scenery = *iter;
-                Vector2D scenery_pos = scenery->getPos();
-                float scenery_width = scenery->getWidth();
-                float scenery_height = scenery->getHeight();
-                float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
-                //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
-                if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
-                    // clicked on or near this scenery
-                    ignore_scenery = scenery;
-                }
-                if( dist_from_click <= click_tol_scenery_c ) {
-                    // clicked on this scenery
-                    float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
-                    //LOG("    player_dist : %f", player_dist);
-                    if( player_dist <= npc_radius_c + 0.5f ) {
-                        clicked_scenerys.push_back(scenery);
-                    }
-                }
-            }
-
-            for(vector<Scenery *>::iterator iter = clicked_scenerys.begin(); iter != clicked_scenerys.end() && !done; ++iter) {
-                Scenery *scenery = *iter;
-                qDebug("clicked on scenery: %s", scenery->getName().c_str());
-
-                bool confirm_ok = true;
-                if( scenery->getConfirmText().length() > 0 ) {
-                    confirm_ok = this->askQuestionDialog(scenery->getConfirmText());
-                }
-
-                if( confirm_ok ) {
-                    if( scenery->getTrap() != NULL ) {
-                        scenery->getTrap()->setOff(this, player);
-                        scenery->setTrap(NULL);
-                        if( player->isDead() ) {
-                            break;
-                        }
-                    }
-
-                    bool is_locked = false;
-                    if( scenery->isLocked() ) {
-                        // can we unlock it?
-                        is_locked = true;
-                        string unlock_item_name = scenery->getUnlockItemName();
-                        Item *item = NULL;
-                        if( unlock_item_name.length() > 0 ) {
-                            qDebug("search for %s", unlock_item_name.c_str());
-                            for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                                item = *iter;
-                                //LOG("    compare to: %s\n", item->getKey().c_str());
-                                if( item->getKey() == unlock_item_name ) {
-                                    is_locked = false;
-                                }
-                            }
-                        }
-                        if( is_locked ) {
-                            done = true;
-                            if( !scenery->isLockedSilent() ) {
-                                this->playSound("lock");
-                            }
-                            if( scenery->getLockedText().length() == 0 ) {
-                                stringstream str;
-                                str << "The " << scenery->getName() << " is locked!";
-                                this->addTextEffect(str.str(), player->getPos(), 2000);
-                            }
-                            else if( scenery->getLockedText() != "none" ) {
-                                this->addTextEffect(scenery->getLockedText(), player->getPos(), 2000);
-                            }
-                        }
-                        else {
-                            ASSERT_LOGGER(item != NULL);
-                            stringstream str;
-                            if( scenery->getUnlockText().length() == 0 ) {
-                                str << "You unlock the " << scenery->getName() << ".";
-                            }
-                            else {
-                                str << scenery->getUnlockText();
-                            }
-                            this->addTextEffect(str.str(), player->getPos(), 2000);
-                            scenery->setLocked(false);
-                            qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
-                            if( scenery->isLockedUsedUp() ) {
-                                player->takeItem(item);
-                                delete item;
-                                item = NULL;
-                            }
-                            player->addXP(this, scenery->getUnlockXP());
-                        }
-                    }
-
-                    if( !is_locked ) {
-                        if( scenery->getNItems() > 0 ) {
-                            done = true;
-                            bool all_gold = true;
-                            for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
-                                Item *item = *iter;
-                                if( item->getType() != ITEMTYPE_CURRENCY ) {
-                                    all_gold = false;
-                                }
-                                c_location->addItem(item, player->getX(), player->getY());
-                            }
-                            scenery->eraseAllItems();
-                            this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
-                        }
-
-                        if( scenery->canBeOpened() && !scenery->isOpened() ) {
-                            done = true;
-                            this->playSound("container");
-                            scenery->setOpened(true);
-                        }
-
-                        if( scenery->isDoor() ) {
-                            done = true;
-                            qDebug("clicked on a door");
-                            // open door
-                            if( scenery->getName() == "Door" ) {
-                                this->playSound("door");
-                            }
-                            this->addTextEffect("Opening door...", scenery->getPos(), 1000);
-                            qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
-                            c_location->removeScenery(scenery);
-                            delete scenery;
-                            scenery = NULL;
-                            ignore_scenery = NULL;
-                        }
-                        else if( scenery->isExit() ) {
-                            done = true;
-                            LOG("clicked on an exit\n");
-                            // exit
-                            if( scenery->getName() == "Door" ) {
-                                this->playSound("door");
-                            }
-                            this->closeSubWindow(); // just in case
-                            this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
-                            if( this->getQuest()->isCompleted() ) {
-                                this->getQuest()->getQuestObjective()->completeQuest(this);
-                                /*int gold = this->getQuest()->getQuestObjective()->getGold();
-                                this->player->addGold(gold);*/
-                                string completed_text = this->getQuest()->getCompletedText();
-                                completed_text = convertToHTML(completed_text);
-                                this->showInfoDialog(completed_text);
-                            }
-                            new CampaignWindow(this);
-                            game_g->getScreen()->setPaused(true);
-                            this->player->restoreHealth();
-                            this->player->expireProfileEffects();
-                        }
-                        else if( scenery->getExitLocation().length() > 0 ) {
-                            done = true;
-                            if( scenery->getName() == "Door" ) {
-                                this->playSound("door");
-                            }
-                            LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
-                            Location *new_location = quest->findLocation(scenery->getExitLocation());
-                            ASSERT_LOGGER(new_location != NULL);
-                            if( new_location != NULL ) {
-#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
-                                this->autoSave();
-#endif
-                                this->moveToLocation(new_location, scenery->getExitLocationPos());
-                                move = false;
-                            }
-                        }
-                        else if( scenery->getInteractType().length() > 0 ) {
-                            done = true;
-                            LOG("interact_type: %s\n", scenery->getInteractType().c_str());
-                            string dialog_text;
-                            vector<string> options = scenery->getInteractionText(&dialog_text);
-                            if( options.size() == 0 ) {
-                                // auto-interact
-                                scenery->interact(this, 0);
-                            }
-                            else {
-                                //if( this->askQuestionDialog(dialog_text) ) {
-                                //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
-                                InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false);
-                                this->addWidget(dialog);
-                                int result = dialog->exec();
-                                LOG("scenery iteraction dialog returns %d\n", result);
-                                this->closeSubWindow();
-                                if( result != options.size()-1 ) {
-                                    scenery->interact(this, result);
-                                }
-                            }
-                        }
-                        else if( scenery->getDescription().length() > 0 ) {
-                            done = true;
-                            string description = scenery->getDescription();
-                            description = convertToHTML(description);
-                            this->showInfoDialog(description);
-                        }
-                    }
-                }
-            }
+            done = handleClickForScenerys(&move, &ignore_scenery, dest);
         }
 
         if( move && !player->isDead() ) {
@@ -5573,6 +5661,8 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 void PlayingGamestate::addWidget(QWidget *widget) {
     this->main_stacked_widget->addWidget(widget);
     this->main_stacked_widget->setCurrentWidget(widget);
+    this->view->setEnabled(false);
+    this->view->releaseKeyboard();
 }
 
 void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int duration_ms) {

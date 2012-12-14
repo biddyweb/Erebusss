@@ -195,7 +195,7 @@ public:
 class CharacterListener {
 public:
     virtual void characterUpdateGraphics(const Character *character, void *user_data)=0;
-    virtual void characterTurn(const Character *character, void *user_data, Vector2D dir)=0;
+    virtual void characterTurn(const Character *character, void *user_data)=0;
     virtual void characterMoved(Character *character, void *user_data)=0;
     virtual void characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart)=0;
     virtual void characterDeath(Character *character, void *user_data)=0;
@@ -331,6 +331,7 @@ class Character {
     bool is_dead;
     int time_of_death_ms; // not saved
     Vector2D pos;
+    Vector2D direction;
     bool is_visible; // not saved // for NPCs: whether player and NPC can see each other
     bool has_path; // not saved
     vector<Vector2D> path; // not saved
@@ -426,6 +427,10 @@ public:
     }
     Vector2D getPos() const {
         return this->pos;
+    }
+    void setDirection(Vector2D dir);
+    Vector2D getDirection() const {
+        return this->direction;
     }
     string getName() const {
         return this->name;

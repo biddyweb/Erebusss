@@ -102,7 +102,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     animation_name(animation_name), static_image(false), bounce(false),
     location(NULL), listener(NULL), listener_data(NULL),
-    is_dead(false), time_of_death_ms(0), is_visible(false),
+    is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false),
@@ -488,10 +488,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     string anim = is_ranged ? "ranged" : "attack";
                                     this->listener->characterSetAnimation(this, this->listener_data, anim, true);
                                     Vector2D dir = target_npc->getPos() - this->getPos();
-                                    if( dist > 0.0f ) {
+                                    /*if( dist > 0.0f ) {
                                         dir.normalise();
+                                        this->direction = dir;
                                         this->listener->characterTurn(this, this->listener_data, dir);
-                                    }
+                                    }*/
+                                    this->setDirection(dir);
                                 }
                                 playing_gamestate->playSound("swing");
                             }
@@ -712,6 +714,14 @@ bool Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int de
         this->kill(playing_gamestate);
     }
     return (decrease > 0);
+}
+
+void Character::setDirection(Vector2D dir) {
+    if( dir.magnitude() > 0.0f ) {
+        dir.normalise();
+        this->direction = dir;
+        this->listener->characterTurn(this, this->listener_data);
+    }
 }
 
 void Character::kill(const PlayingGamestate *playing_gamestate) {

@@ -399,6 +399,10 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
         this->saveGame("autosave.xml");
     }
     void requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery);
+    void clickedOnNPC(Character *character);
+    bool handleClickForItems(Vector2D dest);
+    bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
+    bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest);
 
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
@@ -438,7 +442,7 @@ public:
     void checkQuestComplete();
 
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
-    virtual void characterTurn(const Character *character, void *user_data, Vector2D dir);
+    virtual void characterTurn(const Character *character, void *user_data);
     virtual void characterMoved(Character *character, void *user_data);
     virtual void characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart);
     virtual void characterDeath(Character *character, void *user_data);
@@ -452,6 +456,7 @@ public:
 
     virtual void locationAddCharacter(const Location *location, Character *character);
 
+    void actionCommand();
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
