@@ -1250,7 +1250,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         layout->addLayout(h_layout);
 
         QLabel *label = new QLabel("What would you like to buy?");
-        label->setWordWrap(true);
+        //label->setWordWrap(true);
         h_layout->addWidget(label);
 
         goldLabel = new QLabel("");
