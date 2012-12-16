@@ -1323,6 +1323,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
             list_item->setIcon(icon);
             list->addItem(list_item);
         }
+        connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(clickedInfo()));
     }
 
     {
