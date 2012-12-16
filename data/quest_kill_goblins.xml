@@ -85,6 +85,7 @@
 </floorregion>
 
 <scenery name="Rock" image_name="rock1" x="8.5" y="7.1" size="0.2" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="7.75" y="9.0" size="0.5" draw_type="background"/>
 
 <npc name="Goblin" template="Goblin" x="8.0" y="8.0">
     <item template="Leather Armour"/>
@@ -111,6 +112,9 @@
 
     <floorregion shape="rect" rect_x="12.0" rect_y="10.1" rect_w="0.5" rect_h="0.8" />
 <floorregion shape="rect" rect_x="12.5" rect_y="7.5" rect_w="2.0" rect_h="3.5" />
+
+<scenery name="Campfire" image_name="campfire" x="14.0" y="8.5" size="0.8" blocking="true"/>
+<scenery name="Bones" image_name="bones" x="13.5" y="9.5" size="0.5" draw_type="background"/>
 
     <floorregion shape="rect" rect_x="10.5" rect_y="12.6" rect_w="0.5" rect_h="0.8" />
 <floorregion shape="rect" rect_x="7.5" rect_y="11.5" rect_w="3.0" rect_h="3.0" />

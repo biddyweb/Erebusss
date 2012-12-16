@@ -48,6 +48,7 @@
 <image type="scenery" name="bigboulder" filename="gfx/textures/scenery/bigboulder.png"/>
 <image type="scenery" name="bloodstain" filename="gfx/textures/scenery/bloodstain.png"/>
 <image type="scenery" name="bloodstain2" filename="gfx/textures/scenery/bloodstain2.png"/>
+<image type="scenery" name="bones" filename="gfx/textures/scenery/bones.png"/>
 <image type="scenery" name="boulders" filename="gfx/textures/scenery/boulders.png"/>
 <image type="scenery" name="boulders2" filename="gfx/textures/scenery/boulders2.png"/>
 <image type="scenery" name="building" filename="gfx/textures/scenery/building.png"/>
@@ -59,6 +60,7 @@
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
 </image>
+<image type="scenery" name="grass" filename="gfx/textures/scenery/grass.png"/>
 <image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
 <image type="scenery" name="hut" filename="gfx/textures/scenery/hut.png"/>
 <image type="scenery" name="painting_sword" filename="gfx/textures/scenery/scenery_painting_sword.png"/>
@@ -66,6 +68,7 @@
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>
+<image type="scenery" name="skulls" filename="gfx/textures/scenery/skulls.png"/>
 <image type="scenery" name="stairsdown_outdoors" filename="gfx/textures/scenery/stairsdown_outdoors.png"/>
 <image type="scenery" name="stairsdown_indoors" filename="gfx/textures/scenery/stairsdown_indoors.png"/>
 <image type="scenery" name="stairsup_indoors" filename="gfx/textures/scenery/stairsup_indoors.png"/>
@@ -75,7 +78,10 @@
 <image type="scenery" name="tent" filename="gfx/textures/scenery/tent.png"/>
 <image type="scenery" name="throne" filename="gfx/textures/scenery/throne.png"/>
 <image type="scenery" name="tomb" filename="gfx/textures/scenery/tomb.png"/>
-<image type="scenery" name="tree2" filename="gfx/textures/scenery/tree2.png" width="144" height="130" stride_x="144" expected_width="576">
+<image type="scenery" name="tree2" filename="gfx/textures/scenery/tree2.png" width="72" height="65" stride_x="72" expected_width="288">
+    <animation name="" start="0" length="4" type="loop"/>
+</image>
+<image type="scenery" name="tree3" filename="gfx/textures/scenery/tree3.png" width="72" height="65" stride_x="72" expected_width="288">
     <animation name="" start="0" length="4" type="loop"/>
 </image>
 
