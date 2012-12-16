@@ -274,6 +274,9 @@ This journal seems to be a record of grisly torture that took place in this room
     </item>
 </scenery>
 
+<scenery name="Skulls" image_name="skulls" x="53.5" y="11.5" size="0.5" draw_type="background"/>
+<scenery name="Bones" image_name="bones" x="51.0" y="13.5" size="0.5" draw_type="background"/>
+
 <!--exit to next location-->
 
 <floorregion shape="rect" rect_x="48.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
@@ -504,11 +507,11 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <scenery name="Tree" image_name="tree2" x="36.0" y="15.0" size="1.0"/>
 
-<scenery name="Plant" image_name="plant" x="29.75" y="13.25" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="29.75" y="13.25" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="32.0" y="15.25" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="32.0" y="15.25" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="34.0" y="14.5" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="34.0" y="14.5" size="0.5" draw_type="background"/>
 
 <item template="Wyvern Egg" x="32.25" y="15.25"/>
 
@@ -882,6 +885,8 @@ Experiments.
 
 <scenery name="Stairs" image_name="stairsdown_indoors" x="37.5" y="29.5" size="2.0" blocking="true" exit_location="level_6" exit_location_x="38.5" exit_location_y="14.0"/>
 
+<scenery name="Skulls" image_name="skulls" x="39.5" y="27.5" size="0.5" draw_type="background"/>
+
 <!--time travel portals-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="23.0" rect_w="1.0" rect_h="5.0"/>
@@ -919,10 +924,20 @@ The journal claims that each of the nearby teleporters is linked to a different 
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
 </item>-->
 
-<scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="1.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
+<scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
     locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true" locked_text="The teleporter does not seem to function!" locked_used_up="true"/>
 
 <scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true"/>
+
+<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="25.0" size="1.0" blocking="true"/>
+
+<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="27.0" size="1.0" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="25.9" y="36.0" size="0.58" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders2" x="21.1" y="21.0" size="0.58" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="22.8" y="42.3" size="0.58" blocking="true"/>
 
 <scenery name="Armourer" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0"/>
 
@@ -947,6 +962,30 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 <scenery name="Tree" image_name="tree2" x="27.0" y="33.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="22.5" y="32.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="18.0" y="27.6" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="30.9" y="19.8" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="20.6" y="34.9" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="23.3" y="37.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="22.7" y="40.1" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="18.4" y="40.8" size="3.0"/>
+
+<scenery name="Grass" image_name="grass" x="36.5" y="28.7" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="20.5" y="31.8" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="25.0" y="34.2" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="31.4" y="36.7" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="38.5" y="31.4" size="1.0" draw_type="background"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="22.0" y="23.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1112,7 +1151,17 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="1.0"/>
 
-<floorregion shape="rect" rect_x="4.0" rect_y="16.0" rect_w="2.0" rect_h="10.0" />
+<scenery name="Bones" image_name="bones" x="5.5" y="27.5" size="0.5" draw_type="background"/>
+
+<scenery name="Plant" image_name="plant" x="3.25" y="28.5" size="0.5" draw_type="background"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="5.0" y="16.0" />
+    <floorregion_point x="4.0" y="17.0" />
+    <floorregion_point x="4.0" y="26.0" />
+    <floorregion_point x="6.0" y="26.0" />
+    <floorregion_point x="6.0" y="16.0" />
+</floorregion>
 
 <npc name="Orc" template="Orc" x="4.5" y="17.0">
     <item template="Chain Mail Armour"/>
@@ -1137,7 +1186,8 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <gold amount="25"/>
 </scenery>
 
-<scenery name="Fire" image_name="campfire" x="17.0" y="24.0" w="1.0" h="1.0"/>
+<scenery name="Campfire" image_name="campfire" x="17.0" y="24.0" size="0.8" blocking="true"/>
+<scenery name="Bones" image_name="bones" x="18.5" y="23.5" size="0.5" draw_type="background"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="25.0" />
@@ -1189,6 +1239,10 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <scenery name="Door" image_name="door_wood" x="33.0" y="25.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Orc Warlord's Key" unlock_xp="80"
     />
+
+<scenery name="Bones" image_name="bones" x="34.5" y="27.0" size="0.5" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="36.5" y="25.5" size="0.5" draw_type="background"/>
+<scenery name="Rock" image_name="rock1" x="36.6" y="27.1" size="0.2" draw_type="background"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="36.0" y="25.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1316,16 +1370,16 @@ Every so often, one of the prisoners was taken away, never to be returned.
 
 <scenery name="Throne" image_name="throne" x="41.5" y="17.5" size="0.8" blocking="true"/>
 
-<npc name="Orc Warlord" template="Orc Champion" x="43.0" y="17.5">
+<npc name="Orc Warlord" template="Orc Champion" x="44.0" y="19.0">
     <item name="Orc Warlord's Key" image_name="key" icon_width="0.5" weight="0"/>
     <item template="Chain Mail Armour"/>
 </npc>
 
-<npc name="Orc Champion" template="Orc Champion" x="44.0" y="19.0">
+<npc name="Orc Champion" template="Orc Champion" x="43.0" y="18.5">
     <item template="Chain Mail Armour"/>
 </npc>
 
-<npc name="Orc" template="Orc" x="40.0" y="15.0">
+<npc name="Orc" template="Orc" x="43.0" y="17.5">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
@@ -1494,6 +1548,8 @@ Inside this casket are a collection of bones.
 
 <!--<player_start x="38.5" y="14.0"/>-->
 
+<scenery name="Bones" image_name="bones" x="35.5" y="14.0" size="0.5" draw_type="background"/>
+
 <floorregion shape="rect" rect_x="32.5" rect_y="15.5" rect_w="2.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="32.5" rect_y="16.5" rect_w="1.0" rect_h="1.5"/>
 <floorregion shape="rect" rect_x="33.5" rect_y="17.0" rect_w="6.5" rect_h="1.0"/>
@@ -1571,11 +1627,15 @@ A small bronze statuette of a humanoid bull-like creature.
 
 <scenery name="Tree" image_name="tree2" x="17.5" y="11.0" size="1.0"/>
 
-<scenery name="Plant" image_name="plant" x="21.1" y="12.25" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="21.1" y="12.25" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="20.8" y="18.0" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="20.8" y="18.0" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="17.3" y="17.5" size="0.5"/>
+<scenery name="Plant" image_name="plant" x="17.3" y="17.5" size="0.5" draw_type="background"/>
+
+<scenery name="Bones" image_name="bones" x="20.5" y="13.5" size="0.5" draw_type="background"/>
+
+<scenery name="Skulls" image_name="skulls" x="18.1" y="14.9" size="0.5" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
     <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
