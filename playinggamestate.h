@@ -456,7 +456,7 @@ public:
 
     virtual void locationAddCharacter(const Location *location, Character *character);
 
-    void actionCommand();
+    void actionCommand(bool pickup_only);
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);

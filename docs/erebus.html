@@ -27,6 +27,7 @@
 
 <p><b>Features:</b><ul>
 <li>Classic point-n-click style RPG, with dungeons to explore, enemies to fight, NPCs to talk to, sub-quests to complete, scenery to interact with, weapons, treasure and other items to find.</li>
+<li>Also supports Rogue-like keyboard controls.</li>
 <li>Multiple quests (currently only two, more will be added as development progresses!)</li>
 <li>Choice of starting characters (currently Barbarian, Elf, Halfling, Ranger, Warrior).</li>
 <li>Start straight into the action - none of this "For your first quest, please find your next door neighbour's pet cat".</li>
@@ -255,10 +256,23 @@ them. Note that at the moment you don't get a choice if there is more than one
 (see below).</li>
 </ul></p>
 
-<p>There are further controls and information that can be accessed from the
-buttons on the left hand side:</p>
+<p>Erebus can also be controlled via a keyboard:<ul>
+<li><b>Move</b> with the arrow keys, or W/A/S/D (use combinations to move
+diagonally), or the numeric keypad.</li>
+<li><b>Action</b> - Press space or enter for a generic action, which will be:
+attack or talk to an NPC in front of you (or otherwise attack the nearest enemy
+if you are armed with a ranged weapon); open a door in front of you; interact
+with scenery (or open a container) in front of you, or picking up items at your
+feet.</li>
+<li><b>Force pick up</b> - You can also pick up items at your feet by pressing
+"U" (normally pressing space/enter will work, but not if there's also something
+in front to interact with).</li>
+</ul></p>
 
-<p><a name="stats"><b>Stats</b></p>
+<p>There are further controls and information that can be accessed from the
+buttons on the left hand side (or via a keyboard shortcut):</p>
+
+<p><a name="stats"><b>Stats (F1)</b></p>
 
 <p>This shows your characters current statistics, which indicate how good you
 are at various activities, as well as your current health, and experience:<ul>
@@ -285,7 +299,7 @@ Level. You receive XP by various actions, such as killing enemies, unlocking
 doors, completing sub-quests.</li>
 </ul></p>
 
-<p><a name="items"><b>Items</b></p>
+<p><a name="items"><b>Items (F2)</b></p>
 
 <p>This window displays the items that you are carrying. You can filter the list
 by selecting the options along the top (e.g., to only display weapons, click
@@ -338,25 +352,25 @@ allowing you the option to drink them.</p>
 
 <!--<p><a name="credits"><b>Credits etc</b></p>-->
 
-<p><a name="spells"><b>Spells</b></p>
+<!--<p><a name="spells"><b>Spells</b></p>
 
-<p>Not yet available, so this button does nothing!</p>
+<p>Not yet available, so this button does nothing!</p>-->
 
-<p><a name="journal"><b>Journal</b></p>
+<p><a name="journal"><b>Journal (F3)</b></p>
 
 <p>Displays details of your quest.</p>
 
-<p><a name="pause"><b>Pause</b></p>
+<p><a name="pause"><b>Pause (P)</b></p>
 
 <p>Pauses the game. To unpause, click anywhere. Note that the game also pauses
 when the window is deactivated, so again click anywhere to unpause.</p>
 
-<p><a name="rest"><b>Rest</b></p>
+<p><a name="rest"><b>Rest (R)</b></p>
 
 <p>Rest until you have recovered your health. You can't rest if enemies are
 nearby.</p>
 
-<p><a name="options"><b>Options</b></p>
+<p><a name="options"><b>Options (Escape)</b></p>
 
 <p>This offers the following options:<ul>
 <li><b>Quit game</b> - Quits the current game. Make sure you save the game
@@ -446,10 +460,12 @@ Any content for Erebus must be releaed under a Free/Open Source compatible licen
 Version 0.3 (Work in progress)
 
 FIXED   Rock scenery texture was sometimes drawn above player.
+ADDED   Player can now be controlled via rogue-like keyboard controls.
 UPDATED Improved floor graphics.
 UPDATED Improved rock scenery texture.
 UPDATED Made some 1st quest boundaries more natural and cave-like.
 UPDATED Allowed floor regions to be concave rather than just convex.
+UPDATED More graphical scenery.
 
 Version 0.2 (2012/12/01)
 

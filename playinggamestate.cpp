@@ -304,7 +304,13 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
     case Qt::Key_Enter:
         done = true;
         if( down ) {
-            this->playing_gamestate->actionCommand();
+            this->playing_gamestate->actionCommand(false);
+        }
+        break;
+    case Qt::Key_U:
+        done = true;
+        if( down ) {
+            this->playing_gamestate->actionCommand(true);
         }
         break;
     case Qt::Key_PageDown:
@@ -2103,10 +2109,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         //player->addGold( rollDice(2, 6, 10) );
         player->addGold( 333 ); // CHEAT, simulate start of quest 2
         player->setXP(68); // CHEAT, simulate start of quest 2
-        //player->addGold( 1000 ); // CHEAT
         */
         this->player = game_g->createPlayer(player_type);
         this->player->initialiseHealth(600); // CHEAT
+        //player->addGold( 1000 ); // CHEAT
     }
 
     LOG("load images\n");
@@ -2904,7 +2910,7 @@ void PlayingGamestate::setupView() {
     MainWindow *window = game_g->getScreen()->getMainWindow();
 
     view->createLightingMap(this->c_location->getLightingMin());
-    view->centerOn(player->getPos().x, player->getPos().y);
+    //view->centerOn(player->getPos().x, player->getPos().y);
 
     const float offset_y = 0.5f;
     float location_width = 0.0f, location_height = 0.0f;
@@ -3053,6 +3059,7 @@ void PlayingGamestate::setupView() {
         Character *character = *iter;
         this->locationAddCharacter(c_location, character);
     }
+    view->centreOnPlayer(); // must be done after player character graphic object is created
 
     /*const int size_c = 256;
     const int alpha = 255;
@@ -4463,48 +4470,42 @@ void PlayingGamestate::update() {
         if( this->view->keyDown(MainGraphicsView::KEY_L) ) {
             moved = true;
             dest.x -= step;
-            this->player->setDirection(Vector2D(-1.0f, 0.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_R) ) {
             moved = true;
             dest.x += step;
-            this->player->setDirection(Vector2D(1.0f, 0.0f));
         }
         if( this->view->keyDown(MainGraphicsView::KEY_U) ) {
             moved = true;
             dest.y -= step;
-            this->player->setDirection(Vector2D(0.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_D) ) {
             moved = true;
             dest.y += step;
-            this->player->setDirection(Vector2D(0.0f, 1.0f));
         }
         if( this->view->keyDown(MainGraphicsView::KEY_LU) ) {
             moved = true;
             dest.x -= step;
             dest.y -= step;
-            this->player->setDirection(Vector2D(-1.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_RU) ) {
             moved = true;
             dest.x += step;
             dest.y -= step;
-            this->player->setDirection(Vector2D(1.0f, -1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_LD) ) {
             moved = true;
             dest.x -= step;
             dest.y += step;
-            this->player->setDirection(Vector2D(-1.0f, 1.0f));
         }
         else if( this->view->keyDown(MainGraphicsView::KEY_RD) ) {
             moved = true;
             dest.x += step;
             dest.y += step;
-            this->player->setDirection(Vector2D(1.0f, 1.0f));
         }
         if( moved ) {
+            this->player->setDirection(dest - player->getPos());
+            this->view->centreOnPlayer();
             this->requestPlayerMove(dest, NULL);
         }
     }
@@ -5070,7 +5071,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
     return done;
 }
 
-void PlayingGamestate::actionCommand() {
+void PlayingGamestate::actionCommand(bool pickup_only) {
     qDebug("PlayingGamestate::actionCommand()");
     if( game_g->getScreen()->isPaused() ) {
         game_g->getScreen()->setPaused(false);
@@ -5082,6 +5083,7 @@ void PlayingGamestate::actionCommand() {
         Vector2D forward_dest2 = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
 
         // search for NPC
+        if( !pickup_only )
         {
             float min_dist = 0.0f;
             Character *target_npc = NULL;
@@ -5101,10 +5103,28 @@ void PlayingGamestate::actionCommand() {
                     }
                 }
             }
+            if( target_npc == NULL && player->getCurrentWeapon() != NULL && player->getCurrentWeapon()->isRanged() ) {
+                // for ranged weapons, pick closest visible enemy to player
+                for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+                    Character *character = *iter;
+                    if( character == player )
+                        continue;
+                    if( !character->isVisible() )
+                        continue;
+                    if( !character->isHostile() )
+                        continue;
+                    float dist_from_player = (player->getPos() - character->getPos()).magnitude();
+                    if( target_npc == NULL || dist_from_player < min_dist ) {
+                        done = true;
+                        target_npc = character;
+                        min_dist = dist_from_player;
+                    }
+                }
+            }
             this->clickedOnNPC(target_npc); // call even if target_npc is NULL
         }
 
-        if( !done ) {
+        if( !done && !pickup_only ) {
             bool move = false;
             Scenery *ignore_scenery = NULL;
             done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1);
