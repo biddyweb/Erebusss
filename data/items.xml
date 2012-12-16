@@ -64,7 +64,7 @@ Plate armour provides excellent protection, but it is also heavy to carry and we
 This potion will heal some or all of your injuries.
 </item>
 
-<item name="Potion of Combat" image_name="potion_green" weight="1"
+<item name="Potion of Combat" image_name="potion_red" weight="1"
     arg1_s="FP" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
 This potion will grant the drinker improved fighting prowess for a limted time.
 </item>
