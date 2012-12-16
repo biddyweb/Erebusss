@@ -5078,7 +5078,8 @@ void PlayingGamestate::actionCommand() {
 
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
         bool done = false;
-        Vector2D forward_dest = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
+        Vector2D forward_dest1 = player->getPos() + player->getDirection() * npc_radius_c * 1.1f;
+        Vector2D forward_dest2 = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
 
         // search for NPC
         {
@@ -5090,7 +5091,7 @@ void PlayingGamestate::actionCommand() {
                     continue;
                 if( !character->isVisible() )
                     continue;
-                float dist_from_click = (forward_dest - character->getPos()).magnitude();
+                float dist_from_click = (forward_dest2 - character->getPos()).magnitude();
                 if( dist_from_click <= npc_radius_c ) {
                     if( target_npc == NULL || dist_from_click < min_dist ) {
                         // clicked on this character
@@ -5106,7 +5107,10 @@ void PlayingGamestate::actionCommand() {
         if( !done ) {
             bool move = false;
             Scenery *ignore_scenery = NULL;
-            done = handleClickForScenerys(&move, &ignore_scenery, forward_dest);
+            done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1);
+            if( !done ) {
+                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2);
+            }
         }
 
         if( !done ) {
