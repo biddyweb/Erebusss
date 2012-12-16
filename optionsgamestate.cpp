@@ -279,6 +279,7 @@ void OptionsGamestate::clickedLoad() {
     QStringList files = dir.entryList(filter);
     if( files.size() > 0 ) {
         load_list = new ScrollingListWidget();
+        load_list->grabKeyboard();
         if( !mobile_c ) {
             QFont list_font = load_list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );

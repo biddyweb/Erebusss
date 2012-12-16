@@ -301,6 +301,7 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
         done = true;
         break;
     case Qt::Key_Space:
+    case Qt::Key_Return:
     case Qt::Key_Enter:
         done = true;
         if( down ) {
@@ -776,49 +777,56 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewAllButton = new QPushButton("All");
         game_g->initButton(viewAllButton);
         viewAllButton->setFont(font_small);
-        viewAllButton->setToolTip("Display all items");
+        viewAllButton->setToolTip("Display all items (F1)");
+        viewAllButton->setShortcut(QKeySequence(Qt::Key_F1));
         h_layout->addWidget(viewAllButton);
         connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
 
         QPushButton *viewWeaponsButton = new QPushButton("Wpns");
         game_g->initButton(viewWeaponsButton);
         viewWeaponsButton->setFont(font_small);
-        viewWeaponsButton->setToolTip("Display only weapons");
+        viewWeaponsButton->setToolTip("Display only weapons (F2)");
+        viewWeaponsButton->setShortcut(QKeySequence(Qt::Key_F2));
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
 
         QPushButton *viewAmmoButton = new QPushButton("Ammo");
         game_g->initButton(viewAmmoButton);
         viewAmmoButton->setFont(font_small);
-        viewAmmoButton->setToolTip("Display only ammunition");
+        viewAmmoButton->setToolTip("Display only ammunition (F3)");
+        viewAmmoButton->setShortcut(QKeySequence(Qt::Key_F3));
         h_layout->addWidget(viewAmmoButton);
         connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
 
         QPushButton *viewShieldsButton = new QPushButton("Shields");
         game_g->initButton(viewShieldsButton);
         viewShieldsButton->setFont(font_small);
-        viewShieldsButton->setToolTip("Display only shields");
+        viewShieldsButton->setToolTip("Display only shields (F4)");
+        viewShieldsButton->setShortcut(QKeySequence(Qt::Key_F4));
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
         QPushButton *viewArmourButton = new QPushButton("Arm");
         game_g->initButton(viewArmourButton);
         viewArmourButton->setFont(font_small);
-        viewArmourButton->setToolTip("Display only armour");
+        viewArmourButton->setToolTip("Display only armour (F5)");
+        viewArmourButton->setShortcut(QKeySequence(Qt::Key_F5));
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
 
         QPushButton *viewMagicButton = new QPushButton("Magic");
         game_g->initButton(viewMagicButton);
         viewMagicButton->setFont(font_small);
-        viewMagicButton->setToolTip("Display only magical items");
+        viewMagicButton->setToolTip("Display only magical items (F6)");
+        viewMagicButton->setShortcut(QKeySequence(Qt::Key_F6));
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
 
         QPushButton *viewMiscButton = new QPushButton("Misc");
         game_g->initButton(viewMiscButton);
         viewMiscButton->setFont(font_small);
-        viewMiscButton->setToolTip("Display only miscellaneous items");
+        viewMiscButton->setToolTip("Display only miscellaneous items (F7)");
+        viewMiscButton->setShortcut(QKeySequence(Qt::Key_F7));
         h_layout->addWidget(viewMiscButton);
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
     }
@@ -839,6 +847,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     }
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
+    list->grabKeyboard();
 
     this->refreshList();
 
@@ -865,26 +874,33 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
         armButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(armButton);
+        armButton->setToolTip("Arm/disarm weapon or shield (Space)");
         h_layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
 
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(wearButton);
+        wearButton->setToolTip("Wear/take off armour (Space)");
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
 
         useButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(useButton);
+        useButton->setToolTip("Use item (Space)");
         h_layout->addWidget(useButton);
         connect(useButton, SIGNAL(clicked()), this, SLOT(clickedUseItem()));
 
         dropButton = new QPushButton("Drop Item");
         game_g->initButton(dropButton);
+        dropButton->setToolTip("Drop item onto the ground (D))");
+        dropButton->setShortcut(QKeySequence(Qt::Key_D));
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
         infoButton = new QPushButton("Info");
         game_g->initButton(infoButton);
+        infoButton->setToolTip("More information on this item (I))");
+        infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
@@ -934,6 +950,9 @@ void ItemsWindow::refreshList() {
         list_item->setIcon(icon);
         list->addItem(list_item);
         list_items.push_back(item);
+    }
+    if( list->count() > 0 ) {
+        list->setCurrentRow(0);
     }
 }
 
@@ -1049,6 +1068,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         useButton->setVisible(true);
         useButton->setText(item->getUseVerb().c_str());
     }
+
+    armButton->setShortcut(QKeySequence(Qt::Key_Space));
+    wearButton->setShortcut(QKeySequence(Qt::Key_Space));
+    useButton->setShortcut(QKeySequence(Qt::Key_Space));
 }
 
 void ItemsWindow::setWeightLabel() {
@@ -1308,25 +1331,37 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 
         QPushButton *sellButton = new QPushButton("Sell");
         game_g->initButton(sellButton);
+        sellButton->setFocusPolicy(Qt::NoFocus);
+        sellButton->setToolTip("Sell the item selected of yours (on the left) (S)");
+        sellButton->setShortcut(QKeySequence(Qt::Key_S));
         h_layout->addWidget(sellButton);
         connect(sellButton, SIGNAL(clicked()), this, SLOT(clickedSell()));
 
         QPushButton *buyButton = new QPushButton("Buy");
         game_g->initButton(buyButton);
+        buyButton->setFocusPolicy(Qt::NoFocus);
+        buyButton->setToolTip("Buy the item selected (on the right) (B)");
+        buyButton->setShortcut(QKeySequence(Qt::Key_B));
         h_layout->addWidget(buyButton);
         connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
 
         QPushButton *infoButton = new QPushButton("Info");
         game_g->initButton(infoButton);
+        infoButton->setFocusPolicy(Qt::NoFocus);
+        infoButton->setToolTip("Display more information about the selected item for sale (I)");
+        infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
     QPushButton *closeButton = new QPushButton("Finish Trading");
     game_g->initButton(closeButton);
+    closeButton->setFocusPolicy(Qt::NoFocus);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
+
+    list->setFocus();
 }
 
 void TradeWindow::updateGoldLabel() {
@@ -1472,6 +1507,7 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
         layout->addLayout(h_layout);
 
         list = new ScrollingListWidget();
+        list->grabKeyboard();
         if( !mobile_c ) {
             QFont list_font = list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );
@@ -1517,16 +1553,21 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
 
         QPushButton *pickUpButton = new QPushButton("Pick Up");
         game_g->initButton(pickUpButton);
+        pickUpButton->setToolTip("Pick up the selected item (Space)");
+        pickUpButton->setShortcut(QKeySequence(Qt::Key_Space));
         h_layout->addWidget(pickUpButton);
         connect(pickUpButton, SIGNAL(clicked()), this, SLOT(clickedPickUp()));
 
         QPushButton *dropButton = new QPushButton("Drop");
         game_g->initButton(dropButton);
+        dropButton->setToolTip("Drop the selected item of yours onto the ground");
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDrop()));
 
         QPushButton *infoButton = new QPushButton("Info");
         game_g->initButton(infoButton);
+        infoButton->setToolTip("Display more information about the selected item (I)");
+        infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
@@ -1669,6 +1710,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
             const Shop *shop = *iter;
             QPushButton *shopButton = new QPushButton(shop->getName().c_str());
             game_g->initButton(shopButton);
+            shopButton->setShortcut(QKeySequence(shop->getName().at(0)));
             QVariant variant = qVariantFromValue((void *)shop);
             shopButton->setProperty("shop", variant);
             //shopButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -1757,6 +1799,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     this->setLayout(layout);
 
     list = new ScrollingListWidget();
+    list->grabKeyboard();
     if( !mobile_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
@@ -1791,6 +1834,8 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
         QPushButton *deleteButton = new QPushButton("Delete File");
         game_g->initButton(deleteButton);
+        deleteButton->setToolTip("Delete the selected save game file (D)");
+        deleteButton->setShortcut(QKeySequence(Qt::Key_D));
         //deleteButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(deleteButton);
         connect(deleteButton, SIGNAL(clicked()), this, SLOT(clickedDelete()));
