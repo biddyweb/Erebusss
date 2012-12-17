@@ -1053,6 +1053,7 @@ void Game::log(const char *text) {
 QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const {
     // need to use QImageReader - QPixmap::load doesn't work on large images on Symbian!
     QImageReader reader(filename.c_str());
+    //qDebug("Game::loadImage(): %s", filename.c_str());
     if( clip ) {
         //qDebug("clipping");
         int actual_width = reader.size().width();
@@ -1082,8 +1083,11 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
         LOG("failed to convert image to pixmap: %s\n", filename.c_str());
         LOG("image reader error: %d\n", reader.error());
         LOG("image reader error string: %s\n", reader.errorString().toStdString().c_str());
-        throw string("Failed to convert image to pixmap");
+        //throw string("Failed to convert image to pixmap");
+        string error = reader.errorString().toStdString();
+        throw error;
     }
+    //qDebug("    %d  %d\n", pixmap.width(), pixmap.height());
     return pixmap;
 }
 
