@@ -390,6 +390,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, Spell *> spells;
     vector<Shop *> shops;
 
+    QPixmap smoke_pixmap;
+
     Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);

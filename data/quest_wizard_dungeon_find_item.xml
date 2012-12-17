@@ -927,7 +927,7 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 <scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
     locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true" locked_text="The teleporter does not seem to function!" locked_used_up="true"/>
 
-<scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true"/>
+<scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true" has_smoke="true"/>
 
 <scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="25.0" size="1.0" blocking="true"/>
 
@@ -1061,7 +1061,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     xp_worth="0"
     shop="Armourer"/>
 
-<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true"/>
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
 
 </location>
 
@@ -1832,7 +1832,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
         />
 </scenery>
 
-<scenery name="Fire" image_name="fire" x="43.5" y="21.0" size="1.0" blocking="true"/>
+<scenery name="Fire" image_name="fire" x="43.5" y="21.0" size="1.0" blocking="true" has_smoke="true"/>
 
 </location>
 

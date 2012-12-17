@@ -217,6 +217,53 @@ public:
     }
 };
 
+class Particle {
+    float xpos, ypos; // floats to allow for movement
+    int birth_time;
+public:
+    Particle();
+
+    float getX() const {
+            return this->xpos;
+    }
+    float getY() const {
+            return this->ypos;
+    }
+    void setPos(float xpos, float ypos) {
+            this->xpos = xpos;
+            this->ypos = ypos;
+    }
+    int getBirthTime() const {
+            return this->birth_time;
+    }
+};
+
+class ParticleSystem : public QGraphicsItem {
+protected:
+    vector<Particle> particles;
+    QPixmap pixmap;
+
+public:
+    ParticleSystem(const QPixmap &pixmap) : pixmap(pixmap) {
+    }
+
+    virtual void advance(int phase);
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    virtual QRectF boundingRect() const;
+    virtual void update()=0;
+};
+
+class SmokeParticleSystem : public ParticleSystem {
+    float birth_rate;
+    int life_exp;
+    int last_emit_time;
+public:
+    SmokeParticleSystem(const QPixmap &pixmap);
+    void setBirthRate(float birth_rate);
+
+    virtual void update();
+};
+
 class ScrollingListWidget : public QListWidget {
     Q_OBJECT
 

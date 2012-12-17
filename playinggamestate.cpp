@@ -1991,6 +1991,20 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
 
+    {
+        const int res_c = 15;
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+        radialGrad.setColorAt(0.0, QColor(255, 255, 255, 63));
+        radialGrad.setColorAt(1.0, QColor(255, 255, 255, 0));
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter.end();
+        this->smoke_pixmap = pixmap;
+    }
+
     // create UI
     LOG("create UI\n");
     QFont font = game_g->getFontStd();
@@ -2703,6 +2717,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false);
+
 }
 
 PlayingGamestate::~PlayingGamestate() {
@@ -3138,6 +3153,13 @@ void PlayingGamestate::setupView() {
         scene->addItem(text_effect);
     }*/
     //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
+
+    /*SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
+    ps->setBirthRate(1.0f);
+    ps->setPos(player->getX(), player->getY());
+    ps->setScale(0.5f / smoke_pixmap.width());
+    ps->setZValue(1000.0f);
+    scene->addItem(ps);*/
 
     LOG("init visibility\n");
     //c_location->initVisibility(player->getPos());
@@ -3785,6 +3807,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef pos_y_s = reader.attributes().value("y");
                     float pos_y = parseFloat(pos_y_s.toString());
                     QStringRef opacity_s = reader.attributes().value("opacity");
+                    QStringRef has_smoke_s = reader.attributes().value("has_smoke");
                     QStringRef draw_type_s = reader.attributes().value("draw_type");
                     QStringRef action_last_time_s = reader.attributes().value("action_last_time");
                     QStringRef action_delay_s = reader.attributes().value("action_delay");
@@ -3900,6 +3923,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     if( opacity_s.length() > 0 ) {
                         float opacity = parseFloat(opacity_s.toString());
                         scenery->setOpacity(opacity);
+                    }
+                    if( has_smoke_s.length() > 0 ) {
+                        bool has_smoke = parseBool(has_smoke_s.toString());
+                        scenery->setHasSmoke(has_smoke);
                     }
                     if( draw_type_s.length() > 0 ) {
                         if( draw_type_s == "floating" ) {
@@ -4193,6 +4220,14 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         transform = transform.scale(scenery_scale_w, scenery_scale_h);
         transform = transform.translate(-centre_x, -centre_y);
         object->setTransform(transform);
+        if( scenery->hasSmoke() ) {
+            SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
+            ps->setBirthRate(1.0f);
+            ps->setPos(centre_x, 2.0f*smoke_pixmap.height());
+            ps->setScale(2.0f);
+            ps->setZValue(object->pos().y() + 2000.0f);
+            ps->setParentItem(object);
+        }
     }
 }
 

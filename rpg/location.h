@@ -64,6 +64,7 @@ protected:
     string confirm_text; // relevant only for some types, e.g., doors
     DrawType draw_type;
     float opacity;
+    bool has_smoke;
     float width, height;
 
     // actions are events which happen periodically
@@ -218,6 +219,12 @@ public:
     }
     float getOpacity() const {
         return this->opacity;
+    }
+    void setHasSmoke(bool has_smoke) {
+        this->has_smoke = has_smoke;
+    }
+    bool hasSmoke() const {
+        return this->has_smoke;
     }
     void setActionLastTime(int action_last_time) {
         this->action_last_time = action_last_time;

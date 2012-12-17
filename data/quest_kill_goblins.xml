@@ -51,7 +51,7 @@
 <scenery name="Boulders" image_name="boulders2" x="14.0" y="1.5" size="0.56" blocking="true"/>
 <scenery name="Big Boulder" image_name="bigboulder" x="13.0" y="1.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
-<scenery name="Fire" image_name="fire" x="14.0" y="3.0" w="1.0" h="1.0" blocking="true"/>
+<scenery name="Fire" image_name="fire" x="14.0" y="3.0" w="1.0" h="1.0" blocking="true" has_smoke="true"/>
 <scenery name="Rock" image_name="rock1" x="14.5" y="5.7" size="0.2" draw_type="background"/>
 
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" w="0.8" h="0.8" blocking="true">

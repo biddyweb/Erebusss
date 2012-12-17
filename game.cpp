@@ -344,6 +344,94 @@ int AnimatedObject::getHeight() const {
     }
 }
 
+Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0) {
+    this->birth_time = game_g->getScreen()->getGameTimeTotalMS();
+}
+
+void ParticleSystem::advance(int phase) {
+    //qDebug("AnimatedObject::advance() phase %d", phase);
+    if( phase == 1 ) {
+        this->update();
+    }
+}
+
+void ParticleSystem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    qDebug("draw %d particles", particles.size());
+    for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
+        painter->drawPixmap(iter->getX() - this->pixmap.width()*0.5f, iter->getY() - this->pixmap.height()*0.5f, this->pixmap);
+    }
+}
+
+QRectF ParticleSystem::boundingRect() const {
+    qDebug("ParticleSystem::boundingRect()");
+    /*for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
+    }*/
+    return QRectF(-100, -100, 200, 200);
+}
+
+SmokeParticleSystem::SmokeParticleSystem(const QPixmap &pixmap) : ParticleSystem(pixmap),
+    birth_rate(0.0f), life_exp(1500), last_emit_time(0) {
+    this->last_emit_time = game_g->getScreen()->getGameTimeTotalMS();
+}
+
+void SmokeParticleSystem::setBirthRate(float birth_rate) {
+    this->birth_rate = birth_rate;
+}
+
+void SmokeParticleSystem::update() {
+    // expire old particles
+    int time_now = game_g->getScreen()->getGameTimeTotalMS();
+    for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
+            if( time_now >= particles.at(i).getBirthTime() + life_exp ) {
+                    // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
+                    particles[i] = particles[particles.size()-1];
+                    particles.resize(particles.size()-1);
+            }
+    }
+
+    int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
+    //LOG("%d\n", real_loop_time);
+    // update particles
+    for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
+            //const float xspeed = 0.01f;
+            const float xspeed = 0.015f;
+            //const float yspeed = 0.05f;
+            const float yspeed = 0.03f;
+            float xpos = particles.at(i).getX();
+            float ypos = particles.at(i).getY();
+            float ydiff = real_loop_time * yspeed;
+            ypos -= ydiff;
+            float xdiff = real_loop_time * xspeed;
+            if( rand() % 2 == 0 ) {
+                    xdiff = - xdiff;
+            }
+            xpos += xdiff;
+            /*if( ypos < 0 ) {
+                    // kill
+                    // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
+                    particles[i] = particles[particles.size()-1];
+                    particles.resize(particles.size()-1);
+                    //LOG("resize to %d\n", particles.size());
+            }
+            else*/ {
+                    particles.at(i).setPos(xpos, ypos);
+            }
+    }
+
+    // emit new particles
+    int accumulated_time = game_g->getScreen()->getGameTimeTotalMS() - this->last_emit_time;
+    int new_particles = (int)(this->birth_rate * accumulated_time);
+    new_particles = std::min(1, new_particles); // helps make rate more steady
+    this->last_emit_time += (int)(1.0f/birth_rate * new_particles);
+    if( new_particles > 0 ) {
+            //LOG("%d new particles (total will be %d)\n", new_particles, particles.size() + new_particles);
+            for(int i=0;i<new_particles;i++) {
+                    Particle particle;
+                    particles.push_back(particle);
+            }
+    }
+}
+
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug, also needed for Symbian
