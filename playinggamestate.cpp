@@ -1887,6 +1887,7 @@ void SaveGameWindow::clickedSave() {
         layout->addWidget(label);
 
         this->edit = new QLineEdit(filename);
+        edit->grabKeyboard(); // needed, due to previously having set the savegame list to grab the keyboard
         // disallow: \ / : * ? " < > |
         QRegExp rx("[^\\\\/:*?\"<>|]*");
         QValidator *validator = new QRegExpValidator(rx, this);
