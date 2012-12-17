@@ -47,6 +47,7 @@
     natural_damageX="2" natural_damageY="12" natural_damageZ="1"
     health_min="70" health_max="80" gold_min="0" gold_max="0"
     xp_worth="50"
+    causes_terror="true" terror_effect="0"
 />
 
 <!--Natural damage-->
@@ -65,6 +66,7 @@
     health_min="35" health_max="40" gold_min="0" gold_max="0"
     xp_worth="25"
     requires_magical="true"
+    causes_terror="true" terror_effect="2"
 />
 
 <!--Natural damage-->
@@ -73,6 +75,7 @@
     natural_damageX="1" natural_damageY="6" natural_damageZ="0"
     health_min="40" health_max="50" gold_min="0" gold_max="0"
     xp_worth="10"
+    causes_terror="true" terror_effect="1"
 />
 
 <!--Natural damage-->
@@ -81,6 +84,7 @@
     natural_damageX="3" natural_damageY="10" natural_damageZ="10"
     health_min="50" health_max="60" gold_min="0" gold_max="0"
     xp_worth="40"
+    causes_terror="true" terror_effect="2"
 />
 
 </npcs>

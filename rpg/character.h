@@ -211,12 +211,14 @@ class CharacterTemplate {
     bool can_fly;
     int gold_min, gold_max;
     int xp_worth;
+    bool causes_terror;
+    int terror_effect;
     bool requires_magical; // requires magical weapon to hit?
     string animation_name;
     bool static_image;
     bool bounce;
 public:
-    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth);
+    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect);
 
     const Profile *getProfile() const {
         return &this->profile;
@@ -278,6 +280,12 @@ public:
     int getXPWorth() const {
         return xp_worth;
     }
+    bool getCausesTerror() const {
+        return this->causes_terror;
+    }
+    int getTerrorEffect() const {
+        return this->terror_effect;
+    }
     void setRequiresMagical(bool requires_magical) {
         this->requires_magical = requires_magical;
     }
@@ -318,6 +326,7 @@ public:
 class Character {
     // basic info
     string name;
+    string biography;
     bool is_ai; // not saved
     bool is_hostile;
     string animation_name; // for NPCs (player is handled separately)
@@ -331,7 +340,7 @@ class Character {
     bool is_dead;
     int time_of_death_ms; // not saved
     Vector2D pos;
-    Vector2D direction;
+    Vector2D direction; // not saved
     bool is_visible; // not saved // for NPCs: whether player and NPC can see each other
     bool has_path; // not saved
     vector<Vector2D> path; // not saved
@@ -374,6 +383,9 @@ class Character {
     int level;
     int xp;
     int xp_worth;
+    bool causes_terror;
+    int terror_effect;
+    bool done_terror;
     bool requires_magical; // requires magical weapon to hit?
 
     // npc talk information
@@ -399,6 +411,12 @@ public:
     Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
+    void setBiography(const string &biography) {
+        this->biography = biography;
+    }
+    string getBiography() const {
+        return this->biography;
+    }
     void setStateIdle();
     void setDefaultPosition(float xpos, float ypos) {
         this->has_default_position = true;
@@ -699,6 +717,22 @@ public:
     }
     void setXPWorth(int xp_worth) {
         this->xp_worth = xp_worth;
+    }
+    bool getCausesTerror() const {
+        return this->causes_terror;
+    }
+    int getTerrorEffect() const {
+        return this->terror_effect;
+    }
+    void setCausesTerror(int terror_effect) {
+        this->causes_terror = true;
+        this->terror_effect = terror_effect;
+    }
+    bool hasDoneTerror() const {
+        return this->done_terror;
+    }
+    void setDoneTerror(bool done_terror) {
+        this->done_terror = done_terror;
     }
     bool requiresMagical() const {
         return requires_magical;

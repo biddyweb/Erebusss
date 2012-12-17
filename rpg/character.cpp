@@ -69,9 +69,9 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     source->useSpell(this->getName());
 }
 
-CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth) :
+CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect) :
     //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false), bounce(false)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), requires_magical(false), animation_name(animation_name), static_image(false), bounce(false)
 {
 }
 
@@ -111,7 +111,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -133,7 +133,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -143,6 +143,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     }
     this->gold = character_template.getGold();
     this->xp_worth = character_template.getXPWorth();
+    this->causes_terror = character_template.getCausesTerror();
+    this->terror_effect = character_template.getTerrorEffect();
     this->requires_magical = character_template.requiresMagical();
 }
 

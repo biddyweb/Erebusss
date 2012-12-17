@@ -2555,9 +2555,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
                     int gold_max = parseInt(gold_max_s.toString());
                     QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                     int xp_worth = parseInt(xp_worth_s.toString());
+                    QStringRef causes_terror_s = reader.attributes().value("causes_terror");
+                    bool causes_terror = parseBool(causes_terror_s.toString(), true);
+                    QStringRef terror_effect_s = reader.attributes().value("terror_effect");
+                    int terror_effect = parseInt(terror_effect_s.toString(), true);
                     QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                     bool requires_magical = parseBool(requires_magical_s.toString(), true);
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth);
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect);
                     character_template->setStaticImage(static_image);
                     character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
@@ -3577,6 +3581,16 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                         int xp_worth = parseInt(xp_worth_s.toString());
                         npc->setXPWorth(xp_worth);
+                        QStringRef causes_terror_s = reader.attributes().value("causes_terror");
+                        bool causes_terror = parseBool(causes_terror_s.toString(), true);
+                        if( causes_terror ) {
+                            QStringRef terror_effect_s = reader.attributes().value("terror_effect");
+                            int terror_effect = parseInt(terror_effect_s.toString());
+                            npc->setCausesTerror(terror_effect);
+                        }
+                        QStringRef done_terror_s = reader.attributes().value("done_terror");
+                        bool done_terror = parseBool(done_terror_s.toString(), true);
+                        npc->setDoneTerror(done_terror);
                         QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                         bool requires_magical = parseBool(requires_magical_s.toString(), true);
                         npc->setRequiresMagical(requires_magical);
@@ -4643,6 +4657,22 @@ void PlayingGamestate::update() {
         }
     }
 
+    // terror
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        if( character != player && character->isVisible() && character->getCausesTerror() && !character->hasDoneTerror() ) {
+            int roll = rollDice(2, 6, character->getTerrorEffect());
+            int bravery = player->getProfileIntProperty(profile_key_B_c);
+            qDebug("Terror? Roll %d vs %d", roll, bravery);
+            if( roll > bravery )
+            {
+                player->paralyse(5000);
+                this->addTextEffect("You are too terrified to move!", player->getPos(), 5000);
+            }
+            character->setDoneTerror(true);
+        }
+    }
+
     vector<Character *> delete_characters;
     //LOG("update characters\n");
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
@@ -5460,6 +5490,7 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         const Currency *currency = static_cast<const Currency *>(item);
         fprintf(file, " value=\"%d\"", currency->getValue());
         break;
+
     }
     }
     fprintf(file, ">");
@@ -5603,6 +5634,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " level=\"%d\"", character->getLevel());
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
+            fprintf(file, " causes_terror=\"%s\"", character->getCausesTerror() ? "true" : "false");
+            fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
+            fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
             fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
             fprintf(file, " gold=\"%d\"", character->getGold());
             fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
