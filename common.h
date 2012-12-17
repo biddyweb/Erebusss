@@ -14,9 +14,9 @@ const bool mobile_c = false;
 #define DEPLOYMENT_PATH ""
 #endif
 
-// remember to update version in PRO file!
+// remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;
-const int versionMinor = 2;
+const int versionMinor = 3;
 
 enum Difficulty {
     DIFFICULTY_EASY = 0,

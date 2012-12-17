@@ -36,7 +36,7 @@ QT += xml
 # For use with Nokia Ovi Store only:
 symbian:TARGET.UID3 = 0x2006dbd2
 
-VERSION = 0.2 # remember to update version in common.h
+VERSION = 0.3 # remember to update version in common.h, and for Android/necessitas!
 
 # Smart Installer package's UID
 # This UID is from the protected range 
