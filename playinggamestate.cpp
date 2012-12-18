@@ -4528,8 +4528,9 @@ void PlayingGamestate::update() {
             scrolled = true;
         }
     }
-    if( !scrolled ) {
+    if( !scrolled && !mobile_c ) {
         // scroll due to player near the edge
+        // disabed for touchscreens, as makes drag-scrolling harder
         QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
         if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
             const int wid = 64;
