@@ -4871,7 +4871,8 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                     vector<const TalkItem *> talk_items;
                     if( !character->isHostile() ) {
                         // being hostile means the character has become hostile whilst talking, so now the only thing left is to say Goodbye!
-                        for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter) {
+                        int count=0;
+                        for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter, count++) {
                             const TalkItem *talk_item = &*iter;
                             if( talk_item->while_not_done && character->isInteractionCompleted() ) {
                                 continue;
@@ -4883,9 +4884,9 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                             //answers.push_back(talk_item->answer);
                             talk_items.push_back(talk_item);
                         }
-                }
+                    }
                     buttons.push_back("Goodbye");
-                    InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true);
+                    InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true, true);
                     this->addWidget(dialog);
                     dialog->scrollToBottom();
                     int result = dialog->exec();
@@ -5133,7 +5134,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     else {
                         //if( this->askQuestionDialog(dialog_text) ) {
                         //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
-                        InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false);
+                        InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false, true);
                         this->addWidget(dialog);
                         int result = dialog->exec();
                         LOG("scenery iteraction dialog returns %d\n", result);
