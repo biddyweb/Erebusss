@@ -235,7 +235,7 @@ void OptionsGamestate::clickedStart() {
 
     QPushButton *startButton = new QPushButton("Start");
     game_g->initButton(startButton);
-    startButton->setShortcut(QKeySequence(Qt::Key_Return));
+    startButton->setShortcut(QKeySequence(Qt::Key_S));
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
