@@ -4947,7 +4947,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     qDebug("PlayingGamestate::handleClickForItems");
     bool done = false;
     float min_dist = 0.0f;
-    const float click_tol_items_c = 0.0f;
+    const float click_tol_items_c = 0.25f;
     // search for clicking on an item
     vector<Item *> pickup_items;
     for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
