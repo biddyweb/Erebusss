@@ -380,6 +380,7 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
             text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
             int damage = rollDice(4, 12, rating);
             character->decreaseHealth(playing_gamestate, damage, true, false);
+            character->setStateIdle();
         }
     }
     else if( type == "gas" ) {
