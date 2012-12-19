@@ -2743,6 +2743,10 @@ PlayingGamestate::~PlayingGamestate() {
         AnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
     }
+    for(map<string, AnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+        AnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
+    }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
         Item *item = iter->second;
         qDebug("about to delete standard item: %d", item);

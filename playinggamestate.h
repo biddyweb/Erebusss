@@ -380,10 +380,10 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     // data
     map<string, AnimationLayer *> animation_layers;
+    map<string, AnimationLayer *> scenery_animation_layers;
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
     map<string, QPixmap> scenery_images;
-    map<string, AnimationLayer *> scenery_animation_layers;
     map<string, QPixmap> builtin_images;
     map<string, QPixmap> npc_static_images;
     map<string, CharacterTemplate *> character_templates;
