@@ -425,6 +425,9 @@ Location::Location(const string &name) :
 }
 
 Location::~Location() {
+    if( distance_graph != NULL ) {
+        delete distance_graph;
+    }
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         delete floor_region;
@@ -441,8 +444,9 @@ Location::~Location() {
         Scenery *scenery = *iter;
         delete scenery;
     }
-    if( distance_graph != NULL ) {
-        delete distance_graph;
+    for(set<Trap *>::iterator iter = traps.begin(); iter != traps.end(); ++iter) {
+        Trap *trap = *iter;
+        delete trap;
     }
 }
 
@@ -681,6 +685,7 @@ void Location::addTrap(Trap *trap, float xpos, float ypos) {
 void Location::removeTrap(Trap *trap) {
     //trap->setLocation(NULL);
     this->traps.erase(trap);
+    delete trap;
 }
 
 void Location::createBoundariesForRegions() {
