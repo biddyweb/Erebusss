@@ -1084,7 +1084,15 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
         LOG("image reader error: %d\n", reader.error());
         LOG("image reader error string: %s\n", reader.errorString().toStdString().c_str());
         //throw string("Failed to convert image to pixmap");
-        string error = reader.errorString().toStdString();
+        string error;
+        if( reader.error() == QImageReader::InvalidDataError ) {
+            // Normally this code returns the string "Unable to read image data", but (on Symbian at least) can occur when we run
+            // out of memory. Better to return a more helpful code (and make it clear it's not a bug, but a problem with lack of resources!)
+            error = "Out of memory";
+        }
+        else {
+            error = reader.errorString().toStdString();
+        }
         throw error;
     }
     //qDebug("    %d  %d\n", pixmap.width(), pixmap.height());
