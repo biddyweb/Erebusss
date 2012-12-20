@@ -145,14 +145,12 @@
     <animation name="death" start="24" length="8" type="single"/>
 </image> <!-- original for wyvern: expected_width 7168, death animation start 48 -->
 
-<image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="5632">
+<image type="npc" name="zombie" filename="gfx/textures/npcs/zombie.png" xpos="32" ypos="40" width="64" height="64" expected_width="3072">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
-    <!--<animation name="ranged" start="16" length="4" type="single"/>-->
-    <!--<animation name="death" start="22" length="6" type="single"/>-->
-    <animation name="death" start="28" length="8" type="single"/>
-</image>
+    <animation name="death" start="16" length="8" type="single"/>
+    </image> <!-- original for zombie: expected_width 5632, death animation start 28 -->
 <image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
 
 <image type="npc" name="spider" filename="gfx/textures/npcs/spider_giant.png" xpos="32" ypos="40" width="64" height="64" expected_width="4096">
