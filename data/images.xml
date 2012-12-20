@@ -112,13 +112,12 @@
 <image type="scenery" name="tile_black" imagetype="perlin" max_red="32" max_green="32" max_blue="32" min_red="0" min_green="0" min_blue="0"/>
 <image type="scenery" name="tile_white" imagetype="perlin" max_red="255" max_green="255" max_blue="255" min_red="160" min_green="160" min_blue="160"/>
 
-<image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="6144">
+<image type="npc" name="goblin" filename="gfx/textures/npcs/goblin.png" xpos="32" ypos="40" width="64" height="64" expected_width="2688">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
-    <animation name="attack" start="20" length="3" type="single"/>
-    <!--<animation name="ranged" start="24" length="4" type="single"/>-->
-    <animation name="death" start="34" length="6" type="single"/>
-</image>
+    <animation name="attack" start="12" length="3" type="single"/>
+    <animation name="death" start="15" length="6" type="single"/>
+</image> <!-- original for goblin: expected_width 6144, attack animation start 20, death animation start 34 -->
 <!--<image type="npc" name="goblin_champion" filename="gfx/textures/npcs/goblin_champion.png" xpos="32" ypos="40" width="64" height="64" expected_width="128">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
