@@ -707,6 +707,9 @@ public:
     const vector<Location *>::const_iterator locationsEnd() const {
         return this->locations.end();
     }
+    int getNLocations() const {
+        return this->locations.size();
+    }
 
     bool isCompleted() const {
         return this->is_completed;

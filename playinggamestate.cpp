@@ -3191,6 +3191,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     window->setEnabled(false);
     game_g->getScreen()->setPaused(true);
 
+    gui_overlay->setProgress(0);
+    qApp->processEvents();
+
     if( this->player != NULL && this->player->getLocation() != NULL ) {
         qDebug("remove player from location\n");
         this->player->getLocation()->removeCharacter(this->player);
@@ -3212,10 +3215,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     this->quest->addLocation(location);*/
     Location *location = NULL;
 
-    gui_overlay->setProgress(0);
+    gui_overlay->setProgress(10);
     qApp->processEvents();
 
     {
+        int progress_lo = 10, progress_hi = 50;
         bool done_player_start = false;
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
@@ -3233,11 +3237,20 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
         }
+        qint64 size = file.size();
+        int progress_count = 0;
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
             reader.readNext();
             if( reader.isStartElement() )
             {
+                progress_count++;
+                if( progress_count % 20 == 0 ) {
+                    float progress = ((float)file.pos()) / ((float)size);
+                    gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
+                    qApp->processEvents();
+                }
+
                 qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
                 if( reader.name() == "info" ) {
                     if( is_savegame ) {
@@ -4112,6 +4125,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         }
     }
 
+    gui_overlay->setProgress(50);
+    qApp->processEvents();
+
+    int progress_lo = 50, progress_hi = 100;
+    int progress_count = 0;
     for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
         Location *loc = *iter;
         qDebug("process location: %s", loc->getName().c_str());
@@ -4125,6 +4143,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         loc->createBoundariesForRegions();
         loc->createBoundariesForScenery();
         loc->calculateDistanceGraph();
+
+        progress_count++;
+        if( progress_count % 4 == 0 ) {
+            float progress = ((float)progress_count) / ((float)quest->getNLocations());
+            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
+            qApp->processEvents();
+        }
     }
 
     this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
