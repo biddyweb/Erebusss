@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "qt_screen.h"
-//#include "game.h"
+#include "game.h"
+#include "gamestate.h"
+#include "logiface.h"
 
 #include <QtCore/QCoreApplication>
 
@@ -104,3 +106,14 @@ void MainWindow::updateScene() {
     //elapsed_time = new_time;
 }
 #endif
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    LOG("MainWindow received close event\n");
+    if( game_g != NULL && game_g->getGamestate() != NULL ) {
+        game_g->getGamestate()->quitGame();
+        event->ignore();
+    }
+    else {
+        event->accept();
+    }
+}

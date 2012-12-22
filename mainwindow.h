@@ -8,6 +8,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+protected:
+    void closeEvent(QCloseEvent *event);
     //int elapsed_time;
     //virtual void mouseReleaseEvent(QMouseEvent *event);
 public:

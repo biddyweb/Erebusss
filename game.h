@@ -402,8 +402,12 @@ public:
 
     void run();
     void update();
-    void activate(bool active);
     void runTests();
+
+    void activate(bool active);
+    Gamestate *getGamestate() const {
+        return this->gamestate;
+    }
     //void mouseClick(int m_x, int m_y);
     string getApplicationFilename(const string &name);
     //void log(const char *text, ...);
