@@ -177,6 +177,8 @@ public:
 class Polygon2D {
 protected:
     vector<Vector2D> points; // should be stored anti-clockwise
+    Vector2D top_left;
+    Vector2D bottom_right;
     int source_type;
     void *source;
 
@@ -190,9 +192,7 @@ public:
     size_t getNPoints() const {
         return points.size();
     }
-    virtual void addPoint(Vector2D point) {
-        this->points.push_back(point);
-    }
+    virtual void addPoint(Vector2D point);
     virtual void insertPoint(size_t indx, Vector2D point);
     void setSource(void *source) {
         this->source = source;

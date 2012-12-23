@@ -51,6 +51,20 @@ float Vector2D::distFromLineSq(const Vector2D &o, const Vector2D &n) const {
     return dist;
 }
 
+void Polygon2D::addPoint(Vector2D point) {
+    this->points.push_back(point);
+    if( this->points.size() == 1 ) {
+        this->top_left = point;
+        this->bottom_right = point;
+    }
+    else {
+        this->top_left.x = std::min(this->top_left.x, point.x);
+        this->top_left.y = std::min(this->top_left.y, point.y);
+        this->bottom_right.x = std::max(this->bottom_right.x, point.x);
+        this->bottom_right.y = std::max(this->bottom_right.y, point.y);
+    }
+}
+
 void Polygon2D::insertPoint(size_t indx, Vector2D point) {
     if( indx == 0 || indx > points.size() ) {
         LOG("Polygon2D::insertPoint invalid indx %d\n", indx);
@@ -58,6 +72,16 @@ void Polygon2D::insertPoint(size_t indx, Vector2D point) {
     }
     //LOG("insert point at %d: %f, %f\n", indx, point.x, point.y);
     this->points.insert( this->points.begin() + indx, point );
+    if( this->points.size() == 1 ) {
+        this->top_left = point;
+        this->bottom_right = point;
+    }
+    else {
+        this->top_left.x = std::min(this->top_left.x, point.x);
+        this->top_left.y = std::min(this->top_left.y, point.y);
+        this->bottom_right.x = std::max(this->bottom_right.x, point.x);
+        this->bottom_right.y = std::max(this->bottom_right.y, point.y);
+    }
 }
 
 Vector2D Polygon2D::offsetInwards(size_t indx, float dist) const {
@@ -102,6 +126,9 @@ Vector2D Polygon2D::findCentre() const {
 }
 
 bool Polygon2D::pointInside(Vector2D pvec) const {
+    if( pvec.x < this->top_left.x || pvec.x > this->bottom_right.x || pvec.y < this->top_left.y || pvec.y > this->bottom_right.y ) {
+        return false;
+    }
     bool c = false;
     for(int i=0,j=this->getNPoints()-1;i<this->getNPoints();j=i++) {
         Vector2D pi = points.at(i);
