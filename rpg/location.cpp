@@ -11,8 +11,6 @@ using std::min;
 using std::max;
 using std::swap;
 
-#include <ctime>
-
 #ifdef _DEBUG
 #include <cassert>
 #endif
@@ -1241,7 +1239,7 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
 }*/
 
 vector<Vector2D> Location::calculatePathWayPoints() const {
-    qDebug("Location::calculatePathWayPoints()");
+    //qDebug("Location::calculatePathWayPoints()");
     vector<Vector2D> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
@@ -1290,8 +1288,8 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
 }*/
 
 void Location::calculateDistanceGraph() {
-    qDebug("Location::calculateDistanceGraph()");
-    int time_s = clock();
+    //qDebug("Location::calculateDistanceGraph()");
+    //int time_s = clock();
     if( this->distance_graph != NULL ) {
         delete this->distance_graph;
     }
@@ -1328,7 +1326,7 @@ void Location::calculateDistanceGraph() {
             }
         }
     }
-    qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
+    //qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
 }
 
 vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Scenery *ignore_scenery, bool can_fly) const {

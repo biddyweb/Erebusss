@@ -689,7 +689,12 @@ enum TestID {
     TEST_POINTINPOLYGON_9 = 14,
     TEST_POINTINPOLYGON_10 = 15,
     TEST_POINTINPOLYGON_11 = 16,
-    N_TESTS = 17
+    TEST_PERF_POINTINPOLYGON_0 = 17,
+    TEST_PERF_POINTINPOLYGON_1 = 18,
+    TEST_PERF_POINTINPOLYGON_2 = 19,
+    TEST_PERF_DISTANCEGRAPH_0 = 20,
+    TEST_PERF_PATHFINDING_0 = 21,
+    N_TESTS = 22
 };
 
 /**
@@ -710,6 +715,11 @@ enum TestID {
   TEST_POINTINPOLYGON_9 - tests that a point is inside a concave polygon (L-shape)
   TEST_POINTINPOLYGON_10 - tests that a point is on a concave polygon (L-shape)
   TEST_POINTINPOLYGON_11 - tests that a point is not inside a concave polygon (L-shape)
+  TEST_PERF_POINTINPOLYGON_0 - performance test version of TEST_POINTINPOLYGON_9
+  TEST_PERF_POINTINPOLYGON_1 - performance test version of TEST_POINTINPOLYGON_11
+  TEST_PERF_POINTINPOLYGON_2 - as TEST_PERF_POINTINPOLYGON_1, but point is now outside of AABB
+  TEST_PERF_DISTANCEGRAPH_0 - performance test for calculating a distance graph
+  TEST_PERF_PATHFINDING_0 - performance test for calculating a shortest path
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -725,6 +735,8 @@ void Game::runTest(const string &filename, int test_id) {
     fprintf(testfile, "%d,", test_id);
 
     bool ok = true;
+    bool has_score = false;
+    double score = 0;
 
     try {
         if( test_id == TEST_PATHFINDING_0 || test_id == TEST_PATHFINDING_1 || test_id == TEST_PATHFINDING_2 || test_id == TEST_PATHFINDING_3 || test_id == TEST_PATHFINDING_4 ) {
@@ -862,7 +874,9 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("failed point inside polygon test");
             }
         }
-        else if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ) {
+        else if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ||
+                 test_id == TEST_PERF_POINTINPOLYGON_0 || test_id == TEST_PERF_POINTINPOLYGON_1 || test_id == TEST_PERF_POINTINPOLYGON_2
+                 ) {
             Polygon2D poly;
             poly.addPoint(Vector2D(0.0f, 0.0f));
             poly.addPoint(Vector2D(0.0f, 3.0f));
@@ -872,7 +886,7 @@ void Game::runTest(const string &filename, int test_id) {
             poly.addPoint(Vector2D(1.0f, 0.0f));
             Vector2D test_pt;
             bool exp_inside = false;
-            if( test_id == TEST_POINTINPOLYGON_9 ) {
+            if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_PERF_POINTINPOLYGON_0 ) {
                 test_pt.set(0.5f, 2.5f);
                 exp_inside = true;
             }
@@ -880,20 +894,114 @@ void Game::runTest(const string &filename, int test_id) {
                 test_pt.set(0.5f, 0.0f);
                 exp_inside = true;
             }
-            else {
-                test_pt.set(1.1f, 0.0f);
+            else if( test_id == TEST_POINTINPOLYGON_11 || test_id == TEST_PERF_POINTINPOLYGON_1 ) {
+                test_pt.set(1.1f, 0.1f);
                 exp_inside = false;
             }
-            bool inside = poly.pointInside(test_pt);
-            if( inside != exp_inside ) {
-                throw string("failed point inside polygon test");
+            else {
+                test_pt.set(1.1f, -0.1f);
+                exp_inside = false;
             }
+
+            if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ) {
+                bool inside = poly.pointInside(test_pt);
+                if( inside != exp_inside ) {
+                    throw string("failed point inside polygon test");
+                }
+            }
+            else {
+                QElapsedTimer timer;
+                timer.start();
+                //int time_s = clock();
+                int n_times = 1000000;
+                for(int i=0;i<n_times;i++) {
+                    bool inside = poly.pointInside(test_pt);
+                    if( inside != exp_inside ) {
+                        throw string("failed point inside polygon test");
+                    }
+                }
+                has_score = true;
+                //score = ((double)(clock() - time_s)) / (double)n_times;
+                score = ((double)timer.elapsed()) / ((double)n_times);
+                score /= 1000.0;
+            }
+        }
+        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 ) {
+            Location location("");
+
+            FloorRegion *floor_region = NULL;
+            floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(14.0f, 2.0f, 5.0f, 1.0f);
+            location.addFloorRegion(floor_region);
+
+            floor_region = FloorRegion::createRectangle(1.0f, 5.0f, 2.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(0.0f, 10.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+
+            floor_region = FloorRegion::createRectangle(1.0f, 15.0f, 2.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(0.0f, 20.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+
+            floor_region = FloorRegion::createRectangle(1.0f, 25.0f, 2.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(0.0f, 30.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+
+            floor_region = FloorRegion::createRectangle(5.0f, 22.0f, 5.0f, 1.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(10.0f, 20.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+
+            floor_region = FloorRegion::createRectangle(15.0f, 22.0f, 5.0f, 1.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(20.0f, 20.0f, 5.0f, 5.0f);
+            location.addFloorRegion(floor_region);
+
+            location.createBoundariesForRegions();
+            location.createBoundariesForScenery();
+            location.calculateDistanceGraph();
+
+            QElapsedTimer timer;
+            timer.start();
+            int n_times = 1000;
+            for(int i=0;i<n_times;i++) {
+                if( test_id == TEST_PERF_DISTANCEGRAPH_0 ) {
+                    location.calculateDistanceGraph();
+                }
+                else {
+                    Vector2D src(1.0f, 1.0f);
+                    Vector2D dest(21.0f, 21.0f);
+                    vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+                }
+            }
+            has_score = true;
+            score = ((double)timer.elapsed()) / ((double)n_times);
+            score /= 1000.0;
+
+            //vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+
         }
         else {
             throw string("unknown test");
         }
 
-        fprintf(testfile, "PASSED\n");
+        fprintf(testfile, "PASSED,");
+        if( has_score ) {
+            if( score < 0.01 ) {
+                fprintf(testfile, "%E", score);
+            }
+            else {
+                fprintf(testfile, "%f", score);
+            }
+        }
+        fprintf(testfile, "\n");
     }
     catch(const string &str) {
         LOG("ERROR: %s\n", str.c_str());
@@ -905,7 +1013,7 @@ void Game::runTest(const string &filename, int test_id) {
         LOG("<<< TEST %d PASSED\n", test_id);
     }
     else {
-        LOG("<<< TEST %d FAILED", test_id);
+        LOG("<<< TEST %d FAILED\n", test_id);
     }
 
     fclose(testfile);
@@ -922,7 +1030,7 @@ void Game::runTests() {
         time_t time_val;
         time(&time_val);
         fprintf(testfile, "%s\n", ctime(&time_val));
-        fprintf(testfile, "TEST,RESULT\n");
+        fprintf(testfile, "TEST,RESULT,SCORE\n");
         fclose(testfile);
     }
 
