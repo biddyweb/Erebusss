@@ -194,6 +194,12 @@ public:
     }
     virtual void addPoint(Vector2D point);
     virtual void insertPoint(size_t indx, Vector2D point);
+    Vector2D getTopLeft() const {
+        return this->top_left;
+    }
+    Vector2D getBottomRight() const {
+        return this->bottom_right;
+    }
     void setSource(void *source) {
         this->source = source;
     }

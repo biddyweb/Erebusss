@@ -1077,6 +1077,20 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
         if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
             continue;
         }
+        Vector2D top_left = boundary->getTopLeft();
+        Vector2D bottom_right = boundary->getBottomRight();
+        if( start.x + width < top_left.x && end.x + width < top_left.x ) {
+            continue;
+        }
+        else if( start.x + width > bottom_right.x && end.x + width > bottom_right.x ) {
+            continue;
+        }
+        else if( start.y + width < top_left.y && end.y + width < top_left.y ) {
+            continue;
+        }
+        else if( start.y + width > bottom_right.y && end.y + width > bottom_right.y ) {
+            continue;
+        }
         for(size_t j=0;j<boundary->getNPoints() && !(*done);j++) {
             Vector2D p0 = boundary->getPoint(j);
             Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
