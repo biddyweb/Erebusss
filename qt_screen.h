@@ -20,6 +20,7 @@ class Screen : public QObject {
     int saved_elapsed_time_ms;
     int game_time_total_ms;
     int game_time_frame_ms;
+    int accumulator;
 
 private slots:
     void update();

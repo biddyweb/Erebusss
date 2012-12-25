@@ -4172,7 +4172,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     game_g->getScreen()->setPaused(false);
     game_g->getScreen()->restartElapsedTimer();
 
-    qApp->processEvents();
+    //qApp->processEvents();
 
     if( !is_savegame && quest->getInfo().length() > 0 ) {
         string quest_info = quest->getInfo();
@@ -4463,7 +4463,7 @@ void PlayingGamestate::clickedQuit() {
 
 void PlayingGamestate::showInfoWindow(const string &html) {
     // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
-    LOG("showInfoWindow()\n");
+    qDebug("showInfoWindow()\n");
 
     game_g->getScreen()->setPaused(true);
 
