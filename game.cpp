@@ -694,7 +694,8 @@ enum TestID {
     TEST_PERF_POINTINPOLYGON_2 = 19,
     TEST_PERF_DISTANCEGRAPH_0 = 20,
     TEST_PERF_PATHFINDING_0 = 21,
-    N_TESTS = 22
+    TEST_PERF_REMOVE_SCENERY_0 = 22,
+    N_TESTS = 23
 };
 
 /**
@@ -720,6 +721,7 @@ enum TestID {
   TEST_PERF_POINTINPOLYGON_2 - as TEST_PERF_POINTINPOLYGON_1, but point is now outside of AABB
   TEST_PERF_DISTANCEGRAPH_0 - performance test for calculating a distance graph
   TEST_PERF_PATHFINDING_0 - performance test for calculating a shortest path
+  TEST_PERF_REMOVE_SCENERY_0 - performance test for removing scenery (including recalculating distance graph)
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -926,7 +928,7 @@ void Game::runTest(const string &filename, int test_id) {
                 score /= 1000.0;
             }
         }
-        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 ) {
+        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
             Location location("");
 
             FloorRegion *floor_region = NULL;
@@ -964,6 +966,13 @@ void Game::runTest(const string &filename, int test_id) {
             floor_region = FloorRegion::createRectangle(20.0f, 20.0f, 5.0f, 5.0f);
             location.addFloorRegion(floor_region);
 
+            Scenery *scenery = NULL;
+            if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+                scenery = new Scenery("", "", false, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 5.5f, 22.5f);
+            }
+
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
             location.calculateDistanceGraph();
@@ -971,14 +980,20 @@ void Game::runTest(const string &filename, int test_id) {
             QElapsedTimer timer;
             timer.start();
             int n_times = 1000;
+            if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+                n_times = 1; // test can only be run once!
+            }
             for(int i=0;i<n_times;i++) {
                 if( test_id == TEST_PERF_DISTANCEGRAPH_0 ) {
                     location.calculateDistanceGraph();
                 }
-                else {
+                else if( test_id == TEST_PERF_PATHFINDING_0 ) {
                     Vector2D src(1.0f, 1.0f);
                     Vector2D dest(21.0f, 21.0f);
                     vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+                }
+                else if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+                    location.removeScenery(scenery);
                 }
             }
             has_score = true;
