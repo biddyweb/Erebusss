@@ -82,6 +82,7 @@ private:
     int lasttime_calculated_lighting_pixmap_scaled_ms;
     QPixmap lighting_pixmap_scaled;
     unsigned char darkness_alpha;
+    QElapsedTimer fps_timer;
 
     bool key_down[N_KEYS];
 

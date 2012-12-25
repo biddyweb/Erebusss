@@ -59,6 +59,7 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
     /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0)
 {
+    this->fps_timer.invalidate();
     for(int i=0;i<N_KEYS;i++) {
         this->key_down[i] = false;
     }
@@ -352,8 +353,16 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
-    QElapsedTimer timer;
-    timer.start();
+    /*QElapsedTimer timer;
+    timer.start();*/
+    if( fps_timer.isValid() ) {
+        int time_ms = fps_timer.elapsed();
+        if( time_ms > 0 ) {
+            float fps = 1000.0f/(float)time_ms;
+            this->gui_overlay->setFPS(fps);
+        }
+    }
+    fps_timer.start();
 
     QGraphicsView::paintEvent(event);
 
@@ -413,11 +422,11 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         }
     }
 
-    int time_ms = timer.elapsed();
+    /*int time_ms = timer.elapsed();
     if( time_ms > 0 ) {
         float fps = 1000.0f/(float)time_ms;
         this->gui_overlay->setFPS(fps);
-    }
+    }*/
 }
 
 void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
