@@ -630,6 +630,7 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
 
 void Location::removeScenery(Scenery *scenery) {
     // remove corresponding boundary
+    //qDebug("Location::removeScenery(%d)", scenery);
     for(vector<Polygon2D>::iterator iter = this->boundaries.begin(); iter != this->boundaries.end();) {
         Polygon2D *boundary = &*iter;
         if( boundary->getSource() == scenery ) {
@@ -665,7 +666,64 @@ void Location::removeScenery(Scenery *scenery) {
         this->listener->locationRemoveScenery(this, scenery);
     }
 
-    this->calculateDistanceGraph();
+    // now remove corresponding nodes from the graph
+    /*if( this->distance_graph != NULL ) {
+        for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
+            GraphVertex *graph_vertex = this->distance_graph->getVertex(i);
+            //qDebug("%d : %d", i, graph_vertex->getUserData());
+            if( graph_vertex->getUserData() == scenery ) {
+                //qDebug("### node %d can be removed", i);
+            }
+        }
+    }*/
+    //this->calculateDistanceGraph();
+
+    if( this->distance_graph != NULL ) {
+        // update distance graph
+        for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
+            GraphVertex *v_A = this->distance_graph->getVertex(i);
+            Vector2D A_pos = v_A->getPos();
+            for(size_t j=i+1;j<this->distance_graph->getNVertices();j++) {
+                //qDebug("### update %d vs %d?", i, j);
+                GraphVertex *v_B = this->distance_graph->getVertex(j);
+                Vector2D top_left = scenery->getPos();
+                Vector2D bottom_right = scenery->getPos();
+                top_left.x -= scenery->getWidth();
+                bottom_right.x += scenery->getWidth();
+                top_left.y -= scenery->getHeight();
+                bottom_right.y += scenery->getHeight();
+                Vector2D B_pos = v_B->getPos();
+                if( A_pos.x < top_left.x && B_pos.x < top_left.x ) {
+                    continue;
+                }
+                else if( A_pos.x > bottom_right.x && B_pos.x > bottom_right.x ) {
+                    continue;
+                }
+                else if( A_pos.y < top_left.y && B_pos.y < top_left.y ) {
+                    continue;
+                }
+                else if( A_pos.y > bottom_right.y && B_pos.y > bottom_right.y ) {
+                    continue;
+                }
+                //qDebug("    updating %d vs %d", i, j);
+                bool already_visible = false;
+                for(size_t k=0;k<v_A->getNNeighbours() && !already_visible;k++) {
+                    if( v_A->getNeighbour(this->distance_graph, k) == v_B ) {
+                        already_visible = true;
+                    }
+                }
+                // only need to test if not already visible (since we're moving scenery)
+                if( !already_visible ) {
+                    float dist = 0.0f;
+                    bool hit = testGraphVerticesHit(&dist, v_A, v_B);
+                    if( !hit ) {
+                        v_A->addNeighbour(j, dist);
+                        v_B->addNeighbour(i, dist);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Location::updateScenery(Scenery *scenery) {
@@ -841,12 +899,13 @@ void Location::createBoundariesForRegions() {
 }
 
 void Location::createBoundariesForScenery() {
-    qDebug("Location::createBoundariesForScenery()");
+    //qDebug("Location::createBoundariesForScenery()");
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
         Scenery *scenery = *iter;
         if( !scenery->isBlocking() ) {
             continue;
         }
+        //qDebug(">>> set scenery %d", scenery);
         Polygon2D boundary;
         boundary.setSourceType((int)SOURCETYPE_SCENERY);
         boundary.setSource(scenery);
@@ -1252,9 +1311,9 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
     // tests whether a point is within the valid location region
 }*/
 
-vector<Vector2D> Location::calculatePathWayPoints() const {
+vector<Location::PathWayPoint> Location::calculatePathWayPoints() const {
     //qDebug("Location::calculatePathWayPoints()");
-    vector<Vector2D> path_way_points;
+    vector<PathWayPoint> path_way_points;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
         size_t n_points = boundary->getNPoints();
@@ -1282,12 +1341,13 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
                 inwards.normalise();
                 //const float offset = npc_radius_c/ratio;
                 const float offset = npc_radius_c/ratio + E_TOL_LINEAR;
-                Vector2D path_way_point = point + inwards * offset;
+                Vector2D path_way_point_pos = point + inwards * offset;
 
                 // test we get get to the way point
                 // important to use E_TOL_LINEAR for the width, otherwise can cause problems for scenery right next to the wall
                 Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL, false) ) {
+                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point_pos, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL, false) ) {
+                    PathWayPoint path_way_point(path_way_point_pos, boundary->getSource());
                     path_way_points.push_back( path_way_point );
                 }
             }
@@ -1301,6 +1361,22 @@ vector<Vector2D> Location::calculatePathWayPoints() const {
     LOG("Location::refreshDistanceGraph()\n");
 }*/
 
+bool Location::testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const {
+    bool hit = false;
+    Vector2D A = v_A->getPos();
+    Vector2D B = v_B->getPos();
+    *dist = (A - B).magnitude();
+    if( *dist <= E_TOL_LINEAR ) {
+        // needed for coi way points?
+        hit = false;
+    }
+    else {
+        Vector2D hit_pos;
+        hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL, false);
+    }
+    return hit;
+}
+
 void Location::calculateDistanceGraph() {
     //qDebug("Location::calculateDistanceGraph()");
     //int time_s = clock();
@@ -1309,31 +1385,22 @@ void Location::calculateDistanceGraph() {
     }
     this->distance_graph = new Graph();
 
-    vector<Vector2D> path_way_points = this->calculatePathWayPoints();
+    vector<PathWayPoint> path_way_points = this->calculatePathWayPoints();
     //LOG("Location::calculateDistanceGraph() calculatePathWayPoints() time taken: %d\n", clock() - time_s);
 
     for(size_t i=0;i<path_way_points.size();i++) {
-        Vector2D A = path_way_points.at(i);
-        GraphVertex vertex(A, NULL);
+        PathWayPoint path_way_point = path_way_points.at(i);
+        Vector2D A = path_way_point.point;
+        GraphVertex vertex(A, path_way_point.source);
         this->distance_graph->addVertex(vertex);
     }
 
     for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
         GraphVertex *v_A = this->distance_graph->getVertex(i);
-        Vector2D A = v_A->getPos();
         for(size_t j=i+1;j<this->distance_graph->getNVertices();j++) {
             GraphVertex *v_B = this->distance_graph->getVertex(j);
-            Vector2D B = v_B->getPos();
-            Vector2D hit_pos;
-            float dist = (A - B).magnitude();
-            bool hit = false;
-            if( dist <= E_TOL_LINEAR ) {
-                // needed for coi way points?
-                hit = false;
-            }
-            else {
-                hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL, false);
-            }
+            float dist = 0.0f;
+            bool hit = testGraphVerticesHit(&dist, v_A, v_B);
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
                 v_B->addNeighbour(i, dist);
@@ -1366,20 +1433,10 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
         // n.b., don't need to check for link between start_vertex and end_vertex, as this code path is only for where we can't walk directly between the start and end!
         for(size_t i=0;i<n_old_vertices;i++) {
             GraphVertex *v_A = graph->getVertex(i);
-            Vector2D A = v_A->getPos();
             for(size_t j=n_old_vertices;j<graph->getNVertices();j++) {
                 GraphVertex *v_B = graph->getVertex(j);
-                Vector2D B = v_B->getPos();
-                Vector2D hit_pos;
-                float dist = (A - B).magnitude();
-                bool hit = false;
-                if( dist <= E_TOL_LINEAR ) {
-                    // needed for coi way points?
-                    hit = false;
-                }
-                else {
-                    hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL, can_fly);
-                }
+                float dist = 0.0f;
+                bool hit = testGraphVerticesHit(&dist, v_A, v_B);
                 if( !hit ) {
                     v_A->addNeighbour(j, dist);
                     v_B->addNeighbour(i, dist);
