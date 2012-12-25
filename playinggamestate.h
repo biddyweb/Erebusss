@@ -435,6 +435,7 @@ public:
 
     virtual void quitGame();
     virtual void update();
+    virtual void render();
     virtual void activate(bool active) {
         // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
         /*if( !active ) {

@@ -4646,8 +4646,6 @@ void PlayingGamestate::update() {
         }
     }
 
-    this->view->update();
-
     // test for fog of war
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
@@ -4672,7 +4670,6 @@ void PlayingGamestate::update() {
     }
 
     scene->advance();
-    gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
@@ -4753,6 +4750,12 @@ void PlayingGamestate::update() {
         this->checkQuestComplete();
     }
     //qDebug("PlayingGamestate::update() exit");
+}
+
+void PlayingGamestate::render() {
+    // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
+    this->view->update();
+    gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 }
 
 void PlayingGamestate::checkQuestComplete() {

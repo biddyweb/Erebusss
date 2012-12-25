@@ -402,6 +402,7 @@ public:
 
     void run();
     void update();
+    void render();
     void runTests();
 
     void activate(bool active);

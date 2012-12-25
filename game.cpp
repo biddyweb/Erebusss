@@ -1136,6 +1136,12 @@ void Game::update() {
     }
 }
 
+void Game::render() {
+    if( gamestate != NULL ) {
+        gamestate->render();
+    }
+}
+
 /*void Game::mouseClick(int m_x, int m_y) {
     gamestate->mouseClick(m_x, m_y);
 }*/

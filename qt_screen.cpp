@@ -50,6 +50,7 @@ void Screen::update() {
     }
 
     game_g->update();
+    game_g->render();
 }
 
 void Screen::setPaused(bool paused) {
