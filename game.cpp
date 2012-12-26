@@ -356,14 +356,14 @@ void ParticleSystem::advance(int phase) {
 }
 
 void ParticleSystem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    qDebug("draw %d particles", particles.size());
+    //qDebug("draw %d particles", particles.size());
     for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
         painter->drawPixmap(iter->getX() - this->pixmap.width()*0.5f, iter->getY() - this->pixmap.height()*0.5f, this->pixmap);
     }
 }
 
 QRectF ParticleSystem::boundingRect() const {
-    qDebug("ParticleSystem::boundingRect()");
+    //qDebug("ParticleSystem::boundingRect()");
     /*for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
     }*/
     return QRectF(-100, -100, 200, 200);
