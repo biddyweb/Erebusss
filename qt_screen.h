@@ -20,6 +20,7 @@ class Screen : public QObject {
     int saved_elapsed_time_ms;
     int game_time_total_ms;
     int game_time_frame_ms;
+    int real_time_frame_ms;
     int accumulator;
 
 private slots:
@@ -47,6 +48,9 @@ public:
     }
     int getGameTimeTotalMS() const {
         return this->game_time_total_ms;
+    }
+    int getRealTimeFrameMS() const {
+        return this->real_time_frame_ms;
     }
 
 public slots:

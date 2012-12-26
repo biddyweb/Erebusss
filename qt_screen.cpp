@@ -4,7 +4,7 @@
 #include "logiface.h"
 
 Screen::Screen() :
-    mainWindow(NULL), paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0), accumulator(0)
+    mainWindow(NULL), paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0), real_time_frame_ms(0), accumulator(0)
 {
     LOG("Screen::Screen()\n");
     mainWindow = new MainWindow();
@@ -69,6 +69,7 @@ void Screen::update() {
         //qDebug("Elapsed time: %d", elapsed_time_ms);
         //qDebug("Accumulator: %d", accumulator);
 
+        this->real_time_frame_ms = update_dt_c;
         this->game_time_frame_ms = update_dt_c;
         while( accumulator >= update_dt_c ) {
             //qDebug("    Update: frame time: %d", this->game_time_frame_ms);

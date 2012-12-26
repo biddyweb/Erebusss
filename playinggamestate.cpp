@@ -220,7 +220,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
-                int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+                int time_ms = game_g->getScreen()->getRealTimeFrameMS();
                 diff /= (float)time_ms;
                 this->has_kinetic_scroll = true;
                 this->kinetic_scroll_dir.set(diff.x(), diff.y());
@@ -456,7 +456,7 @@ void MainGraphicsView::update() {
         float speed = (4.0f * time_ms)/1000.0f;*/
         //if( fabs(this->kinetic_scroll_x) >= 0.0f && fabs(this->kinetic_scroll_y) >= 0.0f ) {
         if( this->has_kinetic_scroll ) {
-            int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+            int time_ms = game_g->getScreen()->getRealTimeFrameMS();
             //qDebug("centre was: %f, %f", centre.x(), centre.y());
             float step = time_ms*this->kinetic_scroll_speed;
             float move_x = step * this->kinetic_scroll_dir.x;
@@ -4535,8 +4535,8 @@ void PlayingGamestate::update() {
     //qDebug("PlayingGamestate::update()");
     // scroll
     bool scrolled = false;
-    int time_ms = game_g->getScreen()->getGameTimeFrameMS();
-    float speed = (4.0f * time_ms)/1000.0f;
+    int real_time_ms = game_g->getScreen()->getRealTimeFrameMS();
+    float speed = (4.0f * real_time_ms)/1000.0f;
     if( !mobile_c ) {
         // scroll due to mouse at edge of screen
         int m_x = QCursor::pos().x();
