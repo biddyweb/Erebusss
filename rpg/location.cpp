@@ -1217,7 +1217,9 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
                 normal_from_wall /= dp_length;
                 double dist = (pos - closest_pt) % normal_from_wall;
                 //qDebug("    closest_pt %f, %f; dist = %f", closest_pt.x, closest_pt.y, dist);
-                if( fabs(dist) <= width ) {
+                //if( fabs(dist) <= width ) {
+                if( dist >= -2.0f*width && dist <= width ) {
+                    // we allow as far as -2.0f*width "inside" the wall, to allow a bit more tolerance when clicking/touching
                     float move_dist = width - dist;
                     move_dist += E_TOL_LINEAR;
                     Vector2D test_pos = pos + normal_from_wall * move_dist;
