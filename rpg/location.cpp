@@ -1193,7 +1193,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
     return hit;
 }
 
-Vector2D Location::nudgeToFreeSpace(Vector2D pos, float width) const {
+Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const {
     Vector2D saved_pos = pos; // saved for debugging
     bool nudged = false;
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
@@ -1216,14 +1216,20 @@ Vector2D Location::nudgeToFreeSpace(Vector2D pos, float width) const {
                 Vector2D normal_from_wall = dp.perpendicularYToX(); // since walls are defined anti-clockwise, this vector must point away from the wall
                 normal_from_wall /= dp_length;
                 double dist = (pos - closest_pt) % normal_from_wall;
-                //qDebug("    dist = %f", dist);
+                //qDebug("    closest_pt %f, %f; dist = %f", closest_pt.x, closest_pt.y, dist);
                 if( fabs(dist) <= width ) {
                     float move_dist = width - dist;
                     move_dist += E_TOL_LINEAR;
-                    pos += normal_from_wall * move_dist;
-                    /*qDebug("    nudged %f, %f to %f, %f (dist %f)", saved_pos.x, saved_pos.y, pos.x, pos.y, dist);
-                    qDebug("        due to %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);*/
-                    nudged = true;
+                    Vector2D test_pos = pos + normal_from_wall * move_dist;
+                    //qDebug("    nudge to %f, %f?", test_pos.x, test_pos.y);
+
+                    vector<Vector2D> new_path = this->calculatePathTo(src, test_pos, NULL, false);
+                    if( new_path.size() > 0 ) {
+                        pos = test_pos;
+                        /*qDebug("    nudged %f, %f to %f, %f (dist %f)", saved_pos.x, saved_pos.y, pos.x, pos.y, dist);
+                        qDebug("        due to %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);*/
+                        nudged = true;
+                    }
                 }
             }
             // n.b., only care about the closest point on the line seg, and not the end points of the line seg - as we'll look at the adjacent boundary segments to find the real closest point
@@ -1414,7 +1420,7 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
     vector<Vector2D> new_path;
 
     Vector2D hit_pos;
-    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, can_fly) ) {
+    if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, can_fly) ) {
         // easy
         //LOG("easy\n");
         new_path.push_back(dest);

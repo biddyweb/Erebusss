@@ -5200,6 +5200,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
 }
 
 bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest) {
+    //qDebug("PlayingGamestate::handleClickForScenerys(): %f, %f", dest.x, dest.y);
     // search for clicking on a scenery
     const float click_tol_scenery_c = 0.0f;
     vector<Scenery *> clicked_scenerys;
@@ -5366,7 +5367,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
 void PlayingGamestate::requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery) {
     // nudge position due to boundaries
-    dest = this->c_location->nudgeToFreeSpace(dest, npc_radius_c);
+    dest = this->c_location->nudgeToFreeSpace(player->getPos(), dest, 2.0f*npc_radius_c);
+        // we use a width of 2.0f*npc_width, to allow a bit more tolerance when clicking/touching
     if( dest != player->getPos() ) {
         qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
         player->setDestination(dest.x, dest.y, ignore_scenery);
