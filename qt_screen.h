@@ -6,6 +6,34 @@
 
 #include <QtGui>
 
+class GameClock {
+    bool paused;
+    int saved_paused_time_ms;
+    int saved_elapsed_time_ms;
+    int game_time_total_ms;
+    int game_time_frame_ms;
+    int accumulator;
+
+public:
+    GameClock();
+
+    bool isPaused() const {
+        return this->paused;
+    }
+    void setPaused(bool paused, int time_now_ms);
+
+    int getGameTimeFrameMS() const {
+        return this->game_time_frame_ms;
+    }
+    int getGameTimeTotalMS() const {
+        return this->game_time_total_ms;
+    }
+
+    int update(int time_now_ms);
+    void callingUpdate();
+    void restart();
+};
+
 class Screen : public QObject {
     Q_OBJECT
 
@@ -13,15 +41,9 @@ class Screen : public QObject {
     MainWindow *mainWindow;
     QElapsedTimer elapsed_timer; // used to measure game time
 
-    int getElapsedMS() const;
+    GameClock game_clock;
 
-    bool paused;
-    int saved_paused_time_ms;
-    int saved_elapsed_time_ms;
-    int game_time_total_ms;
-    int game_time_frame_ms;
-    int real_time_frame_ms;
-    int accumulator;
+    int getElapsedMS() const;
 
 private slots:
     void update();
@@ -38,23 +60,23 @@ public:
     }
     void runMainLoop();
     bool isPaused() const {
-        return this->paused;
+        return this->game_clock.isPaused();
     }
     void setPaused(bool paused);
     void restartElapsedTimer();
     void enableUpdateTimer(bool enabled);
     int getGameTimeFrameMS() const {
-        return this->game_time_frame_ms;
+        return this->game_clock.getGameTimeFrameMS();
     }
     int getGameTimeTotalMS() const {
-        return this->game_time_total_ms;
+        return this->game_clock.getGameTimeTotalMS();
     }
     int getRealTimeFrameMS() const {
-        return this->real_time_frame_ms;
+        return this->game_clock.getGameTimeFrameMS();
     }
 
 public slots:
     void togglePaused() {
-        setPaused(!paused);
+        this->setPaused( !this->isPaused() );
     }
 };
