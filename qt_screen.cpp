@@ -54,6 +54,7 @@ void Screen::update() {
     game_g->render();*/
 
     if( paused ) {
+        this->real_time_frame_ms = 0;
         this->game_time_frame_ms = 0;
         game_g->update();
     }

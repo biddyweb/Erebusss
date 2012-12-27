@@ -221,13 +221,15 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
                 int time_ms = game_g->getScreen()->getRealTimeFrameMS();
-                diff /= (float)time_ms;
-                this->has_kinetic_scroll = true;
-                this->kinetic_scroll_dir.set(diff.x(), diff.y());
-                this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
-                this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
-                this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
-                //qDebug("    speed: %f", this->kinetic_scroll_speed);
+                if( time_ms > 0 ) {
+                    diff /= (float)time_ms;
+                    this->has_kinetic_scroll = true;
+                    this->kinetic_scroll_dir.set(diff.x(), diff.y());
+                    this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
+                    this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
+                    this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
+                    qDebug("    speed: %f", this->kinetic_scroll_speed);
+                }
             }
             else {
                 this->has_kinetic_scroll = false;
