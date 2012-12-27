@@ -4530,9 +4530,9 @@ void PlayingGamestate::quitGame() {
 void PlayingGamestate::update() {
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
-    if( game_g->getScreen()->isPaused() ) {
+    /*if( game_g->getScreen()->isPaused() ) {
         return;
-    }
+    }*/
 
     //qDebug("PlayingGamestate::update()");
     // scroll
