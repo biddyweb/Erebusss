@@ -9,6 +9,8 @@ public:
     //virtual VI_Panel *getPanel()=0;
     virtual void quitGame()=0;
     virtual void update()=0;
+    virtual void updateInput() {
+    }
     virtual void render() {
     }
     virtual void activate(bool active) {

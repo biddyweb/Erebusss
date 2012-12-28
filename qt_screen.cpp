@@ -122,24 +122,42 @@ void Screen::update() {
     game_g->update();
     game_g->render();*/
 
-    int n_updates = game_clock.update(this->getElapsedMS());
-    for(int i=0;i<n_updates;i++) {
-        game_clock.callingUpdate();
-        game_g->update();
+    int time_now_ms = this->getElapsedMS();
+
+    {
+        int n_updates = game_clock.update(time_now_ms);
+        for(int i=0;i<n_updates;i++) {
+            game_clock.callingUpdate();
+            game_g->update();
+        }
+    }
+
+    {
+        int n_updates = input_clock.update(time_now_ms);
+        for(int i=0;i<n_updates;i++) {
+            input_clock.callingUpdate();
+            game_g->updateInput();
+        }
     }
 
     //qDebug("    Render");
     game_g->render();
 }
 
-void Screen::setPaused(bool paused) {
-    game_clock.setPaused(paused, this->getElapsedMS());
+void Screen::setPaused(bool paused, bool also_input) {
+    int time_now_ms = this->getElapsedMS();
+    game_clock.setPaused(paused, time_now_ms);
+    if( also_input || !paused ) {
+        // if unpausing, always also unpause the input clock
+        input_clock.setPaused(paused, time_now_ms);
+    }
 }
 
 void Screen::restartElapsedTimer() {
     qDebug("Screen::restartElapsedTimer()");
     this->elapsed_timer.restart();
     this->game_clock.restart();
+    this->input_clock.restart();
 }
 
 void Screen::enableUpdateTimer(bool enabled) {

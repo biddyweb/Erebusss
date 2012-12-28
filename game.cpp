@@ -1136,6 +1136,12 @@ void Game::update() {
     }
 }
 
+void Game::updateInput() {
+    if( gamestate != NULL ) {
+        gamestate->updateInput();
+    }
+}
+
 void Game::render() {
     if( gamestate != NULL ) {
         gamestate->render();
@@ -1405,7 +1411,7 @@ bool Game::askQuestionDialog(const string &title, const string &message) {
 void Game::activate(bool active) {
     this->getScreen()->enableUpdateTimer(active);
     if( !active ) {
-        this->getScreen()->setPaused(true); // automatically pause when application goes inactive
+        this->getScreen()->setPaused(true, false); // automatically pause when application goes inactive
     }
     if( this->gamestate != NULL ) {
         this->gamestate->activate(active);

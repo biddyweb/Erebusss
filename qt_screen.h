@@ -41,7 +41,8 @@ class Screen : public QObject {
     MainWindow *mainWindow;
     QElapsedTimer elapsed_timer; // used to measure game time
 
-    GameClock game_clock;
+    GameClock game_clock; // used for real-world game action
+    GameClock input_clock; // used for input - as we still want to allow, e.g., changing viewpoint, even when game action is paused
 
     int getElapsedMS() const;
 
@@ -62,7 +63,7 @@ public:
     bool isPaused() const {
         return this->game_clock.isPaused();
     }
-    void setPaused(bool paused);
+    void setPaused(bool paused, bool also_input);
     void restartElapsedTimer();
     void enableUpdateTimer(bool enabled);
     int getGameTimeFrameMS() const {
@@ -71,12 +72,12 @@ public:
     int getGameTimeTotalMS() const {
         return this->game_clock.getGameTimeTotalMS();
     }
-    int getRealTimeFrameMS() const {
-        return this->game_clock.getGameTimeFrameMS();
+    int getInputTimeFrameMS() const {
+        return this->input_clock.getGameTimeFrameMS();
     }
 
 public slots:
     void togglePaused() {
-        this->setPaused( !this->isPaused() );
+        this->setPaused( !this->isPaused(), false );
     }
 };

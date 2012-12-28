@@ -220,7 +220,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
-                int time_ms = game_g->getScreen()->getRealTimeFrameMS();
+                int time_ms = game_g->getScreen()->getInputTimeFrameMS();
                 if( time_ms > 0 ) {
                     diff /= (float)time_ms;
                     this->has_kinetic_scroll = true;
@@ -452,13 +452,13 @@ void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
     }
 }
 
-void MainGraphicsView::update() {
+void MainGraphicsView::updateInput() {
     if( (qApp->mouseButtons() & Qt::LeftButton) == 0 ) {
         /*int time_ms = game_g->getScreen()->getGameTimeFrameMS();
         float speed = (4.0f * time_ms)/1000.0f;*/
         //if( fabs(this->kinetic_scroll_x) >= 0.0f && fabs(this->kinetic_scroll_y) >= 0.0f ) {
         if( this->has_kinetic_scroll ) {
-            int time_ms = game_g->getScreen()->getRealTimeFrameMS();
+            int time_ms = game_g->getScreen()->getInputTimeFrameMS();
             //qDebug("centre was: %f, %f", centre.x(), centre.y());
             float step = time_ms*this->kinetic_scroll_speed;
             float move_x = step * this->kinetic_scroll_dir.x;
@@ -2005,7 +2005,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 
     {
         const int res_c = 15;
@@ -2732,7 +2732,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     qApp->processEvents();
 
     window->setEnabled(true);
-    game_g->getScreen()->setPaused(false);
+    game_g->getScreen()->setPaused(false, true);
 
 }
 
@@ -3200,7 +3200,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -4171,7 +4171,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     qApp->processEvents();
 
     window->setEnabled(true);
-    game_g->getScreen()->setPaused(false);
+    game_g->getScreen()->setPaused(false, true);
     game_g->getScreen()->restartElapsedTimer();
 
     //qApp->processEvents();
@@ -4358,7 +4358,7 @@ void PlayingGamestate::clickedStats() {
     this->closeSubWindow();
 
     new StatsWindow(this);
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 }
 
 void PlayingGamestate::clickedItems() {
@@ -4366,7 +4366,7 @@ void PlayingGamestate::clickedItems() {
     this->closeSubWindow();
 
     new ItemsWindow(this);
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 }
 
 void PlayingGamestate::clickedJournal() {
@@ -4385,7 +4385,7 @@ void PlayingGamestate::clickedOptions() {
     LOG("clickedOptions()\n");
     this->closeSubWindow();
 
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 
     QWidget *subwindow = new QWidget();
     this->addWidget(subwindow);
@@ -4467,7 +4467,7 @@ void PlayingGamestate::showInfoWindow(const string &html) {
     // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
     qDebug("showInfoWindow()\n");
 
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
 
     QWidget *subwindow = new QWidget();
     this->addWidget(subwindow);
@@ -4498,7 +4498,7 @@ void PlayingGamestate::closeSubWindow() {
         this->main_stacked_widget->removeWidget(subwindow);
         subwindow->deleteLater();
         if( n_stacked_widgets == 2 ) {
-            game_g->getScreen()->setPaused(false);
+            game_g->getScreen()->setPaused(false, true);
             this->view->setEnabled(true);
             this->view->grabKeyboard();
         }
@@ -4512,7 +4512,7 @@ void PlayingGamestate::closeAllSubWindows() {
         this->main_stacked_widget->removeWidget(subwindow);
         subwindow->deleteLater();
     }
-    game_g->getScreen()->setPaused(false);
+    game_g->getScreen()->setPaused(false, true);
     this->view->setEnabled(true);
     this->view->grabKeyboard();
 }
@@ -4535,70 +4535,6 @@ void PlayingGamestate::update() {
     }*/
 
     //qDebug("PlayingGamestate::update()");
-    // scroll
-    bool scrolled = false;
-    int real_time_ms = game_g->getScreen()->getRealTimeFrameMS();
-    float speed = (4.0f * real_time_ms)/1000.0f;
-    if( !mobile_c ) {
-        // scroll due to mouse at edge of screen
-        int m_x = QCursor::pos().x();
-        int m_y = QCursor::pos().y();
-        int screen_width = QApplication::desktop()->width();
-        int screen_height = QApplication::desktop()->height();
-        //qDebug("mouse at %d, %d", m_x, m_y);
-        //qDebug("screen size %d x %d", screen_width, screen_height);
-        QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
-        if( m_x <= 0 ) {
-            centre.setX( centre.x() - speed );
-            this->view->centerOn(centre);
-            scrolled = true;
-        }
-        else if( m_x >= screen_width-1 ) {
-            centre.setX( centre.x() + speed );
-            this->view->centerOn(centre);
-            scrolled = true;
-        }
-        if( m_y <= 0 ) {
-            centre.setY( centre.y() - speed );
-            this->view->centerOn(centre);
-            scrolled = true;
-        }
-        else if( m_y >= screen_height-1 ) {
-            centre.setY( centre.y() + speed );
-            this->view->centerOn(centre);
-            scrolled = true;
-        }
-    }
-    if( !scrolled && !mobile_c ) {
-        // scroll due to player near the edge
-        // disabed for touchscreens, as makes drag-scrolling harder
-        QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
-        if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
-            const int wid = 64;
-            QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
-            if( player_pos.x() < wid ) {
-                centre.setX( centre.x() - speed );
-                this->view->centerOn(centre);
-                scrolled = true;
-            }
-            else if( player_pos.x() >= this->view->width() - wid ) {
-                centre.setX( centre.x() + speed );
-                this->view->centerOn(centre);
-                scrolled = true;
-            }
-            if( player_pos.y() < wid ) {
-                centre.setY( centre.y() - speed );
-                this->view->centerOn(centre);
-                scrolled = true;
-            }
-            else if( player_pos.y() >= this->view->height() - wid ) {
-                centre.setY( centre.y() + speed );
-                this->view->centerOn(centre);
-                scrolled = true;
-            }
-        }
-    }
-
     // update due to keyboard input
     {
         // n.b., we need to call setDirection() on the player, so that the direction still gets set even if the player can't move in that direction (e.g., blocked by NPC or scenery) - needed to we can still do Action on that NPC or scenery!
@@ -4754,9 +4690,77 @@ void PlayingGamestate::update() {
     //qDebug("PlayingGamestate::update() exit");
 }
 
+void PlayingGamestate::updateInput() {
+    // scroll
+    bool scrolled = false;
+    int real_time_ms = game_g->getScreen()->getInputTimeFrameMS();
+    float speed = (4.0f * real_time_ms)/1000.0f;
+    if( !mobile_c ) {
+        // scroll due to mouse at edge of screen
+        int m_x = QCursor::pos().x();
+        int m_y = QCursor::pos().y();
+        int screen_width = QApplication::desktop()->width();
+        int screen_height = QApplication::desktop()->height();
+        //qDebug("mouse at %d, %d", m_x, m_y);
+        //qDebug("screen size %d x %d", screen_width, screen_height);
+        QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
+        if( m_x <= 0 ) {
+            centre.setX( centre.x() - speed );
+            this->view->centerOn(centre);
+            scrolled = true;
+        }
+        else if( m_x >= screen_width-1 ) {
+            centre.setX( centre.x() + speed );
+            this->view->centerOn(centre);
+            scrolled = true;
+        }
+        if( m_y <= 0 ) {
+            centre.setY( centre.y() - speed );
+            this->view->centerOn(centre);
+            scrolled = true;
+        }
+        else if( m_y >= screen_height-1 ) {
+            centre.setY( centre.y() + speed );
+            this->view->centerOn(centre);
+            scrolled = true;
+        }
+    }
+    if( !scrolled && !mobile_c ) {
+        // scroll due to player near the edge
+        // disabed for touchscreens, as makes drag-scrolling harder
+        QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
+        if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
+            const int wid = 64;
+            QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
+            if( player_pos.x() < wid ) {
+                centre.setX( centre.x() - speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            else if( player_pos.x() >= this->view->width() - wid ) {
+                centre.setX( centre.x() + speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            if( player_pos.y() < wid ) {
+                centre.setY( centre.y() - speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+            else if( player_pos.y() >= this->view->height() - wid ) {
+                centre.setY( centre.y() + speed );
+                this->view->centerOn(centre);
+                scrolled = true;
+            }
+        }
+    }
+
+    this->view->updateInput();
+}
+
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
-    this->view->update();
+    //this->view->update();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 }
 
@@ -5018,7 +5022,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     }
     else if( pickup_items.size() > 1 ) {
         new ItemsPickerWindow(this, pickup_items);
-        game_g->getScreen()->setPaused(true);
+        game_g->getScreen()->setPaused(true, true);
     }
     return done;
 }
@@ -5147,7 +5151,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         this->showInfoDialog(completed_text);
                     }
                     new CampaignWindow(this);
-                    game_g->getScreen()->setPaused(true);
+                    game_g->getScreen()->setPaused(true, true);
                     this->player->restoreHealth();
                     this->player->expireProfileEffects();
                 }
@@ -5234,7 +5238,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
 void PlayingGamestate::actionCommand(bool pickup_only) {
     qDebug("PlayingGamestate::actionCommand()");
     if( game_g->getScreen()->isPaused() ) {
-        game_g->getScreen()->setPaused(false);
+        game_g->getScreen()->setPaused(false, false);
     }
 
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
@@ -5304,7 +5308,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
 
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
     if( game_g->getScreen()->isPaused() ) {
-        game_g->getScreen()->setPaused(false);
+        game_g->getScreen()->setPaused(false, false);
     }
 
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {

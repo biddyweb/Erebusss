@@ -402,6 +402,7 @@ public:
 
     void run();
     void update();
+    void updateInput();
     void render();
     void runTests();
 

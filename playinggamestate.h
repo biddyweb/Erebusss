@@ -113,7 +113,7 @@ public:
         this->gui_overlay = gui_overlay;
     }
     void createLightingMap(unsigned char lighting_min);
-    void update();
+    void updateInput();
     void setScale(float c_scale);
     void setScale(QPointF centre, float c_scale);
     float getScale() const {
@@ -435,6 +435,7 @@ public:
 
     virtual void quitGame();
     virtual void update();
+    virtual void updateInput();
     virtual void render();
     virtual void activate(bool active) {
         // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)

@@ -110,8 +110,8 @@ void InfoDialog::scrollToBottom() {
 }
 
 int InfoDialog::exec() {
-    game_g->getScreen()->setPaused(true);
+    game_g->getScreen()->setPaused(true, true);
     int result = QDialog::exec();
-    game_g->getScreen()->setPaused(false);
+    game_g->getScreen()->setPaused(false, true);
     return result;
 }
