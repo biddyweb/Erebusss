@@ -4282,7 +4282,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         object->setTransform(transform);
         if( scenery->hasSmoke() ) {
             SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
-            ps->setBirthRate(1.0f);
+            ps->setBirthRate(25.0f);
             ps->setPos(centre_x, 30.0f);
             ps->setZValue(object->pos().y() + 2000.0f);
             ps->setParentItem(object);

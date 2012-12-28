@@ -309,4 +309,6 @@ int rollDice(int X, int Y, int Z);
 
 float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);
 
+int poisson(int mean_ticks_per_event, int time_interval);
+
 float perlin_noise2(float vec[2]);

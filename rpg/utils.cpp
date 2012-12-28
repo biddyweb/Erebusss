@@ -379,6 +379,18 @@ float distFromBox2D(const Vector2D &centre, float width, float height, const Vec
     return sqrt( dist_x*dist_x + dist_y*dist_y );
 }
 
+/* Return probability (as a proportion of RAND_MAX) that at least one poisson event
+* occurred within the time_interval, given the mean number of time units per event.
+*/
+int poisson(int mean_ticks_per_event, int time_interval) {
+        if( mean_ticks_per_event == 0 )
+                return RAND_MAX;
+        ASSERT_LOGGER( mean_ticks_per_event > 0 );
+        int prob = (int)(RAND_MAX * ( 1.0 - exp( - ((double)time_interval) / mean_ticks_per_event ) ));
+        return prob;
+}
+
+
 // Perlin noise
 
 #define B 0x100

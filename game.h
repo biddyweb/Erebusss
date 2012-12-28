@@ -220,6 +220,7 @@ public:
 class Particle {
     float xpos, ypos; // floats to allow for movement
     int birth_time;
+    bool flag;
 public:
     Particle();
 
@@ -235,6 +236,12 @@ public:
     }
     int getBirthTime() const {
             return this->birth_time;
+    }
+    void setFlag(bool flag) {
+        this->flag = flag;
+    }
+    bool isFlag() const {
+        return this->flag;
     }
 };
 

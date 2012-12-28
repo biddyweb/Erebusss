@@ -3,7 +3,9 @@
 #include "game.h"
 #include "logiface.h"
 
-const int time_per_frame_c = 1000/25;
+//const int time_per_frame_c = 1000/25;
+const int time_per_frame_c = 1000/60;
+//const int time_per_frame_c = 1000/200;
 
 GameClock::GameClock() : paused(false), saved_paused_time_ms(0), saved_elapsed_time_ms(0), game_time_total_ms(0), game_time_frame_ms(0), accumulator(0) {
 }
@@ -127,6 +129,7 @@ void Screen::update() {
     {
         int n_updates = game_clock.update(time_now_ms);
         for(int i=0;i<n_updates;i++) {
+            //qDebug("%d : frame time %d total time %d", i, game_clock.getGameTimeFrameMS(), game_clock.getGameTimeTotalMS());
             game_clock.callingUpdate();
             game_g->update();
         }

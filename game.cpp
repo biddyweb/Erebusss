@@ -344,7 +344,7 @@ int AnimatedObject::getHeight() const {
     }
 }
 
-Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0) {
+Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0), flag(false) {
     this->birth_time = game_g->getScreen()->getGameTimeTotalMS();
 }
 
@@ -391,18 +391,24 @@ void SmokeParticleSystem::update() {
     }
 
     int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
-    //LOG("%d\n", real_loop_time);
+    const float xspeed = 0.03f;
+    const float yspeed = 0.06f;
     // update particles
     for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
-            const float xspeed = 0.03f;
-            const float yspeed = 0.06f;
             float xpos = particles.at(i).getX();
             float ypos = particles.at(i).getY();
+            float xdiff = real_loop_time * xspeed;
             float ydiff = real_loop_time * yspeed;
             ypos -= ydiff;
-            float xdiff = real_loop_time * xspeed;
-            if( rand() % 2 == 0 ) {
+            /*if( rand() % 2 == 0 ) {
                     xdiff = - xdiff;
+            }*/
+            int prob = poisson(100, real_loop_time);
+            if( rand() % RAND_MAX <= prob ) {
+                particles.at(i).setFlag( !particles.at(i).isFlag() );
+            }
+            if( !particles.at(i).isFlag() ) {
+                xdiff = - xdiff;
             }
             xpos += xdiff;
             /*if( ypos < 0 ) {
@@ -419,13 +425,14 @@ void SmokeParticleSystem::update() {
 
     // emit new particles
     int accumulated_time = game_g->getScreen()->getGameTimeTotalMS() - this->last_emit_time;
-    int new_particles = (int)(this->birth_rate * accumulated_time);
-    new_particles = std::min(1, new_particles); // helps make rate more steady
-    this->last_emit_time += (int)(1.0f/birth_rate * new_particles);
+    //qDebug("accumulated_time = %d - %d = %d", game_g->getScreen()->getGameTimeTotalMS(), this->last_emit_time, accumulated_time);
+    int new_particles = (int)(this->birth_rate/1000.0f * accumulated_time);
+    this->last_emit_time += (int)(1000.0f/birth_rate * new_particles);
     if( new_particles > 0 ) {
-            //LOG("%d new particles (total will be %d)\n", new_particles, particles.size() + new_particles);
+            //qDebug("%d new particles (total will be %d)", new_particles, particles.size() + new_particles);
             for(int i=0;i<new_particles;i++) {
                     Particle particle;
+                    particle.setFlag( rand() % 2 == 0 );
                     particles.push_back(particle);
             }
     }
