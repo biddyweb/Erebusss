@@ -2008,7 +2008,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     game_g->getScreen()->setPaused(true, true);
 
     {
+#if defined(Q_OS_SYMBIAN)
         const int res_c = 15;
+#else
+        const int res_c = 63;
+#endif
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
         QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
@@ -4279,8 +4283,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         if( scenery->hasSmoke() ) {
             SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
             ps->setBirthRate(1.0f);
-            ps->setPos(centre_x, 2.0f*smoke_pixmap.height());
-            ps->setScale(2.0f);
+            ps->setPos(centre_x, 30.0f);
             ps->setZValue(object->pos().y() + 2000.0f);
             ps->setParentItem(object);
         }

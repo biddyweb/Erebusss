@@ -357,8 +357,9 @@ void ParticleSystem::advance(int phase) {
 
 void ParticleSystem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     //qDebug("draw %d particles", particles.size());
+    const float size = 31.0f;
     for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
-        painter->drawPixmap(iter->getX() - this->pixmap.width()*0.5f, iter->getY() - this->pixmap.height()*0.5f, this->pixmap);
+        painter->drawPixmap(iter->getX() - size*0.5f, iter->getY() - size*0.5f, size, size, this->pixmap);
     }
 }
 
@@ -393,10 +394,8 @@ void SmokeParticleSystem::update() {
     //LOG("%d\n", real_loop_time);
     // update particles
     for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
-            //const float xspeed = 0.01f;
-            const float xspeed = 0.015f;
-            //const float yspeed = 0.05f;
-            const float yspeed = 0.03f;
+            const float xspeed = 0.03f;
+            const float yspeed = 0.06f;
             float xpos = particles.at(i).getX();
             float ypos = particles.at(i).getY();
             float ydiff = real_loop_time * yspeed;
