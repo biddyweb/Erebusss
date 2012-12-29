@@ -329,6 +329,10 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
     qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
+    if( game_g->getScreen()->isPaused() ) {
+        game_g->getScreen()->setPaused(false, false);
+    }
+
     bool done = handleKey(event, true);
     if( !done ) {
         QGraphicsView::keyPressEvent(event);
@@ -5240,9 +5244,6 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
 
 void PlayingGamestate::actionCommand(bool pickup_only) {
     qDebug("PlayingGamestate::actionCommand()");
-    if( game_g->getScreen()->isPaused() ) {
-        game_g->getScreen()->setPaused(false, false);
-    }
 
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
         bool done = false;
@@ -5378,7 +5379,7 @@ void PlayingGamestate::requestPlayerMove(Vector2D dest, const Scenery *ignore_sc
     // nudge position due to boundaries
     dest = this->c_location->nudgeToFreeSpace(player->getPos(), dest, npc_radius_c);
     if( dest != player->getPos() ) {
-        qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
+        //qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
         player->setDestination(dest.x, dest.y, ignore_scenery);
         if( player->carryingTooMuch() ) {
             this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
