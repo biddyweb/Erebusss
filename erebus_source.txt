@@ -23,6 +23,8 @@ This should then produce the executable file erebus. To run, type:
 
 The Linux version has been tested on Ubuntu 12.04 Precise Pangolin 32-bit.
 
+Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to have version 4.6.3 of libqt4-dev, where as Erebus requires 4.7.3 or later. You need to download from the testing or unstable repositories. This should be fixed in version 7.0 "wheezy".
+
 Windows
 =======
 
