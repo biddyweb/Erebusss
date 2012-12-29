@@ -1,4 +1,4 @@
-Erebus is built using Nokia Qt Creator ( http://qt.nokia.com/products/qt-sdk ), available for Windows, Linux and OS X. The Linux version can also be built more easily from the command line.
+Erebus is built using Nokia Qt Creator ( http://qt.nokia.com/products/qt-sdk ), available for Windows, Linux and OS X. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
 
 Note that if you have downloaded the source from the Git Repository ( http://sourceforge.net/p/erebusrpg/code/ ), you still need to download the various media/binary files needed to run the game. You can get a complete archive by downloading a source archive ("erebussrc.zip" from https://launchpad.net/erebus/+download ).
 
