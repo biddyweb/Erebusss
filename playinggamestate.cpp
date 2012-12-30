@@ -356,6 +356,7 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
         //qDebug("### %d, %d", scene()->sceneRect().x(), scene()->sceneRect().y());
         //this->gui_overlay_item->setPos( this->scene()->sceneRect().topLeft() );
     }
+    this->resetCachedContent();
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
