@@ -12,7 +12,6 @@ copy %src%\erebus_source.txt %dst%
 
 copy %src%\erebus.pro %dst%
 copy %src%\deployment.pri %dst%
-copy %src%\erebus.qrc %dst%
 copy %src%\erebus.ico %dst%
 copy %src%\resource.rc %dst%
 copy %src%\erebus.svg %dst%

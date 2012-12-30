@@ -164,5 +164,4 @@ OTHER_FILES += \
     _devdocs/rules.odt \
     data/quest_necromancer.xml
 
-RESOURCES += \
-    erebus.qrc
+RESOURCES +=
