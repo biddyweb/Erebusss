@@ -4,8 +4,8 @@
 using std::string;
 
 #include "utils.h"
+#include "character.h" // for Profile
 
-class Character;
 class PlayingGamestate;
 
 enum ItemType {
@@ -41,6 +41,7 @@ protected:
     int rating;
     bool is_magical;
     int worth_bonus;
+    Profile profile_bonus;
 public:
     Item(const string &name, const string &image_name, int weight);
     virtual ~Item();
@@ -159,6 +160,11 @@ public:
     int getWorthBonus() const {
         return this->worth_bonus;
     }
+    void setProfileBonus(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->profile_bonus.set(FP, BS, S, A, M, D, B, Sp);
+    }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
 class Weapon : public Item {
@@ -217,6 +223,8 @@ public:
     int getMinStrength() const {
         return this->min_strength;
     }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
 class Shield : public Item {
@@ -234,6 +242,8 @@ public:
     string getAnimationName() const {
         return this->animation_name;
     }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
 class Armour : public Item {
@@ -258,6 +268,8 @@ public:
     int getMinStrength() const {
         return this->min_strength;
     }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
 class Ring : public Item {
@@ -270,6 +282,9 @@ public:
         return ITEMTYPE_RING;
     }
     virtual Ring *clone() const; // virtual copy constructor
+
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
 class Ammo : public Item {
@@ -296,6 +311,12 @@ public:
     void setAmount(int amount) {
         this->amount = amount;
     }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const {
+        return 0;
+    }
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const {
+        return 0;
+    }
 };
 
 class Currency : public Item {
@@ -316,6 +337,12 @@ public:
     }
     void setValue(int value) {
         this->value = value;
+    }
+    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const {
+        return 0;
+    }
+    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const {
+        return 0;
     }
 };
 

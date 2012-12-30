@@ -12,7 +12,7 @@ using std::stringstream;
 
 Item::Item(const string &name, const string &image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), icon_width(0.5f), weight(weight),
-   arg1(0), arg2(0), rating(1), is_magical(false), worth_bonus(0)
+    arg1(0), arg2(0), rating(1), is_magical(false), worth_bonus(0)
 {
 }
 
@@ -184,6 +184,18 @@ string Item::getDetailedDescription() const {
     return str.str();
 }
 
+int Item::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // default for item is that profile bonus is always active
+    int value = this->profile_bonus.getIntProperty(key);
+    return value;
+}
+
+float Item::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    // default for item is that profile bonus is always active
+    int value = this->profile_bonus.getIntProperty(key);
+    return value;
+}
+
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), is_ranged(false), requires_ammo(false),
@@ -201,6 +213,20 @@ int Weapon::getDamage() const {
     return roll;
 }
 
+int Weapon::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // profile bonus only active if weapon is armed
+    if( this != character->getCurrentWeapon() )
+        return 0;
+    return Item::getProfileBonusIntProperty(character, key);
+}
+
+float Weapon::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    // profile bonus only active if weapon is armed
+    if( this != character->getCurrentWeapon() )
+        return 0;
+    return Item::getProfileBonusFloatProperty(character, key);
+}
+
 Shield::Shield(const string &name, const string &image_name, int weight, const string &animation_name) :
     Item(name, image_name, weight), animation_name(animation_name)
 {
@@ -208,6 +234,20 @@ Shield::Shield(const string &name, const string &image_name, int weight, const s
 
 Shield *Shield::clone() const {
     return new Shield(*this);
+}
+
+int Shield::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // profile bonus only active if shield is armed
+    if( this != character->getCurrentShield() )
+        return 0;
+    return Item::getProfileBonusIntProperty(character, key);
+}
+
+float Shield::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    // profile bonus only active if shield is armed
+    if( this != character->getCurrentShield() )
+        return 0;
+    return Item::getProfileBonusFloatProperty(character, key);
 }
 
 Armour::Armour(const string &name, const string &image_name, int weight, int rating) :
@@ -221,6 +261,20 @@ Armour *Armour::clone() const {
     return new Armour(*this);
 }
 
+int Armour::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // profile bonus only active if armour is worn
+    if( this != character->getCurrentArmour() )
+        return 0;
+    return Item::getProfileBonusIntProperty(character, key);
+}
+
+float Armour::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    // profile bonus only active if armour is worn
+    if( this != character->getCurrentArmour() )
+        return 0;
+    return Item::getProfileBonusFloatProperty(character, key);
+}
+
 Ring::Ring(const string &name, const string &image_name, int weight) :
     Item(name, image_name, weight)
 {
@@ -228,6 +282,20 @@ Ring::Ring(const string &name, const string &image_name, int weight) :
 
 Ring *Ring::clone() const {
     return new Ring(*this);
+}
+
+int Ring::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // profile bonus only active if ring is worn
+    if( this != character->getCurrentRing() )
+        return 0;
+    return Item::getProfileBonusIntProperty(character, key);
+}
+
+float Ring::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    // profile bonus only active if ring is worn
+    if( this != character->getCurrentRing() )
+        return 0;
+    return Item::getProfileBonusFloatProperty(character, key);
 }
 
 Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount) :
