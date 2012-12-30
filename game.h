@@ -407,7 +407,7 @@ public:
         this->webViewEventFilter->setWebView(webView);
     }
 
-    void run(int argc, char *argv[]);
+    void run(bool fullscreen);
     void handleMessages();
     void update();
     void updateInput();
