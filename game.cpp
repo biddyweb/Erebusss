@@ -1141,12 +1141,14 @@ void Game::handleMessages() {
 }
 
 void Game::update() {
+    this->handleMessages(); // needed to process any messages from earlier update call
     if( gamestate != NULL ) {
         gamestate->update();
     }
 }
 
 void Game::updateInput() {
+    this->handleMessages(); // needed to process any messages from earlier updateInput call
     if( gamestate != NULL ) {
         gamestate->updateInput();
     }

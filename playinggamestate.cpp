@@ -4574,6 +4574,10 @@ void PlayingGamestate::quitGame() {
 }
 
 void PlayingGamestate::update() {
+    if( this->player == NULL ) {
+        return;
+    }
+
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     /*if( game_g->getScreen()->isPaused() ) {
@@ -4725,7 +4729,6 @@ void PlayingGamestate::update() {
             //this->showInfoDialog("Game over!\n\nYou have died!");
             //this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
             this->showInfoDialog("Game over!\n\nYou have died!", string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
-            //qDebug("send game message: GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
@@ -4737,6 +4740,10 @@ void PlayingGamestate::update() {
 }
 
 void PlayingGamestate::updateInput() {
+    if( this->player == NULL ) {
+        return;
+    }
+
     // scroll
     bool scrolled = false;
     int real_time_ms = game_g->getScreen()->getInputTimeFrameMS();
