@@ -1070,7 +1070,7 @@ void Game::initButton(QPushButton *button) const {
 }
 
 void Game::handleMessages() {
-    qDebug("Game::handleMessages()");
+    //qDebug("Game::handleMessages()");
 
     while( !message_queue.empty() ) {
         GameMessage *message = message_queue.front();
