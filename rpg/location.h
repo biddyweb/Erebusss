@@ -676,6 +676,7 @@ public:
 class Quest {
     QuestObjective *quest_objective;
     vector<Location *> locations;
+    string name;
     string info;
     string completed_text;
     bool is_completed;
@@ -690,6 +691,12 @@ public:
     }
     const QuestObjective *getQuestObjective() const {
         return this->quest_objective;
+    }
+    void setName(const string &name) {
+        this->name = name;
+    }
+    string getName() const {
+        return this->name;
     }
     void setInfo(const string &info) {
         this->info = info;

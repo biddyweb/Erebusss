@@ -3271,7 +3271,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                 }
 
                 qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
-                if( reader.name() == "info" ) {
+                if( reader.name() == "quest" ) {
+                    QStringRef name_s = reader.attributes().value("name");
+                    quest->setName(name_s.toString().toStdString());
+                }
+                else if( reader.name() == "info" ) {
                     if( is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: info element not expected in save games");
@@ -4189,12 +4193,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         quest_info = convertToHTML(quest_info);
         stringstream str;
         str << "<html><body>";
-        str << "<h1>Quest</h1>";
+        str << "<h1>Quest: " << quest->getName() << "</h1>";
         str << "<p>" << quest_info << "</p>";
         str << "</body></html>";
         this->showInfoWindow(str.str());
 
-        this->journal_ss << "<p><b>Quest Details</b></p>";
+        this->journal_ss << "<p><b>Quest Details: " << quest->getName() << "</b></p>";
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
