@@ -299,6 +299,7 @@ protected:
 
 public:
     GameMessage(GameMessageType game_message_type) : game_message_type(game_message_type) {
+        qDebug("send game message: %d", game_message_type);
     }
 
     GameMessageType getGameMessageType() const {
