@@ -847,7 +847,7 @@ void Location::createBoundariesForRegions() {
         // first point actually added as last point at end
         for(;;) {
             int n_indx = (c_indx+1) % c_floor_region->getNPoints();
-            Vector2D back_pvec = c_floor_region->getPoint( c_indx );
+            //Vector2D back_pvec = c_floor_region->getPoint( c_indx );
             Vector2D pvec = c_floor_region->getPoint( n_indx );
             //qDebug("on edge %f, %f to %f, %f", back_pvec.x, back_pvec.y, pvec.x, pvec.y);
             if( c_floor_region->getTempMark(c_indx) != 0 ) {
@@ -953,8 +953,8 @@ void Location::createBoundariesForScenery() {
 }
 
 void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const {
-    Vector2D saved_p0 = p0; // for debugging
-    Vector2D saved_p1 = p1;
+    //Vector2D saved_p0 = p0; // for debugging
+    //Vector2D saved_p1 = p1;
     // transform into the space of the swept square
     p0 -= start;
     p0 = Vector2D( p0 % du, p0 % dv );
@@ -1547,7 +1547,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
-            Vector2D point = floor_region->getPoint(j);
+            //Vector2D point = floor_region->getPoint(j);
             int p_j = j==0 ? floor_region->getNPoints()-1 : j-1;
             // now only need to check for points on internal edges
             if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL || floor_region->getEdgeType(p_j) == FloorRegion::EDGETYPE_INTERNAL )

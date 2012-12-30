@@ -129,8 +129,11 @@ bool Polygon2D::pointInside(Vector2D pvec) const {
     if( pvec.x < this->top_left.x || pvec.x > this->bottom_right.x || pvec.y < this->top_left.y || pvec.y > this->bottom_right.y ) {
         return false;
     }
+    if( this->getNPoints() == 0 ) {
+        return false;
+    }
     bool c = false;
-    for(int i=0,j=this->getNPoints()-1;i<this->getNPoints();j=i++) {
+    for(size_t i=0,j=this->getNPoints()-1;i<this->getNPoints();j=i++) {
         Vector2D pi = points.at(i);
         Vector2D pj = points.at(j);
         // first exclude case where the pvec lies on the polygon boundary

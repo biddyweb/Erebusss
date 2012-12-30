@@ -775,8 +775,8 @@ QString StatsWindow::writeStat(const string &visual_name, const string &stat_key
 }
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
-    playing_gamestate(playing_gamestate), list(NULL),
-    dropButton(NULL), armButton(NULL), wearButton(NULL), useButton(NULL),
+    playing_gamestate(playing_gamestate), list(NULL), weightLabel(NULL),
+    armButton(NULL), wearButton(NULL), useButton(NULL), dropButton(NULL), infoButton(NULL),
     view_type(VIEWTYPE_ALL)
 {
     playing_gamestate->addWidget(this);
@@ -5049,7 +5049,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
 bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     qDebug("PlayingGamestate::handleClickForItems");
     bool done = false;
-    float min_dist = 0.0f;
+    //float min_dist = 0.0f;
     const float click_tol_items_c = 0.25f;
     // search for clicking on an item
     vector<Item *> pickup_items;
@@ -5060,7 +5060,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
         float dist_from_player = (player->getPos() - item->getPos()).magnitude();
         if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
             done = true;
-            min_dist = dist_from_click;
+            //min_dist = dist_from_click;
             pickup_items.push_back(item);
         }
     }
@@ -5371,7 +5371,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         // search for clicking on an NPC
         {
-            float min_dist = 0.0f;
+            //float min_dist = 0.0f;
             Character *target_npc = NULL;
             for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
                 Character *character = *iter;
@@ -5397,7 +5397,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     {
                         done = true;
                         target_npc = character;
-                        min_dist = 0.0f;
+                        //min_dist = 0.0f;
                     }
                 }
             }
