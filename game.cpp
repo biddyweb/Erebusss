@@ -591,14 +591,27 @@ Game::~Game() {
 
 void Game::run(int argc, char *argv[]) {
     bool fullscreen = true;
+    bool help = false;
 
 #if !defined(Q_OS_ANDROID)
         // n.b., crashes when run on Galaxy Nexus (even though fine in the emulator)
     for(int i=0;i<argc;i++) {
         if( strcmp(argv[i], "-windowed") == 0 )
             fullscreen = false;
+        else if( strcmp(argv[i], "-help") == 0 )
+            help = true;
     }
 #endif
+
+    if( help ) {
+        // n.b., won't show on Windows due to being a Windowed application
+        printf("Erebus v%d.%d\n", versionMajor, versionMinor);
+        printf("Available options:\n");
+        printf("    -windowed - Run in windowed mode\n");
+        printf("    -help     - Display this message\n");
+        printf("Please see the file erebus.html in docs/ for full instructions.\n");
+        return;
+    }
 
     screen = new Screen(fullscreen);
 
