@@ -407,7 +407,7 @@ public:
         this->webViewEventFilter->setWebView(webView);
     }
 
-    void run();
+    void run(int argc, char *argv[]);
     void handleMessages();
     void update();
     void updateInput();

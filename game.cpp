@@ -589,8 +589,18 @@ Game::~Game() {
     game_g = NULL;
 }
 
-void Game::run() {
-    screen = new Screen();
+void Game::run(int argc, char *argv[]) {
+    bool fullscreen = true;
+
+#if !defined(Q_OS_ANDROID)
+        // n.b., crashes when run on Galaxy Nexus (even though fine in the emulator)
+    for(int i=0;i<argc;i++) {
+        if( strcmp(argv[i], "windowed") == 0 )
+            fullscreen = false;
+    }
+#endif
+
+    screen = new Screen(fullscreen);
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();

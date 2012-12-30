@@ -65,7 +65,7 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
     setAttribute(attribute, true);
 }
 
-void MainWindow::showExpanded()
+void MainWindow::showExpanded(bool fullscreen)
 {
 /*#if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     showFullScreen();
@@ -74,8 +74,13 @@ void MainWindow::showExpanded()
 #else
     show();
 #endif*/
-    showFullScreen();
-    //show();
+    if( mobile_c || fullscreen ) {
+        // mobile platforms always fullscreen
+        showFullScreen();
+    }
+    else {
+        show();
+    }
 }
 
 #if 0

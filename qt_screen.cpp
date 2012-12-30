@@ -76,13 +76,13 @@ void GameClock::restart() {
     this->accumulator = 0;
 }
 
-Screen::Screen() :
+Screen::Screen(bool fullscreen) :
     mainWindow(NULL)
 {
     LOG("Screen::Screen()\n");
     mainWindow = new MainWindow();
     mainWindow->setOrientation(MainWindow::ScreenOrientationLockLandscape);
-    mainWindow->showExpanded();
+    mainWindow->showExpanded(fullscreen);
 }
 
 Screen::~Screen() {

@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     MyApplication app(argc, argv);
 
     Game game;
-    game.run();
+    game.run(argc, argv);
     //game.runTests();
     return 0;
 }

@@ -50,7 +50,7 @@ private slots:
     void update();
 
 public:
-    Screen();
+    Screen(bool fullscreen);
     ~Screen();
 
     MainWindow *getMainWindow() {
