@@ -1069,7 +1069,9 @@ void Game::initButton(QPushButton *button) const {
     button->setPalette(this->gui_palette);
 }
 
-void Game::update() {
+void Game::handleMessages() {
+    qDebug("Game::handleMessages()");
+
     while( !message_queue.empty() ) {
         GameMessage *message = message_queue.front();
         message_queue.pop();
@@ -1136,7 +1138,9 @@ void Game::update() {
         }
         delete message;
     }
+}
 
+void Game::update() {
     if( gamestate != NULL ) {
         gamestate->update();
     }

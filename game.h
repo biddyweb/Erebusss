@@ -408,6 +408,7 @@ public:
     }
 
     void run();
+    void handleMessages();
     void update();
     void updateInput();
     void render();

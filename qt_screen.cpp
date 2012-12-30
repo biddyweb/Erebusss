@@ -109,21 +109,6 @@ void Screen::update() {
     //qApp->beep();
     //qDebug("Screen::update()");
 
-    /*int new_elapsed_time_ms = this->getElapsedMS();
-    if( paused ) {
-        this->game_time_frame_ms = 0;
-    }
-    else {
-        this->game_time_frame_ms = new_elapsed_time_ms - this->saved_elapsed_time_ms;
-        this->game_time_frame_ms = std::min(this->game_time_frame_ms, 1000);
-        this->game_time_total_ms += this->game_time_frame_ms;
-        this->saved_elapsed_time_ms = new_elapsed_time_ms;
-        //qDebug("Update: frame time: %d", this->game_time_frame_ms);
-    }
-
-    game_g->update();
-    game_g->render();*/
-
     int time_now_ms = this->getElapsedMS();
 
     {
@@ -145,9 +130,12 @@ void Screen::update() {
 
     //qDebug("    Render");
     game_g->render();
+
+    game_g->handleMessages();
 }
 
 void Screen::setPaused(bool paused, bool also_input) {
+    //qDebug("Screen::setPaused(%d, %d)", paused, also_input);
     int time_now_ms = this->getElapsedMS();
     game_clock.setPaused(paused, time_now_ms);
     if( also_input || !paused ) {
