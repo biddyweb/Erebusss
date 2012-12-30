@@ -1138,22 +1138,47 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
         }
         Vector2D top_left = boundary->getTopLeft();
         Vector2D bottom_right = boundary->getBottomRight();
+        top_left.x -= E_TOL_LINEAR;
+        top_left.y -= E_TOL_LINEAR;
+        bottom_right.x += E_TOL_LINEAR;
+        bottom_right.y += E_TOL_LINEAR;
         if( start.x + width < top_left.x && end.x + width < top_left.x ) {
             continue;
         }
-        else if( start.x + width > bottom_right.x && end.x + width > bottom_right.x ) {
+        else if( start.x - width > bottom_right.x && end.x - width > bottom_right.x ) {
             continue;
         }
         else if( start.y + width < top_left.y && end.y + width < top_left.y ) {
             continue;
         }
-        else if( start.y + width > bottom_right.y && end.y + width > bottom_right.y ) {
+        else if( start.y - width > bottom_right.y && end.y - width > bottom_right.y ) {
             continue;
         }
+        /*bool aabb_test = false;
+        if( start.x + width < top_left.x && end.x + width < top_left.x ) {
+            aabb_test = true;
+        }
+        else if( start.x - width > bottom_right.x && end.x - width > bottom_right.x ) {
+            aabb_test = true;
+        }
+        else if( start.y + width < top_left.y && end.y + width < top_left.y ) {
+            aabb_test = true;
+        }
+        else if( start.y - width > bottom_right.y && end.y - width > bottom_right.y ) {
+            aabb_test = true;
+        }*/
         for(size_t j=0;j<boundary->getNPoints() && !(*done);j++) {
             Vector2D p0 = boundary->getPoint(j);
             Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
             intersectSweptSquareWithBoundarySeg(hit, hit_dist, done, find_earliest, p0, p1, start, du, dv, width, xmin, xmax, ymin, ymax);
+            /*if( *done && aabb_test ) {
+                qDebug("start: %f, %f", start.x, start.y);
+                qDebug("end: %f, %f", end.x, end.y);
+                qDebug("top_left: %f, %f", top_left.x, top_left.y);
+                qDebug("bottom_right: %f, %f", bottom_right.x, bottom_right.y);
+                qDebug("width: %f", width);
+                throw string("###");
+            }*/
         }
     }
 }
@@ -1424,7 +1449,8 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
     Vector2D hit_pos;
     if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, can_fly) ) {
         // easy
-        //LOG("easy\n");
+        //qDebug("direct path from %f, %f to %f, %f", src.x, src.y, dest.x, dest.y);
+        //qDebug("ignoring: %d", ignore_scenery);
         new_path.push_back(dest);
     }
     else {
