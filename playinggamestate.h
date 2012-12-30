@@ -250,7 +250,7 @@ private slots:
     void clickedViewMisc();
 
     void clickedArmWeapon();
-    void clickedWearArmour();
+    void clickedWear();
     void clickedUseItem();
     void clickedDropItem();
     void clickedInfo();

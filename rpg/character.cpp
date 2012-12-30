@@ -111,7 +111,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -133,7 +133,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -783,9 +783,20 @@ void Character::armShield(Shield *item) {
 
 void Character::wearArmour(Armour *item) {
     // n.b., must be an item owned by Character!
-    // set NULL to disarm
+    // set NULL to take off
     if( this->current_armour != item ) {
         this->current_armour = item;
+        /*if( this->listener != NULL ) {
+            this->listener->characterUpdateGraphics(this, this->listener_data);
+        }*/
+    }
+}
+
+void Character::wearRing(Ring *item) {
+    // n.b., must be an item owned by Character!
+    // set NULL to take off
+    if( this->current_ring != item ) {
+        this->current_ring = item;
         /*if( this->listener != NULL ) {
             this->listener->characterUpdateGraphics(this, this->listener_data);
         }*/
@@ -823,6 +834,10 @@ void Character::addItem(Item *item, bool auto_arm) {
             this->wearArmour(NULL);
         }
     }
+    if( auto_arm && this->current_ring == NULL && item->getType() == ITEMTYPE_RING ) {
+        // automatically wear ring
+        this->wearRing( static_cast<Ring *>(item) );
+    }
 }
 
 void Character::pickupItem(Item *item) {
@@ -845,6 +860,10 @@ void Character::takeItem(Item *item) {
     }
     if( this->current_armour == item ) {
         this->current_armour = NULL;
+        //graphics_changed = true;
+    }
+    if( this->current_ring == item ) {
+        this->current_ring = NULL;
         //graphics_changed = true;
     }
 

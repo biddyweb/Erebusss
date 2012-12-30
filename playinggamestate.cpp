@@ -902,7 +902,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         game_g->initButton(wearButton);
         wearButton->setToolTip("Wear/take off armour (Space)");
         h_layout->addWidget(wearButton);
-        connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWearArmour()));
+        connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWear()));
 
         useButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(useButton);
@@ -1022,6 +1022,9 @@ QString ItemsWindow::getItemString(const Item *item) const {
     else if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
         item_str += " [Current Armour]";
     }
+    else if( playing_gamestate->getPlayer()->getCurrentRing() == item ) {
+        item_str += " [Worn]";
+    }
     if( item->getWeight() > 0 ) {
         item_str += " (Weight " + QString::number(item->getWeight()) + ")";
     }
@@ -1042,6 +1045,7 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     dropButton->setVisible(true);
     infoButton->setVisible(true);
     Item *item = list_items.at(currentRow);
+
     if( item->getType() == ITEMTYPE_WEAPON ) {
         armButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
@@ -1068,10 +1072,8 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     else {
         armButton->setVisible(false);
     }
-    if( item->getType() != ITEMTYPE_ARMOUR ) {
-        wearButton->setVisible(false);
-    }
-    else {
+
+    if( item->getType() == ITEMTYPE_ARMOUR ) {
         wearButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
             wearButton->setText("Take Off Armour");
@@ -1079,6 +1081,18 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         else {
             wearButton->setText("Wear Armour");
         }
+    }
+    else if( item->getType() == ITEMTYPE_RING ) {
+        wearButton->setVisible(true);
+        if( playing_gamestate->getPlayer()->getCurrentRing() == item ) {
+            wearButton->setText("Take Off Ring");
+        }
+        else {
+            wearButton->setText("Wear Ring");
+        }
+    }
+    else {
+        wearButton->setVisible(false);
     }
 
     if( !item->canUse() ) {
@@ -1147,7 +1161,7 @@ void ItemsWindow::clickedArmWeapon() {
     this->changedSelectedItem(index);
 }
 
-void ItemsWindow::clickedWearArmour() {
+void ItemsWindow::clickedWear() {
     LOG("clickedWearArmour()\n");
     int index = list->currentRow();
     LOG("clicked index %d\n", index);
@@ -1155,20 +1169,33 @@ void ItemsWindow::clickedWearArmour() {
         return;
     }
     Item *item = list_items.at(index);
-    if( item->getType() != ITEMTYPE_ARMOUR ) {
-        LOG("not armour?!\n");
-        return;
+    if( item->getType() == ITEMTYPE_ARMOUR ) {
+        Armour *armour = static_cast<Armour *>(item);
+        if( playing_gamestate->getPlayer()->getCurrentArmour() == armour ) {
+            // take off instead
+            LOG("player took off armour\n");
+            playing_gamestate->getPlayer()->wearArmour(NULL);
+        }
+        else {
+            LOG("player put on armour: %s\n", item->getName().c_str());
+            playing_gamestate->getPlayer()->wearArmour(armour);
+            playing_gamestate->playSound("wear_armour");
+        }
     }
-    Armour *armour = static_cast<Armour *>(item);
-    if( playing_gamestate->getPlayer()->getCurrentArmour() == armour ) {
-        // take off instead
-        LOG("player took off armour\n");
-        playing_gamestate->getPlayer()->wearArmour(NULL);
+    else if( item->getType() == ITEMTYPE_RING ) {
+        Ring *ring = static_cast<Ring *>(item);
+        if( playing_gamestate->getPlayer()->getCurrentRing() == ring ) {
+            // take off instead
+            LOG("player took off ring");
+            playing_gamestate->getPlayer()->wearRing(NULL);
+        }
+        else {
+            LOG("player put on ring: %s\n", item->getName().c_str());
+            playing_gamestate->getPlayer()->wearRing(ring);
+        }
     }
     else {
-        LOG("player put on armour: %s\n", item->getName().c_str());
-        playing_gamestate->getPlayer()->wearArmour(armour);
-        playing_gamestate->playSound("wear_armour");
+        LOG("not an armour or ring?!\n");
     }
 
     /*QListWidgetItem *item_widget = list->item(index);
@@ -2849,10 +2876,10 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         rating = 1; // so the default of 0 defaults instead to 1
     bool magical = parseBool(magical_sr.toString(), true);
     int worth_bonus = parseInt(worth_bonus_sr.toString(), true);
+    QStringRef name_s = reader.attributes().value("name");
+    QStringRef image_name_s = reader.attributes().value("image_name");
 
     if( reader.name() == "item" ) {
-        QStringRef name_s = reader.attributes().value("name");
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef icon_width_s = reader.attributes().value("icon_width");
         QStringRef use_s = reader.attributes().value("use");
         QStringRef use_verb_s = reader.attributes().value("use_verb");
@@ -2871,8 +2898,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     }
     else if( reader.name() == "weapon" ) {
         //qDebug("    weapon:");
-        QStringRef name_s = reader.attributes().value("name");
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef animation_name_s = reader.attributes().value("animation_name");
         QStringRef two_handed_s = reader.attributes().value("two_handed");
         QStringRef ranged_s = reader.attributes().value("ranged");
@@ -2904,23 +2929,18 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         weapon->setMinStrength(min_strength);
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        weapon->setDescription(description.toStdString());
+        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "shield" ) {
-        QStringRef name_s = reader.attributes().value("name");
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef animation_name_s = reader.attributes().value("animation_name");
         Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
         item = shield;
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        shield->setDescription(description.toStdString());
+        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "armour" ) {
         //qDebug("    armour:");
-        QStringRef name_s = reader.attributes().value("name");
-        qDebug("    name: %s", name_s.toString().toStdString().c_str());
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef min_strength_s = reader.attributes().value("min_strength");
         int min_strength = parseInt(min_strength_s.toString(), true);
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
@@ -2928,11 +2948,17 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         armour->setMinStrength(min_strength);
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        armour->setDescription(description.toStdString());
+        item->setDescription(description.toStdString());
+    }
+    else if( reader.name() == "ring" ) {
+        //qDebug("    ring:");
+        Ring *ring = new Ring(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
+        item = ring;
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "ammo" ) {
-        QStringRef name_s = reader.attributes().value("name");
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
         QStringRef amount_s = reader.attributes().value("amount");
         int amount = parseInt(amount_s.toString());
@@ -2940,11 +2966,9 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         item = ammo;
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        ammo->setDescription(description.toStdString());
+        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "currency" ) {
-        QStringRef name_s = reader.attributes().value("name");
-        QStringRef image_name_s = reader.attributes().value("image_name");
         QStringRef value_s = reader.attributes().value("value");
         Currency *currency = new Currency(name_s.toString().toStdString(), image_name_s.toString().toStdString());
         if( value_s.length() > 0 ) {
@@ -2956,7 +2980,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     }
     // else ignore unknown element - leave item as NULL
     if( item != NULL ) {
-        // remember not to use the string regs here, as no longer value!
+        // remember not to use the string refs here, as no longer value!
         item->setArg1(arg1);
         item->setArg2(arg2);
         item->setArg1s(arg1_s.toStdString());
@@ -3733,7 +3757,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     int count = parseInt(count_s.toString());
                     npc->addSpell(name_s.toString().toStdString(), count);
                 }
-                else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ammo" || reader.name() == "currency" ) {
+                else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
@@ -3741,7 +3765,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef template_s = reader.attributes().value("template");
                     Item *item = NULL;
                     // need to read everything we want from the reader, before calling parseXMLItem.
-                    bool current_weapon = false, current_shield = false, current_armour = false;
+                    bool current_weapon = false, current_shield = false, current_armour = false, current_ring = false;
                     float pos_x = 0.0f, pos_y = 0.0f;
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                     }
@@ -3752,6 +3776,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         current_shield = parseBool(current_shield_s.toString(), true);
                         QStringRef current_armour_s = reader.attributes().value("current_armour");
                         current_armour = parseBool(current_armour_s.toString(), true);
+                        QStringRef current_ring_s = reader.attributes().value("current_ring");
+                        current_ring = parseBool(current_ring_s.toString(), true);
                     }
                     else {
                         QStringRef pos_x_s = reader.attributes().value("x");
@@ -3806,10 +3832,18 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         else if( current_armour ) {
                             if( item->getType() != ITEMTYPE_ARMOUR ) {
                                 LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_armour is not a armour");
+                                throw string("current_armour is not an armour");
                             }
                             Armour *armour = static_cast<Armour *>(item);
                             npc->wearArmour(armour);
+                        }
+                        else if( current_ring ) {
+                            if( item->getType() != ITEMTYPE_RING ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("current_ring is not a ring");
+                            }
+                            Ring *ring = static_cast<Ring *>(item);
+                            npc->wearRing(ring);
                         }
                     }
                     else {
@@ -5473,6 +5507,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     case ITEMTYPE_ARMOUR:
         fprintf(file, "<armour");
         break;
+    case ITEMTYPE_RING:
+        fprintf(file, "<ring");
+        break;
     case ITEMTYPE_AMMO:
         fprintf(file, "<ammo");
         break;
@@ -5540,6 +5577,14 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         }
         break;
     }
+    case ITEMTYPE_RING:
+    {
+        const Ring *ring = static_cast<const Ring *>(item);
+        if( character != NULL && ring == character->getCurrentRing() ) {
+            fprintf(file, " current_ring=\"true\"");
+        }
+        break;
+    }
     case ITEMTYPE_AMMO:
     {
         const Ammo *ammo = static_cast<const Ammo *>(item);
@@ -5569,6 +5614,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         break;
     case ITEMTYPE_ARMOUR:
         fprintf(file, "</armour>");
+        break;
+    case ITEMTYPE_RING:
+        fprintf(file, "</ring>");
         break;
     case ITEMTYPE_AMMO:
         fprintf(file, "</ammo>");

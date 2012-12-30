@@ -13,8 +13,9 @@ enum ItemType {
     ITEMTYPE_WEAPON = 1,
     ITEMTYPE_SHIELD = 2,
     ITEMTYPE_ARMOUR = 3,
-    ITEMTYPE_AMMO = 4,
-    ITEMTYPE_CURRENCY = 5
+    ITEMTYPE_RING = 4,
+    ITEMTYPE_AMMO = 5,
+    ITEMTYPE_CURRENCY = 6
 };
 
 /*enum ItemUse {
@@ -257,6 +258,18 @@ public:
     int getMinStrength() const {
         return this->min_strength;
     }
+};
+
+class Ring : public Item {
+public:
+    Ring(const string &name, const string &image_name, int weight);
+    virtual ~Ring() {
+    }
+
+    virtual ItemType getType() const {
+        return ITEMTYPE_RING;
+    }
+    virtual Ring *clone() const; // virtual copy constructor
 };
 
 class Ammo : public Item {

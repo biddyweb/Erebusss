@@ -149,6 +149,10 @@ string Item::getDetailedDescription() const {
             str << "<b>Min Strength:</b> " << armour->getMinStrength() << "<br/>";
         }
     }
+    else if( this->getType() == ITEMTYPE_RING ) {
+        str << "<b>Type:</b> Ring<br/>";
+        //const Ring *ring = static_cast<const Ring *>(this);
+    }
     else if( this->getType() == ITEMTYPE_AMMO ) {
         str << "<b>Type:</b> Ammo<br/>";
         const Ammo *ammo = static_cast<const Ammo *>(this);
@@ -215,6 +219,15 @@ Armour::Armour(const string &name, const string &image_name, int weight, int rat
 
 Armour *Armour::clone() const {
     return new Armour(*this);
+}
+
+Ring::Ring(const string &name, const string &image_name, int weight) :
+    Item(name, image_name, weight)
+{
+}
+
+Ring *Ring::clone() const {
+    return new Ring(*this);
 }
 
 Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount) :

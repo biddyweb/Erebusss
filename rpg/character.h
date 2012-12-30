@@ -21,6 +21,7 @@ class Item;
 class Weapon;
 class Shield;
 class Armour;
+class Ring;
 class Ammo;
 class Location;
 class Scenery;
@@ -376,6 +377,7 @@ class Character {
     Weapon *current_weapon;
     Shield *current_shield;
     Armour *current_armour;
+    Ring *current_ring;
     int gold;
 
     map<string, int> spells;
@@ -650,6 +652,13 @@ public:
         return this->current_armour;
     }
     void wearArmour(Armour *item);
+    const Ring *getCurrentRing() const {
+        return this->current_ring;
+    }
+    Ring *getCurrentRing() {
+        return this->current_ring;
+    }
+    void wearRing(Ring *item);
     void addItem(Item *item) {
         addItem(item, true);
     }
