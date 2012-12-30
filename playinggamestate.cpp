@@ -5368,13 +5368,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         bool done = false;
         bool move = true;
-        //const float click_tol_c = 0.0f;
-        //const float click_tol_c = 0.5f;
-        //const float click_tol_npc_c = 0.25f;
 
         // search for clicking on an NPC
         {
-            const float click_tol_npc_c = 0.0f;
             float min_dist = 0.0f;
             Character *target_npc = NULL;
             for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
@@ -5383,7 +5379,9 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     continue;
                 if( !character->isVisible() )
                     continue;
-                /*float dist_from_click = (dest - character->getPos()).magnitude();
+                /*
+                const float click_tol_npc_c = 0.0f;
+                float dist_from_click = (dest - character->getPos()).magnitude();
                 if( dist_from_click <= npc_radius_c + click_tol_npc_c ) {
                     if( target_npc == NULL || dist_from_click < min_dist ) {*/
                 /*if( target_npc == NULL || dist_from_click < min_dist ) {
