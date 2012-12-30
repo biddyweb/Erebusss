@@ -834,10 +834,7 @@ void Character::addItem(Item *item, bool auto_arm) {
             this->wearArmour(NULL);
         }
     }
-    if( auto_arm && this->current_ring == NULL && item->getType() == ITEMTYPE_RING ) {
-        // automatically wear ring
-        this->wearRing( static_cast<Ring *>(item) );
-    }
+    // n.b., don't automatically wear rings
 }
 
 void Character::pickupItem(Item *item) {
