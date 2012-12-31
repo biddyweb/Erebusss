@@ -50,7 +50,7 @@ int GameClock::update(int time_now_ms) {
         const int update_dt_c = time_per_frame_c;
         //qDebug("time from %d to %d", this->saved_elapsed_time_ms, new_elapsed_time_ms);
         int elapsed_time_ms = time_now_ms - this->saved_elapsed_time_ms;
-        elapsed_time_ms = std::min(elapsed_time_ms, 1000);
+        elapsed_time_ms = std::min(elapsed_time_ms, 100); // prevent death spiral
         this->saved_elapsed_time_ms = time_now_ms;
         this->accumulator += elapsed_time_ms;
         //qDebug("Elapsed time: %d", elapsed_time_ms);
@@ -118,6 +118,7 @@ void Screen::update() {
             game_clock.callingUpdate();
             game_g->update();
         }
+        //qDebug("    time for %d updates: %d", n_updates, this->getElapsedMS() - time_now_ms);
     }
 
     {
@@ -126,6 +127,7 @@ void Screen::update() {
             input_clock.callingUpdate();
             game_g->updateInput();
         }
+        //qDebug("    time for %d input updates: %d", n_updates, this->getElapsedMS() - time_now_ms);
     }
 
     //qDebug("    Render");
