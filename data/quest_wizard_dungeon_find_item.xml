@@ -463,6 +463,7 @@ Ah, thank you! Yes that looks like it will be of most help to me.
         magical="true"
         base_template="Short Sword" worth_bonus="200"
         />
+    <ring name="Ring of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1"/>
     <item template="Red Gem"/>
     <gold amount="16"/>
 </scenery>
