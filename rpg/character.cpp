@@ -210,6 +210,11 @@ int Character::getProfileIntProperty(const string &key) const {
         //qDebug("    increase by %d\n", effect_bonus);
         value += effect_bonus;
     }
+    for(set<Item *>::const_iterator iter = this->items.begin();iter != this->items.end(); ++iter) {
+        const Item *item = *iter;
+        int item_bonus = item->getProfileBonusIntProperty(this, key);
+        value += item_bonus;
+    }
     return value;
 }
 
@@ -219,6 +224,11 @@ float Character::getProfileFloatProperty(const string &key) const {
         const ProfileEffect &profile_effect = *iter;
         float effect_bonus = profile_effect.getProfile()->getFloatProperty(key);
         value += effect_bonus;
+    }
+    for(set<Item *>::const_iterator iter = this->items.begin();iter != this->items.end(); ++iter) {
+        const Item *item = *iter;
+        float item_bonus = item->getProfileBonusFloatProperty(this, key);
+        value += item_bonus;
     }
     return value;
 }

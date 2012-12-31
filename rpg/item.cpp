@@ -184,16 +184,24 @@ string Item::getDetailedDescription() const {
     return str.str();
 }
 
-int Item::getProfileBonusIntProperty(const Character *character, const string &key) const {
-    // default for item is that profile bonus is always active
+int Item::getRawProfileBonusIntProperty(const string &key) const {
     int value = this->profile_bonus.getIntProperty(key);
     return value;
 }
 
+float Item::getRawProfileBonusFloatProperty(const string &key) const {
+    float value = this->profile_bonus.getFloatProperty(key);
+    return value;
+}
+
+int Item::getProfileBonusIntProperty(const Character *character, const string &key) const {
+    // default for item is that profile bonus is always active
+    return this->getRawProfileBonusIntProperty(key);
+}
+
 float Item::getProfileBonusFloatProperty(const Character *character, const string &key) const {
     // default for item is that profile bonus is always active
-    int value = this->profile_bonus.getIntProperty(key);
-    return value;
+    return this->getRawProfileBonusFloatProperty(key);
 }
 
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :

@@ -160,9 +160,14 @@ public:
     int getWorthBonus() const {
         return this->worth_bonus;
     }
-    void setProfileBonus(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
-        this->profile_bonus.set(FP, BS, S, A, M, D, B, Sp);
+    void setProfileBonusIntProperty(const string &key, int value) {
+        this->profile_bonus.setIntProperty(key, value);
     }
+    void setProfileBonusFloatProperty(const string &key, float value) {
+        this->profile_bonus.setFloatProperty(key, value);
+    }
+    int getRawProfileBonusIntProperty(const string &key) const;
+    float getRawProfileBonusFloatProperty(const string &key) const;
     virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
     virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };

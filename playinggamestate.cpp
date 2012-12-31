@@ -2855,6 +2855,24 @@ void PlayingGamestate::playBackgroundMusic() {
 #endif*/
 }
 
+void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key) {
+    string attribute = "bonus_" + key;
+    QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
+    if( attribute_sr.length() > 0 ) {
+        int value = parseInt(attribute_sr.toString());
+        item->setProfileBonusIntProperty(key, value);
+    }
+}
+
+void PlayingGamestate::parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key) {
+    string attribute = "bonus_" + key;
+    QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
+    if( attribute_sr.length() > 0 ) {
+        float value = parseFloat(attribute_sr.toString());
+        item->setProfileBonusFloatProperty(key, value);
+    }
+}
+
 Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     Item *item = NULL;
 
@@ -2892,9 +2910,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         if( use_s.length() > 0 ) {
             item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
         }
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "weapon" ) {
         //qDebug("    weapon:");
@@ -2927,17 +2942,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
             weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
         }
         weapon->setMinStrength(min_strength);
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "shield" ) {
         QStringRef animation_name_s = reader.attributes().value("animation_name");
         Shield *shield = new Shield(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString());
         item = shield;
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "armour" ) {
         //qDebug("    armour:");
@@ -2946,17 +2955,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         Armour *armour = new Armour(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, rating);
         item = armour;
         armour->setMinStrength(min_strength);
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "ring" ) {
         //qDebug("    ring:");
         Ring *ring = new Ring(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
         item = ring;
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "ammo" ) {
         QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
@@ -2964,9 +2967,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         int amount = parseInt(amount_s.toString());
         Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), weight, amount);
         item = ammo;
-        // must be done last
-        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-        item->setDescription(description.toStdString());
     }
     else if( reader.name() == "currency" ) {
         QStringRef value_s = reader.attributes().value("value");
@@ -2988,6 +2988,19 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         item->setMagical(magical);
         item->setBaseTemplate(base_template.toStdString());
         item->setWorthBonus(worth_bonus);
+
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_FP_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_BS_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_S_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_A_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_M_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_D_c);
+        this->parseXMLItemProfileAttributeInt(item, reader, profile_key_B_c);
+        this->parseXMLItemProfileAttributeFloat(item, reader, profile_key_Sp_c);
+
+        // must be done last
+        QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        item->setDescription(description.toStdString());
     }
     return item;
 }
@@ -5494,6 +5507,20 @@ void PlayingGamestate::updateVisibility(Vector2D pos) {
     }
 }
 
+void PlayingGamestate::saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const {
+    int value = item->getRawProfileBonusIntProperty(key);
+    if( value > 0 ) {
+        fprintf(file, " bonus_%s=\"%d\"", key.c_str(), value);
+    }
+}
+
+void PlayingGamestate::saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const {
+    float value = item->getRawProfileBonusFloatProperty(key);
+    if( value > 0 ) {
+        fprintf(file, " bonus_%s=\"%f\"", key.c_str(), value);
+    }
+}
+
 void PlayingGamestate::saveItem(FILE *file, const Item *item) const {
     return saveItem(file, item, NULL);
 }
@@ -5536,6 +5563,14 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
     fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
     fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
+    this->saveItemProfileBonusInt(file, item, profile_key_FP_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_BS_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_S_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_A_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_M_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_D_c);
+    this->saveItemProfileBonusInt(file, item, profile_key_B_c);
+    this->saveItemProfileBonusFloat(file, item, profile_key_Sp_c);
     // now do subclasses
     switch( item->getType() ) {
     case ITEMTYPE_GENERAL:

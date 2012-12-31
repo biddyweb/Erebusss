@@ -393,6 +393,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QPixmap smoke_pixmap;
 
+    void parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key);
+    void parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key);
     Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
@@ -407,6 +409,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
     bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest);
 
+    void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;
+    void saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const;
     void saveItem(FILE *file, const Item *item) const;
     void saveItem(FILE *file, const Item *item, const Character *character) const;
     void saveTrap(FILE *file, const Trap *trap) const;
