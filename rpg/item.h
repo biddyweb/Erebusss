@@ -42,6 +42,9 @@ protected:
     bool is_magical;
     int worth_bonus;
     Profile profile_bonus;
+
+    string getProfileBonusDescriptionInt(const string &key) const;
+    string getProfileBonusDescriptionFloat(const string &key) const;
 public:
     Item(const string &name, const string &image_name, int weight);
     virtual ~Item();

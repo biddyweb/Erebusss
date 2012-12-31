@@ -112,6 +112,26 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
     return false;
 }
 
+string Item::getProfileBonusDescriptionInt(const string &key) const {
+    int value = this->getRawProfileBonusIntProperty(key);
+    if( value == 0 ) {
+        return "";
+    }
+    stringstream str;
+    str << "<b>" << key << " Bonus</b>: " << value << "<br/>";
+    return str.str();
+}
+
+string Item::getProfileBonusDescriptionFloat(const string &key) const {
+    float value = this->getRawProfileBonusFloatProperty(key);
+    if( value == 0.0f ) {
+        return "";
+    }
+    stringstream str;
+    str << "<b>" << key << " Bonus</b>: " << value << "<br/>";
+    return str.str();
+}
+
 string Item::getDetailedDescription() const {
     stringstream str;
     str << "<html><body>";
@@ -163,6 +183,14 @@ string Item::getDetailedDescription() const {
     if( this->getRating() > 0 ) {
         str << "<b>Rating:</b> " << this->getRating() << "<br/>";
     }
+    str << this->getProfileBonusDescriptionInt(profile_key_FP_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_BS_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_S_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_A_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_M_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_D_c);
+    str << this->getProfileBonusDescriptionInt(profile_key_B_c);
+    str << this->getProfileBonusDescriptionFloat(profile_key_Sp_c);
     str << "</p>";
     if( this->getDescription().length() > 0 ) {
         /*str << "<pre>";
