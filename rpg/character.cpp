@@ -248,6 +248,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     if( this->location == NULL ) {
         return false;
     }
+    /*if( this == playing_gamestate->getPlayer() ) {
+        qDebug("Character::update() for the player");
+    }*/
 
     const int time_to_die_c = 400;
     const int time_to_hit_c = 400;
