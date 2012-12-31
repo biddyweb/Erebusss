@@ -47,6 +47,13 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <item template="Potion of Archery" x="32.0" y="4.0"/>-->
 <!--<ring name="Ring of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1" x="32.0" y="5.0"/>
 <item name="Amulet of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1" x="33.0" y="5.0"/>-->
+<!--<weapon name="Short Sword +1" image_name="longsword" weight="10"
+    damageX="2" damageY="6" damageZ="1"
+    bonus_FP="1"
+    animation_name="longsword"
+    base_template="Short Sword" worth_bonus="100"
+    x="34.0" y="5.0"
+    />-->
 
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -487,6 +494,12 @@ Ah, thank you! Yes that looks like it will be of most help to me.
     <item template="Dagger"/>
     <item template="Shortbow"/>
     <item template="Arrows"/>
+    <weapon name="Short Sword +1" image_name="longsword" weight="10"
+        damageX="2" damageY="6" damageZ="1"
+        bonus_FP="1"
+        animation_name="longsword"
+        base_template="Short Sword" worth_bonus="100"
+        />
 </scenery>
 <item template="Leather Armour" x="28.5" y="12.5"/>
 <npc name="Orc" template="Orc" x="26.0" y="12.5">
