@@ -3237,7 +3237,15 @@ void PlayingGamestate::setupView() {
             this->updateVisibilityForFloorRegion(floor_region);
         }
     }
+    this->testFogOfWar();
+
+    /*gui_overlay->unsetProgress();
+    qApp->processEvents();
+    for(int i=0;i<10000;i++) {
+        LOG("blah\n");
+    }*/
     LOG("done\n");
+
 }
 
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
@@ -4224,11 +4232,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         }
     }
 
-    this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
-    this->setupView();
-
     gui_overlay->unsetProgress();
     qApp->processEvents();
+
+    this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    this->setupView();
 
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false, true);
@@ -4586,6 +4594,30 @@ void PlayingGamestate::quitGame() {
     }
 }
 
+void PlayingGamestate::testFogOfWar() {
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        if( character != this->player ) {
+            bool is_visible = false;
+            float dist = ( character->getPos() - player->getPos() ).magnitude();
+            if( dist <= hit_range_c ) {
+                // assume always visible
+                is_visible = true;
+            }
+            else if( dist <= npc_visibility_c ) {
+                // check line of sight
+                Vector2D hit_pos;
+                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false) ) {
+                    is_visible = true;
+                }
+            }
+            character->setVisible(is_visible);
+            AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
+            object->setVisible(is_visible);
+        }
+    }
+}
+
 void PlayingGamestate::update() {
     if( this->player == NULL ) {
         return;
@@ -4647,28 +4679,7 @@ void PlayingGamestate::update() {
         }
     }
 
-    // test for fog of war
-    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
-        Character *character = *iter;
-        if( character != this->player ) {
-            bool is_visible = false;
-            float dist = ( character->getPos() - player->getPos() ).magnitude();
-            if( dist <= hit_range_c ) {
-                // assume always visible
-                is_visible = true;
-            }
-            else if( dist <= npc_visibility_c ) {
-                // check line of sight
-                Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false) ) {
-                    is_visible = true;
-                }
-            }
-            character->setVisible(is_visible);
-            AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
-            object->setVisible(is_visible);
-        }
-    }
+    this->testFogOfWar();
 
     scene->advance();
 
