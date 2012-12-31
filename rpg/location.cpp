@@ -1264,7 +1264,7 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
     }
 
     if( nudged ) {
-        qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
+        //qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
     }
     return pos;
 }
