@@ -356,6 +356,7 @@ class Character {
     };
     Action action;
     const Spell *casting_spell;
+    int time_last_complex_update_ms; // not saved
     // default positions only relevant for NPCs that don't change locations
     bool has_default_position;
     Vector2D default_position;

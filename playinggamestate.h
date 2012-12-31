@@ -393,6 +393,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QPixmap smoke_pixmap;
 
+    int time_last_complex_update_ms; // see update() for details
+
     void parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key);
     void parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key);
     Item *parseXMLItem(QXmlStreamReader &reader);

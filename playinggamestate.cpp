@@ -2028,7 +2028,7 @@ void SaveGameWindow::clickedSaveNew() {
 
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
-    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL)
+    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -4622,16 +4622,82 @@ void PlayingGamestate::update() {
     if( this->player == NULL ) {
         return;
     }
+//#define TIMING_INFO
 
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
-    /*if( game_g->getScreen()->isPaused() ) {
-        return;
-    }*/
-
     //qDebug("PlayingGamestate::update()");
-    // update due to keyboard input
+    bool do_complex_update = false;
+
+    if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
+        this->time_last_complex_update_ms = elapsed_ms;
+        do_complex_update = true;
+
+        // we need to run the update() loop at a fast rate (preferably 60FPS) so that the movement and animation is updated as smoothly as possible on fast systems
+        // but we don't need to run other things every frame (and doing so risks the update taking too long on slower systems, leading to a spiral of death)
+    }
+
+    if( do_complex_update ) {
+#ifdef TIMING_INFO
+        QElapsedTimer timer_complex;
+        timer_complex.start();
+#endif
+        // we can get away with not updating this every call
+        this->testFogOfWar();
+
+        for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
+            Scenery *scenery = *iter;
+            if( scenery->getActionType().length() > 0 ) {
+                if( elapsed_ms >= scenery->getActionLastTime() + scenery->getActionDelay() ) {
+                    bool has_effect = false;
+                    if( scenery->getActionType() == "harm_player" ) {
+                        if( !player->isDead() && scenery->isOn(player) ) {
+                            LOG("scenery %s harms player\n", scenery->getName().c_str());
+                            has_effect = true;
+                            player->decreaseHealth(this, scenery->getActionValue(), false, false);
+                        }
+                    }
+                    else {
+                        LOG("unknown action type: %s\n", scenery->getActionType().c_str());
+                        ASSERT_LOGGER(false);
+                    }
+
+                    if( has_effect ) {
+                        scenery->setActionLastTime(elapsed_ms);
+                    }
+                }
+            }
+        }
+
+        // terror
+        for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+            Character *character = *iter;
+            if( character != player && character->isVisible() && character->getCausesTerror() && !character->hasDoneTerror() ) {
+                int roll = rollDice(2, 6, character->getTerrorEffect());
+                int bravery = player->getProfileIntProperty(profile_key_B_c);
+                qDebug("Terror? Roll %d vs %d", roll, bravery);
+                if( roll > bravery )
+                {
+                    player->paralyse(5000);
+                    this->addTextEffect("You are too terrified to move!", player->getPos(), 5000);
+                }
+                character->setDoneTerror(true);
+            }
+        }
+
+#ifdef TIMING_INFO
+        qDebug("complex update took %d", timer_complex.elapsed());
+#endif
+    }
+
     {
+#ifdef TIMING_INFO
+        QElapsedTimer timer_kinput;
+        timer_kinput.start();
+#endif
+        // update due to keyboard input
+        // note that this doesn't actually move the player directly, but sets a target direction to move to
+
         // n.b., we need to call setDirection() on the player, so that the direction still gets set even if the player can't move in that direction (e.g., blocked by NPC or scenery) - needed to we can still do Action on that NPC or scenery!
         bool moved = false;
         Vector2D dest = player->getPos();
@@ -4675,54 +4741,30 @@ void PlayingGamestate::update() {
         if( moved ) {
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
-            this->requestPlayerMove(dest, NULL);
+            if( do_complex_update ) {
+                this->requestPlayerMove(dest, NULL);
+            }
         }
+#ifdef TIMING_INFO
+        qDebug("keyboard input took %d", timer_kinput.elapsed());
+#endif
     }
 
-    this->testFogOfWar();
-
+#ifdef TIMING_INFO
+        QElapsedTimer timer_advance;
+        timer_advance.start();
+#endif
     scene->advance();
+#ifdef TIMING_INFO
+        qDebug("scene advance took %d", timer_advance.elapsed());
+#endif
 
-    for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
-        Scenery *scenery = *iter;
-        if( scenery->getActionType().length() > 0 ) {
-            if( elapsed_ms >= scenery->getActionLastTime() + scenery->getActionDelay() ) {
-                bool has_effect = false;
-                if( scenery->getActionType() == "harm_player" ) {
-                    if( !player->isDead() && scenery->isOn(player) ) {
-                        LOG("scenery %s harms player\n", scenery->getName().c_str());
-                        has_effect = true;
-                        player->decreaseHealth(this, scenery->getActionValue(), false, false);
-                    }
-                }
-                else {
-                    LOG("unknown action type: %s\n", scenery->getActionType().c_str());
-                    ASSERT_LOGGER(false);
-                }
-
-                if( has_effect ) {
-                    scenery->setActionLastTime(elapsed_ms);
-                }
-            }
-        }
-    }
-
-    // terror
-    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
-        Character *character = *iter;
-        if( character != player && character->isVisible() && character->getCausesTerror() && !character->hasDoneTerror() ) {
-            int roll = rollDice(2, 6, character->getTerrorEffect());
-            int bravery = player->getProfileIntProperty(profile_key_B_c);
-            qDebug("Terror? Roll %d vs %d", roll, bravery);
-            if( roll > bravery )
-            {
-                player->paralyse(5000);
-                this->addTextEffect("You are too terrified to move!", player->getPos(), 5000);
-            }
-            character->setDoneTerror(true);
-        }
-    }
-
+#ifdef TIMING_INFO
+        QElapsedTimer timer_cupdate;
+        timer_cupdate.start();
+#endif
+    // Character::update() also handles movement, so need to do that with every update() call
+    // though we could split out the AI etc to a separate function, as that doesn't need to be done with every update() call
     vector<Character *> delete_characters;
     //LOG("update characters\n");
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
@@ -4733,7 +4775,15 @@ void PlayingGamestate::update() {
             delete_characters.push_back(character);
         }
     }
+#ifdef TIMING_INFO
+        qDebug("character update took %d", timer_cupdate.elapsed());
+#endif
     //LOG("done update characters\n");
+    // handle deleted characters
+#ifdef TIMING_INFO
+        QElapsedTimer timer_dcharacters;
+        timer_dcharacters.start();
+#endif
     for(vector<Character *>::iterator iter = delete_characters.begin(); iter != delete_characters.end(); ++iter) {
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
@@ -4760,6 +4810,9 @@ void PlayingGamestate::update() {
     if( this->player != NULL && delete_characters.size() > 0 ) {
         this->checkQuestComplete();
     }
+#ifdef TIMING_INFO
+        qDebug("deleted characters took %d", timer_dcharacters.elapsed());
+#endif
     //qDebug("PlayingGamestate::update() exit");
 }
 
