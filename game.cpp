@@ -223,7 +223,7 @@ void AnimatedObject::advance(int phase) {
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );
         if( n_frame != c_frame ) {
             c_frame = n_frame;
-            this->update();
+            //this->update();
         }
         this->setZValue( this->pos().y() );
     }
