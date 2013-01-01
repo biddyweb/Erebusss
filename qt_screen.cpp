@@ -66,6 +66,8 @@ int GameClock::update(int time_now_ms) {
         // Semi-fixed timestep
         // (Fixed timestep has problems that if time_per_frame_c is too small, we have trouble updating and end up in a death spiral due to calling update() too many times per frame;
         // if time_per_frame_c is too large, we don't get smooth update on faster platforms.)
+        // Note that a proper implementation of semi-fixed timestep would have some interval T0 < elapsed_time_ms < T1 where we would call the update functions multiple times (with game_time_frame_ms=T0, except for 1 call to handle the remainder time); and for elapsed_time_ms > T1 we would set elapsed_time_ms = T1.
+        // But here we are effectively setting T0=T1. In practice on slow systems, we are just as likely to be update-bound rather than render-bound, so there isn't any benefit to this.
         int elapsed_time_ms = time_now_ms - this->saved_elapsed_time_ms;
         elapsed_time_ms = std::min(elapsed_time_ms, 100); // prevent too large a timestep being sent to the update, to avoid instability
         this->saved_elapsed_time_ms = time_now_ms;
