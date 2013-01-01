@@ -714,7 +714,7 @@ void Character::increaseHealth(int increase) {
         health = max_health;
 }
 
-bool Character::decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield) {
+bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield) {
     if( this->is_dead ) {
         LOG("tried to decreaseHealth of %s by %d - already dead!\n", this->getName().c_str(), decrease);
         ASSERT_LOGGER( !this->is_dead );
@@ -745,7 +745,7 @@ void Character::setDirection(Vector2D dir) {
     }
 }
 
-void Character::kill(const PlayingGamestate *playing_gamestate) {
+void Character::kill(PlayingGamestate *playing_gamestate) {
     this->health = 0;
     LOG("%s has died\n", this->getName().c_str());
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
@@ -755,14 +755,21 @@ void Character::kill(const PlayingGamestate *playing_gamestate) {
         this->listener->characterSetAnimation(this, this->listener_data, "death", false);
     }
     if( this->location != NULL ) {
+        bool any_items = false;
+        bool any_gold = false;
         while( this->items.size() > 0 ) {
             Item *item = *this->items.begin();
             this->dropItem(item);
+            any_items = true;
         }
         if( this->gold > 0 ) {
             Currency *currency = playing_gamestate->cloneGoldItem(this->gold);
             location->addItem(currency, this->pos.x, this->pos.y);
             this->gold = 0;
+            any_gold = true;
+        }
+        if( any_items || any_gold ) {
+            playing_gamestate->addTextEffect(!any_items ? "Dropped some gold!" : "Dropped some items!", this->getPos(), 2000);
         }
     }
 }

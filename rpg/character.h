@@ -500,7 +500,7 @@ public:
         // Should only be used to directly set flag, e.g., when loading games. To kill a character, use kill().
         this->is_dead = is_dead;
     }
-    void kill(const PlayingGamestate *playing_gamestate);
+    void kill(PlayingGamestate *playing_gamestate);
 
     void setVisible(bool is_visible) {
         this->is_visible = is_visible;
@@ -611,7 +611,7 @@ public:
         return (int)((100.0f * health)/(float)max_health);
     }
     void increaseHealth(int increase);
-    bool decreaseHealth(const PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield);
+    bool decreaseHealth(PlayingGamestate *playing_gamestate, int decrease, bool armour, bool shield);
     void restoreHealth() {
         this->health = this->max_health;
     }
