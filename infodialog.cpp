@@ -18,17 +18,23 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
         if( !pic.load(picture.c_str()) ) {
             throw string("failed to load image");
         }*/
-        QPixmap pixmap = game_g->loadImage(picture);
-        QLabel *picture_label = new QLabel();
-        //picture_label->setPicture(pic);
-        int height = QApplication::desktop()->height();
-        int max_pic_height = height/3;
-        if( pixmap.height() > max_pic_height ) {
-            pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+        try {
+            QPixmap pixmap = game_g->loadImage(picture);
+            QLabel *picture_label = new QLabel();
+            //picture_label->setPicture(pic);
+            int height = QApplication::desktop()->height();
+            int max_pic_height = height/3;
+            if( pixmap.height() > max_pic_height ) {
+                pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+            }
+            picture_label->setPixmap(pixmap);
+            layout->addWidget(picture_label);
+            layout->setAlignment(picture_label, Qt::AlignCenter);
         }
-        picture_label->setPixmap(pixmap);
-        layout->addWidget(picture_label);
-        layout->setAlignment(picture_label, Qt::AlignCenter);
+        catch(const string &str) {
+            LOG("failed to load: %s\n", picture.c_str());
+            LOG("error: %s\n", str.c_str());
+        }
     }
 
     //QLabel *label = new QLabel(text.c_str());
