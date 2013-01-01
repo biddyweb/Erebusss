@@ -328,7 +328,7 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
 }
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
-    qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
+    //qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
     if( game_g->getScreen()->isPaused() ) {
         game_g->getScreen()->setPaused(false, false);
     }
@@ -4741,9 +4741,7 @@ void PlayingGamestate::update() {
         if( moved ) {
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
-            if( do_complex_update ) {
-                this->requestPlayerMove(dest, NULL);
-            }
+            this->requestPlayerMove(dest, NULL);
         }
 #ifdef TIMING_INFO
         qDebug("keyboard input took %d", timer_kinput.elapsed());
