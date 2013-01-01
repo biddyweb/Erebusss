@@ -42,11 +42,11 @@ void GameClock::setPaused(bool paused, int time_now_ms) {
 
 int GameClock::update(int time_now_ms) {
     int n_updates = 0;
-    if( paused ) {
-        this->game_time_frame_ms = 0;
-    }
-    else {
+    this->game_time_frame_ms = 0;
+    if( !paused ) {
         // based on http://gafferongames.com/game-physics/fix-your-timestep/
+        /*
+        // Fixed timestep
         const int update_dt_c = time_per_frame_c;
         //qDebug("time from %d to %d", this->saved_elapsed_time_ms, new_elapsed_time_ms);
         int elapsed_time_ms = time_now_ms - this->saved_elapsed_time_ms;
@@ -61,6 +61,18 @@ int GameClock::update(int time_now_ms) {
             //qDebug("    Update: frame time: %d", this->game_time_frame_ms);
             accumulator -= update_dt_c;
             n_updates++;
+        }
+        */
+        // Semi-fixed timestep
+        // (Fixed timestep has problems that if time_per_frame_c is too small, we have trouble updating and end up in a death spiral due to calling update() too many times per frame;
+        // if time_per_frame_c is too large, we don't get smooth update on faster platforms.)
+        int elapsed_time_ms = time_now_ms - this->saved_elapsed_time_ms;
+        elapsed_time_ms = std::min(elapsed_time_ms, 100); // prevent too large a timestep being sent to the update, to avoid instability
+        this->saved_elapsed_time_ms = time_now_ms;
+        if( elapsed_time_ms > 0 ) {
+            this->game_time_frame_ms = elapsed_time_ms;
+            n_updates = 1;
+            //qDebug("    Update: frame time: %d", this->game_time_frame_ms);
         }
     }
     return n_updates;
