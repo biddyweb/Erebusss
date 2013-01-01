@@ -4797,9 +4797,6 @@ void PlayingGamestate::update() {
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             this->player = NULL;
-            //game_g->showInfoDialog("Game over", "You have died!");
-            //this->showInfoDialog("Game over!\n\nYou have died!");
-            //this->showInfoDialog("Game over!\n\nYou have died!", ":/gfx/scenes/death.jpg");
             this->showInfoDialog("Game over!\n\nYou have died!", string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
