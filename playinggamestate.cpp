@@ -2100,8 +2100,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->initButton(statsButton);
         statsButton->setShortcut(QKeySequence(Qt::Key_F1));
         statsButton->setToolTip("Display statistics of your character (F1)");
-        statsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //statsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        statsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
         v_layout->addWidget(statsButton);
 
@@ -2109,31 +2108,27 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->initButton(itemsButton);
         itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
         itemsButton->setToolTip("Display the items that you are carrying (F2)");
-        itemsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //itemsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        itemsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
         /*QPushButton *spellsButton = new QPushButton("Spells");
         game_g->initButton(spellsButton);
         spellsButton->setToolTip("Not supported yet");
-        spellsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //spellsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        spellsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);*/
 
         QPushButton *journalButton = new QPushButton("Journal");
         game_g->initButton(journalButton);
         journalButton->setShortcut(QKeySequence(Qt::Key_F3));
         journalButton->setToolTip("Displays information about your quests (F3)");
-        journalButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //journalButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        journalButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
         v_layout->addWidget(journalButton);
 
         /*QPushButton *quitButton = new QPushButton("Quit");
         game_g->initButton(quitButton);
-        quitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        quitButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
 
@@ -2141,7 +2136,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->initButton(pauseButton);
         pauseButton->setShortcut(QKeySequence(Qt::Key_P));
         pauseButton->setToolTip("Pause the game (P)");
-        pauseButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
 
@@ -2149,7 +2144,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->initButton(restButton);
         restButton->setShortcut(QKeySequence(Qt::Key_R));
         restButton->setToolTip("Rest until you are healed (R)");
-        restButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        restButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
 
@@ -2157,8 +2152,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->initButton(optionsButton);
         optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
         optionsButton->setToolTip("Options to save game or quit");
-        optionsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
-        //optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
         v_layout->addWidget(optionsButton);
     }
