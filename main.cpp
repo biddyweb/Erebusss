@@ -34,9 +34,16 @@ bool MyApplication::event(QEvent *event) {
 int main(int argc, char *argv[])
 {
     MyApplication app(argc, argv);
+    {
+        QDir path = QDir::currentPath();
+        path.cd("plugins/");
+        QApplication::addLibraryPath(path.absolutePath());
+    }
 
     bool fullscreen = true;
     bool help = false;
+
+    //fullscreen = false;
 
 #if !defined(Q_OS_ANDROID)
         // n.b., crashes when run on Galaxy Nexus (even though fine in the emulator)

@@ -505,6 +505,9 @@ Any content for Erebus must be releaed under a Free/Open Source compatible licen
 Version 0.4 (Work in progress)
 
 FIXED   Don't crash in InfoDialog if fail to load picture.
+FIXED   Problems on Windows if Qt plugins not available: would crash when dying
+        or otherwise displaying an InfoDialog with a picture; music and sound
+        effects wouldn't work. Now distributed with all Qt plugins.
 FIXED   Corrected FPS reading.
 FIXED   Odd behaviour with kinetic scrolling when paused. Kinetic scrolling and
         mouse pointer scrolling now works when paused.

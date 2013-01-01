@@ -15,6 +15,12 @@ copy %dllsrc%\QtWebKit4.dll %dst%
 copy %dllsrc%\QtXml4.dll %dst%
 copy %dllsrc%\phonon4.dll %dst%
 
+mkdir %dst%\plugins\
+mkdir %dst%\plugins\imageformats\
+copy %dllsrc%\plugins\imageformats\qjpeg4.dll %dst%\plugins\imageformats\
+mkdir %dst%\plugins\phonon_backend\
+copy %dllsrc%\plugins\phonon_backend\phonon_ds94.dll %dst%\plugins\phonon_backend\
+
 mkdir %dst%\docs\
 copy %src%\docs\ %dst%\docs\
 
