@@ -501,26 +501,32 @@ void MainGraphicsView::setScale(float c_scale) {
     this->c_scale = std::max(this->c_scale, min_zoom_c);
     this->resetTransform();
     this->scale(this->c_scale, this->c_scale);
+    //this->scale(this->c_scale, 0.5f*this->c_scale);
 }
 
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
-    this->calculated_lighting_pixmap_scaled = false;
-    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     float old_scale = this->c_scale;
+    QPointF view_centre = this->mapToScene( this->rect() ).boundingRect().center();
+
+    /*this->calculated_lighting_pixmap_scaled = false;
+    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);
-    this->c_scale = std::max(this->c_scale, min_zoom_c);
+    this->c_scale = std::max(this->c_scale, min_zoom_c);*/
+
+    this->setScale(c_scale);
+    c_scale = this->c_scale; // setScale may modify this->c_scale - so this line is just to keep things consistent
 
     float scale_factor = this->c_scale / old_scale;
-    QPointF view_centre = this->mapToScene( this->rect() ).boundingRect().center();
     QPointF diff = ( view_centre - centre );
     qDebug("view_centre: %f, %f", view_centre.x(), view_centre.y());
     qDebug("diff: %f, %f", diff.x(), diff.y());
     qDebug("scale_factor: %f", scale_factor);
 
-    this->resetTransform();
-    this->scale(this->c_scale, this->c_scale);
+    /*this->resetTransform();
+    this->scale(this->c_scale, this->c_scale);*/
+
     QPointF new_view_centre = centre + diff / scale_factor;
     qDebug("new_view_centre: %f, %f", new_view_centre.x(), new_view_centre.y());
     this->centerOn(new_view_centre);
@@ -4403,12 +4409,19 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     int character_size = std::max(object->getWidth(), object->getHeight());
     //const float desired_size = 2.0f;
     const float desired_size = 1.0f;
+    //const float desired_size = 0.75f;
     float character_scale = desired_size / (float)character_size;
     qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
-    //object->setTransformOriginPoint(-32.0f*character_scale, -46.0f*character_scale);
-    //object->setTransformOriginPoint(-32.0f/32.0f, -46.0f/32.0f);
     object->setTransformOriginPoint(-desired_size*64.0f/128.0f, -desired_size*92.0f/128.0f);
     object->setScale(character_scale);
+    /*{
+        Vector2D scale_centre(-desired_size*64.0f/128.0f, -2.0f*desired_size*92.0f/128.0f);
+        QTransform transform;
+        transform.translate(scale_centre.x, scale_centre.y);
+        transform.scale(character_scale, 2.0f*character_scale);
+        transform.translate(-scale_centre.x, -scale_centre.y);
+        object->setTransform(transform);
+    }*/
 
     character->setListener(this, object);
     //item->setAnimationSet("attack"); // test
