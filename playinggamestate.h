@@ -234,7 +234,6 @@ class ItemsWindow : public QWidget {
 
     void refreshList();
     void changeView(ViewType view_type);
-    QString getItemString(const Item *item) const;
     void setWeightLabel();
     void itemIsDeleted(size_t index);
 
@@ -516,6 +515,7 @@ public:
     }
 
     QPixmap &getItemImage(const string &name);
+    QString getItemString(const Item *item, bool want_weight) const;
 
     void showInfoDialog(const string &message);
     void showInfoDialog(const string &message, const string &picture);

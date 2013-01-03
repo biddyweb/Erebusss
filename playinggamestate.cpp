@@ -969,7 +969,7 @@ void ItemsWindow::refreshList() {
         else if( view_type == VIEWTYPE_MISC && !( item->getType() == ITEMTYPE_GENERAL && !item->isMagical() ) ) {
             continue;
         }
-        QString item_str = this->getItemString(item);
+        QString item_str = playing_gamestate->getItemString(item, true);
         //list->addItem( item_str );
         QListWidgetItem *list_item = new QListWidgetItem(item_str);
         QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
@@ -1015,26 +1015,6 @@ void ItemsWindow::clickedViewMagic() {
 
 void ItemsWindow::clickedViewMisc() {
     this->changeView(VIEWTYPE_MISC);
-}
-
-QString ItemsWindow::getItemString(const Item *item) const {
-    QString item_str = item->getName().c_str();
-    if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
-        item_str += " [Current Weapon]";
-    }
-    else if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
-        item_str += " [Current Shield]";
-    }
-    else if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
-        item_str += " [Current Armour]";
-    }
-    else if( playing_gamestate->getPlayer()->getCurrentRing() == item ) {
-        item_str += " [Worn]";
-    }
-    if( item->getWeight() > 0 ) {
-        item_str += " (Weight " + QString::number(item->getWeight()) + ")";
-    }
-    return item_str;
 }
 
 void ItemsWindow::changedSelectedItem(int currentRow) {
@@ -1162,7 +1142,7 @@ void ItemsWindow::clickedArmWeapon() {
     for(size_t i=0;i<list_items.size();i++) {
         const Item *item = list_items.at(i);
         QListWidgetItem *item_widget = list->item(i);
-        item_widget->setText( this->getItemString(item) );
+        item_widget->setText( playing_gamestate->getItemString(item, true) );
     }
     this->changedSelectedItem(index);
 }
@@ -1209,7 +1189,7 @@ void ItemsWindow::clickedWear() {
     for(size_t i=0;i<list_items.size();i++) {
         const Item *item = list_items.at(i);
         QListWidgetItem *item_widget = list->item(i);
-        item_widget->setText( this->getItemString(item) );
+        item_widget->setText( playing_gamestate->getItemString(item, true) );
     }
     this->changedSelectedItem(index);
 }
@@ -1431,7 +1411,8 @@ void TradeWindow::setWeightLabel() {
 
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     buy_cost *= 0.5f;
-    QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
+    //QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
+    QString item_str = playing_gamestate->getItemString(item, false) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
     QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
     list_item->setIcon(icon);
@@ -6126,6 +6107,26 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
         throw string("Failed to find item's image");
     }
     return image_iter->second;
+}
+
+QString PlayingGamestate::getItemString(const Item *item, bool want_weight) const {
+    QString item_str = item->getName().c_str();
+    if( this->getPlayer()->getCurrentWeapon() == item ) {
+        item_str += " [Current Weapon]";
+    }
+    else if( this->getPlayer()->getCurrentShield() == item ) {
+        item_str += " [Current Shield]";
+    }
+    else if( this->getPlayer()->getCurrentArmour() == item ) {
+        item_str += " [Current Armour]";
+    }
+    else if( this->getPlayer()->getCurrentRing() == item ) {
+        item_str += " [Worn]";
+    }
+    if( item->getWeight() > 0 ) {
+        item_str += " (Weight " + QString::number(item->getWeight()) + ")";
+    }
+    return item_str;
 }
 
 void PlayingGamestate::showInfoDialog(const string &message) {
