@@ -66,6 +66,7 @@ protected:
     float opacity;
     bool has_smoke;
     float width, height;
+    float visual_height; // not saved
 
     // actions are events which happen periodically
     int action_last_time;
@@ -85,7 +86,7 @@ protected:
     string description;
 
 public:
-    Scenery(const string &name, const string &image_name, bool is_animation, float width, float height);
+    Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height);
     virtual ~Scenery();
 
     void setLocation(Location *location) {
@@ -268,6 +269,9 @@ public:
     }
     float getHeight() const {
         return this->height;
+    }
+    float getVisualHeight() const {
+        return this->visual_height;
     }
 
     void addItem(Item *item);

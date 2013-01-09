@@ -15,9 +15,9 @@ using std::swap;
 #include <cassert>
 #endif
 
-Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height) :
+Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height) :
     location(NULL), name(name), image_name(image_name), is_animation(is_animation), user_data_gfx(NULL),
-    is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), locked_silent(false), locked_used_up(false), unlock_xp(20), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height),
+    is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), is_locked(false), locked_silent(false), locked_used_up(false), unlock_xp(20), draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height),
     action_last_time(0), action_delay(0), action_value(0),
     interact_state(0),
     can_be_opened(false), opened(false),
@@ -581,6 +581,10 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
     }
     floor_region->addScenery(scenery);*/
     vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
+    if( floor_regions.size() == 0 ) {
+        // for sceneries on a wall
+        floor_regions = this->findFloorRegionsAt(scenery->getPos() + Vector2D(0.0f, 0.5f*scenery->getHeight() + 0.5f));
+    }
     if( floor_regions.size() == 0 ) {
         LOG("add: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
         throw string("add: failed to find floor region for scenery");

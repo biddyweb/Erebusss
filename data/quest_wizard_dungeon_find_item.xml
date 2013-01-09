@@ -55,11 +55,12 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
     x="34.0" y="5.0"
     />-->
 
+<!--<scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>-->
 <scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
-<scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" size="0.8" blocking="true">
     <gold amount="7"/>
 </scenery>
 
@@ -165,13 +166,13 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="4.0" rect_h="2.0"/>
-<scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" size="0.8" blocking="true">
     <gold amount="9"/>
 </scenery>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="8.0" rect_w="3.0" rect_h="2.0"/>
 <floorregion shape="rect" rect_x="18.0" rect_y="8.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Crate" image_name="crate" x="18.5" y="8.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="18.5" y="8.5" size="0.8" blocking="true">
     <gold amount="20"/>
 </scenery>
 
@@ -283,7 +284,7 @@ This journal seems to be a record of grisly torture that took place in this room
     </item>
 </scenery>
 
-<scenery name="Skulls" image_name="skulls" x="53.5" y="11.5" size="0.5" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="53.5" y="11.5" size="0.3" draw_type="background"/>
 <scenery name="Bones" image_name="bones" x="51.0" y="13.5" size="0.5" draw_type="background"/>
 
 <!--exit to next location-->
@@ -314,7 +315,7 @@ This journal seems to be a record of grisly torture that took place in this room
 </npc>
 <npc name="Orc" template="Orc" x="2.0" y="3.0"/>
 
-<scenery name="Crate" image_name="crate" x="4.5" y="5.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="4.5" y="5.5" size="0.8" blocking="true">
     <gold amount="11"/>
 </scenery>
 
@@ -479,14 +480,14 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
     <floorregion shape="rect" rect_x="19.0" rect_y="13.5" rect_w="0.5" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="19.5" rect_y="12.0" rect_w="4.0" rect_h="3.5"/>
-<scenery name="Barrel" image_name="barrel" x="23.0" y="15.0" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="23.0" y="15.0" size="0.8" blocking="true">
     <gold amount="3"/>
 </scenery>
 
 <!--armoury-->
     <floorregion shape="rect" rect_x="26.0" rect_y="15.5" rect_w="1.0" rect_h="0.5"/>
 <floorregion shape="rect" rect_x="24.0" rect_y="12.0" rect_w="5.0" rect_h="3.5"/>
-<scenery name="Crate" image_name="crate" x="28.5" y="15.0" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="28.5" y="15.0" size="0.8" blocking="true">
     <item template="Long Sword"/>
     <item template="Short Sword"/>
     <item template="Short Sword"/>
@@ -624,7 +625,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
 <scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
 
-<scenery name="Crate" image_name="crate" x="4.5" y="2.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="4.5" y="2.5" size="0.8" blocking="true">
     <gold amount="21"/>
 </scenery>
 
@@ -759,7 +760,7 @@ This is a heavy book, that starts talking about the subject matter of the dead, 
 
 <floorregion shape="rect" rect_x="0.0" rect_y="15.0" rect_w="3.0" rect_h="3.0"/>
 
-<scenery name="Barrel" image_name="barrel" x="0.5" y="17.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="0.5" y="17.5" size="0.8" blocking="true">
     <trap type="acid" rating="4"/>
 </scenery>
 
@@ -901,7 +902,7 @@ Experiments.
 
 <scenery name="Stairs" image_name="stairsdown_indoors" x="37.5" y="29.5" size="2.0" blocking="true" exit_location="level_6" exit_location_x="38.5" exit_location_y="14.0"/>
 
-<scenery name="Skulls" image_name="skulls" x="39.5" y="27.5" size="0.5" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="39.5" y="27.5" size="0.3" draw_type="background"/>
 
 <!--time travel portals-->
 
@@ -1198,7 +1199,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <floorregion shape="rect" rect_x="15.0" rect_y="22.0" rect_w="4.0" rect_h="4.0"/>
 
-<scenery name="Crate" image_name="crate" x="15.5" y="25.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="15.5" y="25.5" size="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
 
@@ -1233,7 +1234,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Bed" image_name="bed" x="25.0" y="22.5" size="1.2" blocking="true"/>
 
-<scenery name="Crate" image_name="crate" x="27.5" y="20.1" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="27.5" y="20.1" size="0.8" blocking="true">
     <gold amount="23"/>
     <item template="Green Gem"/>
     <item template="Gold Ring"/>
@@ -1257,7 +1258,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     />
 
 <scenery name="Bones" image_name="bones" x="34.5" y="27.0" size="0.5" draw_type="background"/>
-<scenery name="Skulls" image_name="skulls" x="36.5" y="25.5" size="0.5" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="36.5" y="25.5" size="0.3" draw_type="background"/>
 <scenery name="Rock" image_name="rock1" x="36.6" y="27.1" size="0.2" draw_type="background"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="36.0" y="25.5"
@@ -1320,7 +1321,7 @@ I am a peasant from the nearby village, but I was captured by the Orcs attacking
     locked="true" unlocked_by_template="Orc Warlord's Key"/>
 <floorregion shape="rect" rect_x="27.0" rect_y="14.0" rect_w="3.0" rect_h="4.0"/>
 
-<scenery name="Crate" image_name="crate" x="27.5" y="17.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="27.5" y="17.5" size="0.8" blocking="true">
     <item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter.
     </item>
@@ -1342,7 +1343,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
     <scenery name="Door" image_name="door_wood" x="21.5" y="13.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="10.0" rect_w="5.0" rect_h="5.0"/>
-<scenery name="Barrel" image_name="barrel" x="16.5" y="14.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="barrel" x="16.5" y="14.5" size="0.8" blocking="true">
     <gold amount="12"/>
 </scenery>
 <scenery name="Table" image_name="table" x="20.5" y="14.5" size="0.8" blocking="true"/>
@@ -1354,7 +1355,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
     <scenery name="Door" image_name="door_wood" x="18.5" y="15.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="16.0" rect_w="5.0" rect_h="3.0"/>
-<scenery name="Crate" image_name="crate" x="16.5" y="18.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="16.5" y="18.5" size="0.8" blocking="true">
     <item template="Long Sword"/>
     <item template="Long Sword"/>
     <item template="Short Sword"/>
@@ -1476,11 +1477,11 @@ There seems to be no information on the cause of the war, or who the enemy is.
     <floorregion shape="rect" rect_x="5.0" rect_y="1.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="6.0" rect_y="0.0" rect_w="4.0" rect_h="3.0"/>
 
-<scenery name="Barrel" image_name="crate" x="6.5" y="2.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Barrel" image_name="crate" x="6.5" y="2.5" size="0.8" blocking="true">
     <gold amount="3"/>
 </scenery>
 
-<scenery name="Crate" image_name="crate" x="9.5" y="2.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="9.5" y="2.5" size="0.8" blocking="true">
     <gold amount="9"/>
     <item template="Short Sword"/>
     <item template="Shield"/>
@@ -1489,11 +1490,11 @@ There seems to be no information on the cause of the war, or who the enemy is.
     <floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="11.0" rect_y="0.0" rect_w="4.0" rect_h="4.0"/>
 
-<scenery name="Crate" image_name="crate" x="11.5" y="3.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="11.5" y="3.5" size="0.8" blocking="true">
     <item name="Maze Key" image_name="key" icon_width="0.5" weight="0"/>
 </scenery>
 
-<scenery name="Crate" image_name="crate" x="14.5" y="3.5" w="0.8" h="0.8" blocking="true">
+<scenery name="Crate" image_name="crate" x="14.5" y="3.5" size="0.8" blocking="true">
     <gold amount="9"/>
     <item template="Arrows"/>
 </scenery>
@@ -1651,7 +1652,7 @@ A small bronze statuette of a humanoid bull-like creature.
 
 <scenery name="Bones" image_name="bones" x="20.5" y="13.5" size="0.5" draw_type="background"/>
 
-<scenery name="Skulls" image_name="skulls" x="18.1" y="14.9" size="0.5" draw_type="background"/>
+<scenery name="Skulls" image_name="skulls" x="18.1" y="14.9" size="0.3" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
     <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"

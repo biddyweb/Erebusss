@@ -363,6 +363,9 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MainGraphicsView *view;
     GUIOverlay *gui_overlay;
 
+    bool view_transform_3d;
+    bool view_walls_3d;
+
     QStackedWidget *main_stacked_widget;
 
     Difficulty difficulty;
@@ -475,6 +478,9 @@ public:
     void playSound(const string &sound_effect);
     void showInfoWindow(const string &html);
 
+    bool isTransform3D() const {
+        return this->view_transform_3d;
+    }
     Character *getPlayer() {
         return this->player;
     }

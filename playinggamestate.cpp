@@ -19,9 +19,6 @@
 #define DEBUG_SHOW_PATH
 #endif
 
-//#define TRANSFORM_3D
-//#define WALLS_3D
-
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
@@ -503,11 +500,12 @@ void MainGraphicsView::setScale(float c_scale) {
     this->c_scale = std::min(this->c_scale, max_zoom_c);
     this->c_scale = std::max(this->c_scale, min_zoom_c);
     this->resetTransform();
-#ifdef TRANSFORM_3D
-    this->scale(this->c_scale, 0.5f*this->c_scale);
-#else
-    this->scale(this->c_scale, this->c_scale);
-#endif
+    if( this->playing_gamestate->isTransform3D() ) {
+        this->scale(this->c_scale, 0.5f*this->c_scale);
+    }
+    else {
+        this->scale(this->c_scale, this->c_scale);
+    }
 }
 
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
@@ -556,9 +554,9 @@ void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
             const TextEffect *te = *iter;
             float te_w = te->boundingRect().width() * font_scale;
             float te_h = te->boundingRect().height() * font_scale;
-#ifdef TRANSFORM_3D
-            te_h *= 2.0f;
-#endif
+            if( this->playing_gamestate->isTransform3D() ) {
+                te_h *= 2.0f;
+            }
             if( text_effect->x() + text_effect_w > te->x() &&
                 text_effect->x() < te->x() + te_w &&
                 new_y + text_effect_h > te->y() &&
@@ -1642,6 +1640,8 @@ void ItemsPickerWindow::addPlayerItem(Item *item) {
 }
 
 void ItemsPickerWindow::refreshPlayerItems() {
+
+
     player_list->clear();
     player_items.clear();
     Character *player = playing_gamestate->getPlayer();
@@ -2023,7 +2023,9 @@ void SaveGameWindow::clickedSaveNew() {
 }
 
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
-    scene(NULL), view(NULL), gui_overlay(NULL), main_stacked_widget(NULL),
+    scene(NULL), view(NULL), gui_overlay(NULL),
+    view_transform_3d(false), view_walls_3d(false),
+    main_stacked_widget(NULL),
     difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -2213,7 +2215,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->setXP(68); // CHEAT, simulate start of quest 2
         */
         this->player = game_g->createPlayer(player_type);
-        //this->player->initialiseHealth(600); // CHEAT
+        this->player->initialiseHealth(600); // CHEAT
         //player->addGold( 1000 ); // CHEAT
     }
 
@@ -3038,9 +3040,9 @@ void PlayingGamestate::setupView() {
     scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
     {
         float desired_width_c = mobile_c ? 10.0f : 20.0f;
-#ifdef TRANSFORM_3D
-        desired_width_c /= 1.5f;
-#endif
+        if( this->view_transform_3d ) {
+            desired_width_c /= 1.5f;
+        }
         float initial_scale = window->width() / desired_width_c;
         LOG("width: %d\n", window->width());
         LOG("initial_scale: %f\n", initial_scale);
@@ -3049,16 +3051,17 @@ void PlayingGamestate::setupView() {
 
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
     QBrush wall_brush;
-    {
+    //const float wall_brush_ratio = 1.0f;
+    const float wall_brush_ratio = 3.0f;
+    //{
         /*int pixels_per_unit = 128;
         float scale = 4.0f/(float)pixels_per_unit;*/
         float floor_scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
-        float wall_scale = 2.0f/(float)builtin_images[c_location->getWallImageName()].width();
+        float wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
         floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
         if( c_location->getWallImageName().length() > 0 ) {
             wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
-            //wall_brush.setTransform(QTransform::fromScale(wall_scale, wall_scale));
-            wall_brush.setTransform(QTransform::fromScale(2.0f*wall_scale, wall_scale));
+            wall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*wall_scale, wall_scale));
         }
 
         float background_scale = 1.0f/32.0f;
@@ -3066,7 +3069,7 @@ void PlayingGamestate::setupView() {
         background_brush.setTransform(QTransform::fromScale(background_scale, background_scale));
         view->setBackgroundBrush(background_brush);
         //view->setBackgroundBrush(QBrush(Qt::white));
-    }
+    //}
 
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
         FloorRegion *floor_region = c_location->getFloorRegion(i);
@@ -3106,55 +3109,57 @@ void PlayingGamestate::setupView() {
                 wall_item->setPen(Qt::NoPen);
                 wall_item->setBrush(wall_brush);
 
-#ifdef WALLS_3D
-
-#ifdef TRANSFORM_3D
-                const float wall_height = 0.9f;
-#else
-                const float wall_height = 0.5f;
-#endif
-                if( fabs(normal_into_wall.y) > E_TOL_LINEAR ) {
-                    QPolygonF wall_polygon_3d;
-                    if( normal_into_wall.y < 0.0f )
-                    {
-                        QBrush wall_brush_3d = wall_brush;
-                        QTransform transform = wall_brush_3d.transform();
-                        transform.shear(0.0f, 2.0f * (p1.y - p0.y) / (p1.x - p0.x));
-                        wall_brush_3d.setTransform(transform);
-                        wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
-                        wall_polygon_3d.push_back(QPointF(p0.x, p0.y - wall_height));
-                        wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
-                        wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
-                        QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
-                        //QGraphicsPolygonItem *wall_item_3d = scene->addPolygon(wall_polygon_3d);
-                        wall_item_3d->setPen(Qt::NoPen);
-                        wall_item_3d->setBrush(wall_brush_3d);
-                        //wall_item_3d->setZValue( std::min(p0.y, p1.y) + 10.0f );
-                        if( normal_into_wall.y > 0.0f ) {
-                            wall_item_3d->setZValue(1000000.0);
-                            wall_item_3d->setFlag(QGraphicsItem::ItemStacksBehindParent);
+                if( this->view_walls_3d ) {
+                    const float wall_height = this->view_transform_3d ? 0.9f : 0.5f;
+                    if( fabs(normal_into_wall.y) > E_TOL_LINEAR ) {
+                        QPolygonF wall_polygon_3d;
+                        if( normal_into_wall.y < 0.0f )
+                        {
+                            QBrush wall_brush_3d = wall_brush;
+                            //QTransform transform = wall_brush_3d.transform();
+                            QTransform transform;
+                            //float brush_ratio = builtin_images[c_location->getWallImageName()].height() / builtin_images[c_location->getWallImageName()].width();
+                            //transform.translate(0.0f, (p1.y - wall_height)/wall_scale);
+                            //transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/(wall_brush_ratio*wall_scale));
+                            transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/wall_scale * (p1.y - p0.y) / (p1.x - p0.x));
+                            //transform.translate(p1.x/(wall_brush_ratio*wall_scale), (p1.y - wall_height)/wall_scale);
+                            transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
+                            transform *= wall_brush_3d.transform();
+                            wall_brush_3d.setTransform(transform);
+                            wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                            wall_polygon_3d.push_back(QPointF(p0.x, p0.y - wall_height));
+                            wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
+                            wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                            QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
+                            //QGraphicsPolygonItem *wall_item_3d = scene->addPolygon(wall_polygon_3d);
+                            wall_item_3d->setPen(Qt::NoPen);
+                            wall_item_3d->setBrush(wall_brush_3d);
+                            //wall_item_3d->setZValue( std::min(p0.y, p1.y) + 10.0f );
+                            if( normal_into_wall.y > 0.0f ) {
+                                wall_item_3d->setZValue(1000000.0);
+                                wall_item_3d->setFlag(QGraphicsItem::ItemStacksBehindParent);
+                            }
                         }
+                        /*else {
+                            //wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                            //wall_polygon_3d.push_back(QPointF(p0.x, p0.y + wall_height));
+                            //wall_polygon_3d.push_back(QPointF(p1.x, p1.y + wall_height));
+                            //wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                        }*/
                     }
-                    /*else {
-                        //wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
-                        //wall_polygon_3d.push_back(QPointF(p0.x, p0.y + wall_height));
-                        //wall_polygon_3d.push_back(QPointF(p1.x, p1.y + wall_height));
-                        //wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                    /*if( normal_into_wall.y < E_TOL_LINEAR ) {
+                        QPolygonF wall_polygon_top;
+                        const float wall_dist = 0.1f;
+                        wall_polygon_top.push_back(QPointF(p0.x, p0.y - wall_height));
+                        wall_polygon_top.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y - wall_height + wall_dist * normal_into_wall.y));
+                        wall_polygon_top.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y - wall_height + wall_dist * normal_into_wall.y));
+                        wall_polygon_top.push_back(QPointF(p1.x, p1.y - wall_height));
+                        QGraphicsPolygonItem *wall_item_top = new QGraphicsPolygonItem(wall_polygon_top, item);
+                        wall_item_top->setPen(Qt::NoPen);
+                        wall_item_top->setBrush(wall_brush);
                     }*/
-                }
-                /*if( normal_into_wall.y < E_TOL_LINEAR ) {
-                    QPolygonF wall_polygon_top;
-                    const float wall_dist = 0.1f;
-                    wall_polygon_top.push_back(QPointF(p0.x, p0.y - wall_height));
-                    wall_polygon_top.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y - wall_height + wall_dist * normal_into_wall.y));
-                    wall_polygon_top.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y - wall_height + wall_dist * normal_into_wall.y));
-                    wall_polygon_top.push_back(QPointF(p1.x, p1.y - wall_height));
-                    QGraphicsPolygonItem *wall_item_top = new QGraphicsPolygonItem(wall_polygon_top, item);
-                    wall_item_top->setPen(Qt::NoPen);
-                    wall_item_top->setBrush(wall_brush);
-                }*/
 
-#endif
+                }
             }
         }
     }
@@ -3303,6 +3308,13 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
 
+    if( !is_savegame ) {
+        this->view_transform_3d = true;
+        this->view_walls_3d = true;
+        // if not a savegame, we should be loading new quest data that ought to be compatible
+        // if it is a savegame, we check the versioning when loading
+    }
+
     /*Location *location = new Location();
     this->quest->addLocation(location);*/
     Location *location = NULL;
@@ -3334,6 +3346,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         QXmlStreamReader reader(&file);
         while( !reader.atEnd() && !reader.hasError() ) {
             reader.readNext();
+            //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
             if( reader.isStartElement() )
             {
                 progress_count++;
@@ -3383,6 +3396,23 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
                     this->journal_ss.clear();
                     this->journal_ss << journal.data();
+                }
+                else if( reader.name() == "savegame" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: savegame element only allowed in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: savegame element wasn't expected here");
+                    }
+                    QStringRef savegame_version_s = reader.attributes().value("savegame_version");
+                    int savegame_version = parseInt(savegame_version_s.toString());
+                    LOG("savegame_version = %d\n", savegame_version);
+                    if( savegame_version >= 2 ) {
+                        this->view_transform_3d = true;
+                        this->view_walls_3d = true;
+                    }
                 }
                 else if( reader.name() == "game" ) {
                     if( !is_savegame ) {
@@ -4024,7 +4054,21 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         size_h = parseFloat(size_h_s.toString());
                     }
 
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h);
+                    float visual_h = size_h;
+                    if( this->view_transform_3d ) {
+                        // hack to get height right in 3D mode!
+                        //if( door || exit /*|| draw_type_s.length() > 0*/ ) {
+                        if( size_s.length() == 0 ) {
+                            // if we have specified w/h values explicitly, we assume these are in world coordinates already
+                        }
+                        else {
+                            // otherwise we assume the width/height of the image are already in "isometric"/3D format
+                            visual_h *= 2.0f;
+                            size_h = size_w;
+                        }
+                    }
+
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -4307,17 +4351,18 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item, boo
         object->setVisible(visible);
 
         float item_scale = icon_width / object->pixmap().width();
-#ifdef TRANSFORM_3D
-        Vector2D scale_centre(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
-        QTransform transform;
-        transform.translate(scale_centre.x, scale_centre.y);
-        transform.scale(item_scale, 2.0f*item_scale);
-        transform.translate(-scale_centre.x, -scale_centre.y);
-        object->setTransform(transform);
-#else
-        object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
-        object->setScale(item_scale);
-#endif
+        if( this->view_transform_3d ) {
+            float centre_x = 0.5f*object->boundingRect().width();
+            float centre_y = 0.5f*object->boundingRect().height();
+            QTransform transform;
+            transform = transform.scale(item_scale, 2.0f*item_scale);
+            transform = transform.translate(-centre_x, -centre_y);
+            object->setTransform(transform);
+        }
+        else {
+            object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
+            object->setScale(item_scale);
+        }
     }
 }
 
@@ -4374,12 +4419,14 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         float centre_x = 0.5f*object->pixmap().width();
         float centre_y = 0.5f*object->pixmap().height();*/
         float scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
-        float scenery_scale_h = scenery->getHeight() / object->boundingRect().height();
-#ifdef TRANSFORM_3D
+        float scenery_scale_h = scenery->getVisualHeight() / object->boundingRect().height();
+/*#ifdef TRANSFORM_3D
         scenery_scale_h *= 2.0f;
-#endif
+#endif*/
         float centre_x = 0.5f*object->boundingRect().width();
         float centre_y = 0.5f*object->boundingRect().height();
+        centre_y += 0.25f * (scenery->getVisualHeight() - scenery->getHeight()) * object->boundingRect().height();
+        //ASSERT_LOGGER( scenery->getVisualHeight() - scenery->getHeight() >= 0.0f );
         QTransform transform;
         transform = transform.scale(scenery_scale_w, scenery_scale_h);
         transform = transform.translate(-centre_x, -centre_y);
@@ -4451,27 +4498,28 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     const int off_x = 64 - 32;
     //const int off_y = 92;
     const int off_y = 94 - 40;
-#ifdef TRANSFORM_3D
-    const float desired_size = 0.75f;
-    float character_scale = desired_size / (float)character_size;
-    qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
-    {
-        //Vector2D scale_centre(-desired_size*off_x/128.0f, -2.0f*desired_size*off_y/128.0f);
-        Vector2D scale_centre(-desired_size*off_x/64.0f, -2.0f*desired_size*off_y/64.0f);
-        QTransform transform;
-        transform.translate(scale_centre.x, scale_centre.y);
-        transform.scale(character_scale, 2.0f*character_scale);
-        transform.translate(-scale_centre.x, -scale_centre.y);
-        object->setTransform(transform);
+    if( this->view_transform_3d ) {
+        const float desired_size = 0.75f;
+        float character_scale = desired_size / (float)character_size;
+        qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
+        {
+            //Vector2D scale_centre(-desired_size*off_x/128.0f, -2.0f*desired_size*off_y/128.0f);
+            Vector2D scale_centre(-desired_size*off_x/64.0f, -2.0f*desired_size*off_y/64.0f);
+            QTransform transform;
+            transform.translate(scale_centre.x, scale_centre.y);
+            transform.scale(character_scale, 2.0f*character_scale);
+            transform.translate(-scale_centre.x, -scale_centre.y);
+            object->setTransform(transform);
+        }
     }
-#else
-    const float desired_size = 1.0f;
-    float character_scale = desired_size / (float)character_size;
-    qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
-    //object->setTransformOriginPoint(-desired_size*off_x/128.0f, -desired_size*off_y/128.0f);
-    object->setTransformOriginPoint(-desired_size*off_x/64.0f, -desired_size*off_y/64.0f);
-    object->setScale(character_scale);
-#endif
+    else {
+        const float desired_size = 1.0f;
+        float character_scale = desired_size / (float)character_size;
+        qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
+        //object->setTransformOriginPoint(-desired_size*off_x/128.0f, -desired_size*off_y/128.0f);
+        object->setTransformOriginPoint(-desired_size*off_x/64.0f, -desired_size*off_y/64.0f);
+        object->setScale(character_scale);
+    }
 
     character->setListener(this, object);
     //item->setAnimationSet("attack"); // test
@@ -5807,7 +5855,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
 
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 
-    const int savegame_version = 1;
+    const int savegame_version = 2;
 
     fprintf(file, "<?xml version=\"1.0\" ?>\n");
     fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
@@ -6095,13 +6143,14 @@ void PlayingGamestate::addTextEffect(const string &text, Vector2D pos, int durat
         text_effect_pos.x = std::max(pos.x, (float)view_topright.x()) - text_effect_width;
     }
     text_effect->setPos( text_effect_pos.x, text_effect_pos.y );
-#ifdef TRANSFORM_3D
-    QTransform transform;
-    transform.scale(font_scale, 2.0f*font_scale);
-    text_effect->setTransform(transform);
-#else
-    text_effect->setScale(font_scale);
-#endif
+    if( this->view_transform_3d ) {
+        QTransform transform;
+        transform.scale(font_scale, 2.0f*font_scale);
+        text_effect->setTransform(transform);
+    }
+    else {
+        text_effect->setScale(font_scale);
+    }
     //text_effect->setZValue(text_effect->pos().y() + 1.0f);
     text_effect->setZValue(text_effect->pos().y() + 1000.0f);
     view->addTextEffect(text_effect);

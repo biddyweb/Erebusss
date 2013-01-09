@@ -238,6 +238,7 @@ QRectF AnimatedObject::boundingRect() const {
 
 void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
 
+    //painter->setRenderHint(QPainter::SmoothPixmapTransform);
     //qDebug("paint");
     /*int ms_per_frame = 100;
     int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
@@ -974,7 +975,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             Scenery *scenery = NULL;
             if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f);
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 5.5f, 22.5f);
             }
