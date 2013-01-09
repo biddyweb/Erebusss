@@ -1,0 +1,121 @@
+<?xml version="1.0" ?>
+<quest name="">
+
+<info>News of your heroism spreads, and you are soon able to make a living for yourself by completing expeditions and quests that people offer to you.
+
+
+</info>
+
+<completed_text>
+</completed_text>
+
+<quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
+
+<location>
+
+<floor image_name="floor_rock"/>
+<wall image_name="wall"/>
+<background image_name="background_brown"/>
+
+<player_start x="1.0" y="30.5"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="0.0" y="30.0" />
+    <floorregion_point x="0.0" y="31.0" />
+    <floorregion_point x="2.0" y="31.0" />
+    <floorregion_point x="1.0" y="30.0" />
+</floorregion>
+<floorregion shape="polygon">
+    <floorregion_point x="1.0" y="30.0" />
+    <floorregion_point x="2.0" y="31.0" />
+    <floorregion_point x="12.0" y="21.0" />
+    <floorregion_point x="11.0" y="20.0" />
+</floorregion>
+
+<scenery name="Door" image_name="door_wood" x="0.2" y="30.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
+
+<!-- centre -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="11.0" y="20.0" />
+    <floorregion_point x="12.0" y="21.0" />
+    <floorregion_point x="14.0" y="22.0" />
+    <floorregion_point x="15.0" y="22.0" />
+    <floorregion_point x="17.0" y="21.0" />
+    <floorregion_point x="17.5" y="18.0" />
+    <floorregion_point x="15.0" y="17.0" />
+    <floorregion_point x="13.0" y="17.0" />
+    <floorregion_point x="11.5" y="18.0" />
+</floorregion>
+
+<floorregion shape="polygon">
+    <floorregion_point x="15.0" y="22.0" />
+    <floorregion_point x="14.0" y="22.0" />
+    <floorregion_point x="14.0" y="23.0" />
+    <floorregion_point x="15.0" y="23.0" />
+</floorregion>
+<scenery name="Crate" image_name="crate" x="14.5" y="22.5" size="0.8" blocking="true">
+    <gold amount="7"/>
+</scenery>
+
+<npc name="Wyvern" template="Wyvern" x="14.5" y="21.5"/>
+
+<!-- west route -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="11.25" y="19.0" />
+    <floorregion_point x="11.5" y="18.0" />
+    <floorregion_point x="3.5" y="14.0" />
+    <floorregion_point x="3.25" y="15.0" />
+</floorregion>
+
+<!-- east route -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="17.0" y="21.0" />
+    <floorregion_point x="16.0" y="21.5" />
+    <floorregion_point x="22.0" y="24.5" />
+    <floorregion_point x="23.0" y="24.0" />
+</floorregion>
+
+<floorregion shape="polygon">
+    <floorregion_point x="23.0" y="24.0" />
+    <floorregion_point x="22.0" y="24.5" />
+    <floorregion_point x="22.0" y="27.0" />
+    <floorregion_point x="26.0" y="27.0" />
+    <floorregion_point x="26.0" y="24.0" />
+</floorregion>
+
+<npc name="Goblin" template="Goblin" x="24.5" y="24.5">
+    <gold amount="5"/>
+</npc>
+
+<scenery name="Barrel" image_name="barrel" x="25.5" y="24.5" size="0.8" blocking="true">
+    <gold amount="2"/>
+</scenery>
+<scenery name="Crate" image_name="crate" x="25.5" y="25.5" size="0.8" blocking="true">
+</scenery>
+<scenery name="Crate" image_name="crate" x="25.5" y="26.5" size="0.8" blocking="true">
+    <item template="Gold Ring"/>
+</scenery>
+<scenery name="Barrel" image_name="barrel" x="24.5" y="26.5" size="0.8" blocking="true">
+    <gold amount="3"/>
+</scenery>
+<scenery name="Crate" image_name="crate" x="23.5" y="26.5" size="0.8" blocking="true">
+    <gold amount="12"/>
+</scenery>
+<scenery name="Barrel" image_name="barrel" x="22.5" y="26.5" size="0.8" blocking="true">
+</scenery>
+
+<!-- north route -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="13.0" y="17.0" />
+    <floorregion_point x="15.0" y="17.0" />
+    <floorregion_point x="15.0" y="12.0" />
+    <floorregion_point x="13.0" y="12.0" />
+</floorregion>
+
+</location>
+
+</quest>

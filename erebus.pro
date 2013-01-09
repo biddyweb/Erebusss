@@ -162,6 +162,7 @@ OTHER_FILES += \
     data/spells.xml \
     docs/erebus.html \
     _devdocs/rules.odt \
-    data/quest_necromancer.xml
+    data/quest_necromancer.xml \
+    data/quest_through_mountains.xml
 
 RESOURCES +=
