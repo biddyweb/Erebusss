@@ -769,77 +769,77 @@ This is a heavy book, that starts talking about the subject matter of the dead, 
 <!--chess route-->
 
 <floorregion shape="rect" rect_x="11.0" rect_y="10.0" rect_w="3.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_white" x="11.5" y="10.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="12.5" y="10.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="13.5" y="10.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="11.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="12.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="13.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
 
 <item template="Chess Piece (Knight)" x="11.5" y="10.5"/>
 
 <floorregion shape="rect" rect_x="13.0" rect_y="11.0" rect_w="3.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_black" x="13.5" y="11.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="14.5" y="11.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="15.5" y="11.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="13.5" y="11.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="14.5" y="11.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="15.5" y="11.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="13.0" rect_y="12.0" rect_w="1.0" rect_h="3.0"/>
-<scenery name="Tile" image_name="tile_white" x="13.5" y="12.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="13.5" y="13.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="13.5" y="14.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="13.5" y="12.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="13.5" y="13.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="13.5" y="14.5" w="1.0" h="1.0" draw_type="background"/>
 <trap x="13.0" y="14.0" w="1.0" h="1.0" type="death"/>
 <floorregion shape="rect" rect_x="14.0" rect_y="14.0" rect_w="2.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_black" x="14.5" y="14.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="15.5" y="14.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="14.5" y="14.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="15.5" y="14.5" w="1.0" h="1.0" draw_type="background"/>
 <trap x="14.0" y="14.0" w="1.0" h="1.0" type="death"/>
 <floorregion shape="rect" rect_x="15.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_black" x="15.5" y="13.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="15.5" y="13.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="3.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_white" x="15.5" y="10.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="16.5" y="10.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="17.5" y="10.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="15.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="16.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="17.5" y="10.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="17.0" rect_y="11.0" rect_w="1.0" rect_h="2.0"/>
-<scenery name="Tile" image_name="tile_black" x="17.5" y="11.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="17.5" y="12.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="17.5" y="11.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="17.5" y="12.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="13.0" rect_w="3.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_white" x="16.5" y="13.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="17.5" y="13.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="18.5" y="13.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="16.5" y="13.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="17.5" y="13.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="18.5" y="13.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="18.0" rect_y="14.0" rect_w="1.0" rect_h="3.0"/>
-<scenery name="Tile" image_name="tile_black" x="18.5" y="14.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="18.5" y="15.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="18.5" y="16.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="18.5" y="14.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="18.5" y="15.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="18.5" y="16.5" w="1.0" h="1.0" draw_type="background"/>
 <trap x="18.0" y="16.0" w="1.0" h="1.0" type="death"/>
 <gold amount="100" x="18.5" y="16.5"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="15.0" rect_w="2.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_white" x="16.5" y="15.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_black" x="17.5" y="15.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="16.5" y="15.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="17.5" y="15.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="16.0" rect_w="1.0" rect_h="2.0"/>
-<scenery name="Tile" image_name="tile_black" x="16.5" y="16.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="16.5" y="17.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="16.5" y="16.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="16.5" y="17.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="14.0" rect_y="16.0" rect_w="2.0" rect_h="1.0"/>
 <trap x="15.0" y="16.0" w="1.0" h="1.0" type="death"/>
-<scenery name="Tile" image_name="tile_black" x="14.5" y="16.5" size="1.0" draw_type="background"/>
-<scenery name="Tile" image_name="tile_white" x="15.5" y="16.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_black" x="14.5" y="16.5" w="1.0" h="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="15.5" y="16.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="14.0" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Tile" image_name="tile_white" x="14.5" y="17.5" size="1.0" draw_type="background"/>
+<scenery name="Tile" image_name="tile_white" x="14.5" y="17.5" w="1.0" h="1.0" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="14.0" rect_y="18.0" rect_w="1.0" rect_h="1.0"/>
 
 <!--exit of chessboard-->
 <floorregion shape="rect" rect_x="16.0" rect_y="18.0" rect_w="4.0" rect_h="1.0"/>
 
-<!--<player_start x="16.5" y="18.5"/>-->
+<!--<player_start x="22.5" y="18.5"/>-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
 <trap x="20.0" y="18.0" w="1.0" h="1.0" type="gas" rating="4"/>
 
-<scenery name="Painting" image_name="painting_sword" x="22.0" y="18.0" size="0.5" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
+<scenery name="Painting" image_name="painting_sword" x="22.0" y="17.55" w="0.3" h="0.6" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
 
 <npc name="Shadow" template="Shadow" x="22.5" y="20.5"/>
 
@@ -872,11 +872,11 @@ Gakk!
     <floorregion shape="rect" rect_x="27.0" rect_y="7.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="28.0" rect_y="5.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Experimental Chamber" image_name="experimental_chamber" x="28.7" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="28.7" y="5.6" size="0.75" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
 
-<scenery name="Experimental Chamber" image_name="experimental_chamber" x="30.2" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="30.2" y="5.6" size="0.75" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY"/>
 
-<scenery name="Experimental Chamber" image_name="experimental_chamber" x="31.7" y="5.6" size="1.0" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER"/>
+<scenery name="Experimental Chamber" image_name="experimental_chamber" x="31.7" y="5.6" size="0.75" blocking="true" interact_type="INTERACT_TYPE_EXPERIMENTAL_CHAMBER"/>
 
 <scenery name="Blood Stain" image_name="bloodstain" x="28.9" y="9.2" size="0.7" opacity="0.9" draw_type="background"/>
 
