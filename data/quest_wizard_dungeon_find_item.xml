@@ -380,7 +380,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
 <scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
 
-<scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.5" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
+<scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.0" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
 
 <!--study-->
 
@@ -389,7 +389,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <floorregion shape="rect" rect_x="6.0" rect_y="7.0" rect_w="1.0" rect_h="5.0"/>
 
 <floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="3.0" rect_h="4.0"/>
-<scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" size="2.0" draw_type="background"/>
+<scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" w="1.0" h="1.5" draw_type="background"/>
 <scenery name="Table" image_name="table" x="7.5" y="15.5" size="0.8" blocking="true"/>
 <scenery name="Cabinet" image_name="cabinet" x="5.5" y="12.5" size="0.8" blocking="true"
     locked="true"/>
@@ -935,7 +935,7 @@ The journal claims that each of the nearby teleporters is linked to a different 
 
 <floorregion shape="rect" rect_x="15.0" rect_y="0.0" rect_w="8.0" rect_h="10.0"/>
 
-<!--<player_start x="25.0" y="25.0"/>-->
+<!--<player_start x="25.0" y="24.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
@@ -946,9 +946,9 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Fire" image_name="fire" x="27.0" y="26.0" size="1.0" blocking="true" has_smoke="true"/>
 
-<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="25.0" size="1.0" blocking="true"/>
+<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="24.0" size="1.0" blocking="true"/>
 
-<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="27.0" size="1.0" blocking="true"/>
+<scenery name="Big Boulder" image_name="bigboulder" x="21.5" y="28.0" size="1.0" blocking="true"/>
 
 <scenery name="Boulders" image_name="boulders" x="25.9" y="36.0" size="0.58" blocking="true"/>
 
