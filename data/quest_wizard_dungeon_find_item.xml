@@ -55,10 +55,14 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
     x="34.0" y="5.0"
     />-->
 
-<!--<scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>-->
-<scenery name="Door" image_name="door_wood" x="32.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit="true"/>
-<scenery name="Door" image_name="door_wood" x="28.0" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 <scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Torch" image_name="flame" x="31.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="door_wood" x="31.0" y="0.6" w="0.05" h="0.2"/>
+
+<scenery name="Torch" image_name="flame" x="34.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="door_wood" x="34.0" y="0.6" w="0.05" h="0.2"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" size="0.8" blocking="true">
     <gold amount="7"/>
@@ -67,6 +71,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <!--western route, goblins-->
 
     <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
+    <scenery name="Door" image_name="door_wood_n" x="27.75" y="4.0" w="0.51" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
 <npc name="Goblin" template="Goblin" x="22.5" y="6.0">

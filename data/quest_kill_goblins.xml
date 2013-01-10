@@ -15,7 +15,17 @@
 <wall image_name="wall"/>
 <background image_name="background_brown"/>
 
+<player_start x="0.5" y="9.0"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="8.0" rect_w="1.0" rect_h="2.0" />
+
+<scenery name="Door" image_name="door_wood_n" x="0.5" y="7.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
+
 <floorregion shape="rect" rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
+
+<scenery name="Torch" image_name="flame" x="2.0" y="9.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="door_wood" x="2.0" y="9.6" w="0.05" h="0.2"/>
+
 <floorregion shape="polygon">
     <floorregion_point x="5.0" y="5.0" />
     <floorregion_point x="4.5" y="10.0" />
@@ -125,8 +135,6 @@
 
 <floorregion shape="rect" rect_x="21.5" rect_y="18.0" rect_w="1.0" rect_h="9.0" />
 
-<player_start x="1.0" y="10.5"/>
-
 <!--
 <gold amount="10" x="1.0" y="10.5"/>
 <gold amount="20" x="1.0" y="10.5"/>
@@ -154,16 +162,14 @@
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
-<scenery name="Door" image_name="door_wood" x="0.2" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
-
-<scenery name="Door" image_name="door_wood" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="12.25" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="10.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_wood_n" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="12.25" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="10.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Goblin's Key"/>
-<scenery name="Door" image_name="door_wood" x="14.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="17.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="20.0" y="16.75" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood" x="20.0" y="12.25" w="0.8" h="0.4" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="14.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="17.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="16.5" w="0.8" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="12" w="0.8" h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2" draw_type="background"/>
 
