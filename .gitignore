@@ -1,6 +1,11 @@
 _archive/
 _devdocs/
+_devmedia/
 _old/
+
+gfx_lores/
+gfxold/
+media_source/
 moc/
 obj/
 pics/
@@ -28,8 +33,6 @@ Thumbs.db
 
 *.ico
 *.ogg
-*.png
-*.jpg
 *.svg
 *.wav
 
