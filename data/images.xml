@@ -60,6 +60,9 @@
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
 </image>
+<image type="scenery" name="flame" filename="gfx/textures/scenery/flame.png" width="128" height="128" stride_x="128" expected_width="512">
+    <animation name="" start="0" length="4" type="loop"/>
+</image>
 <image type="scenery" name="grass" filename="gfx/textures/scenery/grass.png"/>
 <image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
 <image type="scenery" name="hut" filename="gfx/textures/scenery/hut.png"/>
@@ -102,6 +105,7 @@
 <!--<image type="scenery" name="door_wood" imagetype="solid" red="60" green="30" blue="0"/>-->
 <!--<image type="scenery" name="door_wood" imagetype="perlin" max_red="150" max_green="75" max_blue="0" min_red="40" min_green="20" min_blue="0"/>-->
 <image type="scenery" name="door_wood" filename="gfx/textures/scenery/door_wood.png"/>
+<image type="scenery" name="door_wood_n" filename="gfx/textures/scenery/door_wood_n.png"/>
 <!--<image type="scenery" name="door_metal" imagetype="perlin" max_red="150" max_green="150" max_blue="150" min_red="40" min_green="40" min_blue="40"/>-->
 <image type="scenery" name="door_metal" filename="gfx/textures/scenery/door_metal.png"/>
 <image type="scenery" name="door_mirror" imagetype="perlin" max_red="200" max_green="200" max_blue="220" min_red="160" min_green="160" min_blue="160"/>
