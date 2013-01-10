@@ -559,6 +559,8 @@ public:
     void calculateSize(float *w, float *h) const;
     FloorRegion *findFloorRegionAt(Vector2D pos);
     vector<FloorRegion *> findFloorRegionsAt(Vector2D pos);
+    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos, float width, float height);
+    vector<FloorRegion *> findFloorRegionsAt(const Scenery *scenery);
 
     void addBoundary(Polygon2D boundary) {
         this->boundaries.push_back(boundary);

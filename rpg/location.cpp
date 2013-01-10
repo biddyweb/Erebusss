@@ -487,6 +487,39 @@ vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
     return result_floor_regions;
 }
 
+vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos, float width, float height) {
+    width *= 0.5f;
+    height *= 0.5f;
+    // we don't want to include floor regions that the scenery only just touches
+    width -= E_TOL_LINEAR;
+    height -= E_TOL_LINEAR;
+    vector<FloorRegion *> result_floor_regions;
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        if( floor_region->pointInside(pos) ||
+                floor_region->pointInside(pos + Vector2D(-width, -height)) ||
+                floor_region->pointInside(pos + Vector2D(width, -height)) ||
+                floor_region->pointInside(pos + Vector2D(-width, height)) ||
+                floor_region->pointInside(pos + Vector2D(width, height)) ) {
+            result_floor_regions.push_back(floor_region);
+        }
+    }
+    return result_floor_regions;
+}
+
+vector<FloorRegion *> Location::findFloorRegionsAt(const Scenery *scenery) {
+    vector<FloorRegion *> result_floor_regions = this->findFloorRegionsAt(scenery->getPos(), scenery->getWidth(), scenery->getHeight());
+    if( result_floor_regions.size() == 0 ) {
+        // for sceneries on a wall
+        result_floor_regions = this->findFloorRegionsAt(scenery->getPos() + Vector2D(0.0f, 0.5f*scenery->getHeight() + 0.5f));
+    }
+    if( result_floor_regions.size() == 0 ) {
+        LOG("add: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+        throw string("add: failed to find floor region for scenery");
+    }
+    return result_floor_regions;
+}
+
 void Location::addCharacter(Character *character, float xpos, float ypos) {
     character->setLocation(this);
     character->setPos(xpos, ypos);
@@ -580,52 +613,11 @@ void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
         throw string("failed to find floor region for scenery");
     }
     floor_region->addScenery(scenery);*/
-    vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
-    if( floor_regions.size() == 0 ) {
-        // for sceneries on a wall
-        floor_regions = this->findFloorRegionsAt(scenery->getPos() + Vector2D(0.0f, 0.5f*scenery->getHeight() + 0.5f));
-    }
-    if( floor_regions.size() == 0 ) {
-        LOG("add: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-        throw string("add: failed to find floor region for scenery");
-    }
-    for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
+    vector<FloorRegion *> scenery_floor_regions = this->findFloorRegionsAt(scenery);
+    for(vector<FloorRegion *>::iterator iter = scenery_floor_regions.begin();iter != scenery_floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         floor_region->addScenery(scenery);
     }
-    /*set<FloorRegion *> all_floor_regions;
-    for(int i=0;i<5;i++) {
-        Vector2D pos = scenery->getPos();
-        if( i == 1 ) {
-            pos.x -= 0.5f*scenery->getWidth();
-            pos.y -= 0.5f*scenery->getHeight();
-        }
-        else if( i == 2 ) {
-            pos.x += 0.5f*scenery->getWidth();
-            pos.y -= 0.5f*scenery->getHeight();
-        }
-        else if( i == 3 ) {
-            pos.x += 0.5f*scenery->getWidth();
-            pos.y += 0.5f*scenery->getHeight();
-        }
-        else if( i == 4 ) {
-            pos.x -= 0.5f*scenery->getWidth();
-            pos.y += 0.5f*scenery->getHeight();
-        }
-        vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(pos);
-        if( floor_regions.size() == 0 && i == 0 ) {
-            LOG("failed to find floor region for scenery %s at %f, %f (i = %d)\n", scenery->getName().c_str(), scenery->getX(), scenery->getY(), i);
-            throw string("failed to find floor region for scenery");
-        }
-        for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
-            FloorRegion *floor_region = *iter;
-            all_floor_regions.insert(floor_region);
-        }
-    }
-    for(set<FloorRegion *>::iterator iter = all_floor_regions.begin(); iter != all_floor_regions.end(); ++iter) {
-        FloorRegion *floor_region = *iter;
-        floor_region->addScenery(scenery);
-    }*/
 
     if( this->listener != NULL ) {
         this->listener->locationAddScenery(this, scenery);
@@ -656,12 +648,8 @@ void Location::removeScenery(Scenery *scenery) {
         throw string("failed to find floor region for scenery");
     }
     floor_region->removeScenery(scenery);*/
-    vector<FloorRegion *> floor_regions = this->findFloorRegionsAt(scenery->getPos());
-    if( floor_regions.size() == 0 ) {
-        LOG("remove: failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-        throw string("remove: failed to find floor region for scenery");
-    }
-    for(vector<FloorRegion *>::iterator iter = floor_regions.begin();iter != floor_regions.end(); ++iter) {
+    vector<FloorRegion *> scenery_floor_regions = this->findFloorRegionsAt(scenery);
+    for(vector<FloorRegion *>::iterator iter = scenery_floor_regions.begin();iter != scenery_floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         floor_region->removeScenery(scenery);
     }
