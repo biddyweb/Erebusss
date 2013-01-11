@@ -490,9 +490,7 @@ vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
 vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos, float width, float height) {
     width *= 0.5f;
     height *= 0.5f;
-    // we don't want to include floor regions that the scenery only just touches
-    width -= E_TOL_LINEAR;
-    height -= E_TOL_LINEAR;
+    // n.b., also includes floor regions that the scenery only just touches
     vector<FloorRegion *> result_floor_regions;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;

@@ -56,7 +56,6 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
     />-->
 
 <scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
-<scenery name="Door" image_name="door_wood" x="32.5" y="6.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Torch" image_name="flame" x="31.0" y="0.55" w="1.5" h="1.5"/>
 <scenery name="Torch" image_name="door_wood" x="31.0" y="0.6" w="0.05" h="0.2"/>
@@ -71,7 +70,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <!--western route, goblins-->
 
     <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
-    <scenery name="Door" image_name="door_wood_n" x="27.75" y="4.0" w="0.51" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="27.75" y="4.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
 <npc name="Goblin" template="Goblin" x="22.5" y="6.0">
@@ -96,14 +95,16 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <!--southern route, poisonous fog-->
 <floorregion shape="rect" rect_x="32.0" rect_y="6.0" rect_w="1.0" rect_h="8.0" />
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="6.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="33.0" rect_y="10.0" rect_w="8.0" rect_h="1.0" />
 
-<scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="1.0" h="8.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
-<scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="8.0" h="1.0" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="1500"/>
+<scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="0.9999" h="7.9999" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
+<scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="7.9999" h="0.9999" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="1500"/>
 
 <!--eastern rooms, goblins-->
     <floorregion shape="rect" rect_x="37.0" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
-    <scenery name="Door" image_name="door_wood" x="37.25" y="4.0" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="37.25" y="4.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="37.5" rect_y="3.0" rect_w="8.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="9.0" rect_w="5.0" rect_h="4.0" />
@@ -135,27 +136,27 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 <floorregion shape="rect" rect_x="20.5" rect_y="15.0" rect_w="1.0" rect_h="1.0" />
 
-<scenery name="Door" image_name="door_wood" x="21.0" y="15.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="21.0" y="15.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
 
 <!--room with orc-->
 
-    <floorregion shape="rect" rect_x="26.5" rect_y="13.5" rect_w="1.0" rect_h="0.5" />
-<floorregion shape="rect" rect_x="25.0" rect_y="10.0" rect_w="4.0" rect_h="3.5" />
-<scenery name="Door" image_name="door_wood" x="27.0" y="14.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"/>
+    <floorregion shape="rect" rect_x="26.5" rect_y="13.0" rect_w="1.0" rect_h="1.0" />
+<floorregion shape="rect" rect_x="25.0" rect_y="9.0" rect_w="4.0" rect_h="4.0" />
+<scenery name="Door" image_name="door_wood_n" x="27.0" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
 
-<npc name="Orc" template="Orc" x="27.0" y="12.0"/>
-<scenery name="Chest" image_name="chest" x="28.0" y="11.0" size="0.8" blocking="true">
+<npc name="Orc" template="Orc" x="27.0" y="11.0"/>
+<scenery name="Chest" image_name="chest" x="28.0" y="10.0" size="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
 
 <!--room with chairs-->
 
-<floorregion shape="rect" rect_x="35.0" rect_y="12.0" rect_w="6.0" rect_h="5.0" />
-<scenery name="Door" image_name="door_wood" x="35.0" y="14.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Throne" image_name="throne" x="37.0" y="13.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_FP"/>
-<scenery name="Throne" image_name="throne" x="39.0" y="13.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_GOLD"/>
-<scenery name="Throne" image_name="throne" x="37.0" y="15.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_M"/>
-<scenery name="Throne" image_name="throne" x="39.0" y="15.5" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_H"/>
+<floorregion shape="rect" rect_x="35.0" rect_y="12.5" rect_w="6.0" rect_h="5.0" />
+<scenery name="Door" image_name="door_wood_n" x="35.0" y="14.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Throne" image_name="throne" x="37.0" y="14.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_FP"/>
+<scenery name="Throne" image_name="throne" x="39.0" y="14.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_GOLD"/>
+<scenery name="Throne" image_name="throne" x="37.0" y="16.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_M"/>
+<scenery name="Throne" image_name="throne" x="39.0" y="16.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_H"/>
 
 </location>
 
