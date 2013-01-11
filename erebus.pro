@@ -163,6 +163,7 @@ OTHER_FILES += \
     docs/erebus.html \
     _devdocs/rules.odt \
     data/quest_necromancer.xml \
-    data/quest_through_mountains.xml
+    data/quest_through_mountains.xml \
+    data/quest_test.xml
 
 RESOURCES +=
