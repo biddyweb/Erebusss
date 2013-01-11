@@ -6261,13 +6261,13 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
 QString PlayingGamestate::getItemString(const Item *item, bool want_weight) const {
     QString item_str = item->getName().c_str();
     if( this->getPlayer()->getCurrentWeapon() == item ) {
-        item_str += " [Current Weapon]";
+        item_str += " [Armed]";
     }
     else if( this->getPlayer()->getCurrentShield() == item ) {
-        item_str += " [Current Shield]";
+        item_str += " [Armed]";
     }
     else if( this->getPlayer()->getCurrentArmour() == item ) {
-        item_str += " [Current Armour]";
+        item_str += " [Worn]";
     }
     else if( this->getPlayer()->getCurrentRing() == item ) {
         item_str += " [Worn]";
