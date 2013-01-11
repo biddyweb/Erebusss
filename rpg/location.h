@@ -499,13 +499,17 @@ protected:
     void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
 
     struct PathWayPoint {
+        Vector2D origin_point;
         Vector2D point;
         void *source;
+        bool active;
 
-        PathWayPoint(Vector2D point, void *source) : point(point), source(source) {
+        PathWayPoint(Vector2D origin_point, Vector2D point, void *source) : origin_point(origin_point), point(point), source(source), active(false) {
         }
     };
-    vector<PathWayPoint> calculatePathWayPoints() const;
+    vector<PathWayPoint> path_way_points;
+    void calculatePathWayPoints();
+    void testActivatePathWayPoint(PathWayPoint *path_way_point) const;
 
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
     bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const;

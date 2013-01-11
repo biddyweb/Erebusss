@@ -998,9 +998,24 @@ void Game::runTest(const string &filename, int test_id) {
                     Vector2D src(1.0f, 1.0f);
                     Vector2D dest(21.0f, 21.0f);
                     vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+                    if( path.size() == 0 ) {
+                        throw string("failed to find path");
+                    }
                 }
                 else if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+                    Vector2D src(1.0f, 1.0f);
+                    Vector2D dest(21.0f, 21.0f);
+                    vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+                    if( path.size() != 0 ) {
+                        throw string("unexpectedly found a path");
+                    }
+
                     location.removeScenery(scenery);
+
+                    path = location.calculatePathTo(src, dest, NULL, false);
+                    if( path.size() == 0 ) {
+                        throw string("failed to find path");
+                    }
                 }
             }
             has_score = true;
@@ -1059,6 +1074,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
+    //runTest(filename, TEST_PERF_REMOVE_SCENERY_0);
 
 }
 

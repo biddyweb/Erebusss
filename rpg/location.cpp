@@ -661,6 +661,7 @@ void Location::removeScenery(Scenery *scenery) {
             //qDebug("%d : %d", i, graph_vertex->getUserData());
             if( graph_vertex->getUserData() == scenery ) {
                 //qDebug("### node %d can be removed", i);
+                // todo
             }
         }
     }*/
@@ -668,6 +669,19 @@ void Location::removeScenery(Scenery *scenery) {
 
     if( this->distance_graph != NULL ) {
         // update distance graph
+
+        // need to see if additional path_way_points can be activated
+        for(size_t i=0;i<path_way_points.size();i++) {
+            PathWayPoint path_way_point = path_way_points.at(i);
+            if( !path_way_point.active ) {
+                this->testActivatePathWayPoint(&path_way_point);
+                if( path_way_point.active ) {
+                    Vector2D A = path_way_point.point;
+                    GraphVertex vertex(A, path_way_point.source);
+                    this->distance_graph->addVertex(vertex);
+                }
+            }
+        }
 
         for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
             GraphVertex *v_A = this->distance_graph->getVertex(i);
@@ -1338,9 +1352,18 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
     // tests whether a point is within the valid location region
 }*/
 
-vector<Location::PathWayPoint> Location::calculatePathWayPoints() const {
+void Location::testActivatePathWayPoint(PathWayPoint *path_way_point) const {
+    // test we get get to the way point
+    // important to use E_TOL_LINEAR for the width, otherwise can cause problems for scenery right next to the wall
+    Vector2D hit_pos;
+    if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, path_way_point->origin_point, path_way_point->point, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL, false) ) {
+        path_way_point->active = true;
+    }
+}
+
+void Location::calculatePathWayPoints() {
     //qDebug("Location::calculatePathWayPoints()");
-    vector<PathWayPoint> path_way_points;
+    path_way_points.clear();
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
         const Polygon2D *boundary = &*iter;
         size_t n_points = boundary->getNPoints();
@@ -1370,18 +1393,12 @@ vector<Location::PathWayPoint> Location::calculatePathWayPoints() const {
                 const float offset = npc_radius_c/ratio + E_TOL_LINEAR;
                 Vector2D path_way_point_pos = point + inwards * offset;
 
-                // test we get get to the way point
-                // important to use E_TOL_LINEAR for the width, otherwise can cause problems for scenery right next to the wall
-                Vector2D hit_pos;
-                if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, point, path_way_point_pos, E_TOL_LINEAR, Location::INTERSECTTYPE_MOVE, NULL, false) ) {
-                    PathWayPoint path_way_point(path_way_point_pos, boundary->getSource());
-                    path_way_points.push_back( path_way_point );
-                }
+                PathWayPoint path_way_point(point, path_way_point_pos, boundary->getSource());
+                this->testActivatePathWayPoint(&path_way_point);
+                path_way_points.push_back( path_way_point );
             }
         }
     }
-
-    return path_way_points;
 }
 
 /*void Location::refreshDistanceGraph() {
@@ -1413,15 +1430,17 @@ void Location::calculateDistanceGraph() {
     }
     this->distance_graph = new Graph();
 
-    vector<PathWayPoint> path_way_points = this->calculatePathWayPoints();
+    this->calculatePathWayPoints();
     //LOG("Location::calculateDistanceGraph() calculatePathWayPoints() time taken: %d\n", clock() - time_s);
 
     //int n_hits = 0;
     for(size_t i=0;i<path_way_points.size();i++) {
         PathWayPoint path_way_point = path_way_points.at(i);
-        Vector2D A = path_way_point.point;
-        GraphVertex vertex(A, path_way_point.source);
-        this->distance_graph->addVertex(vertex);
+        if( path_way_point.active ) {
+            Vector2D A = path_way_point.point;
+            GraphVertex vertex(A, path_way_point.source);
+            this->distance_graph->addVertex(vertex);
+        }
     }
 
     for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
