@@ -654,10 +654,6 @@ void Location::removeScenery(Scenery *scenery) {
         floor_region->removeScenery(scenery);
     }
 
-    if( this->listener != NULL ) {
-        this->listener->locationRemoveScenery(this, scenery);
-    }
-
     // now remove corresponding nodes from the graph
     /*if( this->distance_graph != NULL ) {
         for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
@@ -672,6 +668,7 @@ void Location::removeScenery(Scenery *scenery) {
 
     if( this->distance_graph != NULL ) {
         // update distance graph
+
         for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
             GraphVertex *v_A = this->distance_graph->getVertex(i);
             Vector2D A_pos = v_A->getPos();
@@ -715,6 +712,11 @@ void Location::removeScenery(Scenery *scenery) {
                 }
             }
         }
+
+    }
+
+    if( this->listener != NULL ) {
+        this->listener->locationRemoveScenery(this, scenery);
     }
 }
 
@@ -1390,6 +1392,7 @@ bool Location::testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *
     bool hit = false;
     Vector2D A = v_A->getPos();
     Vector2D B = v_B->getPos();
+
     *dist = (A - B).magnitude();
     if( *dist <= E_TOL_LINEAR ) {
         // needed for coi way points?
@@ -1413,6 +1416,7 @@ void Location::calculateDistanceGraph() {
     vector<PathWayPoint> path_way_points = this->calculatePathWayPoints();
     //LOG("Location::calculateDistanceGraph() calculatePathWayPoints() time taken: %d\n", clock() - time_s);
 
+    //int n_hits = 0;
     for(size_t i=0;i<path_way_points.size();i++) {
         PathWayPoint path_way_point = path_way_points.at(i);
         Vector2D A = path_way_point.point;
@@ -1429,9 +1433,11 @@ void Location::calculateDistanceGraph() {
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
                 v_B->addNeighbour(i, dist);
+                //n_hits++;
             }
         }
     }
+    //qDebug("Location::calculateDistanceGraph(): %d hits", n_hits);
     //qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
 }
 
@@ -1446,7 +1452,7 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
         new_path.push_back(dest);
     }
     else {
-        //LOG("    calculate path\n");
+        //qDebug("    calculate path\n");
         const Graph *distance_graph = this->getDistanceGraph();
         Graph *graph = distance_graph->clone();
 
@@ -1473,7 +1479,7 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
         vector<GraphVertex *> shortest_path = graph->shortestPath(start_index, end_index);
         if( shortest_path.size() == 0 ) {
             // can't reach destination (or already at it)
-            //LOG("    can't reach destination (or already at it)\n");
+            //qDebug("    can't reach destination (or already at it)\n");
         }
         else {
             for(vector<GraphVertex *>::const_iterator iter = shortest_path.begin(); iter != shortest_path.end(); ++iter) {
