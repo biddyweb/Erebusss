@@ -420,6 +420,12 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void saveItem(FILE *file, const Item *item, const Character *character) const;
     void saveTrap(FILE *file, const Trap *trap) const;
 
+#ifdef _DEBUG
+    vector<QGraphicsItem *> debug_items;
+
+    void refreshDebugItems();
+#endif
+
 private slots:
     void clickedStats();
     void clickedItems();

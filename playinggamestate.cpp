@@ -3163,43 +3163,10 @@ void PlayingGamestate::setupView() {
             }
         }
     }
-#ifdef DEBUG_SHOW_PATH
-    {
-        // DEBUG ONLY
-        QPen wall_pen(Qt::red);
-        for(size_t i=0;i<c_location->getNBoundaries();i++) {
-            const Polygon2D *boundary = c_location->getBoundary(i);
-            //qDebug("boundary %d:", i);
-            for(size_t j=0;j<boundary->getNPoints();j++) {
-                Vector2D p0 = boundary->getPoint(j);
-                Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
-                //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
-                //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
-                scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
-            }
-        }
-    }
-    {
-        // DEBUG ONLY
-        QPen wall_pen(Qt::red);
-        const Graph *distance_graph = c_location->getDistanceGraph();
-        for(size_t i=0;i<distance_graph->getNVertices();i++) {
-            const GraphVertex *vertex = distance_graph->getVertex(i);
-            Vector2D path_way_point = vertex->getPos();
-            const float radius = 0.05f;
-            scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
-            // n.b., draws edges twice, but doesn't matter for debug purposes...
-            for(size_t j=0;j<vertex->getNNeighbours();j++) {
-                const GraphVertex *o_vertex = vertex->getNeighbour(distance_graph, j);
-                Vector2D o_path_way_point = o_vertex->getPos();
-                float x1 = path_way_point.x;
-                float y1 = path_way_point.y;
-                float x2 = o_path_way_point.x;
-                float y2 = o_path_way_point.y;
-                scene->addLine(x1, y1, x2, y2, wall_pen);
-            }
-        }
-    }
+
+#ifdef _DEBUG
+    this->debug_items.clear(); // clear any from previous view, as no longer valid
+    this->refreshDebugItems();
 #endif
 
     LOG("add graphics for items\n");
@@ -3279,6 +3246,59 @@ void PlayingGamestate::setupView() {
     LOG("done\n");
 
 }
+
+#ifdef _DEBUG
+void PlayingGamestate::refreshDebugItems() {
+    qDebug("PlayingGamestate::refreshDebugItems()");
+    for(vector<QGraphicsItem *>::iterator iter = this->debug_items.begin(); iter != this->debug_items.end(); ++iter) {
+        QGraphicsItem *item = *iter;
+        delete item;
+    }
+    this->debug_items.clear();
+
+#ifdef DEBUG_SHOW_PATH
+    {
+        // DEBUG ONLY
+        QPen wall_pen(Qt::red);
+        for(size_t i=0;i<c_location->getNBoundaries();i++) {
+            const Polygon2D *boundary = c_location->getBoundary(i);
+            //qDebug("boundary %d:", i);
+            for(size_t j=0;j<boundary->getNPoints();j++) {
+                Vector2D p0 = boundary->getPoint(j);
+                Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+                //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
+                //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
+                QGraphicsItem *item = scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+                this->debug_items.push_back(item);
+            }
+        }
+    }
+    {
+        // DEBUG ONLY
+        QPen wall_pen(Qt::yellow);
+        const Graph *distance_graph = c_location->getDistanceGraph();
+        for(size_t i=0;i<distance_graph->getNVertices();i++) {
+            const GraphVertex *vertex = distance_graph->getVertex(i);
+            Vector2D path_way_point = vertex->getPos();
+            const float radius = 0.05f;
+            QGraphicsItem *item = scene->addEllipse(path_way_point.x - radius, path_way_point.y - radius, 2.0f*radius, 2.0f*radius, wall_pen);
+            this->debug_items.push_back(item);
+            // n.b., draws edges twice, but doesn't matter for debug purposes...
+            for(size_t j=0;j<vertex->getNNeighbours();j++) {
+                const GraphVertex *o_vertex = vertex->getNeighbour(distance_graph, j);
+                Vector2D o_path_way_point = o_vertex->getPos();
+                float x1 = path_way_point.x;
+                float y1 = path_way_point.y;
+                float x2 = o_path_way_point.x;
+                float y2 = o_path_way_point.y;
+                item = scene->addLine(x1, y1, x2, y2, wall_pen);
+                this->debug_items.push_back(item);
+            }
+        }
+    }
+#endif
+}
+#endif
 
 void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
@@ -4451,6 +4471,9 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
 
         if( scenery->blocksVisibility() ) {
             this->updateVisibility(player->getPos());
+#ifdef _DEBUG
+            this->refreshDebugItems();
+#endif
         }
     }
 }
