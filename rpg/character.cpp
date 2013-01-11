@@ -946,85 +946,13 @@ void Character::setPath(vector<Vector2D> &path) {
 }
 
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
-    //LOG("Character::setDestination(%f, %f) for %s , currently at %f, %f\n", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
+    //qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
         ASSERT_LOGGER( location != NULL );
     }
 
     Vector2D dest(xdest, ydest);
-
-    /*vector<Vector2D> new_path;
-
-    Vector2D hit_pos;
-    if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, this->can_fly) ) {
-        // easy
-        //LOG("easy\n");
-        new_path.push_back(dest);
-    }
-    else {
-        //LOG("    calculate path\n");
-        const Graph *distance_graph = this->location->getDistanceGraph();
-        Graph *graph = distance_graph->clone();
-
-        size_t n_old_vertices = graph->getNVertices();
-        GraphVertex start_vertex(this->pos, NULL);
-        GraphVertex end_vertex(dest, NULL);
-        size_t start_index = graph->addVertex(start_vertex);
-        size_t end_index = graph->addVertex(end_vertex);
-
-        // n.b., don't need to check for link between start_vertex and end_vertex, as this code path is only for where we can't walk directly between the start and end!
-        for(size_t i=0;i<n_old_vertices;i++) {
-            GraphVertex *v_A = graph->getVertex(i);
-            Vector2D A = v_A->getPos();
-            for(size_t j=n_old_vertices;j<graph->getNVertices();j++) {
-                GraphVertex *v_B = graph->getVertex(j);
-                Vector2D B = v_B->getPos();
-                Vector2D hit_pos;
-                float dist = (A - B).magnitude();
-                bool hit = false;
-                if( dist <= E_TOL_LINEAR ) {
-                    // needed for coi way points?
-                    hit = false;
-                }
-                else {
-                    hit = location->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, Location::INTERSECTTYPE_MOVE, j==end_index ? ignore_scenery : NULL, this->can_fly);
-                }
-                if( !hit ) {
-                    v_A->addNeighbour(j, dist);
-                    v_B->addNeighbour(i, dist);
-                }
-            }
-        }
-
-        vector<GraphVertex *> shortest_path = graph->shortestPath(start_index, end_index);
-        if( shortest_path.size() == 0 ) {
-            // can't reach destination (or already at it)
-            //LOG("    can't reach destination (or already at it)\n");
-        }
-        else {
-            for(vector<GraphVertex *>::const_iterator iter = shortest_path.begin(); iter != shortest_path.end(); ++iter) {
-                const GraphVertex *vertex = *iter;
-                new_path.push_back(vertex->getPos());
-            }
-        }
-
-        delete graph;
-    }
-
-    if( new_path.size() > 0 ) {
-        //LOG("set path\n");
-        if( ignore_scenery != NULL ) {
-            Vector2D p0 = this->pos;
-            if( new_path.size() >= 2 ) {
-                p0 = new_path.at( new_path.size() - 2 );
-            }
-            if( location->intersectSweptSquareWithBoundaries(&hit_pos, true, p0, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, this->can_fly) ) {
-                new_path[ new_path.size() - 1 ] = hit_pos;
-            }
-        }
-        this->setPath(new_path);
-    }*/
 
     vector<Vector2D> new_path = location->calculatePathTo(this->pos, dest, ignore_scenery, this->can_fly);
     if( new_path.size() > 0 ) {
