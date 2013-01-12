@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <quests>
 
+<!--<quest filename="data/quest_test.xml"/>-->
 <!--<quest filename="data/quest_necromancer.xml"/>-->
 <!--<quest filename="data/quest_through_mountains.xml"/>-->
 <quest filename="data/quest_kill_goblins.xml"/>
