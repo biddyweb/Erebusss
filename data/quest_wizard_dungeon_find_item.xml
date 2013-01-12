@@ -1514,14 +1514,12 @@ There seems to be no information on the cause of the war, or who the enemy is.
     <item template="Chain Mail Armour"/>
 </npc>
 
-<floorregion shape="rect" rect_x="2.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="2.0" rect_y="5.0" rect_w="1.0" rect_h="12.0"/>
 
-<scenery name="Door" image_name="door_metal" x="2.5" y="5.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="2.5" y="5.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Maze Key"/>
 
 <!--Maze area-->
-
-<floorregion shape="rect" rect_x="2.0" rect_y="6.0" rect_w="1.0" rect_h="11.0"/>
 
 <!--<player_start x="2.5" y="2.5"/>-->
 <!--<player_start x="2.5" y="6.5"/>-->
@@ -1570,7 +1568,7 @@ Inside this casket are a collection of bones.
 
 <!--from stairs down route-->
 
-<floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="7.0"/>
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
@@ -1578,28 +1576,28 @@ Inside this casket are a collection of bones.
 
 <scenery name="Bones" image_name="bones" x="35.5" y="14.0" size="0.5" draw_type="background"/>
 
-<floorregion shape="rect" rect_x="32.5" rect_y="15.5" rect_w="2.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="32.5" rect_y="16.5" rect_w="1.0" rect_h="1.5"/>
-<floorregion shape="rect" rect_x="33.5" rect_y="17.0" rect_w="6.5" rect_h="1.0"/>
-<trap x="36.5" y="17.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
-<floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="8.0"/>
-<floorregion shape="rect" rect_x="38.0" rect_y="10.0" rect_w="2.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="32.5" rect_y="17.5" rect_w="2.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="32.5" rect_y="18.5" rect_w="1.0" rect_h="2.5"/>
+<floorregion shape="rect" rect_x="33.5" rect_y="20.0" rect_w="6.5" rect_h="1.0"/>
+<trap x="36.5" y="20.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
+<floorregion shape="rect" rect_x="40.0" rect_y="9.0" rect_w="1.0" rect_h="12.0"/>
+<floorregion shape="rect" rect_x="38.0" rect_y="9.0" rect_w="2.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="31.0" rect_y="14.0" rect_w="3.5" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="31.0" rect_y="15.0" rect_w="1.0" rect_h="4.5"/>
-<floorregion shape="rect" rect_x="32.0" rect_y="18.5" rect_w="9.5" rect_h="1.0"/>
-<trap x="39.0" y="18.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
-<floorregion shape="rect" rect_x="41.5" rect_y="9.5" rect_w="1.0" rect_h="10.0"/>
-<floorregion shape="rect" rect_x="32.5" rect_y="8.5" rect_w="10.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="31.0" rect_y="15.0" rect_w="1.0" rect_h="10.5"/>
+<floorregion shape="rect" rect_x="32.0" rect_y="24.5" rect_w="9.5" rect_h="1.0"/>
+<trap x="39.0" y="24.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
+<floorregion shape="rect" rect_x="41.5" rect_y="7.5" rect_w="1.0" rect_h="18.0"/>
+<floorregion shape="rect" rect_x="32.5" rect_y="6.5" rect_w="10.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="36.5" rect_y="11.0" rect_w="1.0" rect_h="0.5"/>
-<floorregion shape="rect" rect_x="30.5" rect_y="10.0" rect_w="7.0" rect_h="1.0"/>
-<trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
-<floorregion shape="rect" rect_x="30.5" rect_y="8.5" rect_w="1.0" rect_h="1.5"/>
+<floorregion shape="rect" rect_x="36.5" rect_y="10.0" rect_w="1.0" rect_h="1.5"/>
+<floorregion shape="rect" rect_x="30.5" rect_y="9.0" rect_w="7.0" rect_h="1.0"/>
+<trap x="35.5" y="9.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
+<floorregion shape="rect" rect_x="30.5" rect_y="7.5" rect_w="1.0" rect_h="1.5"/>
 
 <floorregion shape="rect" rect_x="25.5" rect_y="11.5" rect_w="9.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="28.0" rect_y="12.5" rect_w="1.0" rect_h="0.5"/>
-<floorregion shape="rect" rect_x="27.0" rect_y="13.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="28.0" rect_y="12.5" rect_w="1.0" rect_h="1.5"/>
+<floorregion shape="rect" rect_x="27.0" rect_y="14.0" rect_w="3.0" rect_h="2.0"/>
 
 <npc name="Orc Champion" template="Orc Champion" x="29.5" y="14.5">
     <item template="Chain Mail Armour"/>
@@ -1611,25 +1609,24 @@ A small bronze statuette of a humanoid bull-like creature.
     </item>
 </scenery>
 
-<floorregion shape="rect" rect_x="25.5" rect_y="12.5" rect_w="1.0" rect_h="4.0"/>
+<floorregion shape="rect" rect_x="25.5" rect_y="12.5" rect_w="1.0" rect_h="6.0"/>
 <trap x="25.5" y="14.5" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
-<floorregion shape="rect" rect_x="26.5" rect_y="15.5" rect_w="4.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="29.5" rect_y="16.5" rect_w="1.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="25.5" rect_y="17.5" rect_w="5.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="26.5" rect_y="17.5" rect_w="4.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="29.5" rect_y="18.5" rect_w="1.0" rect_h="3.0"/>
+<floorregion shape="rect" rect_x="25.5" rect_y="21.5" rect_w="5.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="29.0" rect_y="7.0" rect_w="1.0" rect_h="4.5"/>
-<floorregion shape="rect" rect_x="30.0" rect_y="7.0" rect_w="14.0" rect_h="1.0"/>
-<trap x="37.0" y="7.0" w="1.0" h="1.0" type="arrow" difficulty="2" rating="5"/>
-<floorregion shape="rect" rect_x="43.0" rect_y="8.0" rect_w="1.0" rect_h="13.0"/>
-<floorregion shape="rect" rect_x="30.0" rect_y="20.0" rect_w="13.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="28.0" rect_y="21.0" rect_w="3.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="25.0" rect_y="20.0" rect_w="4.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="24.0" rect_y="7.0" rect_w="1.0" rect_h="14.0"/>
+<floorregion shape="rect" rect_x="29.0" rect_y="4.0" rect_w="1.0" rect_h="7.5"/>
+<floorregion shape="rect" rect_x="30.0" rect_y="4.0" rect_w="14.0" rect_h="1.0"/>
+<trap x="37.0" y="4.0" w="1.0" h="1.0" type="arrow" difficulty="2" rating="5"/>
+<floorregion shape="rect" rect_x="43.0" rect_y="5.0" rect_w="1.0" rect_h="24.0"/>
+<floorregion shape="rect" rect_x="30.0" rect_y="28.0" rect_w="13.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="28.0" rect_y="29.0" rect_w="3.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="25.0" rect_y="28.0" rect_w="4.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="7.0" rect_w="1.0" rect_h="22.0"/>
 
 <floorregion shape="rect" rect_x="13.5" rect_y="7.0" rect_w="10.5" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="13.5" rect_y="8.0" rect_w="1.0" rect_h="10.0"/>
-<floorregion shape="rect" rect_x="12.5" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="10.0" rect_y="18.0" rect_w="3.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="10.0" rect_y="18.0" rect_w="4.5" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="6.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="12.0" rect_y="5.0" rect_w="7.5" rect_h="1.0"/>
@@ -1642,31 +1639,33 @@ A small bronze statuette of a humanoid bull-like creature.
 <floorregion shape="rect" rect_x="22.5" rect_y="10.0" rect_w="1.0" rect_h="10.0"/>
 <floorregion shape="rect" rect_x="15.0" rect_y="20.0" rect_w="8.5" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="18.5" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_metal" x="19.0" y="20.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Bull Statuette" unlock_text="The bull statuette that you carry shakes..."/>
-<floorregion shape="rect" rect_x="16.5" rect_y="10.5" rect_w="5.5" rect_h="8.5"/>
+<floorregion shape="rect" rect_x="18.5" rect_y="18.5" rect_w="1.0" rect_h="1.5"/>
+    <scenery name="Door" image_name="door_metal" x="19.0" y="19.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Bull Statuette" unlock_text="The bull statuette that you carry shakes..."
+    />
+<floorregion shape="rect" rect_x="16.5" rect_y="11.5" rect_w="5.5" rect_h="7.0"/>
 
-<!--<player_start x="19.0" y="19.5"/>-->
+<!--<player_start x="19.0" y="20.5"/>-->
+<!--<player_start x="19.0" y="22.5"/>-->
 
 <npc name="Minotaur" template="Minotaur" x="19.25" y="14.75">
     <item name="Minotaur's Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 
-<scenery name="Tree" image_name="tree2" x="17.5" y="11.0" size="1.0"/>
+<scenery name="Tree" image_name="tree2" x="17.5" y="12.0" size="1.0"/>
 
-<scenery name="Plant" image_name="plant" x="21.1" y="12.25" size="0.5" draw_type="background"/>
+<scenery name="Plant" image_name="plant" x="21.1" y="13.25" size="0.5" draw_type="background"/>
 
 <scenery name="Plant" image_name="plant" x="20.8" y="18.0" size="0.5" draw_type="background"/>
 
 <scenery name="Plant" image_name="plant" x="17.3" y="17.5" size="0.5" draw_type="background"/>
 
-<scenery name="Bones" image_name="bones" x="20.5" y="13.5" size="0.5" draw_type="background"/>
+<scenery name="Bones" image_name="bones" x="20.5" y="14.5" size="0.5" draw_type="background"/>
 
 <scenery name="Skulls" image_name="skulls" x="18.1" y="14.9" size="0.3" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood" x="19.0" y="21.0" w="1.0" h="0.4" blocking="true" block_visibility="true" door="true"
+    <scenery name="Door" image_name="door_wood_n" x="19.0" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Minotaur's Key"/>
 <floorregion shape="rect" rect_x="17.5" rect_y="22.0" rect_w="3.0" rect_h="3.0"/>
 
@@ -1675,8 +1674,9 @@ A small bronze statuette of a humanoid bull-like creature.
     <item name="Vespar's Skull" image_name="skull" icon_width="0.25" weight="10"/>
 </scenery>
 
-<floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="17.5" rect_y="26.0" rect_w="3.0" rect_h="3.0"/>
+<floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.5"/>
+<floorregion shape="rect" rect_x="17.5" rect_y="26.5" rect_w="3.0" rect_h="3.0"/>
+
 
 <!--<player_start x="19.0" y="25.5"/>-->
 
