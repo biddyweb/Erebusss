@@ -167,10 +167,10 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <!--<player_start x="12.5" y="2.0"/>-->
 
 <floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="5.0" rect_h="12.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
+<scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
 
-<floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="4.0" rect_h="2.0"/>
-<scenery name="Barrel" image_name="barrel" x="18.5" y="5.5" size="0.8" blocking="true">
+<floorregion shape="rect" rect_x="15.0" rect_y="4.5" rect_w="4.0" rect_h="2.0"/>
+<scenery name="Barrel" image_name="barrel" x="18.5" y="5.0" size="0.8" blocking="true">
     <gold amount="9"/>
 </scenery>
 
@@ -224,7 +224,7 @@ Food is no longer given to me. I note that I no longer hear any noises - whether
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
-<scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" size="0.7" opacity="0.9" draw_type="background"/>
+<scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" w="0.7" h="0.7" opacity="0.9" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
@@ -242,15 +242,15 @@ Food is no longer given to me. I note that I no longer hear any noises - whether
 
 <!--guard room-->
 
-<floorregion shape="rect" rect_x="48.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="45.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
+<floorregion shape="rect" rect_x="48.0" rect_y="10.0" rect_w="1.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="45.0" rect_y="6.0" rect_w="4.0" rect_h="4.0"/>
 
-<npc name="Orc" template="Orc" x="47.0" y="10.0">
+<npc name="Orc" template="Orc" x="47.0" y="9.0">
     <item name="Vespar's Cell Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
 
-<scenery name="Table" image_name="table" x="46.0" y="8.0" size="1.2" blocking="true"/>
-<scenery name="Chest" image_name="chest" x="48.5" y="7.5" size="0.8" blocking="true">
+<scenery name="Table" image_name="table" x="46.0" y="7.0" size="1.2" blocking="true"/>
+<scenery name="Chest" image_name="chest" x="48.5" y="6.5" size="0.8" blocking="true">
     <gold amount="27"/>
     <item name="Book" image_name="book" icon_width="0.25" weight="1">
 This book seems to be a record of unfortunate prisoners that were kept in this terrible place. You glance at some of the entries:
@@ -278,7 +278,7 @@ F43 - Suspected of witchcraft, sent here until the prisoner confesses his crime.
 <floorregion shape="rect" rect_x="50.5" rect_y="11.0" rect_w="5.0" rect_h="3.0"/>
     <scenery name="Door" image_name="door_metal" x="50.25" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
-<scenery name="Blood Stain" image_name="bloodstain2" x="53.0" y="12.2" size="0.7" opacity="0.9" draw_type="background"/>
+<scenery name="Blood Stain" image_name="bloodstain2" x="53.0" y="12.2" w="0.7" h="0.7" opacity="0.9" draw_type="background"/>
 <scenery name="Skeleton" image_name="skeleton" x="51.5" y="11.4" size="0.65" draw_type="background"/>
 <scenery name="Skeleton" image_name="skeleton" x="54.0" y="13.0" size="0.75" draw_type="background"/>
 
@@ -294,7 +294,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <!--exit to next location-->
 
 <floorregion shape="rect" rect_x="48.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood" x="48.5" y="13.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="48.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="2.0"/>
 
 </location>
 
@@ -307,7 +307,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <!--<player_start x="12.5" y="2.0"/>-->
 
 <floorregion shape="rect" rect_x="5.0" rect_y="1.0" rect_w="15.0" rect_h="2.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
+<scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
 
 <!--north west room-->
 
@@ -369,7 +369,8 @@ This journal seems to be a record of grisly torture that took place in this room
 <!--south passage-->
 
 <floorregion shape="rect" rect_x="5.0" rect_y="19.0" rect_w="15.0" rect_h="2.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="20.8" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="12.5" exit_location_y="2.0"/>
+<floorregion shape="rect" rect_x="12.0" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="12.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="12.5" exit_location_y="2.0"/>
 
 </location>
 
@@ -382,7 +383,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <!--<player_start x="12.5" y="2.0"/>-->
 
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
-<scenery name="Door" image_name="door_wood" x="12.5" y="1.2" w="1.0" h="0.4" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
+<scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
 
 <scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.0" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
 
@@ -437,13 +438,13 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <floorregion shape="rect" rect_x="14.0" rect_y="6.0" rect_w="5.0" rect_h="1.0"/>
 
 <!--west-->
-<floorregion shape="rect" rect_x="18.0" rect_y="7.0" rect_w="1.0" rect_h="10.0"/>
+<floorregion shape="rect" rect_x="18.0" rect_y="7.0" rect_w="1.0" rect_h="13.0"/>
 
 <!--south-->
-<floorregion shape="rect" rect_x="19.0" rect_y="16.0" rect_w="18.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="19.0" rect_y="19.0" rect_w="18.0" rect_h="1.0"/>
 
 <!--east-->
-<floorregion shape="rect" rect_x="37.0" rect_y="7.0" rect_w="1.0" rect_h="10.0"/>
+<floorregion shape="rect" rect_x="37.0" rect_y="7.0" rect_w="1.0" rect_h="13.0"/>
 
 <!--north-->
 <floorregion shape="rect" rect_x="19.0" rect_y="7.0" rect_w="18.0" rect_h="1.0"/>
@@ -452,23 +453,23 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 <!--rooms-->
 
 <!--bedroom-->
-    <floorregion shape="rect" rect_x="19.0" rect_y="9.5" rect_w="0.5" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="19.5" rect_y="8.5" rect_w="4.0" rect_h="3.0"/>
-<scenery name="Bed" image_name="bed" x="22.5" y="9.5" size="1.2" blocking="true"/>
-<scenery name="Cabinet" image_name="cabinet" x="20.0" y="9.0" size="0.8" blocking="true">
+    <floorregion shape="rect" rect_x="19.0" rect_y="10.5" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="19.5" rect_y="9.5" rect_w="4.0" rect_h="3.0"/>
+<scenery name="Bed" image_name="bed" x="22.5" y="10.5" size="1.2" blocking="true"/>
+<scenery name="Cabinet" image_name="cabinet" x="20.0" y="10.0" size="0.8" blocking="true">
     <gold amount="43"/>
     <item template="Gold Ring"/>
 </scenery>
 
 <!--room behind mirror door-->
-<scenery name="Door" image_name="door_mirror" x="23.4999" y="10.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_mirror" x="23.4999" y="11.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Hand Mirror" locked_silent="true" locked_text="none" unlock_text="The mirror shatters before you!"
     />
 
-    <floorregion shape="rect" rect_x="23.5" rect_y="10.0" rect_w="0.5" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="24.0" rect_y="8.5" rect_w="5.0" rect_h="3.0"/>
+    <floorregion shape="rect" rect_x="23.5" rect_y="11.0" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="9.5" rect_w="5.0" rect_h="3.0"/>
 
-<scenery name="Chest" image_name="chest" x="24.5" y="9.0" size="0.8" blocking="true">
+<scenery name="Chest" image_name="chest" x="24.5" y="10.0" size="0.8" blocking="true">
     <weapon name="Magic Short Sword" image_name="longsword" weight="10"
         damageX="2" damageY="6" damageZ="1"
         animation_name="longsword"
@@ -482,16 +483,16 @@ Ah, thank you! Yes that looks like it will be of most help to me.
 
 <!--room-->
 
-    <floorregion shape="rect" rect_x="19.0" rect_y="13.5" rect_w="0.5" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="19.5" rect_y="12.0" rect_w="4.0" rect_h="3.5"/>
-<scenery name="Barrel" image_name="barrel" x="23.0" y="15.0" size="0.8" blocking="true">
+    <floorregion shape="rect" rect_x="19.0" rect_y="15.5" rect_w="0.5" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="19.5" rect_y="14.0" rect_w="4.0" rect_h="3.5"/>
+<scenery name="Barrel" image_name="barrel" x="23.0" y="17.0" size="0.8" blocking="true">
     <gold amount="3"/>
 </scenery>
 
 <!--armoury-->
-    <floorregion shape="rect" rect_x="26.0" rect_y="15.5" rect_w="1.0" rect_h="0.5"/>
-<floorregion shape="rect" rect_x="24.0" rect_y="12.0" rect_w="5.0" rect_h="3.5"/>
-<scenery name="Crate" image_name="crate" x="28.5" y="15.0" size="0.8" blocking="true">
+    <floorregion shape="rect" rect_x="26.0" rect_y="17.5" rect_w="1.0" rect_h="1.5"/>
+<floorregion shape="rect" rect_x="24.0" rect_y="14.0" rect_w="5.0" rect_h="3.5"/>
+<scenery name="Crate" image_name="crate" x="28.5" y="17.0" size="0.8" blocking="true">
     <item template="Long Sword"/>
     <item template="Short Sword"/>
     <item template="Short Sword"/>
@@ -506,45 +507,45 @@ Ah, thank you! Yes that looks like it will be of most help to me.
         base_template="Short Sword" worth_bonus="100"
         />
 </scenery>
-<item template="Leather Armour" x="28.5" y="12.5"/>
-<npc name="Orc" template="Orc" x="26.0" y="12.5">
+<item template="Leather Armour" x="28.5" y="14.5"/>
+<npc name="Orc" template="Orc" x="26.0" y="14.5">
     <item template="Leather Armour"/>
 </npc>
 
 <!--garden-->
-<floorregion shape="rect" rect_x="35.5" rect_y="8.0" rect_w="1.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="35.5" rect_y="8.0" rect_w="1.0" rect_h="7.0"/>
 <trap x="35.5" y="8.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <trap x="35.5" y="10.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 <trap x="35.5" y="12.0" w="1.0" h="1.0" type="arrow" difficulty="1" rating="1"/>
 
-<floorregion shape="rect" rect_x="29.5" rect_y="13.0" rect_w="7.0" rect_h="2.5"/>
-<npc name="Wyvern" template="Wyvern" x="30.5" y="14.0"/>
-<npc name="Wyvern" template="Wyvern" x="33.5" y="15.0"/>
-<npc name="Wyvern" template="Wyvern" x="34.0" y="14.5"/>
+<floorregion shape="rect" rect_x="29.5" rect_y="15.0" rect_w="7.0" rect_h="2.5"/>
+<npc name="Wyvern" template="Wyvern" x="30.5" y="16.0"/>
+<npc name="Wyvern" template="Wyvern" x="33.5" y="17.0"/>
+<npc name="Wyvern" template="Wyvern" x="34.0" y="16.5"/>
 
-<!--<player_start x="33.0" y="15.0"/>-->
+<!--<player_start x="33.0" y="17.0"/>-->
 
-<scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="1.0"/>
+<scenery name="Tree" image_name="tree2" x="30.0" y="17.0" size="1.0"/>
 
-<scenery name="Tree" image_name="tree2" x="36.0" y="15.0" size="1.0"/>
+<scenery name="Tree" image_name="tree2" x="36.0" y="17.0" size="1.0"/>
 
-<scenery name="Plant" image_name="plant" x="29.75" y="13.25" size="0.5" draw_type="background"/>
+<scenery name="Plant" image_name="plant" x="29.75" y="15.25" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="32.0" y="15.25" size="0.5" draw_type="background"/>
+<scenery name="Plant" image_name="plant" x="32.0" y="17.25" size="0.5" draw_type="background"/>
 
-<scenery name="Plant" image_name="plant" x="34.0" y="14.5" size="0.5" draw_type="background"/>
+<scenery name="Plant" image_name="plant" x="34.0" y="16.5" size="0.5" draw_type="background"/>
 
-<item template="Wyvern Egg" x="32.25" y="15.25"/>
+<item template="Wyvern Egg" x="32.25" y="17.25"/>
 
-<item template="Wyvern Egg" x="33.75" y="14.75"/>
+<item template="Wyvern Egg" x="33.75" y="16.75"/>
 
-<item name="Hand Mirror" image_name="hand_mirror" icon_width="0.25" weight="2" x="30.2" y="15.0"/>
+<item name="Hand Mirror" image_name="hand_mirror" icon_width="0.25" weight="2" x="30.2" y="17.0"/>
 
 <!--library-->
-    <floorregion shape="rect" rect_x="31.0" rect_y="12.5" rect_w="1.0" rect_h="0.5"/>
-<floorregion shape="rect" rect_x="29.5" rect_y="8.5" rect_w="4.0" rect_h="4.0"/>
+    <floorregion shape="rect" rect_x="31.0" rect_y="14.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="29.5" rect_y="10.0" rect_w="4.0" rect_h="4.0"/>
 
-<scenery name="Cabinet" image_name="cabinet" x="30.0" y="9.0" size="0.8" blocking="true">
+<scenery name="Cabinet" image_name="cabinet" x="30.0" y="10.5" size="0.8" blocking="true">
     <item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2">
 This old and heavy tome describes the black arts of Necromancy.
     </item>
@@ -553,7 +554,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <!--shadow room-->
 <floorregion shape="rect" rect_x="38.0" rect_y="8.0" rect_w="8.0" rect_h="1.0"/>
 
-<npc name="Shadow" template="Shadow" x="45.0" y="8.5"/>
+<!--<npc name="Shadow" template="Shadow" x="45.0" y="8.5"/>-->
 
     <scenery name="Door" image_name="door_wood" x="45.8" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
