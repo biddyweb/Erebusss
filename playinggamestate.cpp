@@ -4078,8 +4078,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             // otherwise we assume the width/height of the image are already in "isometric"/3D format
                             visual_h *= 2.0f; // to counter the QGraphicsView scaling
                             size_h = size_w;
+                            visual_h = std::max(visual_h, size_h);
                         }
                     }
+                    ASSERT_LOGGER( visual_h - size_h >= 0.0f );
 
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
                     if( location == NULL ) {
@@ -4440,7 +4442,10 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         float centre_y = 0.5f*object->boundingRect().height();
         //centre_y += 0.25f * (scenery->getVisualHeight() - scenery->getHeight()) * object->boundingRect().height();
         centre_y += 0.5f * (scenery->getVisualHeight() - scenery->getHeight()) / scenery_scale_h;
-        ASSERT_LOGGER( scenery->getVisualHeight() - scenery->getHeight() >= 0.0f );
+        if( scenery->getVisualHeight() - scenery->getHeight() < 0.0f ) {
+            qDebug(">>> %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+            ASSERT_LOGGER( scenery->getVisualHeight() - scenery->getHeight() >= 0.0f );
+        }
         QTransform transform;
         transform = transform.scale(scenery_scale_w, scenery_scale_h);
         transform = transform.translate(-centre_x, -centre_y);
