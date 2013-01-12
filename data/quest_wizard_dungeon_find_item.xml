@@ -57,11 +57,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 
-<scenery name="Torch" image_name="flame" x="31.0" y="0.55" w="1.5" h="1.5"/>
-<scenery name="Torch" image_name="door_wood" x="31.0" y="0.6" w="0.05" h="0.2"/>
+<scenery name="Torch" image_name="torch" x="31.0" y="0.55" w="1.5" h="1.5"/>
 
-<scenery name="Torch" image_name="flame" x="34.0" y="0.55" w="1.5" h="1.5"/>
-<scenery name="Torch" image_name="door_wood" x="34.0" y="0.6" w="0.05" h="0.2"/>
+<scenery name="Torch" image_name="torch" x="34.0" y="0.55" w="1.5" h="1.5"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" size="0.8" blocking="true">
     <gold amount="7"/>
