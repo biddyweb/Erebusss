@@ -238,15 +238,15 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             Character *enemy = NULL;
             if( roll == 1 ) {
                 result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Goblin");
+                enemy = playing_gamestate->createCharacter("Goblin", "Goblin");
             }
             else if( roll == 2 ) {
                 result_text = "You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Orc");
+                enemy = playing_gamestate->createCharacter("Orc", "Orc");
             }
             else if( roll == 3 ) {
                 result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Goblin Mage");
+                enemy = playing_gamestate->createCharacter("Goblin Mage", "Goblin Mage");
                 enemy->addSpell("Fire bolt", 6);
             }
 

@@ -517,7 +517,7 @@ public:
     Item *cloneStandardItem(const string &name) const;
     Currency *cloneGoldItem(int value) const;
     const Spell *findSpell(const string &name) const;
-    Character *createCharacter(const string &template_name) const;
+    Character *createCharacter(const string &name, const string &template_name) const;
 
     vector<Shop *>::const_iterator shopsBegin() const {
         return shops.begin();

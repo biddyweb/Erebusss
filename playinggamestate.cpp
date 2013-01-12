@@ -3659,14 +3659,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             throw string("didn't expect player element to load by template");
                         }
                         // load from template
-                        /*CharacterTemplate *character_template = this->character_templates[name_s.toString().toStdString()];
-                        if( character_template == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            LOG("can't find character template: %s\n", template_s.toString().toStdString().c_str());
-                            throw string("can't find character template");
-                        }
-                        npc = new Character(name_s.toString().toStdString(), true, *character_template);*/
-                        npc = this->createCharacter(template_s.toString().toStdString());
+                        npc = this->createCharacter(name_s.toString().toStdString(), template_s.toString().toStdString());
                         QStringRef is_hostile_s = reader.attributes().value("is_hostile");
                         bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
                         npc->setHostile(is_hostile);
@@ -6231,14 +6224,14 @@ const Spell *PlayingGamestate::findSpell(const string &name) const {
     return spell;
 }
 
-Character *PlayingGamestate::createCharacter(const string &template_name) const {
+Character *PlayingGamestate::createCharacter(const string &name, const string &template_name) const {
     map<string, CharacterTemplate *>::const_iterator iter = this->character_templates.find(template_name);
     if( iter == this->character_templates.end() ) {
         LOG("can't find character_templates: %s\n", template_name.c_str());
         throw string("Unknown character_template");
     }
     const CharacterTemplate *character_template = iter->second;
-    Character *character = new Character(template_name, true, *character_template);
+    Character *character = new Character(name, true, *character_template);
     return character;
 }
 
