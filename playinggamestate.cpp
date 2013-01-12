@@ -3099,15 +3099,17 @@ void PlayingGamestate::setupView() {
                 dp /= dp_length;
                 Vector2D normal_into_wall = - dp.perpendicularYToX();
 
-                QPolygonF wall_polygon;
-                const float wall_dist = 0.1f;
-                wall_polygon.push_back(QPointF(p0.x, p0.y));
-                wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
-                wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
-                wall_polygon.push_back(QPointF(p1.x, p1.y));
-                QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
-                wall_item->setPen(Qt::NoPen);
-                wall_item->setBrush(wall_brush);
+                if( !this->view_walls_3d || normal_into_wall.y > -E_TOL_LINEAR ) {
+                    QPolygonF wall_polygon;
+                    const float wall_dist = 0.1f;
+                    wall_polygon.push_back(QPointF(p0.x, p0.y));
+                    wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
+                    wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
+                    wall_polygon.push_back(QPointF(p1.x, p1.y));
+                    QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
+                    wall_item->setPen(Qt::NoPen);
+                    wall_item->setBrush(wall_brush);
+                }
 
                 if( this->view_walls_3d ) {
                     const float wall_height = this->view_transform_3d ? 0.9f : 0.5f;
