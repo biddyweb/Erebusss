@@ -2215,7 +2215,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->setXP(68); // CHEAT, simulate start of quest 2
         */
         this->player = game_g->createPlayer(player_type);
-        this->player->initialiseHealth(600); // CHEAT
+        //this->player->initialiseHealth(600); // CHEAT
         //player->addGold( 1000 ); // CHEAT
     }
 
