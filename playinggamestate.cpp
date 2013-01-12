@@ -1421,6 +1421,10 @@ void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     //QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
     QString item_str = playing_gamestate->getItemString(item, false) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
+    if( buy_cost == 0 ) {
+        list_item->setTextColor(Qt::gray);
+        list_item->setFlags( list_item->flags() & ~Qt::ItemIsSelectable );
+    }
     QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
     list_item->setIcon(icon);
     player_list->addItem(list_item);
@@ -1483,10 +1487,11 @@ void TradeWindow::clickedSell() {
         player_items.erase(player_items.begin() + index);
         player_costs.erase(player_costs.begin() + index);
     }
-    else {
+    /*else {
+        // no longer needed, as items that can't be bought are grayed out
         //game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
         playing_gamestate->showInfoDialog("This shop doesn't buy that item.");
-    }
+    }*/
 }
 
 void TradeWindow::clickedInfo() {
