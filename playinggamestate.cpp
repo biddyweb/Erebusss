@@ -3051,17 +3051,25 @@ void PlayingGamestate::setupView() {
 
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
     QBrush wall_brush;
+    QBrush dropwall_brush;
     //const float wall_brush_ratio = 1.0f;
     const float wall_brush_ratio = 3.0f;
+    float wall_scale = 1.0f;
+    float dropwall_scale = 1.0f;
     //{
         /*int pixels_per_unit = 128;
         float scale = 4.0f/(float)pixels_per_unit;*/
         float floor_scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
-        float wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
         floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
         if( c_location->getWallImageName().length() > 0 ) {
             wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
+            wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
             wall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*wall_scale, wall_scale));
+        }
+        if( c_location->getDropWallImageName().length() > 0 ) {
+            dropwall_brush.setTexture(builtin_images[c_location->getDropWallImageName()]);
+            dropwall_scale = 0.9f/(float)builtin_images[c_location->getDropWallImageName()].height();
+            dropwall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*dropwall_scale, dropwall_scale));
         }
 
         float background_scale = 1.0f/32.0f;
@@ -3083,22 +3091,22 @@ void PlayingGamestate::setupView() {
         QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
         floor_region->setUserGfxData(item);
         item->setVisible(false); // default to false, visibility is checked afterwards
-        if( c_location->getWallImageName().length() > 0 ) {
-            for(size_t j=0;j<floor_region->getNPoints();j++) {
-                if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
-                    continue;
-                }
-                size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
-                Vector2D p0 = floor_region->getPoint(j);
-                Vector2D p1 = floor_region->getPoint(n_j);
-                Vector2D dp = p1 - p0;
-                float dp_length = dp.magnitude();
-                if( dp_length == 0.0f ) {
-                    continue;
-                }
-                dp /= dp_length;
-                Vector2D normal_into_wall = - dp.perpendicularYToX();
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            if( floor_region->getEdgeType(j) == FloorRegion::EDGETYPE_INTERNAL ) {
+                continue;
+            }
+            size_t n_j = j==floor_region->getNPoints()-1 ? 0 : j+1;
+            Vector2D p0 = floor_region->getPoint(j);
+            Vector2D p1 = floor_region->getPoint(n_j);
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            dp /= dp_length;
+            Vector2D normal_into_wall = - dp.perpendicularYToX();
 
+            if( c_location->getWallImageName().length() > 0 ) {
                 if( !this->view_walls_3d || normal_into_wall.y > -E_TOL_LINEAR ) {
                     QPolygonF wall_polygon;
                     const float wall_dist = 0.1f;
@@ -3118,13 +3126,8 @@ void PlayingGamestate::setupView() {
                         if( normal_into_wall.y < 0.0f )
                         {
                             QBrush wall_brush_3d = wall_brush;
-                            //QTransform transform = wall_brush_3d.transform();
                             QTransform transform;
-                            //float brush_ratio = builtin_images[c_location->getWallImageName()].height() / builtin_images[c_location->getWallImageName()].width();
-                            //transform.translate(0.0f, (p1.y - wall_height)/wall_scale);
-                            //transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/(wall_brush_ratio*wall_scale));
                             transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/wall_scale * (p1.y - p0.y) / (p1.x - p0.x));
-                            //transform.translate(p1.x/(wall_brush_ratio*wall_scale), (p1.y - wall_height)/wall_scale);
                             transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
                             transform *= wall_brush_3d.transform();
                             wall_brush_3d.setTransform(transform);
@@ -3133,14 +3136,12 @@ void PlayingGamestate::setupView() {
                             wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
                             wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
                             QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
-                            //QGraphicsPolygonItem *wall_item_3d = scene->addPolygon(wall_polygon_3d);
                             wall_item_3d->setPen(Qt::NoPen);
                             wall_item_3d->setBrush(wall_brush_3d);
-                            //wall_item_3d->setZValue( std::min(p0.y, p1.y) + 10.0f );
-                            if( normal_into_wall.y > 0.0f ) {
+                            /*if( normal_into_wall.y > 0.0f ) {
                                 wall_item_3d->setZValue(1000000.0);
                                 wall_item_3d->setFlag(QGraphicsItem::ItemStacksBehindParent);
-                            }
+                            }*/
                         }
                         /*else {
                             //wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
@@ -3161,6 +3162,25 @@ void PlayingGamestate::setupView() {
                         wall_item_top->setBrush(wall_brush);
                     }*/
 
+                }
+            }
+            if( c_location->getDropWallImageName().length() > 0 && view_walls_3d ) {
+                const float dropwall_height = 0.9f;
+                if( normal_into_wall.y > E_TOL_LINEAR ) {
+                    QPolygonF dropwall_polygon_3d;
+                    QBrush dropwall_brush_3d = dropwall_brush;
+                    QTransform transform;
+                    transform.translate(0.0f, (p1.y - dropwall_height)/dropwall_scale - p1.x/dropwall_scale * (p1.y - p0.y) / (p1.x - p0.x));
+                    transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
+                    transform *= dropwall_brush_3d.transform();
+                    dropwall_brush_3d.setTransform(transform);
+                    dropwall_polygon_3d.push_back(QPointF(p0.x, p0.y + dropwall_height));
+                    dropwall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                    dropwall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                    dropwall_polygon_3d.push_back(QPointF(p1.x, p1.y + dropwall_height));
+                    QGraphicsPolygonItem *dropwall_item_3d = new QGraphicsPolygonItem(dropwall_polygon_3d, item);
+                    dropwall_item_3d->setPen(Qt::NoPen);
+                    dropwall_item_3d->setBrush(dropwall_brush_3d);
                 }
             }
         }
@@ -3523,6 +3543,20 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( image_name_s.length() > 0 ) {
                         location->setWallImageName(image_name_s.toString().toStdString());
+                    }
+                }
+                else if( reader.name() == "dropwall" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: dropwall element wasn't expected here");
+                    }
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: dropwall element outside of location");
+                    }
+                    if( image_name_s.length() > 0 ) {
+                        location->setDropWallImageName(image_name_s.toString().toStdString());
                     }
                 }
                 else if( reader.name() == "background" ) {
@@ -5911,6 +5945,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
         fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
         fprintf(file, "<wall image_name=\"%s\"/>\n", location->getWallImageName().c_str());
+        fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
         fprintf(file, "\n");
 
         for(size_t i=0;i<location->getNFloorRegions();i++) {

@@ -1750,6 +1750,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <location name="level_space" type="outdoors">
 
 <floor image_name="floor_paved"/>
+<dropwall image_name="dropwall"/>
 <background image_name="background_black"/>
 
 <!--<player_start x="20.0" y="20.0"/>-->
