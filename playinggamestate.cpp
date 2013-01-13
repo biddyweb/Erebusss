@@ -5666,7 +5666,13 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         bool done = false;
         bool move = true;
 
+        // do items first - so that player can always pick up items dropped near friendly (or otherwise non-moving) NPCs!
+        if( !done ) {
+            done = handleClickForItems(dest);
+        }
+
         // search for clicking on an NPC
+        if( !done )
         {
             //float min_dist = 0.0f;
             Character *target_npc = NULL;
@@ -5699,10 +5705,6 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 }
             }
             this->clickedOnNPC(target_npc); // call even if target_npc is NULL
-        }
-
-        if( !done ) {
-            done = handleClickForItems(dest);
         }
 
         Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
