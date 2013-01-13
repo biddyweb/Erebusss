@@ -702,7 +702,8 @@ enum TestID {
     TEST_PERF_DISTANCEGRAPH_0 = 20,
     TEST_PERF_PATHFINDING_0 = 21,
     TEST_PERF_REMOVE_SCENERY_0 = 22,
-    N_TESTS = 23
+    TEST_PERF_REMOVE_SCENERY_1 = 23,
+    N_TESTS = 24
 };
 
 /**
@@ -729,6 +730,7 @@ enum TestID {
   TEST_PERF_DISTANCEGRAPH_0 - performance test for calculating a distance graph
   TEST_PERF_PATHFINDING_0 - performance test for calculating a shortest path
   TEST_PERF_REMOVE_SCENERY_0 - performance test for removing scenery (including recalculating distance graph)
+  TEST_PERF_REMOVE_SCENERY_1 - performance test for removing scenery that was blocking important waypoint (including recalculating distance graph)
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -935,7 +937,7 @@ void Game::runTest(const string &filename, int test_id) {
                 score /= 1000.0;
             }
         }
-        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
             Location location("");
 
             FloorRegion *floor_region = NULL;
@@ -979,6 +981,11 @@ void Game::runTest(const string &filename, int test_id) {
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 5.5f, 22.5f);
             }
+            else if( test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 4.25f, 22.5f);
+            }
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
@@ -987,7 +994,7 @@ void Game::runTest(const string &filename, int test_id) {
             QElapsedTimer timer;
             timer.start();
             int n_times = 1000;
-            if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+            if( test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
                 n_times = 1; // test can only be run once!
             }
             for(int i=0;i<n_times;i++) {
@@ -1002,11 +1009,15 @@ void Game::runTest(const string &filename, int test_id) {
                         throw string("failed to find path");
                     }
                 }
-                else if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
+                else if( test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
                     Vector2D src(1.0f, 1.0f);
                     Vector2D dest(21.0f, 21.0f);
                     vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
                     if( path.size() != 0 ) {
+                        for(vector<Vector2D>::const_iterator iter = path.begin(); iter != path.end(); ++iter) {
+                            Vector2D pos = *iter;
+                            LOG("path pos: %f, %f\n", pos.x, pos.y);
+                        }
                         throw string("unexpectedly found a path");
                     }
 
