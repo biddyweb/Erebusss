@@ -1032,16 +1032,22 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
 }
 
 void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
-    if( level % 3 == 1 ) {
+    if( level % 6 == 1 ) {
         this->changeBaseProfileIntProperty(profile_key_FP_c, 1);
+    }
+    else if( level % 6 == 2 ) {
+        this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
+    }
+    else if( level % 6 == 3 ) {
+        this->changeBaseProfileIntProperty(profile_key_S_c, 1);
+    }
+    else if( level % 6 == 4 ) {
         this->changeBaseProfileIntProperty(profile_key_M_c, 1);
     }
-    else if( level % 3 == 2 ) {
-        this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
+    else if( level % 6 == 5 ) {
         this->changeBaseProfileIntProperty(profile_key_B_c, 1);
     }
-    else if( level % 3 == 0 ) {
-        this->changeBaseProfileIntProperty(profile_key_S_c, 1);
+    else if( level % 6 == 0 ) {
         this->changeBaseProfileIntProperty(profile_key_D_c, 1);
     }
     //qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
