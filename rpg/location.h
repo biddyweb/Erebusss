@@ -488,6 +488,10 @@ protected:
 
     unsigned char lighting_min;
 
+    string wandering_monster_template;
+    int wandering_monster_time_ms; // Poisson distribution - if non-zero, mean of one monster produced every wandering_monster_time_ms time interval
+    int wandering_monster_rest_chance; // percentage change of having a wandering monster disturb the player when resting
+
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries;
 
@@ -556,6 +560,20 @@ public:
     }
     unsigned char getLightingMin() const {
         return this->lighting_min;
+    }
+    void setWanderingMonster(const string &wandering_monster_template, int wandering_monster_time_ms, int wandering_monster_rest_chance) {
+        this->wandering_monster_template = wandering_monster_template;
+        this->wandering_monster_time_ms = wandering_monster_time_ms;
+        this->wandering_monster_rest_chance = wandering_monster_rest_chance;
+    }
+    string getWanderingMonsterTemplate() const {
+        return this->wandering_monster_template;
+    }
+    int getWanderingMonsterTimeMS() const {
+        return this->wandering_monster_time_ms;
+    }
+    int getWanderingMonsterRestChance() const {
+        return this->wandering_monster_rest_chance;
     }
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
@@ -657,6 +675,8 @@ public:
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
     //bool intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const;
     Vector2D nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const;
+
+    bool findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) const;
 
     void calculateDistanceGraph();
     const Graph *getDistanceGraph() const {

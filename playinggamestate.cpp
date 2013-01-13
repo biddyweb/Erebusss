@@ -3580,6 +3580,26 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     location->setBackgroundImageName(image_name_s.toString().toStdString());
                 }
+                else if( reader.name() == "wandering_monster" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wandering_monster element wasn't expected here");
+                    }
+                    QStringRef template_s = reader.attributes().value("template");
+                    if( template_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wandering_monster element has no template attribute");
+                    }
+                    QStringRef time_s = reader.attributes().value("time");
+                    QStringRef rest_chance_s = reader.attributes().value("rest_chance");
+                    int time = parseInt(time_s.toString());
+                    int rest_chance = parseInt(rest_chance_s.toString());
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: wandering_monster element outside of location");
+                    }
+                    location->setWanderingMonster(template_s.toString().toStdString(), time, rest_chance);
+                }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -4667,18 +4687,32 @@ void PlayingGamestate::clickedRest() {
     }
     //if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
     if( this->askQuestionDialog("Rest until fully healed?") ) {
-        int health_restore_percent = 100 - this->player->getHealthPercent();
-        int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
-        if( time == 0 ) {
-            time = 1;
+        bool rest_ok = true;
+        if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance() > 0 ) {
+            if( rand() % 100 < c_location->getWanderingMonsterRestChance() ) {
+                Vector2D free_pvec;
+                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), true) ) {
+                    rest_ok = false;
+                    this->addTextEffect("You are disturbed by a\nwandering monster!", player->getPos(), 2000);
+                    Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                    c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                }
+            }
         }
-        this->player->restoreHealth();
-        this->player->expireProfileEffects();
-        stringstream str;
-        str << "Rested for " << time << " hour";
-        if( time > 1 )
-            str << "s";
-        this->addTextEffect(str.str(), player->getPos(), 2000);
+        if( rest_ok ) {
+            int health_restore_percent = 100 - this->player->getHealthPercent();
+            int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
+            if( time == 0 ) {
+                time = 1;
+            }
+            this->player->restoreHealth();
+            this->player->expireProfileEffects();
+            stringstream str;
+            str << "Rested for " << time << " hour";
+            if( time > 1 )
+                str << "s";
+            this->addTextEffect(str.str(), player->getPos(), 2000);
+        }
     }
 }
 
@@ -4796,8 +4830,15 @@ void PlayingGamestate::update() {
 
     //qDebug("PlayingGamestate::update()");
     bool do_complex_update = false;
+    int complex_time_ms = 0; // time since last "complex" update
 
     if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
+        if( time_last_complex_update_ms == 0 ) {
+            complex_time_ms = game_g->getScreen()->getGameTimeFrameMS();
+        }
+        else {
+            complex_time_ms = elapsed_ms - time_last_complex_update_ms;
+        }
         this->time_last_complex_update_ms = elapsed_ms;
         do_complex_update = true;
 
@@ -4850,6 +4891,20 @@ void PlayingGamestate::update() {
                     this->addTextEffect("You are too terrified to move!", player->getPos(), 5000);
                 }
                 character->setDoneTerror(true);
+            }
+        }
+
+        // spawning wandering monsters
+        if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterTimeMS() > 0 ) {
+            int prob = poisson(c_location->getWanderingMonsterTimeMS(), complex_time_ms);
+            //qDebug("prob: %d (update frame time %d, rate %d)", prob, complex_time_ms, c_location->getWanderingMonsterTimeMS());
+            if( rand() < prob ) {
+                Vector2D free_pvec;
+                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), false) ) {
+                    qDebug("spawn wandering monster at %f, %f", free_pvec.x, free_pvec.y);
+                    Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                    c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                }
             }
         }
 
@@ -5951,6 +6006,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
         fprintf(file, "<wall image_name=\"%s\"/>\n", location->getWallImageName().c_str());
         fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
+        if( location->getWanderingMonsterTemplate().length() > 0 ) {
+            fprintf(file, "<wandering template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
+        }
         fprintf(file, "\n");
 
         for(size_t i=0;i<location->getNFloorRegions();i++) {

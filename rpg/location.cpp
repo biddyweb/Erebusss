@@ -232,27 +232,33 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     }
     else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
         if( this->interact_state == 0 ) {
-            int roll = rollDice(1, 3, 0);
-            LOG("bell: roll a %d\n", roll);
-            this->interact_state = 1;
-            Character *enemy = NULL;
-            if( roll == 1 ) {
-                result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Goblin", "Goblin");
-            }
-            else if( roll == 2 ) {
-                result_text = "You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Orc", "Orc");
-            }
-            else if( roll == 3 ) {
-                result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
-                enemy = playing_gamestate->createCharacter("Goblin Mage", "Goblin Mage");
-                enemy->addSpell("Fire bolt", 6);
-            }
+            Vector2D free_pvec;
+            if( this->location->findFreeWayPoint(&free_pvec, playing_gamestate->getPlayer()->getPos(), true) ) {
+                int roll = rollDice(1, 3, 0);
+                LOG("bell: roll a %d\n", roll);
+                this->interact_state = 1;
+                Character *enemy = NULL;
+                if( roll == 1 ) {
+                    result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                    enemy = playing_gamestate->createCharacter("Goblin", "Goblin");
+                }
+                else if( roll == 2 ) {
+                    result_text = "You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!";
+                    enemy = playing_gamestate->createCharacter("Orc", "Orc");
+                }
+                else if( roll == 3 ) {
+                    result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                    enemy = playing_gamestate->createCharacter("Goblin Mage", "Goblin Mage");
+                    enemy->addSpell("Fire bolt", 6);
+                }
 
-            if( enemy != NULL ) {
-                Location *c_location = playing_gamestate->getCLocation();
-                c_location->addCharacter(enemy, this->pos.x + 2.0f, this->pos.y);
+                if( enemy != NULL ) {
+                    Location *c_location = playing_gamestate->getCLocation();
+                    c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                }
+            }
+            else {
+                result_text = "You ring the bell, but nothing seems to happen.";
             }
         }
         else {
@@ -418,7 +424,7 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
 
 Location::Location(const string &name) :
     name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
-    distance_graph(NULL), lighting_min(55)
+    distance_graph(NULL), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
 {
 }
 
@@ -1273,6 +1279,28 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
         //qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
     }
     return pos;
+}
+
+bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) const {
+    vector<Vector2D> candidates;
+    for(vector<PathWayPoint>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
+        const PathWayPoint path_way_point = *iter;
+        if( this->collideWithTransient(NULL, path_way_point.point) ) {
+            continue;
+        }
+        Vector2D hit_pos;
+        bool is_visible = !this->intersectSweptSquareWithBoundaries(&hit_pos, false, from, path_way_point.point, 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false);
+        if( is_visible == visible ) {
+            candidates.push_back(path_way_point.point);
+        }
+    }
+
+    if( candidates.size() == 0 ) {
+        return false;
+    }
+    int r = rand() % candidates.size();
+    *result = candidates.at(r);
+    return true;
 }
 
 /*bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {
