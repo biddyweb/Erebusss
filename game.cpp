@@ -769,6 +769,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
+            location.addSceneryToFloorRegions();
             location.calculateDistanceGraph();
 
             Vector2D src, dest;
@@ -989,6 +990,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
+            location.addSceneryToFloorRegions();
             location.calculateDistanceGraph();
 
             QElapsedTimer timer;

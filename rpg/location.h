@@ -670,6 +670,7 @@ public:
 
     void createBoundariesForRegions();
     void createBoundariesForScenery();
+    void addSceneryToFloorRegions();
 
     bool collideWithTransient(const Character *character, Vector2D pos) const;
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;

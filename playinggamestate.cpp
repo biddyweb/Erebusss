@@ -4369,6 +4369,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
         loc->createBoundariesForRegions();
         loc->createBoundariesForScenery();
+        loc->addSceneryToFloorRegions();
         loc->calculateDistanceGraph();
 
         progress_count++;

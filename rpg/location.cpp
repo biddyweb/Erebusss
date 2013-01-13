@@ -605,23 +605,12 @@ void Location::removeItem(Item *item) {
 /** N.B., boundary for scenery should be created in createBoundariesForScenery(). We'll
   * need to update this function if we ever want to add scenery dynamically to a
   * location.
+  * Similarly for adding scenery to floor regions, done in addSceneryToFloorRegions().
   */
 void Location::addScenery(Scenery *scenery, float xpos, float ypos) {
     scenery->setLocation(this);
     scenery->setPos(xpos, ypos);
     this->scenerys.insert(scenery);
-
-    /*FloorRegion *floor_region = this->findFloorRegionAt(scenery->getPos());
-    if( floor_region == NULL ) {
-        LOG("failed to find floor region for scenery %s at %f, %f\n", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-        throw string("failed to find floor region for scenery");
-    }
-    floor_region->addScenery(scenery);*/
-    vector<FloorRegion *> scenery_floor_regions = this->findFloorRegionsAt(scenery);
-    for(vector<FloorRegion *>::iterator iter = scenery_floor_regions.begin();iter != scenery_floor_regions.end(); ++iter) {
-        FloorRegion *floor_region = *iter;
-        floor_region->addScenery(scenery);
-    }
 
     if( this->listener != NULL ) {
         this->listener->locationAddScenery(this, scenery);
@@ -962,6 +951,17 @@ void Location::createBoundariesForScenery() {
         this->addBoundary(boundary);
     }
     qDebug("    done");
+}
+
+void Location::addSceneryToFloorRegions() {
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        vector<FloorRegion *> scenery_floor_regions = this->findFloorRegionsAt(scenery);
+        for(vector<FloorRegion *>::iterator iter = scenery_floor_regions.begin();iter != scenery_floor_regions.end(); ++iter) {
+            FloorRegion *floor_region = *iter;
+            floor_region->addScenery(scenery);
+        }
+    }
 }
 
 void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const {
