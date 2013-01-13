@@ -179,6 +179,8 @@
     <floorregion shape="rect" rect_x="19.6" rect_y="10.5" rect_w="0.8" rect_h="2.0" />
 <floorregion shape="rect" rect_x="15.0" rect_y="7.25" rect_w="5.5" rect_h="3.25" />
 
+<scenery name="Torch" image_name="torch" x="17.0" y="6.8" w="1.5" h="1.5"/>
+
 <scenery name="Chest" image_name="chest" x="19.0" y="8.25" size="0.8" blocking="true">
     <gold amount="50"/>
     <item template="Potion of Healing"/>
