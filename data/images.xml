@@ -61,7 +61,7 @@
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
 </image>
-<image type="scenery" name="torch" filename="gfx/textures/scenery/torch.png" width="128" height="128" stride_x="128" expected_width="512">
+<image type="scenery" name="torch" filename="gfx/textures/scenery/torch.png" width="64" height="64" stride_x="64" expected_width="256">
     <animation name="" start="0" length="4" type="loop"/>
 </image>
 <image type="scenery" name="grass" filename="gfx/textures/scenery/grass.png"/>

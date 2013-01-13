@@ -59,9 +59,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 
-<scenery name="Torch" image_name="torch" x="31.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="torch" x="31.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Torch" image_name="torch" x="34.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="torch" x="34.0" y="0.55" w="0.75" h="0.75"/>
 
 <scenery name="Barrel" image_name="barrel" x="30.0" y="3.0" size="0.8" blocking="true">
     <gold amount="7"/>
@@ -319,7 +319,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
 
 <npc name="Orc" template="Orc" x="1.0" y="3.0">
     <item template="Shortbow"/>
@@ -337,7 +337,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Torch" image_name="torch" x="24.0" y="0.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="torch" x="24.0" y="0.55" w="0.75" h="0.75"/>
 
 <floorregion shape="rect" rect_x="24.0" rect_y="6.0" rect_w="1.0" rect_h="10.0"/>
 
@@ -407,7 +407,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="3.0" rect_h="4.0"/>
 
-<scenery name="Torch" image_name="torch" x="7.5" y="11.55" w="1.5" h="1.5"/>
+<scenery name="Torch" image_name="torch" x="7.5" y="11.55" w="0.75" h="0.75"/>
 
 <scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" w="1.0" h="1.5" draw_type="background"/>
 <scenery name="Table" image_name="table" x="7.5" y="15.5" size="0.8" blocking="true"/>
