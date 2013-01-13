@@ -728,6 +728,8 @@ This old and heavy tome describes the black arts of Necromancy.
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
 <scenery name="Door" image_name="door_wood_n" x="0.25" y="5.5" w="0.5" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="4.0" exit_location_y="1.5"/>
 
+<scenery name="Torch" image_name="torch" x="2.5" y="4.55" w="0.75" h="0.75"/>
+
 <item name="Smelly Mushroom" image_name="mushroom" icon_width="0.25" weight="0"
     rating="2" use="ITEMUSE_HARM" use_verb="Eat" x="3.0" y="5.5"/>
 
@@ -986,9 +988,9 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="1.5"/>
+<scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="35.0" y="31.0" size="2.5" blocking="true" block_visibility="true" exit_location="peasant_hut" exit_location_x="1.0" exit_location_y="1.5"/>
+<scenery name="Peasant's Hut" image_name="hut" x="35.0" y="31.0" size="2.5" blocking="true" block_visibility="true" exit_location="peasant_hut" exit_location_x="1.0" exit_location_y="2.5"/>
 
 <scenery name="Peasant's Hut" image_name="hut" x="29.0" y="37.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
@@ -1114,12 +1116,14 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
-<floorregion shape="rect" rect_x="0.5" rect_y="2.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="2.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="28.75"/>
+<scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
 
-<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="1.2"
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="28.75"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
@@ -1135,12 +1139,14 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
-<floorregion shape="rect" rect_x="0.5" rect_y="2.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="2.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="32.75"/>
+<scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
 
-<npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="1.2"
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="32.75"/>
+
+<npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
