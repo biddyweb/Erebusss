@@ -424,7 +424,7 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
 
 Location::Location(const string &name) :
     name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
-    distance_graph(NULL), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
+    distance_graph(NULL), wall_x_scale(3.0f), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
 {
 }
 

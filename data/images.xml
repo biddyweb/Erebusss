@@ -2,7 +2,11 @@
 <images>
 
 <image type="generic" name="wall" filename="gfx/textures/wall.png"/>
+<image type="generic" name="wall_redbricks" filename="gfx/textures/wall_redbricks.png"/>
+<image type="generic" name="wall_rock" filename="gfx/textures/wall_rock.png"/>
+
 <image type="generic" name="dropwall" filename="gfx/textures/dropwall.png"/>
+
 <image type="generic" name="grass" filename="gfx/textures/grass.png"/>
 <image type="generic" name="floor_dirt" filename="gfx/textures/floor_dirt.png"/>
 <image type="generic" name="floor_rock" filename="gfx/textures/floor_rock.png"/>

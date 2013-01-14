@@ -3060,7 +3060,8 @@ void PlayingGamestate::setupView() {
     QBrush wall_brush;
     QBrush dropwall_brush;
     //const float wall_brush_ratio = 1.0f;
-    const float wall_brush_ratio = 3.0f;
+    float wall_brush_ratio = 1.0f;
+    const float dropwall_brush_ratio = 3.0f;
     float wall_scale = 1.0f;
     float dropwall_scale = 1.0f;
     //{
@@ -3069,6 +3070,7 @@ void PlayingGamestate::setupView() {
         float floor_scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
         floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
         if( c_location->getWallImageName().length() > 0 ) {
+            wall_brush_ratio = c_location->getWallXScale();
             wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
             wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
             wall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*wall_scale, wall_scale));
@@ -3076,7 +3078,7 @@ void PlayingGamestate::setupView() {
         if( c_location->getDropWallImageName().length() > 0 ) {
             dropwall_brush.setTexture(builtin_images[c_location->getDropWallImageName()]);
             dropwall_scale = 0.9f/(float)builtin_images[c_location->getDropWallImageName()].height();
-            dropwall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*dropwall_scale, dropwall_scale));
+            dropwall_brush.setTransform(QTransform::fromScale(dropwall_brush_ratio*dropwall_scale, dropwall_scale));
         }
 
         float background_scale = 1.0f/32.0f;
@@ -3178,7 +3180,7 @@ void PlayingGamestate::setupView() {
                     QBrush dropwall_brush_3d = dropwall_brush;
                     QTransform transform;
                     transform.translate(0.0f, (p1.y - dropwall_height)/dropwall_scale - p1.x/dropwall_scale * (p1.y - p0.y) / (p1.x - p0.x));
-                    transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
+                    transform.shear(0.0f, dropwall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
                     transform *= dropwall_brush_3d.transform();
                     dropwall_brush_3d.setTransform(transform);
                     dropwall_polygon_3d.push_back(QPointF(p0.x, p0.y + dropwall_height));
@@ -3550,6 +3552,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( image_name_s.length() > 0 ) {
                         location->setWallImageName(image_name_s.toString().toStdString());
+                        QStringRef image_x_scale_s = reader.attributes().value("image_x_scale");
+                        if( image_x_scale_s.length() > 0 ) {
+                            float image_x_scale = parseFloat(image_x_scale_s.toString());
+                            location->setWallXScale(image_x_scale);
+                        }
                     }
                 }
                 else if( reader.name() == "dropwall" ) {
@@ -6009,8 +6016,12 @@ bool PlayingGamestate::saveGame(const string &filename) const {
         qDebug("save location images");
         fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
         fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
-        fprintf(file, "<wall image_name=\"%s\"/>\n", location->getWallImageName().c_str());
-        fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
+        if( location->getWallImageName().length() > 0 ) {
+            fprintf(file, "<wall image_name=\"%s\" image_x_scale=\"%f\"/>\n", location->getWallImageName().c_str(), location->getWallXScale());
+        }
+        if( location->getDropWallImageName().length() > 0 ) {
+            fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
+        }
         if( location->getWanderingMonsterTemplate().length() > 0 ) {
             fprintf(file, "<wandering template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
         }

@@ -482,6 +482,7 @@ protected:
     Graph *distance_graph;
 
     string wall_image_name;
+    float wall_x_scale;
     string drop_wall_image_name;
     string floor_image_name;
     string background_image_name;
@@ -536,6 +537,12 @@ public:
     }
     string getWallImageName() const {
         return this->wall_image_name;
+    }
+    void setWallXScale(float wall_x_scale) {
+        this->wall_x_scale = wall_x_scale;
+    }
+    float getWallXScale() const {
+        return this->wall_x_scale;
     }
     void setDropWallImageName(const string &drop_wall_image_name) {
         this->drop_wall_image_name = drop_wall_image_name;

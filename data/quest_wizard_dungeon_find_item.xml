@@ -163,7 +163,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <location name="level_1">
 
 <floor image_name="floor_paved_blood"/>
-<wall image_name="wall"/>
+<wall image_name="wall_redbricks" image_x_scale="1.0"/>
 <background image_name="background_dark"/>
 
 <!--<player_start x="12.5" y="2.0"/>-->
@@ -1186,7 +1186,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <location name="cave">
 
 <floor image_name="floor_rock"/>
-<wall image_name="wall"/>
+<wall image_name="wall_rock" image_x_scale="1.0"/>
 <background image_name="background_brown"/>
 
 <wandering_monster template="Orc" time="600000" rest_chance="20"/>
