@@ -602,6 +602,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         if( this->listener != NULL ) {
                             this->listener->characterSetAnimation(this, this->listener_data, "run", false);
                         }
+                        if( this == playing_gamestate->getPlayer() ) {
+                            playing_gamestate->playSound("footsteps");
+                        }
                         this->setPos(p1.x, p1.y);
                     }
                     else if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, pos, p2, npc_radius_c, Location::INTERSECTTYPE_MOVE, NULL, this->can_fly) &&
@@ -609,6 +612,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         // managed to avoid obstacle
                         if( this->listener != NULL ) {
                             this->listener->characterSetAnimation(this, this->listener_data, "run", false);
+                        }
+                        if( this == playing_gamestate->getPlayer() ) {
+                            playing_gamestate->playSound("footsteps");
                         }
                         this->setPos(p2.x, p2.y);
                     }
@@ -624,6 +630,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             else {
                 if( this->listener != NULL ) {
                     this->listener->characterSetAnimation(this, this->listener_data, "run", false);
+                }
+                if( this == playing_gamestate->getPlayer() ) {
+                    playing_gamestate->playSound("footsteps");
                 }
                 this->setPos(new_pos.x, new_pos.y);
                 if( next_seg ) {

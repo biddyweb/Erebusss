@@ -2717,12 +2717,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav");
         game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav");
         game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav");
-#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
-        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
-#endif
         game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
         game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
         game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
+#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
+        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
+        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav");
+#endif
         // remember to call freeSound in the PlayingGamestate destructor!
     }
 
@@ -2815,10 +2816,11 @@ PlayingGamestate::~PlayingGamestate() {
         game_g->freeSound("door");
         game_g->freeSound("drink");
         game_g->freeSound("lock");
-        game_g->freeSound("swing");
         game_g->freeSound("turn_page");
         game_g->freeSound("weapon_unsheath");
         game_g->freeSound("wear_armour");
+        game_g->freeSound("swing");
+        game_g->freeSound("footsteps");
     }
     LOG("done\n");
 }
