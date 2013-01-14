@@ -416,7 +416,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     //if( rollDice(2, 6, 0) <= this->getStrength() ) {
                                     if( rollDice(2, 6, 0) <= this->getProfileIntProperty(profile_key_S_c) ) {
                                         qDebug("    extra strong hit!");
-                                        damage++;
+                                        int extra_damage = rollDice(1, 3, 0);
+                                        damage += extra_damage;
                                     }
                                     qDebug("    damage %d", damage);
                                     if( damage > 0 ) {
@@ -1041,22 +1042,20 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
 }
 
 void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
-    if( level % 6 == 1 ) {
+    if( level % 5 == 1 ) {
         this->changeBaseProfileIntProperty(profile_key_FP_c, 1);
     }
-    else if( level % 6 == 2 ) {
+    else if( level % 5 == 2 ) {
         this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
     }
-    else if( level % 6 == 3 ) {
+    else if( level % 5 == 3 ) {
         this->changeBaseProfileIntProperty(profile_key_S_c, 1);
     }
-    else if( level % 6 == 4 ) {
+    else if( level % 5 == 4 ) {
         this->changeBaseProfileIntProperty(profile_key_M_c, 1);
     }
-    else if( level % 6 == 5 ) {
+    else if( level % 5 == 0 ) {
         this->changeBaseProfileIntProperty(profile_key_B_c, 1);
-    }
-    else if( level % 6 == 0 ) {
         this->changeBaseProfileIntProperty(profile_key_D_c, 1);
     }
     //qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
