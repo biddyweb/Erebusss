@@ -2216,12 +2216,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         this->player->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
         player->initialiseHealth(60);
         //player->addGold( rollDice(2, 6, 10) );
-        player->addGold( 333 ); // CHEAT, simulate start of quest 2
-        player->setXP(68); // CHEAT, simulate start of quest 2
         */
         this->player = game_g->createPlayer(player_type);
-        //this->player->initialiseHealth(600); // CHEAT
-        //player->addGold( 1000 ); // CHEAT
     }
 
     LOG("load images\n");
@@ -2769,6 +2765,20 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false, true);
 
+    if( !is_savegame ) {
+        //this->player->initialiseHealth(600); // CHEAT
+        //player->addGold( 1000 ); // CHEAT
+        // CHEAT, simulate start of quest 2:
+        /*player->addGold( 103 );
+        player->addItem(this->cloneStandardItem("Long Sword"), true);
+        player->addItem(this->cloneStandardItem("Shield"), true);
+        //player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
+        //player->addItem(this->cloneStandardItem("Leather Armour"), true);
+        player->addItem(this->cloneStandardItem("Longbow"), true);
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        player->setXP(68);*/
+    }
 }
 
 PlayingGamestate::~PlayingGamestate() {
@@ -4138,7 +4148,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         size_h = parseFloat(size_h_s.toString());
                     }
 
-                    float visual_h = size_h;
+                    float visual_h = 0.0f;
+                    QStringRef visual_h_s = reader.attributes().value("visual_h");
+                    if( visual_h_s.length() > 0 ) {
+                        visual_h = parseFloat(visual_h_s.toString());
+                    }
+                    else {
+                        visual_h = size_h;
+                    }
+
                     if( this->view_transform_3d ) {
                         // hack to get height right in 3D mode!
                         //if( door || exit /*|| draw_type_s.length() > 0*/ ) {
@@ -4147,12 +4165,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                         else {
                             // otherwise we assume the width/height of the image are already in "isometric"/3D format
-                            visual_h *= 2.0f; // to counter the QGraphicsView scaling
+                            if( visual_h_s.length() == 0 )
+                                visual_h *= 2.0f; // to counter the QGraphicsView scaling
                             size_h = size_w;
-                            visual_h = std::max(visual_h, size_h);
+                            if( visual_h_s.length() == 0 ) {
+                                visual_h = std::max(visual_h, size_h);
+                                ASSERT_LOGGER( visual_h - size_h >= 0.0f );
+                            }
                         }
                     }
-                    ASSERT_LOGGER( visual_h - size_h >= 0.0f );
 
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
                     if( location == NULL ) {
@@ -6161,7 +6182,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, " big_image_name=\"%s\"", scenery->getBigImageName().c_str());
             }
             fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
-            fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
+            fprintf(file, " w=\"%f\" h=\"%f\" visual_h=\"%f\"", scenery->getWidth(), scenery->getHeight(), scenery->getVisualHeight());
             fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
             switch( scenery->getDrawType() ) {
             case Scenery::DRAWTYPE_NORMAL:
