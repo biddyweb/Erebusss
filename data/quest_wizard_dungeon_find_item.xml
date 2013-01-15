@@ -879,7 +879,7 @@ This is a heavy book, that starts talking about the subject matter of the dead, 
 <floorregion shape="rect" rect_x="20.0" rect_y="18.0" rect_w="5.0" rect_h="5.0"/>
 <trap x="20.0" y="18.0" w="1.0" h="1.0" type="gas" rating="4"/>
 
-<scenery name="Painting" image_name="painting_sword" x="22.0" y="17.55" w="0.3" h="0.6" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
+<scenery name="Painting" image_name="painting_sword" big_image_name="gfx/scenes/painting_sword.jpg" x="22.0" y="17.55" w="0.3" h="0.6" interact_type="INTERACT_TYPE_PAINTING_SHATTER"/>
 
 <npc name="Shadow" template="Shadow" x="22.5" y="20.5"/>
 
