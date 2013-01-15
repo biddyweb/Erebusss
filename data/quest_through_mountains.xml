@@ -14,14 +14,13 @@
 <location>
 
 <floor image_name="floor_rock"/>
-<wall image_name="wall"/>
+<wall image_name="wall_rock"/>
 <background image_name="background_brown"/>
 
-<player_start x="1.0" y="30.5"/>
+<player_start x="1.5" y="30.5"/>
 
 <floorregion shape="polygon">
-    <floorregion_point x="0.0" y="30.0" />
-    <floorregion_point x="0.0" y="31.0" />
+    <floorregion_point x="1.0" y="31.0" />
     <floorregion_point x="2.0" y="31.0" />
     <floorregion_point x="1.0" y="30.0" />
 </floorregion>
@@ -32,7 +31,8 @@
     <floorregion_point x="11.0" y="20.0" />
 </floorregion>
 
-<scenery name="Door" image_name="door_wood" x="0.2" y="30.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit="true"/>
+<floorregion shape="rect" rect_x="1.0" rect_y="31.0" rect_w="1.0" rect_h="1.0" />
+<scenery name="Door" image_name="door_wood_n" x="1.5" y="31.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit="true"/>
 
 <!-- centre -->
 
