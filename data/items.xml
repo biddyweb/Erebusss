@@ -37,7 +37,6 @@ A shield provides additional protection, but prevents the use of two-handed weap
 </shield>
 
 <armour name="Leather Armour" image_name="leather_armour" weight="100"
-    min_strength="6"
     rating="2">
 Simple lightweight armour, that provides basic protection.
 </armour>
