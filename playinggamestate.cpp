@@ -4053,6 +4053,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     QStringRef image_name_s = reader.attributes().value("image_name");
+                    QStringRef big_image_name_s = reader.attributes().value("big_image_name");
                     QStringRef pos_x_s = reader.attributes().value("x");
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
@@ -4182,6 +4183,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
 
+                    if( big_image_name_s.length() > 0 ) {
+                        scenery->setBigImageName(big_image_name_s.toString().toStdString());
+                    }
                     scenery->setBlocking(blocking, block_visibility);
                     if( is_opened && !scenery->canBeOpened() ) {
                         qDebug("trying to set is_opened on scenery that can't be opened: %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
@@ -5555,7 +5559,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     done = true;
                     string description = scenery->getDescription();
                     description = convertToHTML(description);
-                    this->showInfoDialog(description);
+                    this->showInfoDialog(description, scenery->getBigImageName());
                 }
             }
         }
@@ -5601,6 +5605,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
         bool done = false;
         Vector2D forward_dest1 = player->getPos() + player->getDirection() * npc_radius_c * 1.1f;
         Vector2D forward_dest2 = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
+        Vector2D forward_dest3 = player->getPos() + player->getDirection() * npc_radius_c * 3.0f;
 
         // search for NPC
         if( !pickup_only )
@@ -5650,6 +5655,10 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
             done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1);
             if( !done ) {
                 done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2);
+            }
+            if( !done && player->getDirection().y < 0.0f ) {
+                // needed for scenery on walls
+                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest3);
             }
         }
 
@@ -6148,6 +6157,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, "<scenery");
             fprintf(file, " name=\"%s\"", scenery->getName().c_str());
             fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
+            if( scenery->getBigImageName().length() > 0 ) {
+                fprintf(file, " big_image_name=\"%s\"", scenery->getBigImageName().c_str());
+            }
             fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
             fprintf(file, " w=\"%f\" h=\"%f\"", scenery->getWidth(), scenery->getHeight());
             fprintf(file, " opacity=\"%f\"", scenery->getOpacity());

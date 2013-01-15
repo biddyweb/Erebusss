@@ -45,6 +45,7 @@ protected:
     Location *location; // not saved
     string name;
     string image_name;
+    string big_image_name; // used for description
     bool is_animation; // not saved
     Vector2D pos; // pos in Location (for centre)
     void *user_data_gfx; // not saved
@@ -127,6 +128,12 @@ public:
     }
     string getDescription() const {
         return this->description;
+    }
+    void setBigImageName(const string &big_image_name) {
+        this->big_image_name = big_image_name;
+    }
+    string getBigImageName() const {
+        return this->big_image_name;
     }
     void setBlocking(bool is_blocking, bool blocks_visibility);
     bool isBlocking() const {

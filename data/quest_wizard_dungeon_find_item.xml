@@ -405,12 +405,16 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="6.0" rect_y="7.0" rect_w="1.0" rect_h="5.0"/>
 
-<floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="3.0" rect_h="4.0"/>
+<floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="4.0" rect_h="4.0"/>
 
-<scenery name="Torch" image_name="torch" x="7.5" y="11.55" w="0.75" h="0.75"/>
+<scenery name="Painting" image_name="painting_gate" big_image_name="gfx/scenes/painting_gate.jpg" x="7.75" y="11.5" w="0.768" h="0.54">
+This painting is titled, "The Gate in the Forest".
+</scenery>
+
+<scenery name="Torch" image_name="torch" x="8.5" y="11.55" w="0.75" h="0.75"/>
 
 <scenery name="Carpet" image_name="carpet" x="6.5" y="14.0" w="1.0" h="1.5" draw_type="background"/>
-<scenery name="Table" image_name="table" x="7.5" y="15.5" size="0.8" blocking="true"/>
+<scenery name="Table" image_name="table" x="8.5" y="15.5" size="0.8" blocking="true"/>
 <scenery name="Cabinet" image_name="cabinet" x="5.5" y="12.5" size="0.8" blocking="true"
     locked="true"/>
 <scenery name="Chest" image_name="chest" x="5.5" y="15.5" size="0.8" blocking="true"
@@ -475,6 +479,14 @@ Ah, thank you! Yes that looks like it will be of most help to me.
     <gold amount="43"/>
     <item template="Gold Ring"/>
 </scenery>
+
+<scenery name="Torch" image_name="torch" x="23.0" y="9.05" w="0.75" h="0.75"/>
+
+<scenery name="Painting" image_name="painting_fortress" big_image_name="gfx/scenes/painting_fortress.jpg" x="21.5" y="9.0" w="0.512" h="0.36">
+This painting is titled, "The Fortress".
+</scenery>
+
+<!--<player_start x="21.5" y="11.5"/>-->
 
 <!--room behind mirror door-->
 <scenery name="Door" image_name="door_mirror" x="23.4999" y="11.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
