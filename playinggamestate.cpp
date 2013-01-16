@@ -4935,14 +4935,16 @@ void PlayingGamestate::update() {
         // spawning wandering monsters
         if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterTimeMS() > 0 ) {
             int prob = poisson(c_location->getWanderingMonsterTimeMS(), complex_time_ms);
-            //qDebug("prob: %d (update frame time %d, rate %d)", prob, complex_time_ms, c_location->getWanderingMonsterTimeMS());
-            if( rand() < prob ) {
+            int roll = rand();
+            //qDebug("prob: %d vs %d (update frame time %d, rate %d)", roll, prob, complex_time_ms, c_location->getWanderingMonsterTimeMS());
+            if( roll < prob ) {
                 Vector2D free_pvec;
                 if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), false) ) {
                     qDebug("spawn wandering monster at %f, %f", free_pvec.x, free_pvec.y);
                     Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                     enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                    qApp->beep();
                 }
             }
         }
