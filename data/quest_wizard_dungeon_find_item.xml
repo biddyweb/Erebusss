@@ -27,7 +27,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <player_start x="32.0" y="2.0"/>
 
-<wandering_monster template="Goblin" time="600000" rest_chance="10"/>
+<wandering_monster template="Goblin" time="300000" rest_chance="10"/>
 
 <!--main room-->
 
@@ -165,7 +165,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 <!--<player_start x="12.5" y="2.0"/>-->
 
-<wandering_monster template="Goblin" time="900000" rest_chance="5"/>
+<wandering_monster template="Goblin" time="600000" rest_chance="5"/>
 
 <floorregion shape="rect" rect_x="10.0" rect_y="1.0" rect_w="5.0" rect_h="12.0"/>
 <scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="entrance" exit_location_x="21.0" exit_location_y="15.0"/>
@@ -305,7 +305,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <!--<player_start x="12.5" y="2.0"/>-->
 
-<wandering_monster template="Goblin" time="600000" rest_chance="10"/>
+<wandering_monster template="Goblin" time="300000" rest_chance="10"/>
 
 <floorregion shape="rect" rect_x="5.0" rect_y="1.0" rect_w="15.0" rect_h="2.0"/>
 <scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_1" exit_location_x="48.5" exit_location_y="13.0"/>
@@ -726,7 +726,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<wandering_monster template="Orc" time="600000" rest_chance="10"/>
+<wandering_monster template="Goblin" time="180000" rest_chance="20"/>
 
 <!--<player_start x="1.0" y="5.5"/>-->
 
@@ -1196,7 +1196,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <wall image_name="wall_rock" image_x_scale="1.0"/>
 <background image_name="background_brown"/>
 
-<wandering_monster template="Orc" time="600000" rest_chance="20"/>
+<wandering_monster template="Goblin Champion" time="180000" rest_chance="20"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="3.0" y="31.0" />
@@ -1506,7 +1506,7 @@ There seems to be no information on the cause of the war, or who the enemy is.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<wandering_monster template="Orc" time="600000" rest_chance="10"/>
+<wandering_monster template="Goblin Champion" time="120000" rest_chance="10"/>
 
 <!--trapdoor route-->
 
@@ -1726,7 +1726,6 @@ A small bronze statuette of a humanoid bull-like creature.
 <scenery name="Tomb" image_name="tomb" x="12.0" y="29.0" size="1.0" blocking="true">
     <armour name="Magical Leather Armour" image_name="leather_armour" weight="100"
         rating="3" magical="true"
-        min_strength="6"
         base_template="Leather Armour" worth_bonus="50">
 This leather armour is blessed, offering greater protection.
     </armour>
