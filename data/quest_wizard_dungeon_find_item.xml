@@ -538,7 +538,6 @@ This painting is titled, "The Fortress".
 <floorregion shape="rect" rect_x="29.5" rect_y="15.0" rect_w="7.0" rect_h="2.5"/>
 <npc name="Wyvern" template="Wyvern" x="30.5" y="16.0"/>
 <npc name="Wyvern" template="Wyvern" x="33.5" y="17.0"/>
-<npc name="Wyvern" template="Wyvern" x="34.0" y="16.5"/>
 
 <!--<player_start x="33.0" y="17.0"/>-->
 
@@ -687,7 +686,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <scenery name="Teleport" image_name="teleport" x="4.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_5" exit_location_x="2.5" exit_location_y="1.5"/>
 
 <npc name="Orc" template="Orc" x="0.5" y="3.5"/>
-<npc name="Orc" template="Orc" x="4.5" y="3.5"/>
+<npc name="Goblin" template="Goblin" x="4.5" y="3.5"/>
 
 </location>
 
@@ -914,7 +913,7 @@ Gakk!
 
 <npc name="Zombie" template="Zombie" x="31.0" y="9.0"/>
 
-<!--<player_start x="33.0" y="9.0"/>-->
+<!--<player_start x="29.0" y="9.0"/>-->
 
 <scenery name="Table" image_name="table" x="32.0" y="9.0" size="1.2" blocking="true">
 </scenery>
@@ -938,12 +937,14 @@ Experiments.
 
 <!--time travel portals-->
 
+<!--<player_start x="20.5" y="25.0"/>-->
+
 <floorregion shape="rect" rect_x="20.0" rect_y="23.0" rect_w="1.0" rect_h="5.0"/>
 
 <floorregion shape="rect" rect_x="17.0" rect_y="28.0" rect_w="7.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="12.0" rect_y="28.0" rect_w="5.0" rect_h="4.0"/>
-<scenery name="Teleport" image_name="teleport" x="12.5" y="30.0" size="1.0" blocking="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="25.0"/>
+<scenery name="Teleport" image_name="teleport" x="12.5" y="30.0" size="1.0" blocking="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="24.0"/>
 
 <floorregion shape="rect" rect_x="24.0" rect_y="28.0" rect_w="5.0" rect_h="4.0"/>
 <scenery name="Teleport" image_name="teleport" x="28.5" y="30.0" size="1.0" blocking="true" exit_location="level_future" exit_location_x="22.5" exit_location_y="20.5"/>
