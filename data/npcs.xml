@@ -3,7 +3,7 @@
 
 <!--Weapon hardcoded as natural damage: Spear-->
 <npc name="Goblin" animation_name="goblin"
-    FP="7" BS="8" S="6" A="1" M="6" D="6" B="5" Sp="2"
+    FP="7" BS="8" S="5" A="1" M="6" D="6" B="5" Sp="2"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
     health_min="18" health_max="20" gold_min="5" gold_max="8"
     xp_worth="5"
@@ -19,10 +19,10 @@
 
 <!--Weapon hardcoded as natural damage: Spear-->
 <npc name="Goblin Champion" animation_name="goblin"
-    FP="8" BS="8" S="6" A="1" M="6" D="6" B="6" Sp="2"
+    FP="8" BS="8" S="5" A="1" M="6" D="6" B="6" Sp="2"
     natural_damageX="1" natural_damageY="12" natural_damageZ="0"
     health_min="22" health_max="25" gold_min="6" gold_max="10"
-    xp_worth="8"
+    xp_worth="10"
 />
 
 <!--Weapon hardcoded as natural damage: Battle Axe-->
@@ -30,7 +30,7 @@
     FP="8" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="30" health_max="35" gold_min="8" gold_max="12"
-    xp_worth="10"
+    xp_worth="15"
 />
 
 <!--Weapon hardcoded as natural damage: Battle Axe-->
@@ -38,7 +38,7 @@
     FP="9" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="40" health_max="45" gold_min="12" gold_max="16"
-    xp_worth="15"
+    xp_worth="20"
 />
 
 <!--Weapon hardcoded as natural damage: Two Handed Axe +1-->
@@ -56,7 +56,7 @@
     natural_damageX="2" natural_damageY="8" natural_damageZ="0"
     health_min="30" health_max="35" gold_min="0" gold_max="0"
     can_fly="true"
-    xp_worth="20"
+    xp_worth="15"
 />
 
 <!--Natural damage-->
@@ -74,7 +74,7 @@
     FP="8" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"
     natural_damageX="1" natural_damageY="6" natural_damageZ="0"
     health_min="40" health_max="50" gold_min="0" gold_max="0"
-    xp_worth="10"
+    xp_worth="15"
     causes_terror="true" terror_effect="1"
 />
 
