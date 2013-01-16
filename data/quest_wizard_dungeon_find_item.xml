@@ -726,7 +726,7 @@ This old and heavy tome describes the black arts of Necromancy.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<wandering_monster template="Goblin" time="180000" rest_chance="20"/>
+<wandering_monster template="Goblin" time="300000" rest_chance="15"/>
 
 <!--<player_start x="1.0" y="5.5"/>-->
 
@@ -1196,7 +1196,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <wall image_name="wall_rock" image_x_scale="1.0"/>
 <background image_name="background_brown"/>
 
-<wandering_monster template="Goblin Champion" time="180000" rest_chance="20"/>
+<wandering_monster template="Goblin Champion" time="300000" rest_chance="15"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="3.0" y="31.0" />
