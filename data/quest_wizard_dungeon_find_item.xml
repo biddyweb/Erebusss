@@ -493,7 +493,9 @@ This painting is titled, "The Fortress".
         magical="true"
         base_template="Short Sword" worth_bonus="200"
         />
-    <ring name="Ring of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1"/>
+    <ring name="Ring of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1"
+        base_template="Gold Ring" worth_bonus="150"
+        />
     <item template="Red Gem"/>
     <gold amount="16"/>
 </scenery>
@@ -1222,9 +1224,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <floorregion_point x="6.0" y="16.0" />
 </floorregion>
 
-<npc name="Orc" template="Orc" x="4.5" y="17.0">
-    <item template="Chain Mail Armour"/>
-</npc>
+<npc name="Orc" template="Orc" x="4.5" y="17.0"/>
 <npc name="Orc" template="Orc" x="5.5" y="17.5">
     <item template="Longbow"/>
     <item template="Arrows"/>
@@ -1287,7 +1287,6 @@ I don't know that. We know of nothing of how such powerful magic works - just th
     <item template="Leather Armour"/>
 </npc>
 <npc name="Orc" template="Orc" x="27.0" y="19.5">
-    <item template="Leather Armour"/>
 </npc>
 
 <floorregion shape="rect" rect_x="32.0" rect_y="12.0" rect_w="1.0" rect_h="14.0"/>
@@ -1354,9 +1353,7 @@ I am a peasant from the nearby village, but I was captured by the Orcs attacking
     <scenery name="Door" image_name="door_wood_n" x="28.5" y="11.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="26.0" rect_y="6.5" rect_w="5.0" rect_h="4.0"/>
 
-<npc name="Orc" template="Orc" x="28.0" y="7.5">
-    <item template="Chain Mail Armour"/>
-</npc>
+<npc name="Orc" template="Orc" x="28.0" y="7.5"/>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="13.0" rect_w="1.0" rect_h="1.5"/>
     <scenery name="Door" image_name="door_wood_n" x="28.5" y="13.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
@@ -1433,9 +1430,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
     <item template="Chain Mail Armour"/>
 </npc>
 
-<npc name="Orc Champion" template="Orc Champion" x="43.0" y="18.5">
-    <item template="Chain Mail Armour"/>
-</npc>
+<npc name="Orc" template="Orc" x="43.0" y="18.5"/>
 
 <npc name="Orc" template="Orc" x="43.0" y="17.5">
     <item template="Longbow"/>
