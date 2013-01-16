@@ -2769,7 +2769,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         //this->player->initialiseHealth(600); // CHEAT
         //player->addGold( 1000 ); // CHEAT
         // CHEAT, simulate start of quest 2:
-        /*player->addGold( 103 );
+        /*player->addGold( 166 );
+        player->deleteItem("Leather Armour");
         player->addItem(this->cloneStandardItem("Long Sword"), true);
         player->addItem(this->cloneStandardItem("Shield"), true);
         //player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
@@ -2777,7 +2778,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->addItem(this->cloneStandardItem("Longbow"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->setXP(68);*/
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        player->setXP(70);*/
     }
 }
 
@@ -6079,6 +6081,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
             }
             fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
+            fprintf(file, " bounce=\"%s\"", character->isBounce() ? "true": "false");
             fprintf(file, " name=\"%s\"", character->getName().c_str());
             fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
             fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
