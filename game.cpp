@@ -1308,13 +1308,13 @@ void Game::loadSound(const string &id, const string &filename) {
 #endif
 
 void Game::playSound(const string &sound_effect) {
-    qDebug("play sound: %s\n", sound_effect.c_str());
+    //qDebug("play sound: %s\n", sound_effect.c_str());
     if( game_g->isSoundEnabled() ) {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
             if( sound->state() == Phonon::PlayingState ) {
-                qDebug("    already playing");
+                //qDebug("    already playing");
             }
             else {
                 //sound->stop();
