@@ -397,9 +397,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             qDebug("character %s rolled %d / %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_stat, target_npc->getName().c_str(), is_ranged);
                             if( hit_roll <= mod_stat ) {*/
                             int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
-                            int d_stat = this->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
+                            int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
                             int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
-                            int mod_d_stat = this->modifyStatForDifficulty(playing_gamestate, d_stat);
+                            int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
                             int hit_roll = rollDice(2, 6, -7);
                             qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
                             if( hit_roll + mod_a_stat > mod_d_stat ) {
