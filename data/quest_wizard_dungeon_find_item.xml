@@ -73,19 +73,16 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
     <scenery name="Door" image_name="door_wood_n" x="27.75" y="4.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
-<npc name="Goblin" template="Goblin" x="22.5" y="6.0">
-    <item template="Leather Armour"/>
-</npc>
+<npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
 <npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
 
-<!--orcs-->
+<!--goblins to the west-->
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="7.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="11.0" rect_y="9.0" rect_w="4.0" rect_h="3.0" />
 
-<npc name="Orc" template="Orc" x="12.0" y="9.5"/>
-<npc name="Orc" template="Orc" x="13.0" y="9.5"/>
-<npc name="Orc" template="Orc" x="12.0" y="11.0"/>
+<npc name="Goblin" template="Goblin" x="12.0" y="9.5"/>
+<npc name="Goblin" template="Goblin" x="13.0" y="9.5"/>
 
 <floorregion shape="rect" rect_x="8.0" rect_y="10.0" rect_w="3.0" rect_h="1.0" />
 
@@ -109,7 +106,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="9.0" rect_w="5.0" rect_h="4.0" />
 <npc name="Goblin" template="Goblin" x="45.0" y="10.0"/>
-<npc name="Goblin Champion" template="Goblin Champion" x="48.0" y="10.0"/>
+<npc name="Goblin" template="Goblin" x="48.0" y="10.0"/>
 <npc name="Goblin" template="Goblin" x="48.0" y="12.0"/>
 
 <scenery name="Skeleton" image_name="skeleton" x="47.0" y="12.0" size="0.7" draw_type="background"/>
@@ -138,13 +135,13 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 <scenery name="Door" image_name="door_wood_n" x="21.0" y="15.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
 
-<!--room with orc-->
+<!--room with goblin champion-->
 
     <floorregion shape="rect" rect_x="26.5" rect_y="13.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="25.0" rect_y="9.0" rect_w="4.0" rect_h="4.0" />
 <scenery name="Door" image_name="door_wood_n" x="27.0" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
 
-<npc name="Orc" template="Orc" x="27.0" y="11.0"/>
+<npc name="Goblin Champion" template="Goblin Champion" x="27.0" y="11.0"/>
 <scenery name="Chest" image_name="chest" x="28.0" y="10.0" size="0.8" blocking="true">
     <gold amount="25"/>
 </scenery>
@@ -191,9 +188,7 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <floorregion shape="rect" rect_x="15.0" rect_y="12.0" rect_w="20.0" rect_h="1.0"/>
 <trap x="19.0" y="12.0" w="1.0" h="1.0" type="arrow"/>
 <floorregion shape="rect" rect_x="24.0" rect_y="11.0" rect_w="1.0" rect_h="1.0"/>
-<npc name="Goblin Champion" template="Goblin Champion" x="24.5" y="11.5">
-    <item template="Leather Armour"/>
-</npc>
+<npc name="Goblin Champion" template="Goblin Champion" x="24.5" y="11.5"/>
 
 <!--cells-->
 
@@ -325,7 +320,7 @@ This journal seems to be a record of grisly torture that took place in this room
     <item template="Shortbow"/>
     <item template="Arrows"/>
 </npc>
-<npc name="Orc" template="Orc" x="2.0" y="3.0"/>
+<npc name="Goblin" template="Goblin" x="2.0" y="3.0"/>
 
 <scenery name="Crate" image_name="crate" x="4.5" y="5.5" size="0.8" blocking="true">
     <gold amount="11"/>
@@ -347,11 +342,6 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <npc name="Orc" template="Orc" x="1.0" y="20.0">
     <item template="Shortbow"/>
-    <item template="Arrows"/>
-</npc>
-<npc name="Orc" template="Orc" x="4.0" y="20.0">
-    <item template="Shortbow"/>
-    <item template="Arrows"/>
     <item template="Arrows"/>
 </npc>
 
@@ -577,6 +567,8 @@ This painting is titled, "The Fortress".
 This old and heavy tome describes the black arts of Necromancy.
     </item>
 </scenery>
+
+<!--<player_start x="40.0" y="8.5"/>-->
 
 <!--shadow room-->
 <floorregion shape="rect" rect_x="38.0" rect_y="8.0" rect_w="8.0" rect_h="1.0"/>
