@@ -419,7 +419,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         int extra_damage = rollDice(1, 3, 0);
                                         damage += extra_damage;
                                     }
-                                    qDebug("    damage %d", damage);
                                     if( damage > 0 ) {
                                         if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
                                             target_npc->addPainTextEffect(playing_gamestate);
@@ -428,6 +427,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                             }
                                         }
                                     }
+                                    qDebug("    damage %d remaining %d", damage, target_npc->getHealth());
                                 }
                             }
                             else{
