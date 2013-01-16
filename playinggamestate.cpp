@@ -3039,6 +3039,14 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
     this->c_location = location;
     this->c_location->addCharacter(player, pos.x, pos.y);
     this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    // reset NPCs to their default positions
+    for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+        Character *character = *iter;
+        if( character != player && character->hasDefaultPosition() ) {
+            //qDebug("### move %s from %f, %f to %f, %f", character->getName().c_str(), character->getX(), character->getY(), character->getDefaultX(), character->getDefaultY());
+            character->setPos(character->getDefaultX(), character->getDefaultY());
+        }
+    }
 
     this->setupView();
 }
@@ -3866,8 +3874,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
-                        float default_pos_x = parseFloat(pos_x_s.toString());
-                        float default_pos_y = parseFloat(pos_y_s.toString());
+                        float default_pos_x = parseFloat(default_pos_x_s.toString());
+                        float default_pos_y = parseFloat(default_pos_y_s.toString());
                         npc->setDefaultPosition(default_pos_x, default_pos_y);
                     }
                     else {
