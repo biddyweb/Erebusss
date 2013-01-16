@@ -1386,32 +1386,32 @@ Character *Game::createPlayer(size_t i) const {
     Character *character = new Character(player_types.at(i), "", false);
     if( i == 0 ) {
         // barbarian
-        character->setProfile(7, 6, 8, 1, 5, 5, 8, 1.8f);
-        character->initialiseHealth(65);
+        character->setProfile(8, 6, 8, 1, 5, 5, 8, 1.8f);
+        character->initialiseHealth(75);
         character->setBiography("");
     }
     else if( i == 1 ) {
         // elf
-        character->setProfile(6, 8, 6, 1, 8, 7, 8, 2.25f);
-        character->initialiseHealth(50);
+        character->setProfile(7, 8, 6, 1, 8, 7, 8, 2.25f);
+        character->initialiseHealth(60);
         character->setBiography("");
     }
     else if( i == 2 ) {
         // halfling
-        character->setProfile(6, 7, 5, 1, 7, 9, 7, 1.8f);
-        character->initialiseHealth(40);
+        character->setProfile(7, 7, 5, 1, 7, 9, 7, 1.8f);
+        character->initialiseHealth(50);
         character->setBiography("");
     }
     else if( i == 3 ) {
         // ranger
-        character->setProfile(6, 8, 7, 1, 7, 8, 6, 2.2f);
-        character->initialiseHealth(50);
+        character->setProfile(7, 8, 7, 1, 7, 8, 6, 2.2f);
+        character->initialiseHealth(60);
         character->setBiography("");
     }
     else if( i == 4 ) {
         // warrior
-        character->setProfile(7, 7, 7, 1, 6, 7, 7, 2.0f);
-        character->initialiseHealth(60);
+        character->setProfile(8, 7, 7, 1, 6, 7, 7, 2.0f);
+        character->initialiseHealth(70);
         character->setBiography("");
     }
     else {
