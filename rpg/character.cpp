@@ -915,6 +915,14 @@ void Character::dropItem(Item *item) {
     }
 }
 
+void Character::deleteItem(const string &key) {
+    Item *item = this->findItem(key);
+    if( item != NULL ) {
+        this->takeItem(item);
+        delete item;
+    }
+}
+
 void Character::setGold(int gold) {
     this->gold = gold;
     ASSERT_LOGGER( gold >= 0 );
@@ -1042,24 +1050,25 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
 }
 
 void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
-    if( level % 5 == 1 ) {
+    if( level % 3 == 1 ) {
         this->changeBaseProfileIntProperty(profile_key_FP_c, 1);
-    }
-    else if( level % 5 == 2 ) {
-        this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
-    }
-    else if( level % 5 == 3 ) {
-        this->changeBaseProfileIntProperty(profile_key_S_c, 1);
-    }
-    else if( level % 5 == 4 ) {
         this->changeBaseProfileIntProperty(profile_key_M_c, 1);
     }
-    else if( level % 5 == 0 ) {
+    else if( level % 3 == 2 ) {
+        this->changeBaseProfileIntProperty(profile_key_BS_c, 1);
         this->changeBaseProfileIntProperty(profile_key_B_c, 1);
+    }
+    else if( level % 3 == 0 ) {
+        this->changeBaseProfileIntProperty(profile_key_S_c, 1);
         this->changeBaseProfileIntProperty(profile_key_D_c, 1);
     }
     //qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
-    this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.1f);
+    if( this->getBaseProfileFloatProperty(profile_key_Sp_c) < 2.5f - E_TOL_LINEAR ) {
+        this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.1f);
+    }
+    else {
+        this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.02f);
+    }
     //qDebug("speed is now: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
     int health_bonus = rollDice(1, 6, 0);
     this->max_health += health_bonus;

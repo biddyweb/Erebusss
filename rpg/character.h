@@ -667,6 +667,7 @@ public:
     void pickupItem(Item *item);
     void takeItem(Item *item);
     void dropItem(Item *item);
+    void deleteItem(const string &key);
     set<Item *>::iterator itemsBegin() {
         return this->items.begin();
     }
