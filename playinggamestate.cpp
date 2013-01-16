@@ -973,7 +973,7 @@ void ItemsWindow::refreshList() {
         else if( view_type == VIEWTYPE_MAGIC && !item->isMagical() ) {
             continue;
         }
-        else if( view_type == VIEWTYPE_MISC && !( item->getType() == ITEMTYPE_GENERAL && !item->isMagical() ) ) {
+        else if( view_type == VIEWTYPE_MISC && !( ( item->getType() == ITEMTYPE_GENERAL || item->getType() == ITEMTYPE_RING ) && !item->isMagical() ) ) {
             continue;
         }
         QString item_str = playing_gamestate->getItemString(item, true);
