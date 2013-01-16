@@ -2847,7 +2847,7 @@ float PlayingGamestate::getDifficultyModifier() const {
         factor = 1.0f;
         break;
     case DIFFICULTY_HARD:
-        factor = 0.8f;
+        factor = 0.85f;
         break;
     default:
         ASSERT_LOGGER(false);
