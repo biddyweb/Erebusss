@@ -4732,6 +4732,7 @@ void PlayingGamestate::clickedRest() {
                     rest_ok = false;
                     this->addTextEffect("You are disturbed by a\nwandering monster!", player->getPos(), 2000);
                     Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                    enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
                 }
             }
@@ -4940,6 +4941,7 @@ void PlayingGamestate::update() {
                 if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), false) ) {
                     qDebug("spawn wandering monster at %f, %f", free_pvec.x, free_pvec.y);
                     Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                    enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
                 }
             }
@@ -6055,7 +6057,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
         }
         if( location->getWanderingMonsterTemplate().length() > 0 ) {
-            fprintf(file, "<wandering template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
+            fprintf(file, "<wandering_monster template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
         }
         fprintf(file, "\n");
 

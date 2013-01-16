@@ -254,6 +254,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
 
                 if( enemy != NULL ) {
                     Location *c_location = playing_gamestate->getCLocation();
+                    enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
                 }
             }
