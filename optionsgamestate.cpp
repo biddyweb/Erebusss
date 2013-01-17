@@ -348,7 +348,7 @@ void OptionsGamestate::clickedOptions() {
     soundCheck->setChecked(game_g->isSoundEnabled());
     layout->addWidget(soundCheck);
 
-    lightingCheck = new QCheckBox("Lighting Effects");
+    lightingCheck = new QCheckBox("Lighting Effects (uncheck if too slow)");
     lightingCheck->setChecked(game_g->isLightingEnabled());
     layout->addWidget(lightingCheck);
 
