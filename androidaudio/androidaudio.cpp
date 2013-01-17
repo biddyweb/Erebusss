@@ -211,14 +211,20 @@ void AndroidAudio::playSound(const AndroidSoundEffect *sound) {
         int16_t* lBuffer = (int16_t *)sound->mBuffer;
         off_t lLength = sound->mLength;
 
-        //Remove any sound from the queue
-        lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
-        Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+        SLBufferQueueState queue_state;
+        (*mPlayerQueue)->GetState(mPlayerQueue, &queue_state);
+        if( queue_state.count != 0 ) {
+            // still playing
+        }
+        else {
+            //Remove any sound from the queue
+            lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
+            Q_ASSERT(SL_RESULT_SUCCESS == lRes);
 
-        //Play the new sound
-        (*mPlayerQueue)->Enqueue(mPlayerQueue, lBuffer, lLength);
-        Q_ASSERT(SL_RESULT_SUCCESS == lRes);
-
+            //Play the new sound
+            (*mPlayerQueue)->Enqueue(mPlayerQueue, lBuffer, lLength);
+            Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+        }
     }
 }
 
