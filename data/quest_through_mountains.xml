@@ -11,7 +11,7 @@
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
 
-<location>
+<location name="entrance">
 
 <floor image_name="floor_rock"/>
 <wall image_name="wall_rock"/>
@@ -115,6 +115,48 @@
     <floorregion_point x="15.0" y="12.0" />
     <floorregion_point x="13.0" y="12.0" />
 </floorregion>
+
+<scenery name="Door" image_name="door_wood_n" x="14.0" y="11.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_1" exit_location_x="20.0" exit_location_y="39.0"/>
+
+</location>
+
+<location name="level_1">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="40.0" />
+    <floorregion_point x="21.0" y="40.0" />
+    <floorregion_point x="23.0" y="30.0" />
+    <floorregion_point x="17.0" y="30.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="14.0" exit_location_y="13.0"/>
+
+<!-- surrounding passages -->
+
+<floorregion shape="rect" rect_x="13.0" rect_y="27.0" rect_w="14.0" rect_h="3.0"/>
+
+<floorregion shape="rect" rect_x="13.0" rect_y="19.0" rect_w="3.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="24.0" rect_y="19.0" rect_w="3.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="13.0" rect_y="16.0" rect_w="14.0" rect_h="3.0"/>
+
+<!-- central section -->
+
+<floorregion shape="rect" rect_x="19.5" rect_y="26.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="16.0" rect_y="22.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="23.0" rect_y="22.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="19.5" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="17.0" rect_y="20.0" rect_w="6.0" rect_h="6.0"/>
 
 </location>
 
