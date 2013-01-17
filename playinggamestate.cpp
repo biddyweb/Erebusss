@@ -2718,7 +2718,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
         game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
-        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav");
+#endif
+#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID)
+        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav"); // strange pauses on Symbian?; conflicts with other sounds on Android
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
     }
