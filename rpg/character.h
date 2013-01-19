@@ -526,6 +526,10 @@ public:
     }*/
     void setPath(vector<Vector2D> &path);
     void setDestination(float xdest, float ydest, const Scenery *ignore_scenery);
+    bool hasPath() const {
+        return this->has_path;
+    }
+    Vector2D getDestination() const;
     bool update(PlayingGamestate *playing_gamestate);
     void setTargetNPC(Character *target_npc) {
         if( this->target_npc != target_npc ) {

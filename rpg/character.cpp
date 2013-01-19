@@ -963,6 +963,14 @@ void Character::setPath(vector<Vector2D> &path) {
     }
 }
 
+Vector2D Character::getDestination() const {
+    if( this->has_path && path.size() > 0 ) {
+        return path.at( path.size() - 1 );
+    }
+    ASSERT_LOGGER(false);
+    return Vector2D();
+}
+
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
     //qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
     if( this->location == NULL ) {

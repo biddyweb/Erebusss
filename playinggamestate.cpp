@@ -2079,6 +2079,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     //view->grabGesture(Qt::PinchGesture);
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
+    //view->setOptimizationFlag(QGraphicsView::DontSavePainterState);
 
     /*QWidget *centralWidget = new QWidget(window);
     this->mainwindow = centralWidget;
@@ -2775,13 +2776,25 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->deleteItem("Leather Armour");
         player->addItem(this->cloneStandardItem("Long Sword"), true);
         player->addItem(this->cloneStandardItem("Shield"), true);
-        //player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
-        //player->addItem(this->cloneStandardItem("Leather Armour"), true);
+        player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
         player->addItem(this->cloneStandardItem("Longbow"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->setXP(70);*/
+        // CHEAT, simulate start of quest 3:
+        /*player->addGold( 1241 );
+        player->deleteItem("Leather Armour");
+        player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
+        player->addItem(this->cloneStandardItem("Plate Armour"), true);
+        player->addItem(this->cloneStandardItem("Longbow"), true);
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        player->addItem(this->cloneStandardItem("Arrows"), true);
+        //player->setXP(1140);
+        for(int i=0;i<114;i++) {
+            player->addXP(this, 10);
+        }*/
     }
 }
 
@@ -5015,7 +5028,27 @@ void PlayingGamestate::update() {
         if( moved ) {
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
-            this->requestPlayerMove(dest, NULL);
+            // check if we need to update the target
+            bool need_update = true;
+            if( this->player->hasPath() ) {
+                Vector2D current_dest = this->player->getDestination();
+                Vector2D current_dir = current_dest - this->player->getPos();
+                if( current_dir.magnitude() > 0.5f*step ) {
+                    Vector2D new_dir = dest - player->getPos();
+                    current_dir.normalise();
+                    new_dir.normalise();
+                    if( current_dir.isEqual(new_dir, E_TOL_LINEAR) ) {
+                        need_update = false;
+                    }
+                }
+            }
+            if( need_update ) {
+                //qDebug("update");
+                this->requestPlayerMove(dest, NULL);
+            }
+            /*else {
+                qDebug("no update");
+            }*/
         }
 #ifdef TIMING_INFO
         qDebug("keyboard input took %d", timer_kinput.elapsed());
