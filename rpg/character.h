@@ -406,6 +406,8 @@ class Character {
     // shopkeepers
     string shop;
 
+    string objective_id;
+
     bool useAmmo(Ammo *ammo);
     int getNaturalDamage() const;
 
@@ -843,5 +845,11 @@ public:
     }
     string getShop() const {
         return this->shop;
+    }
+    string getObjectiveId() const {
+        return this->objective_id;
+    }
+    void setObjectiveId(const string &objective_id) {
+        this->objective_id = objective_id;
     }
 };

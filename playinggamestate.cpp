@@ -228,7 +228,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
                     this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
                     this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
                     this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
-                    qDebug("    speed: %f", this->kinetic_scroll_speed);
+                    //qDebug("    speed: %f", this->kinetic_scroll_speed);
                 }
             }
             else {
@@ -2785,6 +2785,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         // CHEAT, simulate start of quest 3:
         /*player->addGold( 1241 );
         player->deleteItem("Leather Armour");
+        player->deleteItem("Long Sword");
+        player->armWeapon(NULL);
         player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
         player->addItem(this->cloneStandardItem("Plate Armour"), true);
         player->addItem(this->cloneStandardItem("Longbow"), true);
@@ -3885,6 +3887,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef shop_s = reader.attributes().value("shop");
                     if( shop_s.length() > 0 ) {
                         npc->setShop(shop_s.toString().toStdString());
+                    }
+                    QStringRef objective_id_s = reader.attributes().value("objective_id");
+                    if( objective_id_s.length() > 0 ) {
+                        npc->setObjectiveId(objective_id_s.toString().toStdString());
                     }
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
@@ -6199,6 +6205,9 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, ">\n");
                 fprintf(file, "%s\n", talk_item->answer.c_str());
                 fprintf(file, "</talk>\n");
+            }
+            if( character->getObjectiveId().length() > 0 ) {
+                fprintf(file, "<objective_id>%s</opening_initial>", character->getObjectiveId().c_str());
             }
             for(map<string, int>::const_iterator iter2 = character->spellsBegin(); iter2 != character->spellsEnd(); ++iter2) {
                 string spell_name = iter2->first;
