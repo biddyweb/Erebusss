@@ -17,7 +17,7 @@
 <wall image_name="wall_rock"/>
 <background image_name="background_brown"/>
 
-<player_start x="1.5" y="30.5"/>
+<!--<player_start x="1.5" y="30.5"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="1.0" y="31.0" />
@@ -59,6 +59,10 @@
 </scenery>
 
 <npc name="Wyvern" template="Wyvern" x="14.5" y="21.5"/>
+
+<scenery name="Plant" image_name="plant" x="16.5" y="18.25" size="0.5" draw_type="background"/>
+
+<scenery name="Plant" image_name="plant" x="15.0" y="20.75" size="0.5" draw_type="background"/>
 
 <!-- west route -->
 
@@ -116,15 +120,190 @@
     <floorregion_point x="13.0" y="12.0" />
 </floorregion>
 
-<scenery name="Door" image_name="door_wood_n" x="14.0" y="11.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_1" exit_location_x="20.0" exit_location_y="39.0"/>
+<scenery name="Door" image_name="door_wood_n" x="14.0" y="11.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_1" exit_location_x="21.0" exit_location_y="39.0"/>
 
 </location>
 
 <location name="level_1">
 
+<floor image_name="floor_rock"/>
+<wall image_name="wall_rock"/>
+<background image_name="background_brown"/>
+
+<player_start x="21.0" y="39.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="40.0" />
+    <floorregion_point x="21.0" y="40.0" />
+    <floorregion_point x="26.0" y="35.0" />
+    <floorregion_point x="24.0" y="35.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="14.0" exit_location_y="13.0"/>
+
+<scenery name="Bones" image_name="bones" x="23.5" y="36.8" size="0.5" draw_type="background"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="24.0" y="35.0" />
+    <floorregion_point x="26.0" y="35.0" />
+    <floorregion_point x="31.0" y="30.0" />
+    <floorregion_point x="29.0" y="30.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="29.0" rect_y="28.0" rect_w="8.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="29.5" rect_y="26.5" rect_w="1.0" rect_h="1.5"/>
+<scenery name="Door" image_name="door_wood_n" x="30.0" y="27.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="28.0" rect_y="22.5" rect_w="4.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="37.0" rect_y="28.0" rect_w="2.0" rect_h="2.0"/>
+
+<npc name="Glenthor" animation_name="man" static_image="true" x="38.0" y="29.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="KILL_NPCS"
+    interaction_data="Glenthor"
+    interaction_xp="75"
+>
+<opening_initial>Hello, fellow traveller! You wouldn't fancy helping me out, would you?
+</opening_initial>
+<opening_later>Hello, you wouldn't fancy helping me out, would you?
+</opening_later>
+<opening_interaction_complete>Hello. Thank you again for slaying those Wyvern!
+</opening_interaction_complete>
+<talk question="How can I help you?" while_not_done="true">I am an archeologist exploring for ancient Dwarven artefacts. I want to explore the cave to the east, but unfortunately it is full of these dreadful and hostile winged creatures. If someone could slay them, it would be of great help to me.
+</talk>
+<talk question="I have killed the Wyvern for you" objective="true">
+Thank you for helping me!
+</talk>
+</npc>
+
+<!-- route to wyverns cave -->
+
+<floorregion shape="rect" rect_x="39.0" rect_y="28.0" rect_w="5.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="43.0" rect_y="30.0" rect_w="2.0" rect_h="2.0"/>
+
+<!-- cave -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="45.0" y="30.0" />
+    <floorregion_point x="45.0" y="32.0" />
+    <floorregion_point x="51.0" y="36.0" />
+    <floorregion_point x="56.0" y="32.0" />
+    <floorregion_point x="56.0" y="30.0" />
+    <floorregion_point x="50.0" y="26.0" />
+</floorregion>
+
+<npc name="Wyvern" template="Wyvern" objective_id="Glenthor" x="48.5" y="29.0"/>
+
+<npc name="Wyvern" template="Wyvern" objective_id="Glenthor" x="48.5" y="33.0"/>
+
+<npc name="Wyvern" template="Wyvern" objective_id="Glenthor" x="52.5" y="33.0"/>
+
+<npc name="Wyvern" template="Wyvern" objective_id="Glenthor" x="53.0" y="29.0"/>
+
+<!-- continuing main passageaways -->
+
+<floorregion shape="rect" rect_x="37.0" rect_y="20.0" rect_w="2.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="36.0" rect_y="23.5" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="36.75" y="24.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="33.0" rect_y="22.0" rect_w="3.0" rect_h="4.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="37.0" y="20.0" />
+    <floorregion_point x="39.0" y="20.0" />
+    <floorregion_point x="44.0" y="15.0" />
+    <floorregion_point x="42.0" y="15.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="42.0" rect_y="13.0" rect_w="2.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="44.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="44.25" y="14.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="45.0" rect_y="12.0" rect_w="4.0" rect_h="4.0"/>
+<npc name="Orc" template="Orc" x="48.5" y="13.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="42.0" y="13.0" />
+    <floorregion_point x="44.0" y="13.0" />
+    <floorregion_point x="39.0" y="8.0" />
+    <floorregion_point x="37.0" y="8.0" />
+</floorregion>
+
+<!-- -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="24.0" y="35.0" />
+    <floorregion_point x="25.0" y="34.0" />
+    <floorregion_point x="20.0" y="29.0" />
+    <floorregion_point x="19.0" y="30.0" />
+</floorregion>
+
+<scenery name="Skulls" image_name="skulls" x="23.4" y="33.5" size="0.5" draw_type="background"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="30.0" />
+    <floorregion_point x="20.0" y="29.0" />
+    <floorregion_point x="20.0" y="20.0" />
+    <floorregion_point x="19.0" y="20.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="18.0" rect_y="25.5" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="18.75" y="26.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="14.0" rect_y="24.0" rect_w="4.0" rect_h="4.0"/>
+<npc name="Orc" template="Orc" x="15.0" y="24.5"/>
+<npc name="Orc" template="Orc" x="15.0" y="27.5"/>
+
+<floorregion shape="rect" rect_x="13.0" rect_y="25.5" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="13.75" y="26.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="9.0" rect_y="24.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Crate" image_name="crate" x="9.5" y="25.0" size="0.8" blocking="true">
+    <gold amount="11"/>
+    <weapon name="Long Sword" image_name="longsword" weight="10"
+        damageX="2" damageY="10" damageZ="2"
+        animation_name="longsword"
+        base_template="Long Sword" worth_bonus="150"
+        />
+</scenery>
+
+<!-- continuing main passageways -->
+
+<floorregion shape="rect" rect_x="14.0" rect_y="18.0" rect_w="12.0" rect_h="2.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="26.0" y="18.0" />
+    <floorregion_point x="26.0" y="20.0" />
+    <floorregion_point x="31.0" y="15.0" />
+    <floorregion_point x="31.0" y="13.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="31.0" rect_y="7.0" rect_w="1.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="32.0" rect_y="7.0" rect_w="7.0" rect_h="1.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="35.5" y="6.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_2" exit_location_x="20.0" exit_location_y="39.0"/>
+
+</location>
+
+<location name="level_2">
+
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
+
+<!--<player_start x="20.0" y="39.0"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
@@ -134,7 +313,7 @@
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="14.0" exit_location_y="13.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="35.5" exit_location_y="7.5"/>
 
 <!-- surrounding passages -->
 
@@ -145,6 +324,10 @@
 <floorregion shape="rect" rect_x="24.0" rect_y="19.0" rect_w="3.0" rect_h="8.0"/>
 
 <floorregion shape="rect" rect_x="13.0" rect_y="16.0" rect_w="14.0" rect_h="3.0"/>
+
+<scenery name="Knight Statue" image_name="knight_statue" x="20.0" y="30.0" size="1.0" blocking="true">
+An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
+</scenery>
 
 <!-- central section -->
 
