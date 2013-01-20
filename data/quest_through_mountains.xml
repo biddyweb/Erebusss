@@ -73,6 +73,45 @@
     <floorregion_point x="3.25" y="15.0" />
 </floorregion>
 
+<floorregion shape="polygon">
+    <floorregion_point x="3.25" y="15.0" />
+    <floorregion_point x="3.5" y="14.0" />
+    <floorregion_point x="3.5" y="10.0" />
+    <floorregion_point x="4.5" y="6.0" />
+    <floorregion_point x="4.0" y="4.0" />
+    <floorregion_point x="2.0" y="4.0" />
+    <floorregion_point x="1.5" y="6.0" />
+    <floorregion_point x="2.5" y="10.0" />
+    <floorregion_point x="2.5" y="15.0" />
+</floorregion>
+
+<npc name="Anmareth" animation_name="peasant_woman" static_image="true" x="2.8" y="6.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Dire Leaf"
+    interaction_xp="30"
+    interaction_reward_item="Potion of Healing"
+>
+<opening_initial>Hello there.
+</opening_initial>
+<opening_later>Hello.
+</opening_later>
+<opening_interaction_complete>
+Hello, thank you again for your help.
+</opening_interaction_complete>
+<talk question="What are you doing here?" while_not_done="true">
+I am an alchemist, in search of some rare ingredients. One in particular, a leaf from the dire plant, rumoured to grow within these caves. They have thin spikey leaves - you haven't seen any, have you?
+</talk>
+<talk question="I have the leaf that may be the one you want" objective="true">
+That's the one! Here, have one of my potions as a reward.
+</talk>
+</npc>
+
 <!-- east route -->
 
 <floorregion shape="polygon">
@@ -130,7 +169,7 @@
 <wall image_name="wall_rock"/>
 <background image_name="background_brown"/>
 
-<player_start x="21.0" y="39.0"/>
+<!--<player_start x="21.0" y="39.0"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
@@ -157,6 +196,10 @@
 <scenery name="Door" image_name="door_wood_n" x="30.0" y="27.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="22.5" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Barrel" image_name="barrel" x="31.5" y="23.0" size="0.8" blocking="true">
+    <item name="Dire Leaf" image_name="leaf_dire" icon_width="0.25" weight="0"/>
+</scenery>
 
 <floorregion shape="rect" rect_x="37.0" rect_y="28.0" rect_w="2.0" rect_h="2.0"/>
 
@@ -232,6 +275,11 @@ Thank you for helping me!
 <floorregion shape="rect" rect_x="45.0" rect_y="12.0" rect_w="4.0" rect_h="4.0"/>
 <npc name="Orc" template="Orc" x="48.5" y="13.0"/>
 
+<scenery name="Barrel" image_name="barrel" x="48.5" y="15.5" size="0.8" blocking="true">
+    <gold amount="3"/>
+    <item name="Dwarven Key" image_name="key" icon_width="0.5" weight="0"/>
+</scenery>
+
 <floorregion shape="polygon">
     <floorregion_point x="42.0" y="13.0" />
     <floorregion_point x="44.0" y="13.0" />
@@ -303,7 +351,7 @@ Thank you for helping me!
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="20.0" y="39.0"/>-->
+<player_start x="20.0" y="39.0"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
@@ -325,7 +373,7 @@ Thank you for helping me!
 
 <floorregion shape="rect" rect_x="13.0" rect_y="16.0" rect_w="14.0" rect_h="3.0"/>
 
-<scenery name="Knight Statue" image_name="knight_statue" x="20.0" y="30.0" size="1.0" blocking="true">
+<scenery name="Knight Statue" image_name="knight_statue" x="20.0" y="30.0" size="1.0" blocking="true" block_visibility="true">
 An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 </scenery>
 
@@ -340,6 +388,18 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 <floorregion shape="rect" rect_x="19.5" rect_y="19.0" rect_w="1.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="17.0" rect_y="20.0" rect_w="6.0" rect_h="6.0"/>
+
+<npc name="Goblin" template="Goblin" x="20.0" y="23.0"/>
+<npc name="Minotaur" template="Minotaur" x="21.0" y="24.0"/>
+<npc name="Orc" template="Orc" x="19.0" y="24.0"/>
+<npc name="Orc Archer" template="Orc" x="19.0" y="23.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc Archer" template="Orc" x="21.0" y="23.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
 
 </location>
 
