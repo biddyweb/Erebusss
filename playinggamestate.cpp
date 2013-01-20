@@ -6185,6 +6185,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
             fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
             fprintf(file, " shop=\"%s\"", character->getShop().c_str());
+            fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
             fprintf(file, ">\n");
             if( character->getTalkOpeningInitial().length() > 0 ) {
                 fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
@@ -6205,9 +6206,6 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, ">\n");
                 fprintf(file, "%s\n", talk_item->answer.c_str());
                 fprintf(file, "</talk>\n");
-            }
-            if( character->getObjectiveId().length() > 0 ) {
-                fprintf(file, "<objective_id>%s</opening_initial>", character->getObjectiveId().c_str());
             }
             for(map<string, int>::const_iterator iter2 = character->spellsBegin(); iter2 != character->spellsEnd(); ++iter2) {
                 string spell_name = iter2->first;
