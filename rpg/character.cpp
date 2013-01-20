@@ -1147,6 +1147,16 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
     if( this->interaction_xp > 0 ) {
         playing_gamestate->getPlayer()->addXP(playing_gamestate, this->interaction_xp);
     }
+    if( this->interaction_reward_item.length() > 0 ) {
+        try {
+            Item *item = playing_gamestate->cloneStandardItem(this->interaction_reward_item);
+            playing_gamestate->getPlayer()->addItem(item);
+        }
+        catch(const string &err) {
+            // catch it, as better than crashing at runtime if the data isn't correct
+            LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
+        }
+    }
     this->interaction_completed = true;
 }
 

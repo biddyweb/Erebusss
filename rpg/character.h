@@ -397,6 +397,7 @@ class Character {
     string interaction_type;
     string interaction_data;
     int interaction_xp;
+    string interaction_reward_item;
     bool interaction_completed;
     string talk_opening_initial;
     string talk_opening_later;
@@ -787,6 +788,12 @@ public:
     }
     void setInteractionXP(int interaction_xp) {
         this->interaction_xp = interaction_xp;
+    }
+    string getInteractionRewardItem() const {
+        return this->interaction_reward_item;
+    }
+    void setInteractionRewardItem(const string &interaction_reward_item) {
+        this->interaction_reward_item = interaction_reward_item;
     }
     bool isInteractionCompleted() const {
         return this->interaction_completed;

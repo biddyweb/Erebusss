@@ -3884,6 +3884,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
                     int interaction_xp = parseInt(interaction_xp_s.toString(), true);
                     npc->setInteractionXP(interaction_xp);
+                    QStringRef interaction_reward_item_s = reader.attributes().value("interaction_reward_item");
+                    npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
                     QStringRef shop_s = reader.attributes().value("shop");
                     if( shop_s.length() > 0 ) {
                         npc->setShop(shop_s.toString().toStdString());
@@ -6183,6 +6185,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
             fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
             fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
+            fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
             fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
             fprintf(file, " shop=\"%s\"", character->getShop().c_str());
             fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
