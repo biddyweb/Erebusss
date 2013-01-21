@@ -19,6 +19,8 @@
 
 <!--<player_start x="1.5" y="30.5"/>-->
 
+<wandering_monster template="Wyvern" time="180000" rest_chance="10"/>
+
 <floorregion shape="polygon">
     <floorregion_point x="1.0" y="31.0" />
     <floorregion_point x="2.0" y="31.0" />
@@ -170,6 +172,8 @@ That's the one! Here, have one of my potions as a reward.
 <background image_name="background_brown"/>
 
 <!--<player_start x="21.0" y="39.0"/>-->
+
+<wandering_monster template="Orc" time="120000" rest_chance="15"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
@@ -351,7 +355,9 @@ Thank you for helping me!
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="20.0" y="39.0"/>
+<!--<player_start x="20.0" y="39.0"/>-->
+
+<wandering_monster template="Orc" time="120000" rest_chance="15"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
@@ -373,9 +379,17 @@ Thank you for helping me!
 
 <floorregion shape="rect" rect_x="13.0" rect_y="16.0" rect_w="14.0" rect_h="3.0"/>
 
+<scenery name="Torch" image_name="torch" x="18.0" y="26.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="22.0" y="26.55" w="0.75" h="0.75"/>
+
 <scenery name="Knight Statue" image_name="knight_statue" x="20.0" y="30.0" size="1.0" blocking="true" block_visibility="true">
 An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 </scenery>
+
+<scenery name="Torch" image_name="torch" x="17.0" y="15.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="23.0" y="15.55" w="0.75" h="0.75"/>
 
 <!-- central section -->
 
@@ -389,8 +403,16 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 
 <floorregion shape="rect" rect_x="17.0" rect_y="20.0" rect_w="6.0" rect_h="6.0"/>
 
-<npc name="Goblin" template="Goblin" x="20.0" y="23.0"/>
-<npc name="Minotaur" template="Minotaur" x="21.0" y="24.0"/>
+<scenery name="Torch" image_name="torch" x="18.0" y="19.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="22.0" y="19.55" w="0.75" h="0.75"/>
+
+<npc name="Goblin Mage" template="Goblin Mage" x="20.0" y="23.0">
+    <spell name="Acid strike" count="4"/>
+</npc>
+<npc name="Minotaur" template="Minotaur" x="21.0" y="24.0">
+    <item template="Gold Gem"/>
+</npc>
 <npc name="Orc" template="Orc" x="19.0" y="24.0"/>
 <npc name="Orc Archer" template="Orc" x="19.0" y="23.0">
     <item template="Longbow"/>
@@ -400,6 +422,96 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
+
+<!-- west route -->
+
+<floorregion shape="rect" rect_x="5.0" rect_y="22.0" rect_w="8.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="6.0" rect_y="20.5" rect_w="1.0" rect_h="1.5"/>
+<scenery name="Door" image_name="door_wood_n" x="6.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<floorregion shape="rect" rect_x="4.0" rect_y="12.5" rect_w="5.0" rect_h="8.0"/>
+
+<scenery name="Table" image_name="table" x="5.0" y="13.5" size="0.8" blocking="true"/>
+
+<scenery name="Table" image_name="table" x="8.0" y="13.5" size="0.8" blocking="true"/>
+
+<scenery name="Tomb" image_name="tomb" x="6.5" y="17.0" size="1.0" blocking="true">
+    <trap type="acid" rating="12"/>
+</scenery>
+
+<item template="Arrows" x="8.0" y="17.5"/>
+
+<gold amount="4" x="5.0" y="17.5"/>
+
+<gold amount="7" x="5.5" y="15.5"/>
+
+<scenery name="Chest" image_name="chest" x="8.0" y="19.5" size="0.8" blocking="true">
+    <item template="Potion of Combat"/>
+    <gold amount="112"/>
+    <item name="Book" image_name="book" icon_width="0.25" weight="1">
+    </item>
+</scenery>
+
+<!--<scenery name="Crate" image_name="crate" x="5.0" y="19.5" size="0.8" blocking="true">
+    <armour name="Magical Plate Armour" image_name="metal_armour" weight="200"
+        min_strength="8" rating="7" magical="true"
+        base_template="Plate Armour" worth_bonus="200">
+This plate armour is blessed with ancient Dwarven magic, offering greater protection, though it is just as heavy.
+    </armour>
+</scenery>-->
+
+<scenery name="Crate" image_name="crate" x="5.0" y="19.5" size="0.8" blocking="true">
+    <gold amount="27"/>
+</scenery>
+
+<!-- east route -->
+
+<floorregion shape="rect" rect_x="27.0" rect_y="22.0" rect_w="8.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="33.0" rect_y="14.0" rect_w="2.0" rect_h="8.0"/>
+
+<npc name="Orc Archer" template="Orc" x="33.5" y="15.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc Archer" template="Orc" x="34.5" y="15.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+
+<npc name="Goblin" template="Goblin" x="33.5" y="16.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="34.0" y="13.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_3" exit_location_x="21.0" exit_location_y="39.0"/>
+
+</location>
+
+<location name="level_3">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="21.0" y="39.0"/>
+
+<wandering_monster template="Orc" time="120000" rest_chance="15"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="40.0" />
+    <floorregion_point x="21.0" y="40.0" />
+    <floorregion_point x="29.0" y="32.0" />
+    <floorregion_point x="27.0" y="30.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="34.0" exit_location_y="14.5"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="24.0" y="27.0" />
+    <floorregion_point x="29.0" y="32.0" />
+    <floorregion_point x="34.0" y="27.0" />
+    <floorregion_point x="29.0" y="22.0" />
+</floorregion>
 
 </location>
 
