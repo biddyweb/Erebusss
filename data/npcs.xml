@@ -78,6 +78,15 @@
     causes_terror="true" terror_effect="1"
 />
 
+<!--Weapon hardcoded as natural damage: Long Sword-->
+<npc name="Skeleton" animation_name="skeleton"
+    FP="10" BS="9" S="8" A="1" M="2" D="8" B="12" Sp="2.8"
+    natural_damageX="2" natural_damageY="10" natural_damageZ="0"
+    health_min="50" health_max="60" gold_min="0" gold_max="0"
+    xp_worth="60"
+    causes_terror="true" terror_effect="2"
+/>
+
 <!--Natural damage-->
 <npc name="Giant Spider" animation_name="spider"
     FP="8" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
