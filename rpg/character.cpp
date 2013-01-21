@@ -863,7 +863,8 @@ void Character::addItem(Item *item, bool auto_arm) {
         this->armShield( static_cast<Shield *>(item) );
     }
     if( auto_arm && this->current_armour == NULL && item->getType() == ITEMTYPE_ARMOUR ) {
-        // automatically wear aromur
+        // automatically wear armour
+        //qDebug("wear armour: %s , %s", this->name.c_str(), item->getName().c_str());
         this->wearArmour( static_cast<Armour *>(item) );
         if( this->tooWeakForArmour() ) {
             // too heavy to wear, need to disarm again!
@@ -1155,6 +1156,7 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
         catch(const string &err) {
             // catch it, as better than crashing at runtime if the data isn't correct
             LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
+            ASSERT_LOGGER(false);
         }
     }
     this->interaction_completed = true;
