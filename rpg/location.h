@@ -59,6 +59,7 @@ protected:
     bool locked_silent; // whether sample is played when trying to unlock
     string locked_text;
     bool locked_used_up;
+    bool key_always_needed;
     string unlock_item_name;
     string unlock_text;
     int unlock_xp;
@@ -191,6 +192,12 @@ public:
     }
     bool isLockedUsedUp() const {
         return this->locked_used_up;
+    }
+    void setKeyAlwaysNeeded(bool key_always_needed) {
+        this->key_always_needed = key_always_needed;
+    }
+    bool isKeyAlwaysNeeded() const {
+        return this->key_always_needed;
     }
     void setUnlockItemName(const string &unlock_item_name) {
         this->unlock_item_name = unlock_item_name;

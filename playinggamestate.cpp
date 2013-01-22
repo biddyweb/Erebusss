@@ -2783,7 +2783,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->setXP(70);*/
         // CHEAT, simulate start of quest 3:
-        /*player->addGold( 1241 );
+        /*for(int i=0;i<114;i++) {
+            player->addXP(this, 10);
+        }
+        player->addGold( 1241 );
         player->deleteItem("Leather Armour");
         player->deleteItem("Long Sword");
         player->armWeapon(NULL);
@@ -2793,9 +2796,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
         player->addItem(this->cloneStandardItem("Arrows"), true);
-        //player->setXP(1140);
-        for(int i=0;i<114;i++) {
-            player->addXP(this, 10);
+        {
+            Item *item = this->cloneStandardItem("Long Sword");
+            item->setMagical(true);
+            player->addItem(item, true);
         }*/
     }
 }
@@ -4128,6 +4132,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef locked_text_s = reader.attributes().value("locked_text");
                     QStringRef locked_used_up_s = reader.attributes().value("locked_used_up");
                     bool locked_used_up = parseBool(locked_used_up_s.toString(), true);
+                    QStringRef key_always_needed_s = reader.attributes().value("key_always_needed");
+                    bool key_always_needed = parseBool(key_always_needed_s.toString(), true);
                     QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
                     QStringRef unlock_text_s = reader.attributes().value("unlock_text");
                     QStringRef unlock_xp_s = reader.attributes().value("unlock_xp");
@@ -4303,6 +4309,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         scenery->setLockedText(locked_text_s.toString().toStdString());
                     }
                     scenery->setLockedUsedUp(locked_used_up);
+                    scenery->setKeyAlwaysNeeded(key_always_needed);
                     if( unlock_item_name_s.length() > 0 ) {
                         scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
                     }
@@ -5498,6 +5505,14 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
                         item = *iter;
                         //LOG("    compare to: %s\n", item->getKey().c_str());
+                        if( item->getType() == ITEMTYPE_WEAPON && player->getCurrentWeapon() != item )
+                            continue;
+                        else if( item->getType() == ITEMTYPE_ARMOUR && player->getCurrentArmour() != item )
+                            continue;
+                        else if( item->getType() == ITEMTYPE_SHIELD && player->getCurrentShield() != item )
+                            continue;
+                        else if( item->getType() == ITEMTYPE_RING && player->getCurrentRing() != item )
+                            continue;
                         if( item->getKey() == unlock_item_name ) {
                             is_locked = false;
                         }
@@ -5527,7 +5542,10 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         str << scenery->getUnlockText();
                     }
                     this->addTextEffect(str.str(), player->getPos(), 2000);
-                    scenery->setLocked(false);
+                    qDebug("isKeyAlwaysNeeded? %d", scenery->isKeyAlwaysNeeded());
+                    if( !scenery->isKeyAlwaysNeeded() ) {
+                        scenery->setLocked(false);
+                    }
                     qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
                     if( scenery->isLockedUsedUp() ) {
                         player->takeItem(item);
@@ -6273,6 +6291,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
             fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
             fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
+            fprintf(file, " key_always_needed=\"%s\"", scenery->isKeyAlwaysNeeded() ? "true": "false");
             fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
             fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
             fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
