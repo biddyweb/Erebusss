@@ -412,6 +412,9 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 </npc>
 <npc name="Minotaur" template="Minotaur" x="21.0" y="24.0">
     <item template="Gold Gem"/>
+    <ring name="Derrin's Ring" image_name="ring_gold" weight="0" magical="true" bonus_D="1"
+        base_template="Gold Ring" worth_bonus="250"
+        />
 </npc>
 <npc name="Orc" template="Orc" x="19.0" y="24.0"/>
 <npc name="Orc Archer" template="Orc" x="19.0" y="23.0">
@@ -428,7 +431,8 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 <floorregion shape="rect" rect_x="5.0" rect_y="22.0" rect_w="8.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="6.0" rect_y="20.5" rect_w="1.0" rect_h="1.5"/>
-<scenery name="Door" image_name="door_wood_n" x="6.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="6.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Dwarven Key"/>
 
 <floorregion shape="rect" rect_x="4.0" rect_y="12.5" rect_w="5.0" rect_h="8.0"/>
 
@@ -497,11 +501,6 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
 <scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="34.0" exit_location_y="14.5"/>
-
-<ring name="Derrin's Ring" image_name="ring_gold" weight="0" magical="true" bonus_D="1"
-    x="22.0" y="38.0"
-    base_template="Gold Ring" worth_bonus="250"
-    />
 
 <floorregion shape="polygon">
     <floorregion_point x="24.0" y="27.0" />
@@ -577,7 +576,7 @@ This grate seems stuck or locked, and you are unable to budge it. Peering down, 
 <npc name="Skeleton" template="Skeleton" x="20.0" y="21.0"/>
 
 <scenery name="Teleport" image_name="teleport" x="19.5" y="22.5" size="1.0" blocking="true" exit_location="level_4" exit_location_x="30.0" exit_location_y="39.0"
-    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!"/>
+    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!" key_always_needed="true"/>
 
 <!-- route to next level -->
 
@@ -662,9 +661,9 @@ This grate seems stuck or locked, and you are unable to budge it. Peering down, 
 </floorregion>
 
 <scenery name="Teleport" image_name="teleport" x="31.0" y="38.0" size="1.0" blocking="true" exit_location="level_3" exit_location_x="20.5" exit_location_y="21.5"
-    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!"/>
+    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!" key_always_needed="true"/>
 
-<armour name="Magical Plate Armour" image_name="metal_armour" x="29.0" y="38.0" weight="200"
+<armour name="Derrin's Armour" image_name="metal_armour" x="29.0" y="38.0" weight="200"
     min_strength="8" rating="7" magical="true"
     base_template="Plate Armour" worth_bonus="200">
 This plate armour is blessed with ancient Dwarven magic, offering greater protection, though it is just as heavy.
