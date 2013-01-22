@@ -387,7 +387,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <floorregion shape="rect" rect_x="11.0" rect_y="1.0" rect_w="3.0" rect_h="6.0"/>
 <scenery name="Door" image_name="door_wood_n" x="12.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_2" exit_location_x="12.5" exit_location_y="20.0"/>
 
-<scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.0" blocking="true"  interact_type="INTERACT_TYPE_SHRINE"/>
+<scenery name="Shrine" image_name="shrine" x="12.5" y="5.0" size="1.0" blocking="true" interact_type="INTERACT_TYPE_SHRINE"/>
 
 <!--study-->
 
