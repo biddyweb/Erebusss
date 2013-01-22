@@ -453,14 +453,6 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
     </item>
 </scenery>
 
-<!--<scenery name="Crate" image_name="crate" x="5.0" y="19.5" size="0.8" blocking="true">
-    <armour name="Magical Plate Armour" image_name="metal_armour" weight="200"
-        min_strength="8" rating="7" magical="true"
-        base_template="Plate Armour" worth_bonus="200">
-This plate armour is blessed with ancient Dwarven magic, offering greater protection, though it is just as heavy.
-    </armour>
-</scenery>-->
-
 <scenery name="Crate" image_name="crate" x="5.0" y="19.5" size="0.8" blocking="true">
     <gold amount="27"/>
 </scenery>
@@ -500,11 +492,16 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="19.0" y="40.0" />
     <floorregion_point x="21.0" y="40.0" />
     <floorregion_point x="29.0" y="32.0" />
-    <floorregion_point x="27.0" y="30.0" />
+    <floorregion_point x="28.0" y="31.0" />
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
 <scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="34.0" exit_location_y="14.5"/>
+
+<ring name="Derrin's Ring" image_name="ring_gold" weight="0" magical="true" bonus_D="1"
+    x="22.0" y="38.0"
+    base_template="Gold Ring" worth_bonus="250"
+    />
 
 <floorregion shape="polygon">
     <floorregion_point x="24.0" y="27.0" />
@@ -560,6 +557,122 @@ This shrine is marked with mysterious runes.
 <scenery name="Trapdoor" image_name="grate" x="50.0" y="29.0" w="0.5" h="0.5" draw_type="background">
 This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.
 </scenery>
+
+<!-- route to teleporter -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="21.0" y="18.0" />
+    <floorregion_point x="20.0" y="19.0" />
+    <floorregion_point x="26.0" y="25.0" />
+    <floorregion_point x="27.0" y="24.0" />
+</floorregion>
+
+<floorregion shape="polygon">
+    <floorregion_point x="20.0" y="19.0" />
+    <floorregion_point x="16.0" y="23.0" />
+    <floorregion_point x="19.0" y="26.0" />
+    <floorregion_point x="23.0" y="22.0" />
+</floorregion>
+
+<npc name="Skeleton" template="Skeleton" x="20.0" y="21.0"/>
+
+<scenery name="Teleport" image_name="teleport" x="19.5" y="22.5" size="1.0" blocking="true" exit_location="level_4" exit_location_x="30.0" exit_location_y="39.0"
+    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!"/>
+
+<!-- route to next level -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="31.0" y="24.0" />
+    <floorregion_point x="32.0" y="25.0" />
+    <floorregion_point x="38.0" y="19.0" />
+    <floorregion_point x="37.0" y="18.0" />
+</floorregion>
+
+<floorregion shape="polygon">
+    <floorregion_point x="37.0" y="18.0" />
+    <floorregion_point x="32.0" y="13.0" />
+    <floorregion_point x="31.0" y="13.0" />
+    <floorregion_point x="31.0" y="14.0" />
+    <floorregion_point x="36.0" y="19.0" />
+</floorregion>
+
+<npc name="Shadow" template="Shadow" x="34.0" y="16.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="31.5" y="12.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_4" exit_location_x="20.0" exit_location_y="40.5"/>
+
+</location>
+
+<location name="level_4" type="outdoors">
+
+<floor image_name="floor_paved"/>
+<dropwall image_name="dropwall"/>
+<background image_name="background_black"/>
+
+<!--<player_start x="20.0" y="40.5"/>-->
+
+<npc name="Wyvern" template="Wyvern" x="30.0" y="40.0"/>
+
+<npc name="Wyvern" template="Wyvern" x="20.0" y="30.0"/>
+
+<npc name="Wyvern" template="Wyvern" x="30.0" y="30.0"/>
+
+<npc name="Wyvern" template="Wyvern" x="35.0" y="30.0"/>
+
+<npc name="Wyvern" template="Wyvern" x="30.0" y="20.0"/>
+
+<npc name="Wyvern" template="Wyvern" x="35.0" y="20.0"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="19.0" y="40.0" />
+    <floorregion_point x="21.0" y="40.0" />
+    <floorregion_point x="29.0" y="32.0" />
+    <floorregion_point x="28.0" y="31.0" />
+</floorregion>
+
+<floorregion shape="rect" rect_x="19.0" rect_y="40.0" rect_w="2.0" rect_h="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="41.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="31.5" exit_location_y="13.5"/>
+
+<floorregion shape="polygon">
+    <floorregion_point x="29.0" y="32.0" />
+    <floorregion_point x="30.0" y="31.0" />
+    <floorregion_point x="22.0" y="23.0" />
+    <floorregion_point x="21.0" y="24.0" />
+</floorregion>
+
+<floorregion shape="polygon">
+    <floorregion_point x="22.0" y="23.0" />
+    <floorregion_point x="23.0" y="24.0" />
+    <floorregion_point x="31.0" y="16.0" />
+    <floorregion_point x="30.0" y="15.0" />
+</floorregion>
+
+<npc name="Orc Archer" template="Orc" x="26.5" y="19.5">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc" template="Orc" x="25.5" y="20.5"/>
+
+<!-- teleporter platform -->
+
+<floorregion shape="polygon">
+    <floorregion_point x="28.0" y="38.0" />
+    <floorregion_point x="31.0" y="41.0" />
+    <floorregion_point x="34.0" y="38.0" />
+    <floorregion_point x="31.0" y="35.0" />
+</floorregion>
+
+<scenery name="Teleport" image_name="teleport" x="31.0" y="38.0" size="1.0" blocking="true" exit_location="level_3" exit_location_x="20.5" exit_location_y="21.5"
+    locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!"/>
+
+<armour name="Magical Plate Armour" image_name="metal_armour" x="29.0" y="38.0" weight="200"
+    min_strength="8" rating="7" magical="true"
+    base_template="Plate Armour" worth_bonus="200">
+This plate armour is blessed with ancient Dwarven magic, offering greater protection, though it is just as heavy.
+</armour>
+
+<gold amount="20" x="31.0" y="37.0"/>
+
+<gold amount="25" x="32.0" y="38.0"/>
 
 </location>
 
