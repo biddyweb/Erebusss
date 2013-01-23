@@ -4651,6 +4651,10 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     this->characterTurn(character, object);
     scene->addItem(object);
     object->setPos(character->getX(), character->getY());
+    if( character != player ) {
+        // default to invisible for NPCs, until set by testFogOfWar()
+        object->setVisible(false);
+    }
     int character_size = std::max(object->getWidth(), object->getHeight());
     //const int off_x = 64;
     const int off_x = 64 - 32;
