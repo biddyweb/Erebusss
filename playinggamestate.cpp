@@ -4903,19 +4903,7 @@ void PlayingGamestate::testFogOfWar() {
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         if( character != this->player ) {
-            bool is_visible = false;
-            float dist = ( character->getPos() - player->getPos() ).magnitude();
-            if( dist <= hit_range_c ) {
-                // assume always visible
-                is_visible = true;
-            }
-            else if( dist <= npc_visibility_c ) {
-                // check line of sight
-                Vector2D hit_pos;
-                if( !c_location->intersectSweptSquareWithBoundaries(&hit_pos, false, player->getPos(), character->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false) ) {
-                    is_visible = true;
-                }
-            }
+            bool is_visible = c_location->visibilityTest(player->getPos(), character->getPos());
             character->setVisible(is_visible);
             AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
             object->setVisible(is_visible);
@@ -5009,7 +4997,6 @@ void PlayingGamestate::update() {
                     Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                     enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
-                    qApp->beep();
                 }
             }
         }

@@ -607,7 +607,9 @@ This grate seems stuck or locked, and you are unable to budge it. Peering down, 
 <dropwall image_name="dropwall"/>
 <background image_name="background_black"/>
 
-<!--<player_start x="20.0" y="40.5"/>-->
+<wandering_monster template="Wyvern" time="60000" rest_chance="30"/>
+
+<player_start x="20.0" y="40.5"/>
 
 <npc name="Wyvern" template="Wyvern" x="30.0" y="40.0"/>
 
@@ -762,7 +764,7 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="36.0" y="5.0" />
 </floorregion>
 
-<player_start x="37.0" y="5.5"/>
+<!--<player_start x="37.0" y="5.5"/>-->
 
 <scenery name="North Exit" image_name="door_wood_n" x="37.0" y="4.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 

@@ -1779,6 +1779,8 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <dropwall image_name="dropwall"/>
 <background image_name="background_black"/>
 
+<wandering_monster template="Wyvern" time="120000" rest_chance="25"/>
+
 <!--<player_start x="20.0" y="20.0"/>-->
 
 <floorregion shape="rect" rect_x="18.0" rect_y="18.0" rect_w="4.0" rect_h="4.0"/>

@@ -1291,7 +1291,9 @@ bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) c
             continue;
         }
         Vector2D hit_pos;
-        bool is_visible = !this->intersectSweptSquareWithBoundaries(&hit_pos, false, from, path_way_point.point, 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false);
+        //bool is_visible = !this->intersectSweptSquareWithBoundaries(&hit_pos, false, from, path_way_point.point, 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false);
+        // remember that visibility test also limits by a range of npc_visibility_c
+        bool is_visible = this->visibilityTest(from, path_way_point.point);
         if( is_visible == visible ) {
             candidates.push_back(path_way_point.point);
         }
@@ -1304,59 +1306,6 @@ bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) c
     *result = candidates.at(r);
     return true;
 }
-
-/*bool Location::intersectSweptSquareWithBoundariesAndNPCs(const Character *character, Vector2D *hit_pos, Vector2D start, Vector2D end, float width) const {
-    bool done = false;
-    bool hit = false;
-    float hit_dist = 0.0f;
-
-    Vector2D dv = end - start;
-    float dv_length = dv.magnitude();
-    if( dv_length == 0.0f ) {
-        LOG("Location::intersectSweptSquareWithBoundaries received equal start and end\n");
-        throw string("Location::intersectSweptSquareWithBoundaries received equal start and end");
-    }
-    dv /= dv_length;
-    Vector2D du = dv.perpendicularYToX();
-    //qDebug("du = %f, %f", du.x, du.y);
-    //qDebug("dv = %f, %f", dv.x, dv.y);
-    //qDebug("dv_length: %f", dv_length);
-    float xmin = - width;
-    float xmax = width;
-    //float ymin = - width;
-    float ymin = 0.0f;
-    float ymax = dv_length + width;
-
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, start, end, du, dv, width, xmin, xmax, ymin, ymax, false, NULL);
-
-    for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !done; ++iter) {
-        const Character *npc = *iter;
-        //if( character == playing_gamestate->getPlayer() ) {
-        if( npc == character ) {
-            continue;
-        }
-        float npc_width = npc_radius_c;
-        Vector2D npc_pos = npc->getPos();
-        //qDebug("npc at %f, %f", npc_pos.x, npc_pos.y);
-        // clockwise, as "inside" should be on the left
-        Vector2D p0 = npc_pos; p0.x -= npc_width; p0.y -= npc_width;
-        Vector2D p1 = npc_pos; p1.x += npc_width; p1.y -= npc_width;
-        Vector2D p2 = npc_pos; p2.x += npc_width; p2.y += npc_width;
-        Vector2D p3 = npc_pos; p3.x -= npc_width; p3.y += npc_width;
-        intersectSweptSquareWithBoundarySeg(&hit, &hit_dist, &done, p0, p1, start, du, dv, width, xmin, xmax, ymin, ymax);
-        if( !done )
-            intersectSweptSquareWithBoundarySeg(&hit, &hit_dist, &done, p1, p2, start, du, dv, width, xmin, xmax, ymin, ymax);
-        if( !done )
-            intersectSweptSquareWithBoundarySeg(&hit, &hit_dist, &done, p2, p3, start, du, dv, width, xmin, xmax, ymin, ymax);
-        if( !done )
-            intersectSweptSquareWithBoundarySeg(&hit, &hit_dist, &done, p3, p0, start, du, dv, width, xmin, xmax, ymin, ymax);
-    }
-
-    if( hit ) {
-        *hit_pos = start + dv * hit_dist;
-    }
-    return hit;
-}*/
 
 bool Location::collideWithTransient(const Character *character, Vector2D pos) const {
     // does collision detection with entities like NPCs, that do not have boundaries due to not having a permanent position (and hence can't be avoided in pathfinding)
@@ -1374,6 +1323,23 @@ bool Location::collideWithTransient(const Character *character, Vector2D pos) co
         }
     }
     return hit;
+}
+
+bool Location::visibilityTest(Vector2D src, Vector2D dest) const {
+    bool is_visible = false;
+    float dist = ( dest - src ).magnitude();
+    if( dist <= hit_range_c ) {
+        // assume always visible
+        is_visible = true;
+    }
+    else if( dist <= npc_visibility_c ) {
+        // check line of sight
+        Vector2D hit_pos;
+        if( !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, false) ) {
+            is_visible = true;
+        }
+    }
+    return is_visible;
 }
 
 /*bool Location::pointInside(Vector2D point) const {

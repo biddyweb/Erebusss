@@ -359,18 +359,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 }
                 bool can_hit = false;
                 if( is_ranged ) {
-                    if( dist <= npc_visibility_c ) {
-                        // check line of sight
-                        Vector2D hit_pos;
-                        if( !location->intersectSweptSquareWithBoundaries(&hit_pos, false, this->pos, target_npc->getPos(), 0.0f, Location::INTERSECTTYPE_VISIBILITY, NULL, this->can_fly) ) {
-                            can_hit = true;
-                        }
-                        else {
-                            //LOG("Character %s can't get line of sight to fire\n", this->getName().c_str());
-                            //LOG("hit from: %f, %f\n", this->pos.x, this->pos.y);
-                            //LOG("hit to: %f, %f\n", target_npc->getPos().x, target_npc->getPos().y);
-                            //LOG("hit at: %f, %f\n", hit_pos.x, hit_pos.y);
-                        }
+                    if( location->visibilityTest(this->pos, target_npc->getPos()) ) {
+                        can_hit = true;
                     }
                 }
                 else {
