@@ -736,6 +736,29 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += "<b>Level:</b> " + QString::number(player->getLevel()) + "<br/>";
     html += "<b>XP:</b> " + QString::number(player->getXP()) + " (" + QString::number(player->getXPForNextLevel()) + " required for next level.)<br/>";
 
+    {
+        stringstream str;
+        int damageX = 0, damageY = 0, damageZ = 0;
+        if( player->getCurrentWeapon() == NULL ) {
+            player->getNaturalDamage(&damageX, &damageY, &damageZ);
+            str << "<b>Current Weapon:</b> None ";
+        }
+        else {
+            const Weapon *weapon = player->getCurrentWeapon();
+            weapon->getDamage(&damageX, &damageY, &damageZ);
+            str << "<b>Current Weapon:</b> " << weapon->getName() << " ";
+        }
+        if( damageZ != 0 ) {
+            char sign = damageZ > 0 ? '+' : '-';
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << sign << abs(damageZ) << "<br/>";
+        }
+        else {
+            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
+        }
+        html += str.str().c_str();
+    }
+    html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/>";
+
     html += "</body></html>";
 
     QWebView *label = new QWebView();

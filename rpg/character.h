@@ -638,6 +638,7 @@ public:
     bool canFly() const {
         return this->can_fly;
     }
+    int getArmourRating(bool armour, bool shield) const;
 
     const Weapon *getCurrentWeapon() const {
         return this->current_weapon;

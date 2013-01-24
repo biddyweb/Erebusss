@@ -710,6 +710,15 @@ int Character::getNaturalDamage() const {
     return roll;
 }
 
+int Character::getArmourRating(bool armour, bool shield) const {
+    int armour_value = 0;
+    if( armour && this->getCurrentArmour() != NULL )
+        armour_value += this->getCurrentArmour()->getRating();
+    if( shield && this->getCurrentShield() != NULL )
+        armour_value++;
+    return armour_value;
+}
+
 void Character::increaseHealth(int increase) {
     if( this->is_dead ) {
         LOG("tried to increaseHealth of %s by %d - already dead!\n", this->getName().c_str(), increase);
@@ -733,11 +742,7 @@ bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease
         LOG("decreaseHealth: received negative decrease: %d\n", decrease);
         ASSERT_LOGGER( decrease >= 0 );
     }
-    int armour_value = 0;
-    if( armour && this->getCurrentArmour() != NULL )
-        armour_value += this->getCurrentArmour()->getRating();
-    if( shield && this->getCurrentShield() != NULL )
-        armour_value++;
+    int armour_value = this->getArmourRating(armour, shield);
     decrease -= armour_value;
     decrease = std::max(decrease, 0);
     this->health -= decrease;
