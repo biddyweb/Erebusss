@@ -1655,6 +1655,10 @@ bool QuestObjective::testIfComplete(const PlayingGamestate *playing_gamestate, c
             complete = true;
         }
     }
+    else if( type == "find_exit" ) {
+        // always set externally
+        complete = quest->isCompleted();
+    }
     else {
         LOG("unknown type: %s\n", type.c_str());
         ASSERT_LOGGER(false);
@@ -1675,6 +1679,8 @@ void QuestObjective::completeQuest(PlayingGamestate *playing_gamestate) const {
             player->takeItem(item);
             delete item;
         }
+    }
+    else if( type == "find_exit" ) {
     }
     else {
         LOG("unknown type: %s\n", type.c_str());

@@ -5603,6 +5603,10 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         this->playSound("door");
                     }
                     this->closeSubWindow(); // just in case
+                    if( this->quest->getQuestObjective() != NULL && this->quest->getQuestObjective()->getType() == "find_exit" && this->quest->getQuestObjective()->getArg1() == scenery->getName() ) {
+                        this->quest->setCompleted(true);
+                    }
+
                     this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
                     if( this->getQuest()->isCompleted() ) {
                         this->getQuest()->getQuestObjective()->completeQuest(this);
