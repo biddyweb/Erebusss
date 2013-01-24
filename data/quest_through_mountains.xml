@@ -222,7 +222,7 @@ That's the one! Here, have one of my potions as a reward.
 </opening_later>
 <opening_interaction_complete>Hello. Thank you again for slaying those Wyvern!
 </opening_interaction_complete>
-<talk question="How can I help you?" while_not_done="true">I am an archeologist exploring for ancient Dwarven artefacts. I want to explore the cave to the east, but unfortunately it is full of these dreadful and hostile winged creatures. If someone could slay them, it would be of great help to me.
+<talk question="How can I help you?" while_not_done="true">I am an archaeologist exploring for ancient Dwarven artefacts. I want to explore the cave to the east, but unfortunately it is full of these dreadful and hostile winged creatures. If someone could slay them, it would be of great help to me.
 </talk>
 <talk question="I have killed the Wyvern for you" objective="true">
 Thank you for helping me!
