@@ -729,7 +729,7 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="22.0" y="3.0" />
 </floorregion>
 
-<!-- passage with mage -->
+<!-- passage with wizard -->
 
 <floorregion shape="polygon">
     <floorregion_point x="16.0" y="11.0" />
@@ -737,6 +737,14 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="19.0" y="16.0" />
     <floorregion_point x="20.0" y="15.0" />
 </floorregion>
+
+<npc name="Wizard" animation_name="wizard" static_image="true" x="19.0" y="15.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Magic Shop"/>
 
 <!-- -->
 
