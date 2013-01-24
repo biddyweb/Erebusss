@@ -4793,12 +4793,15 @@ void PlayingGamestate::clickedRest() {
         if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance() > 0 ) {
             if( rand() % 100 < c_location->getWanderingMonsterRestChance() ) {
                 Vector2D free_pvec;
-                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), true) ) {
+                Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), true, enemy->canFly()) ) {
                     rest_ok = false;
                     this->addTextEffect("You are disturbed by a\nwandering monster!", player->getPos(), 2000);
-                    Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                     enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                }
+                else {
+                    delete enemy;
                 }
             }
         }
@@ -4992,11 +4995,14 @@ void PlayingGamestate::update() {
             //qDebug("prob: %d vs %d (update frame time %d, rate %d)", roll, prob, complex_time_ms, c_location->getWanderingMonsterTimeMS());
             if( roll < prob ) {
                 Vector2D free_pvec;
-                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), false) ) {
+                Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
+                if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), false, enemy->canFly()) ) {
                     qDebug("spawn wandering monster at %f, %f", free_pvec.x, free_pvec.y);
-                    Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                     enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
+                }
+                else {
+                    delete enemy;
                 }
             }
         }

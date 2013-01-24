@@ -234,7 +234,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
         if( this->interact_state == 0 ) {
             Vector2D free_pvec;
-            if( this->location->findFreeWayPoint(&free_pvec, playing_gamestate->getPlayer()->getPos(), true) ) {
+            if( this->location->findFreeWayPoint(&free_pvec, playing_gamestate->getPlayer()->getPos(), true, false) ) {
                 int roll = rollDice(1, 3, 0);
                 LOG("bell: roll a %d\n", roll);
                 this->interact_state = 1;
@@ -1283,7 +1283,7 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
     return pos;
 }
 
-bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) const {
+bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible, bool can_fly) const {
     vector<Vector2D> candidates;
     for(vector<PathWayPoint>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
         const PathWayPoint path_way_point = *iter;
@@ -1295,7 +1295,11 @@ bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible) c
         // remember that visibility test also limits by a range of npc_visibility_c
         bool is_visible = this->visibilityTest(from, path_way_point.point);
         if( is_visible == visible ) {
-            candidates.push_back(path_way_point.point);
+            // test we can actually get to the "from" position from this way point (avoids problem of wandering monsters appearing trapped behind scenery etc)
+            vector<Vector2D> new_path = this->calculatePathTo(path_way_point.point, from, NULL, can_fly);
+            if( new_path.size() > 0 ) {
+                candidates.push_back(path_way_point.point);
+            }
         }
     }
 
