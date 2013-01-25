@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include <QObject>
+#include <QKeyEvent>
 
 class Gamestate : public QObject {
 public:
@@ -17,5 +18,7 @@ public:
     }
     /*virtual void mouseClick(int m_x, int m_y) {
     }*/
+    virtual void keyPress(QKeyEvent *key_event) {
+    }
 };
 

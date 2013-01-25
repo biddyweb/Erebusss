@@ -122,3 +122,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         event->accept();
     }
 }
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+    qDebug("mainwinndow key press: %d", event->key());
+    if( game_g != NULL && game_g->getScreen() != NULL ) {
+        game_g->keyPress(event);
+    }
+}

@@ -2050,11 +2050,12 @@ void SaveGameWindow::clickedSaveNew() {
     playing_gamestate->closeAllSubWindows();
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL),
-    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0)
+    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -2791,39 +2792,44 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type) :
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false, true);
 
-    if( !is_savegame ) {
+    if( !is_savegame && this->cheat_mode ) {
+        this->c_quest_indx = cheat_start_level % this->quest_list.size();
         //this->player->initialiseHealth(600); // CHEAT
         //player->addGold( 1000 ); // CHEAT
-        // CHEAT, simulate start of quest 2:
-        /*player->addGold( 166 );
-        player->deleteItem("Leather Armour");
-        player->addItem(this->cloneStandardItem("Long Sword"), true);
-        player->addItem(this->cloneStandardItem("Shield"), true);
-        player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
-        player->addItem(this->cloneStandardItem("Longbow"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->setXP(70);*/
-        // CHEAT, simulate start of quest 3:
-        /*for(int i=0;i<114;i++) {
-            player->addXP(this, 10);
+        if( this->c_quest_indx == 1 ) {
+            // CHEAT, simulate start of quest 2:
+            /*player->addGold( 166 );
+            player->deleteItem("Leather Armour");
+            player->addItem(this->cloneStandardItem("Long Sword"), true);
+            player->addItem(this->cloneStandardItem("Shield"), true);
+            player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
+            player->addItem(this->cloneStandardItem("Longbow"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->setXP(70);*/
         }
-        player->addGold( 1241 );
-        player->deleteItem("Leather Armour");
-        player->deleteItem("Long Sword");
-        player->armWeapon(NULL);
-        player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
-        player->addItem(this->cloneStandardItem("Plate Armour"), true);
-        player->addItem(this->cloneStandardItem("Longbow"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        player->addItem(this->cloneStandardItem("Arrows"), true);
-        {
-            Item *item = this->cloneStandardItem("Long Sword");
-            item->setMagical(true);
-            player->addItem(item, true);
-        }*/
+        else if( this->c_quest_indx == 2 ) {
+            // CHEAT, simulate start of quest 3:
+            for(int i=0;i<114;i++) {
+                player->addXP(this, 10);
+            }
+            player->addGold( 1241 );
+            player->deleteItem("Leather Armour");
+            player->deleteItem("Long Sword");
+            player->armWeapon(NULL);
+            player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
+            player->addItem(this->cloneStandardItem("Plate Armour"), true);
+            player->addItem(this->cloneStandardItem("Longbow"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            {
+                Item *item = this->cloneStandardItem("Long Sword");
+                item->setMagical(true);
+                player->addItem(item, true);
+            }
+        }
     }
 }
 

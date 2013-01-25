@@ -25,6 +25,9 @@ class OptionsGamestate : public Gamestate {
     QCheckBox *soundCheck;
     QCheckBox *lightingCheck;
 
+    bool cheat_mode;
+    int cheat_start_level;
+
 /*#ifndef Q_OS_ANDROID
     Sound *music;
 #endif*/
@@ -51,4 +54,5 @@ public:
     virtual void quitGame();
     virtual void update() {
     }
+    virtual void keyPress(QKeyEvent *key_event);
 };

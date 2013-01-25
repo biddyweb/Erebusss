@@ -27,6 +27,7 @@ public:
 
     void showExpanded(bool fullscreen);
 
+    virtual void keyPressEvent(QKeyEvent *event);
 /*public slots:
     void updateScene();*/
 };

@@ -13,7 +13,8 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL)
+    main_stacked_widget(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
+    cheat_mode(false), cheat_start_level(0)
 {
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
@@ -167,6 +168,20 @@ void OptionsGamestate::quitGame() {
     qApp->quit();
 }
 
+void OptionsGamestate::keyPress(QKeyEvent *key_event) {
+    if( key_event->key() == Qt::Key_F12 ) {
+        qApp->beep();
+        if( !cheat_mode ) {
+            cheat_mode = true;
+            LOG("enabled cheat mode\n");
+        }
+        else {
+            cheat_start_level++;
+            LOG("set cheat start level to %d\n", cheat_start_level);
+        }
+    }
+}
+
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
     /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
@@ -260,7 +275,7 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
-    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex());
+    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }
 

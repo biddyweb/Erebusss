@@ -397,6 +397,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     int time_last_complex_update_ms; // see update() for details
 
+    bool cheat_mode;
+
     void parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key);
     void parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key);
     Item *parseXMLItem(QXmlStreamReader &reader);
@@ -437,7 +439,7 @@ private slots:
     void playBackgroundMusic();
 
 public:
-    PlayingGamestate(bool is_savegame, size_t player_type);
+    PlayingGamestate(bool is_savegame, size_t player_type, bool cheat_mode, int cheat_start_level);
     virtual ~PlayingGamestate();
 
     float getDifficultyModifier() const;

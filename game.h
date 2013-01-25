@@ -310,8 +310,10 @@ public:
 class StartGameMessage : public GameMessage {
     Difficulty difficulty;
     size_t player_type;
+    bool cheat_mode;
+    int cheat_start_level;
 public:
-    StartGameMessage(Difficulty difficulty, size_t player_type) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty), player_type(player_type) {
+    StartGameMessage(Difficulty difficulty, size_t player_type, bool cheat_mode, int cheat_start_level) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty), player_type(player_type), cheat_mode(cheat_mode), cheat_start_level(cheat_start_level) {
     }
 
     Difficulty getDifficulty() const {
@@ -319,6 +321,12 @@ public:
     }
     size_t getPlayerType() const {
         return this->player_type;
+    }
+    bool getCheatMode() const {
+        return this->cheat_mode;
+    }
+    int getCheatStartLevel() const {
+        return this->cheat_start_level;
     }
 };
 
@@ -416,6 +424,7 @@ public:
     void runTests();
 
     void activate(bool active);
+    void keyPress(QKeyEvent *key_event);
     Gamestate *getGamestate() const {
         return this->gamestate;
     }

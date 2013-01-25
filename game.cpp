@@ -1112,7 +1112,7 @@ void Game::handleMessages() {
                 StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType());
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getCheatMode(), start_message->getCheatStartLevel());
                 gamestate = playing_gamestate;
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
@@ -1125,7 +1125,7 @@ void Game::handleMessages() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, false, 0);
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
@@ -1457,5 +1457,11 @@ void Game::activate(bool active) {
     }
     if( this->gamestate != NULL ) {
         this->gamestate->activate(active);
+    }
+}
+
+void Game::keyPress(QKeyEvent *key_event) {
+    if( this->gamestate != NULL ) {
+        this->gamestate->keyPress(key_event);
     }
 }
