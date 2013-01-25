@@ -175,10 +175,8 @@ void OptionsGamestate::keyPress(QKeyEvent *key_event) {
             cheat_mode = true;
             LOG("enabled cheat mode\n");
         }
-        else {
-            cheat_start_level++;
-            LOG("set cheat start level to %d\n", cheat_start_level);
-        }
+        cheat_start_level++;
+        LOG("set cheat start level to %d\n", cheat_start_level);
     }
 }
 

@@ -2798,7 +2798,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
         //player->addGold( 1000 ); // CHEAT
         if( this->c_quest_indx == 1 ) {
             // CHEAT, simulate start of quest 2:
-            /*player->addGold( 166 );
+            player->addGold( 166 );
             player->deleteItem("Leather Armour");
             player->addItem(this->cloneStandardItem("Long Sword"), true);
             player->addItem(this->cloneStandardItem("Shield"), true);
@@ -2807,7 +2807,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
             player->addItem(this->cloneStandardItem("Arrows"), true);
             player->addItem(this->cloneStandardItem("Arrows"), true);
             player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->setXP(70);*/
+            player->setXP(70);
         }
         else if( this->c_quest_indx == 2 ) {
             // CHEAT, simulate start of quest 3:
