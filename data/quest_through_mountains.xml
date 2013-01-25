@@ -15,7 +15,7 @@
 <wall image_name="wall_rock"/>
 <background image_name="background_brown"/>
 
-<!--<player_start x="1.5" y="30.5"/>-->
+<player_start x="1.5" y="30.5"/>
 
 <wandering_monster template="Wyvern" time="180000" rest_chance="10"/>
 
@@ -693,7 +693,7 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
 <wall image_name="wall_rock"/>
 <background image_name="background_brown"/>
 
-<player_start x="21.0" y="39.0"/>
+<!--<player_start x="21.0" y="39.0"/>-->
 
 <wandering_monster template="Orc" time="60000" rest_chance="20"/>
 
@@ -706,6 +706,10 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="37.0" y="24.0" />
     <floorregion_point x="36.0" y="23.0" />
 </floorregion>
+
+<trap x="26.5" y="30.5" w="2.0" h="2.0" type="arrow" difficulty="3" rating="3"/>
+
+<trap x="30.5" y="26.5" w="2.0" h="2.0" type="arrow" difficulty="3" rating="3"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="20.0" y="23.0" />
@@ -738,6 +742,8 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <item template="Chain Mail Armour"/>
 </npc>
 
+<trap x="19.5" y="23.5" w="2.0" h="2.0" type="darts" rating="3"/>
+
 <!-- -->
 
 <floorregion shape="polygon">
@@ -750,6 +756,8 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
 <npc name="Orc Champion" template="Orc Champion" x="12.5" y="13.5">
     <item template="Chain Mail Armour"/>
 </npc>
+
+<trap x="10.5" y="13.5" w="2.0" h="2.0" type="mantrap" difficulty="3" rating="4"/>
 
 <!-- passage with wizard -->
 
