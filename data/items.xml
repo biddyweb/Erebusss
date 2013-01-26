@@ -58,29 +58,29 @@ Plate armour provides excellent protection, but it is also heavy to carry and we
 
 <ring name="Gold Ring" image_name="ring_gold" weight="0"/>
 
-<item name="Potion of Healing" image_name="potion_green" weight="1"
+<item name="Potion of Healing" image_name="potion_green" weight="2"
     rating="4" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink">
 This potion will heal some or all of your injuries.
 </item>
 
-<item name="Potion of Combat" image_name="potion_red" weight="1"
+<item name="Potion of Combat" image_name="potion_red" weight="2"
     arg1_s="FP" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
-This potion will grant the drinker improved fighting prowess for a limted time.
+This potion will grant the drinker improved fighting prowess for a limited time.
 </item>
 
-<item name="Potion of Archery" image_name="potion_green" weight="1"
+<item name="Potion of Archery" image_name="potion_green" weight="2"
     arg1_s="BS" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
-This potion will grant the drinker an improved ability with bows for a limted time.
+This potion will grant the drinker an improved ability with bows for a limited time.
 </item>
 
-<item name="Potion of Strength" image_name="potion_red" weight="1"
+<item name="Potion of Strength" image_name="potion_red" weight="2"
     arg1_s="S" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
-This potion will grant the drinker improved strength for a limted time.
+This potion will grant the drinker improved strength for a limited time.
 </item>
 
-<item name="Potion of Speed" image_name="potion_blue" weight="1"
+<item name="Potion of Speed" image_name="potion_blue" weight="2"
     arg1_s="Sp" arg1="30000" rating="1" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
-This potion will grant the drinker greater movement for a limted time.
+This potion will grant the drinker greater movement for a limited time.
 </item>
 
 <item name="Chess Piece (Knight)" image_name="chess_knight" icon_width="0.25" weight="0">
