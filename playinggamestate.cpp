@@ -2954,7 +2954,6 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     QString arg1_s = arg1_s_sr.toString();
     int rating = parseInt(rating_sr.toString(), true);
     if( rating == 0 )
-
         rating = 1; // so the default of 0 defaults instead to 1
     bool magical = parseBool(magical_sr.toString(), true);
     int worth_bonus = parseInt(worth_bonus_sr.toString(), true);
@@ -6018,15 +6017,29 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     fprintf(file, " x=\"%f\" y=\"%f\"", item->getX(), item->getY());
     fprintf(file, " icon_width=\"%f\"", item->getIconWidth());
     fprintf(file, " weight=\"%d\"", item->getWeight());
-    fprintf(file, " use=\"%s\"", item->getUse().c_str());
-    fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
-    fprintf(file, " arg1=\"%d\"", item->getArg1());
-    fprintf(file, " arg2=\"%d\"", item->getArg2());
-    fprintf(file, " arg1_s=\"%s\"", item->getArg1s().c_str());
-    fprintf(file, " rating=\"%d\"", item->getRating());
-    fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
-    fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
-    fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
+    if( item->getUse().length() > 0 ) {
+        fprintf(file, " use=\"%s\"", item->getUse().c_str());
+        fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
+    }
+    if( item->getArg1() != 0 ) {
+        fprintf(file, " arg1=\"%d\"", item->getArg1());
+    }
+    if( item->getArg2() != 0 ) {
+        fprintf(file, " arg2=\"%d\"", item->getArg2());
+    }
+    if( item->getArg1s().length() > 0 ) {
+        fprintf(file, " arg1_s=\"%s\"", item->getArg1s().c_str());
+    }
+    fprintf(file, " rating=\"%d\"", item->getRating()); // n.b., should always explicitly save, due to hack with default rating being 1, not 0
+    if( item->isMagical() ) {
+        fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
+    }
+    if( item->getBaseTemplate().length() > 0 ) {
+        fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
+    }
+    if( item->getWorthBonus() > 0 ) {
+        fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
+    }
     this->saveItemProfileBonusInt(file, item, profile_key_FP_c);
     this->saveItemProfileBonusInt(file, item, profile_key_BS_c);
     this->saveItemProfileBonusInt(file, item, profile_key_S_c);
@@ -6043,8 +6056,12 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     {
         const Weapon *weapon = static_cast<const Weapon *>(item);
         fprintf(file, " animation_name=\"%s\"", weapon->getAnimationName().c_str());
-        fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
-        fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
+        if( weapon->isTwoHanded() ) {
+            fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
+        }
+        if( weapon->isRanged() ) {
+            fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
+        }
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
         fprintf(file, " damageX=\"%d\"", damageX);
@@ -6217,24 +6234,22 @@ bool PlayingGamestate::saveGame(const string &filename) const {
                 fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
                 fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
             }
-            fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
-            fprintf(file, " bounce=\"%s\"", character->isBounce() ? "true": "false");
+            if( character->isStaticImage() ) {
+                fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
+            }
+            if( character->isBounce() ) {
+                fprintf(file, " bounce=\"%s\"", character->isBounce() ? "true": "false");
+            }
             fprintf(file, " name=\"%s\"", character->getName().c_str());
-            fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
+            if( character->isDead() ) {
+                fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
+            }
             fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
             if( character->hasDefaultPosition() ) {
                 fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
             }
             fprintf(file, " health=\"%d\"", character->getHealth());
             fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
-            /*fprintf(file, " FP=\"%d\"", character->getFP());
-            fprintf(file, " BS=\"%d\"", character->getBS());
-            fprintf(file, " S=\"%d\"", character->getStrength());
-            fprintf(file, " A=\"%d\"", character->getAttacks());
-            fprintf(file, " M=\"%d\"", character->getMind());
-            fprintf(file, " D=\"%d\"", character->getDexterity());
-            fprintf(file, " B=\"%d\"", character->getBravery());
-            fprintf(file, " Sp=\"%f\"", character->getSpeed());*/
             for(map<string, int>::const_iterator iter = character->getBaseProfile()->intPropertiesBegin(); iter != character->getBaseProfile()->intPropertiesEnd(); ++iter) {
                 string key = iter->first;
                 int value = iter->second;
@@ -6251,26 +6266,48 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
             fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
-            fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
-            fprintf(file, " is_paralysed=\"%s\"", character->isParalysed() ? "true": "false");
-            fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+            if( character->canFly() ) {
+                fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
+            }
+            if( character->isParalysed() ) {
+                fprintf(file, " is_paralysed=\"%s\"", character->isParalysed() ? "true": "false");
+                fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+            }
             fprintf(file, " level=\"%d\"", character->getLevel());
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
-            fprintf(file, " causes_terror=\"%s\"", character->getCausesTerror() ? "true" : "false");
-            fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
+            if( character->getCausesTerror() ) {
+                fprintf(file, " causes_terror=\"%s\"", character->getCausesTerror() ? "true" : "false");
+                fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
+            }
             fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
-            fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
+            if( character->requiresMagical() ) {
+                fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
+            }
             fprintf(file, " gold=\"%d\"", character->getGold());
-            fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
+            if( character->canTalk() ) {
+                fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
+            }
             fprintf(file, " has_talked=\"%s\"", character->hasTalked() ? "true": "false");
-            fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
-            fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
-            fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
-            fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
+            if( character->getInteractionType().length() > 0 ) {
+                fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
+            }
+            if( character->getInteractionData().length() > 0 ) {
+                fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
+            }
+            if( character->getInteractionXP() != 0 ) {
+                fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
+            }
+            if( character->getInteractionRewardItem().length() > 0 ) {
+                fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
+            }
             fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
-            fprintf(file, " shop=\"%s\"", character->getShop().c_str());
-            fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
+            if( character->getShop().length() > 0 ) {
+                fprintf(file, " shop=\"%s\"", character->getShop().c_str());
+            }
+            if( character->getObjectiveId().length() > 0 ) {
+                fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
+            }
             fprintf(file, ">\n");
             if( character->getTalkOpeningInitial().length() > 0 ) {
                 fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
@@ -6345,22 +6382,54 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
             fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
             fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
-            fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
-            fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
-            fprintf(file, " has_smoke=\"%s\"", scenery->hasSmoke() ? "true": "false");
-            fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
-            fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
-            fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
-            fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
-            fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
-            fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
-            fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
-            fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
-            fprintf(file, " key_always_needed=\"%s\"", scenery->isKeyAlwaysNeeded() ? "true": "false");
-            fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
-            fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
-            fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
-            fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
+            if( scenery->isBlocking() ) {
+                fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
+            }
+            if( scenery->blocksVisibility() ) {
+                fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+            }
+            if( scenery->hasSmoke() ) {
+                fprintf(file, " has_smoke=\"%s\"", scenery->hasSmoke() ? "true": "false");
+            }
+            if( scenery->isOpened() ) {
+                fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
+            }
+            if( scenery->isExit() ) {
+                fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
+            }
+            if( scenery->isDoor() ) {
+                fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
+            }
+            if( scenery->getExitLocation().length() > 0 ) {
+                fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
+            }
+            if( scenery->isLocked() ) {
+                fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
+            }
+            if( scenery->isLockedSilent() ) {
+                fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
+            }
+            if( scenery->getLockedText().length() > 0 ) {
+                fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
+            }
+            if( scenery->isLockedUsedUp() ) {
+                fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
+            }
+            if( scenery->isKeyAlwaysNeeded() ) {
+                fprintf(file, " key_always_needed=\"%s\"", scenery->isKeyAlwaysNeeded() ? "true": "false");
+            }
+            if( scenery->getUnlockItemName().length() > 0 ) {
+                fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+            }
+            if( scenery->getUnlockText().length() > 0 ) {
+                fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
+            }
+            if( scenery->getUnlockXP() > 0 ) {
+                fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
+            }
+            if( scenery->getConfirmText().length() > 0 ) {
+                fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
+            }
             fprintf(file, ">");
             for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;
