@@ -1,13 +1,19 @@
 <?xml version="1.0" ?>
-<quest name="">
+<quest name="Journey to Wardensgard">
 
 <info>News of your heroism spreads, and you are soon able to make a living for yourself by completing expeditions and quests that people offer to you.
+
+One man comes to you, a priest. He asks if you can travel to the city of Wardensgard. His brother who lives there has developed a rare illness, and the priest has prepared a potion that he hopes will help.
+
+Wardensgard is located on the other side on a nearby mountain range. To travel around the mountains would risk taking too long, and he needs someone to take the potion directly through the old Dwarven tunnels that pass beneath the mountains. The route is risky for travellers due to creatures that may lurk there, but should be no problem for an adventurer such as yourself.
+
+You will receive three hundred gold pieces for completing the quest.
 </info>
 
-<completed_text>
+<completed_text>You travel to the city of Wardensgard, to the address given to you, and give the potion to the priest's brother. Within hours, his symptoms are improving. He gives you your payment of three hundred gold pieces, plus an extra fifty.
 </completed_text>
 
-<quest_objective type="find_exit" arg1="North Exit" gold="300"/>
+<quest_objective type="find_exit" arg1="North Exit" gold="350"/>
 
 <location name="entrance">
 
@@ -461,9 +467,9 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 <scenery name="Chest" image_name="chest" x="8.0" y="19.5" size="0.8" blocking="true">
     <item template="Potion of Combat"/>
     <gold amount="112"/>
-    <item name="Book" image_name="book" icon_width="0.25" weight="1">
-    </item>
 </scenery>
+<!--<item name="Book" image_name="book" icon_width="0.25" weight="1">
+</item>-->
 
 <scenery name="Crate" image_name="crate" x="5.0" y="19.5" size="0.8" blocking="true">
     <gold amount="27"/>
