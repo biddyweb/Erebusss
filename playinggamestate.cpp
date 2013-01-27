@@ -6347,6 +6347,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
             fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
             fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
             fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+            fprintf(file, " has_smoke=\"%s\"", scenery->hasSmoke() ? "true": "false");
             fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
             fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
             fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
