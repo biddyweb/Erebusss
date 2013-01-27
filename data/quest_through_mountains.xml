@@ -335,6 +335,7 @@ Thank you for helping me!
     <gold amount="11"/>
     <weapon name="Long Sword" image_name="longsword" weight="10"
         damageX="2" damageY="10" damageZ="2"
+        min_strength="7"
         animation_name="longsword"
         base_template="Long Sword" worth_bonus="150"
         />
