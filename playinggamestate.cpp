@@ -2826,6 +2826,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
             player->addItem(this->cloneStandardItem("Arrows"), true);
             {
                 Item *item = this->cloneStandardItem("Long Sword");
+                item->setName("Magical Long Sword");
                 item->setMagical(true);
                 player->addItem(item, true);
             }

@@ -76,6 +76,9 @@ public:
         // the name is used as an ID key
         return this->name;
     }
+    void setName(const string &name) {
+        this->name = name;
+    }
     virtual string getName() const {
         // may be overloaded to give more descriptive names
         return this->name;
