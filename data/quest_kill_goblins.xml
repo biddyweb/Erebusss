@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<quest name="Goblin Caves">
+<quest name="Goblin caves">
 
 <info>The nearby caves to your village have become infested with Goblins, who have been responsible for taking part in raids on your village, killing innocent people and burning down their homes. Kill these vermin, and you will be rewarded with one hundred gold pieces!
 </info>
@@ -14,6 +14,8 @@
 <floor image_name="floor_rock"/>
 <wall image_name="wall"/>
 <background image_name="background_brown"/>
+
+<!--<wandering_monster template="Goblin" time="120000" rest_chance="10"/>-->
 
 <player_start x="0.5" y="9.0"/>
 
