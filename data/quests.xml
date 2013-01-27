@@ -3,8 +3,8 @@
 
 <!--<quest filename="data/quest_test.xml"/>-->
 <!--<quest filename="data/quest_necromancer.xml"/>-->
-<!--<quest filename="data/quest_through_mountains.xml"/>-->
 <quest filename="data/quest_kill_goblins.xml"/>
 <quest filename="data/quest_wizard_dungeon_find_item.xml"/>
+<quest filename="data/quest_through_mountains.xml"/>
 
 </quests>
