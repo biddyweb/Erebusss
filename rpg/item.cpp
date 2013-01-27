@@ -232,6 +232,16 @@ float Item::getProfileBonusFloatProperty(const Character *character, const strin
     return this->getRawProfileBonusFloatProperty(key);
 }
 
+bool ItemCompare::operator()(const Item *lhs, const Item *rhs) const {
+    // class that can be used for sorting
+    // we prefer to sort by type, then by name
+    // n.b., we can't simply add an operator< to Item class, as we typically sort lists of pointers to Item, rather than lists of Items
+    if( lhs->getType() != rhs->getType() ) {
+        return lhs->getType() < rhs->getType();
+    }
+    return lhs->getName() < rhs->getName();
+}
+
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), is_ranged(false), requires_ammo(false),

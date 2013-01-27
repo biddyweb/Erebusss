@@ -979,7 +979,13 @@ void ItemsWindow::refreshList() {
     list_items.clear();
     list->clear();
     Character *player = playing_gamestate->getPlayer();
+    vector<Item *> sorted_list;
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        sorted_list.push_back(item);
+    }
+    std::stable_sort(sorted_list.begin(), sorted_list.end(), ItemCompare());
+    for(vector<Item *>::iterator iter = sorted_list.begin(); iter != sorted_list.end(); ++iter) {
         Item *item = *iter;
         if( view_type == VIEWTYPE_WEAPONS && item->getType() != ITEMTYPE_WEAPON ) {
             continue;
@@ -1352,7 +1358,13 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
             player_list->setIconSize(QSize(icon_size, icon_size));
         }
         h_layout->addWidget(player_list);
+        vector<Item *> sorted_list;
         for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+            Item *item = *iter;
+            sorted_list.push_back(item);
+        }
+        std::stable_sort(sorted_list.begin(), sorted_list.end(), ItemCompare());
+        for(vector<Item *>::iterator iter = sorted_list.begin(); iter != sorted_list.end(); ++iter) {
             Item *item = *iter;
             int cost = 0;
             for(size_t i=0;i<items.size();i++) {
@@ -2828,6 +2840,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                 Item *item = this->cloneStandardItem("Long Sword");
                 item->setName("Magical Long Sword");
                 item->setMagical(true);
+                item->setBaseTemplate("Long Sword");
                 player->addItem(item, true);
             }
         }

@@ -178,6 +178,11 @@ public:
     virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;
 };
 
+class ItemCompare {
+public:
+    bool operator()(const Item *lhs, const Item *rhs) const;
+};
+
 class Weapon : public Item {
     string animation_name;
     bool is_two_handed;
