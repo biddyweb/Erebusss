@@ -919,6 +919,22 @@ void Character::deleteItem(const string &key) {
     }
 }
 
+set<Item *>::iterator Character::itemsBegin() {
+    return this->items.begin();
+}
+
+set<Item *>::const_iterator Character::itemsBegin() const {
+    return this->items.begin();
+}
+
+set<Item *>::iterator Character::itemsEnd() {
+    return this->items.end();
+}
+
+set<Item *>::const_iterator Character::itemsEnd() const {
+    return this->items.end();
+}
+
 void Character::setGold(int gold) {
     this->gold = gold;
     ASSERT_LOGGER( gold >= 0 );

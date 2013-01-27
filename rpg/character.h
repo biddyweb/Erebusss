@@ -676,18 +676,10 @@ public:
     void takeItem(Item *item);
     void dropItem(Item *item);
     void deleteItem(const string &key);
-    set<Item *>::iterator itemsBegin() {
-        return this->items.begin();
-    }
-    set<Item *>::const_iterator itemsBegin() const {
-        return this->items.begin();
-    }
-    set<Item *>::iterator itemsEnd() {
-        return this->items.end();
-    }
-    set<Item *>::const_iterator itemsEnd() const {
-        return this->items.end();
-    }
+    set<Item *>::iterator itemsBegin();
+    set<Item *>::const_iterator itemsBegin() const;
+    set<Item *>::iterator itemsEnd();
+    set<Item *>::const_iterator itemsEnd() const;
     Item *findItem(const string &key);
     const Item *findItem(const string &key) const;
     int getGold() const {
