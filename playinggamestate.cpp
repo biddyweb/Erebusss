@@ -2953,6 +2953,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     QString arg1_s = arg1_s_sr.toString();
     int rating = parseInt(rating_sr.toString(), true);
     if( rating == 0 )
+
         rating = 1; // so the default of 0 defaults instead to 1
     bool magical = parseBool(magical_sr.toString(), true);
     int worth_bonus = parseInt(worth_bonus_sr.toString(), true);
@@ -3479,6 +3480,14 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
                 qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
                 if( reader.name() == "quest" ) {
+                    if( is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: quest element not expected in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: quest element wasn't expected here");
+                    }
                     QStringRef name_s = reader.attributes().value("name");
                     quest->setName(name_s.toString().toStdString());
                 }
@@ -3504,20 +3513,6 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     qDebug("quest completed_text: %s\n", completed_text.toStdString().c_str());
                     quest->setCompletedText(completed_text.toStdString());
                 }
-                else if( reader.name() == "journal" ) {
-                    if( !is_savegame ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: journal element only allowed in save games");
-                    }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: journal element wasn't expected here");
-                    }
-                    QString encoded = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
-                    this->journal_ss.clear();
-                    this->journal_ss << journal.data();
-                }
                 else if( reader.name() == "savegame" ) {
                     if( !is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -3534,6 +3529,44 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         this->view_transform_3d = true;
                         this->view_walls_3d = true;
                     }
+                }
+                else if( reader.name() == "current_quest" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: current_quest element only allowed in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: current_quest element wasn't expected here");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    bool found = false;
+                    int c = 0;
+                    for(vector<QuestInfo>::const_iterator iter = this->quest_list.begin(); iter != this->quest_list.end(); ++iter, c++) {
+                        const QuestInfo *quest_info = &*iter;
+                        if( quest_info->getFilename() == name_s.toString().toStdString() ) {
+                            found = true;
+                            this->c_quest_indx = c;
+                        }
+                    }
+                    if( !found ) {
+                        LOG("error, current quest not found in quest list: %s\n", name_s.toString().toStdString().c_str());
+                        this->c_quest_indx = 0;
+                    }
+                }
+                else if( reader.name() == "journal" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: journal element only allowed in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: journal element wasn't expected here");
+                    }
+                    QString encoded = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
+                    this->journal_ss.clear();
+                    this->journal_ss << journal.data();
                 }
                 else if( reader.name() == "game" ) {
                     if( !is_savegame ) {
