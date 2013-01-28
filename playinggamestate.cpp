@@ -1,6 +1,7 @@
 #include <QtWebKit/QWebView>
 
 #include <ctime>
+#include <algorithm> // needed for stable_sort on Symbian at least
 
 #ifdef _DEBUG
 #include <cassert>
@@ -2826,7 +2827,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
             for(int i=0;i<114;i++) {
                 player->addXP(this, 10);
             }
-            player->addGold( 1241 );
+            player->addGold( 1541 );
             player->deleteItem("Leather Armour");
             player->deleteItem("Long Sword");
             player->armWeapon(NULL);
