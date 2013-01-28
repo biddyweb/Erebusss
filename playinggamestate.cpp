@@ -1681,12 +1681,16 @@ void ItemsPickerWindow::addPlayerItem(Item *item) {
 }
 
 void ItemsPickerWindow::refreshPlayerItems() {
-
-
     player_list->clear();
     player_items.clear();
     Character *player = playing_gamestate->getPlayer();
+    vector<Item *> sorted_list;
     for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        Item *item = *iter;
+        sorted_list.push_back(item);
+    }
+    std::stable_sort(sorted_list.begin(), sorted_list.end(), ItemCompare());
+    for(vector<Item *>::iterator iter = sorted_list.begin(); iter != sorted_list.end(); ++iter) {
         Item *item = *iter;
         addPlayerItem(item);
     }
@@ -5759,7 +5763,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
         if( dist_from_click <= click_tol_scenery_c ) {
             // clicked on this scenery
             float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
-            //LOG("    player_dist : %f", player_dist);
+            //qDebug("    player_dist from %s: %f", scenery->getName().c_str(), player_dist);
             if( player_dist <= npc_radius_c + 0.5f ) {
                 clicked_scenerys.push_back(scenery);
             }
