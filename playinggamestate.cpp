@@ -45,6 +45,8 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
         cursor.clearSelection();
         this->setTextCursor(cursor);
     }
+
+    this->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
 void TextEffect::advance(int phase) {
@@ -361,16 +363,17 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
-    /*QElapsedTimer timer;
-    timer.start();*/
-    if( fps_timer.isValid() ) {
-        int time_ms = fps_timer.elapsed();
-        if( time_ms > 0 ) {
-            float fps = 1000.0f/(float)time_ms;
-            this->gui_overlay->setFPS(fps);
+    if( !mobile_c )
+    {
+        if( fps_timer.isValid() ) {
+            int time_ms = fps_timer.elapsed();
+            if( time_ms > 0 ) {
+                float fps = 1000.0f/(float)time_ms;
+                this->gui_overlay->setFPS(fps);
+            }
         }
+        fps_timer.start();
     }
-    fps_timer.start();
 
     QGraphicsView::paintEvent(event);
 
@@ -429,12 +432,6 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
             painter.fillRect(sx, sy + pixmap_width, pixmap_width, this->height() - sy - pixmap_width, brush);
         }
     }
-
-    /*int time_ms = timer.elapsed();
-    if( time_ms > 0 ) {
-        float fps = 1000.0f/(float)time_ms;
-        this->gui_overlay->setFPS(fps);
-    }*/
 }
 
 void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
