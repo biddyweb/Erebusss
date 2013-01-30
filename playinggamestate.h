@@ -413,7 +413,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void clickedOnNPC(Character *character);
     bool handleClickForItems(Vector2D dest);
     bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
-    bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest);
+    bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
     void testFogOfWar();
 
     void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;

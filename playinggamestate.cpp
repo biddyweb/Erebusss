@@ -5741,7 +5741,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
     return done;
 }
 
-bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest) {
+bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click) {
     //qDebug("PlayingGamestate::handleClickForScenerys(): %f, %f", dest.x, dest.y);
     // search for clicking on a scenery
     const float click_tol_scenery_c = 0.0f;
@@ -5750,7 +5750,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
         Scenery *scenery = *iter;
         Vector2D scenery_pos = scenery->getPos();
         float scenery_width = scenery->getWidth();
-        float scenery_height = scenery->getHeight();
+        float scenery_height = is_click ? scenery->getVisualHeight() : scenery->getHeight();
         float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
         //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
         if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
@@ -5826,13 +5826,13 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
         if( !done && !pickup_only ) {
             bool move = false;
             Scenery *ignore_scenery = NULL;
-            done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1);
+            done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1, false);
             if( !done ) {
-                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2);
+                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2, false);
             }
             if( !done && player->getDirection().y < 0.0f ) {
                 // needed for scenery on walls
-                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest3);
+                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest3, false);
             }
         }
 
@@ -5858,7 +5858,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         bool done = false;
         bool move = true;
 
-        // do items first - so that player can always pick up items dropped near friendly (or otherwise non-moving) NPCs!
+        // do items first - so that player can always pick up items dropped near friendly (or otherwise non-moving) NPCs, as well as behind scenery!
         if( !done ) {
             done = handleClickForItems(dest);
         }
@@ -5901,7 +5901,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
 
         Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
         if( !done ) {
-            done = handleClickForScenerys(&move, &ignore_scenery, dest);
+            done = handleClickForScenerys(&move, &ignore_scenery, dest, true);
         }
 
         if( move && !player->isDead() ) {
