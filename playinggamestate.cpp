@@ -2410,17 +2410,21 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                         }
                     }
 
+                    if( animation_layer_definition.size() > 0 && filename.length() == 0 ) {
+                        throw string("animations can only load from filenames");
+                    }
+
                     if( filename.length() > 0 ) {
-                        //QString filename_qt = ":/" + filename;
-                        QString qt_filename = DEPLOYMENT_PATH + filename;
+                        filename = DEPLOYMENT_PATH + filename;
                         if( animation_layer_definition.size() > 0 ) {
                             qDebug("load with animations");
+                            // now load lazily
                             // clipping is done on a per-frame basis, for animation
-                            pixmap = game_g->loadImage(qt_filename.toStdString());
+                            //pixmap = game_g->loadImage(filename.toStdString());
                         }
                         else {
                             qDebug("load image");
-                            pixmap = game_g->loadImage(qt_filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
+                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
                         }
                     }
                     if( !clip && animation_layer_definition.size() > 0 ) {
@@ -2445,21 +2449,20 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                     }
                     else if( type == "scenery" ) {
                         if( animation_layer_definition.size() > 0 ) {
-                            //qDebug("create scenery_animation_layers: %s", name.toStdString().c_str());
-                            //this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, 64, 72, 64, 72, 1);
-                            this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
+                            //this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
+                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
                         }
                         else {
                             this->scenery_images[name.toStdString()] = pixmap;
                         }
                     }
-                    /*else if( type == "npc_static" ) {
-                        this->npc_static_images[name.toStdString()] = pixmap;
-                    }*/
                     else if( type == "npc" ) {
                         if( animation_layer_definition.size() > 0 ) {
-                            //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, expected_width, expected_width, N_DIRECTIONS);
-                            this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
+                            //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
+                            /*AnimationLayer *animation_layer = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
+                            LazyAnimationLayer *lazy_animation_layer = new LazyAnimationLayer(animation_layer);
+                            this->animation_layers[name.toStdString()] = lazy_animation_layer;*/
+                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
                         }
                         else {
                             this->npc_static_images[name.toStdString()] = pixmap;
@@ -2479,6 +2482,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
             throw string("error reading images xml file");
         }
     }
+
+    /*{
+        // force all lazily loaded data to be loaded
+        for(map<string, LazyAnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+            LazyAnimationLayer *animation_layer = (*iter).second;
+            animation_layer->getAnimationLayer();
+        }
+        for(map<string, LazyAnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+            LazyAnimationLayer *animation_layer = (*iter).second;
+            animation_layer->getAnimationLayer();
+        }
+    }*/
 
     gui_overlay->setProgress(20);
     qApp->processEvents();
@@ -2726,18 +2741,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
     player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
     player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    //LOG("clothes layer\n");
-    //int time_s = clock();
-    //this->animation_layers["clothes"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/clothes.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //this->animation_layers["head"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/male_head1.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    this->animation_layers["player"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //LOG("time to load: %d\n", clock() - time_s);
-    //LOG("longsword layer\n");
-    this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //LOG("longbow layer\n");
-    this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //LOG("shield layer\n");
-    this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["player"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    //this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+    this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
 
     gui_overlay->setProgress(70);
     qApp->processEvents();
@@ -2863,12 +2874,20 @@ PlayingGamestate::~PlayingGamestate() {
     quest = NULL;
     c_location = NULL;
 
-    for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+    /*for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
         AnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
+    }*/
+    for(map<string, LazyAnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+        LazyAnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
     }
-    for(map<string, AnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+    /*for(map<string, AnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
         AnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
+    }*/
+    for(map<string, LazyAnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+        LazyAnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
     }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
@@ -3874,6 +3893,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             npc->setStaticImage(static_image);
                             npc->setBounce(bounce);
                             npc->setHostile(is_hostile);
+
+                            if( !static_image ) {
+                                this->animation_layers[ npc->getAnimationName() ]->getAnimationLayer(); // force animation to be loaded
+                            }
                         }
                         QStringRef is_dead_s = reader.attributes().value("is_dead");
                         npc->setDead( parseBool(is_dead_s.toString(), true) );
@@ -4219,7 +4242,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef size_s = reader.attributes().value("size");
                     bool is_animation = false;
                     map<string, QPixmap>::iterator image_iter = this->scenery_images.find(image_name_s.toString().toStdString());
-                    map<string, AnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
+                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
                     if( image_iter == this->scenery_images.end() ) {
                         if( animation_iter == this->scenery_animation_layers.end() ) {
                             LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
@@ -4228,6 +4251,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                         else {
                             is_animation = true;
+                            animation_iter->second->getAnimationLayer(); // force animation to be loaded
                         }
                     }
                     else {
@@ -4238,7 +4262,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         float size = parseFloat(size_s.toString());
                         QPixmap image;
                         if( is_animation ) {
-                            const AnimationLayer *animation_layer = animation_iter->second;
+                            const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                             image = animation_layer->getAnimationSet("")->getFrame(0, 0);
                         }
                         else {
@@ -4311,9 +4335,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
 
                     if( is_animation ) {
-                        map<string, AnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
+                        map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
                         if( animation_iter != this->scenery_animation_layers.end() ) {
-                            const AnimationLayer *animation_layer = animation_iter->second;
+                            const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                             if( animation_layer->getAnimationSet("opened") != NULL ) {
                                 scenery->setCanBeOpened(true);
                             }
@@ -4698,7 +4722,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
         AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData());
         object->clearAnimationLayers();
         //qDebug("update scenery: %s", scenery->getName().c_str());
-        object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()] );
+        object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()]->getAnimationLayer() );
         if( scenery->isOpened() ) {
             object->setAnimationSet("opened", true);
         }
@@ -5301,14 +5325,12 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
     }
     object->clearAnimationLayers();
     if( character == player ) {
-        //object->addAnimationLayer( this->animation_layers["clothes"] );
-        //object->addAnimationLayer( this->animation_layers["head"] );
-        object->addAnimationLayer( this->animation_layers["player"] );
+        object->addAnimationLayer( this->animation_layers["player"]->getAnimationLayer() );
         if( character->getCurrentWeapon() != NULL ) {
-            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName() ]->getAnimationLayer() );
         }
         if( character->getCurrentShield() != NULL ) {
-            object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName() ]->getAnimationLayer() );
         }
     }
     else {
@@ -5316,7 +5338,7 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
             object->setStaticImage( this->npc_static_images[ character->getAnimationName() ] );
         }
         else {
-            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ] );
+            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ]->getAnimationLayer() );
         }
     }
 }

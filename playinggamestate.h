@@ -16,6 +16,7 @@ using std::map;
 #include "rpg/location.h"
 
 class MainGraphicsView;
+class LazyAnimationLayer;
 class AnimationLayer;
 class Shop;
 class Currency;
@@ -382,8 +383,10 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     set<QGraphicsItem *> graphicsitems_characters;
 
     // data
-    map<string, AnimationLayer *> animation_layers;
-    map<string, AnimationLayer *> scenery_animation_layers;
+    //map<string, AnimationLayer *> animation_layers;
+    map<string, LazyAnimationLayer *> animation_layers;
+    //map<string, AnimationLayer *> scenery_animation_layers;
+    map<string, LazyAnimationLayer *> scenery_animation_layers;
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
     map<string, QPixmap> scenery_images;

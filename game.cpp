@@ -349,6 +349,15 @@ int AnimatedObject::getHeight() const {
     }
 }
 
+AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
+    if( this->animation_layer == NULL ) {
+        LOG("lazily load animation layer from: %s\n", this->filename.c_str());
+        this->animation_layer = AnimationLayer::create(filename, animation_layer_definitions, off_x, off_y, width, height, stride_x, stride_y, expected_total_width, n_dimensions);
+        LOG("    done\n");
+    }
+    return this->animation_layer;
+}
+
 Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0), flag(false) {
     this->birth_time = game_g->getScreen()->getGameTimeTotalMS();
 }
