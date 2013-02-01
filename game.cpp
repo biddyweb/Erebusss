@@ -121,6 +121,7 @@ AnimationSet::~AnimationSet() {
 }
 
 const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) const {
+    c_dimension = c_dimension % this->n_dimensions;
     //qDebug("animation type: %d", this->animation_type);
     //LOG("%d : type %d, frame %d\n", this, this->animation_type, c_frame);
     switch( this->animation_type ) {
@@ -150,10 +151,6 @@ const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) 
 }
 
 AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
-    if( icon_width == 0 )
-        icon_width = stride_x;
-    if( icon_height == 0 )
-        icon_height = stride_y;
     //qDebug("### %d x %d\n", icon_width, icon_height);
     vector<QPixmap> frames;
     for(unsigned int i=0;i<n_dimensions;i++) {
@@ -172,15 +169,38 @@ AnimationLayer::~AnimationLayer() {
     }
 }
 
-AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
+AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
     if( image.height() % n_dimensions != 0 ) {
         throw string("image height is not multiple of n_dimensions");
     }
-    //int stride_x = expected_stride_x;
-    //int stride_y = image.height() / n_dimensions;
-    //if( expected_stride_y != stride_y ) {
+    if( !clip ) {
+        bool static_image = true;
+        for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end() && static_image; ++iter) {
+            const AnimationLayerDefinition animation_layer_definition = *iter;
+            if( animation_layer_definition.position > 0 || animation_layer_definition.n_frames > 1 )
+                static_image = false;
+        }
+        if( static_image ) {
+            // fill in info automatically
+            off_x = 0;
+            off_y = 0;
+            width = image.width();
+            if( image.height() % n_dimensions != 0 ) {
+                LOG("image %d x %d ; n_dimensions = %d\n", image.width(), image.height(), n_dimensions);
+                throw string("image height not a multiple of n_dimensions");
+            }
+            height = image.height() / n_dimensions;
+            expected_total_width = width;
+            stride_x = width;
+            stride_y = height;
+            //qDebug("image is %d x %d n_dimensions = %d", width, height, n_dimensions);
+            //throw string("blah");
+        }
+        else {
+            throw string("animated images must always be clipped");
+        }
+    }
     if( expected_total_width != image.width() ) {
-        //float ratio = ((float)stride_y)/(float)expected_stride_y;
         float ratio = ((float)image.width())/(float)expected_total_width;
         width *= ratio;
         height *= ratio;
@@ -203,10 +223,9 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     return layer;
 }
 
-AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
+AnimationLayer *AnimationLayer::create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) {
     QPixmap image = game_g->loadImage(filename.c_str());
-    //return create(image, animation_layer_definitions, off_x, off_y, width, height, expected_stride_x, expected_stride_y, n_dimensions);
-    return create(image, animation_layer_definitions, off_x, off_y, width, height,stride_x, stride_y, expected_total_width, n_dimensions);
+    return create(image, animation_layer_definitions, clip, off_x, off_y, width, height,stride_x, stride_y, expected_total_width, n_dimensions);
 }
 
 AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
@@ -229,7 +248,6 @@ void AnimatedObject::advance(int phase) {
             c_frame = n_frame;
             //this->update();
         }
-        this->setZValue( this->pos().y() );
     }
 }
 
@@ -258,15 +276,10 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         off_y -= scale/2;
     }
 
-    if( this->is_static_image ) {
-        painter->drawPixmap(0, off_y, this->static_image);
-    }
-    else {
-        for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
-            const AnimationSet *c_animation_set = *iter;
-            const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
-            painter->drawPixmap(0, off_y, pixmap);
-        }
+    for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
+        const AnimationSet *c_animation_set = *iter;
+        const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
+        painter->drawPixmap(0, off_y, pixmap);
     }
 }
 
@@ -284,7 +297,7 @@ void AnimatedObject::addAnimationLayer(AnimationLayer *animation_layer) {
 void AnimatedObject::clearAnimationLayers() {
     this->animation_layers.clear();
     this->c_animation_sets.clear();
-    this->clearStaticImage();
+    //this->clearStaticImage();
 }
 
 void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
@@ -297,8 +310,12 @@ void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
             const AnimationLayer *animation_layer = *iter;
             const AnimationSet *c_animation_set = animation_layer->getAnimationSet(name);
             if( c_animation_set == NULL ) {
-                LOG("unknown animation set: %s\n", name.c_str());
-                throw string("Unknown animation set");
+                // reset to standard animation, needed for static images
+                c_animation_set = animation_layer->getAnimationSet("");
+                if( c_animation_set == NULL ) {
+                    LOG("unknown animation set: %s - also can't find standard animation\n", name.c_str());
+                    throw string("Unknown animation set");
+                }
             }
             this->c_animation_sets.push_back(c_animation_set);
         }
@@ -328,31 +345,28 @@ void AnimatedObject::setDimension(unsigned int c_dimension) {
 }
 
 int AnimatedObject::getWidth() const {
-    if( this->is_static_image ) {
-        return this->static_image.width();
-    }
-    else {
-        ASSERT_LOGGER( this->animation_layers.size() > 0 );
-        const AnimationLayer *animation_layer = this->animation_layers.at(0);
-        return animation_layer->getWidth();
-    }
+    ASSERT_LOGGER( this->animation_layers.size() > 0 );
+    const AnimationLayer *animation_layer = this->animation_layers.at(0);
+    return animation_layer->getWidth();
 }
 
 int AnimatedObject::getHeight() const {
-    if( this->is_static_image ) {
-        return this->static_image.height();
-    }
-    else {
-        ASSERT_LOGGER( this->animation_layers.size() > 0 );
-        const AnimationLayer *animation_layer = this->animation_layers.at(0);
-        return animation_layer->getHeight();
-    }
+    ASSERT_LOGGER( this->animation_layers.size() > 0 );
+    const AnimationLayer *animation_layer = this->animation_layers.at(0);
+    return animation_layer->getHeight();
+}
+
+LazyAnimationLayer::LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
+    animation_layer(NULL), clip(false), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
+{
+    // pixmap already supplied, so we load straight away
+    this->animation_layer = AnimationLayer::create(pixmap, animation_layer_definitions, clip, off_x, off_y, width, height, stride_x, stride_y, expected_total_width, n_dimensions);
 }
 
 AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
     if( this->animation_layer == NULL ) {
         LOG("lazily load animation layer from: %s\n", this->filename.c_str());
-        this->animation_layer = AnimationLayer::create(filename, animation_layer_definitions, off_x, off_y, width, height, stride_x, stride_y, expected_total_width, n_dimensions);
+        this->animation_layer = AnimationLayer::create(filename, animation_layer_definitions, clip, off_x, off_y, width, height, stride_x, stride_y, expected_total_width, n_dimensions);
         LOG("    done\n");
     }
     return this->animation_layer;

@@ -166,13 +166,11 @@ public:
         return this->height;
     }
 
-    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
-    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
+    static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
+    static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
 };
 
 class AnimatedObject : public QGraphicsItem {
-    bool is_static_image;
-    QPixmap static_image;
     vector<AnimationLayer *> animation_layers;
     bool set_c_animation_name;
     string c_animation_name;
@@ -186,7 +184,6 @@ class AnimatedObject : public QGraphicsItem {
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //void setFrame(int c_frame);
 public:
     AnimatedObject();
     virtual ~AnimatedObject();
@@ -197,14 +194,6 @@ public:
     void setDimension(unsigned int c_dimension);
     int getWidth() const;
     int getHeight() const;
-    void setStaticImage(const QPixmap &static_image) {
-        this->is_static_image = true;
-        this->static_image = static_image;
-    }
-    void clearStaticImage() {
-        this->is_static_image = false;
-        this->static_image = NULL;
-    }
     void setBounce(bool bounce) {
         this->bounce = bounce;
     }
@@ -215,6 +204,7 @@ class LazyAnimationLayer {
     // if animation_layer == NULL, then we also store the information to load it when required:
     string filename;
     vector<AnimationLayerDefinition> animation_layer_definitions;
+    bool clip; // must be true for animations
     int off_x;
     int off_y;
     int width;
@@ -225,13 +215,14 @@ class LazyAnimationLayer {
     unsigned int n_dimensions;
 public:
     LazyAnimationLayer(AnimationLayer *animation_layer) :
-        animation_layer(animation_layer), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
+        animation_layer(animation_layer), clip(false), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
     {
     }
-    LazyAnimationLayer(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
-        animation_layer(NULL), filename(filename), animation_layer_definitions(animation_layer_definitions), off_x(off_x), off_y(off_y), width(width), height(height), stride_x(stride_x), stride_y(stride_y), expected_total_width(expected_total_width), n_dimensions(n_dimensions)
+    LazyAnimationLayer(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
+        animation_layer(NULL), filename(filename), animation_layer_definitions(animation_layer_definitions), clip(clip), off_x(off_x), off_y(off_y), width(width), height(height), stride_x(stride_x), stride_y(stride_y), expected_total_width(expected_total_width), n_dimensions(n_dimensions)
     {
     }
+    LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
 
     ~LazyAnimationLayer() {
         if( this->animation_layer != NULL ) {

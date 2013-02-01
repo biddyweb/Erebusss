@@ -401,8 +401,9 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         // This is only a minor performance improvement anyway.
         if( !this->calculated_lighting_pixmap_scaled && game_g->getScreen()->getGameTimeTotalMS() > lasttime_calculated_lighting_pixmap_scaled_ms + 1000 ) {
             this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS();
-            //qDebug("scale pixmap");
+            //qDebug("scale pixmap from %d to %d", lighting_pixmap.width(), 2*radius);
             this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
+            //qDebug("    done");
             this->calculated_lighting_pixmap_scaled = true;
         }
 #endif
@@ -2293,6 +2294,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
                     int stride_x = 0;
+                    const int def_width_c = 128, def_height_c = 128;
                     if( imagetype_s.length() == 0 ) {
                         // load file
                         QStringRef filename_s = reader.attributes().value("filename");
@@ -2315,32 +2317,30 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             height = parseInt(height_s.toString());
                             expected_width = parseInt(expected_width_s.toString());
                             qDebug("    clip to: %d, %d, %d, %d (expected width %d)", xpos, ypos, width, height, expected_width);
+
+                            QStringRef stride_x_s = reader.attributes().value("stride_x");
+                            if( stride_x_s.length() > 0 ) {
+                                stride_x = parseInt(stride_x_s.toString());
+                            }
+                            else {
+                                // set a default in case needed for animation
+                                stride_x = def_width_c;
+                            }
                         }
                         else {
+                            // set up defaults in case needed for animation
                             if( expected_width_s.length() > 0 ) {
                                 expected_width = parseInt(expected_width_s.toString());
                             }
                             else {
-                                expected_width = 128;
+                                expected_width = def_width_c;
                             }
-                        }
 
-                        QStringRef stride_x_s = reader.attributes().value("stride_x");
-                        if( stride_x_s.length() > 0 ) {
-                            stride_x = parseInt(stride_x_s.toString());
+                            width = def_width_c;
+                            height = def_height_c;
+                            stride_x = def_width_c;
                         }
-                        else {
-                            stride_x = 128;
-                        }
-                        // image loaded later
-                        /*QString filename_qt = ":/" + filename;
-                        if( type_s == "npc" ) {
-                            // clipping is done on a per-frame basis, for animation
-                            pixmap = game_g->loadImage(filename_qt.toStdString().c_str());
-                        }
-                        else {
-                            pixmap = game_g->loadImage(filename_qt.toStdString().c_str(), clip, xpos, ypos, width, height, expected_width);
-                        }*/
+                        // image loaded later, lazily
                     }
                     else if( imagetype_s == "solid" ) {
                         QStringRef red_s = reader.attributes().value("red");
@@ -2413,24 +2413,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                     if( animation_layer_definition.size() > 0 && filename.length() == 0 ) {
                         throw string("animations can only load from filenames");
                     }
+                    if( animation_layer_definition.size() > 0 && !clip ) {
+                        // animations must have clip data specified - we'll use the defaults set above
+                        clip = true;
+                    }
 
                     if( filename.length() > 0 ) {
                         filename = DEPLOYMENT_PATH + filename;
-                        if( animation_layer_definition.size() > 0 ) {
-                            qDebug("load with animations");
-                            // now load lazily
-                            // clipping is done on a per-frame basis, for animation
-                            //pixmap = game_g->loadImage(filename.toStdString());
-                        }
-                        else {
-                            qDebug("load image");
-                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
-                        }
-                    }
-                    if( !clip && animation_layer_definition.size() > 0 ) {
-                        // set the default stride values
-                        width = 128;
-                        height = 128;
                     }
 
                     if( type == "generic") {
@@ -2438,6 +2427,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("animations not supported for this animation type");
                         }
+                        if( filename.length() > 0 )
+                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
                         this->builtin_images[name.toStdString()] = pixmap;
                     }
                     else if( type == "item") {
@@ -2445,28 +2436,28 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("animations not supported for this animation type");
                         }
+                        if( filename.length() > 0 )
+                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
                         this->item_images[name.toStdString()] = pixmap;
                     }
                     else if( type == "scenery" ) {
-                        if( animation_layer_definition.size() > 0 ) {
-                            //this->scenery_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
-                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, 1);
+                        if( animation_layer_definition.size() == 0 ) {
+                            animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         }
-                        else {
-                            this->scenery_images[name.toStdString()] = pixmap;
-                        }
+                        if( filename.length() > 0 )
+                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 1);
+                        else
+                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 1);
                     }
                     else if( type == "npc" ) {
-                        if( animation_layer_definition.size() > 0 ) {
-                            //this->animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
-                            /*AnimationLayer *animation_layer = AnimationLayer::create(pixmap, animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
-                            LazyAnimationLayer *lazy_animation_layer = new LazyAnimationLayer(animation_layer);
-                            this->animation_layers[name.toStdString()] = lazy_animation_layer;*/
-                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, xpos, ypos, width, height, stride_x, 128, expected_width, N_DIRECTIONS);
+                        unsigned int n_dimensions = animation_layer_definition.size() > 0 ? N_DIRECTIONS : 1;
+                        if( animation_layer_definition.size() == 0 ) {
+                            animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         }
-                        else {
-                            this->npc_static_images[name.toStdString()] = pixmap;
-                        }
+                        if( filename.length() > 0 )
+                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, n_dimensions);
+                        else
+                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, n_dimensions);
                     }
                     else {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -2745,10 +2736,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
     //this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     //this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
     //this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
 
     gui_overlay->setProgress(70);
     qApp->processEvents();
@@ -4240,8 +4231,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef confirm_text_s = reader.attributes().value("confirm_text");
                     float size_w = 0.0f, size_h = 0.0f;
                     QStringRef size_s = reader.attributes().value("size");
-                    bool is_animation = false;
-                    map<string, QPixmap>::iterator image_iter = this->scenery_images.find(image_name_s.toString().toStdString());
+                   /* bool is_animation = false;
+                   *map<string, QPixmap>::iterator image_iter = this->scenery_images.find(image_name_s.toString().toStdString());
                     map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
                     if( image_iter == this->scenery_images.end() ) {
                         if( animation_iter == this->scenery_animation_layers.end() ) {
@@ -4256,18 +4247,29 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     else {
                         is_animation = false;
+                    }*/
+                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
+                    if( animation_iter == this->scenery_animation_layers.end() ) {
+                        LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
+                        LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
+                        throw string("Failed to find scenery's image");
+                    }
+                    else {
+                        animation_iter->second->getAnimationLayer(); // force animation to be loaded
                     }
 
                     if( size_s.length() > 0 ) {
                         float size = parseFloat(size_s.toString());
-                        QPixmap image;
+                        /*QPixmap image;
                         if( is_animation ) {
                             const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                             image = animation_layer->getAnimationSet("")->getFrame(0, 0);
                         }
                         else {
                             image = image_iter->second;
-                        }
+                        }*/
+                        const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
+                        QPixmap image = animation_layer->getAnimationSet("")->getFrame(0, 0);
                         //QPixmap image = this->scenery_images[image_name_s.toString().toStdString()];
                         int image_w = image.width();
                         int image_h = image.height();
@@ -4315,7 +4317,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         }
                     }
 
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
+                    //scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -4334,7 +4337,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         throw string("scenery can't be both an exit_location and a door");
                     }
 
-                    if( is_animation ) {
+                    /*if( is_animation ) {
                         map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
                         if( animation_iter != this->scenery_animation_layers.end() ) {
                             const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
@@ -4342,6 +4345,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                                 scenery->setCanBeOpened(true);
                             }
                         }
+                    }*/
+                    const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
+                    if( animation_layer->getAnimationSet("opened") != NULL ) {
+                        scenery->setCanBeOpened(true);
                     }
 
                     if( big_image_name_s.length() > 0 ) {
@@ -4649,6 +4656,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
             z_value += 1000.0f;
         }
         else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
+            //qDebug("background: %s", scenery->getName().c_str());
             z_value = E_TOL_LINEAR;
         }
         object->setZValue(z_value);
@@ -4730,7 +4738,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
             object->setAnimationSet("", true);
         }
     }
-    else {
+    /*else {
         QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         if( object != NULL ) {
             map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName());
@@ -4742,7 +4750,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
             object->setPixmap( image_iter->second );
             object->update();
         }
-    }
+    }*/
 }
 
 void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
@@ -4752,6 +4760,7 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     this->characterTurn(character, object);
     scene->addItem(object);
     object->setPos(character->getX(), character->getY());
+    object->setZValue( object->pos().y() );
     if( character != player ) {
         // default to invisible for NPCs, until set by testFogOfWar()
         object->setVisible(false);
@@ -5334,12 +5343,7 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         }
     }
     else {
-        if( character->isStaticImage() ) {
-            object->setStaticImage( this->npc_static_images[ character->getAnimationName() ] );
-        }
-        else {
-            object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ]->getAnimationLayer() );
-        }
+        object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ]->getAnimationLayer() );
     }
 }
 
@@ -5367,6 +5371,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
     QPointF new_pos(character->getX(), character->getY());
     if( new_pos != old_pos ) {
         object->setPos(new_pos);
+        object->setZValue( object->pos().y() );
         /*Direction direction = DIRECTION_W;
         if( new_pos.x() > old_pos.x() ) {
             direction = DIRECTION_E;
