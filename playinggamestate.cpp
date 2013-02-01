@@ -5226,7 +5226,18 @@ void PlayingGamestate::update() {
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             this->player = NULL;
-            this->showInfoDialog("Game over!\n\nYou have died!", string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
+            string death_message;
+            int r = rand() % 3;
+            if( r == 0 ) {
+                death_message = "<p><b>Game over</b></p><p>You have died! Your noble quest has come to an end. Your corpse rots away, left for future brave adventurers to encounter.</p>";
+            }
+            else if( r == 1 ) {
+                death_message = "<p><b>Game over</b></p><p>You have died! Your adventure has met an untimely end. Better luck next time!</p>";
+            }
+            else {
+                death_message = "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
+            }
+            this->showInfoDialog(death_message, string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
@@ -5314,7 +5325,6 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
-    //this->view->update();
     gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
 }
 
