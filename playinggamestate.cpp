@@ -2069,7 +2069,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL),
-    difficulty(DIFFICULTY_MEDIUM), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -3602,17 +3602,22 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: game element wasn't expected here");
                     }
+
                     QStringRef difficulty_s = reader.attributes().value("difficulty");
                     qDebug("read difficulty: %s\n", difficulty_s.toString().toStdString().c_str());
                     for(int i=0;i<N_DIFFICULTIES;i++) {
                         Difficulty test_difficulty = (Difficulty)i;
                         if( difficulty_s.toString().toStdString() == Game::getDifficultyString(test_difficulty) ) {
-                            this->difficulty = test_difficulty;
-                            qDebug("    set difficulty to: %d\n", difficulty);
+                            this->setDifficulty(test_difficulty);
                             break;
                         }
                     }
                     // if not defined, we keep to the default
+
+                    QStringRef permadeath_s = reader.attributes().value("permadeath");
+                    qDebug("read permadeath: %s\n", permadeath_s.toString().toStdString().c_str());
+                    bool permadeath = parseBool(permadeath_s.toString(), true);
+                    this->setPermadeath(permadeath);
                 }
                 else if( reader.name() == "location" ) {
                     if( location != NULL ) {
@@ -6229,7 +6234,7 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     fprintf(file, "<?xml version=\"1.0\" ?>\n");
     fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
     fprintf(file, "\n");
-    fprintf(file, "<game difficulty=\"%s\"/>", Game::getDifficultyString(difficulty).c_str());
+    fprintf(file, "<game difficulty=\"%s\" permadeath=\"%s\"/>", Game::getDifficultyString(difficulty).c_str(), permadeath ? "true" : "false");
     fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
     fprintf(file, "\n");
 

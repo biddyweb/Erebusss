@@ -13,9 +13,11 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ characterComboBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
+    main_stacked_widget(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
+    //cheat_mode = true;
+    //cheat_start_level = 1;
     LOG("OptionsGamestate::OptionsGamestate()\n");
     optionsGamestate = this;
 
@@ -246,19 +248,29 @@ void OptionsGamestate::clickedStart() {
         }*/
     }
 
-    QPushButton *startButton = new QPushButton("Start");
-    game_g->initButton(startButton);
-    startButton->setShortcut(QKeySequence(Qt::Key_S));
-    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(startButton);
-    connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
+    permadeathCheckBox = new QCheckBox("Permadeath");
+    permadeathCheckBox->setFont(game_g->getFontBig());
+    permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
+    layout->addWidget(permadeathCheckBox);
 
-    QPushButton *closeButton = new QPushButton("Cancel");
-    game_g->initButton(closeButton);
-    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
-    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(closeButton);
-    connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QPushButton *startButton = new QPushButton("Start");
+        game_g->initButton(startButton);
+        startButton->setShortcut(QKeySequence(Qt::Key_S));
+        startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(startButton);
+        connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
+
+        QPushButton *closeButton = new QPushButton("Cancel");
+        game_g->initButton(closeButton);
+        closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
+        closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        h_layout->addWidget(closeButton);
+        connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+    }
 }
 
 void OptionsGamestate::clickedStartGame() {
@@ -267,13 +279,14 @@ void OptionsGamestate::clickedStartGame() {
     //int difficulty_id = this->difficultyButtonGroup->checkedId();
     int difficulty_id = this->difficultyComboBox->currentIndex();
     LOG("difficulty_id: %d\n", difficulty_id);
+    bool permadeath = this->permadeathCheckBox->isChecked();
     ASSERT_LOGGER(difficulty_id > 0);
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
     Difficulty difficulty = (Difficulty)difficulty_id;
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
-    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), cheat_mode, cheat_start_level);
+    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), permadeath, cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }
 

@@ -1142,6 +1142,7 @@ void Game::handleMessages() {
                 PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getCheatMode(), start_message->getCheatStartLevel());
                 gamestate = playing_gamestate;
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
+                playing_gamestate->setPermadeath(start_message->getPermadeath());
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
                 string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
                 playing_gamestate->loadQuest(qt_filename, false);

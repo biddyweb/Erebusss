@@ -326,10 +326,11 @@ public:
 class StartGameMessage : public GameMessage {
     Difficulty difficulty;
     size_t player_type;
+    bool permadeath;
     bool cheat_mode;
     int cheat_start_level;
 public:
-    StartGameMessage(Difficulty difficulty, size_t player_type, bool cheat_mode, int cheat_start_level) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty), player_type(player_type), cheat_mode(cheat_mode), cheat_start_level(cheat_start_level) {
+    StartGameMessage(Difficulty difficulty, size_t player_type, bool permadeath, bool cheat_mode, int cheat_start_level) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), difficulty(difficulty), player_type(player_type), permadeath(permadeath), cheat_mode(cheat_mode), cheat_start_level(cheat_start_level) {
     }
 
     Difficulty getDifficulty() const {
@@ -337,6 +338,9 @@ public:
     }
     size_t getPlayerType() const {
         return this->player_type;
+    }
+    bool getPermadeath() const {
+        return this->permadeath;
     }
     bool getCheatMode() const {
         return this->cheat_mode;

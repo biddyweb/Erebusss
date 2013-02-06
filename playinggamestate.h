@@ -370,6 +370,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     QStackedWidget *main_stacked_widget;
 
     Difficulty difficulty;
+    bool permadeath;
 
     Character *player;
     stringstream journal_ss;
@@ -446,6 +447,9 @@ public:
         return this->difficulty;
     }
     void setDifficulty(Difficulty difficulty);
+    void setPermadeath(bool permadeath) {
+        this->permadeath = permadeath;
+    }
     void loadQuest(string filename, bool is_savegame);
     bool saveGame(const string &filename) const;
 
