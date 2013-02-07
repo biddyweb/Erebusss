@@ -802,3 +802,26 @@ public:
         return filename;
     }
 };
+
+enum Direction4 {
+    DIRECTION4_NORTH = 0,
+    DIRECTION4_EAST = 1,
+    DIRECTION4_SOUTH = 2,
+    DIRECTION4_WEST = 3
+};
+
+class Seed {
+public:
+    Vector2D pos;
+    Direction4 dir;
+
+    Seed(Vector2D pos, Direction4 dir) : pos(pos), dir(dir) {
+    }
+};
+
+class LocationGenerator {
+    static void exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, bool first);
+
+public:
+    static Location *generateLocation(Vector2D *player_start);
+};

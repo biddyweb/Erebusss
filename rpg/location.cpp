@@ -417,6 +417,12 @@ void FloorRegion::insertPoint(size_t indx, Vector2D point) {
 
 FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     FloorRegion *floor_regions = new FloorRegion();
+    if( x < 0.0f ) {
+        throw string("x coord too small");
+    }
+    else if( y < 0.0f ) {
+        throw string("y coord too small");
+    }
     floor_regions->addPoint(Vector2D(x, y));
     floor_regions->addPoint(Vector2D(x, y+h));
     floor_regions->addPoint(Vector2D(x+w, y+h));
@@ -1694,4 +1700,158 @@ bool Quest::testIfComplete(const PlayingGamestate *playing_gamestate) {
 }
 
 QuestInfo::QuestInfo(const string &filename) : filename(filename) {
+}
+
+Direction4 rotateDirection4(Direction4 dir, int turn) {
+    int i_dir = (int)dir;
+    i_dir += turn;
+    while( i_dir < 0 )
+        i_dir += 4;
+    while( i_dir >= 4 )
+        i_dir -= 4;
+    dir = (Direction4)i_dir;
+    return dir;
+}
+
+Vector2D directionFromEnum(Direction4 dir) {
+    if( dir == DIRECTION4_NORTH )
+        return Vector2D(0.0f, -1.0f);
+    else if( dir == DIRECTION4_EAST )
+        return Vector2D(1.0f, 0.0f);
+    else if( dir == DIRECTION4_SOUTH )
+        return Vector2D(0.0f, 1.0f);
+    return Vector2D(-1.0f, 0.0f);
+}
+
+void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, bool first) {
+    const float passage_width = 1.0f;
+    const float passage_hwidth = 0.5f * passage_width;
+    float passage_length = 0;
+    {
+        int roll = rollDice(1, 6, 0);
+        if( roll == 1 )
+            passage_length = 2.5f;
+        else if( roll >= 2 && roll <= 4 )
+            passage_length = 5.0f;
+        else
+            passage_length = 7.5f;
+    }
+    Vector2D dir_vec = directionFromEnum(seed.dir);
+    Vector2D end_pos = seed.pos + dir_vec * passage_length;
+    bool room_for_junction = true;
+    Vector2D rect_pos, rect_size;
+    if( seed.dir == DIRECTION4_NORTH ) {
+        if( seed.pos.y - passage_length < 0.0f ) {
+            return;
+        }
+        if( seed.pos.y - (passage_length+passage_width) < 0.0f ) {
+            room_for_junction = false;
+        }
+        rect_pos = Vector2D(seed.pos.x - passage_hwidth, seed.pos.y - passage_length);
+        rect_size = Vector2D(passage_width, passage_length);
+    }
+    else if( seed.dir == DIRECTION4_EAST ) {
+        rect_pos = Vector2D(seed.pos.x, seed.pos.y - passage_hwidth);
+        rect_size = Vector2D(passage_length, passage_width);
+    }
+    else if( seed.dir == DIRECTION4_SOUTH ) {
+        rect_pos = Vector2D(seed.pos.x - passage_hwidth, seed.pos.y);
+        rect_size = Vector2D(passage_width, passage_length);
+    }
+    else if( seed.dir == DIRECTION4_WEST ) {
+        if( seed.pos.x - passage_length < 0.0f ) {
+            return;
+        }
+        if( seed.pos.x - (passage_length+passage_width) < 0.0f ) {
+            room_for_junction = false;
+        }
+        rect_pos = Vector2D(seed.pos.x - passage_length, seed.pos.y - passage_hwidth);
+        rect_size = Vector2D(passage_length, passage_width);
+    }
+    FloorRegion *floor_region = FloorRegion::createRectangle(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
+    location->addFloorRegion(floor_region);
+
+    if( !room_for_junction ) {
+        return;
+    }
+
+    // passage end
+    bool has_end = false;
+    bool left_turn = false;
+    bool right_turn = false;
+    int roll = first ? 2 : rollDice(2, 12, 0);
+    if( roll >= 4 && roll <= 8 ) {
+    }
+    else if( roll >= 9 && roll <= 11 ) {
+        has_end = true;
+        left_turn = true;
+    }
+    else if( roll >= 15 && roll <= 17 ) {
+        has_end = true;
+        right_turn = true;
+    }
+    else {
+        has_end = true;
+        left_turn = true;
+        right_turn = true;
+    }
+    // TODO: stairs
+
+    Direction4 l_dir = rotateDirection4(seed.dir, -1);
+    Direction4 r_dir = rotateDirection4(seed.dir, 1);
+    Vector2D l_dir_vec = directionFromEnum(l_dir);
+    Vector2D r_dir_vec = directionFromEnum(r_dir);
+
+    if( seed.dir == DIRECTION4_NORTH ) {
+        floor_region = FloorRegion::createRectangle(end_pos.x - passage_hwidth, end_pos.y - passage_width, passage_width, passage_width);
+    }
+    else if( seed.dir == DIRECTION4_EAST ) {
+        floor_region = FloorRegion::createRectangle(end_pos.x, end_pos.y - passage_hwidth, passage_width, passage_width);
+    }
+    else if( seed.dir == DIRECTION4_SOUTH ) {
+        floor_region = FloorRegion::createRectangle(end_pos.x - passage_hwidth, end_pos.y, passage_width, passage_width);
+    }
+    else if( seed.dir == DIRECTION4_WEST ) {
+        floor_region = FloorRegion::createRectangle(end_pos.x - passage_width, end_pos.y - passage_hwidth, passage_width, passage_width);
+    }
+    location->addFloorRegion(floor_region);
+
+    /*if( left_turn ) {
+        Seed new_seed(end_pos + dir_vec*passage_hwidth + l_dir_vec*passage_hwidth, l_dir);
+        seeds->push_back(new_seed);
+    }*/
+    if( right_turn ) {
+        Seed new_seed(end_pos + dir_vec*passage_hwidth + r_dir_vec*passage_hwidth, r_dir);
+        seeds->push_back(new_seed);
+    }
+}
+
+Location *LocationGenerator::generateLocation(Vector2D *player_start) {
+    Location *location = new Location("");
+    location->setBackgroundImageName("background_brown");
+    location->setFloorImageName("floor_rock");
+    location->setWallImageName("wall");
+
+    Vector2D start_pos(0.0f, 50.0f);
+    Seed seed(start_pos, DIRECTION4_EAST);
+    *player_start = Vector2D(start_pos + Vector2D(0.5f, 0.0f));
+
+    vector<Seed> seeds;
+    seeds.push_back(seed);
+
+    for(int count=0;count<10 && seeds.size() > 0;count++) {
+        vector<Seed> c_seeds;
+        for(vector<Seed>::iterator iter = seeds.begin(); iter != seeds.end(); ++iter) {
+            Seed seed = *iter;
+            c_seeds.push_back(seed);
+        }
+        seeds.clear();
+
+        for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
+            Seed seed = *iter;
+            exploreFromSeed(location, seed, &seeds, count==0);
+        }
+    }
+
+    return location;
 }

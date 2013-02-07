@@ -451,6 +451,7 @@ public:
         this->permadeath = permadeath;
     }
     void loadQuest(string filename, bool is_savegame);
+    void createRandomQuest();
     bool saveGame(const string &filename) const;
 
     virtual void quitGame();

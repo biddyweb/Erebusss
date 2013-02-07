@@ -4597,6 +4597,101 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
     LOG("done\n");
 }
 
+void PlayingGamestate::createRandomQuest() {
+    LOG("PlayingGamestate::createRandomQuest()\n");
+
+    MainWindow *window = game_g->getScreen()->getMainWindow();
+    window->setEnabled(false);
+    game_g->getScreen()->setPaused(true, true);
+
+    gui_overlay->setProgress(0);
+    qApp->processEvents();
+
+    if( this->player != NULL && this->player->getLocation() != NULL ) {
+        qDebug("remove player from location\n");
+        this->player->getLocation()->removeCharacter(this->player);
+        this->player->setListener(NULL, NULL);
+    }
+    if( this->quest != NULL ) {
+        qDebug("delete previous quest...\n");
+        delete this->quest;
+    }
+    // delete any items from previous quests
+    view->clear();
+    //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
+
+    qDebug("create random quest\n");
+    this->quest = new Quest();
+    //this->quest->setCompleted(true); // test
+
+    this->view_transform_3d = true;
+    this->view_walls_3d = true;
+
+    Vector2D player_start;
+    Location *location = LocationGenerator::generateLocation(&player_start);
+
+    this->quest->addLocation(location);
+    this->c_location = location;
+    this->c_location->addCharacter(player, player_start.x, player_start.y);
+
+    gui_overlay->setProgress(50);
+    qApp->processEvents();
+
+    int progress_lo = 50, progress_hi = 100;
+    int progress_count = 0;
+    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
+        Location *loc = *iter;
+        qDebug("process location: %s", loc->getName().c_str());
+        if( loc->getBackgroundImageName().length() == 0 ) {
+            throw string("Location doesn't define background image name");
+        }
+        else if( loc->getFloorImageName().length() == 0 ) {
+            throw string("Location doesn't define floor image name");
+        }
+
+        loc->createBoundariesForRegions();
+        loc->createBoundariesForScenery();
+        loc->addSceneryToFloorRegions();
+        loc->calculateDistanceGraph();
+
+        progress_count++;
+        if( progress_count % 4 == 0 ) {
+            float progress = ((float)progress_count) / ((float)quest->getNLocations());
+            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
+            qApp->processEvents();
+        }
+    }
+
+    gui_overlay->unsetProgress();
+    qApp->processEvents();
+
+    this->c_location->setListener(this, NULL); // must do after creating the location and its contents, so it doesn't try to add items to the scene, etc
+    this->setupView();
+
+    window->setEnabled(true);
+    game_g->getScreen()->setPaused(false, true);
+    game_g->getScreen()->restartElapsedTimer();
+
+    //qApp->processEvents();
+
+    if( quest->getInfo().length() > 0 ) {
+        string quest_info = quest->getInfo();
+        quest_info = convertToHTML(quest_info);
+        stringstream str;
+        str << "<html><body>";
+        str << "<h1>Quest: " << quest->getName() << "</h1>";
+        str << "<p>" << quest_info << "</p>";
+        str << "</body></html>";
+        this->showInfoWindow(str.str());
+
+        this->journal_ss << "<p><b>Quest Details: " << quest->getName() << "</b></p>";
+        this->journal_ss << "<p>" << quest_info << "</p>";
+    }
+
+    qDebug("View is transformed? %d", view->isTransformed());
+    LOG("done\n");
+}
+
 void PlayingGamestate::locationAddItem(const Location *location, Item *item, bool visible) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
