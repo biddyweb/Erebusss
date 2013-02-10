@@ -474,6 +474,7 @@ public:
     }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);
+    static FloorRegion *createRectangle(const Rect2D &rect);
 };
 
 class Location {
@@ -820,7 +821,8 @@ public:
 };
 
 class LocationGenerator {
-    static void exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, bool first);
+    static bool collidesWithFloorRegions(vector<Rect2D> *floor_regions_rects, Rect2D rect, float gap);
+    static void exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
 
 public:
     static Location *generateLocation(Vector2D *player_start);

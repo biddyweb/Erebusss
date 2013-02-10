@@ -430,6 +430,10 @@ FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     return floor_regions;
 }
 
+FloorRegion *FloorRegion::createRectangle(const Rect2D &rect) {
+    return createRectangle(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+}
+
 Location::Location(const string &name) :
     name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
     distance_graph(NULL), wall_x_scale(3.0f), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
@@ -755,6 +759,20 @@ void Location::removeTrap(Trap *trap) {
 
 void Location::createBoundariesForRegions() {
     qDebug("Location::createBoundariesForRegions()");
+
+#ifdef _DEBUG
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        /*for(vector<FloorRegion *>::iterator iter2 = iter+1; iter2 != floor_regions.end(); ++iter2) {
+            FloorRegion *floor_region2 = *iter2;
+        }*/
+        qDebug("Floor region:");
+        for(size_t j=0;j<floor_region->getNPoints();j++) {
+            Vector2D p0 = floor_region->getPoint(j);
+            qDebug("    %d : %f, %f", j, p0.x, p0.y);
+        }
+    }
+#endif
     // imprint coi vertices
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
@@ -1723,7 +1741,18 @@ Vector2D directionFromEnum(Direction4 dir) {
     return Vector2D(-1.0f, 0.0f);
 }
 
-void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, bool first) {
+bool LocationGenerator::collidesWithFloorRegions(vector<Rect2D> *floor_regions_rects, Rect2D rect, float gap) {
+    rect.expand(gap);
+    for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end(); ++iter) {
+        Rect2D test_rect = *iter;
+        if( test_rect.overlaps(rect) ) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
     const float passage_width = 1.0f;
     const float passage_hwidth = 0.5f * passage_width;
     float passage_length = 0;
@@ -1737,6 +1766,7 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
             passage_length = 7.5f;
     }
     Vector2D dir_vec = directionFromEnum(seed.dir);
+    qDebug("explore from seed at %f, %f ; direction %d: %f, %f", seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     Vector2D end_pos = seed.pos + dir_vec * passage_length;
     bool room_for_junction = true;
     Vector2D rect_pos, rect_size;
@@ -1768,8 +1798,81 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
         rect_pos = Vector2D(seed.pos.x - passage_length, seed.pos.y - passage_hwidth);
         rect_size = Vector2D(passage_length, passage_width);
     }
-    FloorRegion *floor_region = FloorRegion::createRectangle(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
-    location->addFloorRegion(floor_region);
+    Rect2D floor_region_rect(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
+    qDebug("    add passage?: %f, %f w %f h %f", rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
+    {
+        /*bool collides = false;
+        for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end() && !collides; ++iter) {
+            Rect2D rect = *iter;
+            if( floor_region_rect.overlaps(rect) ) {
+                collides = true;
+            }
+        }*/
+        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, floor_region_rect, 0.0f);
+        // TODO: shorten passage length to try to fit?
+        if( collides ) {
+            qDebug("    ### passageway collided!");
+            return;
+        }
+        FloorRegion *floor_region = FloorRegion::createRectangle(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
+        location->addFloorRegion(floor_region);
+        floor_regions_rects->push_back(floor_region_rect);
+    }
+
+    // contents
+    int n_doors = 0;
+    {
+        int roll = rollDice(2, 12, 0);
+        if( roll >= 5 && roll <= 15 ) {
+        }
+        else if( roll >= 16 && roll <= 19 ) {
+            n_doors = 1;
+        }
+        else if( roll >= 20 && roll <= 21 ) {
+            n_doors = 2;
+        }
+        else {
+            // TODO: wandering monster!
+        }
+    }
+    for(int i=0;i<n_doors;i++) {
+        const float scale = 2.0f;
+        const float door_width = 1.0f;
+        const float door_depth = 1.0f;
+        const float room_size = 2.5f;
+        // TODO: different room sizes
+        int n_slots = (int)(scale*passage_length) - 2;
+        int pos_i = 1 + rand() % n_slots;
+        float pos = ((float)pos_i) / (float)scale;
+        bool side = rand() % 2 == 0;
+        Direction4 room_dir = rotateDirection4(seed.dir, side ? -1 : 1);
+        Vector2D room_dir_vec = directionFromEnum(room_dir);
+        Vector2D door_centre = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * ( passage_hwidth + 0.5f*door_depth );
+        Vector2D door_size = ( seed.dir == DIRECTION4_WEST || seed.dir == DIRECTION4_EAST ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
+        Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
+        bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, door_rect, 0.0f);
+        if( !collides_door ) {
+            Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*room_size );
+            Rect2D room_rect(room_centre - Vector2D(0.5f*room_size, 0.5f*room_size), room_centre + Vector2D(0.5f*room_size, 0.5f*room_size));
+            bool collides_room = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, room_rect, 1.0f);
+            // TODO: different positions or sizes if room collides
+            if( !collides_room ) {
+                FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
+                location->addFloorRegion(floor_region);
+                floor_regions_rects->push_back(door_rect);
+
+                floor_region = FloorRegion::createRectangle(room_rect);
+                location->addFloorRegion(floor_region);
+                floor_regions_rects->push_back(room_rect);
+
+                // TODO: room contents
+
+                int n_room_doors = rollDice(1, 3, -2);
+                for(int j=0;j<n_room_doors;j++) {
+                }
+            }
+        }
+    }
 
     if( !room_for_junction ) {
         return;
@@ -1779,21 +1882,24 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
     bool has_end = false;
     bool left_turn = false;
     bool right_turn = false;
-    int roll = first ? 2 : rollDice(2, 12, 0);
-    if( roll >= 4 && roll <= 8 ) {
-    }
-    else if( roll >= 9 && roll <= 11 ) {
-        has_end = true;
-        left_turn = true;
-    }
-    else if( roll >= 15 && roll <= 17 ) {
-        has_end = true;
-        right_turn = true;
-    }
-    else {
-        has_end = true;
-        left_turn = true;
-        right_turn = true;
+    {
+        int roll = first ? 2 : rollDice(2, 12, 0);
+        //roll = 2;
+        if( roll >= 4 && roll <= 8 ) {
+        }
+        else if( roll >= 9 && roll <= 11 ) {
+            has_end = true;
+            left_turn = true;
+        }
+        else if( roll >= 15 && roll <= 17 ) {
+            has_end = true;
+            right_turn = true;
+        }
+        else {
+            has_end = true;
+            left_turn = true;
+            right_turn = true;
+        }
     }
     // TODO: stairs
 
@@ -1802,26 +1908,50 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
     Vector2D l_dir_vec = directionFromEnum(l_dir);
     Vector2D r_dir_vec = directionFromEnum(r_dir);
 
+    Rect2D floor_region_junction_rect;
     if( seed.dir == DIRECTION4_NORTH ) {
-        floor_region = FloorRegion::createRectangle(end_pos.x - passage_hwidth, end_pos.y - passage_width, passage_width, passage_width);
+        floor_region_junction_rect = Rect2D(end_pos.x - passage_hwidth, end_pos.y - passage_width, passage_width, passage_width);
     }
     else if( seed.dir == DIRECTION4_EAST ) {
-        floor_region = FloorRegion::createRectangle(end_pos.x, end_pos.y - passage_hwidth, passage_width, passage_width);
+        floor_region_junction_rect = Rect2D(end_pos.x, end_pos.y - passage_hwidth, passage_width, passage_width);
     }
     else if( seed.dir == DIRECTION4_SOUTH ) {
-        floor_region = FloorRegion::createRectangle(end_pos.x - passage_hwidth, end_pos.y, passage_width, passage_width);
+        floor_region_junction_rect = Rect2D(end_pos.x - passage_hwidth, end_pos.y, passage_width, passage_width);
     }
     else if( seed.dir == DIRECTION4_WEST ) {
-        floor_region = FloorRegion::createRectangle(end_pos.x - passage_width, end_pos.y - passage_hwidth, passage_width, passage_width);
+        floor_region_junction_rect = Rect2D(end_pos.x - passage_width, end_pos.y - passage_hwidth, passage_width, passage_width);
     }
-    location->addFloorRegion(floor_region);
+    else {
+        throw string("unknown direction");
+    }
+    qDebug("    add junction?: %f, %f w %f h %f", floor_region_junction_rect.getX(), floor_region_junction_rect.getY(), floor_region_junction_rect.getWidth(), floor_region_junction_rect.getHeight());
+    {
+        /*bool collides = false;
+        for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end() && !collides; ++iter) {
+            Rect2D rect = *iter;
+            if( floor_region_junction_rect.overlaps(rect) ) {
+                collides = true;
+            }
+        }*/
+        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, floor_region_junction_rect, 0.0f);
+        if( collides ) {
+            qDebug("    ### junction collided!");
+            return;
+        }
+        FloorRegion *floor_region = FloorRegion::createRectangle(floor_region_junction_rect);
+        location->addFloorRegion(floor_region);
+    }
 
-    /*if( left_turn ) {
+    floor_regions_rects->push_back(floor_region_junction_rect);
+
+    if( left_turn ) {
         Seed new_seed(end_pos + dir_vec*passage_hwidth + l_dir_vec*passage_hwidth, l_dir);
+        qDebug("    add left turn at %f, %f", new_seed.pos.x, new_seed.pos.y);
         seeds->push_back(new_seed);
-    }*/
+    }
     if( right_turn ) {
         Seed new_seed(end_pos + dir_vec*passage_hwidth + r_dir_vec*passage_hwidth, r_dir);
+        qDebug("    add right turn at %f, %f", new_seed.pos.x, new_seed.pos.y);
         seeds->push_back(new_seed);
     }
 }
@@ -1838,6 +1968,7 @@ Location *LocationGenerator::generateLocation(Vector2D *player_start) {
 
     vector<Seed> seeds;
     seeds.push_back(seed);
+    vector<Rect2D> floor_regions_rects;
 
     for(int count=0;count<10 && seeds.size() > 0;count++) {
         vector<Seed> c_seeds;
@@ -1849,7 +1980,7 @@ Location *LocationGenerator::generateLocation(Vector2D *player_start) {
 
         for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
             Seed seed = *iter;
-            exploreFromSeed(location, seed, &seeds, count==0);
+            exploreFromSeed(location, seed, &seeds, &floor_regions_rects, count==0);
         }
     }
 
