@@ -51,6 +51,22 @@ float Vector2D::distFromLineSq(const Vector2D &o, const Vector2D &n) const {
     return dist;
 }
 
+bool Rect2D::intersect(const Rect2D &rect) const {
+    if( rect.bottom_right.x >= this->top_left.x - E_TOL_LINEAR && rect.bottom_right.y >= this->top_left.y - E_TOL_LINEAR &&
+        rect.top_left.x <= this->bottom_right.x + E_TOL_LINEAR && rect.top_left.y <= this->bottom_right.y + E_TOL_LINEAR ) {
+        return true;
+    }
+    return false;
+}
+
+bool Rect2D::overlaps(const Rect2D &rect) const {
+    if( rect.bottom_right.x >= this->top_left.x + E_TOL_LINEAR && rect.bottom_right.y >= this->top_left.y + E_TOL_LINEAR &&
+        rect.top_left.x <= this->bottom_right.x - E_TOL_LINEAR && rect.top_left.y <= this->bottom_right.y - E_TOL_LINEAR ) {
+        return true;
+    }
+    return false;
+}
+
 void Polygon2D::addPoint(Vector2D point) {
     this->points.push_back(point);
     if( this->points.size() == 1 ) {

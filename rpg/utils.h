@@ -174,6 +174,39 @@ public:
     }
 };
 
+class Rect2D {
+    Vector2D top_left;
+    Vector2D bottom_right;
+public:
+    Rect2D() {
+    }
+    Rect2D(Vector2D top_left, Vector2D bottom_right) : top_left(top_left), bottom_right(bottom_right) {
+    }
+    Rect2D(float x, float y, float w, float h) : top_left(x, y), bottom_right(x+w, y+h) {
+    }
+
+    float getX() const {
+        return top_left.x;
+    }
+    float getY() const {
+        return top_left.y;
+    }
+    float getWidth() const {
+        return bottom_right.x - top_left.x;
+    }
+    float getHeight() const {
+        return bottom_right.y - top_left.y;
+    }
+
+    bool intersect(const Rect2D &rect) const;
+    bool overlaps(const Rect2D &rect) const;
+
+    void expand(float dist) {
+        this->top_left -= Vector2D(dist, dist);
+        this->bottom_right += Vector2D(dist, dist);
+    }
+};
+
 class Polygon2D {
 protected:
     vector<Vector2D> points; // should be stored anti-clockwise
