@@ -344,6 +344,8 @@ class SaveGameWindow : public QWidget {
     QListWidget *list;
     QLineEdit *edit;
 
+    void requestNewSaveGame();
+
 private slots:
     void clickedSave();
     void clickedDelete();
@@ -371,6 +373,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     Difficulty difficulty;
     bool permadeath;
+    bool permadeath_has_savefilename;
+    string permadeath_savefilename;
 
     Character *player;
     stringstream journal_ss;
@@ -407,7 +411,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void moveToLocation(Location *location, Vector2D pos);
     void setupView();
     void autoSave() {
-        this->saveGame("autosave.xml");
+        this->saveGame("autosave.xml", false);
     }
     void requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery);
     void clickedOnNPC(Character *character);
@@ -450,9 +454,18 @@ public:
     void setPermadeath(bool permadeath) {
         this->permadeath = permadeath;
     }
+    bool isPermadeath() const {
+        return this->permadeath;
+    }
+    bool hasPermadeathSavefilename() const {
+        return this->permadeath_has_savefilename;
+    }
+    string getPermadeathSavefilename() const {
+        return this->permadeath_savefilename;
+    }
     void loadQuest(string filename, bool is_savegame);
     void createRandomQuest();
-    bool saveGame(const string &filename) const;
+    bool saveGame(const string &filename, bool already_fullpath);
 
     virtual void quitGame();
     virtual void update();

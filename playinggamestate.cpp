@@ -1877,6 +1877,23 @@ void CampaignWindow::clickedMagicShop() {
 SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), list(NULL), edit(NULL)
 {
+    if( playing_gamestate->isPermadeath() ) {
+        if( playing_gamestate->hasPermadeathSavefilename() ) {
+            string filename = playing_gamestate->getPermadeathSavefilename();
+            LOG("permadeath save mode: save as existing file: %s\n", filename.c_str());
+            if( playing_gamestate->saveGame(filename, true) ) {
+                playing_gamestate->showInfoDialog("The game has been successfully saved.");
+            }
+            else {
+                game_g->showErrorDialog("Failed to save game!");
+            }
+        }
+        else {
+            this->requestNewSaveGame();
+        }
+        return;
+    }
+
     playing_gamestate->addWidget(this);
 
     QFont font = game_g->getFontBig();
@@ -1936,17 +1953,10 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
 }
 
-void SaveGameWindow::clickedSave() {
-    LOG("SaveGameWindow::clickedSave()\n");
-
-    int index = list->currentRow();
-    LOG("clicked index %d\n", index);
-    if( index == -1 ) {
-        return;
-    }
-    ASSERT_LOGGER(index >= 0 && index < list->count());
-    if( index == 0 ) {
-        QString filename = QString(savegame_root.c_str());
+void SaveGameWindow::requestNewSaveGame() {
+    QString filename;
+    if( !playing_gamestate->isPermadeath() ) {
+        filename = QString(savegame_root.c_str());
         QDateTime date_time = QDateTime::currentDateTime();
         QDate date = date_time.date();
         filename += QString("%1").arg(QString::number(date.year()), 2, QChar('0'));
@@ -1962,46 +1972,60 @@ void SaveGameWindow::clickedSave() {
         filename += "-";
         filename += QString("%1").arg(QString::number(time.second()), 2, QChar('0'));
         //filename += date_time.toString();
+    }
 
-        QWidget *subwindow = new QWidget();
-        playing_gamestate->addWidget(subwindow);
+    QWidget *subwindow = new QWidget();
+    playing_gamestate->addWidget(subwindow);
 
-        QVBoxLayout *layout = new QVBoxLayout();
-        subwindow->setLayout(layout);
+    QVBoxLayout *layout = new QVBoxLayout();
+    subwindow->setLayout(layout);
 
-        QLabel *label = new QLabel("Choose a filename:");
-        layout->addWidget(label);
+    QLabel *label = new QLabel("Choose a filename:");
+    layout->addWidget(label);
 
-        this->edit = new QLineEdit(filename);
-        edit->grabKeyboard(); // needed, due to previously having set the savegame list to grab the keyboard
-        // disallow: \ / : * ? " < > |
-        QRegExp rx("[^\\\\/:*?\"<>|]*");
-        QValidator *validator = new QRegExpValidator(rx, this);
-        this->edit->setValidator(validator);
-        layout->addWidget(edit);
-        this->edit->setFocus();
-        connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
+    this->edit = new QLineEdit(filename);
+    edit->grabKeyboard(); // needed, due to previously having set the savegame list to grab the keyboard
+    // disallow: \ / : * ? " < > |
+    QRegExp rx("[^\\\\/:*?\"<>|]*");
+    QValidator *validator = new QRegExpValidator(rx, this);
+    this->edit->setValidator(validator);
+    layout->addWidget(edit);
+    this->edit->setFocus();
+    connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
-        QPushButton *saveButton = new QPushButton("Save game");
-        game_g->initButton(saveButton);
-        saveButton->setShortcut(QKeySequence(Qt::Key_Return));
-        saveButton->setFont(game_g->getFontBig());
-        saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        layout->addWidget(saveButton);
-        connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSaveNew()));
+    QPushButton *saveButton = new QPushButton("Save game");
+    game_g->initButton(saveButton);
+    saveButton->setShortcut(QKeySequence(Qt::Key_Return));
+    saveButton->setFont(game_g->getFontBig());
+    saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(saveButton);
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSaveNew()));
 
-        QPushButton *closeButton = new QPushButton("Cancel");
-        game_g->initButton(closeButton);
-        closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
-        closeButton->setFont(game_g->getFontBig());
-        closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        layout->addWidget(closeButton);
-        connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
+    QPushButton *closeButton = new QPushButton("Cancel");
+    game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
+    closeButton->setFont(game_g->getFontBig());
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeAllSubWindows()));
+}
+
+void SaveGameWindow::clickedSave() {
+    LOG("SaveGameWindow::clickedSave()\n");
+
+    int index = list->currentRow();
+    LOG("clicked index %d\n", index);
+    if( index == -1 ) {
+        return;
+    }
+    ASSERT_LOGGER(index >= 0 && index < list->count());
+    if( index == 0 ) {
+        this->requestNewSaveGame();
     }
     else {
         QString filename = list->item(index)->text();
         LOG("save as existing file: %s\n", filename.toStdString().c_str());
-        if( playing_gamestate->saveGame(filename.toStdString()) ) {
+        if( playing_gamestate->saveGame(filename.toStdString(), false) ) {
             //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
             playing_gamestate->showInfoDialog("The game has been successfully saved.");
         }
@@ -2039,37 +2063,42 @@ void SaveGameWindow::clickedSaveNew() {
     LOG("SaveGameWindow::clickedSaveNew()\n");
     ASSERT_LOGGER(this->edit != NULL);
     QString filename = this->edit->text();
-    filename += QString(savegame_ext.c_str());
-    LOG("save as new file: %s\n", filename.toStdString().c_str());
 
-    string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
-    QFile qfile( QString(full_path.c_str()) );
-    bool ok = true;
-    if( qfile.exists() ) {
-        LOG("file exists!\n");
-        //if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
-        if( !playing_gamestate->askQuestionDialog("Are you sure you wish to overwrite an existing save game file?") ) {
-            LOG("user says to not save\n");
-            ok = false;
-        }
+    if( filename.length() == 0 ) {
+        playing_gamestate->showInfoDialog("Please enter a filename.");
     }
-    if( ok ) {
-        if( playing_gamestate->saveGame(filename.toStdString()) ) {
-            //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
-            playing_gamestate->showInfoDialog("The game has been successfully saved.");
+    else {
+        filename += QString(savegame_ext.c_str());
+        LOG("save as new file: %s\n", filename.toStdString().c_str());
+        string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
+        QFile qfile( QString(full_path.c_str()) );
+        bool ok = true;
+        if( qfile.exists() ) {
+            LOG("file exists!\n");
+            //if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
+            if( !playing_gamestate->askQuestionDialog("Are you sure you wish to overwrite an existing save game file?") ) {
+                LOG("user says to not save\n");
+                ok = false;
+            }
         }
-        else {
-            game_g->showErrorDialog("Failed to save game!");
+        if( ok ) {
+            if( playing_gamestate->saveGame(full_path, true) ) {
+                //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
+                playing_gamestate->showInfoDialog("The game has been successfully saved.");
+            }
+            else {
+                game_g->showErrorDialog("Failed to save game!");
+            }
         }
+        playing_gamestate->closeAllSubWindows();
     }
-    playing_gamestate->closeAllSubWindows();
 }
 
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL),
-    difficulty(DIFFICULTY_MEDIUM), permadeath(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(false), permadeath_has_savefilename(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -4539,6 +4568,11 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         }
     }
 
+    if( this->permadeath && is_savegame ) {
+        this->permadeath_has_savefilename = true;
+        this->permadeath_savefilename = filename;
+    }
+
     gui_overlay->setProgress(50);
     qApp->processEvents();
 
@@ -5325,6 +5359,16 @@ void PlayingGamestate::update() {
 
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
+            if( this->permadeath && this->permadeath_has_savefilename ) {
+                string full_path = this->permadeath_savefilename;
+                QFile qfile( QString(full_path.c_str()) );
+                if( qfile.remove() ) {
+                    LOG("permadeath mode: removed save filename: %s\n", full_path.c_str());
+                }
+                else {
+                    LOG("permadeath mode: failed to remove save filename!: %s\n", full_path.c_str());
+                }
+            }
             this->player = NULL;
             string death_message;
             int r = rand() % 3;
@@ -6311,9 +6355,13 @@ void PlayingGamestate::saveTrap(FILE *file, const Trap *trap) const {
     fprintf(file, " />\n");
 }
 
-bool PlayingGamestate::saveGame(const string &filename) const {
+bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
     LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
-    string full_path = game_g->getApplicationFilename(savegame_folder + filename);
+    string full_path;
+    if( already_fullpath )
+        full_path = filename;
+    else
+        full_path = game_g->getApplicationFilename(savegame_folder + filename);
     LOG("full path: %s\n", full_path.c_str());
 
     FILE *file = fopen(full_path.c_str(), "wt");
@@ -6643,6 +6691,11 @@ bool PlayingGamestate::saveGame(const string &filename) const {
     fprintf(file, "</savegame>\n");
 
     fclose(file);
+
+    if( this->permadeath ) {
+        this->permadeath_has_savefilename = true;
+        this->permadeath_savefilename = full_path;
+    }
 
     game_g->getScreen()->getMainWindow()->unsetCursor();
     return true;
