@@ -412,7 +412,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 }
                                 else {
                                     int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                    if( is_ranged && rollDice(2, 6, 0) <= a_str ) {
+                                    if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
                                         qDebug("    extra strong hit!");
                                         int extra_damage = rollDice(1, 3, 0);
                                         damage += extra_damage;
