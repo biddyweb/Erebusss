@@ -393,15 +393,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                         }
                         else {
-                            /*int hit_roll = rollDice(2, 6, 0);
-                            int stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
-                            int mod_stat = this->modifyStatForDifficulty(playing_gamestate, stat);
-                            qDebug("character %s rolled %d / %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_stat, target_npc->getName().c_str(), is_ranged);
-                            if( hit_roll <= mod_stat ) {*/
                             int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
                             int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
                             int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
                             int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
+                            int a_str = this->getProfileIntProperty(profile_key_S_c);
+
                             int hit_roll = rollDice(2, 6, -7);
                             qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
                             if( hit_roll + mod_a_stat > mod_d_stat ) {
@@ -415,8 +412,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 }
                                 else {
                                     int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                    //if( rollDice(2, 6, 0) <= this->getStrength() ) {
-                                    if( is_ranged && rollDice(2, 6, 0) <= this->getProfileIntProperty(profile_key_S_c) ) {
+                                    if( is_ranged && rollDice(2, 6, 0) <= a_str ) {
                                         qDebug("    extra strong hit!");
                                         int extra_damage = rollDice(1, 3, 0);
                                         damage += extra_damage;
