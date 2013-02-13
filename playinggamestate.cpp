@@ -49,6 +49,67 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
+CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), spell(NULL), object(NULL) {
+    this->source_pos = source->getPos();
+    this->dest_pos = target_npc->getPos();
+    this->time_ms = game_g->getScreen()->getGameTimeTotalMS();
+}
+
+CharacterAction::~CharacterAction() {
+    if( this->object != NULL ) {
+        delete this->object;
+    }
+}
+
+void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
+    if( target_npc == NULL ) {
+        // target no longer exists
+        return;
+    }
+    if( type == CHARACTERACTION_SPELL ) {
+        ASSERT_LOGGER( spell != NULL );
+        spell->castOn(playing_gamestate, source, target_npc);
+    }
+}
+
+void CharacterAction::update() {
+    if( this->target_npc != NULL ) {
+        // update destination
+        this->dest_pos = this->target_npc->getPos();
+    }
+    if( this->object != NULL ) {
+        int diff_ms = game_g->getScreen()->getGameTimeTotalMS() - this->time_ms;
+        float alpha = ((float)diff_ms) / (float)duration_ms;
+        alpha = std::max(alpha, 0.0f);
+        alpha = std::min(alpha, 1.0f);
+        Vector2D curr_pos = this->source_pos * (1.0f-alpha) + this->dest_pos * alpha;
+        curr_pos.y += offset_y;
+        this->object->setPos(curr_pos.x, curr_pos.y);
+    }
+}
+
+void CharacterAction::notifyDead(Character *character) {
+    if( character == this->source )
+        this->source = NULL;
+    if( character == this->target_npc )
+        this->target_npc = NULL;
+}
+
+bool CharacterAction::isExpired() const {
+    if( game_g->getScreen()->getGameTimeTotalMS() >= time_ms + duration_ms ) {
+        return true;
+    }
+    return false;
+}
+
+CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell) {
+    CharacterAction *character_action = new CharacterAction(CHARACTERACTION_SPELL, source, target_npc, -0.75f);
+    character_action->duration_ms = 250;
+    character_action->spell = spell;
+    character_action->object = playing_gamestate->addSpellGraphic(source->getPos());
+    return character_action;
+}
+
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
         if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
@@ -2127,6 +2188,23 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
         painter.end();
         this->smoke_pixmap = pixmap;
     }
+    {
+#if defined(Q_OS_SYMBIAN)
+        const int res_c = 15;
+#else
+        const int res_c = 63;
+#endif
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+        radialGrad.setColorAt(0.0, QColor(255, 127, 0, 255));
+        radialGrad.setColorAt(1.0, QColor(255, 127, 0, 0));
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter.end();
+        this->fireball_pixmap = pixmap;
+    }
 
     // create UI
     LOG("create UI\n");
@@ -2894,6 +2972,10 @@ PlayingGamestate::~PlayingGamestate() {
     quest = NULL;
     c_location = NULL;
 
+    for(vector<CharacterAction *>::iterator iter = this->character_actions.begin(); iter != this->character_actions.end(); ++iter) {
+        CharacterAction *character_action = *iter;
+        delete character_action;
+    }
     /*for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
         AnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
@@ -4726,12 +4808,29 @@ void PlayingGamestate::createRandomQuest() {
     LOG("done\n");
 }
 
+void PlayingGamestate::addGraphicsItem(QGraphicsItem *object, float width) {
+    float item_scale = width / object->boundingRect().width();
+    if( this->view_transform_3d ) {
+        // undo the 3D transform
+        float centre_x = 0.5f*object->boundingRect().width();
+        float centre_y = 0.5f*object->boundingRect().height();
+        QTransform transform;
+        transform = transform.scale(item_scale, 2.0f*item_scale);
+        transform = transform.translate(-centre_x, -centre_y);
+        object->setTransform(transform);
+    }
+    else {
+        object->setTransformOriginPoint(-0.5f*object->boundingRect().width()*item_scale, -0.5f*object->boundingRect().height()*item_scale);
+        object->setScale(item_scale);
+    }
+    scene->addItem(object);
+}
+
 void PlayingGamestate::locationAddItem(const Location *location, Item *item, bool visible) {
     if( this->c_location == location ) {
         QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
         item->setUserGfxData(object);
         object->setPixmap( this->getItemImage( item->getImageName() ) );
-        scene->addItem(object);
         /*{
             // DEBUG
             QPen pen(Qt::red);
@@ -4742,20 +4841,7 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item, boo
         object->setPos(item->getX(), item->getY());
         object->setZValue(2.0f*E_TOL_LINEAR); // so items appear above DRAWTYPE_BACKGROUND Scenery
         object->setVisible(visible);
-
-        float item_scale = icon_width / object->pixmap().width();
-        if( this->view_transform_3d ) {
-            float centre_x = 0.5f*object->boundingRect().width();
-            float centre_y = 0.5f*object->boundingRect().height();
-            QTransform transform;
-            transform = transform.scale(item_scale, 2.0f*item_scale);
-            transform = transform.translate(-centre_x, -centre_y);
-            object->setTransform(transform);
-        }
-        else {
-            object->setTransformOriginPoint(-0.5f*object->pixmap().width()*item_scale, -0.5f*object->pixmap().height()*item_scale);
-            object->setScale(item_scale);
-        }
+        this->addGraphicsItem(object, icon_width);
     }
 }
 
@@ -4794,32 +4880,10 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
             z_value = E_TOL_LINEAR;
         }
         object->setZValue(z_value);
-        /*
-        //float scenery_scale = scenery_width / object->pixmap().width();
-        // n.b., aspect-ratio of scenery should match that of the corresponding image for this scenery!
-        float scenery_scale = scenery->getWidth() / object->pixmap().width();
-        //object->setTransformOriginPoint(-0.5f*object->pixmap().width()*scenery_scale, -0.5f*object->pixmap().height()*scenery_scale);
-        //object->setScale(scenery_scale);
-        //QTransform transform = QTransform::fromScale(scenery_scale, scenery_scale);
-        float centre_x = 0.5f*object->pixmap().width();
-        float centre_y = 0.5f*object->pixmap().height();
-        QTransform transform;
-        transform = transform.scale(scenery_scale, scenery_scale);
-        transform = transform.translate(-centre_x, -centre_y);
-        object->setTransform(transform);
-        */
-        /*float scenery_scale_w = scenery->getWidth() / object->pixmap().width();
-        float scenery_scale_h = scenery->getHeight() / object->pixmap().height();
-        float centre_x = 0.5f*object->pixmap().width();
-        float centre_y = 0.5f*object->pixmap().height();*/
         float scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
         float scenery_scale_h = scenery->getVisualHeight() / object->boundingRect().height();
-/*#ifdef TRANSFORM_3D
-        scenery_scale_h *= 2.0f;
-#endif*/
         float centre_x = 0.5f*object->boundingRect().width();
         float centre_y = 0.5f*object->boundingRect().height();
-        //centre_y += 0.25f * (scenery->getVisualHeight() - scenery->getHeight()) * object->boundingRect().height();
         centre_y += 0.5f * (scenery->getVisualHeight() - scenery->getHeight()) / scenery_scale_h;
         if( scenery->getVisualHeight() - scenery->getHeight() < 0.0f ) {
             qDebug(">>> %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
@@ -4909,7 +4973,6 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
         float character_scale = desired_size / (float)character_size;
         qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
         {
-            //Vector2D scale_centre(-desired_size*off_x/128.0f, -2.0f*desired_size*off_y/128.0f);
             Vector2D scale_centre(-desired_size*off_x/64.0f, -2.0f*desired_size*off_y/64.0f);
             QTransform transform;
             transform.translate(scale_centre.x, scale_centre.y);
@@ -5312,17 +5375,41 @@ void PlayingGamestate::update() {
     }
 
 #ifdef TIMING_INFO
-        QElapsedTimer timer_advance;
-        timer_advance.start();
+    QElapsedTimer timer_advance;
+    timer_advance.start();
 #endif
     scene->advance();
 #ifdef TIMING_INFO
-        qDebug("scene advance took %d", timer_advance.elapsed());
+    qDebug("scene advance took %d", timer_advance.elapsed());
 #endif
 
+
+    vector<CharacterAction *> delete_character_actions;
+    for(vector<CharacterAction *>::iterator iter = this->character_actions.begin(); iter != this->character_actions.end(); ++iter) {
+        CharacterAction *character_action = *iter;
+        if( character_action->isExpired() ) {
+            delete_character_actions.push_back(character_action);
+        }
+        else {
+            character_action->update();
+        }
+    }
+    for(vector<CharacterAction *>::iterator iter = delete_character_actions.begin(); iter != delete_character_actions.end(); ++iter) {
+        CharacterAction *character_action = *iter;
+        for(vector<CharacterAction *>::iterator iter2 = this->character_actions.begin(); iter2 != this->character_actions.end(); ++iter2) {
+            CharacterAction *character_action2 = *iter2;
+            if( character_action2 == character_action ) {
+                this->character_actions.erase(iter2);
+                break;
+            }
+        }
+        character_action->implement(this);
+        delete character_action;
+    }
+
 #ifdef TIMING_INFO
-        QElapsedTimer timer_cupdate;
-        timer_cupdate.start();
+    QElapsedTimer timer_cupdate;
+    timer_cupdate.start();
 #endif
     // Character::update() also handles movement, so need to do that with every update() call
     // though we could split out the AI etc to a separate function, as that doesn't need to be done with every update() call
@@ -5355,6 +5442,10 @@ void PlayingGamestate::update() {
             if( ch->getTargetNPC() == character ) {
                 ch->setTargetNPC(NULL);
             }
+        }
+        for(vector<CharacterAction *>::iterator iter = this->character_actions.begin(); iter != this->character_actions.end(); ++iter) {
+            CharacterAction *character_action = *iter;
+            character_action->notifyDead(character);
         }
 
         delete character; // also removes character from the QGraphicsScene, via the listeners
@@ -6770,6 +6861,19 @@ void PlayingGamestate::playSound(const string &sound_effect) {
 void PlayingGamestate::advanceQuest() {
     this->c_quest_indx++;
     ASSERT_LOGGER(this->c_quest_indx < this->quest_list.size());
+}
+
+QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
+    qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
+    QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
+    object->setPixmap( this->fireball_pixmap );
+    object->setPos(pos.x, pos.y);
+    object->setZValue(pos.y + 1000.0f);
+    /*float scale = 0.25f / object->pixmap().width();
+    object->setScale(scale);
+    this->scene->addItem(object);*/
+    this->addGraphicsItem(object, 0.25f);
+    return object;
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {

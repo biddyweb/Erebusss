@@ -49,12 +49,15 @@ bool Profile::hasFloatProperty(const string &key) const {
 }
 
 void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const {
+    // source may be NULL, if caster is no longer alive
+    // source may also equal the target, if casting on self
+    // n.b., caller should have called useSpell()
     if( this->type == "attack" ) {
         int damage = rollDice(rollX, rollY, rollZ);
         if( damage > 0 ) {
             if( target->decreaseHealth(playing_gamestate, damage, true, true) ) {
                 target->addPainTextEffect(playing_gamestate);
-                if( target->isDead() && source == playing_gamestate->getPlayer() ) {
+                if( target->isDead() && source != NULL && source == playing_gamestate->getPlayer() ) {
                     source->addXP(playing_gamestate, target->getXPWorth());
                 }
             }
@@ -66,7 +69,6 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
         LOG("unknown spell type: %s\n", this->type.c_str());
         ASSERT_LOGGER(false);
     }
-    source->useSpell(this->getName());
 }
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect) :
@@ -377,7 +379,17 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 str << "Casts ";
                                 str << spell->getName();
                                 playing_gamestate->addTextEffect(str.str(), this->getPos(), 500);
-                                spell->castOn(playing_gamestate, this, target_npc);
+                                this->useSpell(spell->getName());
+                                //spell->castOn(playing_gamestate, this, target_npc);
+                                if( this == target_npc ) {
+                                    // can cast straight away
+                                    spell->castOn(playing_gamestate, this, target_npc);
+                                }
+                                else {
+                                    // fire off an action
+                                    CharacterAction *action = CharacterAction::createSpellAction(playing_gamestate, this, target_npc, spell);
+                                    playing_gamestate->addCharacterAction(action);
+                                }
                             }
                         }
                         else {

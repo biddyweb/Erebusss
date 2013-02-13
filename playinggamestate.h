@@ -34,6 +34,38 @@ enum Direction {
     N_DIRECTIONS = 8
 };
 
+class CharacterAction {
+    enum Type {
+        CHARACTERACTION_RANGED_WEAPON = 0,
+        CHARACTERACTION_SPELL = 1
+    };
+    Type type;
+
+    Character *source;
+    Vector2D source_pos;
+    Character *target_npc;
+    Vector2D dest_pos;
+    int time_ms;
+    int duration_ms;
+    float offset_y;
+
+    const Spell *spell;
+
+    QGraphicsItem *object;
+
+    CharacterAction(Type type, Character *source, Character *target_npc, float offset_y);
+
+public:
+    ~CharacterAction();
+
+    void implement(PlayingGamestate *playing_gamestate) const;
+    void update();
+    void notifyDead(Character *character);
+    bool isExpired() const;
+
+    static CharacterAction *createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell);
+};
+
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
     MainGraphicsView *view;
@@ -384,6 +416,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Location *c_location;
     Quest *quest;
 
+    vector<CharacterAction *> character_actions;
+
     // character items in the view
     set<QGraphicsItem *> graphicsitems_characters;
 
@@ -398,6 +432,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     vector<Shop *> shops;
 
     QPixmap smoke_pixmap;
+    QPixmap fireball_pixmap;
 
     int time_last_complex_update_ms; // see update() for details
 
@@ -419,6 +454,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
     bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
     void testFogOfWar();
+    void addGraphicsItem(QGraphicsItem *object, float width);
 
     void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;
     void saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const;
@@ -531,6 +567,11 @@ public:
     Location *getCLocation() const {
         return this->c_location;
     }
+
+    void addCharacterAction(CharacterAction *character_action) {
+        this->character_actions.push_back(character_action);
+    }
+    QGraphicsItem *addSpellGraphic(Vector2D pos);
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;
