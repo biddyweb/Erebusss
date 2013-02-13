@@ -110,6 +110,14 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
     return character_action;
 }
 
+CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const string *projectile_image_name) {
+    CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
+    character_action->duration_ms = 250;
+    //character_action->object = playing_gamestate->addSpellGraphic(source->getPos());
+    return character_action;
+}
+
+
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
         if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
@@ -2547,6 +2555,17 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
                         this->item_images[name.toStdString()] = pixmap;
                     }
+                    else if( type == "projectile") {
+                        if( animation_layer_definition.size() > 0 ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("animations not supported for this animation type");
+                        }
+                        animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                        if( filename.length() > 0 )
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 8);
+                        else
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 8);
+                    }
                     else if( type == "scenery" ) {
                         if( animation_layer_definition.size() == 0 ) {
                             animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
@@ -2990,6 +3009,10 @@ PlayingGamestate::~PlayingGamestate() {
     }*/
     for(map<string, LazyAnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
         LazyAnimationLayer *animation_layer = (*iter).second;
+        delete animation_layer;
+    }
+    for(map<string, AnimationLayer *>::iterator iter = this->projectile_animation_layers.begin(); iter != this->projectile_animation_layers.end(); ++iter) {
+        AnimationLayer *animation_layer = (*iter).second;
         delete animation_layer;
     }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {

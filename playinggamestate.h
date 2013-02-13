@@ -64,6 +64,7 @@ public:
     bool isExpired() const;
 
     static CharacterAction *createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell);
+    static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const string *projectile_image_name);
 };
 
 class TextEffect : public QGraphicsTextItem {
@@ -424,6 +425,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     // data
     map<string, LazyAnimationLayer *> animation_layers;
     map<string, LazyAnimationLayer *> scenery_animation_layers;
+    map<string, AnimationLayer *> projectile_animation_layers;
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
     map<string, QPixmap> builtin_images;
