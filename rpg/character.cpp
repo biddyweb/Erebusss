@@ -55,7 +55,8 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     if( this->type == "attack" ) {
         int damage = rollDice(rollX, rollY, rollZ);
         if( damage > 0 ) {
-            if( target->decreaseHealth(playing_gamestate, damage, true, true) ) {
+            qDebug("cast attack spell: %d, %d", damage_armour, damage_shield);
+            if( target->decreaseHealth(playing_gamestate, damage, damage_armour, damage_shield) ) {
                 target->addPainTextEffect(playing_gamestate);
                 if( target->isDead() && source != NULL && source == playing_gamestate->getPlayer() ) {
                     source->addXP(playing_gamestate, target->getXPWorth());

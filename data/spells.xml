@@ -3,10 +3,12 @@
 
 <spell name="Fire bolt" type="attack"
     rollX="2" rollY="10" rollZ="0"
+    damage_shield="true"
     />
 
 <spell name="Acid strike" type="attack"
     rollX="2" rollY="20" rollZ="0"
+    damage_armour="true" damage_shield="true"
     />
 
 <spell name="Heal" type="heal"

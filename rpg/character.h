@@ -147,34 +147,26 @@ public:
 class Spell {
     string name;
     string type;
-    //int rating;
     int rollX, rollY, rollZ;
+    bool damage_armour, damage_shield;
 public:
-    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0) {
+    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0), damage_armour(false), damage_shield(false) {
     }
 
-    /*void setRating(int rating) {
-        this->rating = rating;
-    }
-    int getRating() const {
-        return this->rating;
-    }*/
-
-    void setRoll(int rollX, int rollY, int rollZ) {
-        this->rollX = rollX;
-        this->rollY = rollY;
-        this->rollZ = rollZ;
-    }
-    void getRoll(int *rollX, int *rollY, int *rollZ) const {
-        *rollX = this->rollX;
-        *rollY = this->rollY;
-        *rollZ = this->rollZ;
-    }
     string getName() const {
         return this->name;
     }
     string getType() const {
         return this->type;
+    }
+    void setRoll(int rollX, int rollY, int rollZ) {
+        this->rollX = rollX;
+        this->rollY = rollY;
+        this->rollZ = rollZ;
+    }
+    void setDamage(bool damage_armour, bool damage_shield) {
+        this->damage_armour = damage_armour;
+        this->damage_shield = damage_shield;
     }
     void castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const;
 };
