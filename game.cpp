@@ -152,22 +152,11 @@ const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) 
 
 AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
     //qDebug("### %d x %d\n", icon_width, icon_height);
-    bool dimensions_vertical = true;
-    if( n_frames == 1 && image.height() == stride_y ) {
-        dimensions_vertical = false; // hack for single-frame images that have the dimensions in the column direction, e.g., arrow.png projectile
-    }
     vector<QPixmap> frames;
     for(unsigned int i=0;i<n_dimensions;i++) {
         for(size_t j=0;j<n_frames;j++) {
-            int xpos = 0, ypos = 0;
-            if( dimensions_vertical ) {
-                xpos = stride_x*(x_offset+j) + icon_off_x;
-                ypos = stride_y*i + icon_off_y;
-            }
-            else {
-                xpos = stride_x*i;
-                ypos = 0;
-            }
+            int xpos = stride_x*(x_offset+j) + icon_off_x;
+            int ypos = stride_y*i + icon_off_y;
             frames.push_back( image.copy(xpos, ypos, icon_width, icon_height));
         }
     }

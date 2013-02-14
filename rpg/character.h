@@ -852,4 +852,6 @@ public:
     void setObjectiveId(const string &objective_id) {
         this->objective_id = objective_id;
     }
+
+    static void hitEnemy(PlayingGamestate *playing_gamestate, Character *source, Character *target, bool weapon_no_effect_magical, int weapon_damage);
 };

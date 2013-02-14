@@ -34,6 +34,8 @@ enum Direction {
     N_DIRECTIONS = 8
 };
 
+Direction directionFromVecDir(Vector2D dir);
+
 class CharacterAction {
     enum Type {
         CHARACTERACTION_RANGED_WEAPON = 0,
@@ -48,6 +50,10 @@ class CharacterAction {
     int time_ms;
     int duration_ms;
     float offset_y;
+
+    bool hits;
+    bool weapon_no_effect_magical;
+    int weapon_damage;
 
     const Spell *spell;
 
@@ -64,7 +70,7 @@ public:
     bool isExpired() const;
 
     static CharacterAction *createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell);
-    static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const string *projectile_image_name);
+    static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &ammo_key);
 };
 
 class TextEffect : public QGraphicsTextItem {
@@ -456,7 +462,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
     bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
     void testFogOfWar();
-    void addGraphicsItem(QGraphicsItem *object, float width);
 
     void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;
     void saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const;
@@ -573,6 +578,8 @@ public:
     void addCharacterAction(CharacterAction *character_action) {
         this->character_actions.push_back(character_action);
     }
+    void addGraphicsItem(QGraphicsItem *object, float width);
+    QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos);
     QGraphicsItem *addSpellGraphic(Vector2D pos);
 
     void addStandardItem(Item *item);
@@ -588,6 +595,7 @@ public:
         return shops.end();
     }
 
+    AnimationLayer *getProjectileAnimationLayer(const string &name);
     QPixmap &getItemImage(const string &name);
     QString getItemString(const Item *item, bool want_weight) const;
 

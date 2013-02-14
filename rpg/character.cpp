@@ -247,6 +247,24 @@ int Character::modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int 
     return value;
 }
 
+void Character::hitEnemy(PlayingGamestate *playing_gamestate, Character *source, Character *target, bool weapon_no_effect_magical, int weapon_damage) {
+    // source may be NULL, if attacker is no longer alive (for ranged attacks)
+    if( weapon_no_effect_magical ) {
+        if( source == playing_gamestate->getPlayer() ) {
+            playing_gamestate->addTextEffect("Weapon has no effect!", source->getPos(), 2000, 255, 0, 0);
+        }
+    }
+    else if( weapon_damage > 0 ) {
+        if( target->decreaseHealth(playing_gamestate, weapon_damage, true, true) ) {
+            target->addPainTextEffect(playing_gamestate);
+            if( target->isDead() && source == playing_gamestate->getPlayer() ) {
+                source->addXP(playing_gamestate, target->getXPWorth());
+            }
+        }
+        //qDebug("    damage %d remaining %d", weapon_damage, target->getHealth());
+    }
+}
+
 bool Character::update(PlayingGamestate *playing_gamestate) {
     //qDebug("Character::update() for: %s", this->name.c_str());
     if( this->location == NULL ) {
@@ -399,37 +417,49 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
                             int a_str = this->getProfileIntProperty(profile_key_S_c);
 
+                            bool hits = false;
+                            bool weapon_no_effect_magical = false;
+                            int weapon_damage = 0;
+
                             int hit_roll = rollDice(2, 6, -7);
                             qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
                             if( hit_roll + mod_a_stat > mod_d_stat ) {
                                 qDebug("    hit");
-                                bool is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
-                                if( !is_magical && target_npc->requiresMagical() ) {
+                                hits = true;
+                                bool weapon_is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
+                                if( !weapon_is_magical && target_npc->requiresMagical() ) {
                                     // weapon has no effect!
-                                    if( this == playing_gamestate->getPlayer() ) {
-                                        playing_gamestate->addTextEffect("Weapon has no effect!", this->getPos(), 2000, 255, 0, 0);
-                                    }
+                                    weapon_no_effect_magical = true;
                                 }
                                 else {
-                                    int damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
+                                    weapon_damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
                                     if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
                                         qDebug("    extra strong hit!");
                                         int extra_damage = rollDice(1, 3, 0);
-                                        damage += extra_damage;
+                                        weapon_damage += extra_damage;
                                     }
-                                    if( damage > 0 ) {
-                                        if( target_npc->decreaseHealth(playing_gamestate, damage, true, true) ) {
-                                            target_npc->addPainTextEffect(playing_gamestate);
-                                            if( target_npc->isDead() && this == playing_gamestate->getPlayer() ) {
-                                                this->addXP(playing_gamestate, target_npc->getXPWorth());
-                                            }
-                                        }
-                                    }
-                                    qDebug("    damage %d remaining %d", damage, target_npc->getHealth());
                                 }
                             }
                             else{
                                 //LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
+                            }
+
+                            if( is_ranged ) {
+                                // fire off an action
+                                // get ammo - note that the ammo may have already been used up by the character
+                                Ammo *ammo = NULL;
+                                string ammo_key;
+                                if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                                    ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                                }
+                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, ammo_key);
+                                playing_gamestate->addCharacterAction(action);
+                            }
+                            else {
+                                // do it straight away
+                                if( hits ) {
+                                    hitEnemy(playing_gamestate, this, target_npc, weapon_no_effect_magical, weapon_damage);
+                                }
                             }
                         }
                     }

@@ -51,6 +51,8 @@
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
+<image type="projectile" name="Arrows" filename="gfx/textures/items/arrow.png" width="64" height="64" stride_x="64" stride_y="64" expected_width="64"/>
+
 <image type="scenery" name="bed" filename="gfx/textures/scenery/bed.png"/>
 <image type="scenery" name="bigboulder" filename="gfx/textures/scenery/bigboulder.png"/>
 <image type="scenery" name="bloodstain" filename="gfx/textures/scenery/bloodstain.png"/>

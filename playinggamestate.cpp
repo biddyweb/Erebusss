@@ -25,6 +25,25 @@ const float MainGraphicsView::max_zoom_c = 200.0f;
 
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
+Direction directionFromVecDir(Vector2D dir) {
+    if( dir.magnitude() < E_TOL_LINEAR ) {
+        return DIRECTION_E; // arbitrary
+    }
+    dir.normalise();
+    float angle = atan2(dir.y, dir.x);
+    if( angle < 0.0f )
+        angle += (float)(2.0*M_PI);
+    angle /= (float)(2.0*M_PI);
+    float turn = angle*((int)N_DIRECTIONS) + 0.5f;
+    int turn_i = (int)turn;
+    /*qDebug("angle %f", angle);
+    qDebug("turn %f", turn);
+    qDebug("turn_i %d", turn_i);*/
+    turn_i += 4; // 0 is west
+    Direction direction = (Direction)(turn_i % (int)N_DIRECTIONS);
+    return direction;
+}
+
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
     QGraphicsTextItem(text), time_expire(0), view(view) {
 
@@ -49,7 +68,7 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), spell(NULL), object(NULL) {
+CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), hits(false), weapon_no_effect_magical(false), weapon_damage(0), spell(NULL), object(NULL) {
     this->source_pos = source->getPos();
     this->dest_pos = target_npc->getPos();
     this->time_ms = game_g->getScreen()->getGameTimeTotalMS();
@@ -66,7 +85,12 @@ void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
         // target no longer exists
         return;
     }
-    if( type == CHARACTERACTION_SPELL ) {
+    if( type == CHARACTERACTION_RANGED_WEAPON ) {
+        if( hits ) {
+            Character::hitEnemy(playing_gamestate, source, target_npc, weapon_no_effect_magical, weapon_damage);
+        }
+    }
+    else if( type == CHARACTERACTION_SPELL ) {
         ASSERT_LOGGER( spell != NULL );
         spell->castOn(playing_gamestate, source, target_npc);
     }
@@ -85,6 +109,7 @@ void CharacterAction::update() {
         Vector2D curr_pos = this->source_pos * (1.0f-alpha) + this->dest_pos * alpha;
         curr_pos.y += offset_y;
         this->object->setPos(curr_pos.x, curr_pos.y);
+        this->object->setZValue(object->pos().y() + 1000.0f);
     }
 }
 
@@ -106,17 +131,29 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_SPELL, source, target_npc, -0.75f);
     character_action->duration_ms = 250;
     character_action->spell = spell;
-    character_action->object = playing_gamestate->addSpellGraphic(source->getPos());
+    character_action->object = playing_gamestate->addSpellGraphic(source->getPos() + Vector2D(0.0f, character_action->offset_y));
     return character_action;
 }
 
-CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const string *projectile_image_name) {
+CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &ammo_key) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
     character_action->duration_ms = 250;
-    //character_action->object = playing_gamestate->addSpellGraphic(source->getPos());
+    character_action->hits = hits;
+    character_action->weapon_no_effect_magical = weapon_no_effect_magical;
+    character_action->weapon_damage = weapon_damage;
+
+    AnimatedObject *object = new AnimatedObject();
+    character_action->object = object;
+    object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(ammo_key) );
+    playing_gamestate->addGraphicsItem(object, 0.5f);
+
+    Vector2D dir = character_action->dest_pos - character_action->source_pos;
+    Direction direction = directionFromVecDir(dir);
+    object->setDimension(direction);
+
+    character_action->update(); // set position, z-value
     return character_action;
 }
-
 
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
@@ -2408,7 +2445,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                     QPixmap pixmap;
                     bool clip = false;
                     int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
-                    int stride_x = 0;
+                    int stride_x = 0, stride_y = 0;
                     const int def_width_c = 128, def_height_c = 128;
                     if( imagetype_s.length() == 0 ) {
                         // load file
@@ -2441,6 +2478,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                                 // set a default in case needed for animation
                                 stride_x = def_width_c;
                             }
+                            QStringRef stride_y_s = reader.attributes().value("stride_y");
+                            if( stride_y_s.length() > 0 ) {
+                                stride_y = parseInt(stride_y_s.toString());
+                            }
+                            else {
+                                // set a default in case needed for animation
+                                stride_y = def_height_c;
+                            }
                         }
                         else {
                             // set up defaults in case needed for animation
@@ -2454,6 +2499,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             width = def_width_c;
                             height = def_height_c;
                             stride_x = def_width_c;
+                            stride_y = def_height_c;
                         }
                         // image loaded later, lazily
                     }
@@ -2562,18 +2608,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                         }
                         animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         if( filename.length() > 0 )
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 8);
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 8);
                         else
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 8);
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 8);
                     }
                     else if( type == "scenery" ) {
                         if( animation_layer_definition.size() == 0 ) {
                             animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         }
                         if( filename.length() > 0 )
-                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 1);
+                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
                         else
-                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, 1);
+                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
                     }
                     else if( type == "npc" ) {
                         unsigned int n_dimensions = animation_layer_definition.size() > 0 ? N_DIRECTIONS : 1;
@@ -2581,9 +2627,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
                             animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         }
                         if( filename.length() > 0 )
-                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, n_dimensions);
+                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                         else
-                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, def_height_c, expected_width, n_dimensions);
+                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                     }
                     else {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5618,17 +5664,7 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
 void PlayingGamestate::characterTurn(const Character *character, void *user_data) {
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
     Vector2D dir = character->getDirection();
-    float angle = atan2(dir.y, dir.x);
-    if( angle < 0.0f )
-        angle += (float)(2.0*M_PI);
-    angle /= (float)(2.0*M_PI);
-    float turn = angle*((int)N_DIRECTIONS) + 0.5f;
-    int turn_i = (int)turn;
-    /*qDebug("angle %f", angle);
-    qDebug("turn %f", turn);
-    qDebug("turn_i %d", turn_i);*/
-    turn_i += 4; // 0 is west
-    Direction direction = (Direction)(turn_i % (int)N_DIRECTIONS);
+    Direction direction = directionFromVecDir(dir);
     object->setDimension(direction);
 }
 
@@ -6886,17 +6922,19 @@ void PlayingGamestate::advanceQuest() {
     ASSERT_LOGGER(this->c_quest_indx < this->quest_list.size());
 }
 
-QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
-    qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
+QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2D pos) {
+    qDebug("PlayingGamestate::addPixmapGraphic(%f, %f)", pos.x, pos.y);
     QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
-    object->setPixmap( this->fireball_pixmap );
+    object->setPixmap(pixmap);
     object->setPos(pos.x, pos.y);
     object->setZValue(pos.y + 1000.0f);
-    /*float scale = 0.25f / object->pixmap().width();
-    object->setScale(scale);
-    this->scene->addItem(object);*/
     this->addGraphicsItem(object, 0.25f);
     return object;
+}
+
+QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
+    qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
+    return this->addPixmapGraphic(this->fireball_pixmap, pos);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
@@ -6938,6 +6976,16 @@ Currency *PlayingGamestate::cloneGoldItem(int value) const {
     Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
     item->setValue(value);
     return item;
+}
+
+AnimationLayer *PlayingGamestate::getProjectileAnimationLayer(const string &name) {
+    map<string, AnimationLayer *>::iterator image_iter = this->projectile_animation_layers.find(name);
+    if( image_iter == this->projectile_animation_layers.end() ) {
+        LOG("failed to find image for projectile: %s\n", name.c_str());
+        LOG("    image name: %s\n", name.c_str());
+        throw string("Failed to find projectile's image");
+    }
+    return image_iter->second;
 }
 
 QPixmap &PlayingGamestate::getItemImage(const string &name) {
