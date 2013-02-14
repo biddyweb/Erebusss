@@ -442,7 +442,9 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
     //qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
-    if( game_g->getScreen()->isPaused() ) {
+    if( game_g->getScreen()->isPaused() && event->key() != Qt::Key_Control && event->key() != Qt::Key_Alt ) {
+        // Qt::Key_Control, Qt::Key_Alt produced when doing multitouch zoom in/out for some reason?!
+        //qDebug("unpause");
         game_g->getScreen()->setPaused(false, false);
     }
 
