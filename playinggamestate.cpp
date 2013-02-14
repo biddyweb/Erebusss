@@ -2204,11 +2204,11 @@ void SaveGameWindow::clickedSaveNew() {
     }
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool cheat_mode, int cheat_start_level) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL),
-    difficulty(DIFFICULTY_MEDIUM), permadeath(false), permadeath_has_savefilename(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -2366,6 +2366,16 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool ch
         {
             QHBoxLayout *h_layout = new QHBoxLayout();
             v_layout->addLayout(h_layout);
+
+            if( !this->permadeath ) {
+                QPushButton *quickSaveButton = new QPushButton("QS");
+                game_g->initButton(quickSaveButton);
+                quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
+                quickSaveButton->setToolTip("Quick-save");
+                quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+                connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
+                h_layout->addWidget(quickSaveButton);
+            }
 
             QPushButton *zoomoutButton = new QPushButton("-");
             game_g->initButton(zoomoutButton);
@@ -3800,8 +3810,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
 
                     QStringRef permadeath_s = reader.attributes().value("permadeath");
                     qDebug("read permadeath: %s\n", permadeath_s.toString().toStdString().c_str());
-                    bool permadeath = parseBool(permadeath_s.toString(), true);
-                    this->setPermadeath(permadeath);
+                    this->permadeath = parseBool(permadeath_s.toString(), true);
                 }
                 else if( reader.name() == "location" ) {
                     if( location != NULL ) {

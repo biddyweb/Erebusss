@@ -1141,10 +1141,9 @@ void Game::handleMessages() {
                 StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getCheatMode(), start_message->getCheatStartLevel());
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getPermadeath(), start_message->getCheatMode(), start_message->getCheatStartLevel());
                 gamestate = playing_gamestate;
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
-                playing_gamestate->setPermadeath(start_message->getPermadeath());
 
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
                 string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
@@ -1158,7 +1157,7 @@ void Game::handleMessages() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, false, 0);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, false, false, 0);
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);

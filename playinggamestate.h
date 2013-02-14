@@ -454,7 +454,9 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void moveToLocation(Location *location, Vector2D pos);
     void setupView();
     void autoSave() {
-        this->saveGame("autosave.xml", false);
+        if( !this->permadeath ) {
+            this->saveGame("autosave.xml", false);
+        }
     }
     void requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery);
     void clickedOnNPC(Character *character);
@@ -484,9 +486,15 @@ private slots:
     void clickedSave();
     void clickedQuit();
     void playBackgroundMusic();
+    void quickSave() {
+        qDebug("quickSave()");
+        if( !this->permadeath ) {
+            this->saveGame("quicksave.xml", false);
+        }
+    }
 
 public:
-    PlayingGamestate(bool is_savegame, size_t player_type, bool cheat_mode, int cheat_start_level);
+    PlayingGamestate(bool is_savegame, size_t player_type, bool permadeath, bool cheat_mode, int cheat_start_level);
     virtual ~PlayingGamestate();
 
     float getDifficultyModifier() const;
@@ -494,9 +502,9 @@ public:
         return this->difficulty;
     }
     void setDifficulty(Difficulty difficulty);
-    void setPermadeath(bool permadeath) {
+    /*void setPermadeath(bool permadeath) {
         this->permadeath = permadeath;
-    }
+    }*/
     bool isPermadeath() const {
         return this->permadeath;
     }
