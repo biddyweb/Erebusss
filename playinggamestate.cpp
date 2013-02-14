@@ -129,7 +129,9 @@ bool CharacterAction::isExpired() const {
 
 CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_SPELL, source, target_npc, -0.75f);
-    character_action->duration_ms = 250;
+    //character_action->duration_ms = 250;
+    const float speed = 0.02f; // units per ms
+    character_action->duration_ms = (int)((character_action->dest_pos - character_action->source_pos).magnitude() / speed);
     character_action->spell = spell;
     character_action->object = playing_gamestate->addSpellGraphic(source->getPos() + Vector2D(0.0f, character_action->offset_y));
     return character_action;
@@ -137,7 +139,9 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
 
 CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &ammo_key) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
-    character_action->duration_ms = 250;
+    //character_action->duration_ms = 250;
+    const float speed = 0.02f; // units per ms
+    character_action->duration_ms = (int)((character_action->dest_pos - character_action->source_pos).magnitude() / speed);
     character_action->hits = hits;
     character_action->weapon_no_effect_magical = weapon_no_effect_magical;
     character_action->weapon_damage = weapon_damage;
