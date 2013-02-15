@@ -352,6 +352,8 @@ class Character {
     // default positions only relevant for NPCs that don't change locations
     bool has_default_position;
     Vector2D default_position;
+    bool has_last_known_player_position;
+    Vector2D last_known_player_position;
 
     // rpg data
     //int FP, BS, S, A, M, D, B;

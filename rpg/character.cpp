@@ -109,7 +109,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -131,7 +131,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     //FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     profile(character_template),
     health(0), max_health(0),
@@ -554,7 +554,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             }
         }
 
-        //if( is_ai && !is_hitting && ai_try_moving ) {
         if( is_ai && action == ACTION_NONE && ai_try_moving ) {
             bool done_target = false;
             if( is_hostile && playing_gamestate->getPlayer() != NULL ) {
@@ -563,11 +562,28 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     Vector2D dest = playing_gamestate->getPlayer()->getPos();
                     this->setDestination(dest.x, dest.y, NULL);
                     done_target = true;
+                    this->has_last_known_player_position = true;
+                    this->last_known_player_position = dest;
                 }
             }
 
             if( !done_target ) {
                 this->setTargetNPC(NULL);
+
+                if( this->has_last_known_player_position ) {
+                    if( this->last_known_player_position == this->pos ) {
+                        this->has_last_known_player_position = false;
+                    }
+                    else {
+                        // move to player's last known position
+                        this->setDestination(this->last_known_player_position.x, this->last_known_player_position.y, NULL);
+                        done_target = true;
+                    }
+                }
+            }
+
+            if( !done_target ) {
+                // return to default position
                 if( this->has_default_position && this->default_position != this->pos ) {
                     this->setDestination(this->default_position.x, this->default_position.y, NULL);
                     done_target = true;
