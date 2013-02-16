@@ -355,6 +355,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <npc name="Goblin Champion" template="Goblin Champion" x="23.0" y="20.0"/>
 <npc name="Goblin Mage" template="Goblin Mage" x="20.5" y="17.0">
     <spell name="Fire bolt" count="6"/>
+    <spell name="Heal" count="1"/>
 </npc>
 
 <scenery name="Chest" image_name="chest" x="24.5" y="20.5" size="0.8" blocking="true">
@@ -1871,6 +1872,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <floorregion shape="rect" rect_x="38.0" rect_y="18.0" rect_w="6.0" rect_h="4.0"/>
 <npc name="Goblin Mage" template="Goblin Mage" x="43.5" y="20.0">
     <spell name="Fire bolt" count="8"/>
+    <spell name="Heal" count="1"/>
 </npc>
 <npc name="Goblin Champion" template="Goblin Champion" x="42.5" y="19.0"/>
 <npc name="Goblin Champion" template="Goblin Champion" x="42.5" y="21.0"/>

@@ -348,6 +348,7 @@ class Character {
     };
     Action action;
     const Spell *casting_spell;
+    Character *casting_spell_target;
     int time_last_complex_update_ms; // not saved
     // default positions only relevant for NPCs that don't change locations
     bool has_default_position;
@@ -542,6 +543,7 @@ public:
     Character *getTargetNPC() const {
         return this->target_npc;
     }
+    void notifyDead(const Character *character);
 
     const Profile *getBaseProfile() const {
         return &this->profile;

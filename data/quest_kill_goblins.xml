@@ -56,6 +56,7 @@
 <npc name="Goblin" template="Goblin" x="13.0" y="3.0"/>
 <npc name="Goblin Mage" template="Goblin Mage" x="15.0" y="2.0">
     <spell name="Fire bolt" count="6"/>
+    <spell name="Heal" count="1"/>
 </npc>
 
 <scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>

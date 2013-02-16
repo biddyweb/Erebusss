@@ -436,6 +436,7 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 
 <npc name="Goblin Mage" template="Goblin Mage" x="20.0" y="23.0">
     <spell name="Acid strike" count="4"/>
+    <spell name="Heal" count="2"/>
 </npc>
 <npc name="Minotaur" template="Minotaur" x="21.0" y="24.0">
     <item template="Gold Gem"/>

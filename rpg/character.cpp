@@ -55,7 +55,7 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     if( this->type == "attack" ) {
         int damage = rollDice(rollX, rollY, rollZ);
         if( damage > 0 ) {
-            qDebug("cast attack spell: %d, %d", damage_armour, damage_shield);
+            qDebug("cast attack spell: %d; %d, %d", damage, damage_armour, damage_shield);
             if( target->decreaseHealth(playing_gamestate, damage, damage_armour, damage_shield) ) {
                 target->addPainTextEffect(playing_gamestate);
                 if( target->isDead() && source != NULL && source == playing_gamestate->getPlayer() ) {
@@ -65,6 +65,11 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
         }
     }
     else if( this->type == "heal" ) {
+        int heal = rollDice(rollX, rollY, rollZ);
+        if( heal > 0 ) {
+            qDebug("cast heal spell: %d", heal);
+            target->increaseHealth(heal);
+        }
     }
     else {
         LOG("unknown spell type: %s\n", this->type.c_str());
@@ -109,7 +114,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -131,7 +136,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     //FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     profile(character_template),
     health(0), max_health(0),
@@ -324,7 +329,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
         //ASSERT_LOGGER( !( is_hitting && target_npc == NULL ) );
         ASSERT_LOGGER( !( (action == ACTION_HITTING || action == ACTION_FIRING || action == ACTION_CASTING) && target_npc == NULL ) );
-        if( target_npc != NULL && are_enemies ) {
+        Character *target = action == ACTION_CASTING ? casting_spell_target : target_npc;
+        if( target != NULL && ( action == ACTION_CASTING || are_enemies ) ) {
             enum HitState {
                 HITSTATE_HAS_HIT = 0,
                 HITSTATE_IS_HITTING = 1,
@@ -352,34 +358,58 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             }
 
             if( hit_state == HITSTATE_HAS_HIT || hit_state == HITSTATE_IS_NOT_HITTING ) {
-                float dist = ( target_npc->getPos() - this->getPos() ).magnitude();
-                /* We could use the is_visible flag, but for future use we might want
-                   to cater for Enemy NPCs shooting friendly NPCs.
-                   This shouldn't be a performance issue, as this code is only
-                   executed when firing/hitting, and not every frame.
-                */
+                float dist = ( target->getPos() - this->getPos() ).magnitude();
                 bool is_ranged = false;
                 const Spell *spell = NULL;
+                Character *spell_target = NULL;
                 if( hit_state == HITSTATE_HAS_HIT ) {
                     is_ranged = action == ACTION_FIRING || action == ACTION_CASTING;
-                    if( action == ACTION_CASTING )
+                    if( action == ACTION_CASTING ) {
                         spell = casting_spell;
+                        spell_target = casting_spell_target;
+                    }
                 }
                 else {
-                    for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end(); ++iter) {
-                        if( iter->second > 0 ) {
-                            string spell_name = iter->first;
-                            const Spell *this_spell = playing_gamestate->findSpell(spell_name);
-                            if( this_spell->getType() == "attack") {
-                                spell = this_spell;
-                                break;
+                    if( this->health < 0.5f*this->max_health ) {
+                        // try casting a healing spell
+                        for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
+                            if( iter->second > 0 ) {
+                                string spell_name = iter->first;
+                                const Spell *this_spell = playing_gamestate->findSpell(spell_name);
+                                if( this_spell->getType() == "heal") {
+                                    spell = this_spell;
+                                    spell_target = this;
+                                }
+                            }
+                        }
+                    }
+                    if( spell == NULL ) {
+                        // try casting an attack spell
+                        for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
+                            if( iter->second > 0 ) {
+                                string spell_name = iter->first;
+                                const Spell *this_spell = playing_gamestate->findSpell(spell_name);
+                                if( this_spell->getType() == "attack") {
+                                    spell = this_spell;
+                                    spell_target = target_npc;
+                                }
                             }
                         }
                     }
                     is_ranged = spell != NULL || ( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged() );
                 }
                 bool can_hit = false;
-                if( is_ranged ) {
+                /* We could use the is_visible flag, but for future use we might want
+                   to cater for Enemy NPCs shooting friendly NPCs.
+                   This shouldn't be a performance issue, as this code is only
+                   executed when firing/hitting, and not every frame.
+                */
+                if( spell != NULL ) {
+                    if( spell_target == this || location->visibilityTest(this->pos, spell_target->getPos()) ) {
+                        can_hit = true;
+                    }
+                }
+                else if( is_ranged ) {
                     if( location->visibilityTest(this->pos, target_npc->getPos()) ) {
                         can_hit = true;
                     }
@@ -387,26 +417,28 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 else {
                     can_hit = dist <= hit_range_c;
                 }
+
                 if( hit_state == HITSTATE_HAS_HIT ) {
-                    if( can_hit && !target_npc->is_dead ) {
+                    bool casting_on_self = spell != NULL && spell_target == this;
+                    if( can_hit && ( casting_on_self || !target_npc->is_dead ) ) {
                         ai_try_moving = false; // no point trying to move, just wait to hit again
                         if( action == ACTION_CASTING ) {
                             // make sure we still have the spell
                             ASSERT_LOGGER(casting_spell != NULL);
+                            ASSERT_LOGGER(casting_spell_target != NULL);
                             if( this->getSpellCount(casting_spell->getName()) > 0 ) {
                                 stringstream str;
                                 str << "Casts ";
-                                str << spell->getName();
+                                str << casting_spell->getName();
                                 playing_gamestate->addTextEffect(str.str(), this->getPos(), 500);
                                 this->useSpell(spell->getName());
-                                //spell->castOn(playing_gamestate, this, target_npc);
-                                if( this == target_npc ) {
+                                if( this == casting_spell_target ) {
                                     // can cast straight away
-                                    spell->castOn(playing_gamestate, this, target_npc);
+                                    spell->castOn(playing_gamestate, this, casting_spell_target);
                                 }
                                 else {
                                     // fire off an action
-                                    CharacterAction *action = CharacterAction::createSpellAction(playing_gamestate, this, target_npc, spell);
+                                    CharacterAction *action = CharacterAction::createSpellAction(playing_gamestate, this, casting_spell_target, casting_spell);
                                     playing_gamestate->addCharacterAction(action);
                                 }
                             }
@@ -474,6 +506,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 // cast spell!
                                 action = ACTION_CASTING;
                                 casting_spell = spell;
+                                casting_spell_target = spell_target;
                                 has_path = false;
                                 time_last_action_ms = elapsed_ms;
                             }
@@ -692,6 +725,13 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     return false;
+}
+
+void Character::notifyDead(const Character *character) {
+    if( character == this->target_npc )
+        this->target_npc = NULL;
+    if( character == this->casting_spell_target )
+        this->casting_spell_target = NULL;
 }
 
 void Character::addPainTextEffect(PlayingGamestate *playing_gamestate) const {
