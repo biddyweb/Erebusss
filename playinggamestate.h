@@ -66,7 +66,7 @@ public:
 
     void implement(PlayingGamestate *playing_gamestate) const;
     void update();
-    void notifyDead(Character *character);
+    void notifyDead(const Character *character);
     bool isExpired() const;
 
     static CharacterAction *createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell);

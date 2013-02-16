@@ -113,7 +113,7 @@ void CharacterAction::update() {
     }
 }
 
-void CharacterAction::notifyDead(Character *character) {
+void CharacterAction::notifyDead(const Character *character) {
     if( character == this->source )
         this->source = NULL;
     if( character == this->target_npc )
