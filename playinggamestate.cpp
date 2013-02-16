@@ -2373,7 +2373,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
                 QPushButton *quickSaveButton = new QPushButton("QS");
                 game_g->initButton(quickSaveButton);
                 quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
+#ifndef Q_OS_ANDROID
+                // for some reason, this sometimes shows on Android when it shouldn't?
                 quickSaveButton->setToolTip("Quick-save");
+#endif
                 quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
                 connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
                 h_layout->addWidget(quickSaveButton);
@@ -2382,21 +2385,30 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
             QPushButton *zoomoutButton = new QPushButton("-");
             game_g->initButton(zoomoutButton);
             zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
             zoomoutButton->setToolTip("Zoom out");
+#endif
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             h_layout->addWidget(zoomoutButton);
 
             QPushButton *zoominButton = new QPushButton("+");
             game_g->initButton(zoominButton);
             zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
             zoominButton->setToolTip("Zoom in");
+#endif
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
 
             QPushButton *centreButton = new QPushButton("O");
             game_g->initButton(centreButton);
             centreButton->setShortcut(QKeySequence(Qt::Key_C));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
             centreButton->setToolTip("Centre view on your player's location");
+#endif
             centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
             h_layout->addWidget(centreButton);
