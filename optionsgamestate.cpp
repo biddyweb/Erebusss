@@ -58,7 +58,7 @@ OptionsGamestate::OptionsGamestate() :
     game_g->initButton(startButton);
     startButton->setShortcut(QKeySequence(Qt::Key_S));
 #ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
+    // for some reason, this sometimes shows on Android when it shouldn't?
     startButton->setToolTip("Start playing a new game (S)");
 #endif
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -69,7 +69,7 @@ OptionsGamestate::OptionsGamestate() :
     game_g->initButton(loadButton);
     loadButton->setShortcut(QKeySequence(Qt::Key_L));
 #ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
+    // for some reason, this sometimes shows on Android when it shouldn't?
     loadButton->setToolTip("Load a previously saved game (L)");
 #endif
     loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -80,7 +80,7 @@ OptionsGamestate::OptionsGamestate() :
     game_g->initButton(optionsButton);
     optionsButton->setShortcut(QKeySequence(Qt::Key_O));
 #ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
+    // for some reason, this sometimes shows on Android when it shouldn't?
     optionsButton->setToolTip("Configure various game options (O)");
 #endif
     optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
