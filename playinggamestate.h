@@ -464,6 +464,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
     bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
     void testFogOfWar();
+    bool canSaveHere();
 
     void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;
     void saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const;
@@ -486,12 +487,7 @@ private slots:
     void clickedSave();
     void clickedQuit();
     void playBackgroundMusic();
-    void quickSave() {
-        qDebug("quickSave()");
-        if( !this->permadeath ) {
-            this->saveGame("quicksave.xml", false);
-        }
-    }
+    void quickSave();
 
 public:
     PlayingGamestate(bool is_savegame, size_t player_type, bool permadeath, bool cheat_mode, int cheat_start_level);

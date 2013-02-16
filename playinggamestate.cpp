@@ -3144,6 +3144,22 @@ void PlayingGamestate::playBackgroundMusic() {
 #endif*/
 }
 
+void PlayingGamestate::quickSave() {
+    qDebug("quickSave()");
+    if( !this->permadeath ) {
+        if( this->canSaveHere() ) {
+            this->showInfoDialog("You cannot save here - enemies are nearby.");
+            return;
+        }
+        if( this->saveGame("quicksave.xml", false) )  {
+            this->showInfoDialog("The game has been successfully saved.");
+        }
+        else {
+            game_g->showErrorDialog("Failed to save game!");
+        }
+    }
+}
+
 void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key) {
     string attribute = "bonus_" + key;
     QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
@@ -5195,10 +5211,13 @@ void PlayingGamestate::clickedRest() {
     }
 }
 
+bool PlayingGamestate::canSaveHere() {
+    return c_location->hasEnemies(this);
+}
+
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
-    if( c_location->hasEnemies(this) ) {
-        //game_g->showInfoDialog("Save", "You cannot save here - enemies are nearby.");
+    if( this->canSaveHere() ) {
         this->showInfoDialog("You cannot save here - enemies are nearby.");
         return;
     }
@@ -5376,6 +5395,7 @@ void PlayingGamestate::update() {
                 }
                 else {
                     delete enemy;
+
                 }
             }
         }
