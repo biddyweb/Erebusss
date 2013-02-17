@@ -509,6 +509,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 casting_spell_target = spell_target;
                                 has_path = false;
                                 time_last_action_ms = elapsed_ms;
+                                if( this->listener != NULL ) {
+                                    // we don't have an animation specific for spell-casting, but should still explicitly set to the idle animation, in case previously set to something else
+                                    this->listener->characterSetAnimation(this, this->listener_data, "", false);
+                                }
                             }
                             else {
                                 // take a swing!
