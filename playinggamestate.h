@@ -583,7 +583,7 @@ public:
         this->character_actions.push_back(character_action);
     }
     void addGraphicsItem(QGraphicsItem *object, float width);
-    QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos);
+    QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width);
     QGraphicsItem *addSpellGraphic(Vector2D pos);
 
     void addStandardItem(Item *item);

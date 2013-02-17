@@ -130,7 +130,7 @@ bool CharacterAction::isExpired() const {
 CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_SPELL, source, target_npc, -0.75f);
     //character_action->duration_ms = 250;
-    const float speed = 0.02f; // units per ms
+    const float speed = 0.01f; // units per ms
     character_action->duration_ms = (int)((character_action->dest_pos - character_action->source_pos).magnitude() / speed);
     character_action->spell = spell;
     character_action->object = playing_gamestate->addSpellGraphic(source->getPos() + Vector2D(0.0f, character_action->offset_y));
@@ -6974,19 +6974,19 @@ void PlayingGamestate::advanceQuest() {
     ASSERT_LOGGER(this->c_quest_indx < this->quest_list.size());
 }
 
-QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2D pos) {
-    qDebug("PlayingGamestate::addPixmapGraphic(%f, %f)", pos.x, pos.y);
+QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width) {
+    qDebug("PlayingGamestate::addPixmapGraphic(%f, %f, %f)", pos.x, pos.y, width);
     QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
     object->setPixmap(pixmap);
     object->setPos(pos.x, pos.y);
     object->setZValue(pos.y + 1000.0f);
-    this->addGraphicsItem(object, 0.25f);
+    this->addGraphicsItem(object, width);
     return object;
 }
 
 QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
     qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
-    return this->addPixmapGraphic(this->fireball_pixmap, pos);
+    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.5f);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
