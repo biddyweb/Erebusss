@@ -1870,7 +1870,7 @@ Thank you! Now I feel no longer bound to this terrible place. You should leave t
 <floorregion shape="rect" rect_x="32.0" rect_y="19.5" rect_w="6.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="38.0" rect_y="18.0" rect_w="6.0" rect_h="4.0"/>
-<npc name="Goblin Mage" template="Goblin Mage" x="43.5" y="20.0">
+<npc name="Orc Shaman" template="Orc Shaman" x="43.5" y="20.0">
     <spell name="Fire bolt" count="8"/>
     <spell name="Heal" count="1"/>
 </npc>
