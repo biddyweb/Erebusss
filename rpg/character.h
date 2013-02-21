@@ -322,6 +322,7 @@ class Character {
     string biography;
     bool is_ai; // not saved
     bool is_hostile;
+    string portrait;
     string animation_name; // for NPCs (player is handled separately)
     bool static_image; // for NPCs
     bool bounce;
@@ -412,6 +413,12 @@ public:
     Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
     ~Character();
 
+    void setPortrait(const string &portrait) {
+        this->portrait = portrait;
+    }
+    string getPortrait() const {
+        return this->portrait;
+    }
     void setBiography(const string &biography) {
         this->biography = biography;
     }

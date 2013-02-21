@@ -713,19 +713,27 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.setFont( game_g->getFontScene() );
     if( playing_gamestate->getPlayer() != NULL ) {
-        float bar_x = 16.0f/640.0f;
-        float bar_y = 32.0f/360.0f;
-        float text_y = bar_y - 4.0f/360.0f;
+        const float bar_x = 16.0f/640.0f;
+        const float bar_y = 32.0f/360.0f;
+        const float portrait_size = 80.0f/1080.f;
+        float text_x = bar_x;
+        const float text_y = bar_y - 4.0f/360.0f;
         const Character *player = playing_gamestate->getPlayer();
-        painter.setPen(Qt::white);
-        painter.drawText(bar_x*width(), text_y*height(), player->getName().c_str());
+        if( player->getPortrait().length() > 0 ) {
+            QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
+            painter.drawPixmap(bar_x*width(), (bar_y - portrait_size)*height(), portrait_size*height(), portrait_size*height(), pixmap);
+        }
+        else {
+            painter.setPen(Qt::white);
+            painter.drawText(text_x*width(), text_y*height(), player->getName().c_str());
+        }
         float fraction = ((float)player->getHealthPercent()) / (float)100.0f;
         this->drawBar(painter, bar_x, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkGreen);
         if( player->getTargetNPC() != NULL && player->getTargetNPC()->isHostile() ) {
             const Character *enemy = player->getTargetNPC();
             //qDebug("enemy: %d", enemy);
             //qDebug("name: %s", enemy->getName().c_str());
-            float bar_x2 = 132.0f/640.0f;
+            const float bar_x2 = 132.0f/640.0f;
             painter.setPen(Qt::white);
             painter.drawText(bar_x2*width(), text_y*height(), enemy->getName().c_str());
             fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
@@ -794,6 +802,13 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
+
+    if( player->getPortrait().length() > 0 ) {
+        QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
+        QLabel *portrait_label = new QLabel();
+        portrait_label->setPixmap(pixmap);
+        layout->addWidget(portrait_label);
+    }
 
     QString html ="<html><body>";
 
@@ -2673,6 +2688,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
             throw string("error reading images xml file");
         }
     }
+
+    this->portrait_images["portrait_barbarian"] = game_g->loadImage("gfx/portraits/barbarian_m0.png");
+    this->portrait_images["portrait_elf"] = game_g->loadImage("gfx/portraits/elf_f0.png");
+    this->portrait_images["portrait_halfling"] = game_g->loadImage("gfx/portraits/halfling_f0.png");
+    this->portrait_images["portrait_ranger"] = game_g->loadImage("gfx/portraits/ranger_m0.png");
+    this->portrait_images["portrait_warrior"] = game_g->loadImage("gfx/portraits/warrior_m0.png");
 
     /*{
         // force all lazily loaded data to be loaded
@@ -7036,6 +7057,16 @@ AnimationLayer *PlayingGamestate::getProjectileAnimationLayer(const string &name
         LOG("failed to find image for projectile: %s\n", name.c_str());
         LOG("    image name: %s\n", name.c_str());
         throw string("Failed to find projectile's image");
+    }
+    return image_iter->second;
+}
+
+QPixmap &PlayingGamestate::getPortraitImage(const string &name) {
+    map<string, QPixmap>::iterator image_iter = this->portrait_images.find(name);
+    if( image_iter == this->portrait_images.end() ) {
+        LOG("failed to find image for portrait_images: %s\n", name.c_str());
+        LOG("    image name: %s\n", name.c_str());
+        throw string("Failed to find portrait_images's image");
     }
     return image_iter->second;
 }
