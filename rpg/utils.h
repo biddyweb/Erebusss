@@ -185,6 +185,9 @@ public:
     Rect2D(float x, float y, float w, float h) : top_left(x, y), bottom_right(x+w, y+h) {
     }
 
+    bool operator== (const Rect2D& v) const {
+        return (v.top_left == top_left && v.bottom_right==bottom_right);
+    }
     float getX() const {
         return top_left.x;
     }

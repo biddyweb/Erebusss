@@ -1741,32 +1741,173 @@ Vector2D directionFromEnum(Direction4 dir) {
     return Vector2D(-1.0f, 0.0f);
 }
 
-bool LocationGenerator::collidesWithFloorRegions(vector<Rect2D> *floor_regions_rects, Rect2D rect, float gap) {
+bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<const Rect2D> *ignore_rects, Rect2D rect, float gap) {
     rect.expand(gap);
     for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end(); ++iter) {
         Rect2D test_rect = *iter;
-        if( test_rect.overlaps(rect) ) {
+        bool ignore = false;
+        if( ignore_rects != NULL ) {
+            for(vector<const Rect2D>::const_iterator iter2 = ignore_rects->begin(); iter2 != ignore_rects->end() && !ignore; ++iter2) {
+                Rect2D ignore_rect = *iter2;
+                if( test_rect == ignore_rect ) {
+                    ignore = true;
+                }
+            }
+        }
+        if( ignore ) {
+            continue;
+        }
+        else if( test_rect.overlaps(rect) ) {
             return true;
         }
     }
     return false;
 }
 
-void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
-    const float passage_width = 1.0f;
-    const float passage_hwidth = 0.5f * passage_width;
-    float passage_length = 0;
-    {
-        int roll = rollDice(1, 6, 0);
-        if( roll == 1 )
-            passage_length = 2.5f;
-        else if( roll >= 2 && roll <= 4 )
-            passage_length = 5.0f;
-        else
-            passage_length = 7.5f;
-    }
+const float base_passage_length = 5.0f;
+const float base_room_size = base_passage_length - 2.0f;
+const float passage_width = 1.0f;
+const float passage_hwidth = 0.5f * passage_width;
+const float door_width = 1.0f;
+const float door_depth = 1.0f;
+
+void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
-    qDebug("explore from seed at %f, %f ; direction %d: %f, %f", seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
+    Vector2D door_centre = seed.pos + dir_vec * 0.5f * door_depth;
+    Vector2D door_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
+    Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
+    if( door_rect.getX() < 0.0f )
+        return;
+    if( door_rect.getY() < 0.0f )
+        return;
+    bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
+    if( !collides_door ) {
+        Vector2D passageway_centre = door_centre + dir_vec * ( 0.5f*door_depth + passage_hwidth );
+        float passageway_w = 0.0f, passageway_h = 0.0f;
+        if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
+            passageway_w = base_passage_length;
+            //passageway_w = 2.0f;
+            passageway_h = passage_width;
+        }
+        else {
+            passageway_w = passage_width;
+            passageway_h = base_passage_length;
+            //passageway_h = 2.0f;
+        }
+        //passageway_w = 1.0f;
+        //passageway_h = 1.0f;
+        Rect2D passageway_rect(passageway_centre - Vector2D(0.5f*passageway_w, 0.5f*passageway_h), passageway_centre + Vector2D(0.5f*passageway_w, 0.5f*passageway_h));
+        if( passageway_rect.getX() < 0.0f )
+            return;
+        if( passageway_rect.getY() < 0.0f )
+            return;
+        bool collides_passageway = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, NULL, passageway_rect, 1.0f);
+        if( !collides_passageway ) {
+            FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
+            location->addFloorRegion(floor_region);
+            floor_regions_rects->push_back(door_rect);
+
+            floor_region = FloorRegion::createRectangle(passageway_rect);
+            location->addFloorRegion(floor_region);
+            floor_regions_rects->push_back(passageway_rect);
+
+            // TODO: passageway contents?
+            // TODO: explore from passageway
+        }
+    }
+}
+
+void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
+    const float room_size = base_room_size;
+    Vector2D room_dir_vec = directionFromEnum(seed.dir);
+    Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
+    Vector2D door_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
+    Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
+    if( door_rect.getX() < 0.0f )
+        return;
+    if( door_rect.getY() < 0.0f )
+        return;
+    bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
+    if( !collides_door ) {
+        Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*room_size );
+        Rect2D room_rect(room_centre - Vector2D(0.5f*room_size, 0.5f*room_size), room_centre + Vector2D(0.5f*room_size, 0.5f*room_size));
+        if( room_rect.getX() < 0.0f )
+            return;
+        if( room_rect.getY() < 0.0f )
+            return;
+        bool collides_room = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, NULL, room_rect, 1.0f);
+        if( !collides_room ) {
+            FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
+            location->addFloorRegion(floor_region);
+            floor_regions_rects->push_back(door_rect);
+
+            floor_region = FloorRegion::createRectangle(room_rect);
+            location->addFloorRegion(floor_region);
+            floor_regions_rects->push_back(room_rect);
+
+            // TODO: place door scenery itself
+            // TODO: room contents
+
+            int n_room_doors = rollDice(1, 3, -1);
+            vector<Direction4> done_dirs;
+            done_dirs.push_back( rotateDirection4(seed.dir, 2) );
+            for(int j=0;j<n_room_doors;j++) {
+                Direction4 new_room_dir;
+                bool done = false;
+                while( !done ) {
+                    //new_room_dir = (Direction4)(rollDice(1, 4, -1));
+                    if( j == 0 )
+                        new_room_dir = seed.dir;
+                    else {
+                        int turn = rollDice(1, 2, 1) == 1 ? 1 : -1;
+                        new_room_dir = rotateDirection4(seed.dir, turn);
+                    }
+                    done = true;
+                    for(vector<Direction4>::iterator iter = done_dirs.begin(); iter != done_dirs.end() && done; ++iter) {
+                        Direction4 done_dir = *iter;
+                        if( done_dir == new_room_dir )
+                            done = false;
+                    }
+                }
+                done_dirs.push_back(new_room_dir);
+
+                Vector2D new_room_dir_vec = directionFromEnum(new_room_dir);
+                Vector2D door_pos = room_centre + new_room_dir_vec * 0.5 * room_size;
+                //Seed::Type seed_type = rollDice(1, 2, 1) == 1 ? Seed::TYPE_X_ROOM : Seed::TYPE_ROOM_PASSAGEWAY;
+                Seed::Type seed_type = Seed::TYPE_ROOM_PASSAGEWAY;
+                Seed new_seed(seed_type, door_pos, new_room_dir);
+                new_seed.addIgnoreRect(room_rect);
+                qDebug("    add new room from room at %f, %f", new_seed.pos.x, new_seed.pos.y);
+                seeds->push_back(new_seed);
+            }
+        }
+    }
+}
+
+void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
+    Vector2D dir_vec = directionFromEnum(seed.dir);
+    qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
+    if( seed.type == Seed::TYPE_X_ROOM ) {
+        exploreFromSeedXRoom(location, seed, seeds, floor_regions_rects, first);
+        return;
+    }
+    else if( seed.type == Seed::TYPE_ROOM_PASSAGEWAY ) {
+        exploreFromSeedRoomPassageway(location, seed, seeds, floor_regions_rects, first);
+        return;
+    }
+
+    vector<const Rect2D> ignore_rects = seed.ignore_rects;
+    int passage_length_i = 0;
+    {
+        int roll = first ? 2 : rollDice(1, 6, 0);
+        if( roll == 1 )
+            passage_length_i = 1;
+        else if( roll >= 2 && roll <= 4 )
+            passage_length_i = 2;
+        else
+            passage_length_i = 3;
+    }
+    float passage_length = passage_length_i * base_passage_length;
     Vector2D end_pos = seed.pos + dir_vec * passage_length;
     bool room_for_junction = true;
     Vector2D rect_pos, rect_size;
@@ -1801,14 +1942,7 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
     Rect2D floor_region_rect(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
     qDebug("    add passage?: %f, %f w %f h %f", rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
     {
-        /*bool collides = false;
-        for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end() && !collides; ++iter) {
-            Rect2D rect = *iter;
-            if( floor_region_rect.overlaps(rect) ) {
-                collides = true;
-            }
-        }*/
-        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, floor_region_rect, 0.0f);
+        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &ignore_rects, floor_region_rect, 1.0f);
         // TODO: shorten passage length to try to fit?
         if( collides ) {
             qDebug("    ### passageway collided!");
@@ -1817,10 +1951,12 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
         FloorRegion *floor_region = FloorRegion::createRectangle(rect_pos.x, rect_pos.y, rect_size.x, rect_size.y);
         location->addFloorRegion(floor_region);
         floor_regions_rects->push_back(floor_region_rect);
+        ignore_rects.push_back(floor_region_rect);
     }
 
     // contents
     int n_doors = 0;
+    if( !first )
     {
         int roll = rollDice(2, 12, 0);
         if( roll >= 5 && roll <= 15 ) {
@@ -1836,26 +1972,34 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
         }
     }
     for(int i=0;i<n_doors;i++) {
-        const float scale = 2.0f;
-        const float door_width = 1.0f;
-        const float door_depth = 1.0f;
-        const float room_size = 2.5f;
+        /*const float scale = 2.0f;
         // TODO: different room sizes
         int n_slots = (int)(scale*passage_length) - 2;
         int pos_i = 1 + rand() % n_slots;
-        float pos = ((float)pos_i) / (float)scale;
+        float pos = ((float)pos_i) / (float)scale;*/
+        int passage_section = rand() % passage_length_i;
+        float pos = (passage_section+0.5f)*base_passage_length;
         bool side = rand() % 2 == 0;
         Direction4 room_dir = rotateDirection4(seed.dir, side ? -1 : 1);
         Vector2D room_dir_vec = directionFromEnum(room_dir);
-        Vector2D door_centre = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * ( passage_hwidth + 0.5f*door_depth );
+        //Vector2D door_centre = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * ( passage_hwidth + 0.5f*door_depth );
+        Vector2D door_pos = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * passage_hwidth;
+        Seed new_seed(Seed::TYPE_X_ROOM, door_pos, room_dir);
+        new_seed.addIgnoreRect(floor_region_rect);
+        qDebug("    add new room from passage at %f, %f", new_seed.pos.x, new_seed.pos.y);
+        seeds->push_back(new_seed);
+#if 0
         Vector2D door_size = ( seed.dir == DIRECTION4_WEST || seed.dir == DIRECTION4_EAST ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
         Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
-        bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, door_rect, 0.0f);
+        bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &ignore_rects, door_rect, 1.0f);
         if( !collides_door ) {
-            Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*room_size );
+            Seed new_seed(Seed::TYPE_ROOM, door_centre + room_dir_vec * 0.5 * door_depth, room_dir);
+            new_seed.addIgnoreRect(door_rect);
+            qDebug("    add new room at %f, %f", new_seed.pos.x, new_seed.pos.y);
+            seeds->push_back(new_seed);
+            /*Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*room_size );
             Rect2D room_rect(room_centre - Vector2D(0.5f*room_size, 0.5f*room_size), room_centre + Vector2D(0.5f*room_size, 0.5f*room_size));
-            bool collides_room = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, room_rect, 1.0f);
-            // TODO: different positions or sizes if room collides
+            bool collides_room = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &ignore_rects, room_rect, 1.0f);
             if( !collides_room ) {
                 FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
                 location->addFloorRegion(floor_region);
@@ -1870,8 +2014,9 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
                 int n_room_doors = rollDice(1, 3, -2);
                 for(int j=0;j<n_room_doors;j++) {
                 }
-            }
+            }*/
         }
+#endif
     }
 
     if( !room_for_junction ) {
@@ -1933,7 +2078,7 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
                 collides = true;
             }
         }*/
-        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, floor_region_junction_rect, 0.0f);
+        bool collides = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &ignore_rects, floor_region_junction_rect, 1.0f);
         if( collides ) {
             qDebug("    ### junction collided!");
             return;
@@ -1945,12 +2090,16 @@ void LocationGenerator::exploreFromSeed(Location *location, Seed seed, vector<Se
     floor_regions_rects->push_back(floor_region_junction_rect);
 
     if( left_turn ) {
-        Seed new_seed(end_pos + dir_vec*passage_hwidth + l_dir_vec*passage_hwidth, l_dir);
+        Seed new_seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, end_pos + dir_vec*passage_hwidth + l_dir_vec*passage_hwidth, l_dir);
+        new_seed.addIgnoreRect(floor_region_rect);
+        new_seed.addIgnoreRect(floor_region_junction_rect);
         qDebug("    add left turn at %f, %f", new_seed.pos.x, new_seed.pos.y);
         seeds->push_back(new_seed);
     }
     if( right_turn ) {
-        Seed new_seed(end_pos + dir_vec*passage_hwidth + r_dir_vec*passage_hwidth, r_dir);
+        Seed new_seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, end_pos + dir_vec*passage_hwidth + r_dir_vec*passage_hwidth, r_dir);
+        new_seed.addIgnoreRect(floor_region_rect);
+        new_seed.addIgnoreRect(floor_region_junction_rect);
         qDebug("    add right turn at %f, %f", new_seed.pos.x, new_seed.pos.y);
         seeds->push_back(new_seed);
     }
@@ -1963,7 +2112,7 @@ Location *LocationGenerator::generateLocation(Vector2D *player_start) {
     location->setWallImageName("wall");
 
     Vector2D start_pos(0.0f, 50.0f);
-    Seed seed(start_pos, DIRECTION4_EAST);
+    Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, DIRECTION4_EAST);
     *player_start = Vector2D(start_pos + Vector2D(0.5f, 0.0f));
 
     vector<Seed> seeds;

@@ -813,16 +813,28 @@ enum Direction4 {
 
 class Seed {
 public:
+    enum Type {
+        TYPE_PASSAGEWAY_PASSAGEWAY = 0,
+        TYPE_ROOM_PASSAGEWAY = 1,
+        TYPE_X_ROOM = 2
+    };
+    Type type;
     Vector2D pos;
     Direction4 dir;
+    vector<const Rect2D> ignore_rects;
 
-    Seed(Vector2D pos, Direction4 dir) : pos(pos), dir(dir) {
+    Seed(Type type, Vector2D pos, Direction4 dir) : type(type), pos(pos), dir(dir) {
+    }
+    void addIgnoreRect(const Rect2D &ignore_rect ) {
+        this->ignore_rects.push_back(ignore_rect);
     }
 };
 
 class LocationGenerator {
-    static bool collidesWithFloorRegions(vector<Rect2D> *floor_regions_rects, Rect2D rect, float gap);
-    static void exploreFromSeed(Location *location, Seed seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
+    static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<const Rect2D> *ignore_rects, Rect2D rect, float gap);
+    static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
+    static void exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
+    static void exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
 
 public:
     static Location *generateLocation(Vector2D *player_start);
