@@ -1741,13 +1741,13 @@ Vector2D directionFromEnum(Direction4 dir) {
     return Vector2D(-1.0f, 0.0f);
 }
 
-bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<const Rect2D> *ignore_rects, Rect2D rect, float gap) {
+bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap) {
     rect.expand(gap);
     for(vector<Rect2D>::const_iterator iter = floor_regions_rects->begin(); iter != floor_regions_rects->end(); ++iter) {
         Rect2D test_rect = *iter;
         bool ignore = false;
         if( ignore_rects != NULL ) {
-            for(vector<const Rect2D>::const_iterator iter2 = ignore_rects->begin(); iter2 != ignore_rects->end() && !ignore; ++iter2) {
+            for(vector<Rect2D>::const_iterator iter2 = ignore_rects->begin(); iter2 != ignore_rects->end() && !ignore; ++iter2) {
                 Rect2D ignore_rect = *iter2;
                 if( test_rect == ignore_rect ) {
                     ignore = true;
@@ -1896,7 +1896,7 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
         return;
     }
 
-    vector<const Rect2D> ignore_rects = seed.ignore_rects;
+    vector<Rect2D> ignore_rects = seed.ignore_rects;
     int passage_length_i = 0;
     {
         int roll = first ? 2 : rollDice(1, 6, 0);

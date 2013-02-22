@@ -821,7 +821,7 @@ public:
     Type type;
     Vector2D pos;
     Direction4 dir;
-    vector<const Rect2D> ignore_rects;
+    vector<Rect2D> ignore_rects;
 
     Seed(Type type, Vector2D pos, Direction4 dir) : type(type), pos(pos), dir(dir) {
     }
@@ -831,7 +831,7 @@ public:
 };
 
 class LocationGenerator {
-    static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<const Rect2D> *ignore_rects, Rect2D rect, float gap);
+    static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap);
     static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
     static void exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
     static void exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
