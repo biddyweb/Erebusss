@@ -2,6 +2,9 @@
 
 #include "common.h"
 
+#include <vector>
+using std::vector;
+
 #include <QtGui>
 
 #include "gamestate.h"
@@ -22,6 +25,7 @@ class OptionsGamestate : public Gamestate {
     QCheckBox *permadeathCheckBox;
 
     ScrollingListWidget *load_list;
+    vector<QString> load_filenames;
 
     QCheckBox *soundCheck;
     QCheckBox *lightingCheck;

@@ -299,26 +299,15 @@ void OptionsGamestate::clickedLoad() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
-    QStringList filter;
-    filter << "*" + QString( savegame_ext.c_str() );
-    QStringList files = dir.entryList(filter);
-    if( files.size() > 0 ) {
-        load_list = new ScrollingListWidget();
-        load_list->grabKeyboard();
-        if( !mobile_c ) {
-            QFont list_font = load_list->font();
-            list_font.setPointSize( list_font.pointSize() + 8 );
-            load_list->setFont(list_font);
-        }
+    this->load_list = NULL;
+    this->load_filenames.clear();
+    game_g->fillSaveGameFiles(&load_list, &load_filenames);
+
+    // load_list only created if it has items
+    if( load_list != NULL ) {
+        ASSERT_LOGGER(load_list->count() > 0 );
+        ASSERT_LOGGER(load_list->count() == load_filenames.size());
         layout->addWidget(load_list);
-        load_list->setSelectionMode(QAbstractItemView::SingleSelection);
-
-        for(int i=0;i<files.size();i++) {
-            const QString &file = files.at(i);
-            load_list->addItem(file);
-        }
-
         load_list->setCurrentRow(0);
 
         QPushButton *loadButton = new QPushButton("Load");
@@ -353,8 +342,10 @@ void OptionsGamestate::clickedLoadGame() {
     if( index == -1 ) {
         return;
     }
-    ASSERT_LOGGER(index >= 0 && index < load_list->count() );
-    QString filename = this->load_list->item(index)->text();
+    ASSERT_LOGGER(load_list->count() == load_filenames.size());
+    ASSERT_LOGGER(index >= 0 && index < load_list->count());
+    ASSERT_LOGGER(index >= 0 && index < load_filenames.size());
+    QString filename = this->load_filenames.at(index);
     LoadGameMessage *game_message = new LoadGameMessage(filename.toStdString());
     game_g->pushMessage(game_message);
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);

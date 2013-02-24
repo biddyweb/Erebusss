@@ -121,9 +121,9 @@ AnimationSet::~AnimationSet() {
 }
 
 const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) const {
+    //qDebug("%d : type %d, frame %d / %d\n", this, this->animation_type, c_frame, this->n_dimensions);
     c_dimension = c_dimension % this->n_dimensions;
     //qDebug("animation type: %d", this->animation_type);
-    //LOG("%d : type %d, frame %d\n", this, this->animation_type, c_frame);
     switch( this->animation_type ) {
     case ANIMATIONTYPE_BOUNCE:
         if( n_frames == 1 )
@@ -1501,4 +1501,32 @@ void Game::keyPress(QKeyEvent *key_event) {
     if( this->gamestate != NULL ) {
         this->gamestate->keyPress(key_event);
     }
+}
+
+void Game::fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const {
+    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
+    QStringList filter;
+    filter << "*" + QString( savegame_ext.c_str() );
+    QFileInfoList files = dir.entryInfoList(filter, QDir::Files, QDir::Time);
+    if( files.size() > 0 ) {
+        if( *list == NULL ) {
+            *list = new ScrollingListWidget();
+            (*list)->grabKeyboard();
+            if( !mobile_c ) {
+                QFont list_font = (*list)->font();
+                list_font.setPointSize( list_font.pointSize() + 8 );
+                (*list)->setFont(list_font);
+            }
+            (*list)->setSelectionMode(QAbstractItemView::SingleSelection);
+        }
+
+        for(size_t i=0;i<files.size();i++) {
+            QFileInfo file_info = files.at(i);
+            filenames->push_back(file_info.fileName());
+            QString file_str = file_info.fileName();
+            file_str += " [" + file_info.lastModified().toString("d-MMM-yyyy hh:mm") + "]";
+            (*list)->addItem(file_str);
+        }
+    }
+
 }

@@ -474,6 +474,7 @@ public:
         return player_types.at(i);
     }
     Character *createPlayer(size_t i) const;
+    void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);
     /*void showInfoDialog(const string &title, const string &message);

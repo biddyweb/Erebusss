@@ -21,6 +21,7 @@ class AnimationLayer;
 class Shop;
 class Currency;
 class Spell;
+class ScrollingListWidget;
 
 enum Direction {
     DIRECTION_W = 0,
@@ -381,7 +382,8 @@ class SaveGameWindow : public QWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
-    QListWidget *list;
+    vector<QString> save_filenames;
+    ScrollingListWidget *list;
     QLineEdit *edit;
 
     void requestNewSaveGame();

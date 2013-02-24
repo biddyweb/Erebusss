@@ -2048,15 +2048,18 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
     list->addItem("New Save Game File");
+    save_filenames.push_back(""); // dummy entry
 
-    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
+    /*QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
     QStringList filter;
     filter << "*" + QString( savegame_ext.c_str() );
     QStringList files = dir.entryList(filter);
     for(int i=0;i<files.size();i++) {
         const QString &file = files.at(i);
         list->addItem(file);
-    }
+    }*/
+    game_g->fillSaveGameFiles(&list, &save_filenames);
+    ASSERT_LOGGER(list->count() == save_filenames.size());
 
     list->setCurrentRow(0);
 
@@ -2090,7 +2093,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
 void SaveGameWindow::requestNewSaveGame() {
     QString filename;
-    if( !playing_gamestate->isPermadeath() ) {
+    /*if( !playing_gamestate->isPermadeath() ) {
         filename = QString(savegame_root.c_str());
         QDateTime date_time = QDateTime::currentDateTime();
         QDate date = date_time.date();
@@ -2107,7 +2110,7 @@ void SaveGameWindow::requestNewSaveGame() {
         filename += "-";
         filename += QString("%1").arg(QString::number(time.second()), 2, QChar('0'));
         //filename += date_time.toString();
-    }
+    }*/
 
     QWidget *subwindow = new QWidget();
     playing_gamestate->addWidget(subwindow);
@@ -2153,12 +2156,14 @@ void SaveGameWindow::clickedSave() {
     if( index == -1 ) {
         return;
     }
+    ASSERT_LOGGER(list->count() == save_filenames.size());
     ASSERT_LOGGER(index >= 0 && index < list->count());
+    ASSERT_LOGGER(index >= 0 && index < save_filenames.size());
     if( index == 0 ) {
         this->requestNewSaveGame();
     }
     else {
-        QString filename = list->item(index)->text();
+        QString filename = save_filenames.at(index);
         LOG("save as existing file: %s\n", filename.toStdString().c_str());
         if( playing_gamestate->saveGame(filename.toStdString(), false) ) {
             //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
@@ -2179,9 +2184,11 @@ void SaveGameWindow::clickedDelete() {
     if( index == -1 ) {
         return;
     }
+    ASSERT_LOGGER(list->count() == save_filenames.size());
     ASSERT_LOGGER(index >= 0 && index < list->count());
+    ASSERT_LOGGER(index >= 0 && index < save_filenames.size());
     if( index >= 1 ) {
-        QString filename = list->item(index)->text();
+        QString filename = save_filenames.at(index);
         //if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
         if( playing_gamestate->askQuestionDialog("Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
             LOG("delete existing file: %s\n", filename.toStdString().c_str());
@@ -2190,6 +2197,8 @@ void SaveGameWindow::clickedDelete() {
             remove(full_path.c_str());
             QListWidgetItem *list_item = list->takeItem(index);
             delete list_item;
+            save_filenames.erase(save_filenames.begin() + index);
+            ASSERT_LOGGER(list->count() == save_filenames.size());
         }
     }
 }
