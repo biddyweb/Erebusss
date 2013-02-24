@@ -25,6 +25,22 @@
     xp_worth="10"
 />
 
+<!--Weapon hardcoded as natural damage: Spear-->
+<npc name="Hobgoblin" animation_name="goblin"
+    FP="7" BS="8" S="5" A="1" M="6" D="6" B="5" Sp="2"
+    natural_damageX="1" natural_damageY="12" natural_damageZ="0"
+    health_min="25" health_max="30" gold_min="5" gold_max="8"
+    xp_worth="10"
+/>
+
+<!--Weapon hardcoded as natural damage: Spear-->
+<npc name="Hobgoblin Mage" animation_name="goblin"
+    FP="5" BS="6" S="4" A="1" M="7" D="6" B="5" Sp="1.8"
+    natural_damageX="1" natural_damageY="12" natural_damageZ="0"
+    health_min="20" health_max="25" gold_min="10" gold_max="12"
+    xp_worth="10"
+/>
+
 <!--Weapon hardcoded as natural damage: Battle Axe-->
 <npc name="Orc" animation_name="orc"
     FP="8" BS="8" S="7" A="1" M="7" D="7" B="6" Sp="2.5"
