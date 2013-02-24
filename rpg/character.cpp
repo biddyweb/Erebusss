@@ -444,62 +444,102 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                         }
                         else {
-                            int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
-                            int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
-                            int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
-                            int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
-                            int a_str = this->getProfileIntProperty(profile_key_S_c);
-
-                            bool hits = false;
-                            bool weapon_no_effect_magical = false;
-                            int weapon_damage = 0;
-
-                            int hit_roll = rollDice(2, 6, -7);
-                            qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
-                            if( hit_roll + mod_a_stat > mod_d_stat ) {
-                                qDebug("    hit");
-                                hits = true;
-                                bool weapon_is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
-                                if( !weapon_is_magical && target_npc->requiresMagical() ) {
-                                    // weapon has no effect!
-                                    weapon_no_effect_magical = true;
+                            Ammo *ammo = NULL;
+                            if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                                // obtain the ammo - and make sure we still have some!
+                                // note, it's better to use up the ammo now, rather than we first decide to fire, so that we still have the information on the ammo
+                                string ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                                Item *item = this->findItem(ammo_key);
+                                if( item == NULL ) {
+                                    // run out of ammo!
+                                    can_hit = false;
+                                    // no need to change weapon, this will happen when Character next tries to hit
                                 }
                                 else {
-                                    weapon_damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                    if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
-                                        qDebug("    extra strong hit!");
-                                        int extra_damage = rollDice(1, 3, 0);
-                                        weapon_damage += extra_damage;
+                                    if( item->getType() != ITEMTYPE_AMMO ) {
+                                        LOG("required ammo type %s is not ammo\n", item->getName().c_str());
+                                        ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
+                                    }
+                                    ammo = static_cast<Ammo *>(item);
+                                }
+                            }
+
+                            if( can_hit ) {
+                                int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
+                                int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
+                                int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
+                                int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
+                                int a_str = this->getProfileIntProperty(profile_key_S_c);
+
+                                bool hits = false;
+                                bool weapon_no_effect_magical = false;
+                                int weapon_damage = 0;
+
+                                int hit_roll = rollDice(2, 6, -7);
+                                qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
+                                if( hit_roll + mod_a_stat > mod_d_stat ) {
+                                    qDebug("    hit");
+                                    hits = true;
+                                    bool weapon_is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
+                                    if( !weapon_is_magical && target_npc->requiresMagical() ) {
+                                        // weapon has no effect!
+                                        weapon_no_effect_magical = true;
+                                    }
+                                    else {
+                                        weapon_damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
+                                        if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
+                                            qDebug("    extra strong hit!");
+                                            int extra_damage = rollDice(1, 3, 0);
+                                            weapon_damage += extra_damage;
+                                        }
                                     }
                                 }
-                            }
-                            else{
-                                //LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
-                            }
+                                else{
+                                    //LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
+                                }
 
-                            if( is_ranged ) {
-                                // fire off an action
-                                string projectile_key;
-                                float projectile_icon_width = 0.0f;
-                                ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
-                                if( this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
-                                    projectile_key = this->getCurrentWeapon()->getAmmoKey();
-                                    // note, the ammo may have already been used up (as the ammo is used when firing the weapon, before this point)
-                                    // so we have to get a new pointer for the item
-                                    const Item *projectile_item = playing_gamestate->getStandardItem(projectile_key);
-                                    projectile_icon_width = projectile_item->getIconWidth();
+                                if( is_ranged ) {
+                                    // fire off an action
+                                    string projectile_key;
+                                    float projectile_icon_width = 0.0f;
+                                    ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
+                                    if( this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
+                                        projectile_key = this->getCurrentWeapon()->getAmmoKey();
+                                        const Item *projectile_item = playing_gamestate->getStandardItem(projectile_key);
+                                        ASSERT_LOGGER( ammo != NULL );
+                                        projectile_icon_width = ammo->getIconWidth();
+                                    }
+                                    else {
+                                        projectile_key = this->getCurrentWeapon()->getKey();
+                                        projectile_icon_width = this->getCurrentWeapon()->getIconWidth();
+                                    }
+                                    CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, projectile_key, projectile_icon_width);
+                                    playing_gamestate->addCharacterAction(action);
                                 }
                                 else {
-                                    projectile_key = this->getCurrentWeapon()->getKey();
-                                    projectile_icon_width = this->getCurrentWeapon()->getIconWidth();
+                                    // do it straight away
+                                    if( hits ) {
+                                        hitEnemy(playing_gamestate, this, target_npc, weapon_no_effect_magical, weapon_damage);
+                                    }
                                 }
-                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, projectile_key, projectile_icon_width);
-                                playing_gamestate->addCharacterAction(action);
-                            }
-                            else {
-                                // do it straight away
-                                if( hits ) {
-                                    hitEnemy(playing_gamestate, this, target_npc, weapon_no_effect_magical, weapon_damage);
+
+                                if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_THROWN ) {
+                                    // use up the weapon itself!
+                                    Item *item = this->getCurrentWeapon();
+                                    this->takeItem( item );
+                                    delete item;
+                                }
+                                if( ammo != NULL ) {
+                                    if( this->useAmmo(ammo) ) {
+                                        ammo = NULL; // just to be safe, as pointer now deleted
+                                        string ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                                        if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
+                                            // really has used up all available ammo
+                                            LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
+                                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                            this->armWeapon(NULL); // disarm it
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -525,10 +565,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             else {
                                 // take a swing!
                                 bool can_hit = true;
-                                Ammo *ammo = NULL;
-                                string ammo_key;
+                                // make sure we have enough ammo (ammo is used up when we actually fire - see above)
                                 if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
-                                    ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                                    string ammo_key = this->getCurrentWeapon()->getAmmoKey();
                                     Item *item = this->findItem(ammo_key);
                                     if( item == NULL ) {
                                         if( this == playing_gamestate->getPlayer() ) {
@@ -540,13 +579,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         can_hit = false;
                                         this->armWeapon(NULL); // disarm it
                                     }
-                                    else {
-                                        if( item->getType() != ITEMTYPE_AMMO ) {
-                                            //LOG("required ammo type %s is not ammo\n", item->getName().c_str());
-                                            ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
-                                        }
-                                        ammo = static_cast<Ammo *>(item);
-                                    }
                                 }
                                 if( can_hit && this->tooWeakForWeapon() ) {
                                     can_hit = false;
@@ -557,37 +589,13 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 }
 
                                 if( can_hit ) {
-                                    if( ammo != NULL ) {
-                                        // ammo will be deleted if used up!
-                                        if( this->useAmmo(ammo) ) {
-                                            ammo = NULL; // just to be safe, as pointer now deleted
-                                            if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
-                                                // really has used up all available ammo
-                                                if( this == playing_gamestate->getPlayer() ) {
-                                                    LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                                                    playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
-                                                    this->armWeapon(NULL); // disarm it
-                                                }
-                                                else {
-                                                    this->armWeapon(NULL); // disarm it (will select the best weapon to use on next hit attempt)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    //is_hitting = true;
                                     action = is_ranged ? ACTION_FIRING : ACTION_HITTING;
-                                    //has_destination = false;
                                     has_path = false;
                                     time_last_action_ms = elapsed_ms;
                                     if( this->listener != NULL ) {
                                         string anim = is_ranged ? "ranged" : "attack";
                                         this->listener->characterSetAnimation(this, this->listener_data, anim, true);
                                         Vector2D dir = target_npc->getPos() - this->getPos();
-                                        /*if( dist > 0.0f ) {
-                                            dir.normalise();
-                                            this->direction = dir;
-                                            this->listener->characterTurn(this, this->listener_data, dir);
-                                        }*/
                                         this->setDirection(dir);
                                     }
                                     playing_gamestate->playSound("swing");
