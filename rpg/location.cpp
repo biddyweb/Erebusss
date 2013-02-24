@@ -434,6 +434,30 @@ FloorRegion *FloorRegion::createRectangle(const Rect2D &rect) {
     return createRectangle(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
 }
 
+/*const float tile_width = 1.0f;
+const float tile_height = 1.0f;*/
+
+Tilemap::Tilemap(float x, float y, const string &imagemap, int tile_width, int tile_height, vector<string> rows) : pos(x, y), /*width(0.0f), height(0.0f),*/ imagemap(imagemap), tile_width(tile_width), tile_height(tile_height), rows(rows), max_length(0) {
+    //height = rows.size() * tile_height;
+    for(vector<string>::const_iterator iter = rows.begin(); iter != rows.end(); ++iter) {
+        string str = *iter;
+        int length = str.length();
+        max_length = std::max(max_length, length);
+    }
+    //width = max_length * tile_width;
+}
+
+char Tilemap::getTileAt(int x, int y) const {
+    ASSERT_LOGGER(x >= 0);
+    ASSERT_LOGGER(x < max_length);
+    ASSERT_LOGGER(y >= 0);
+    ASSERT_LOGGER(y < rows.size());
+    if( x >= rows.at(y).length() ) {
+        return ' ';
+    }
+    return rows.at(y).at(x);
+}
+
 Location::Location(const string &name) :
     name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
     distance_graph(NULL), wall_x_scale(3.0f), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
@@ -447,6 +471,10 @@ Location::~Location() {
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         delete floor_region;
+    }
+    for(vector<Tilemap *>::iterator iter = tilemaps.begin(); iter != tilemaps.end(); ++iter) {
+        Tilemap *tilemap = *iter;
+        delete tilemap;
     }
     for(set<Character *>::iterator iter = characters.begin(); iter != characters.end(); ++iter) {
         Character *character = *iter;

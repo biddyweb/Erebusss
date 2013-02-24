@@ -977,6 +977,31 @@ The journal claims that each of the nearby teleporters is linked to a different 
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
 </item>-->
 
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="22.5" y="17.5">
+ 68
+ 9b
+ 9b
+ 9b
+65477778
+cddddd2b
+      9b
+      9b
+      9b
+      9b
+      9b
+ 677775b
+ 91dddde
+ 9b
+ 9b
+ 9b
+ 9b
+ 9b
+ 9b
+ 9b
+ 9b
+ ce
+</tilemap>
+
 <scenery name="Teleport" image_name="teleport" x="25.0" y="26.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="14.0" exit_location_y="30.0"
     locked="true" unlocked_by_template="Missing Teleporter Piece" locked_silent="true" locked_text="The teleporter does not seem to function!" locked_used_up="true"/>
 
@@ -992,7 +1017,7 @@ A complex piece of machinery. You wonder if this is the essential piece missing 
 
 <scenery name="Boulders" image_name="boulders" x="22.8" y="42.3" size="0.58" blocking="true"/>
 
-<scenery name="Armourer" image_name="building" x="25.0" y="20.0" size="5.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0"/>
+<scenery name="Armourer" image_name="building" x="25.0" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0"/>
 
 <scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
@@ -1102,7 +1127,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
 <floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="23.0"/>
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="19.0"/>
 
 <scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
 
@@ -1704,7 +1729,6 @@ A small bronze statuette of a humanoid bull-like creature.
 
 <floorregion shape="rect" rect_x="18.5" rect_y="25.0" rect_w="1.0" rect_h="1.5"/>
 <floorregion shape="rect" rect_x="17.5" rect_y="26.5" rect_w="3.0" rect_h="3.0"/>
-
 
 <!--<player_start x="19.0" y="25.5"/>-->
 

@@ -3589,6 +3589,51 @@ void PlayingGamestate::setupView() {
         }
     }
 
+    LOG("add graphics for tilemaps");
+    for(size_t i=0;i<c_location->getNTilemaps();i++) {
+        const Tilemap *tilemap = c_location->getTilemap(i);
+        const string &imagemap = tilemap->getImagemap();
+        QPixmap image = builtin_images[imagemap];
+        int image_w = image.width();
+        int image_h = image.height();
+        int tile_width = tilemap->getTileWidth();
+        int tile_height = tilemap->getTileHeight();
+        qDebug("Tilemap: image: %s w %d h %d tile w %d tile h %d", imagemap.c_str(), image_w, image_h, tile_width, tile_height);
+        int n_x = image_w / tile_width;
+        int n_y = image_h / tile_height;
+        for(int y=0;y<tilemap->getHeighti();y++) {
+            for(int x=0;x<tilemap->getWidthi();x++) {
+                char ch = tilemap->getTileAt(x, y);
+                if( ( ch >= '0' && ch <= '9' ) || ( ch >= 'a' && ch <= 'z' ) ) {
+                    int value = 0;
+                    int ch_i = (int)ch;
+                    if( ch >= '0' && ch <= '9' ) {
+                        value = ch_i - (int)'0';
+                    }
+                    else {
+                        value = 10 + ch_i - (int)'a';
+                    }
+                    if( value >= n_x*n_y ) {
+                        LOG("tilemap at %d, %d has value %d, out of bounds for %d x %d\n", x, y, value, n_x, n_y);
+                        throw string("tilemap value out of bounds for imagemap");
+                    }
+                    int pos_x = value % n_x;
+                    int pos_y = value / n_x;
+                    QPixmap tile = image.copy(pos_x*tile_width, pos_y*tile_height, tile_width, tile_height);
+                    //QPixmap tile = image;
+                    //qDebug("### %d, %d :")
+                    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(tile);
+                    item->setPos(tilemap->getX() + x, tilemap->getY() + y);
+                    item->setZValue(E_TOL_LINEAR);
+                    float item_scale = 1.0f / item->boundingRect().width();
+                    item->setScale(item_scale);
+                    scene->addItem(item);
+                    //this->addGraphicsItem(item, 1.0f);
+                }
+            }
+        }
+    }
+
 #ifdef _DEBUG
     this->debug_items.clear(); // clear any from previous view, as no longer valid
     this->refreshDebugItems();
@@ -4083,6 +4128,41 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     QStringRef y_s = reader.attributes().value("y");
                     float y = parseFloat(y_s.toString());
                     floor_region->addPoint(Vector2D(x, y));
+                }
+                else if( reader.name() == "tilemap" ) {
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: tilemap element outside of location");
+                    }
+                    QStringRef x_s = reader.attributes().value("x");
+                    float x = parseFloat(x_s.toString());
+                    QStringRef y_s = reader.attributes().value("y");
+                    float y = parseFloat(y_s.toString());
+                    QStringRef imagemap_s = reader.attributes().value("imagemap");
+                    QString imagemap = imagemap_s.toString();
+                    QStringRef tile_width_s = reader.attributes().value("tile_width");
+                    int tile_width = parseInt(tile_width_s.toString());
+                    QStringRef tile_height_s = reader.attributes().value("tile_height");
+                    int tile_height = parseInt(tile_height_s.toString());
+                    QString map = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                    if( map.length() > 0 ) {
+                        qDebug("tilemap:");
+                        int index = 0;
+                        if( map.at(index) == '\n' )
+                            index++;
+                        vector<string> map_lines;
+                        for(;;) {
+                            int next_index =  map.indexOf('\n', index);
+                            if( next_index == -1 || next_index == index )
+                                break;
+                            QString line = map.mid(index, next_index - index); // doesn't copy the newline
+                            map_lines.push_back(line.toStdString());
+                            qDebug("    %s", line.toStdString().c_str());
+                            index = next_index+1;
+                        }
+                        Tilemap *tilemap = new Tilemap(x, y, imagemap.toStdString(), tile_width, tile_height, map_lines);
+                        location->addTilemap(tilemap);
+                    }
                 }
                 /*else if( reader.name() == "boundary" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE ) {
@@ -6714,6 +6794,20 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
                 fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
             }
             fprintf(file, "</floorregion>\n");
+        }
+        fprintf(file, "\n");
+
+        for(size_t i=0;i<c_location->getNTilemaps();i++) {
+            const Tilemap *tilemap = c_location->getTilemap(i);
+            fprintf(file, "<tilemap imagemap=\"%s\" tile_width=\"%d\" tile_height=\"%d\" x=\"%f\" y=\"%f\">\n", tilemap->getImagemap().c_str(), tilemap->getTileWidth(), tilemap->getTileHeight(), tilemap->getX(), tilemap->getY());
+            for(int y=0;y<tilemap->getHeighti();y++) {
+                for(int x=0;x<tilemap->getWidthi();x++) {
+                    char ch = tilemap->getTileAt(x, y);
+                    fprintf(file, "%c", ch);
+                }
+                fprintf(file, "\n");
+            }
+            fprintf(file, "</tilemap>\n");
         }
         fprintf(file, "\n");
 

@@ -18,6 +18,8 @@
 <image type="generic" name="background_black" imagetype="perlin" max_red="16" max_green="16" max_blue="24" min_red="0" min_green="0" min_blue="0"/>
 <image type="generic" name="background_green" imagetype="perlin" max_red="160" max_green="180" max_blue="110" min_red="100" min_green="128" min_blue="48"/>
 
+<image type="generic" name="dirt_extended" filename="gfx/textures/dirt_extended.png"/>
+
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
 <image type="item" name="shield" filename="gfx/textures/items/shield.png"/>

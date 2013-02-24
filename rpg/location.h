@@ -477,6 +477,42 @@ public:
     static FloorRegion *createRectangle(const Rect2D &rect);
 };
 
+class Tilemap {
+    Vector2D pos; // pos in Location (for top-left)
+    //float width, height;
+    string imagemap;
+    int tile_width;
+    int tile_height;
+    vector<string> rows;
+    int max_length;
+
+public:
+    Tilemap(float x, float y, const string &imagemap, int tile_width, int tile_height, vector<string> rows);
+
+    const string &getImagemap() const {
+        return this->imagemap;
+    }
+    int getTileWidth() const {
+        return this->tile_width;
+    }
+    int getTileHeight() const {
+        return this->tile_height;
+    }
+    float getX() const {
+        return pos.x;
+    }
+    float getY() const {
+        return pos.y;
+    }
+    int getWidthi() const {
+        return max_length;
+    }
+    int getHeighti() const {
+        return (int)rows.size();
+    }
+    char getTileAt(int x, int y) const;
+};
+
 class Location {
 public:
     enum IntersectType {
@@ -510,6 +546,8 @@ protected:
 
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries;
+
+    vector<Tilemap *> tilemaps;
 
     set<Character *> characters;
     set<Item *> items;
@@ -621,6 +659,16 @@ public:
     }
     size_t getNBoundaries() const {
         return this->boundaries.size();
+    }
+
+    void addTilemap(Tilemap *tilemap) {
+        this->tilemaps.push_back(tilemap);
+    }
+    const Tilemap *getTilemap(size_t i) const {
+        return this->tilemaps.at(i);
+    }
+    size_t getNTilemaps() const {
+        return this->tilemaps.size();
     }
 
     void setListener(LocationListener *listener, void *listener_data) {
