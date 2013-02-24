@@ -31,6 +31,14 @@
     animation_name="longbow"
     two_handed="true" ranged="true" ammo="Arrows"/>
 
+<weapon name="Holy Water" image_name="vial" icon_width="0.15" weight="2"
+    damageX="4" damageY="6" damageZ="0"
+    magical="true" unholy_only="true" thrown="true">
+This is water that has been blessed by a priest, and collected in vials. Whilst seemingly no different to standard water, when thrown at unholy creatures (undead and demonic), it will burn into their flesh, causing them great pain.
+
+Note that whilst not strictly a magical weapon, in that its power derives from divine power rather than magic, this will harm unholy creatures that are normally only affected by magical weapons.
+</weapon>
+
 <shield name="Shield" image_name="shield" weight="36"
     animation_name="shield">
 A shield provides additional protection, but prevents the use of two-handed weapons.
@@ -122,6 +130,7 @@ A small wooden chess piece, the Knight.
     <purchase template="Potion of Archery" cost="200"/>
     <purchase template="Potion of Strength" cost="200"/>
     <purchase template="Potion of Speed" cost="250"/>
+    <purchase template="Holy Water" cost="150"/>
 </shop>
 
 <shop name="General Stores">

@@ -48,10 +48,12 @@
 <image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
 <image type="item" name="mushroom" filename="gfx/textures/items/mushroom.png"/>
 <image type="item" name="book" filename="gfx/textures/items/book.png"/>
+<image type="item" name="vial" filename="gfx/textures/items/vial.png"/>
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
 <image type="projectile" name="Arrows" filename="gfx/textures/items/arrow.png" width="64" height="64" stride_x="64" stride_y="64" expected_width="64"/>
+<image type="projectile" name="Holy Water" filename="gfx/textures/items/vial.png" width="32" height="52" stride_x="32" stride_y="52" expected_width="32" n_dimensions="1"/>
 
 <image type="scenery" name="bed" filename="gfx/textures/scenery/bed.png"/>
 <image type="scenery" name="bigboulder" filename="gfx/textures/scenery/bigboulder.png"/>
