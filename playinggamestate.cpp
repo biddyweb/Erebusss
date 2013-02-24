@@ -4182,6 +4182,10 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                                 this->animation_layers[ npc->getAnimationName() ]->getAnimationLayer(); // force animation to be loaded
                             }
                         }
+                        QStringRef portrait_s = reader.attributes().value("portrait");
+                        if( portrait_s.length() > 0 ) {
+                            npc->setPortrait(portrait_s.toString().toStdString());
+                        }
                         QStringRef is_dead_s = reader.attributes().value("is_dead");
                         npc->setDead( parseBool(is_dead_s.toString(), true) );
                         QStringRef health_s = reader.attributes().value("health");
@@ -6716,6 +6720,9 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
             }
             if( character->isStaticImage() ) {
                 fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
+            }
+            if( character->getPortrait().length() > 0 ) {
+                fprintf(file, " portrait=\"%s\"", character->getPortrait().c_str());
             }
             if( character->isBounce() ) {
                 fprintf(file, " bounce=\"true\"");
