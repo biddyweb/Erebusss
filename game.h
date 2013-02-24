@@ -116,9 +116,6 @@ public:
     AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length n_dimensions * n_frames
     virtual ~AnimationSet();
 
-    unsigned int getNDimensions() const {
-        return this->n_dimensions;
-    }
     size_t getNFrames() const {
         return this->n_frames;
     }
