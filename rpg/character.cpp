@@ -480,14 +480,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             if( is_ranged ) {
                                 // fire off an action
                                 string projectile_key;
+                                float projectile_icon_width = 0.0f;
                                 ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
                                 if( this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
                                     projectile_key = this->getCurrentWeapon()->getAmmoKey();
+                                    // note, the ammo may have already been used up (as the ammo is used when firing the weapon, before this point)
+                                    // so we have to get a new pointer for the item
+                                    const Item *projectile_item = playing_gamestate->getStandardItem(projectile_key);
+                                    projectile_icon_width = projectile_item->getIconWidth();
                                 }
                                 else {
                                     projectile_key = this->getCurrentWeapon()->getKey();
+                                    projectile_icon_width = this->getCurrentWeapon()->getIconWidth();
                                 }
-                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, projectile_key);
+                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, projectile_key, projectile_icon_width);
                                 playing_gamestate->addCharacterAction(action);
                             }
                             else {

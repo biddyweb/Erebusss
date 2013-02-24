@@ -137,7 +137,7 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
     return character_action;
 }
 
-CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key) {
+CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key, float icon_width) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
     //character_action->duration_ms = 250;
     const float speed = 0.02f; // units per ms
@@ -149,7 +149,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     AnimatedObject *object = new AnimatedObject();
     character_action->object = object;
     object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(projectile_key) );
-    playing_gamestate->addGraphicsItem(object, 0.5f);
+    playing_gamestate->addGraphicsItem(object, icon_width);
 
     Vector2D dir = character_action->dest_pos - character_action->source_pos;
     Direction direction = directionFromVecDir(dir);
@@ -7039,13 +7039,18 @@ void PlayingGamestate::addStandardItem(Item *item) {
 }
 
 Item *PlayingGamestate::cloneStandardItem(const string &name) const {
+    const Item *item = this->getStandardItem(name);
+    return item->clone();
+}
+
+const Item *PlayingGamestate::getStandardItem(const string &name) const {
     map<string, Item *>::const_iterator iter = this->standard_items.find(name);
     if( iter == this->standard_items.end() ) {
-        LOG("can't clone standard item which doesn't exist: %s\n", name.c_str());
+        LOG("can't find standard item which doesn't exist: %s\n", name.c_str());
         throw string("Unknown standard item");
     }
     const Item *item = iter->second;
-    return item->clone();
+    return item;
 }
 
 const Spell *PlayingGamestate::findSpell(const string &name) const {

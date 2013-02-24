@@ -70,7 +70,7 @@ public:
     bool isExpired() const;
 
     static CharacterAction *createSpellAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, const Spell *spell);
-    static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key);
+    static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key, float icon_width);
 };
 
 class TextEffect : public QGraphicsTextItem {
@@ -589,6 +589,7 @@ public:
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;
+    const Item *getStandardItem(const string &name) const;
     Currency *cloneGoldItem(int value) const;
     const Spell *findSpell(const string &name) const;
     Character *createCharacter(const string &name, const string &template_name) const;
