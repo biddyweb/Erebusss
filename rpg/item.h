@@ -198,6 +198,7 @@ private:
     string ammo_key;
     int damageX, damageY, damageZ;
     int min_strength;
+    bool unholy_only;
 public:
     Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ);
     virtual ~Weapon() {
@@ -248,6 +249,12 @@ public:
     }
     int getMinStrength() const {
         return this->min_strength;
+    }
+    void setUnholyOnly(bool unholy_only) {
+        this->unholy_only = unholy_only;
+    }
+    bool isUnholyOnly() const {
+        return this->unholy_only;
     }
     virtual int getProfileBonusIntProperty(const Character *character, const string &key) const;
     virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const;

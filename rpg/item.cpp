@@ -252,7 +252,7 @@ Weapon::Weapon(const string &name, const string &image_name, int weight, const s
     Item(name, image_name, weight), animation_name(animation_name),
     is_two_handed(false), weapon_type(WEAPONTYPE_HAND), requires_ammo(false),
     damageX(damageX), damageY(damageY), damageZ(damageZ),
-    min_strength(0)
+    min_strength(0), unholy_only(false)
 {
 }
 

@@ -68,7 +68,7 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
-CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), hits(false), weapon_no_effect_magical(false), weapon_damage(0), spell(NULL), object(NULL) {
+CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), hits(false), weapon_no_effect_magical(false), weapon_no_effect_holy(false), weapon_damage(0), spell(NULL), object(NULL) {
     this->source_pos = source->getPos();
     this->dest_pos = target_npc->getPos();
     this->time_ms = game_g->getScreen()->getGameTimeTotalMS();
@@ -87,7 +87,7 @@ void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
     }
     if( type == CHARACTERACTION_RANGED_WEAPON ) {
         if( hits ) {
-            Character::hitEnemy(playing_gamestate, source, target_npc, weapon_no_effect_magical, weapon_damage);
+            Character::hitEnemy(playing_gamestate, source, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
         }
     }
     else if( type == CHARACTERACTION_SPELL ) {
@@ -137,13 +137,14 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
     return character_action;
 }
 
-CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key, float icon_width) {
+CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage, const string &projectile_key, float icon_width) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
     //character_action->duration_ms = 250;
     const float speed = 0.02f; // units per ms
     character_action->duration_ms = (int)((character_action->dest_pos - character_action->source_pos).magnitude() / speed);
     character_action->hits = hits;
     character_action->weapon_no_effect_magical = weapon_no_effect_magical;
+    character_action->weapon_no_effect_holy = weapon_no_effect_holy;
     character_action->weapon_damage = weapon_damage;
 
     AnimatedObject *object = new AnimatedObject();
@@ -2880,10 +2881,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
                     int terror_effect = parseInt(terror_effect_s.toString(), true);
                     QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                     bool requires_magical = parseBool(requires_magical_s.toString(), true);
+                    QStringRef unholy_s = reader.attributes().value("unholy");
+                    bool unholy = parseBool(unholy_s.toString(), true);
                     CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect);
                     character_template->setStaticImage(static_image);
                     character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
+                    character_template->setUnholy(unholy);
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -3263,6 +3267,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef damageY_s = reader.attributes().value("damageY");
         QStringRef damageZ_s = reader.attributes().value("damageZ");
         QStringRef min_strength_s = reader.attributes().value("min_strength");
+        QStringRef unholy_only_s = reader.attributes().value("unholy_only");
         /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
         qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
         qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
@@ -3277,6 +3282,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         int damageY = parseInt(damageY_s.toString());
         int damageZ = parseInt(damageZ_s.toString());
         int min_strength = parseInt(min_strength_s.toString(), true);
+        bool unholy_only = parseBool(unholy_only_s.toString(), true);
         Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString(), damageX, damageY, damageZ);
         item = weapon;
         weapon->setTwoHanded(two_handed);
@@ -3297,6 +3303,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
             weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
         }
         weapon->setMinStrength(min_strength);
+        weapon->setUnholyOnly(unholy_only);
     }
     else if( reader.name() == "shield" ) {
         QStringRef animation_name_s = reader.attributes().value("animation_name");
@@ -4228,6 +4235,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                         bool requires_magical = parseBool(requires_magical_s.toString(), true);
                         npc->setRequiresMagical(requires_magical);
+                        QStringRef unholy_s = reader.attributes().value("unholy");
+                        bool unholy = parseBool(unholy_s.toString(), true);
+                        npc->setUnholy(unholy);
                         QStringRef gold_s = reader.attributes().value("gold");
                         npc->addGold( parseInt( gold_s.toString(), true) );
                     }
@@ -6513,6 +6523,9 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         if( weapon->getMinStrength() > 0 ) {
             fprintf(file, " min_strength=\"%d\"", weapon->getMinStrength());
         }
+        if( weapon->isUnholyOnly() ) {
+            fprintf(file, " unholy_only=\"true\"");
+        }
         if( weapon->getRequiresAmmo() ) {
             fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
         }
@@ -6730,6 +6743,9 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
             fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
             if( character->requiresMagical() ) {
                 fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
+            }
+            if( character->isUnholy() ) {
+                fprintf(file, " unholy=\"%s\"", character->isUnholy() ? "true" : "false");
             }
             fprintf(file, " gold=\"%d\"", character->getGold());
             if( character->canTalk() ) {

@@ -207,6 +207,7 @@ class CharacterTemplate {
     bool causes_terror;
     int terror_effect;
     bool requires_magical; // requires magical weapon to hit?
+    bool unholy;
     string animation_name;
     bool static_image;
     bool bounce;
@@ -284,6 +285,12 @@ public:
     }
     bool requiresMagical() const {
         return requires_magical;
+    }
+    void setUnholy(bool unholy) {
+        this->unholy = unholy;
+    }
+    bool isUnholy() const {
+        return this->unholy;
     }
     string getAnimationName() const {
         return this->animation_name;
@@ -386,6 +393,7 @@ class Character {
     int terror_effect;
     bool done_terror;
     bool requires_magical; // requires magical weapon to hit?
+    bool unholy;
 
     // npc talk information
     bool can_talk;
@@ -754,6 +762,12 @@ public:
     void setRequiresMagical(bool requires_magical) {
         this->requires_magical = requires_magical;
     }
+    void setUnholy(bool unholy) {
+        this->unholy = unholy;
+    }
+    bool isUnholy() const {
+        return this->unholy;
+    }
 
     bool canTalk() const {
         return this->can_talk;
@@ -856,5 +870,5 @@ public:
         this->objective_id = objective_id;
     }
 
-    static void hitEnemy(PlayingGamestate *playing_gamestate, Character *source, Character *target, bool weapon_no_effect_magical, int weapon_damage);
+    static void hitEnemy(PlayingGamestate *playing_gamestate, Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage);
 };
