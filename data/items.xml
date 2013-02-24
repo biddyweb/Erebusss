@@ -97,6 +97,11 @@ This potion will grant the drinker improved strength for a limited time.
 This potion will grant the drinker greater movement for a limited time.
 </item>
 
+<item name="Potion of Cure Disease" image_name="potion_green" weight="2"
+    arg1_s="cure_disease" magical="true" use="ITEMUSE_POTION_EFFECT" use_verb="Drink">
+This potion will cure the drinker of any diseases.
+</item>
+
 <item name="Chess Piece (Knight)" image_name="chess_knight" icon_width="0.25" weight="0">
 A small wooden chess piece, the Knight.
 </item>
@@ -137,6 +142,7 @@ A small wooden chess piece, the Knight.
     <purchase template="Potion of Archery" cost="200"/>
     <purchase template="Potion of Strength" cost="200"/>
     <purchase template="Potion of Speed" cost="250"/>
+    <purchase template="Potion of Cure Disease" cost="200"/>
     <purchase template="Holy Water" cost="150"/>
 </shop>
 

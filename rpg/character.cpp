@@ -77,9 +77,9 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     }
 }
 
-CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect) :
+CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis) :
     //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false)
 {
 }
 
@@ -120,7 +120,8 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false), unholy(false),
+    is_diseased(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -143,7 +144,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), requires_magical(false), unholy(false),
+    is_diseased(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -155,6 +157,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     this->xp_worth = character_template.getXPWorth();
     this->causes_terror = character_template.getCausesTerror();
     this->terror_effect = character_template.getTerrorEffect();
+    this->causes_disease = character_template.getCausesDisease();
+    this->causes_paralysis = character_template.getCausesParalysis();
     this->requires_magical = character_template.requiresMagical();
     this->unholy = character_template.isUnholy();
 }
@@ -215,16 +219,24 @@ bool Character::useAmmo(Ammo *ammo) {
 int Character::getProfileIntProperty(const string &key) const {
     //qDebug("key: %s", key.c_str());
     int value = this->getBaseProfileIntProperty(key);
+    // effects from profile bonues
     for(vector<ProfileEffect>::const_iterator iter = this->profile_effects.begin(); iter != this->profile_effects.end(); ++iter) {
         const ProfileEffect &profile_effect = *iter;
         int effect_bonus = profile_effect.getProfile()->getIntProperty(key);
         //qDebug("    increase by %d\n", effect_bonus);
         value += effect_bonus;
     }
+    // effect from items
     for(set<Item *>::const_iterator iter = this->items.begin();iter != this->items.end(); ++iter) {
         const Item *item = *iter;
         int item_bonus = item->getProfileBonusIntProperty(this, key);
         value += item_bonus;
+    }
+    if( this->is_diseased ) {
+        // effect of disease
+        if( key == profile_key_FP_c || key == profile_key_S_c ) {
+            value--;
+        }
     }
     return value;
 }
@@ -532,6 +544,32 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     // do it straight away
                                     if( hits ) {
                                         hitEnemy(playing_gamestate, this, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
+                                        // note that special effects are currently only supported as non-ranged attacks
+                                        if( !target_npc->isDead() ) {
+                                            if( this->causes_disease && !target_npc->isDiseased() ) {
+                                                int roll = rollDice(1, 100, 0);
+                                                qDebug("roll for causing disease: %d vs %d", roll, this->causes_disease);
+                                                if( roll < this->causes_disease ) {
+                                                    // infect!
+                                                    target_npc->setDiseased(true);
+                                                    if( target_npc == playing_gamestate->getPlayer() ) {
+                                                        playing_gamestate->addTextEffect("You have been infected with a disease!", playing_gamestate->getPlayer()->getPos(), 5000);
+                                                    }
+                                                }
+                                            }
+                                            if( this->causes_paralysis > 0 && !target_npc->isParalysed() ) {
+                                                // note, although we could paralyse someone who's already paralysed (the effect being to extend the length of paralysis), it seems fairer to the player to not do this, to avoid the risk of a player being unable to ever do anything!
+                                                int roll = rollDice(1, 100, 0);
+                                                qDebug("roll for causing paralysis: %d vs %d", roll, this->causes_paralysis);
+                                                if( roll < this->causes_paralysis ) {
+                                                    // paralyse!
+                                                    target_npc->paralyse(5000);
+                                                    if( target_npc == playing_gamestate->getPlayer() ) {
+                                                        playing_gamestate->addTextEffect("You are paralysed by the enemy!", playing_gamestate->getPlayer()->getPos(), 5000);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
 

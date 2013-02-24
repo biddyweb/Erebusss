@@ -54,21 +54,29 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         return true;
     }
     else if( this->use == "ITEMUSE_POTION_EFFECT" ) {
-        // arg1_s gives statistic affect, rating gives increase, arg1 gives time in ms
-        LOG("Character: %s drinks potion, change %s by %d for %d\n", character->getName().c_str(), this->arg1_s.c_str(), this->rating, this->arg1);
-        Profile potion_profile;
-        if( character->hasBaseProfileIntProperty(this->arg1_s) ) {
-            potion_profile.setIntProperty(this->arg1_s, this->rating);
-        }
-        else if( character->hasBaseProfileFloatProperty(this->arg1_s) ) {
-            potion_profile.setFloatProperty(this->arg1_s, static_cast<float>(this->rating));
+        LOG("Character: %s drinks potion, effect: %s\n", character->getName().c_str(), this->arg1_s.c_str());
+        if( this->arg1_s == "cure_disease" ) {
+            if( character->isDiseased() ) {
+                character->setDiseased(false);
+            }
         }
         else {
-            LOG("### unknown property type!\n");
-            ASSERT_LOGGER(false);
+            // arg1_s gives statistic affect, rating gives increase, arg1 gives time in ms
+            LOG("Character: %s drinks potion, change %s by %d for %d\n", character->getName().c_str(), this->arg1_s.c_str(), this->rating, this->arg1);
+            Profile potion_profile;
+            if( character->hasBaseProfileIntProperty(this->arg1_s) ) {
+                potion_profile.setIntProperty(this->arg1_s, this->rating);
+            }
+            else if( character->hasBaseProfileFloatProperty(this->arg1_s) ) {
+                potion_profile.setFloatProperty(this->arg1_s, static_cast<float>(this->rating));
+            }
+            else {
+                LOG("### unknown property type!\n");
+                ASSERT_LOGGER(false);
+            }
+            ProfileEffect profile_effect(potion_profile, this->arg1);
+            character->addProfileEffect(profile_effect);
         }
-        ProfileEffect profile_effect(potion_profile, this->arg1);
-        character->addProfileEffect(profile_effect);
         playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
         if( character == playing_gamestate->getPlayer() ) {
             playing_gamestate->playSound("drink");

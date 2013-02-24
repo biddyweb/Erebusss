@@ -862,6 +862,12 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     html += "<b>Level:</b> " + QString::number(player->getLevel()) + "<br/>";
     html += "<b>XP:</b> " + QString::number(player->getXP()) + " (" + QString::number(player->getXPForNextLevel()) + " required for next level.)<br/>";
+    if( player->isParalysed() ) {
+        html += "<font color=\"#ff0000\">PARALYSED</font><br/>";
+    }
+    if( player->isDiseased() ) {
+        html += "<font color=\"#ff0000\">DISEASED</font><br/>";
+    }
 
     {
         stringstream str;
@@ -1591,6 +1597,7 @@ void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     list_item->setIcon(icon);
     player_list->addItem(list_item);
     player_items.push_back(item);
+
     player_costs.push_back(buy_cost);
 }
 
@@ -2879,11 +2886,15 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
                     bool causes_terror = parseBool(causes_terror_s.toString(), true);
                     QStringRef terror_effect_s = reader.attributes().value("terror_effect");
                     int terror_effect = parseInt(terror_effect_s.toString(), true);
+                    QStringRef causes_disease_s = reader.attributes().value("causes_disease");
+                    int causes_disease = parseInt(causes_disease_s.toString(), true);
+                    QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
+                    int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
                     QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                     bool requires_magical = parseBool(requires_magical_s.toString(), true);
                     QStringRef unholy_s = reader.attributes().value("unholy");
                     bool unholy = parseBool(unholy_s.toString(), true);
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect);
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect, causes_disease, causes_paralysis);
                     character_template->setStaticImage(static_image);
                     character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
@@ -4213,6 +4224,9 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                             int paralysed_time = parseInt(paralysed_time_s.toString());
                             npc->paralyse(paralysed_time);
                         }
+                        QStringRef is_diseased_s = reader.attributes().value("is_diseased");
+                        bool is_diseased = parseBool(is_diseased_s.toString(), true);
+                        npc->setDiseased(is_diseased);
                         QStringRef level_s = reader.attributes().value("level");
                         int level = parseInt(level_s.toString(), true);
                         npc->setLevel(level);
@@ -4232,6 +4246,12 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                         QStringRef done_terror_s = reader.attributes().value("done_terror");
                         bool done_terror = parseBool(done_terror_s.toString(), true);
                         npc->setDoneTerror(done_terror);
+                        QStringRef causes_disease_s = reader.attributes().value("causes_disease");
+                        int causes_disease = parseInt(causes_disease_s.toString(), true);
+                        npc->setCausesDisease(causes_disease);
+                        QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
+                        int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
+                        npc->setCausesParalysis(causes_paralysis);
                         QStringRef requires_magical_s = reader.attributes().value("requires_magical");
                         bool requires_magical = parseBool(requires_magical_s.toString(), true);
                         npc->setRequiresMagical(requires_magical);
@@ -6698,11 +6718,11 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
                 fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
             }
             if( character->isBounce() ) {
-                fprintf(file, " bounce=\"%s\"", character->isBounce() ? "true": "false");
+                fprintf(file, " bounce=\"true\"");
             }
             fprintf(file, " name=\"%s\"", character->getName().c_str());
             if( character->isDead() ) {
-                fprintf(file, " is_dead=\"%s\"", character->isDead() ? "true": "false");
+                fprintf(file, " is_dead=\"true\"");
             }
             fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
             if( character->hasDefaultPosition() ) {
@@ -6727,31 +6747,42 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
             fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
             fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
             if( character->canFly() ) {
-                fprintf(file, " can_fly=\"%s\"", character->canFly() ? "true": "false");
+                fprintf(file, " can_fly=\"true\"");
             }
             if( character->isParalysed() ) {
-                fprintf(file, " is_paralysed=\"%s\"", character->isParalysed() ? "true": "false");
+                fprintf(file, " is_paralysed=\"true\"");
                 fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+            }
+            if( character->isDiseased() ) {
+                fprintf(file, " is_diseased=\"true\"");
             }
             fprintf(file, " level=\"%d\"", character->getLevel());
             fprintf(file, " xp=\"%d\"", character->getXP());
             fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
             if( character->getCausesTerror() ) {
-                fprintf(file, " causes_terror=\"%s\"", character->getCausesTerror() ? "true" : "false");
+                fprintf(file, " causes_terror=\"true\"");
                 fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
             }
             fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
+            if( character->getCausesDisease() > 0 ) {
+                fprintf(file, " causes_disease=\"%d\"", character->getCausesDisease());
+            }
+            if( character->getCausesParalysis() > 0 ) {
+                fprintf(file, " causes_paralysis=\"%d\"", character->getCausesParalysis());
+            }
             if( character->requiresMagical() ) {
-                fprintf(file, " requires_magical=\"%s\"", character->requiresMagical() ? "true" : "false");
+                fprintf(file, " requires_magical=\"true\"");
             }
             if( character->isUnholy() ) {
-                fprintf(file, " unholy=\"%s\"", character->isUnholy() ? "true" : "false");
+                fprintf(file, " unholy=\"true\"");
             }
             fprintf(file, " gold=\"%d\"", character->getGold());
             if( character->canTalk() ) {
-                fprintf(file, " can_talk=\"%s\"", character->canTalk() ? "true": "false");
+                fprintf(file, " can_talk=\"true\"");
             }
-            fprintf(file, " has_talked=\"%s\"", character->hasTalked() ? "true": "false");
+            if( character->hasTalked() ) {
+                fprintf(file, " has_talked=\"true\"");
+            }
             if( character->getInteractionType().length() > 0 ) {
                 fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
             }
@@ -6764,7 +6795,9 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
             if( character->getInteractionRewardItem().length() > 0 ) {
                 fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
             }
-            fprintf(file, " interaction_completed=\"%s\"", character->isInteractionCompleted() ? "true": "false");
+            if( character->isInteractionCompleted() ) {
+                fprintf(file, " interaction_completed=\"true\"");
+            }
             if( character->getShop().length() > 0 ) {
                 fprintf(file, " shop=\"%s\"", character->getShop().c_str());
             }

@@ -206,13 +206,15 @@ class CharacterTemplate {
     int xp_worth;
     bool causes_terror;
     int terror_effect;
+    int causes_disease;
+    int causes_paralysis;
     bool requires_magical; // requires magical weapon to hit?
     bool unholy;
     string animation_name;
     bool static_image;
     bool bounce;
 public:
-    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect);
+    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis);
 
     const Profile *getProfile() const {
         return &this->profile;
@@ -279,6 +281,12 @@ public:
     }
     int getTerrorEffect() const {
         return this->terror_effect;
+    }
+    int getCausesDisease() const {
+        return this->causes_disease;
+    }
+    int getCausesParalysis() const {
+        return this->causes_paralysis;
     }
     void setRequiresMagical(bool requires_magical) {
         this->requires_magical = requires_magical;
@@ -374,6 +382,7 @@ class Character {
     bool can_fly;
     bool is_paralysed;
     int paralysed_until;
+    bool is_diseased;
 
     vector<ProfileEffect> profile_effects;
 
@@ -392,6 +401,8 @@ class Character {
     bool causes_terror;
     int terror_effect;
     bool done_terror;
+    int causes_disease;
+    int causes_paralysis;
     bool requires_magical; // requires magical weapon to hit?
     bool unholy;
 
@@ -527,6 +538,12 @@ public:
     }
     int getParalysedUntil() const {
         return this->paralysed_until;
+    }
+    void setDiseased(bool is_diseased) {
+        this->is_diseased = is_diseased;
+    }
+    bool isDiseased() const {
+        return this->is_diseased;
     }
     /*void setDestination(float xdest, float ydest) {
         bool old_has_destination = this->has_destination;
@@ -755,6 +772,18 @@ public:
     }
     void setDoneTerror(bool done_terror) {
         this->done_terror = done_terror;
+    }
+    int getCausesDisease() const {
+        return this->causes_disease;
+    }
+    void setCausesDisease(int causes_disease) {
+        this->causes_disease = causes_disease;
+    }
+    int getCausesParalysis() const {
+        return this->causes_paralysis;
+    }
+    void setCausesParalysis(int causes_paralysis) {
+        this->causes_paralysis = causes_paralysis;
     }
     bool requiresMagical() const {
         return requires_magical;
