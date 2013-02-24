@@ -184,9 +184,16 @@ public:
 };
 
 class Weapon : public Item {
+public:
+    enum WeaponType {
+        WEAPONTYPE_HAND = 0,
+        WEAPONTYPE_RANGED = 1,
+        WEAPONTYPE_THROWN = 2
+    };
+private:
     string animation_name;
     bool is_two_handed;
-    bool is_ranged;
+    WeaponType weapon_type;
     bool requires_ammo;
     string ammo_key;
     int damageX, damageY, damageZ;
@@ -211,11 +218,14 @@ public:
     bool isTwoHanded() const {
         return this->is_two_handed;
     }
-    void setRanged(bool is_ranged) {
-        this->is_ranged = is_ranged;
+    void setWeaponType(WeaponType weapon_type) {
+        this->weapon_type = weapon_type;
     }
-    bool isRanged() const {
-        return this->is_ranged;
+    WeaponType getWeaponType() const {
+        return this->weapon_type;
+    }
+    bool isRangedOrThrown() const {
+        return this->weapon_type == WEAPONTYPE_RANGED || this->weapon_type == WEAPONTYPE_THROWN;
     }
     void setRequiresAmmo(bool requires_ammo, const string &ammo_key) {
         this->requires_ammo = requires_ammo;

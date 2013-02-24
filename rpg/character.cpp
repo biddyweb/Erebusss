@@ -359,7 +359,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
             if( hit_state == HITSTATE_HAS_HIT || hit_state == HITSTATE_IS_NOT_HITTING ) {
                 float dist = ( target->getPos() - this->getPos() ).magnitude();
-                bool is_ranged = false;
+                bool is_ranged = false; // also includes thrown weapons, and spell attacks
                 const Spell *spell = NULL;
                 Character *spell_target = NULL;
                 if( hit_state == HITSTATE_HAS_HIT ) {
@@ -396,7 +396,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
                         }
                     }
-                    is_ranged = spell != NULL || ( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRanged() );
+                    is_ranged = spell != NULL || ( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRangedOrThrown() );
                 }
                 bool can_hit = false;
                 /* We could use the is_visible flag, but for future use we might want
@@ -479,13 +479,15 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
                             if( is_ranged ) {
                                 // fire off an action
-                                // get ammo - note that the ammo may have already been used up by the character
-                                Ammo *ammo = NULL;
-                                string ammo_key;
-                                if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
-                                    ammo_key = this->getCurrentWeapon()->getAmmoKey();
+                                string projectile_key;
+                                ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
+                                if( this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
+                                    projectile_key = this->getCurrentWeapon()->getAmmoKey();
                                 }
-                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, ammo_key);
+                                else {
+                                    projectile_key = this->getCurrentWeapon()->getKey();
+                                }
+                                CharacterAction *action = CharacterAction::createProjectileAction(playing_gamestate, this, target_npc, hits, weapon_no_effect_magical, weapon_damage, projectile_key);
                                 playing_gamestate->addCharacterAction(action);
                             }
                             else {

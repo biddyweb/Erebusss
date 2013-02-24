@@ -153,9 +153,15 @@ string Item::getDetailedDescription() const {
         if( weapon->getMinStrength() > 0 ) {
             str << "<b>Min Strength:</b> " << weapon->getMinStrength() << "<br/>";
         }
-        str << "<b>Ranged?:</b> " << (weapon->isRanged() ? "Yes" : "No") << "<br/>";
-        if( weapon->isRanged() ) {
+        if( weapon->getWeaponType() == Weapon::WEAPONTYPE_HAND ) {
+            str << "<b>Weapon Type:</b> Hand to Hand<br/>";
+        }
+        else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
+            str << "<b>Weapon Type:</b> Ranged<br/>";
             str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
+        }
+        else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_THROWN ) {
+            str << "<b>Weapon Type:</b> Thrown<br/>";
         }
     }
     else if( this->getType() == ITEMTYPE_SHIELD ) {
@@ -244,7 +250,7 @@ bool ItemCompare::operator()(const Item *lhs, const Item *rhs) const {
 
 Weapon::Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ) :
     Item(name, image_name, weight), animation_name(animation_name),
-    is_two_handed(false), is_ranged(false), requires_ammo(false),
+    is_two_handed(false), weapon_type(WEAPONTYPE_HAND), requires_ammo(false),
     damageX(damageX), damageY(damageY), damageZ(damageZ),
     min_strength(0)
 {

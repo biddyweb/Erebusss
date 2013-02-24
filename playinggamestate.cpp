@@ -137,7 +137,7 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
     return character_action;
 }
 
-CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &ammo_key) {
+CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, int weapon_damage, const string &projectile_key) {
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
     //character_action->duration_ms = 250;
     const float speed = 0.02f; // units per ms
@@ -148,7 +148,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
 
     AnimatedObject *object = new AnimatedObject();
     character_action->object = object;
-    object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(ammo_key) );
+    object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(projectile_key) );
     playing_gamestate->addGraphicsItem(object, 0.5f);
 
     Vector2D dir = character_action->dest_pos - character_action->source_pos;
@@ -2490,6 +2490,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
                     int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
                     int stride_x = 0, stride_y = 0;
                     const int def_width_c = 128, def_height_c = 128;
+                    int n_dimensions = 0;
+                    QStringRef n_dimensions_s = reader.attributes().value("n_dimensions");
+                    if( n_dimensions_s.length() > 0 ) {
+                        n_dimensions = parseInt(n_dimensions_s.toString());
+                    }
                     if( imagetype_s.length() == 0 ) {
                         // load file
                         QStringRef filename_s = reader.attributes().value("filename");
@@ -2649,11 +2654,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("animations not supported for this animation type");
                         }
+                        if( n_dimensions == 0 ) {
+                            n_dimensions = 8;
+                        }
                         animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
                         if( filename.length() > 0 )
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 8);
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                         else
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 8);
+                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                     }
                     else if( type == "scenery" ) {
                         if( animation_layer_definition.size() == 0 ) {
@@ -3234,17 +3242,12 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     int worth_bonus = parseInt(worth_bonus_sr.toString(), true);
     QStringRef name_s = reader.attributes().value("name");
     QStringRef image_name_s = reader.attributes().value("image_name");
+    QStringRef icon_width_s = reader.attributes().value("icon_width");
 
     if( reader.name() == "item" ) {
-        QStringRef icon_width_s = reader.attributes().value("icon_width");
         QStringRef use_s = reader.attributes().value("use");
         QStringRef use_verb_s = reader.attributes().value("use_verb");
         item = new Item(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight);
-        if( icon_width_s.length() > 0 ) {
-            float icon_width = parseFloat(icon_width_s.toString());
-            //LOG("icon_width: %f\n", icon_width);
-            item->setIconWidth(icon_width);
-        }
         if( use_s.length() > 0 ) {
             item->setUse(use_s.toString().toStdString(), use_verb_s.toString().toStdString());
         }
@@ -3254,6 +3257,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         QStringRef animation_name_s = reader.attributes().value("animation_name");
         QStringRef two_handed_s = reader.attributes().value("two_handed");
         QStringRef ranged_s = reader.attributes().value("ranged");
+        QStringRef thrown_s = reader.attributes().value("thrown");
         QStringRef ammo_s = reader.attributes().value("ammo");
         QStringRef damageX_s = reader.attributes().value("damageX");
         QStringRef damageY_s = reader.attributes().value("damageY");
@@ -3268,6 +3272,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         qDebug("    ammo_s: %s", ammo_s.toString().toStdString().c_str());*/
         bool two_handed = parseBool(two_handed_s.toString(), true);
         bool ranged = parseBool(ranged_s.toString(), true);
+        bool thrown = parseBool(thrown_s.toString(), true);
         int damageX = parseInt(damageX_s.toString());
         int damageY = parseInt(damageY_s.toString());
         int damageZ = parseInt(damageZ_s.toString());
@@ -3275,7 +3280,19 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString(), damageX, damageY, damageZ);
         item = weapon;
         weapon->setTwoHanded(two_handed);
-        weapon->setRanged(ranged);
+        if( ranged && thrown ) {
+            throw string("Weapons can be ranged and thrown");
+        }
+        else if( ranged ) {
+            weapon->setWeaponType(Weapon::WEAPONTYPE_RANGED);
+        }
+        else if( thrown ) {
+            weapon->setWeaponType(Weapon::WEAPONTYPE_THROWN);
+        }
+        else {
+            weapon->setWeaponType(Weapon::WEAPONTYPE_HAND);
+        }
+        //weapon->setRanged(ranged);
         if( ammo_s.length() > 0 ) {
             weapon->setRequiresAmmo(true, ammo_s.toString().toStdString());
         }
@@ -3318,7 +3335,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
     }
     // else ignore unknown element - leave item as NULL
     if( item != NULL ) {
-        // remember not to use the string refs here, as no longer value!
+        if( icon_width_s.length() > 0 ) {
+            float icon_width = parseFloat(icon_width_s.toString());
+            //LOG("icon_width: %f\n", icon_width);
+            item->setIconWidth(icon_width);
+        }
         item->setArg1(arg1);
         item->setArg2(arg2);
         item->setArg1s(arg1_s.toStdString());
@@ -5722,10 +5743,10 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
     object->clearAnimationLayers();
     if( character == player ) {
         object->addAnimationLayer( this->animation_layers["player"]->getAnimationLayer() );
-        if( character->getCurrentWeapon() != NULL ) {
+        if( character->getCurrentWeapon() != NULL && character->getCurrentWeapon()->getAnimationName().length() > 0 ) {
             object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName() ]->getAnimationLayer() );
         }
-        if( character->getCurrentShield() != NULL ) {
+        if( character->getCurrentShield() != NULL && character->getCurrentShield()->getAnimationName().length() > 0 ) {
             object->addAnimationLayer( this->animation_layers[ character->getCurrentShield()->getAnimationName() ]->getAnimationLayer() );
         }
     }
@@ -6206,7 +6227,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
                     }
                 }
             }
-            if( target_npc == NULL && player->getCurrentWeapon() != NULL && player->getCurrentWeapon()->isRanged() ) {
+            if( target_npc == NULL && player->getCurrentWeapon() != NULL && player->getCurrentWeapon()->isRangedOrThrown() ) {
                 // for ranged weapons, pick closest visible enemy to player
                 for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
                     Character *character = *iter;
@@ -6478,8 +6499,11 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
         if( weapon->isTwoHanded() ) {
             fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
         }
-        if( weapon->isRanged() ) {
-            fprintf(file, " ranged=\"%s\"", weapon->isRanged() ? "true": "false");
+        if( weapon->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
+            fprintf(file, " ranged=\"true\"");
+        }
+        else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_THROWN ) {
+            fprintf(file, " thrown=\"true\"");
         }
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
