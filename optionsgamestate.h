@@ -19,6 +19,8 @@ class OptionsGamestate : public Gamestate {
 
     QStackedWidget *main_stacked_widget;
 
+    int options_page_index;
+
     QComboBox *characterComboBox;
     QComboBox *difficultyComboBox;
     //QButtonGroup *difficultyButtonGroup;
@@ -40,6 +42,8 @@ class OptionsGamestate : public Gamestate {
 private slots:
     void clickedStart();
     void clickedStartGame();
+    void clickedNext();
+    void clickedCancel();
     void clickedLoad();
     void clickedLoadGame();
     void clickedOptions();

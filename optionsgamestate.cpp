@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
+    main_stacked_widget(NULL), options_page_index(0), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
     //cheat_mode = true;
@@ -182,11 +182,16 @@ void OptionsGamestate::keyPress(QKeyEvent *key_event) {
     }
 }
 
+const int n_options_pages = 1;
+//const int n_options_pages = 2;
+
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
+    LOG("options_page_index = %d\n", options_page_index);
     /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
     GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
     game_g->pushMessage(game_message);*/
+    ASSERT_LOGGER(options_page_index >= 0 && options_page_index < n_options_pages);
 
     QWidget *widget = new QWidget();
     this->main_stacked_widget->addWidget(widget);
@@ -195,82 +200,103 @@ void OptionsGamestate::clickedStart() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
+    if( options_page_index == 0 ) {
+        {
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
 
-        QLabel *label = new QLabel("Character: ");
-        label->setAlignment(Qt::AlignCenter);
-        h_layout->addWidget(label);
+            QLabel *label = new QLabel("Character: ");
+            label->setAlignment(Qt::AlignCenter);
+            h_layout->addWidget(label);
 
-        characterComboBox = new QComboBox();
-        characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
-        characterComboBox->setFont(game_g->getFontBig());
-        for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
-            characterComboBox->addItem(game_g->getPlayerType(i).c_str());
-        }
-        characterComboBox->setCurrentIndex(4); // select Warrior
-        characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        h_layout->addWidget(characterComboBox);
-    }
-
-    {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
-
-        QLabel *label = new QLabel("Difficulty: ");
-        label->setAlignment(Qt::AlignCenter);
-        h_layout->addWidget(label);
-
-        difficultyComboBox = new QComboBox();
-        difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
-        difficultyComboBox->setFont(game_g->getFontBig());
-        for(int i=0;i<N_DIFFICULTIES;i++) {
-            Difficulty test_difficulty = (Difficulty)i;
-            difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
-        }
-        difficultyComboBox->setCurrentIndex(1);
-        difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        h_layout->addWidget(difficultyComboBox);
-
-        /*QVBoxLayout *v_layout = new QVBoxLayout();
-        h_layout->addLayout(v_layout);
-
-        difficultyButtonGroup = new QButtonGroup(this);
-        for(int i=0;i<N_DIFFICULTIES;i++) {
-            Difficulty test_difficulty = (Difficulty)i;
-            QRadioButton *radio = new QRadioButton( game_g->getDifficultyString(test_difficulty).c_str() );
-            v_layout->addWidget(radio);
-            difficultyButtonGroup->addButton(radio, i);
-            if( test_difficulty == DIFFICULTY_MEDIUM ) {
-                radio->setChecked(true);
+            characterComboBox = new QComboBox();
+            characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+            characterComboBox->setFont(game_g->getFontBig());
+            for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
+                characterComboBox->addItem(game_g->getPlayerType(i).c_str());
             }
-        }*/
-    }
+            characterComboBox->setCurrentIndex(4); // select Warrior
+            characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            h_layout->addWidget(characterComboBox);
+        }
 
-    permadeathCheckBox = new QCheckBox("Permadeath");
-    permadeathCheckBox->setFont(game_g->getFontBig());
-    permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
-    layout->addWidget(permadeathCheckBox);
+        {
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
+
+            QLabel *label = new QLabel("Difficulty: ");
+            label->setAlignment(Qt::AlignCenter);
+            h_layout->addWidget(label);
+
+            difficultyComboBox = new QComboBox();
+            difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+            difficultyComboBox->setFont(game_g->getFontBig());
+            for(int i=0;i<N_DIFFICULTIES;i++) {
+                Difficulty test_difficulty = (Difficulty)i;
+                difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
+            }
+            difficultyComboBox->setCurrentIndex(1);
+            difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            h_layout->addWidget(difficultyComboBox);
+
+            /*QVBoxLayout *v_layout = new QVBoxLayout();
+            h_layout->addLayout(v_layout);
+
+            difficultyButtonGroup = new QButtonGroup(this);
+            for(int i=0;i<N_DIFFICULTIES;i++) {
+                Difficulty test_difficulty = (Difficulty)i;
+                QRadioButton *radio = new QRadioButton( game_g->getDifficultyString(test_difficulty).c_str() );
+                v_layout->addWidget(radio);
+                difficultyButtonGroup->addButton(radio, i);
+                if( test_difficulty == DIFFICULTY_MEDIUM ) {
+                    radio->setChecked(true);
+                }
+            }*/
+        }
+
+        permadeathCheckBox = new QCheckBox("Permadeath");
+        permadeathCheckBox->setFont(game_g->getFontBig());
+        permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
+        layout->addWidget(permadeathCheckBox);
+
+    }
+    /*else if( options_page_index == 1 ) {
+    }*/
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *startButton = new QPushButton("Start");
+        QPushButton *startButton = new QPushButton("Next");
         game_g->initButton(startButton);
-        startButton->setShortcut(QKeySequence(Qt::Key_S));
+        startButton->setShortcut(QKeySequence(Qt::Key_N));
         startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(startButton);
-        connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
+        if( options_page_index == n_options_pages-1 ) {
+            connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
+        }
+        else {
+            connect(startButton, SIGNAL(clicked()), this, SLOT(clickedNext()));
+        }
 
         QPushButton *closeButton = new QPushButton("Cancel");
         game_g->initButton(closeButton);
         closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
         closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(closeButton);
-        connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+        //connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+        connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCancel()));
     }
+}
+
+void OptionsGamestate::clickedNext() {
+    this->options_page_index++;
+    this->clickedStart();
+}
+
+void OptionsGamestate::clickedCancel() {
+    this->options_page_index = 0;
+    this->closeAllSubWindows();
 }
 
 void OptionsGamestate::clickedStartGame() {
