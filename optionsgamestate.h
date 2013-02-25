@@ -26,6 +26,8 @@ class OptionsGamestate : public Gamestate {
     //QButtonGroup *difficultyButtonGroup;
     QCheckBox *permadeathCheckBox;
 
+    QLineEdit *nameLineEdit;
+
     ScrollingListWidget *load_list;
     vector<QString> load_filenames;
 

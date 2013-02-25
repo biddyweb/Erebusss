@@ -1141,7 +1141,7 @@ void Game::handleMessages() {
                 StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getPermadeath(), start_message->getCheatMode(), start_message->getCheatStartLevel());
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getName(), start_message->getPermadeath(), start_message->getCheatMode(), start_message->getCheatStartLevel());
                 gamestate = playing_gamestate;
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
 
@@ -1157,7 +1157,7 @@ void Game::handleMessages() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, false, false, 0);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, "", false, false, 0);
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
@@ -1413,9 +1413,10 @@ void Game::createPlayerNames() {
     this->player_types.push_back("Warrior");
 }
 
-Character *Game::createPlayer(size_t i) const {
+Character *Game::createPlayer(size_t i, const string &player_name) const {
     ASSERT_LOGGER(i < this->getNPlayerTypes() );
-    Character *character = new Character(player_types.at(i), "", false);
+    //Character *character = new Character(player_types.at(i), "", false);
+    Character *character = new Character(player_name, "", false);
     if( i == 0 ) {
         // barbarian
         character->setProfile(8, 6, 8, 1, 5, 5, 8, 1.8f);

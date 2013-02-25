@@ -13,7 +13,9 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), options_page_index(0), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL), load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
+    main_stacked_widget(NULL), options_page_index(0), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
+    nameLineEdit(NULL),
+    load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
     //cheat_mode = true;
@@ -182,8 +184,8 @@ void OptionsGamestate::keyPress(QKeyEvent *key_event) {
     }
 }
 
-const int n_options_pages = 1;
-//const int n_options_pages = 2;
+//const int n_options_pages = 1;
+const int n_options_pages = 2;
 
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
@@ -260,8 +262,25 @@ void OptionsGamestate::clickedStart() {
         layout->addWidget(permadeathCheckBox);
 
     }
-    /*else if( options_page_index == 1 ) {
-    }*/
+    else if( options_page_index == 1 ) {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *label = new QLabel("Your name:");
+        h_layout->addWidget(label);
+
+        int character_id = this->characterComboBox->currentIndex();
+        nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
+        h_layout->addWidget(nameLineEdit);
+        nameLineEdit->setFocus();
+        nameLineEdit->selectAll();
+        if( options_page_index == n_options_pages-1 ) {
+            connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
+        }
+        else {
+            connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedNext()));
+        }
+    }
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -312,7 +331,7 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
-    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), permadeath, cheat_mode, cheat_start_level);
+    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }
 

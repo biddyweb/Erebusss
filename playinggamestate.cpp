@@ -2238,7 +2238,7 @@ void SaveGameWindow::clickedSaveNew() {
     }
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool permadeath, bool cheat_mode, int cheat_start_level) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL),
@@ -2469,7 +2469,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, bool pe
         player->initialiseHealth(60);
         //player->addGold( rollDice(2, 6, 10) );
         */
-        this->player = game_g->createPlayer(player_type);
+        this->player = game_g->createPlayer(player_type, player_name);
     }
 
     LOG("load images\n");
