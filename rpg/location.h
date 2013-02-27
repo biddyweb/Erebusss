@@ -67,6 +67,7 @@ protected:
     DrawType draw_type;
     float opacity;
     bool has_smoke;
+    Vector2D smoke_pos;
     float width, height;
     float visual_height; // not saved
 
@@ -235,11 +236,15 @@ public:
     float getOpacity() const {
         return this->opacity;
     }
-    void setHasSmoke(bool has_smoke) {
+    void setHasSmoke(bool has_smoke, Vector2D smoke_pos) {
         this->has_smoke = has_smoke;
+        this->smoke_pos = smoke_pos;
     }
     bool hasSmoke() const {
         return this->has_smoke;
+    }
+    Vector2D getSmokePos() const {
+        return this->smoke_pos;
     }
     void setActionLastTime(int action_last_time) {
         this->action_last_time = action_last_time;

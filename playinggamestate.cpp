@@ -4596,6 +4596,8 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     float pos_y = parseFloat(pos_y_s.toString());
                     QStringRef opacity_s = reader.attributes().value("opacity");
                     QStringRef has_smoke_s = reader.attributes().value("has_smoke");
+                    QStringRef smoke_x_s = reader.attributes().value("smoke_x");
+                    QStringRef smoke_y_s = reader.attributes().value("smoke_y");
                     QStringRef draw_type_s = reader.attributes().value("draw_type");
                     QStringRef action_last_time_s = reader.attributes().value("action_last_time");
                     QStringRef action_delay_s = reader.attributes().value("action_delay");
@@ -4763,7 +4765,15 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
                     }
                     if( has_smoke_s.length() > 0 ) {
                         bool has_smoke = parseBool(has_smoke_s.toString());
-                        scenery->setHasSmoke(has_smoke);
+                        // we allow a default for backwards compatibility, for when the smoke positio was hardcoded for the campfire
+                        Vector2D smoke_pos(0.5f, 0.4167f);
+                        if( smoke_x_s.length() > 0 ) {
+                            smoke_pos.x = parseFloat(smoke_x_s.toString());
+                        }
+                        if( smoke_y_s.length() > 0 ) {
+                            smoke_pos.y = parseFloat(smoke_y_s.toString());
+                        }
+                        scenery->setHasSmoke(has_smoke, smoke_pos);
                     }
                     if( draw_type_s.length() > 0 ) {
                         if( draw_type_s == "floating" ) {
@@ -5178,9 +5188,18 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         if( scenery->hasSmoke() ) {
             SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
             ps->setBirthRate(25.0f);
-            ps->setPos(centre_x, 30.0f);
+            //ps->setPos(centre_x, 30.0f);
+            //ps->setPos(0.5f*object->boundingRect().width(), 0.4167f*object->boundingRect().height());
+            Vector2D smoke_pos = scenery->getSmokePos();
+            ps->setPos(smoke_pos.x*object->boundingRect().width(), smoke_pos.y*object->boundingRect().height());
             ps->setZValue(object->pos().y() + 2000.0f);
             ps->setParentItem(object);
+            QTransform transform2;
+            qDebug("### scenery scale %f , %f", scenery_scale_w, scenery_scale_h);
+            qDebug("### object %f x %f", object->boundingRect().width(), object->boundingRect().height());
+            const float mult_y = this->view_transform_3d ? 2.0f : 1.0f;
+            transform2 = transform2.scale(1.0f/(64.0f*scenery_scale_w), mult_y/(64.0f*scenery_scale_h));
+            ps->setTransform(transform2);
         }
     }
 }
@@ -6995,7 +7014,9 @@ bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
                 fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
             }
             if( scenery->hasSmoke() ) {
-                fprintf(file, " has_smoke=\"%s\"", scenery->hasSmoke() ? "true": "false");
+                fprintf(file, " has_smoke=\"true\"");
+                fprintf(file, " smoke_x=\"%f\"", scenery->getSmokePos().x);
+                fprintf(file, " smoke_y=\"%f\"", scenery->getSmokePos().y);
             }
             if( scenery->isOpened() ) {
                 fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
