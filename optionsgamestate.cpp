@@ -58,10 +58,10 @@ OptionsGamestate::OptionsGamestate() :
 
     QPushButton *startButton = new QPushButton("Start game");
     game_g->initButton(startButton);
-    startButton->setShortcut(QKeySequence(Qt::Key_S));
+    startButton->setShortcut(QKeySequence(Qt::Key_Return));
 #ifndef Q_OS_ANDROID
     // for some reason, this sometimes shows on Android when it shouldn't?
-    startButton->setToolTip("Start playing a new game (S)");
+    startButton->setToolTip("Start playing a new game (Return)");
 #endif
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
@@ -94,6 +94,10 @@ OptionsGamestate::OptionsGamestate() :
     QPushButton *quitButton = new QPushButton("Quit game");
     game_g->initButton(quitButton);
     quitButton->setShortcut(QKeySequence(Qt::Key_Escape));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        quitButton->setToolTip("Exit the game (Escape)");
+#endif
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
@@ -288,7 +292,11 @@ void OptionsGamestate::clickedStart() {
 
         QPushButton *startButton = new QPushButton("Next");
         game_g->initButton(startButton);
-        startButton->setShortcut(QKeySequence(Qt::Key_N));
+        startButton->setShortcut(QKeySequence(Qt::Key_Return));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        startButton->setToolTip("Accept the options and proceed to next step (Return)");
+#endif
         startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(startButton);
         if( options_page_index == n_options_pages-1 ) {
@@ -301,6 +309,10 @@ void OptionsGamestate::clickedStart() {
         QPushButton *closeButton = new QPushButton("Cancel");
         game_g->initButton(closeButton);
         closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        closeButton->setToolTip("Return to main menu (Escape)");
+#endif
         closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(closeButton);
         //connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
