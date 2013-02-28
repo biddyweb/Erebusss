@@ -511,10 +511,10 @@ with the argument "-windowed". E.g., on Windows, run with:
   <li>Any reported error messages.</li>
 	<li>The "log.txt" file. This can be found:<ul>
     <li>For Windows, in %LOCALAPPDATA%\erebus .</li>
-    <!--<li>
-      For Linux, in $HOME/.config/gigalomania (in Ubuntu, go to menu Places->Home Folder,
-      then make sure View->Show Hidden Files is selected, then open the folder .config).
-    </li>-->
+    <li>
+      For Linux, it should be in $HOME/.local/share/data/erebus (in Ubuntu, make sure View->Show Hidden
+      Files is selected). If not, try looking for an erebus/ folder somewhere in your home folder.
+    </li>
     <li>
       For Symbian it's located in the folder private/2006dbd2 on the drive that you installed the
       game on.<!--The folder needs changing, if we change the UID of the game!--> Seeing this folder
@@ -537,6 +537,8 @@ with the argument "-windowed". E.g., on Windows, run with:
   window, and note if that gives any error messages.</li>
   <li>A description of what happened, and what steps you took that resulted in the bug.</li>
   <li>Does the bug happen every time?</li>
+  <li>A save game file, if relevant (in the savegames/ folder, in the same location as the log.txt file -
+  see above for details on the location).</li>
   <li>Any details of your system may also be helpful, e.g.: operating system and version, CPU, graphics
   card, Direct X version if relevant, make/model of smartphone/tablet if relevant.</li>
 </ul>
