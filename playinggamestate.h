@@ -239,7 +239,7 @@ class StatsWindow : public QWidget {
 
     PlayingGamestate *playing_gamestate;
 
-    QString writeStat(const string &visual_name, const string &stat_key, bool is_float) const;
+    QString writeStat(const string &stat_key, bool is_float) const;
 private slots:
 
 public:
@@ -361,6 +361,27 @@ public:
     virtual ~ItemsPickerWindow() {
     }
 };
+
+class LevelUpWindow : public QWidget {
+    Q_OBJECT
+
+    PlayingGamestate *playing_gamestate;
+    QPushButton *closeButton;
+    map<string, QCheckBox *> check_boxes;
+    vector<QCheckBox *> selected;
+
+    QCheckBox *addProfileCheckBox(const string &key);
+
+private slots:
+    void clickedCheckBox(int state);
+    void clickedLevelUp();
+
+public:
+    LevelUpWindow(PlayingGamestate *playing_gamestate);
+    virtual ~LevelUpWindow() {
+    }
+};
+
 
 class CampaignWindow : public QWidget {
     Q_OBJECT

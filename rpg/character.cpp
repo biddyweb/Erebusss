@@ -12,6 +12,27 @@
 #include <cassert>
 #endif
 
+string getLongString(const string &key) {
+    if( key == profile_key_FP_c )
+        return "Fighting Prowess";
+    else if( key == profile_key_BS_c )
+        return "Bow Skill";
+    else if( key == profile_key_S_c )
+        return "Strength";
+    else if( key == profile_key_A_c )
+        return "Attacks";
+    else if( key == profile_key_M_c )
+        return "Mind";
+    else if( key == profile_key_D_c )
+        return "Dexterity";
+    else if( key == profile_key_B_c )
+        return "Bravery";
+    else if( key == profile_key_Sp_c )
+        return "Speed";
+    LOG("getLongString: unknown key: %s\n", key.c_str());
+    throw string("unknown key");
+}
+
 Profile::Profile(const CharacterTemplate &character_template) {
     *this = *character_template.getProfile();
 }
@@ -1235,7 +1256,7 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
 }
 
 void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
-    if( level % 3 == 1 ) {
+    /*if( level % 3 == 1 ) {
         this->changeBaseProfileIntProperty(profile_key_FP_c, 1);
         this->changeBaseProfileIntProperty(profile_key_M_c, 1);
     }
@@ -1246,7 +1267,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
     else if( level % 3 == 0 ) {
         this->changeBaseProfileIntProperty(profile_key_S_c, 1);
         this->changeBaseProfileIntProperty(profile_key_D_c, 1);
-    }
+    }*/
     //qDebug("speed was: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
     if( this->getBaseProfileFloatProperty(profile_key_Sp_c) < 2.5f - E_TOL_LINEAR ) {
         this->changeBaseProfileFloatProperty(profile_key_Sp_c, 0.1f);
@@ -1262,9 +1283,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
     this->level++;
     if( this == playing_gamestate->getPlayer() ) {
         LOG("player advances to level %d (xp %d)\n", level, xp);
-        stringstream xp_str;
-        xp_str << "Advanced to level " << level << "!";
-        playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 255, 0);
+        new LevelUpWindow(playing_gamestate);
     }
 }
 

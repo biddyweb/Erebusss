@@ -95,6 +95,8 @@ const string profile_key_D_c = "D";
 const string profile_key_B_c = "B";
 const string profile_key_Sp_c = "Sp";
 
+string getLongString(const string &key);
+
 class Profile {
     map<string, int> int_properties;
     map<string, float> float_properties;

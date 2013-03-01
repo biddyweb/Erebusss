@@ -838,14 +838,14 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += "<b>Dexterity:</b> " + QString::number(player->getProfileIntProperty(profile_key_D_c)) + "<br/>";
     html += "<b>Bravery:</b> " + QString::number(player->getProfileIntProperty(profile_key_B_c)) + "<br/>";
     html += "<b>Speed:</b> " + QString::number(player->getProfileFloatProperty(profile_key_Sp_c)) + "<br/>";*/
-    html += this->writeStat("Fighting Prowess", profile_key_FP_c, false);
-    html += this->writeStat("Bow Skill", profile_key_BS_c, false);
-    html += this->writeStat("Strength", profile_key_S_c, false);
-    html += this->writeStat("Attacks", profile_key_A_c, false);
-    html += this->writeStat("Mind", profile_key_M_c, false);
-    html += this->writeStat("Dexterity", profile_key_D_c, false);
-    html += this->writeStat("Bravery", profile_key_B_c, false);
-    html += this->writeStat("Speed", profile_key_Sp_c, true);
+    html += this->writeStat(profile_key_FP_c, false);
+    html += this->writeStat(profile_key_BS_c, false);
+    html += this->writeStat(profile_key_S_c, false);
+    html += this->writeStat(profile_key_A_c, false);
+    html += this->writeStat(profile_key_M_c, false);
+    html += this->writeStat(profile_key_D_c, false);
+    html += this->writeStat(profile_key_B_c, false);
+    html += this->writeStat(profile_key_Sp_c, true);
 
     html += "<b>Health:</b> ";
     if( player->getHealth() < player->getMaxHealth() ) {
@@ -906,7 +906,8 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 }
 
-QString StatsWindow::writeStat(const string &visual_name, const string &stat_key, bool is_float) const {
+QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
+    string visual_name = getLongString(stat_key);
     const Character *player = playing_gamestate->getPlayer();
     QString html = "<b>";
     html += visual_name.c_str();
@@ -1897,6 +1898,167 @@ void ItemsPickerWindow::setWeightLabel() {
     Character *player = this->playing_gamestate->getPlayer();
     string weight_str = player->getWeightString();
     this->weightLabel->setText(weight_str.c_str());
+}
+
+const int n_level_up_stats_c = 2;
+
+LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
+    playing_gamestate(playing_gamestate), closeButton(NULL) {
+    playing_gamestate->addWidget(this);
+
+    QFont font = game_g->getFontStd();
+    this->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    this->setLayout(layout);
+
+    Character *player = playing_gamestate->getPlayer();
+
+    QString text = "You have advanced to level " + QString::number(player->getLevel()) + " (" + QString::number(player->getXP()) + " XP)";
+    text += "\n\n Select " + QString::number(n_level_up_stats_c) + " statistics that you wish to improve:";
+    QLabel *label = new QLabel(text);
+    //label->setFont(game_g->getFontSmall());
+    label->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+    label->setWordWrap(true);
+    //label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(label);
+
+    {
+        QGridLayout *g_layout = new QGridLayout();
+        layout->addLayout(g_layout);
+
+        g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), 0, 0 );
+        g_layout->addWidget( new QLabel("Hand-to-hand combat"), 1, 0 );
+        g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), 2, 0 );
+        g_layout->addWidget( new QLabel("Ranged combat: bows and thrown weapons"), 3, 0 );
+        g_layout->addWidget( addProfileCheckBox(profile_key_S_c), 4, 0 );
+        g_layout->addWidget( new QLabel("How strong you are"), 5, 0 );
+
+        g_layout->addWidget( addProfileCheckBox(profile_key_M_c), 0, 1 );
+        g_layout->addWidget( new QLabel("Your mental and psychic abilities"), 1, 1 );
+        g_layout->addWidget( addProfileCheckBox(profile_key_D_c), 2, 1 );
+        g_layout->addWidget( new QLabel("Useful for avoiding traps"), 3, 1 );
+        g_layout->addWidget( addProfileCheckBox(profile_key_B_c), 4, 1 );
+        g_layout->addWidget( new QLabel("Courage against terrifying enemies"), 5, 1 );
+    }
+
+    // select some defaults - the min and max
+    {
+        int max_val = -1, min_val = -1;
+        string min_key, max_key;
+        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+            string key = (*iter).first;
+            int val = player->getBaseProfileIntProperty(key);
+            if( min_val == -1 || val < min_val ) {
+                min_val = val;
+                min_key = key;
+            }
+            if( max_val == -1 || val > max_val ) {
+                max_val = val;
+                max_key = key;
+            }
+        }
+        if( min_val == max_val ) {
+            // all the same, set some defaults
+            check_boxes[profile_key_FP_c]->setChecked(true);
+            selected.push_back(check_boxes[profile_key_FP_c]);
+            check_boxes[profile_key_BS_c]->setChecked(true);
+            selected.push_back(check_boxes[profile_key_BS_c]);
+        }
+        else {
+            check_boxes[max_key]->setChecked(true);
+            selected.push_back(check_boxes[max_key]);
+            check_boxes[min_key]->setChecked(true);
+            selected.push_back(check_boxes[min_key]);
+        }
+    }
+
+    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QCheckBox *check_box = (*iter).second;
+        connect(check_box, SIGNAL(stateChanged(int)), this, SLOT(clickedCheckBox(int)));
+    }
+
+    closeButton = new QPushButton("Level Up!");
+    game_g->initButton(closeButton);
+    closeButton->setShortcut(QKeySequence(Qt::Key_Return));
+    layout->addWidget(closeButton);
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedLevelUp()));
+}
+
+QCheckBox *LevelUpWindow::addProfileCheckBox(const string &key) {
+    string long_string = getLongString(key);
+    QCheckBox * check_box = new QCheckBox(long_string.c_str());
+    check_boxes[key] = check_box;
+    return check_box;
+}
+
+void LevelUpWindow::clickedCheckBox(int state) {
+    qDebug("LevelUpWindow::clickedCheckBox(%d)", state);
+    QObject *sender = this->sender();
+    ASSERT_LOGGER( sender != NULL );
+    // count how many now selected (includes this one)
+    int count = 0;
+    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QCheckBox *check_box = (*iter).second;
+        if( check_box->checkState() == Qt::Checked ) {
+            count++;
+        }
+    }
+    qDebug("    count = %d", count);
+    if( state == Qt::Unchecked ) {
+        // still have to check count, as this function is called when we uncheck a state (because there are too many), rather than the user unchecking
+        ASSERT_LOGGER( count <= n_level_up_stats_c );
+        if( count < n_level_up_stats_c ) {
+            this->closeButton->setEnabled(false);
+        }
+        // remove from the selected list
+        for(vector<QCheckBox *>::iterator iter = selected.begin(); iter != selected.end(); ++iter) {
+            QCheckBox *check_box = *iter;
+            if( sender == check_box ) {
+                selected.erase(iter);
+                break;
+            }
+        }
+    }
+    else if( state == Qt::Checked ) {
+        ASSERT_LOGGER( count > 0 );
+        ASSERT_LOGGER( count <= n_level_up_stats_c+1 );
+        selected.push_back( static_cast<QCheckBox *>(sender) );
+        if( count >= n_level_up_stats_c ) {
+            // can re-enable
+            this->closeButton->setEnabled(true);
+        }
+        if( count > n_level_up_stats_c ) {
+            // need to unselect one!
+            ASSERT_LOGGER( selected.size() >= n_level_up_stats_c+1 );
+            QCheckBox *check_box = selected.at( selected.size() - n_level_up_stats_c - 1 );
+            ASSERT_LOGGER( check_box->checkState() == Qt::Checked );
+            check_box->setCheckState(Qt::Unchecked);
+        }
+    }
+}
+
+void LevelUpWindow::clickedLevelUp() {
+    playing_gamestate->closeSubWindow();
+    Character *player = playing_gamestate->getPlayer();
+
+    int count = 0;
+    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QCheckBox *check_box = (*iter).second;
+        if( check_box->checkState() == Qt::Checked ) {
+            count++;
+            string key = (*iter).first;
+            player->changeBaseProfileIntProperty(key, 1);
+            if( count == n_level_up_stats_c ) {
+                // no more allowed
+                break;
+            }
+        }
+    }
+
+    stringstream xp_str;
+    xp_str << "Advanced to level " << player->getLevel() << "!";
+    playing_gamestate->addTextEffect(xp_str.str(), player->getPos(), 2000, 255, 255, 0);
 }
 
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
@@ -3066,10 +3228,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     window->setEnabled(true);
     game_g->getScreen()->setPaused(false, true);
 
-    if( !is_savegame && this->cheat_mode ) {
-        this->c_quest_indx = cheat_start_level % this->quest_list.size();
+    if( !is_savegame ) {
         //this->player->initialiseHealth(600); // CHEAT
         //player->addGold( 1000 ); // CHEAT
+        //player->addXP(this, 96); // CHEAT
+    }
+    if( !is_savegame && this->cheat_mode ) {
+        this->c_quest_indx = cheat_start_level % this->quest_list.size();
         if( this->c_quest_indx == 1 ) {
             // CHEAT, simulate start of quest 2:
             player->addGold( 166 );
