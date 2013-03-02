@@ -2133,7 +2133,7 @@ void CampaignWindow::clickedClose() {
             LOG("move onto next quest\n");
             playing_gamestate->advanceQuest();
             const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
-            string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
+            QString qt_filename = DEPLOYMENT_PATH + QString(c_quest_info.getFilename().c_str());
             LOG("move onto next quest: %s\n", c_quest_info.getFilename().c_str());
             playing_gamestate->loadQuest(qt_filename, false);
         }
@@ -2176,8 +2176,8 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 {
     if( playing_gamestate->isPermadeath() ) {
         if( playing_gamestate->hasPermadeathSavefilename() ) {
-            string filename = playing_gamestate->getPermadeathSavefilename();
-            LOG("permadeath save mode: save as existing file: %s\n", filename.c_str());
+            QString filename = playing_gamestate->getPermadeathSavefilename();
+            LOG("permadeath save mode: save as existing file: %s\n", filename.toUtf8().data());
             if( playing_gamestate->saveGame(filename, true) ) {
                 playing_gamestate->showInfoDialog("The game has been successfully saved.");
             }
@@ -2326,8 +2326,8 @@ void SaveGameWindow::clickedSave() {
     }
     else {
         QString filename = save_filenames.at(index);
-        LOG("save as existing file: %s\n", filename.toStdString().c_str());
-        if( playing_gamestate->saveGame(filename.toStdString(), false) ) {
+        LOG("save as existing file: %s\n", filename.toUtf8().data());
+        if( playing_gamestate->saveGame(filename, false) ) {
             //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
             playing_gamestate->showInfoDialog("The game has been successfully saved.");
         }
@@ -2354,9 +2354,10 @@ void SaveGameWindow::clickedDelete() {
         //if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
         if( playing_gamestate->askQuestionDialog("Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
             LOG("delete existing file: %s\n", filename.toStdString().c_str());
-            string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
-            LOG("full path: %s\n", full_path.c_str());
-            remove(full_path.c_str());
+            QString full_path = game_g->getApplicationFilename(savegame_folder + filename);
+            LOG("full path: %s\n", full_path.toUtf8().data());
+            //remove(full_path.c_str());
+            QFile::remove(full_path);
             QListWidgetItem *list_item = list->takeItem(index);
             delete list_item;
             save_filenames.erase(save_filenames.begin() + index);
@@ -2374,10 +2375,11 @@ void SaveGameWindow::clickedSaveNew() {
         playing_gamestate->showInfoDialog("Please enter a filename.");
     }
     else {
-        filename += QString(savegame_ext.c_str());
-        LOG("save as new file: %s\n", filename.toStdString().c_str());
-        string full_path = game_g->getApplicationFilename(savegame_folder + filename.toStdString());
-        QFile qfile( QString(full_path.c_str()) );
+        filename += savegame_ext;
+        //LOG("save as new file: %s\n", filename.toStdString().c_str());
+        LOG("save as new file: %s\n", filename.toUtf8().data());
+        QString full_path = game_g->getApplicationFilename(savegame_folder + filename);
+        QFile qfile( full_path );
         bool ok = true;
         if( qfile.exists() ) {
             LOG("file exists!\n");
@@ -3935,8 +3937,8 @@ void PlayingGamestate::refreshDebugItems() {
 }
 #endif
 
-void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
-    LOG("PlayingGamestate::loadQuest(%s)\n", filename.c_str());
+void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
+    LOG("PlayingGamestate::loadQuest(%s)\n", filename.toUtf8().data());
     // filename should be full path
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
@@ -3992,7 +3994,7 @@ void PlayingGamestate::loadQuest(string filename, bool is_savegame) {
         Scenery *scenery = NULL;
         Character *npc = NULL;
         FloorRegion *floor_region = NULL;
-        QFile file(filename.c_str());
+        QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
         }
@@ -5921,13 +5923,12 @@ void PlayingGamestate::update() {
         delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             if( this->permadeath && this->permadeath_has_savefilename ) {
-                string full_path = this->permadeath_savefilename;
-                QFile qfile( QString(full_path.c_str()) );
-                if( qfile.remove() ) {
-                    LOG("permadeath mode: removed save filename: %s\n", full_path.c_str());
+                QString full_path = this->permadeath_savefilename;
+                if( QFile::remove(full_path) ) {
+                    LOG("permadeath mode: removed save filename: %s\n", full_path.toUtf8().data());
                 }
                 else {
-                    LOG("permadeath mode: failed to remove save filename!: %s\n", full_path.c_str());
+                    LOG("permadeath mode: failed to remove save filename!: %s\n", full_path.toUtf8().data());
                 }
             }
             this->player = NULL;
@@ -6912,16 +6913,16 @@ void PlayingGamestate::saveTrap(FILE *file, const Trap *trap) const {
     fprintf(file, " />\n");
 }
 
-bool PlayingGamestate::saveGame(const string &filename, bool already_fullpath) {
-    LOG("PlayingGamestate::saveGame(%s)\n", filename.c_str());
-    string full_path;
+bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) {
+    LOG("PlayingGamestate::saveGame(%s)\n", filename.toUtf8().data());
+    QString full_path;
     if( already_fullpath )
         full_path = filename;
     else
         full_path = game_g->getApplicationFilename(savegame_folder + filename);
-    LOG("full path: %s\n", full_path.c_str());
+    LOG("full path: %s\n", full_path.toUtf8().data());
 
-    FILE *file = fopen(full_path.c_str(), "wt");
+    FILE *file = fopen(full_path.toUtf8().data(), "wt");
     if( file == NULL ) {
         LOG("failed to create file\n");
         return false;

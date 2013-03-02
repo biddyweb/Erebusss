@@ -550,18 +550,20 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     if( !QDir(pathQt).exists() ) {
         QDir().mkpath(pathQt);
     }
-    //QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation) + QString("/erebus");
     QString nativePath(QDir::toNativeSeparators(pathQt));
-    application_path = nativePath.toStdString();
+    application_path = nativePath;
     logfilename = getApplicationFilename("log.txt");
     oldlogfilename = getApplicationFilename("log_old.txt");
-    qDebug("application_path: %s", application_path.c_str());
-    qDebug("logfilename: %s", logfilename.c_str());
-    qDebug("oldlogfilename: %s", oldlogfilename.c_str());
+    qDebug("application_path: %s", application_path.toUtf8().data());
+    qDebug("logfilename: %s", logfilename.toUtf8().data());
+    qDebug("oldlogfilename: %s", oldlogfilename.toUtf8().data());
 
-    remove(oldlogfilename.c_str());
+    /*remove(oldlogfilename.c_str());
     rename(logfilename.c_str(), oldlogfilename.c_str());
-    remove(logfilename.c_str());
+    remove(logfilename.c_str());*/
+    QFile::remove(oldlogfilename);
+    QFile::rename(logfilename, oldlogfilename);
+    QFile::remove(logfilename); // just in case we failed to rename, make sure the old log file is removed
 
     LOG("Initialising Log File...\n");
     LOG("erebus startup\n");
@@ -593,7 +595,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     LOG("Platform: UNKNOWN\n");
 #endif
 
-    QString savegame_path = QString(getApplicationFilename(savegame_folder).c_str());
+    QString savegame_path = getApplicationFilename(savegame_folder);
     if( !QDir(savegame_path).exists() ) {
         LOG("create savegame_path: %s\n", savegame_path.toStdString().c_str());
         QDir().mkpath(savegame_path);
@@ -1146,7 +1148,7 @@ void Game::handleMessages() {
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
 
                 const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
-                string qt_filename = DEPLOYMENT_PATH + c_quest_info.getFilename();
+                QString qt_filename = DEPLOYMENT_PATH + QString(c_quest_info.getFilename().c_str());
                 playing_gamestate->loadQuest(qt_filename, false);
                 //playing_gamestate->createRandomQuest();
 
@@ -1161,7 +1163,7 @@ void Game::handleMessages() {
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
-                    string full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
+                    QString full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
                     playing_gamestate->loadQuest(full_filename, true);
                     this->getScreen()->getMainWindow()->unsetCursor();
                 }
@@ -1226,13 +1228,12 @@ void Game::render() {
     gamestate->mouseClick(m_x, m_y);
 }*/
 
-string Game::getApplicationFilename(const string &name) {
+QString Game::getApplicationFilename(const QString &name) {
     // not safe to use LOG here, as logfile may not have been initialised!
-    QString pathQt = QString(application_path.c_str()) + QString("/") + QString(name.c_str());
+    QString pathQt = application_path + QString("/") + name;
     QString nativePath(QDir::toNativeSeparators(pathQt));
-    string filename = nativePath.toStdString();
-    qDebug("getApplicationFilename returns: %s", filename.c_str());
-    return filename;
+    qDebug("getApplicationFilename returns: %s", nativePath.toUtf8().data());
+    return nativePath;
 }
 
 /*void Game::log(const char *text, ...) {
@@ -1251,12 +1252,19 @@ string Game::getApplicationFilename(const string &name) {
 }*/
 
 void Game::log(const char *text) {
-    FILE *logfile = fopen(logfilename.c_str(), "at+");
+    //FILE *logfile = fopen(logfilename.c_str(), "at+");
+    /*FILE *logfile = fopen(logfilename.toUtf8().data(), "at+");
     if( logfile != NULL )
         fprintf(logfile, text);
     qDebug("%s", text);
     if( logfile != NULL )
-        fclose(logfile);
+        fclose(logfile);*/
+    QFile logfile(logfilename);
+    if( logfile.open(QIODevice::Append | QIODevice::Text) ) {
+        QTextStream stream(&logfile);
+        stream << text;
+    }
+    qDebug("%s", text);
 }
 
 QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const {
@@ -1505,9 +1513,9 @@ void Game::keyPress(QKeyEvent *key_event) {
 }
 
 void Game::fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const {
-    QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
+    QDir dir( game_g->getApplicationFilename(savegame_folder) );
     QStringList filter;
-    filter << "*" + QString( savegame_ext.c_str() );
+    filter << "*" + savegame_ext;
     QFileInfoList files = dir.entryInfoList(filter, QDir::Files, QDir::Time);
     if( files.size() > 0 ) {
         if( *list == NULL ) {

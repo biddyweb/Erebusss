@@ -437,7 +437,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Difficulty difficulty;
     bool permadeath;
     bool permadeath_has_savefilename;
-    string permadeath_savefilename;
+    QString permadeath_savefilename;
 
     Character *player;
     stringstream journal_ss;
@@ -532,12 +532,12 @@ public:
     bool hasPermadeathSavefilename() const {
         return this->permadeath_has_savefilename;
     }
-    string getPermadeathSavefilename() const {
+    QString getPermadeathSavefilename() const {
         return this->permadeath_savefilename;
     }
-    void loadQuest(string filename, bool is_savegame);
+    void loadQuest(const QString &filename, bool is_savegame);
     void createRandomQuest();
-    bool saveGame(const string &filename, bool already_fullpath);
+    bool saveGame(const QString &filename, bool already_fullpath);
 
     virtual void quitGame();
     virtual void update();

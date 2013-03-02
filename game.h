@@ -41,9 +41,9 @@ class Shop;
 class CharacterTemplate;
 class Character;
 
-const string savegame_root = "savegame_";
-const string savegame_ext = ".xml";
-const string savegame_folder = "savegames/";
+//const QString savegame_root = "savegame_";
+const QString savegame_ext = ".xml";
+const QString savegame_folder = "savegames/";
 
 #ifndef Q_OS_ANDROID
 class Sound {
@@ -352,12 +352,12 @@ public:
 };
 
 class LoadGameMessage : public GameMessage {
-    string filename;
+    QString filename;
 public:
-    LoadGameMessage(string filename) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD), filename(filename) {
+    LoadGameMessage(const QString &filename) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD), filename(filename) {
     }
 
-    const string &getFilename() const {
+    const QString &getFilename() const {
         return this->filename;
     }
 };
@@ -374,9 +374,9 @@ protected:
 
     QSettings *settings;
 
-    string application_path;
-    string logfilename;
-    string oldlogfilename;
+    QString application_path;
+    QString logfilename;
+    QString oldlogfilename;
 
     QStyle *style;
     QFont font_scene;
@@ -450,7 +450,7 @@ public:
         return this->gamestate;
     }
     //void mouseClick(int m_x, int m_y);
-    string getApplicationFilename(const string &name);
+    QString getApplicationFilename(const QString &name);
     //void log(const char *text, ...);
     void log(const char *text);
     QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const;

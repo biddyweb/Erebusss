@@ -403,7 +403,7 @@ void OptionsGamestate::clickedLoadGame() {
     ASSERT_LOGGER(index >= 0 && index < load_list->count());
     ASSERT_LOGGER(index >= 0 && index < load_filenames.size());
     QString filename = this->load_filenames.at(index);
-    LoadGameMessage *game_message = new LoadGameMessage(filename.toStdString());
+    LoadGameMessage *game_message = new LoadGameMessage(filename);
     game_g->pushMessage(game_message);
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 }
