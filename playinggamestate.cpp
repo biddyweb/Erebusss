@@ -2353,7 +2353,7 @@ void SaveGameWindow::clickedDelete() {
         QString filename = save_filenames.at(index);
         //if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
         if( playing_gamestate->askQuestionDialog("Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
-            LOG("delete existing file: %s\n", filename.toStdString().c_str());
+            LOG("delete existing file: %s\n", filename.toUtf8().data());
             QString full_path = game_g->getApplicationFilename(savegame_folder + filename);
             LOG("full path: %s\n", full_path.toUtf8().data());
             //remove(full_path.c_str());
@@ -2405,7 +2405,7 @@ void SaveGameWindow::clickedSaveNew() {
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
-    main_stacked_widget(NULL),
+    main_stacked_widget(NULL), quickSaveButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
@@ -2566,7 +2566,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
             v_layout->addLayout(h_layout);
 
             if( !this->permadeath ) {
-                QPushButton *quickSaveButton = new QPushButton("QS");
+                quickSaveButton = new QPushButton("QS");
                 game_g->initButton(quickSaveButton);
                 quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
 #ifndef Q_OS_ANDROID
@@ -2641,7 +2641,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";
         QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            qDebug("failed to open: %s", filename.toStdString().c_str());
+            qDebug("failed to open: %s", filename.toUtf8().data());
             throw string("Failed to open images xml file");
         }
         QXmlStreamReader reader(&file);
@@ -5112,6 +5112,10 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     if( this->permadeath && is_savegame ) {
         this->permadeath_has_savefilename = true;
         this->permadeath_savefilename = filename;
+        if( this->quickSaveButton != NULL ) {
+            delete this->quickSaveButton;
+            this->quickSaveButton = NULL;
+        }
     }
 
     gui_overlay->setProgress(50);
@@ -6718,84 +6722,107 @@ void PlayingGamestate::updateVisibility(Vector2D pos) {
     }
 }
 
-void PlayingGamestate::saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const {
+void PlayingGamestate::saveItemProfileBonusInt(QTextStream &stream, const Item *item, const string &key) const {
     int value = item->getRawProfileBonusIntProperty(key);
     if( value > 0 ) {
-        fprintf(file, " bonus_%s=\"%d\"", key.c_str(), value);
+        //fprintf(file, " bonus_%s=\"%d\"", key.c_str(), value);
+        stream << " bonus_" << key.c_str() << "=\"" << value << "\"";
     }
 }
 
-void PlayingGamestate::saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const {
+void PlayingGamestate::saveItemProfileBonusFloat(QTextStream &stream, const Item *item, const string &key) const {
     float value = item->getRawProfileBonusFloatProperty(key);
     if( value > 0 ) {
-        fprintf(file, " bonus_%s=\"%f\"", key.c_str(), value);
+        //fprintf(file, " bonus_%s=\"%f\"", key.c_str(), value);
+        stream << " bonus_" << key.c_str() << "=\"" << value << "\"";
     }
 }
 
-void PlayingGamestate::saveItem(FILE *file, const Item *item) const {
-    return saveItem(file, item, NULL);
+void PlayingGamestate::saveItem(QTextStream &stream, const Item *item) const {
+    return saveItem(stream, item, NULL);
 }
 
-void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *character) const {
+void PlayingGamestate::saveItem(QTextStream &stream, const Item *item, const Character *character) const {
     switch( item->getType() ) {
     case ITEMTYPE_GENERAL:
-        fprintf(file, "<item");
+        //fprintf(file, "<item");
+        stream << "<item";
         break;
     case ITEMTYPE_WEAPON:
-        fprintf(file, "<weapon");
+        //fprintf(file, "<weapon");
+        stream << "<weapon";
         break;
     case ITEMTYPE_SHIELD:
-        fprintf(file, "<shield");
+        //fprintf(file, "<shield");
+        stream << "<shield";
         break;
     case ITEMTYPE_ARMOUR:
-        fprintf(file, "<armour");
+        //fprintf(file, "<armour");
+        stream << "<armour";
         break;
     case ITEMTYPE_RING:
-        fprintf(file, "<ring");
+        //fprintf(file, "<ring");
+        stream << "<ring";
         break;
     case ITEMTYPE_AMMO:
-        fprintf(file, "<ammo");
+        //fprintf(file, "<ammo");
+        stream << "<ammo";
         break;
     case ITEMTYPE_CURRENCY:
-        fprintf(file, "<currency");
+        //fprintf(file, "<currency");
+        stream << "<currency";
         break;
     }
-    fprintf(file, " name=\"%s\"", item->getKey().c_str()); // n.b., we use the key, not the name, as the latter may be overloaded to give more descriptive names
-    fprintf(file, " image_name=\"%s\"", item->getImageName().c_str());
-    fprintf(file, " x=\"%f\" y=\"%f\"", item->getX(), item->getY());
-    fprintf(file, " icon_width=\"%f\"", item->getIconWidth());
-    fprintf(file, " weight=\"%d\"", item->getWeight());
+    //fprintf(file, " name=\"%s\"", item->getKey().c_str()); // n.b., we use the key, not the name, as the latter may be overloaded to give more descriptive names
+    stream << " name=\"" << item->getKey().c_str() << "\""; // n.b., we use the key, not the name, as the latter may be overloaded to give more descriptive names
+    //fprintf(file, " image_name=\"%s\"", item->getImageName().c_str());
+    stream << " image_name=\"" << item->getImageName().c_str() << "\"";
+    //fprintf(file, " x=\"%f\" y=\"%f\"", item->getX(), item->getY());
+    stream << " x=\"" << item->getX() << "\" y=\"" << item->getY() << "\"";
+    //fprintf(file, " icon_width=\"%f\"", item->getIconWidth());
+    stream << " icon_width=\"" << item->getIconWidth() << "\"";
+    //fprintf(file, " weight=\"%d\"", item->getWeight());
+    stream << " weight=\"" << item->getWeight() << "\"";
     if( item->getUse().length() > 0 ) {
-        fprintf(file, " use=\"%s\"", item->getUse().c_str());
-        fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
+        //fprintf(file, " use=\"%s\"", item->getUse().c_str());
+        stream << " use=\"" << item->getUse().c_str() << "\"";
+        //fprintf(file, " use_verb=\"%s\"", item->getUseVerb().c_str());
+        stream << " use_verb=\"" << item->getUseVerb().c_str() << "\"";
     }
     if( item->getArg1() != 0 ) {
-        fprintf(file, " arg1=\"%d\"", item->getArg1());
+        //fprintf(file, " arg1=\"%d\"", item->getArg1());
+        stream << " arg1=\"" << item->getArg1() << "\"";
     }
     if( item->getArg2() != 0 ) {
-        fprintf(file, " arg2=\"%d\"", item->getArg2());
+        //fprintf(file, " arg2=\"%d\"", item->getArg2());
+        stream << " arg2=\"" << item->getArg2() << "\"";
     }
     if( item->getArg1s().length() > 0 ) {
-        fprintf(file, " arg1_s=\"%s\"", item->getArg1s().c_str());
+        //fprintf(file, " arg1_s=\"%s\"", item->getArg1s().c_str());
+        stream << " arg1_s=\"" << item->getArg1s().c_str() << "\"";
     }
-    fprintf(file, " rating=\"%d\"", item->getRating()); // n.b., should always explicitly save, due to hack with default rating being 1, not 0
+    //fprintf(file, " rating=\"%d\"", item->getRating()); // n.b., should always explicitly save, due to hack with default rating being 1, not 0
+    stream << " rating=\"" << item->getRating() << "\""; // n.b., should always explicitly save, due to hack with default rating being 1, not 0
     if( item->isMagical() ) {
-        fprintf(file, " magical=\"%s\"", item->isMagical() ? "true": "false");
+        //fprintf(file, " magical=\"true\"");
+        stream << " magical=\"true\"";
     }
     if( item->getBaseTemplate().length() > 0 ) {
-        fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
+        //fprintf(file, " base_template=\"%s\"", item->getBaseTemplate().c_str());
+        stream << " base_template=\"" << item->getBaseTemplate().c_str() << "\"";
     }
     if( item->getWorthBonus() > 0 ) {
-        fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
+        //fprintf(file, " worth_bonus=\"%d\"", item->getWorthBonus());
+        stream << " worth_bonus=\"" << item->getWorthBonus() << "\"";
     }
-    this->saveItemProfileBonusInt(file, item, profile_key_FP_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_BS_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_S_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_A_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_M_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_D_c);
-    this->saveItemProfileBonusInt(file, item, profile_key_B_c);
-    this->saveItemProfileBonusFloat(file, item, profile_key_Sp_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_FP_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_BS_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_S_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_A_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_M_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_D_c);
+    this->saveItemProfileBonusInt(stream, item, profile_key_B_c);
+    this->saveItemProfileBonusFloat(stream, item, profile_key_Sp_c);
     // now do subclasses
     switch( item->getType() ) {
     case ITEMTYPE_GENERAL:
@@ -6803,41 +6830,54 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     case ITEMTYPE_WEAPON:
     {
         const Weapon *weapon = static_cast<const Weapon *>(item);
-        fprintf(file, " animation_name=\"%s\"", weapon->getAnimationName().c_str());
+        //fprintf(file, " animation_name=\"%s\"", weapon->getAnimationName().c_str());
+        stream << " animation_name=\"" << weapon->getAnimationName().c_str() << "\"";
         if( weapon->isTwoHanded() ) {
-            fprintf(file, " two_handed=\"%s\"", weapon->isTwoHanded() ? "true": "false");
+            //fprintf(file, " two_handed=\"true\"");
+            stream << " two_handed=\"true\"";
         }
         if( weapon->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
-            fprintf(file, " ranged=\"true\"");
+            //fprintf(file, " ranged=\"true\"");
+            stream << " ranged=\"true\"";
         }
         else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_THROWN ) {
-            fprintf(file, " thrown=\"true\"");
+            //fprintf(file, " thrown=\"true\"");
+            stream << " thrown=\"true\"";
         }
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
-        fprintf(file, " damageX=\"%d\"", damageX);
-        fprintf(file, " damageY=\"%d\"", damageY);
-        fprintf(file, " damageZ=\"%d\"", damageZ);
+        //fprintf(file, " damageX=\"%d\"", damageX);
+        //fprintf(file, " damageY=\"%d\"", damageY);
+        //fprintf(file, " damageZ=\"%d\"", damageZ);
+        stream << " damageX=\"" << damageX << "\"";
+        stream << " damageY=\"" << damageY << "\"";
+        stream << " damageZ=\"" << damageZ << "\"";
         if( weapon->getMinStrength() > 0 ) {
-            fprintf(file, " min_strength=\"%d\"", weapon->getMinStrength());
+            //fprintf(file, " min_strength=\"%d\"", weapon->getMinStrength());
+            stream << " min_strength=\"" << weapon->getMinStrength() << "\"";
         }
         if( weapon->isUnholyOnly() ) {
-            fprintf(file, " unholy_only=\"true\"");
+            //fprintf(file, " unholy_only=\"true\"");
+            stream << " unholy_only=\"true\"";
         }
         if( weapon->getRequiresAmmo() ) {
-            fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
+            //fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
+            stream << " ammo=\"" << weapon->getAmmoKey().c_str() << "\"";
         }
         if( character != NULL && weapon == character->getCurrentWeapon() ) {
-            fprintf(file, " current_weapon=\"true\"");
+            //fprintf(file, " current_weapon=\"true\"");
+            stream << " current_weapon=\"true\"";
         }
         break;
     }
     case ITEMTYPE_SHIELD:
     {
         const Shield *shield = static_cast<const Shield *>(item);
-        fprintf(file, " animation_name=\"%s\"", shield->getAnimationName().c_str());
+        //fprintf(file, " animation_name=\"%s\"", shield->getAnimationName().c_str());
+        stream << " animation_name=\"" << shield->getAnimationName().c_str() << "\"";
         if( character != NULL && shield == character->getCurrentShield() ) {
-            fprintf(file, " current_shield=\"true\"");
+            //fprintf(file, " current_shield=\"true\"");
+            stream << " current_shield=\"true\"";
         }
         break;
     }
@@ -6845,10 +6885,12 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     {
         const Armour *armour = static_cast<const Armour *>(item);
         if( armour->getMinStrength() > 0 ) {
-            fprintf(file, " min_strength=\"%d\"", armour->getMinStrength());
+            //fprintf(file, " min_strength=\"%d\"", armour->getMinStrength());
+            stream << " min_strength=\"" << armour->getMinStrength() << "\"";
         }
         if( character != NULL && armour == character->getCurrentArmour() ) {
-            fprintf(file, " current_armour=\"true\"");
+            //fprintf(file, " current_armour=\"true\"");
+            stream << " current_armour=\"true\"";
         }
         break;
     }
@@ -6856,61 +6898,79 @@ void PlayingGamestate::saveItem(FILE *file, const Item *item, const Character *c
     {
         const Ring *ring = static_cast<const Ring *>(item);
         if( character != NULL && ring == character->getCurrentRing() ) {
-            fprintf(file, " current_ring=\"true\"");
+            //fprintf(file, " current_ring=\"true\"");
+            stream << " current_ring=\"true\"";
         }
         break;
     }
     case ITEMTYPE_AMMO:
     {
         const Ammo *ammo = static_cast<const Ammo *>(item);
-        fprintf(file, " projectile_image_name=\"%s\"", ammo->getProjectileImageName().c_str());
-        fprintf(file, " amount=\"%d\"", ammo->getAmount());
+        //fprintf(file, " projectile_image_name=\"%s\"", ammo->getProjectileImageName().c_str());
+        stream << " projectile_image_name=\"" << ammo->getProjectileImageName().c_str() << "\"";
+        //fprintf(file, " amount=\"%d\"", ammo->getAmount());
+        stream << " amount=\"" << ammo->getAmount() << "\"";
         break;
     }
     case ITEMTYPE_CURRENCY:
     {
         const Currency *currency = static_cast<const Currency *>(item);
-        fprintf(file, " value=\"%d\"", currency->getValue());
+        //fprintf(file, " value=\"%d\"", currency->getValue());
+        stream << " value=\"" << currency->getValue() << "\"";
         break;
 
     }
     }
-    fprintf(file, ">");
-    fprintf(file, "%s", item->getDescription().c_str());
+    //fprintf(file, ">");
+    stream << ">";
+    //fprintf(file, "%s", item->getDescription().c_str());
+    stream << item->getDescription().c_str();
     switch( item->getType() ) {
     case ITEMTYPE_GENERAL:
-        fprintf(file, "</item>");
+        //fprintf(file, "</item>");
+        stream << "</item>";
         break;
     case ITEMTYPE_WEAPON:
-        fprintf(file, "</weapon>");
+        //fprintf(file, "</weapon>");
+        stream << "</weapon>";
         break;
     case ITEMTYPE_SHIELD:
-        fprintf(file, "</shield>");
+        //fprintf(file, "</shield>");
+        stream << "</shield>";
         break;
     case ITEMTYPE_ARMOUR:
-        fprintf(file, "</armour>");
+        //fprintf(file, "</armour>");
+        stream << "</armour>";
         break;
     case ITEMTYPE_RING:
-        fprintf(file, "</ring>");
+        //fprintf(file, "</ring>");
+        stream << "</ring>";
         break;
     case ITEMTYPE_AMMO:
-        fprintf(file, "</ammo>");
+        //fprintf(file, "</ammo>");
+        stream << "</ammo>";
         break;
     case ITEMTYPE_CURRENCY:
-        fprintf(file, "</currency>");
+        //fprintf(file, "</currency>");
+        stream << "</currency>";
         break;
     }
-    fprintf(file, "\n");
+    //fprintf(file, "\n");
+    stream << "\n";
 }
 
-void PlayingGamestate::saveTrap(FILE *file, const Trap *trap) const {
-    fprintf(file, "<trap");
-    fprintf(file, " type=\"%s\"", trap->getType().c_str());
-    fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
-    fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
-    fprintf(file, " difficulty=\"%d\"", trap->getDifficulty());
-    fprintf(file, " rating=\"%d\"", trap->getRating());
-    fprintf(file, " />\n");
+void PlayingGamestate::saveTrap(QTextStream &stream, const Trap *trap) const {
+    //fprintf(file, "<trap");
+    //fprintf(file, " type=\"%s\"", trap->getType().c_str());
+    //fprintf(file, " x=\"%f\" y=\"%f\"", trap->getX(), trap->getY());
+    //fprintf(file, " w=\"%f\" h=\"%f\"", trap->getWidth(), trap->getHeight());
+    //fprintf(file, " difficulty=\"%d\"", trap->getDifficulty());
+    //fprintf(file, " rating=\"%d\"", trap->getRating());
+    //fprintf(file, " />\n");
+    stream << "<trap type=\"" << trap->getType().c_str() << "\" x=\"" << trap->getX() << "\" y=\"" << trap->getY() << "\"";
+    stream << " w=\"" << trap->getWidth() << "\" h=\"" << trap->getHeight() << "\" difficulty=\"" << trap->getDifficulty() << "\"";
+    stream << " rating=\"" << trap->getRating() << "\"";
+    stream << " />\n";
 }
 
 bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) {
@@ -6922,22 +6982,34 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
         full_path = game_g->getApplicationFilename(savegame_folder + filename);
     LOG("full path: %s\n", full_path.toUtf8().data());
 
-    FILE *file = fopen(full_path.toUtf8().data(), "wt");
+    /*FILE *file = fopen(full_path.toUtf8().data(), "wt");
     if( file == NULL ) {
         LOG("failed to create file\n");
         return false;
+    }*/
+    QFile file(full_path);
+    if( !file.open(QIODevice::WriteOnly | QIODevice::Text) ) {
+        LOG("failed to create file\n");
+        return false;
     }
+    QTextStream stream(&file);
 
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 
     const int savegame_version = 2;
 
-    fprintf(file, "<?xml version=\"1.0\" ?>\n");
-    fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
-    fprintf(file, "\n");
-    fprintf(file, "<game difficulty=\"%s\" permadeath=\"%s\"/>", Game::getDifficultyString(difficulty).c_str(), permadeath ? "true" : "false");
-    fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
-    fprintf(file, "\n");
+    //fprintf(file, "<?xml version=\"1.0\" ?>\n");
+    //fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
+    //fprintf(file, "\n");
+    //fprintf(file, "<game difficulty=\"%s\" permadeath=\"%s\"/>", Game::getDifficultyString(difficulty).c_str(), permadeath ? "true" : "false");
+    //fprintf(file, "<current_quest name=\"%s\"/>\n", this->quest_list.at(this->c_quest_indx).getFilename().c_str());
+    //fprintf(file, "\n");
+    stream << "<?xml version=\"1.0\" ?>\n";
+    stream << "<savegame major=\"" << versionMajor << "\" minor=\"" << versionMinor << "\" savegame_version=\"" << savegame_version << "\">\n";
+    stream << "\n";
+    stream << "<game difficulty=\"" << Game::getDifficultyString(difficulty).c_str() << "\" permadeath=\"" << (permadeath ? "true" : "false") << "\"/>";
+    stream << "<current_quest name=\"" << this->quest_list.at(this->c_quest_indx).getFilename().c_str() << "\"/>\n";
+    stream << "\n";
 
     qDebug("save locations");
     for(vector<Location *>::const_iterator iter_loc = quest->locationsBegin(); iter_loc != quest->locationsEnd(); ++iter_loc) {
@@ -6955,335 +7027,457 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             ASSERT_LOGGER(false);
             break;
         }
-        fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
+        //fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
+        stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\">\n\n";
 
         qDebug("save location images");
-        fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
-        fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
+        //fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
+        stream << "<background image_name=\"" << location->getBackgroundImageName().c_str() << "\"/>\n";
+        //fprintf(file, "<floor image_name=\"%s\"/>\n", location->getFloorImageName().c_str());
+        stream << "<floor image_name=\"" << location->getFloorImageName().c_str() << "\"/>\n";
         if( location->getWallImageName().length() > 0 ) {
-            fprintf(file, "<wall image_name=\"%s\" image_x_scale=\"%f\"/>\n", location->getWallImageName().c_str(), location->getWallXScale());
+            //fprintf(file, "<wall image_name=\"%s\" image_x_scale=\"%f\"/>\n", location->getWallImageName().c_str(), location->getWallXScale());
+            stream << "<wall image_name=\"" << location->getWallImageName().c_str() << "\" image_x_scale=\"" << location->getWallXScale() << "\"/>\n";
         }
         if( location->getDropWallImageName().length() > 0 ) {
-            fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
+            //fprintf(file, "<dropwall image_name=\"%s\"/>\n", location->getDropWallImageName().c_str());
+            stream << "<dropwall image_name=\"" << location->getDropWallImageName().c_str() << "\"/>\n";
         }
         if( location->getWanderingMonsterTemplate().length() > 0 ) {
-            fprintf(file, "<wandering_monster template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
+            //fprintf(file, "<wandering_monster template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
+            stream << "<wandering_monster template=\"" << location->getWanderingMonsterTemplate().c_str() << "\" time=\"" << location->getWanderingMonsterTimeMS() << "\" rest_chance=\"" << location->getWanderingMonsterRestChance() << "\"/>\n";
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         for(size_t i=0;i<location->getNFloorRegions();i++) {
             const FloorRegion *floor_region = location->getFloorRegion(i);
-            fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
+            //fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
+            stream << "<floorregion shape=\"polygon\" visible=\"" << (floor_region->isVisible() ? "true" : "false") << "\">\n";
             for(size_t j=0;j<floor_region->getNPoints();j++) {
                 Vector2D point = floor_region->getPoint(j);
-                fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
+                //fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
+                stream << "    <floorregion_point x=\"" << point.x << "\" y=\"" << point.y << "\"/>\n";
             }
-            fprintf(file, "</floorregion>\n");
+            //fprintf(file, "</floorregion>\n");
+            stream << "</floorregion>\n";
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         for(size_t i=0;i<c_location->getNTilemaps();i++) {
             const Tilemap *tilemap = c_location->getTilemap(i);
-            fprintf(file, "<tilemap imagemap=\"%s\" tile_width=\"%d\" tile_height=\"%d\" x=\"%f\" y=\"%f\">\n", tilemap->getImagemap().c_str(), tilemap->getTileWidth(), tilemap->getTileHeight(), tilemap->getX(), tilemap->getY());
+            //fprintf(file, "<tilemap imagemap=\"%s\" tile_width=\"%d\" tile_height=\"%d\" x=\"%f\" y=\"%f\">\n", tilemap->getImagemap().c_str(), tilemap->getTileWidth(), tilemap->getTileHeight(), tilemap->getX(), tilemap->getY());
+            stream << "<tilemap imagemap=\"" << tilemap->getImagemap().c_str() << "\" tile_width=\"" << tilemap->getTileWidth() << "\" tile_height=\"" << tilemap->getTileHeight() << "\" x=\"" << tilemap->getX() << "\" y=\"" << tilemap->getY() << "\">\n";
             for(int y=0;y<tilemap->getHeighti();y++) {
                 for(int x=0;x<tilemap->getWidthi();x++) {
                     char ch = tilemap->getTileAt(x, y);
-                    fprintf(file, "%c", ch);
+                    //fprintf(file, "%c", ch);
+                    stream << ch;
                 }
-                fprintf(file, "\n");
+                //fprintf(file, "\n");
+                stream << "\n";
             }
-            fprintf(file, "</tilemap>\n");
+            //fprintf(file, "</tilemap>\n");
+            stream << "</tilemap>\n";
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         qDebug("save player and npcs");
         for(set<Character *>::const_iterator iter = location->charactersBegin(); iter != location->charactersEnd(); ++iter) {
             const Character *character = *iter;
-            if( player == character )
-                fprintf(file, "<player");
+            if( player == character ) {
+                //fprintf(file, "<player");
+                stream << "<player";
+            }
             else {
-                fprintf(file, "<npc");
-                fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
-                fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
+                //fprintf(file, "<npc");
+                //fprintf(file, " is_hostile=\"%s\"", character->isHostile() ? "true": "false");
+                //fprintf(file, " animation_name=\"%s\"", character->getAnimationName().c_str());
+                stream << "<npc is_hostile=\"" << (character->isHostile() ? "true": "false") << "\" animation_name=\"" << character->getAnimationName().c_str() << "\"";
             }
             if( character->isStaticImage() ) {
-                fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
+                //fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
+                stream << " static_image=\"" << (character->isStaticImage() ? "true": "false") << "\"";
             }
             if( character->getPortrait().length() > 0 ) {
-                fprintf(file, " portrait=\"%s\"", character->getPortrait().c_str());
+                //fprintf(file, " portrait=\"%s\"", character->getPortrait().c_str());
+                stream << " portrait=\"" << character->getPortrait().c_str() << "\"";
             }
             if( character->isBounce() ) {
-                fprintf(file, " bounce=\"true\"");
+                //fprintf(file, " bounce=\"true\"");
+                stream << " bounce=\"true\"";
             }
-            fprintf(file, " name=\"%s\"", character->getName().c_str());
+            //fprintf(file, " name=\"%s\"", character->getName().c_str());
+            stream << " name=\"" << character->getName().c_str() << "\"";
             if( character->isDead() ) {
-                fprintf(file, " is_dead=\"true\"");
+                //fprintf(file, " is_dead=\"true\"");
+                stream << " is_dead=\"true\"";
             }
-            fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
+            //fprintf(file, " x=\"%f\" y=\"%f\"", character->getX(), character->getY());
+            stream << " x=\"" << character->getX() << "\" y=\"" << character->getY() << "\"";
             if( character->hasDefaultPosition() ) {
-                fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
+                //fprintf(file, " default_x=\"%f\" default_y=\"%f\"", character->getDefaultX(), character->getDefaultY());
+                stream << " default_x=\"" << character->getDefaultX() << "\" default_y=\"" << character->getDefaultY() << "\"";
             }
-            fprintf(file, " health=\"%d\"", character->getHealth());
-            fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
+            //fprintf(file, " health=\"%d\"", character->getHealth());
+            stream << " health=\"" << character->getHealth() << "\"";
+            //fprintf(file, " max_health=\"%d\"", character->getMaxHealth());
+            stream << " max_health=\"" << character->getMaxHealth() << "\"";
             for(map<string, int>::const_iterator iter = character->getBaseProfile()->intPropertiesBegin(); iter != character->getBaseProfile()->intPropertiesEnd(); ++iter) {
                 string key = iter->first;
                 int value = iter->second;
-                fprintf(file, " %s=\"%d\"", key.c_str(), value);
+                //fprintf(file, " %s=\"%d\"", key.c_str(), value);
+                stream << " " << key.c_str() << "=\"" << value << "\"";
             }
             for(map<string, float>::const_iterator iter = character->getBaseProfile()->floatPropertiesBegin(); iter != character->getBaseProfile()->floatPropertiesEnd(); ++iter) {
                 string key = iter->first;
                 float value = iter->second;
-                fprintf(file, " %s=\"%f\"", key.c_str(), value);
+                //fprintf(file, " %s=\"%f\"", key.c_str(), value);
+                stream << " " << key.c_str() << "=\"" << value << "\"";
             }
             int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
             character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
 
-            fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
-            fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
-            fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
+            //fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
+            //fprintf(file, " natural_damageY=\"%d\"", natural_damageY);
+            //fprintf(file, " natural_damageZ=\"%d\"", natural_damageZ);
+            stream << " natural_damageX=\"" << natural_damageX << "\"";
+            stream << " natural_damageY=\"" << natural_damageY << "\"";
+            stream << " natural_damageZ=\"" << natural_damageZ << "\"";
             if( character->canFly() ) {
-                fprintf(file, " can_fly=\"true\"");
+                //fprintf(file, " can_fly=\"true\"");
+                stream << " can_fly=\"true\"";
             }
             if( character->isParalysed() ) {
-                fprintf(file, " is_paralysed=\"true\"");
-                fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+                //fprintf(file, " is_paralysed=\"true\"");
+                stream << " is_paralysed=\"true\"";
+                //fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
+                stream << " paralysed_time=\"" << (character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS()) << "\"";
             }
             if( character->isDiseased() ) {
-                fprintf(file, " is_diseased=\"true\"");
+                //fprintf(file, " is_diseased=\"true\"");
+                stream << " is_diseased=\"true\"";
             }
-            fprintf(file, " level=\"%d\"", character->getLevel());
-            fprintf(file, " xp=\"%d\"", character->getXP());
-            fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
+            //fprintf(file, " level=\"%d\"", character->getLevel());
+            stream << " level=\"" << character->getLevel() << "\"";
+            //fprintf(file, " xp=\"%d\"", character->getXP());
+            stream << " xp=\"" << character->getXP() << "\"";
+            //fprintf(file, " xp_worth=\"%d\"", character->getXPWorth());
+            stream << " xp_worth=\"" << character->getXPWorth() << "\"";
             if( character->getCausesTerror() ) {
-                fprintf(file, " causes_terror=\"true\"");
-                fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
+                //fprintf(file, " causes_terror=\"true\"");
+                stream << " causes_terror=\"true\"";
+                //fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
+                stream << " terror_effect=\"" << character->getTerrorEffect() << "\"";
             }
-            fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
+            //fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
+            stream << " done_terror=\"" << (character->hasDoneTerror() ? "true" : "false") << "\"";
             if( character->getCausesDisease() > 0 ) {
-                fprintf(file, " causes_disease=\"%d\"", character->getCausesDisease());
+                //fprintf(file, " causes_disease=\"%d\"", character->getCausesDisease());
+                stream << " causes_disease=\"" << character->getCausesDisease() << "\"";
             }
             if( character->getCausesParalysis() > 0 ) {
-                fprintf(file, " causes_paralysis=\"%d\"", character->getCausesParalysis());
+                //fprintf(file, " causes_paralysis=\"%d\"", character->getCausesParalysis());
+                stream << " causes_paralysis=\"" << character->getCausesParalysis() << "\"";
             }
             if( character->requiresMagical() ) {
-                fprintf(file, " requires_magical=\"true\"");
+                //fprintf(file, " requires_magical=\"true\"");
+                stream << " requires_magical=\"true\"";
             }
             if( character->isUnholy() ) {
-                fprintf(file, " unholy=\"true\"");
+                //fprintf(file, " unholy=\"true\"");
+                stream << " unholy=\"true\"";
             }
-            fprintf(file, " gold=\"%d\"", character->getGold());
+            //fprintf(file, " gold=\"%d\"", character->getGold());
+            stream << " gold=\"" << character->getGold() << "\"";
             if( character->canTalk() ) {
-                fprintf(file, " can_talk=\"true\"");
+                //fprintf(file, " can_talk=\"true\"");
+                stream << " can_talk=\"true\"";
             }
             if( character->hasTalked() ) {
-                fprintf(file, " has_talked=\"true\"");
+                //fprintf(file, " has_talked=\"true\"");
+                stream << " has_talked=\"true\"";
             }
             if( character->getInteractionType().length() > 0 ) {
-                fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
+                //fprintf(file, " interaction_type=\"%s\"", character->getInteractionType().c_str());
+                stream << " interaction_type=\"" << character->getInteractionType().c_str() << "\"";
             }
             if( character->getInteractionData().length() > 0 ) {
-                fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
+                //fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
+                stream << " interaction_data=\"" << character->getInteractionData().c_str() << "\"";
             }
             if( character->getInteractionXP() != 0 ) {
-                fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
+                //fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
+                stream << " interaction_xp=\"" << character->getInteractionXP() << "\"";
             }
             if( character->getInteractionRewardItem().length() > 0 ) {
-                fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
+                //fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
+                stream << " interaction_reward_item=\"" << character->getInteractionRewardItem().c_str() << "\"";
             }
             if( character->isInteractionCompleted() ) {
-                fprintf(file, " interaction_completed=\"true\"");
+                //fprintf(file, " interaction_completed=\"true\"");
+                stream << " interaction_completed=\"true\"";
             }
             if( character->getShop().length() > 0 ) {
-                fprintf(file, " shop=\"%s\"", character->getShop().c_str());
+                //fprintf(file, " shop=\"%s\"", character->getShop().c_str());
+                stream << " shop=\"" << character->getShop().c_str() << "\"";
             }
             if( character->getObjectiveId().length() > 0 ) {
-                fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
+                //fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
+                stream << " objective_id=\"" << character->getObjectiveId().c_str() << "\"";
             }
-            fprintf(file, ">\n");
+            //fprintf(file, ">\n");
+            stream << ">\n";
             if( character->getTalkOpeningInitial().length() > 0 ) {
-                fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
+                //fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
+                stream << "<opening_initial>" << character->getTalkOpeningInitial().c_str() << "</opening_initial>";
             }
             if( character->getTalkOpeningLater().length() > 0 ) {
-                fprintf(file, "<opening_later>%s</opening_later>", character->getTalkOpeningLater().c_str());
+                //fprintf(file, "<opening_later>%s</opening_later>", character->getTalkOpeningLater().c_str());
+                stream << "<opening_later>" << character->getTalkOpeningLater().c_str() << "</opening_later>";
             }
             if( character->getTalkOpeningInteractionComplete().length() > 0 ) {
-                fprintf(file, "<opening_interaction_complete>%s</opening_interaction_complete>", character->getTalkOpeningInteractionComplete().c_str());
+                //fprintf(file, "<opening_interaction_complete>%s</opening_interaction_complete>", character->getTalkOpeningInteractionComplete().c_str());
+                stream << "<opening_interaction_complete>" << character->getTalkOpeningInteractionComplete().c_str() << "</opening_interaction_complete>";
             }
             for(vector<TalkItem>::const_iterator iter2 = character->talkItemsBegin(); iter2 != character->talkItemsEnd(); ++iter2) {
                 const TalkItem *talk_item = &*iter2;
-                fprintf(file, "<talk");
-                fprintf(file, " question=\"%s\"", talk_item->question.c_str());
-                fprintf(file, " action=\"%s\"", talk_item->action.c_str());
-                fprintf(file, " while_not_done=\"%s\"", talk_item->while_not_done ? "true": "false");
-                fprintf(file, " objective=\"%s\"", talk_item->objective ? "true": "false");
-                fprintf(file, ">\n");
-                fprintf(file, "%s\n", talk_item->answer.c_str());
-                fprintf(file, "</talk>\n");
+                //fprintf(file, "<talk");
+                //fprintf(file, " question=\"%s\"", talk_item->question.c_str());
+                //fprintf(file, " action=\"%s\"", talk_item->action.c_str());
+                //fprintf(file, " while_not_done=\"%s\"", talk_item->while_not_done ? "true": "false");
+                //fprintf(file, " objective=\"%s\"", talk_item->objective ? "true": "false");
+                //fprintf(file, ">\n");
+                //fprintf(file, "%s\n", talk_item->answer.c_str());
+                //fprintf(file, "</talk>\n");
+                stream << "<talk question=\"" << talk_item->question.c_str() << "\" action=\"" << talk_item->action.c_str() << "\"";
+                stream << " while_not_done=\"" << (talk_item->while_not_done ? "true": "false") << "\"";
+                stream << " objective=\"" << (talk_item->objective ? "true": "false") << "\"";
+                stream << ">\n";
+                stream << talk_item->answer.c_str() << "\n";
+                stream << "</talk>\n";
             }
             for(map<string, int>::const_iterator iter2 = character->spellsBegin(); iter2 != character->spellsEnd(); ++iter2) {
                 string spell_name = iter2->first;
                 int spell_count = iter2->second;
-                fprintf(file, "<spell name=\"%s\" count=\"%d\"/>\n", spell_name.c_str(), spell_count);
+                //fprintf(file, "<spell name=\"%s\" count=\"%d\"/>\n", spell_name.c_str(), spell_count);
+                stream << "<spell name=\"" << spell_name.c_str() << "\" count=\"" << spell_count << "\"/>\n";
             }
             for(set<Item *>::const_iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;
-                this->saveItem(file, item, character);
+                this->saveItem(stream, item, character);
             }
-            if( player == character )
-                fprintf(file, "</player>\n");
-            else
-                fprintf(file, "</npc>\n");
+            if( player == character ) {
+                //fprintf(file, "</player>\n");
+                stream << "</player>\n";
+            }
+            else {
+                //fprintf(file, "</npc>\n");
+                stream << "</npc>\n";
+            }
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         if( location == c_location ) {
             qDebug("save player additional info");
-            fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
-            fprintf(file, "\n");
+            //fprintf(file, "<player_start x=\"%f\" y=\"%f\"/>\n", player->getX(), player->getY());
+            //fprintf(file, "\n");
+            stream << "<player_start x=\"" << player->getX() << "\" y=\"" << player->getY() << "\"/>\n\n";
         }
 
         qDebug("save scenery");
         for(set<Scenery *>::const_iterator iter = location->scenerysBegin(); iter != location->scenerysEnd(); ++iter) {
             const Scenery *scenery = *iter;
-            fprintf(file, "<scenery");
-            fprintf(file, " name=\"%s\"", scenery->getName().c_str());
-            fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
+            //fprintf(file, "<scenery");
+            stream << "<scenery";
+            //fprintf(file, " name=\"%s\"", scenery->getName().c_str());
+            stream << " name=\"" << scenery->getName().c_str() << "\"";
+            //fprintf(file, " image_name=\"%s\"", scenery->getImageName().c_str());
+            stream << " image_name=\"" << scenery->getImageName().c_str() << "\"";
             if( scenery->getBigImageName().length() > 0 ) {
-                fprintf(file, " big_image_name=\"%s\"", scenery->getBigImageName().c_str());
+                //fprintf(file, " big_image_name=\"%s\"", scenery->getBigImageName().c_str());
+                stream << " big_image_name=\"" << scenery->getBigImageName().c_str() << "\"";
             }
-            fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
-            fprintf(file, " w=\"%f\" h=\"%f\" visual_h=\"%f\"", scenery->getWidth(), scenery->getHeight(), scenery->getVisualHeight());
-            fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
+            //fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
+            stream << " x=\"" << scenery->getX() << "\" y=\"" << scenery->getY() << "\"";
+            //fprintf(file, " w=\"%f\" h=\"%f\" visual_h=\"%f\"", scenery->getWidth(), scenery->getHeight(), scenery->getVisualHeight());
+            stream << " w=\"" << scenery->getWidth() << "\" h=\"" << scenery->getHeight() << "\" visual_h=\"" << scenery->getVisualHeight() << "\"";
+            //fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
+            stream << " opacity=\"" << scenery->getOpacity() << "\"";
             switch( scenery->getDrawType() ) {
             case Scenery::DRAWTYPE_NORMAL:
                 break;
             case Scenery::DRAWTYPE_FLOATING:
-                fprintf(file, " draw_type=\"floating\"");
+                //fprintf(file, " draw_type=\"floating\"");
+                stream << " draw_type=\"floating\"";
                 break;
             case Scenery::DRAWTYPE_BACKGROUND:
-                fprintf(file, " draw_type=\"background\"");
+                //fprintf(file, " draw_type=\"background\"");
+                stream << " draw_type=\"background\"";
                 break;
             default:
                 ASSERT_LOGGER(false);
                 break;
             }
-            fprintf(file, " action_last_time=\"%d\"", scenery->getActionLastTime());
-            fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
-            fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
-            fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
-            fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
-            fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
+            //fprintf(file, " action_last_time=\"%d\"", scenery->getActionLastTime());
+            //fprintf(file, " action_delay=\"%d\"", scenery->getActionDelay());
+            //fprintf(file, " action_type=\"%s\"", scenery->getActionType().c_str());
+            //fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
+            //fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
+            //fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
+            stream << " action_last_time=\"" << scenery->getActionLastTime() << "\" action_delay=\"" << scenery->getActionDelay() << "\"";
+            stream << " action_type=\"" << scenery->getActionType().c_str() << "\"";
+            stream << " action_value=\"" << scenery->getActionValue() << "\"";
+            stream << " interact_type=\"" << scenery->getInteractType().c_str() << "\"";
+            stream << " interact_state=\"" << scenery->getInteractState() << "\"";
             if( scenery->isBlocking() ) {
-                fprintf(file, " blocking=\"%s\"", scenery->isBlocking() ? "true": "false");
+                //fprintf(file, " blocking=\"true\"");
+                stream << " blocking=\"true\"";
             }
             if( scenery->blocksVisibility() ) {
-                fprintf(file, " block_visibility=\"%s\"", scenery->blocksVisibility() ? "true": "false");
+                //fprintf(file, " block_visibility=\"true\"");
+                stream << " block_visibility=\"true\"";
             }
             if( scenery->hasSmoke() ) {
-                fprintf(file, " has_smoke=\"true\"");
-                fprintf(file, " smoke_x=\"%f\"", scenery->getSmokePos().x);
-                fprintf(file, " smoke_y=\"%f\"", scenery->getSmokePos().y);
+                //fprintf(file, " has_smoke=\"true\"");
+                //fprintf(file, " smoke_x=\"%f\"", scenery->getSmokePos().x);
+                //fprintf(file, " smoke_y=\"%f\"", scenery->getSmokePos().y);
+                stream << " has_smoke=\"true\" smoke_x=\"" << scenery->getSmokePos().x << "\" smoke_y=\"" << scenery->getSmokePos().y << "\"";
             }
             if( scenery->isOpened() ) {
-                fprintf(file, " is_opened=\"%s\"", scenery->isOpened() ? "true": "false");
+                //fprintf(file, " is_opened=\"true\"");
+                stream << " is_opened=\"true\"";
             }
             if( scenery->isExit() ) {
-                fprintf(file, " exit=\"%s\"", scenery->isExit() ? "true": "false");
+                //fprintf(file, " exit=\"true\"");
+                stream << " exit=\"true\"";
             }
             if( scenery->isDoor() ) {
-                fprintf(file, " door=\"%s\"", scenery->isDoor() ? "true": "false");
+                //fprintf(file, " door=\"true\"");
+                stream << " door=\"true\"";
             }
             if( scenery->getExitLocation().length() > 0 ) {
-                fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
+                //fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
+                stream << " exit_location=\"" << scenery->getExitLocation().c_str() << "\" exit_location_x=\"" << scenery->getExitLocationPos().x << "\" exit_location_y=\"" << scenery->getExitLocationPos().y << "\"";
             }
             if( scenery->isLocked() ) {
-                fprintf(file, " locked=\"%s\"", scenery->isLocked() ? "true": "false");
+                //fprintf(file, " locked=\"true\"");
+                stream << " locked=\"true\"";
             }
             if( scenery->isLockedSilent() ) {
-                fprintf(file, " locked_silent=\"%s\"", scenery->isLockedSilent() ? "true": "false");
+                //fprintf(file, " locked_silent=\"true\"");
+                stream << " locked_silent=\"true\"";
             }
             if( scenery->getLockedText().length() > 0 ) {
-                fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
+                //fprintf(file, " locked_text=\"%s\"", scenery->getLockedText().c_str());
+                stream << " locked_text=\"" << scenery->getLockedText().c_str() << "\"";
             }
             if( scenery->isLockedUsedUp() ) {
-                fprintf(file, " locked_used_up=\"%s\"", scenery->isLockedUsedUp() ? "true": "false");
+                //fprintf(file, " locked_used_up=\"true\"");
+                stream << " locked_used_up=\"true\"";
             }
             if( scenery->isKeyAlwaysNeeded() ) {
-                fprintf(file, " key_always_needed=\"%s\"", scenery->isKeyAlwaysNeeded() ? "true": "false");
+                //fprintf(file, " key_always_needed=\"true\"");
+                stream << " key_always_needed=\"true\"";
             }
             if( scenery->getUnlockItemName().length() > 0 ) {
-                fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+                //fprintf(file, " unlocked_by_template=\"%s\"", scenery->getUnlockItemName().c_str());
+                stream << " unlocked_by_template=\"" << scenery->getUnlockItemName().c_str() << "\"";
             }
             if( scenery->getUnlockText().length() > 0 ) {
-                fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
+                //fprintf(file, " unlock_text=\"%s\"", scenery->getUnlockText().c_str());
+                stream << " unlock_text=\"" << scenery->getUnlockText().c_str() << "\"";
             }
             if( scenery->getUnlockXP() > 0 ) {
-                fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
+                //fprintf(file, " unlock_xp=\"%d\"", scenery->getUnlockXP());
+                stream << " unlock_xp=\"" << scenery->getUnlockXP() << "\"";
             }
             if( scenery->getConfirmText().length() > 0 ) {
-                fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
+                //fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
+                stream << " confirm_text=\"" << scenery->getConfirmText().c_str() << "\"";
             }
-            fprintf(file, ">");
+            //fprintf(file, ">");
+            stream << ">";
             for(set<Item *>::const_iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
                 const Item *item = *iter2;
-                this->saveItem(file, item);
+                this->saveItem(stream, item);
             }
             if( scenery->getTrap() != NULL ) {
-                this->saveTrap(file, scenery->getTrap());
+                this->saveTrap(stream, scenery->getTrap());
             }
             if( scenery->getDescription().length() > 0 ) {
-                fprintf(file, "%s", scenery->getDescription().c_str());
+                //fprintf(file, "%s", scenery->getDescription().c_str());
+                stream << scenery->getDescription().c_str();
             }
-            fprintf(file, "</scenery>\n");
+            //fprintf(file, "</scenery>\n");
+            stream << "</scenery>\n";
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         qDebug("save items");
         for(set<Item *>::const_iterator iter = location->itemsBegin(); iter != location->itemsEnd(); ++iter) {
             const Item *item = *iter;
-            this->saveItem(file, item);
+            this->saveItem(stream, item);
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
         qDebug("save traps");
         for(set<Trap *>::const_iterator iter = location->trapsBegin(); iter != location->trapsEnd(); ++iter) {
             const Trap *trap = *iter;
-            this->saveTrap(file, trap);
+            this->saveTrap(stream, trap);
         }
-        fprintf(file, "\n");
+        //fprintf(file, "\n");
+        stream << "\n";
 
-        fprintf(file, "</location>\n\n");
+        //fprintf(file, "</location>\n\n");
+        stream << "</location>\n\n";
     }
 
     const QuestObjective *quest_objective = this->getQuest()->getQuestObjective();
     if( quest_objective != NULL ) {
         qDebug("save quest objective");
-        fprintf(file, "<quest_objective");
-        fprintf(file, " type=\"%s\"", quest_objective->getType().c_str());
-        fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
-        fprintf(file, " gold=\"%d\"", quest_objective->getGold());
-        fprintf(file, " />");
+        //fprintf(file, "<quest_objective");
+        //fprintf(file, " type=\"%s\"", quest_objective->getType().c_str());
+        //fprintf(file, " arg1=\"%s\"", quest_objective->getArg1().c_str());
+        //fprintf(file, " gold=\"%d\"", quest_objective->getGold());
+        //fprintf(file, " />");
+        stream << "<quest_objective type=\"" << quest_objective->getType().c_str() << "\"";
+        stream << " arg1=\"" << quest_objective->getArg1().c_str() << "\"";
+        stream << " gold=\"" << quest_objective->getGold() << "\"";
+        stream << " />";
     }
-    fprintf(file, "\n");
+    //fprintf(file, "\n");
+    stream << "\n";
 
     qDebug("save quest completed text");
-    fprintf(file, "<completed_text>%s</completed_text>\n", this->getQuest()->getCompletedText().c_str());
-    fprintf(file, "\n");
+    //fprintf(file, "<completed_text>%s</completed_text>\n", this->getQuest()->getCompletedText().c_str());
+    //fprintf(file, "\n");
+    stream << "<completed_text>" << this->getQuest()->getCompletedText().c_str() << "</completed_text>\n\n";
 
     qDebug("save current quest info");
-    fprintf(file, "<quest_info complete=\"%s\"/>\n", this->getQuest()->isCompleted() ? "true" : "false");
-    fprintf(file, "\n");
+    //fprintf(file, "<quest_info complete=\"%s\"/>\n", this->getQuest()->isCompleted() ? "true" : "false");
+    //fprintf(file, "\n");
+    stream << "<quest_info complete=\"" << (this->getQuest()->isCompleted() ? "true" : "false") << "\"/>\n\n";
 
     qDebug("save journal");
-    fprintf(file, "<journal>\n");
+    //fprintf(file, "<journal>\n");
+    stream << "<journal>\n";
     QByteArray encoded = QUrl::toPercentEncoding(this->journal_ss.str().c_str(), QByteArray(), "<>");
-    fprintf(file, "%s", encoded.data());
-    fprintf(file, "</journal>\n");
-    fprintf(file, "\n");
+    //fprintf(file, "%s", encoded.data());
+    stream << encoded;
+    //fprintf(file, "</journal>\n");
+    //fprintf(file, "\n");
+    stream << "</journal>\n\n";
 
-    fprintf(file, "</savegame>\n");
+    //fprintf(file, "</savegame>\n");
+    stream << "</savegame>\n";
 
-    fclose(file);
+    //fclose(file);
 
     if( this->permadeath ) {
         this->permadeath_has_savefilename = true;

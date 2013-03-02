@@ -434,6 +434,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QStackedWidget *main_stacked_widget;
 
+    QPushButton *quickSaveButton;
+
     Difficulty difficulty;
     bool permadeath;
     bool permadeath_has_savefilename;
@@ -491,11 +493,11 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void testFogOfWar();
     bool canSaveHere();
 
-    void saveItemProfileBonusInt(FILE *file, const Item *item, const string &key) const;
-    void saveItemProfileBonusFloat(FILE *file, const Item *item, const string &key) const;
-    void saveItem(FILE *file, const Item *item) const;
-    void saveItem(FILE *file, const Item *item, const Character *character) const;
-    void saveTrap(FILE *file, const Trap *trap) const;
+    void saveItemProfileBonusInt(QTextStream &stream, const Item *item, const string &key) const;
+    void saveItemProfileBonusFloat(QTextStream &stream, const Item *item, const string &key) const;
+    void saveItem(QTextStream &stream, const Item *item) const;
+    void saveItem(QTextStream &stream, const Item *item, const Character *character) const;
+    void saveTrap(QTextStream &stream, const Trap *trap) const;
 
 #ifdef _DEBUG
     vector<QGraphicsItem *> debug_items;
