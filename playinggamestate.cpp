@@ -3114,6 +3114,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
                     QStringRef name_s = reader.attributes().value("name");
                     qDebug("found spell template: %s", name_s.toString().toStdString().c_str());
                     QStringRef type_s = reader.attributes().value("type");
+                    QStringRef effect_s = reader.attributes().value("effect");
                     QStringRef rollX_s = reader.attributes().value("rollX");
                     QStringRef rollY_s = reader.attributes().value("rollY");
                     QStringRef rollZ_s = reader.attributes().value("rollZ");
@@ -3126,7 +3127,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
                     bool damage_armour = parseBool(damage_armour_s.toString(), true);
                     bool damage_shield = parseBool(damage_shield_s.toString(), true);
                     bool mind_test = parseBool(mind_test_s.toString(), true);
-                    Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString());
+                    Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString(), effect_s.toString().toStdString());
                     spell->setRoll(rollX, rollY, rollZ);
                     spell->setDamage(damage_armour, damage_shield);
                     spell->setMindTest(mind_test);

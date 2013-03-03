@@ -103,6 +103,12 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
                     }
                 }
             }
+            if( effect == "paralyse" ) {
+                target->paralyse(10000);
+                if( target == playing_gamestate->getPlayer() ) {
+                    playing_gamestate->addTextEffect("The spell paralyses you!", playing_gamestate->getPlayer()->getPos(), 5000);
+                }
+            }
         }
     }
     else if( this->type == "heal" ) {
@@ -444,15 +450,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     }
                     if( spell == NULL ) {
                         // try casting an attack spell
+                        vector<const Spell *> candidate_spells;
                         for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
                             if( iter->second > 0 ) {
                                 string spell_name = iter->first;
                                 const Spell *this_spell = playing_gamestate->findSpell(spell_name);
                                 if( this_spell->getType() == "attack") {
-                                    spell = this_spell;
-                                    spell_target = target_npc;
+                                    candidate_spells.push_back(this_spell);
                                 }
                             }
+                        }
+                        if( candidate_spells.size() > 0 ) {
+                            int r = rand() % candidate_spells.size();
+                            spell = candidate_spells.at(r);
+                            spell_target = target_npc;
                         }
                     }
                     is_ranged = spell != NULL || ( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRangedOrThrown() );

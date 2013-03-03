@@ -149,11 +149,12 @@ public:
 class Spell {
     string name;
     string type;
+    string effect; // use to define more specific types of effects (distinct from the type, which is a more general grouping, to help the AI decide what to cast)
     int rollX, rollY, rollZ;
     bool damage_armour, damage_shield;
     bool mind_test; // if true, receipient can avoid bad effects if passes a mind test
 public:
-    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0), damage_armour(false), damage_shield(false), mind_test(false) {
+    Spell(const string &name, const string &type, const string &effect) : name(name), type(type), effect(effect), /*rating(1),*/ rollX(0), rollY(0), rollZ(0), damage_armour(false), damage_shield(false), mind_test(false) {
     }
 
     string getName() const {

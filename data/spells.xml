@@ -21,4 +21,9 @@
     rollX="4" rollY="6" rollZ="0"
     />
 
+<spell name="Paralyse" type="attack"
+    effect="paralyse"
+    mind_test="true"
+    />
+
 </spells>
