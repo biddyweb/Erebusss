@@ -136,7 +136,7 @@ That's the one! Here, have one of my potions as a reward.
     <floorregion_point x="26.0" y="24.0" />
 </floorregion>
 
-<npc name="Goblin" template="Goblin" x="24.5" y="24.5">
+<npc name="Hobgoblin" template="Hobgoblin" x="24.5" y="24.5">
     <item template="Leather Armour"/>
 </npc>
 
