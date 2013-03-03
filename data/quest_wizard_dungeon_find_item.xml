@@ -421,6 +421,7 @@ This painting is titled, "The Gate in the Forest".
     interaction_type="WANT_OBJECT"
     interaction_data="Necromancy for Beginners"
     interaction_xp="50"
+    interaction_journal="I found a book on necromancy for Calbert, allowing him to complete his work."
 >
 <opening_initial>My goodness, how wonderful to have a visitor! It has been a long time since I have had any kind of company down here.
 </opening_initial>
@@ -435,7 +436,7 @@ I am Calbert, a scholar, employed by the great wizard Vespar to help in his rese
 <talk question="Don't you know Vespar is long dead? It's been one hundred years...">
 No, surely not ... that is terrible news if he has died, admittedly I haven't seen him in a while. But one hundred years? It's been a while, but surely not more than a few months...
 </talk>
-<talk question="Why are you still here?" while_not_done="true">
+<talk question="Why are you still here?" while_not_done="true" journal="I met Calbert, who has been trapped in his room by a spell, until he completes his work. He is after some information on necromancy.">
 The wizard had set me a research task, but grew impatient at my lack of progress - he cast a spell trapping me in this room, to remain until I had completed my task. Unfortuately the answers do not lie in these books, and I am now unable to leave. Perhaps you could help me? All I need is some information on necromancy, maybe there is some resource of the subject matter you are able to bring me...
 </talk>
 <talk question="I have a book that may help you" objective="true">
@@ -1774,6 +1775,7 @@ This leather armour is blessed, offering greater protection.
     interaction_type="WANT_OBJECT"
     interaction_data="Ghost's Bones"
     interaction_xp="30"
+    interaction_journal="I found and returned the ghost's bones."
 >
 <opening_initial>You can see me? Don't be afraid!
 </opening_initial>
@@ -1788,7 +1790,7 @@ I guess you could say that ... for some reason I have been trapped here as a spi
 <talk question="How did you die?">
 I would rather not talk about that ... it is too terrible to mention.
 </talk>
-<talk question="Is there anything I can do?" while_not_done="true">
+<talk question="Is there anything I can do?" while_not_done="true" journal="I met a ghost, who asked if I could find his bones.">
 Perhaps you can find my bones. I have tried searching for them, but without luck. Maybe if they were returned to me, I might be able to finally leave this plane of existence.
 </talk>
 <talk question="I have found your bones" objective="true">

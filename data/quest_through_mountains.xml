@@ -102,6 +102,7 @@ You will receive three hundred gold pieces for completing the quest.
     interaction_data="Dire Leaf"
     interaction_xp="30"
     interaction_reward_item="Potion of Healing"
+    interaction_journal="I found a dire plant leaf for Anmareth, who gave me a potion of healing as thanks."
 >
 <opening_initial>Hello there.
 </opening_initial>
@@ -110,7 +111,7 @@ You will receive three hundred gold pieces for completing the quest.
 <opening_interaction_complete>
 Hello, thank you again for your help.
 </opening_interaction_complete>
-<talk question="What are you doing here?" while_not_done="true">
+<talk question="What are you doing here?" while_not_done="true" journal="I met an alchemist named Anmareth who is looking for a leaf from the dire plant.">
 I am an alchemist, in search of some rare ingredients. One in particular, a leaf from the dire plant, rumoured to grow within these caves. They have thin spikey leaves - you haven't seen any, have you?
 </talk>
 <talk question="I have the leaf that may be the one you want" objective="true">
@@ -221,6 +222,7 @@ That's the one! Here, have one of my potions as a reward.
     interaction_type="KILL_NPCS"
     interaction_data="Glenthor"
     interaction_xp="75"
+    interaction_journal="I killed the Wyvern for Glenthor, allowing him to continue his work."
 >
 <opening_initial>Hello, fellow traveller! You wouldn't fancy helping me out, would you?
 </opening_initial>
@@ -228,7 +230,7 @@ That's the one! Here, have one of my potions as a reward.
 </opening_later>
 <opening_interaction_complete>Hello. Thank you again for slaying those Wyvern!
 </opening_interaction_complete>
-<talk question="How can I help you?" while_not_done="true">I am an archaeologist exploring for ancient Dwarven artefacts. I want to explore the cave to the east, but unfortunately it is full of these dreadful and hostile winged creatures. If someone could slay them, it would be of great help to me.
+<talk question="How can I help you?" while_not_done="true" journal="I met an archaeologist named Glenthor, who asked if I could kill the Wyvern in the nearby cave.">I am an archaeologist exploring for ancient Dwarven artefacts. I want to explore the cave to the east, but unfortunately it is full of these dreadful and hostile winged creatures. If someone could slay them, it would be of great help to me.
 </talk>
 <talk question="I have killed the Wyvern for you" objective="true">
 Thank you for helping me!
