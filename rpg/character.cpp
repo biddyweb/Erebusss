@@ -1355,9 +1355,9 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
         }
     }
     if( this->interaction_journal.length() > 0 ) {
-        playing_gamestate->writeJournal("<hr/>");
+        playing_gamestate->writeJournal("<hr/><p>");
         playing_gamestate->writeJournal(this->interaction_journal);
-        playing_gamestate->writeJournal("<br/><br/>");
+        playing_gamestate->writeJournal("</p>");
     }
     this->interaction_completed = true;
 }

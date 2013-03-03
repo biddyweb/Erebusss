@@ -5267,8 +5267,11 @@ void PlayingGamestate::createRandomQuest() {
         str << "</body></html>";
         this->showInfoWindow(str.str());
 
-        this->journal_ss << "<p><b>Quest Details: " << quest->getName() << "</b></p>";
-        this->journal_ss << "<p>" << quest_info << "</p>";
+        this->writeJournal("<hr/><p><b>Quest Details: ");
+        this->writeJournal(quest->getName());
+        this->writeJournal("</b></p><p>");
+        this->writeJournal(quest_info);
+        this->writeJournal("</p>");
     }
 
     qDebug("View is transformed? %d", view->isTransformed());
@@ -6222,7 +6225,9 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                         message << talk_item->answer;
                         message << "<br/>";
                         if( talk_item->journal.length() > 0 ) {
-                            this->journal_ss <<  "<hr/>" << talk_item->journal << "<br/><br/>";
+                            this->writeJournal("<hr/><p>");
+                            this->writeJournal(talk_item->journal);
+                            this->writeJournal("</p>");
                             talk_item->journal = ""; // stops the journal text being written repeatedly
                         }
                         if( talk_item->objective ) {
@@ -6430,6 +6435,9 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         string completed_text = this->getQuest()->getCompletedText();
                         completed_text = convertToHTML(completed_text);
                         this->showInfoDialog(completed_text);
+                        this->writeJournal("<hr/><p>");
+                        this->writeJournal(completed_text);
+                        this->writeJournal("</p>");
                     }
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true, true);
