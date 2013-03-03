@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include <QtGui>
+#include <QtWebKit/QWebView>
 
 #include <sstream>
 using std::stringstream;
@@ -575,7 +576,7 @@ public:
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b);
     void playSound(const string &sound_effect);
-    void showInfoWindow(const string &html);
+    QWebView *showInfoWindow(const string &html);
 
     bool isTransform3D() const {
         return this->view_transform_3d;

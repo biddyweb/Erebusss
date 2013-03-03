@@ -1,4 +1,5 @@
 #include <QtWebKit/QWebView>
+#include <QtWebKit/QWebFrame>
 
 #include <ctime>
 #include <algorithm> // needed for stable_sort on Symbian at least
@@ -5495,10 +5496,14 @@ void PlayingGamestate::clickedJournal() {
     this->playSound("turn_page");
     stringstream str;
     str << "<html><body>";
+    /*for(int i=0;i<100;i++) {
+        str << "i = " << i << "<br/>";
+    }*/
     str << "<h1>Journal</h1>";
     str << this->journal_ss.str();
     str << "</body></html>";
-    this->showInfoWindow(str.str());
+    QWebView *web_view = this->showInfoWindow(str.str());
+    web_view->page()->mainFrame()->setScrollBarValue(Qt::Vertical, web_view->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
 }
 
 void PlayingGamestate::clickedOptions() {
@@ -5604,14 +5609,13 @@ void PlayingGamestate::clickedQuit() {
     this->quitGame();
 }
 
-void PlayingGamestate::showInfoWindow(const string &html) {
+QWebView *PlayingGamestate::showInfoWindow(const string &html) {
     // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
     qDebug("showInfoWindow()\n");
 
     game_g->getScreen()->setPaused(true, true);
 
     QWidget *subwindow = new QWidget();
-    this->addWidget(subwindow);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -5628,7 +5632,8 @@ void PlayingGamestate::showInfoWindow(const string &html) {
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
 
-    //this->showInfoDialog(html);
+    this->addWidget(subwindow); // should be last, so resizing is already correct - needed for things like scrolling to bottom to work
+    return label;
 }
 
 void PlayingGamestate::closeSubWindow() {
