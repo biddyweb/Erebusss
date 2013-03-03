@@ -1492,7 +1492,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
 
 You can also see large strange iron contraptions around the place, that appear to be damaged beyond repair. Some of them have wheels, though made of a material that looks alien to you.
 
-Further away, the landscape is formed by fields and trees, with occasional buildings, but many fires are dotted around the landscape, and most of the buildings look damaged. The trees look burned black, with no leaves. There is no sign of life that you see.
+Further away, the landscape is formed by fields and trees, with occasional buildings, most of them damaged, some of them reduced to rubble. The trees look burned black, with no leaves. There is no sign of life that you see.
 </scenery>
 
 <scenery name="Cabinet" image_name="cabinet" x="21.0" y="21.5" size="0.8" blocking="true">
