@@ -245,6 +245,19 @@ const Item *Character::findItem(const string &key) const {
     return NULL;
 }
 
+Ammo *Character::findAmmo(const string &key) {
+    for(set<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        Item *item = *iter;
+        if( item->getType() == ITEMTYPE_AMMO ) {
+            Ammo *ammo = static_cast<Ammo *>(item);
+            if( ammo->getAmmoType() == key ) {
+                return ammo;
+            }
+        }
+    }
+    return NULL;
+}
+
 bool Character::useAmmo(Ammo *ammo) {
     // n.b., must be an item owned by Character!
     bool used_up = false;
@@ -519,19 +532,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 // obtain the ammo - and make sure we still have some!
                                 // note, it's better to use up the ammo now, rather than we first decide to fire, so that we still have the information on the ammo
                                 string ammo_key = this->getCurrentWeapon()->getAmmoKey();
-                                Item *item = this->findItem(ammo_key);
-                                if( item == NULL ) {
+                                //Item *item = this->findItem(ammo_key);
+                                ammo = this->findAmmo(ammo_key);
+                                if( ammo == NULL ) {
                                     // run out of ammo!
                                     can_hit = false;
                                     // no need to change weapon, this will happen when Character next tries to hit
                                 }
-                                else {
+                                /*else {
                                     if( item->getType() != ITEMTYPE_AMMO ) {
                                         LOG("required ammo type %s is not ammo\n", item->getName().c_str());
                                         ASSERT_LOGGER( item->getType() == ITEMTYPE_AMMO );
                                     }
                                     ammo = static_cast<Ammo *>(item);
-                                }
+                                }*/
                             }
 
                             if( can_hit ) {
@@ -635,7 +649,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     if( this->useAmmo(ammo) ) {
                                         ammo = NULL; // just to be safe, as pointer now deleted
                                         string ammo_key = this->getCurrentWeapon()->getAmmoKey();
-                                        if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
+                                        //if( this->findItem(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
+                                        if( this->findAmmo(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
                                             // really has used up all available ammo
                                             LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
                                             playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
@@ -670,7 +685,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 // make sure we have enough ammo (ammo is used up when we actually fire - see above)
                                 if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
                                     string ammo_key = this->getCurrentWeapon()->getAmmoKey();
-                                    Item *item = this->findItem(ammo_key);
+                                    //Item *item = this->findItem(ammo_key);
+                                    Ammo *item = this->findAmmo(ammo_key);
                                     if( item == NULL ) {
                                         if( this == playing_gamestate->getPlayer() ) {
                                             // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)

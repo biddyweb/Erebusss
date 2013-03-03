@@ -720,6 +720,7 @@ public:
     set<Item *>::const_iterator itemsEnd() const;
     Item *findItem(const string &key);
     const Item *findItem(const string &key) const;
+    Ammo *findAmmo(const string &key);
     int getGold() const {
         return this->gold;
     }

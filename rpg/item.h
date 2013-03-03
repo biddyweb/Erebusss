@@ -321,10 +321,11 @@ public:
 };
 
 class Ammo : public Item {
+    string ammo_type;
     string projectile_image_name;
     int amount;
 public:
-    Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount);
+    Ammo(const string &name, const string &image_name, const string &ammo_type, const string &projectile_image_name, int weight, int amount);
     virtual ~Ammo() {
     }
 
@@ -335,6 +336,9 @@ public:
 
     virtual string getName() const;
 
+    string getAmmoType() const {
+        return this->ammo_type;
+    }
     string getProjectileImageName() const {
         return this->projectile_image_name;
     }

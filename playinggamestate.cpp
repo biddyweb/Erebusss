@@ -3516,10 +3516,15 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
         item = ring;
     }
     else if( reader.name() == "ammo" ) {
+        QStringRef ammo_type_s = reader.attributes().value("ammo_type");
         QStringRef projectile_image_name_s = reader.attributes().value("projectile_image_name");
         QStringRef amount_s = reader.attributes().value("amount");
         int amount = parseInt(amount_s.toString());
-        Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), projectile_image_name_s.toString().toStdString(), weight, amount);
+        QString ammo_type = ammo_type_s.toString();
+        if( ammo_type.length() == 0 ) {
+            ammo_type = name_s.toString(); // needed for backwards compatibility
+        }
+        Ammo *ammo = new Ammo(name_s.toString().toStdString(), image_name_s.toString().toStdString(), ammo_type.toStdString(), projectile_image_name_s.toString().toStdString(), weight, amount);
         item = ammo;
     }
     else if( reader.name() == "currency" ) {
@@ -6942,6 +6947,7 @@ void PlayingGamestate::saveItem(QTextStream &stream, const Item *item, const Cha
     case ITEMTYPE_AMMO:
     {
         const Ammo *ammo = static_cast<const Ammo *>(item);
+        stream << " ammo_type=\"" << ammo->getAmmoType().c_str() << "\"";
         //fprintf(file, " projectile_image_name=\"%s\"", ammo->getProjectileImageName().c_str());
         stream << " projectile_image_name=\"" << ammo->getProjectileImageName().c_str() << "\"";
         //fprintf(file, " amount=\"%d\"", ammo->getAmount());

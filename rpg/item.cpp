@@ -190,6 +190,7 @@ string Item::getDetailedDescription() const {
     else if( this->getType() == ITEMTYPE_AMMO ) {
         str << "<b>Type:</b> Ammo<br/>";
         const Ammo *ammo = static_cast<const Ammo *>(this);
+        str << "<b>Base Ammo Type:</b> " << ammo->getAmmoType() << "<br/>";
         str << "<b>Amount:</b> " << ammo->getAmount() << "<br/>";
     }
     str << "<b>Weight: </b>" << this->getWeight() << "<br/>";
@@ -358,8 +359,8 @@ float Ring::getProfileBonusFloatProperty(const Character *character, const strin
     return Item::getProfileBonusFloatProperty(character, key);
 }
 
-Ammo::Ammo(const string &name, const string &image_name, const string &projectile_image_name, int weight, int amount) :
-    Item(name, image_name, weight), projectile_image_name(projectile_image_name), amount(amount)
+Ammo::Ammo(const string &name, const string &image_name, const string &ammo_type, const string &projectile_image_name, int weight, int amount) :
+    Item(name, image_name, weight), ammo_type(ammo_type), projectile_image_name(projectile_image_name), amount(amount)
 {
 }
 
