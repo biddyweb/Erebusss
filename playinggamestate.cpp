@@ -4507,6 +4507,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         QStringRef done_terror_s = reader.attributes().value("done_terror");
                         bool done_terror = parseBool(done_terror_s.toString(), true);
                         npc->setDoneTerror(done_terror);
+                        QStringRef is_fleeing_s = reader.attributes().value("is_fleeing");
+                        bool is_fleeing = parseBool(is_fleeing_s.toString(), true);
+                        npc->setFleeing(is_fleeing);
                         QStringRef causes_disease_s = reader.attributes().value("causes_disease");
                         int causes_disease = parseInt(causes_disease_s.toString(), true);
                         npc->setCausesDisease(causes_disease);
@@ -5581,6 +5584,14 @@ void PlayingGamestate::clickedRest() {
             }
             this->player->restoreHealth();
             this->player->expireProfileEffects();
+            // also set all NPCs to no longer be fleeing
+            for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+                Character *character = *iter;
+                if( character->isFleeing() ) {
+                    character->setFleeing(false);
+                    character->setStateIdle();
+                }
+            }
             stringstream str;
             str << "Rested for " << time << " hour";
             if( time > 1 )
@@ -7193,8 +7204,13 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 //fprintf(file, " terror_effect=\"%d\"", character->getTerrorEffect());
                 stream << " terror_effect=\"" << character->getTerrorEffect() << "\"";
             }
-            //fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
-            stream << " done_terror=\"" << (character->hasDoneTerror() ? "true" : "false") << "\"";
+            if( character->hasDoneTerror() ) {
+                //fprintf(file, " done_terror=\"%s\"", character->hasDoneTerror() ? "true" : "false");
+                stream << " done_terror=\"true\"";
+            }
+            if( character->isFleeing() ) {
+                stream << " is_fleeing=\"true\"";
+            }
             if( character->getCausesDisease() > 0 ) {
                 //fprintf(file, " causes_disease=\"%d\"", character->getCausesDisease());
                 stream << " causes_disease=\"" << character->getCausesDisease() << "\"";

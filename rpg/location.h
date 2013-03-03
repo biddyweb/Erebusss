@@ -749,6 +749,7 @@ public:
 
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
     Vector2D nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const;
+    bool findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_from, bool can_fly) const;
     bool findFreeWayPoint(Vector2D *result, Vector2D from, bool visible, bool can_fly) const;
     bool collideWithTransient(const Character *character, Vector2D pos) const;
     bool visibilityTest(Vector2D src, Vector2D dest) const;

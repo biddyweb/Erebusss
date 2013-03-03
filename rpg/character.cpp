@@ -142,7 +142,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -166,7 +166,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -396,7 +396,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 }
             }
 
-            if( hit_state == HITSTATE_HAS_HIT || hit_state == HITSTATE_IS_NOT_HITTING ) {
+            if( hit_state == HITSTATE_HAS_HIT || ( hit_state == HITSTATE_IS_NOT_HITTING && !is_fleeing ) ) {
                 float dist = ( target->getPos() - this->getPos() ).magnitude();
                 bool is_ranged = false; // also includes thrown weapons, and spell attacks
                 const Spell *spell = NULL;
@@ -680,7 +680,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
         if( is_ai && action == ACTION_NONE && ai_try_moving ) {
             bool done_target = false;
-            if( is_hostile && playing_gamestate->getPlayer() != NULL ) {
+            if( is_hostile && !is_fleeing && playing_gamestate->getPlayer() != NULL ) {
                 if( this->is_visible ) {
                     this->setTargetNPC( playing_gamestate->getPlayer() );
                     Vector2D dest = playing_gamestate->getPlayer()->getPos();
@@ -688,6 +688,26 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     done_target = true;
                     this->has_last_known_player_position = true;
                     this->last_known_player_position = dest;
+                }
+            }
+
+            if( !done_target && is_fleeing ) {
+                // run away!
+                done_target = true;
+                if( playing_gamestate->getPlayer() != NULL && !has_path ) {
+                    /*Vector2D dir = this->getPos() - playing_gamestate->getPlayer()->getPos();
+                    if( dir.magnitude() > 0 ) {
+                        dir.normalise();
+                        Vector2D new_pos = this->pos + dir*1.0f;
+                        qDebug("### flee to %f, %f", new_pos.x, new_pos.y);
+                        this->setDestination(new_pos.x, new_pos.y, NULL);
+                        this->location->findFreeWayPoint()
+                    }*/
+                    Vector2D flee_pos;
+                    if( this->location->findFleePoint(&flee_pos, this->pos, playing_gamestate->getPlayer()->getPos(), this->can_fly) ) {
+                        //qDebug("### flee to %f, %f", flee_pos.x, flee_pos.y);
+                        this->setDestination(flee_pos.x, flee_pos.y, NULL);
+                    }
                 }
             }
 
@@ -924,6 +944,14 @@ bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease
     this->health -= decrease;
     if( health <= 0 ) {
         this->kill(playing_gamestate);
+    }
+    else if( this->is_ai && !this->is_fleeing && this->health <= 0.5f*this->max_health ) {
+        // NPC flees if fails a bravery test
+        int r = rollDice(2, 6, 0);
+        if( r > this->getProfileIntProperty(profile_key_B_c) ) {
+            qDebug("NPC %s decides to flee", this->getName().c_str());
+            this->is_fleeing = true;
+        }
     }
     return (decrease > 0);
 }
@@ -1171,6 +1199,9 @@ Vector2D Character::getDestination() const {
 
 void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
     //qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
+    /*if( is_fleeing ) {
+        qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
+    }*/
     if( this->location == NULL ) {
         LOG("can't set destination for character with NULL location");
         ASSERT_LOGGER( location != NULL );

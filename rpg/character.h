@@ -404,6 +404,7 @@ class Character {
     bool causes_terror;
     int terror_effect;
     bool done_terror;
+    bool is_fleeing; // for NPCs
     int causes_disease;
     int causes_paralysis;
     bool requires_magical; // requires magical weapon to hit?
@@ -776,6 +777,12 @@ public:
     }
     void setDoneTerror(bool done_terror) {
         this->done_terror = done_terror;
+    }
+    bool isFleeing() const {
+        return this->is_fleeing;
+    }
+    void setFleeing(bool is_fleeing) {
+        this->is_fleeing = is_fleeing;
     }
     int getCausesDisease() const {
         return this->causes_disease;
