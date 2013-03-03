@@ -323,7 +323,11 @@ combat.</li>
 able to inflict stronger blows on their enemies. They can also carry more
 items.</li>
 <li><b>Attacks (A)</b> - Currently unused.</li>
-<li><b>Mind (M)</b> - Currently unused.</li>
+<li><b>Mind (M)</b> - Used for magic attacks and defence. Some spells only
+cause harm to the target if the spellcaster wins a Mind roll against the target.
+The chance of success depends on how the two characters' Mind statistic
+compares. Currently your player cannot use magic, so this statistic basically
+helps you avoid some magical attacks.</li>
 <li><b>Dexterity (D)</b> - How good your character is at avoiding traps, and
 avoiding being hit by arrows.</li>
 <li><b>Bravery (B)</b> - Some enemies (such as the undead) cause <i>terror</i>.
@@ -495,6 +499,11 @@ currently implemented:</p>
 <p><b>Acid Strike.</b> The spell causes a jet of acid to be sprayed at the
 target, causing 2D20 damage (reduced by armour or shield).</p>
 
+<p><b>Agony.</b> The spell uses the caster's psychic energy, directed at the
+unfortunate recipient, causing great pain - and 2D20 damage (with no defence
+from armour or shield). The effects can be avoided with a successful Mind test.
+</p>
+
 <p><b>Fire Bolt.</b> The spellcaster shoots forth a bolt of fire at the target,
 causing 2D10 damage (a shield reduces damage, armour has no effect).</p>
 
@@ -577,7 +586,7 @@ ADDED   Player can now select which two statistics to increase when levelling
 ADDED   New weapon "Holy Water", can be thrown at "unholy" creatures causing
         them damage.
 ADDED   New weapon "Acid", can be thrown at enemies.
-ADDED   New spell "Heal".
+ADDED   New spells "Acid Strike", "Agony", "Heal".
 ADDED   Arrows now displayed when firing bows.
 ADDED   Graphical effect for spells.
 ADDED   Various (random) "game over" messages.

@@ -3119,14 +3119,17 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
                     QStringRef rollZ_s = reader.attributes().value("rollZ");
                     QStringRef damage_armour_s = reader.attributes().value("damage_armour");
                     QStringRef damage_shield_s = reader.attributes().value("damage_shield");
+                    QStringRef mind_test_s = reader.attributes().value("mind_test");
                     int rollX = parseInt(rollX_s.toString(), true);
                     int rollY = parseInt(rollY_s.toString(), true);
                     int rollZ = parseInt(rollZ_s.toString(), true);
                     bool damage_armour = parseBool(damage_armour_s.toString(), true);
                     bool damage_shield = parseBool(damage_shield_s.toString(), true);
+                    bool mind_test = parseBool(mind_test_s.toString(), true);
                     Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString());
                     spell->setRoll(rollX, rollY, rollZ);
                     spell->setDamage(damage_armour, damage_shield);
+                    spell->setMindTest(mind_test);
                     this->spells[ name_s.toString().toStdString() ] = spell;
                 }
             }

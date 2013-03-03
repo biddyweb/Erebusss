@@ -11,6 +11,12 @@
     damage_armour="true" damage_shield="true"
     />
 
+<spell name="Agony" type="attack"
+    rollX="2" rollY="20" rollZ="0"
+    damage_armour="false" damage_shield="false"
+    mind_test="true"
+    />
+
 <spell name="Heal" type="heal"
     rollX="4" rollY="6" rollZ="0"
     />

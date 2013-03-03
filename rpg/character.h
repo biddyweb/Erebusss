@@ -151,8 +151,9 @@ class Spell {
     string type;
     int rollX, rollY, rollZ;
     bool damage_armour, damage_shield;
+    bool mind_test; // if true, receipient can avoid bad effects if passes a mind test
 public:
-    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0), damage_armour(false), damage_shield(false) {
+    Spell(const string &name, const string &type) : name(name), type(type), /*rating(1),*/ rollX(0), rollY(0), rollZ(0), damage_armour(false), damage_shield(false), mind_test(false) {
     }
 
     string getName() const {
@@ -169,6 +170,9 @@ public:
     void setDamage(bool damage_armour, bool damage_shield) {
         this->damage_armour = damage_armour;
         this->damage_shield = damage_shield;
+    }
+    void setMindTest(bool mind_test) {
+        this->mind_test = mind_test;
     }
     void castOn(PlayingGamestate *playing_gamestate, Character *source, Character *target) const;
 };

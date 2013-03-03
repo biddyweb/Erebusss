@@ -74,13 +74,33 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     // source may also equal the target, if casting on self
     // n.b., caller should have called useSpell()
     if( this->type == "attack" ) {
-        int damage = rollDice(rollX, rollY, rollZ);
-        if( damage > 0 ) {
-            qDebug("cast attack spell: %d; %d, %d", damage, damage_armour, damage_shield);
-            if( target->decreaseHealth(playing_gamestate, damage, damage_armour, damage_shield) ) {
-                target->addPainTextEffect(playing_gamestate);
-                if( target->isDead() && source != NULL && source == playing_gamestate->getPlayer() ) {
-                    source->addXP(playing_gamestate, target->getXPWorth());
+        bool success = true;
+        if( mind_test ) {
+            int a_stat = source->getProfileIntProperty(profile_key_M_c);
+            int d_stat = target->getProfileIntProperty(profile_key_M_c);
+            int mod_a_stat = source->modifyStatForDifficulty(playing_gamestate, a_stat);
+            int mod_d_stat = target->modifyStatForDifficulty(playing_gamestate, d_stat);
+
+            int hit_roll = rollDice(2, 6, -7);
+            qDebug("spell mind test: %d vs %d (%d vs %d) : roll %d", a_stat, d_stat, mod_a_stat, mod_d_stat, hit_roll);
+            if( hit_roll + mod_a_stat > mod_d_stat ) {
+                // hits
+                qDebug("    attacker wins");
+            }
+            else {
+                success = false;
+                qDebug("    defender wins");
+            }
+        }
+        if( success ) {
+            int damage = rollDice(rollX, rollY, rollZ);
+            if( damage > 0 ) {
+                qDebug("cast attack spell: %d; %d, %d", damage, damage_armour, damage_shield);
+                if( target->decreaseHealth(playing_gamestate, damage, damage_armour, damage_shield) ) {
+                    target->addPainTextEffect(playing_gamestate);
+                    if( target->isDead() && source != NULL && source == playing_gamestate->getPlayer() ) {
+                        source->addXP(playing_gamestate, target->getXPWorth());
+                    }
                 }
             }
         }
