@@ -1354,6 +1354,11 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
             ASSERT_LOGGER(false);
         }
     }
+    if( this->interaction_journal.length() > 0 ) {
+        playing_gamestate->writeJournal("<hr/>");
+        playing_gamestate->writeJournal(this->interaction_journal);
+        playing_gamestate->writeJournal("<br/><br/>");
+    }
     this->interaction_completed = true;
 }
 

@@ -636,6 +636,10 @@ public:
     void showInfoDialog(const string &message, const string &picture);
     bool askQuestionDialog(const string &message);
 
+    void writeJournal(const string &text) {
+        journal_ss << text;
+    }
+
 public slots:
     void closeSubWindow();
     void closeAllSubWindows();

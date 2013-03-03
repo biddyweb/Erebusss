@@ -4546,6 +4546,8 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     npc->setInteractionXP(interaction_xp);
                     QStringRef interaction_reward_item_s = reader.attributes().value("interaction_reward_item");
                     npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
+                    QStringRef interaction_journal_s = reader.attributes().value("interaction_journal");
+                    npc->setInteractionJournal(interaction_journal_s.toString().toStdString());
                     QStringRef shop_s = reader.attributes().value("shop");
                     if( shop_s.length() > 0 ) {
                         npc->setShop(shop_s.toString().toStdString());
@@ -4604,12 +4606,14 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QString question = question_s.toString();
                     QStringRef action_s = reader.attributes().value("action");
                     QString action = action_s.toString();
+                    QStringRef journal_s = reader.attributes().value("journal");
+                    QString journal = journal_s.toString();
                     QStringRef while_not_done_s = reader.attributes().value("while_not_done");
                     bool while_not_done = parseBool(while_not_done_s.toString(), true);
                     QStringRef objective_s = reader.attributes().value("objective");
                     bool objective = parseBool(objective_s.toString(), true);
                     QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), while_not_done, objective);
+                    npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), journal.toStdString(), while_not_done, objective);
                 }
                 else if( reader.name() == "spell") {
                     if( questXMLType != QUEST_XML_TYPE_NPC ) {
@@ -6175,12 +6179,12 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                 for(;;) {
                     vector<string> buttons;
                     //vector<string> answers;
-                    vector<const TalkItem *> talk_items;
+                    vector<TalkItem *> talk_items;
                     if( !character->isHostile() ) {
                         // being hostile means the character has become hostile whilst talking, so now the only thing left is to say Goodbye!
                         int count=0;
-                        for(vector<TalkItem>::const_iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter, count++) {
-                            const TalkItem *talk_item = &*iter;
+                        for(vector<TalkItem>::iterator iter = character->talkItemsBegin(); iter != character->talkItemsEnd(); ++iter, count++) {
+                            TalkItem *talk_item = &*iter;
                             if( talk_item->while_not_done && character->isInteractionCompleted() ) {
                                 continue;
                             }
@@ -6204,7 +6208,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                         break;
                     }
                     else {
-                        const TalkItem *talk_item = talk_items.at(result);
+                        TalkItem *talk_item = talk_items.at(result);
                         message << "<b>";
                         message << player->getName();
                         message << "</b>: ";
@@ -6217,6 +6221,10 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                         //message << answers.at(result);
                         message << talk_item->answer;
                         message << "<br/>";
+                        if( talk_item->journal.length() > 0 ) {
+                            this->journal_ss <<  "<hr/>" << talk_item->journal << "<br/><br/>";
+                            talk_item->journal = ""; // stops the journal text being written repeatedly
+                        }
                         if( talk_item->objective ) {
                             character->completeInteraction(this);
                         }
@@ -7208,6 +7216,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 //fprintf(file, " interaction_data=\"%s\"", character->getInteractionData().c_str());
                 stream << " interaction_data=\"" << character->getInteractionData().c_str() << "\"";
             }
+            if( character->getInteractionJournal().length() > 0 ) {
+                stream << " interaction_journal=\"" << character->getInteractionJournal().c_str() << "\"";
+            }
             if( character->getInteractionXP() != 0 ) {
                 //fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
                 stream << " interaction_xp=\"" << character->getInteractionXP() << "\"";
@@ -7252,7 +7263,13 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 //fprintf(file, ">\n");
                 //fprintf(file, "%s\n", talk_item->answer.c_str());
                 //fprintf(file, "</talk>\n");
-                stream << "<talk question=\"" << talk_item->question.c_str() << "\" action=\"" << talk_item->action.c_str() << "\"";
+                stream << "<talk question=\"" << talk_item->question.c_str() << "\"";
+                if( talk_item->action.length() > 0 ) {
+                    stream << " action=\"" << talk_item->action.c_str() << "\"";
+                }
+                if( talk_item->journal.length() > 0 ) {
+                    stream << " journal=\"" << talk_item->journal.c_str() << "\"";
+                }
                 stream << " while_not_done=\"" << (talk_item->while_not_done ? "true": "false") << "\"";
                 stream << " objective=\"" << (talk_item->objective ? "true": "false") << "\"";
                 stream << ">\n";

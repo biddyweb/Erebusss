@@ -178,11 +178,12 @@ public:
     string question;
     string answer;
     string action;
+    string journal;
     bool while_not_done;
     bool objective;
 
-    TalkItem(const string &question, const string &answer, const string &action, bool while_not_done, bool objective) :
-        question(question), answer(answer), action(action), while_not_done(while_not_done), objective(objective)
+    TalkItem(const string &question, const string &answer, const string &action, const string &journal, bool while_not_done, bool objective) :
+        question(question), answer(answer), action(action), journal(journal), while_not_done(while_not_done), objective(objective)
     {
     }
 };
@@ -415,6 +416,7 @@ class Character {
     string interaction_data;
     int interaction_xp;
     string interaction_reward_item;
+    string interaction_journal;
     bool interaction_completed;
     string talk_opening_initial;
     string talk_opening_later;
@@ -836,6 +838,12 @@ public:
     void setInteractionRewardItem(const string &interaction_reward_item) {
         this->interaction_reward_item = interaction_reward_item;
     }
+    string getInteractionJournal() const {
+        return this->interaction_journal;
+    }
+    void setInteractionJournal(const string &interaction_journal) {
+        this->interaction_journal = interaction_journal;
+    }
     bool isInteractionCompleted() const {
         return this->interaction_completed;
     }
@@ -872,9 +880,15 @@ public:
     map<string, string>::const_iterator talkItemsEnd() const {
         return this->talk_items.end();
     }*/
-    void addTalkItem(const string &question, const string &answer, const string &action, bool while_not_done, bool objective) {
-        TalkItem talk_item(question, answer, action, while_not_done, objective);
+    void addTalkItem(const string &question, const string &answer, const string &action, const string &journal, bool while_not_done, bool objective) {
+        TalkItem talk_item(question, answer, action, journal, while_not_done, objective);
         this->talk_items.push_back(talk_item);
+    }
+    vector<TalkItem>::iterator talkItemsBegin() {
+        return this->talk_items.begin();
+    }
+    vector<TalkItem>::iterator talkItemsEnd() {
+        return this->talk_items.end();
     }
     vector<TalkItem>::const_iterator talkItemsBegin() const {
         return this->talk_items.begin();
