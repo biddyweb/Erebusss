@@ -396,6 +396,7 @@ class Character {
 
     set<Item *> items;
     Weapon *current_weapon;
+    Ammo *current_ammo;
     Shield *current_shield;
     Armour *current_armour;
     Ring *current_ring;
@@ -685,6 +686,13 @@ public:
         return this->current_weapon;
     }
     void armWeapon(Weapon *item);
+    const Ammo *getCurrentAmmo() const {
+        return this->current_ammo;
+    }
+    Ammo *getCurrentAmmo() {
+        return this->current_ammo;
+    }
+    void selectAmmo(Ammo *item);
     const Shield *getCurrentShield() const {
         return this->current_shield;
     }

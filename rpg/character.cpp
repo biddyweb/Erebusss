@@ -168,7 +168,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
 
@@ -192,7 +192,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
-    current_weapon(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
@@ -246,6 +246,12 @@ const Item *Character::findItem(const string &key) const {
 }
 
 Ammo *Character::findAmmo(const string &key) {
+    if( this->current_ammo != NULL ) {
+        if( this->current_ammo->getAmmoType() == key ) {
+            return this->current_ammo;
+        }
+        this->current_ammo = NULL;
+    }
     for(set<Item *>::iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
         Item *item = *iter;
         if( item->getType() == ITEMTYPE_AMMO ) {
@@ -1059,6 +1065,15 @@ void Character::armWeapon(Weapon *item) {
     }
 }
 
+void Character::selectAmmo(Ammo *item) {
+    // n.b., must be an item owned by Character!
+    // set NULL to disarm
+    if( this->current_ammo != item ) {
+        this->current_ammo = item;
+        // n.b., doesn't matter if the ammo is no longer suitable for the weapon, as we'll still find one that is when required in useAmmo()
+    }
+}
+
 void Character::armShield(Shield *item) {
     // n.b., must be an item owned by Character!
     // set NULL to disarm
@@ -1114,6 +1129,7 @@ void Character::addItem(Item *item, bool auto_arm) {
             this->armWeapon(NULL);
         }
     }
+    // n.b., no need to automatically select ammo, as useAmmo() will find ammo when required
     if( auto_arm && this->current_shield == NULL && item->getType() == ITEMTYPE_SHIELD ) {
         // automatically arm shield
         this->armShield( static_cast<Shield *>(item) );
@@ -1143,6 +1159,9 @@ void Character::takeItem(Item *item) {
     if( this->current_weapon == item ) {
         this->current_weapon = NULL;
         graphics_changed = true;
+    }
+    if( this->current_ammo == item ) {
+        this->current_ammo = NULL;
     }
     if( this->current_shield == item ) {
         this->current_shield = NULL;

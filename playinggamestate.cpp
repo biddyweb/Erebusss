@@ -1212,6 +1212,15 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
             armButton->setText("Arm Weapon");
         }
     }
+    else if( item->getType() == ITEMTYPE_AMMO ) {
+        if( playing_gamestate->getPlayer()->getCurrentAmmo() == item ) {
+            armButton->setVisible(false);
+        }
+        else {
+            armButton->setVisible(true);
+            armButton->setText("Select Ammo");
+        }
+    }
     else if( item->getType() == ITEMTYPE_SHIELD ) {
         if( playing_gamestate->getPlayer()->getCurrentWeapon() != NULL && playing_gamestate->getPlayer()->getCurrentWeapon()->isTwoHanded() ) {
             armButton->setVisible(false);
@@ -1290,6 +1299,13 @@ void ItemsWindow::clickedArmWeapon() {
             LOG("player armed weapon: %s\n", item->getName().c_str());
             playing_gamestate->getPlayer()->armWeapon(weapon);
             playing_gamestate->playSound("weapon_unsheath");
+        }
+    }
+    else if( item->getType() == ITEMTYPE_AMMO ) {
+        Ammo *ammo = static_cast<Ammo *>(item);
+        if( playing_gamestate->getPlayer()->getCurrentAmmo() != ammo ) {
+            LOG("player selected ammo: %s\n", item->getName().c_str());
+            playing_gamestate->getPlayer()->selectAmmo(ammo);
         }
     }
     else if( item->getType() == ITEMTYPE_SHIELD ) {
@@ -4646,13 +4662,15 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QStringRef template_s = reader.attributes().value("template");
                     Item *item = NULL;
                     // need to read everything we want from the reader, before calling parseXMLItem.
-                    bool current_weapon = false, current_shield = false, current_armour = false, current_ring = false;
+                    bool current_weapon = false, current_ammo = false, current_shield = false, current_armour = false, current_ring = false;
                     float pos_x = 0.0f, pos_y = 0.0f;
                     if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
                     }
                     else if( questXMLType == QUEST_XML_TYPE_NPC ) {
                         QStringRef current_weapon_s = reader.attributes().value("current_weapon");
                         current_weapon = parseBool(current_weapon_s.toString(), true);
+                        QStringRef current_ammo_s = reader.attributes().value("current_ammo");
+                        current_ammo = parseBool(current_ammo_s.toString(), true);
                         QStringRef current_shield_s = reader.attributes().value("current_shield");
                         current_shield = parseBool(current_shield_s.toString(), true);
                         QStringRef current_armour_s = reader.attributes().value("current_armour");
@@ -4701,6 +4719,14 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                             }
                             Weapon *weapon = static_cast<Weapon *>(item);
                             npc->armWeapon(weapon);
+                        }
+                        else if( current_ammo ) {
+                            if( item->getType() != ITEMTYPE_AMMO ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("current_weapon is not an ammo");
+                            }
+                            Ammo *ammo = static_cast<Ammo *>(item);
+                            npc->selectAmmo(ammo);
                         }
                         else if( current_shield ) {
                             if( item->getType() != ITEMTYPE_SHIELD ) {
@@ -6952,6 +6978,9 @@ void PlayingGamestate::saveItem(QTextStream &stream, const Item *item, const Cha
         stream << " projectile_image_name=\"" << ammo->getProjectileImageName().c_str() << "\"";
         //fprintf(file, " amount=\"%d\"", ammo->getAmount());
         stream << " amount=\"" << ammo->getAmount() << "\"";
+        if( character != NULL && ammo == character->getCurrentAmmo() ) {
+            stream << " current_ammo=\"true\"";
+        }
         break;
     }
     case ITEMTYPE_CURRENCY:
@@ -7709,6 +7738,9 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
 QString PlayingGamestate::getItemString(const Item *item, bool want_weight) const {
     QString item_str = item->getName().c_str();
     if( this->getPlayer()->getCurrentWeapon() == item ) {
+        item_str += " [Armed]";
+    }
+    else if( this->getPlayer()->getCurrentAmmo() == item ) {
         item_str += " [Armed]";
     }
     else if( this->getPlayer()->getCurrentShield() == item ) {
