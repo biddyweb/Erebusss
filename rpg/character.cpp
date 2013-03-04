@@ -572,6 +572,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     qDebug("    hit");
                                     hits = true;
                                     bool weapon_is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
+                                    if( !weapon_is_magical && ammo != NULL && ammo->isMagical() ) {
+                                        weapon_is_magical = true;
+                                    }
                                     if( !weapon_is_magical && target_npc->requiresMagical() ) {
                                         // weapon has no effect!
                                         weapon_no_effect_magical = true;
@@ -998,7 +1001,7 @@ bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease
     if( health <= 0 ) {
         this->kill(playing_gamestate);
     }
-    else if( this->is_ai && !this->is_fleeing && this->health <= 0.5f*this->max_health ) {
+    else if( this->is_ai && !this->is_fleeing && this->health <= 0.25f*this->max_health ) {
         // NPC flees if fails a bravery test
         int r = rollDice(2, 6, 0);
         if( r > this->getProfileIntProperty(profile_key_B_c) ) {
