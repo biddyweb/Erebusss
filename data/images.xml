@@ -26,7 +26,7 @@
 <image type="item" name="leather_armour" filename="gfx/textures/items/leather_armor.png"/>
 <image type="item" name="metal_armour" filename="gfx/textures/items/metal_armor.png"/>
 <image type="item" name="arrow" filename="gfx/textures/items/arrow.png"
-    xpos="0" ypos="16" width="64" height="32" expected_width="512"
+    xpos="0" ypos="16" width="64" height="32" expected_width="64"
     />
 
 <image type="item" name="bull_statuette" filename="gfx/textures/items/bull_statuette.png"/>
