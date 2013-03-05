@@ -1589,6 +1589,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
     connect(closeButton, SIGNAL(clicked()), playing_gamestate, SLOT(closeSubWindow()));
 
     list->setFocus();
+    list->setCurrentRow(0);
 }
 
 void TradeWindow::updateGoldLabel() {
