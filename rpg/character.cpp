@@ -590,6 +590,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                                 int extra_damage = rollDice(1, 3, 0);
                                                 weapon_damage += extra_damage;
                                             }
+                                            if( ammo != NULL ) {
+                                                // -1 from rating, as default rating is 1, but this should mean no modification
+                                                weapon_damage += (ammo->getRating()-1);
+                                            }
                                         }
                                     }
                                 }
