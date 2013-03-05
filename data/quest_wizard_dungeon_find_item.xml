@@ -576,6 +576,11 @@ This old and heavy tome describes the black arts of Necromancy.
 <!--shadow room-->
 <floorregion shape="rect" rect_x="38.0" rect_y="8.0" rect_w="8.0" rect_h="1.0"/>
 
+<!--<ammo name="Magical Arrows" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
+    x="38.5" y="8.5"
+    magical="true"
+    amount="20"/>-->
+
 <npc name="Shadow" template="Shadow" x="45.0" y="8.5"/>
 
     <scenery name="Door" image_name="door_wood_n" x="45.75" y="8.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
@@ -1430,6 +1435,11 @@ Every so often, one of the prisoners was taken away, never to be returned.
     <item template="Longbow"/>
     <item template="Arrows"/>
     <item template="Arrows"/>
+    <ammo name="Arrows +1" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
+        rating="2"
+        magical="true"
+        base_template="Arrows" worth_bonus="50"
+        amount="5"/>
 </scenery>
 
 <floorregion shape="rect" rect_x="11.0" rect_y="12.0" rect_w="5.0" rect_h="1.0"/>

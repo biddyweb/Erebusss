@@ -475,7 +475,15 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
     <trap type="acid" rating="12"/>
 </scenery>
 
-<item template="Arrows" x="8.0" y="17.5"/>
+<ammo name="Arrows +1" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
+    rating="2"
+    magical="true"
+    base_template="Arrows" worth_bonus="100"
+    amount="10"
+    x="8.5" y="17.5"
+    />
+
+<!--<player_start x="9.0" y="17.0"/>-->
 
 <gold amount="4" x="5.0" y="17.5"/>
 
