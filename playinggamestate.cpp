@@ -2197,7 +2197,8 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
             QString filename = playing_gamestate->getPermadeathSavefilename();
             LOG("permadeath save mode: save as existing file: %s\n", filename.toUtf8().data());
             if( playing_gamestate->saveGame(filename, true) ) {
-                playing_gamestate->showInfoDialog("The game has been successfully saved.");
+                //playing_gamestate->showInfoDialog("The game has been successfully saved.");
+                playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
             }
             else {
                 game_g->showErrorDialog("Failed to save game!");
@@ -2347,7 +2348,8 @@ void SaveGameWindow::clickedSave() {
         LOG("save as existing file: %s\n", filename.toUtf8().data());
         if( playing_gamestate->saveGame(filename, false) ) {
             //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
-            playing_gamestate->showInfoDialog("The game has been successfully saved.");
+            //playing_gamestate->showInfoDialog("The game has been successfully saved.");
+            playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
         }
         else {
             game_g->showErrorDialog("Failed to save game!");
@@ -2410,7 +2412,8 @@ void SaveGameWindow::clickedSaveNew() {
         if( ok ) {
             if( playing_gamestate->saveGame(full_path, true) ) {
                 //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
-                playing_gamestate->showInfoDialog("The game has been successfully saved.");
+                //playing_gamestate->showInfoDialog("The game has been successfully saved.");
+                playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
             }
             else {
                 game_g->showErrorDialog("Failed to save game!");
@@ -3406,7 +3409,8 @@ void PlayingGamestate::quickSave() {
             return;
         }
         if( this->saveGame("quicksave.xml", false) )  {
-            this->showInfoDialog("The game has been successfully saved.");
+            //this->showInfoDialog("The game has been successfully saved.");
+            this->addTextEffect("The game has been successfully saved", this->getPlayer()->getPos(), 5000);
         }
         else {
             game_g->showErrorDialog("Failed to save game!");
