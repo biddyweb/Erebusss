@@ -2424,7 +2424,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     main_stacked_widget(NULL), quickSaveButton(NULL),
-    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -3988,6 +3988,10 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     view->clear();
     //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
 
+    if( !is_savegame ) {
+        this->time_hours = 1; // reset
+    }
+
     qDebug("create new quest\n");
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
@@ -4129,6 +4133,19 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
                     this->journal_ss.clear();
                     this->journal_ss << journal.data();
+                }
+                else if( reader.name() == "time_hours" ) {
+                    if( !is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: time_hours element only allowed in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: time_hours element wasn't expected here");
+                    }
+                    QStringRef time_hours_s = reader.attributes().value("value");
+                    this->time_hours = parseInt(time_hours_s.toString());
+                    LOG("time_hours = %d\n", time_hours);
                 }
                 else if( reader.name() == "game" ) {
                     if( !is_savegame ) {
@@ -5212,7 +5229,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         str << "</body></html>";
         this->showInfoWindow(str.str());
 
-        this->journal_ss << "<p><b>Quest Details: " << quest->getName() << "</b></p>";
+        this->journal_ss << "<hr/><p><b>Quest Details: " << quest->getName() << "</b></p>";
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
@@ -5633,6 +5650,7 @@ void PlayingGamestate::clickedRest() {
             if( time > 1 )
                 str << "s";
             this->addTextEffect(str.str(), player->getPos(), 2000);
+            time_hours += time;
         }
     }
 }
@@ -6278,6 +6296,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                         message << "<br/>";
                         if( talk_item->journal.length() > 0 ) {
                             this->writeJournal("<hr/><p>");
+                            this->writeJournalDate();
                             this->writeJournal(talk_item->journal);
                             this->writeJournal("</p>");
                             talk_item->journal = ""; // stops the journal text being written repeatedly
@@ -6488,6 +6507,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         completed_text = convertToHTML(completed_text);
                         this->showInfoDialog(completed_text);
                         this->writeJournal("<hr/><p>");
+                        this->writeJournalDate();
                         this->writeJournal(completed_text);
                         this->writeJournal("</p>");
                     }
@@ -7559,6 +7579,8 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
     //fprintf(file, "</journal>\n");
     //fprintf(file, "\n");
     stream << "</journal>\n\n";
+
+    stream << "<time_hours value=\"" << this->time_hours << "\"/>";
 
     //fprintf(file, "</savegame>\n");
     stream << "</savegame>\n";

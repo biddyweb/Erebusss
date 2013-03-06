@@ -1460,6 +1460,7 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
     }
     if( this->interaction_journal.length() > 0 ) {
         playing_gamestate->writeJournal("<hr/><p>");
+        playing_gamestate->writeJournalDate();
         playing_gamestate->writeJournal(this->interaction_journal);
         playing_gamestate->writeJournal("</p>");
     }

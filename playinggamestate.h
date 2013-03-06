@@ -444,6 +444,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     Character *player;
     stringstream journal_ss;
+    int time_hours;
 
     vector<QuestInfo> quest_list;
     size_t c_quest_indx;
@@ -639,6 +640,11 @@ public:
 
     void writeJournal(const string &text) {
         journal_ss << text;
+    }
+    void writeJournalDate() {
+        int days = time_hours/24;
+        days++; // start count from 1, not 0
+        journal_ss << "<b>Day " << days << ": </b>";
     }
 
 public slots:
