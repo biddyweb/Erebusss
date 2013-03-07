@@ -1960,12 +1960,64 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         g_layout->addWidget( new QLabel("Courage against terrifying enemies"), 5, 1 );
     }
 
+    int initial_level = player->getInitialLevel();
+    /*map<string, bool> is_enabled; // needed as we can't seem to check with isEnabled() at this stage (perhaps because GUI isn't yet created?)
+    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        string key = (*iter).first;
+        is_enabled[key] = true;
+    }*/
+    if( initial_level != 0 ) {
+        // see which can be improved
+        int n_levels = player->getLevel() - initial_level;
+        qDebug("player has advanced %d levels to level %d", n_levels, player->getLevel());
+        int max_stat_inc = (n_levels+1)/2;
+        max_stat_inc++;
+        qDebug("max_stat_inc = %d", max_stat_inc);
+        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+            string key = (*iter).first;
+            int initial_val = player->getInitialBaseProfile()->getIntProperty(key);
+            int val = player->getBaseProfileIntProperty(key);
+            qDebug("### check stat: %s %d vs %d", key.c_str(), val, initial_val);
+            if( val - initial_val >= max_stat_inc ) {
+                // already increased to max
+                (*iter).second->setEnabled(false);
+                //is_enabled[key] = false;
+            }
+        }
+
+        // check we haven't disabled too many!
+        int n_enabled = 0;
+        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+            //string key = (*iter).first;
+            //if( is_enabled[key] ) {
+            if( (*iter).second->isEnabled() ) {
+                n_enabled++;
+            }
+        }
+        ASSERT_LOGGER(n_enabled >= n_level_up_stats_c);
+        if( n_enabled < n_level_up_stats_c ) {
+            // runtime workaround
+            LOG("error, not enough available level up stats: %d vs %d\n", n_enabled, n_level_up_stats_c);
+            for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+                string key = (*iter).first;
+                (*iter).second->setEnabled(true);
+                //is_enabled[key] = true;
+            }
+        }
+    }
+
     // select some defaults - the min and max
     {
         int max_val = -1, min_val = -1;
         string min_key, max_key;
         for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
             string key = (*iter).first;
+            //qDebug("### check stat: %s", key.c_str());
+            //qDebug("enabled? %d", is_enabled[key]);
+            //if( !is_enabled[key] ) {
+            if( !(*iter).second->isEnabled() ) {
+                continue;
+            }
             int val = player->getBaseProfileIntProperty(key);
             if( min_val == -1 || val < min_val ) {
                 min_val = val;
@@ -1978,10 +2030,19 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         }
         if( min_val == max_val ) {
             // all the same, set some defaults
-            check_boxes[profile_key_FP_c]->setChecked(true);
-            selected.push_back(check_boxes[profile_key_FP_c]);
-            check_boxes[profile_key_BS_c]->setChecked(true);
-            selected.push_back(check_boxes[profile_key_BS_c]);
+            int count = 0;
+            for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+                string key = (*iter).first;
+                if( !(*iter).second->isEnabled() ) {
+                    continue;
+                }
+                check_boxes[key]->setChecked(true);
+                selected.push_back(check_boxes[key]);
+                count++;
+                if( count == n_level_up_stats_c ) {
+                    break;
+                }
+            }
         }
         else {
             check_boxes[max_key]->setChecked(true);
@@ -4496,6 +4557,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         QStringRef max_health_s = reader.attributes().value("max_health");
                         npc->initialiseHealth( parseInt( max_health_s.toString()) );
                         npc->setHealth( parseInt( health_s.toString()) );
+
                         QStringRef FP_s = reader.attributes().value("FP");
                         int FP = parseInt(FP_s.toString());
                         QStringRef BS_s = reader.attributes().value("BS");
@@ -4512,7 +4574,37 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         int B = parseInt(B_s.toString());
                         QStringRef Sp_s = reader.attributes().value("Sp");
                         float Sp = parseFloat(Sp_s.toString());
-                        npc->setProfile(FP, BS, S, A, M, D, B, Sp);
+
+                        QStringRef level_s = reader.attributes().value("level");
+                        int level = parseInt(level_s.toString(), true);
+                        npc->setLevel(level);
+                        QStringRef xp_s = reader.attributes().value("xp");
+                        int xp = parseInt(xp_s.toString(), true);
+                        npc->setXP(xp);
+                        npc->setProfile(FP, BS, S, A, M, D, B, Sp); // must be done after setting level, so that the initial level is set correctly
+
+                        QStringRef initial_level_s = reader.attributes().value("initial_level");
+                        if( initial_level_s.length() > 0 ) {
+                            int initial_level = parseInt(initial_level_s.toString());
+                            QStringRef initial_FP_s = reader.attributes().value("initial_FP");
+                            int initial_FP = parseInt(initial_FP_s.toString());
+                            QStringRef initial_BS_s = reader.attributes().value("initial_BS");
+                            int initial_BS = parseInt(initial_BS_s.toString());
+                            QStringRef initial_S_s = reader.attributes().value("initial_S");
+                            int initial_S = parseInt(initial_S_s.toString());
+                            QStringRef initial_A_s = reader.attributes().value("initial_A");
+                            int initial_A = parseInt(initial_A_s.toString());
+                            QStringRef initial_M_s = reader.attributes().value("initial_M");
+                            int initial_M = parseInt(initial_M_s.toString());
+                            QStringRef initial_D_s = reader.attributes().value("initial_D");
+                            int initial_D = parseInt(initial_D_s.toString());
+                            QStringRef initial_B_s = reader.attributes().value("initial_B");
+                            int initial_B = parseInt(initial_B_s.toString());
+                            QStringRef initial_Sp_s = reader.attributes().value("initial_Sp");
+                            float initial_Sp = parseFloat(initial_Sp_s.toString());
+                            npc->setInitialProfile(initial_level, initial_FP, initial_BS, initial_S, initial_A, initial_M, initial_D, initial_B, initial_Sp);
+                        }
+
                         QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                         QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                         QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -4535,12 +4627,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         QStringRef is_diseased_s = reader.attributes().value("is_diseased");
                         bool is_diseased = parseBool(is_diseased_s.toString(), true);
                         npc->setDiseased(is_diseased);
-                        QStringRef level_s = reader.attributes().value("level");
-                        int level = parseInt(level_s.toString(), true);
-                        npc->setLevel(level);
-                        QStringRef xp_s = reader.attributes().value("xp");
-                        int xp = parseInt(xp_s.toString(), true);
-                        npc->setXP(xp);
                         QStringRef xp_worth_s = reader.attributes().value("xp_worth");
                         int xp_worth = parseInt(xp_worth_s.toString());
                         npc->setXPWorth(xp_worth);
@@ -7232,6 +7318,20 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 float value = iter->second;
                 //fprintf(file, " %s=\"%f\"", key.c_str(), value);
                 stream << " " << key.c_str() << "=\"" << value << "\"";
+            }
+            if( character == this->getPlayer() ) {
+                // only care about initial stats for player for now
+                stream << " initial_level=\"" << character->getInitialLevel() << "\"";
+                for(map<string, int>::const_iterator iter = character->getInitialBaseProfile()->intPropertiesBegin(); iter != character->getInitialBaseProfile()->intPropertiesEnd(); ++iter) {
+                    string key = iter->first;
+                    int value = iter->second;
+                    stream << " initial_" << key.c_str() << "=\"" << value << "\"";
+                }
+                for(map<string, float>::const_iterator iter = character->getInitialBaseProfile()->floatPropertiesBegin(); iter != character->getInitialBaseProfile()->floatPropertiesEnd(); ++iter) {
+                    string key = iter->first;
+                    float value = iter->second;
+                    stream << " initial_" << key.c_str() << "=\"" << value << "\"";
+                }
             }
             int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
             character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);

@@ -168,6 +168,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     can_fly(false),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
+    initial_level(0),
     current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -192,6 +193,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
+    initial_level(0),
     current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
@@ -208,6 +210,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     this->causes_paralysis = character_template.getCausesParalysis();
     this->requires_magical = character_template.requiresMagical();
     this->unholy = character_template.isUnholy();
+    this->initial_level = this->level;
+    this->initial_profile = this->profile;
 }
 
 Character::~Character() {
@@ -1393,7 +1397,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
 
 int Character::getXPForNextLevel() const {
     int value = 100;
-    //int value = 10;
+    //int value = 5;
     for(int i=0;i<level-1;i++) {
         value *= 2;
     }

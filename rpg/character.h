@@ -394,6 +394,10 @@ class Character {
 
     vector<ProfileEffect> profile_effects;
 
+    // used for levelling:
+    Profile initial_profile;
+    int initial_level;
+
     set<Item *> items;
     Weapon *current_weapon;
     Ammo *current_ammo;
@@ -591,6 +595,9 @@ public:
     const Profile *getBaseProfile() const {
         return &this->profile;
     }
+    const Profile *getInitialBaseProfile() const {
+        return &this->initial_profile;
+    }
     void changeBaseProfileIntProperty(const string &key, int change) {
         int value = this->profile.getIntProperty(key);
         value += change;
@@ -617,6 +624,12 @@ public:
     }
     void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->profile.set(FP, BS, S, A, M, D, B, Sp);
+        this->initial_level = this->level;
+        this->initial_profile = this->profile;
+    }
+    void setInitialProfile(int initial_level, int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->initial_level = initial_level;
+        this->initial_profile.set(FP, BS, S, A, M, D, B, Sp);
     }
     void addProfileEffect(const ProfileEffect &profile_effect) {
         this->profile_effects.push_back(profile_effect);
@@ -759,6 +772,9 @@ public:
     }
     void setLevel(int level) {
         this->level = level;
+    }
+    int getInitialLevel() const {
+        return this->initial_level;
     }
     int getXP() const {
         return xp;
