@@ -6097,7 +6097,6 @@ void PlayingGamestate::update() {
             character_action->notifyDead(character);
         }
 
-        delete character; // also removes character from the QGraphicsScene, via the listeners
         if( character == this->player ) {
             if( this->permadeath && this->permadeath_has_savefilename ) {
                 QString full_path = this->permadeath_savefilename;
@@ -6108,22 +6107,25 @@ void PlayingGamestate::update() {
                     LOG("permadeath mode: failed to remove save filename!: %s\n", full_path.toUtf8().data());
                 }
             }
-            this->player = NULL;
-            string death_message;
+            stringstream death_message;
             int r = rand() % 3;
             if( r == 0 ) {
-                death_message = "<p><b>Game over</b></p><p>You have died! Your noble quest has come to an end. Your corpse rots away, left for future brave adventurers to encounter.</p>";
+                death_message << "<p><b>Game over</b></p><p>You have died! Your noble quest has come to an end. Your corpse rots away, left for future brave adventurers to encounter.</p>";
             }
             else if( r == 1 ) {
-                death_message = "<p><b>Game over</b></p><p>You have died! Your adventure has met an untimely end. Better luck next time!</p>";
+                death_message << "<p><b>Game over</b></p><p>You have died! Your adventure has met an untimely end. Better luck next time!</p>";
             }
             else {
-                death_message = "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
+                death_message << "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
             }
-            this->showInfoDialog(death_message, string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
+            death_message << "<p><b>Achieved Level:</b> " << player->getLevel() << "<br/><b>Achieved XP:</b> " << player->getXP() << "</p>";
+            this->showInfoDialog(death_message.str(), string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
+
+            this->player = NULL;
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
         }
+        delete character; // also removes character from the QGraphicsScene, via the listeners
     }
     if( this->player != NULL && delete_characters.size() > 0 ) {
         this->checkQuestComplete();
