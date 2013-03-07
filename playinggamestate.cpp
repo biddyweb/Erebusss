@@ -5647,6 +5647,7 @@ void PlayingGamestate::clickedJournal() {
     }*/
     str << "<h1>Journal</h1>";
     str << this->journal_ss.str();
+    str << "<hr/><p>" << this->getJournalDate() << "</p>";
     str << "</body></html>";
     QWebView *web_view = this->showInfoWindow(str.str());
     web_view->page()->mainFrame()->setScrollBarValue(Qt::Vertical, web_view->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
@@ -5694,6 +5695,15 @@ void PlayingGamestate::clickedOptions() {
     //game_g->getScreen()->getMainWindow()->hide();
 }
 
+int PlayingGamestate::getRestTime() const {
+    int health_restore_percent = 100 - this->player->getHealthPercent();
+    int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
+    if( time == 0 ) {
+        time = 1;
+    }
+    return time;
+}
+
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
     if( c_location->hasEnemies(this) ) {
@@ -5720,11 +5730,7 @@ void PlayingGamestate::clickedRest() {
             }
         }
         if( rest_ok ) {
-            int health_restore_percent = 100 - this->player->getHealthPercent();
-            int time = (int)(health_restore_percent*10.0f/100.0f + 0.5f);
-            if( time == 0 ) {
-                time = 1;
-            }
+            int time = this->getRestTime();
             this->player->restoreHealth();
             this->player->expireProfileEffects();
             // also set all NPCs to no longer be fleeing
@@ -6603,6 +6609,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     }
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true, true);
+                    this->time_hours += 48 + this->getRestTime();
                     this->player->restoreHealth();
                     this->player->expireProfileEffects();
                 }

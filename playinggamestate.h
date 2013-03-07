@@ -494,6 +494,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
     void testFogOfWar();
     bool canSaveHere();
+    int getRestTime() const;
 
     void saveItemProfileBonusInt(QTextStream &stream, const Item *item, const string &key) const;
     void saveItemProfileBonusFloat(QTextStream &stream, const Item *item, const string &key) const;
@@ -641,10 +642,15 @@ public:
     void writeJournal(const string &text) {
         journal_ss << text;
     }
-    void writeJournalDate() {
+    string getJournalDate() {
         int days = time_hours/24;
         days++; // start count from 1, not 0
-        journal_ss << "<b>Day " << days << ": </b>";
+        stringstream ss;
+        ss << "<b>Day " << days << ": </b>";
+        return ss.str();
+    }
+    void writeJournalDate() {
+        journal_ss << getJournalDate();
     }
 
 public slots:
