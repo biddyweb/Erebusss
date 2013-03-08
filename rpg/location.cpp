@@ -1337,16 +1337,27 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
 
 bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_from, bool can_fly) const {
     //qDebug("findFleePoint");
-    bool found = false;
+    //QElapsedTimer timer;
+    //timer.start();
+
+    /*bool found = false;
+    bool stop_search = false;
     Vector2D flee_pos;
     float max_dist = 0.0f;
-    for(vector<PathWayPoint>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
+    for(vector<PathWayPoint>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end() && !stop_search; ++iter) {
         const PathWayPoint path_way_point = *iter;
+        QElapsedTimer timer1;
+        timer1.start();
         vector<Vector2D> new_path = this->calculatePathTo(from, path_way_point.point, NULL, can_fly);
+        if( timer1.elapsed() > 0 ) {
+            qDebug("    time1: %d", timer1.elapsed());
+            qDebug("    path length %d", new_path.size());
+        }
         //qDebug("from: %f, %f", from.x, from.y);
         //qDebug("fleeing_from: %f, %f", fleeing_from.x, fleeing_from.y);
         //qDebug("path_way_point.point: %f, %f", path_way_point.point.x, path_way_point.point.y);
         if( new_path.size() > 0 ) {
+            //qDebug(">>> new_path size %d", new_path.size());
             float dist = (new_path.at(0) - from).magnitude();
             for(size_t i=0;i<new_path.size()-1;i++) {
                 Vector2D p0 = new_path.at(i);
@@ -1360,7 +1371,13 @@ bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_f
             }
 
             if( !found || dist > max_dist + E_TOL_LINEAR ) {
+                QElapsedTimer timer2;
+                timer2.start();
                 vector<Vector2D> new_path2 = this->calculatePathTo(fleeing_from, path_way_point.point, NULL, can_fly); // note, still use can_fly flag here
+                if( timer2.elapsed() > 0 ) {
+                    qDebug("    time2: %d", timer2.elapsed());
+                    qDebug("    path length %d", new_path2.size());
+                }
                 float dist2 = 0.0f;
                 if( new_path2.size() > 0 ) {
                     dist2 += (new_path2.at(0) - fleeing_from).magnitude();
@@ -1381,13 +1398,80 @@ bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_f
                     found = true;
                     flee_pos = path_way_point.point;
                     max_dist = dist;
+                    if( new_path.size() > 1 ) {
+                        // needed for performance - the flee point is good enough if it's not in direct line of sight
+                        stop_search = true;
+                    }
                 }
             }
         }
     }
 
+    qDebug("time: %d", timer.elapsed());
     *result = flee_pos;
     return found;
+    */
+
+    // needs to be fast!
+    Vector2D diff = from - fleeing_from;
+    bool coi = true;
+    if( diff.magnitude() > E_TOL_LINEAR ) {
+        diff.normalise();
+        coi = false;
+    }
+    vector<PathWayPoint> candidates;
+    for(vector<PathWayPoint>::const_iterator iter = path_way_points.begin(); iter != path_way_points.end(); ++iter) {
+        const PathWayPoint path_way_point = *iter;
+        Vector2D dir = path_way_point.point - from;
+        if( dir.magnitude() > npc_radius_c ) {
+            dir.normalise();
+            if( coi || diff % dir > -E_TOL_LINEAR ) {
+                candidates.push_back(path_way_point);
+            }
+        }
+    }
+    if( candidates.size() == 0 ) {
+        return false;
+    }
+    int r = rand() % candidates.size();
+    Vector2D flee_pos = candidates.at(r).point;
+
+    // check that the route won't take us past the flee_from point
+    // note we shouldn't do this when collecting candidates, as would be too slow to do on every way point!
+    vector<Vector2D> new_path = this->calculatePathTo(from, flee_pos, NULL, can_fly);
+    if( new_path.size() == 0 ) {
+        //qDebug("can't get to flee point");
+        return false;
+    }
+    vector<Vector2D> new_path2 = this->calculatePathTo(fleeing_from, flee_pos, NULL, can_fly); // note, still use can_fly flag here
+    bool ok = true;
+    if( new_path2.size() > 0 ) {
+        float dist = (new_path.at(0) - from).magnitude();
+        for(size_t i=0;i<new_path.size()-1;i++) {
+            Vector2D p0 = new_path.at(i);
+            Vector2D p1 = new_path.at(i+1);
+            float this_dist = (p1 - p0).magnitude();
+            dist += this_dist;
+        }
+        float dist2 = (new_path2.at(0) - fleeing_from).magnitude();
+        for(size_t i=0;i<new_path2.size()-1;i++) {
+            Vector2D p0 = new_path2.at(i);
+            Vector2D p1 = new_path2.at(i+1);
+            float this_dist = (p1 - p0).magnitude();
+            dist2 += this_dist;
+        }
+        //qDebug("%f : %f", dist, dist2);
+        if( dist > dist2 + E_TOL_LINEAR ) {
+            ok = false;
+        }
+    }
+    if( !ok ) {
+        return false;
+    }
+
+    //qDebug("time: %d", timer.elapsed());
+    *result = flee_pos;
+    return true;
 }
 
 bool Location::findFreeWayPoint(Vector2D *result, Vector2D from, bool visible, bool can_fly) const {

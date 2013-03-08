@@ -768,9 +768,14 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         this->location->findFreeWayPoint()
                     }*/
                     Vector2D flee_pos;
+                    //qDebug("findFreePoint");
                     if( this->location->findFleePoint(&flee_pos, this->pos, playing_gamestate->getPlayer()->getPos(), this->can_fly) ) {
                         //qDebug("### flee to %f, %f", flee_pos.x, flee_pos.y);
                         this->setDestination(flee_pos.x, flee_pos.y, NULL);
+                    }
+                    else {
+                        // can't run away, return to fighting
+                        this->is_fleeing = false;
                     }
                 }
             }
@@ -838,6 +843,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 new_pos += diff * step;
             }
             if( location->collideWithTransient(this, new_pos) ) {
+                is_fleeing = false; // stop NPC getting trapped when trying to flee
                 if( this->path.size() == 1 && dist <= 2.0f*npc_radius_c + E_TOL_LINEAR ) {
                     // close enough, so stay where we are (to avoid aimlessly circling round a point that we can't reach
                     if( this->listener != NULL ) {
@@ -1012,6 +1018,7 @@ bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease
     else if( this->is_ai && !this->is_fleeing && ( this->health <= 2 || this->health <= 0.1f*this->max_health ) ) {
         // NPC flees if fails a bravery test
         int r = rollDice(2, 6, 0);
+        //r = 13;
         if( r > this->getProfileIntProperty(profile_key_B_c) ) {
             qDebug("NPC %s decides to flee", this->getName().c_str());
             this->is_fleeing = true;
