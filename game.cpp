@@ -1316,10 +1316,19 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     return pixmap;
 }
 
+void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
+    if( newstate == Phonon::ErrorState ) {
+        LOG("Game::stateChanged received Phonon::ErrorState\n");
+        Phonon::MediaObject *mediaObject = static_cast<Phonon::MediaObject *>(this->sender());
+        LOG("    error code %d\n", mediaObject->errorType());
+        LOG("    error string: %s\n", mediaObject->errorString().toStdString().c_str());
+    }
+}
+
 void Game::loadSound(const string &id, const string &filename) {
 #ifndef Q_OS_ANDROID
     Phonon::MediaObject *mediaObject = new Phonon::MediaObject(qApp);
-    //connect(sound, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
+    connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(stateChanged(Phonon::State, Phonon::State)));
     mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
     Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
     Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);

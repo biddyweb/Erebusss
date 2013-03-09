@@ -401,6 +401,11 @@ protected:
     void createPlayerNames();
     void runTest(const string &filename, int test_id);
 
+private slots:
+#ifndef Q_OS_ANDROID
+    void stateChanged(Phonon::State newstate, Phonon::State oldstate) const;
+#endif
+
 public:
     Game();
     ~Game();
