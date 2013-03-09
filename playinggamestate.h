@@ -433,7 +433,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     bool view_transform_3d;
     bool view_walls_3d;
 
-    QStackedWidget *main_stacked_widget;
+    //QStackedWidget *main_stacked_widget;
+    vector<QWidget *> widget_stack;
 
     QPushButton *quickSaveButton;
 

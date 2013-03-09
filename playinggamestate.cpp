@@ -716,8 +716,8 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
     painter.setFont( game_g->getFontScene() );
     if( playing_gamestate->getPlayer() != NULL ) {
         const float bar_x = 16.0f/640.0f;
-        const float bar_y = 32.0f/360.0f;
-        const float portrait_size = 80.0f/1080.f;
+        const float bar_y = 48.0f/360.0f;
+        const float portrait_size = 160.0f/1080.f;
         float text_x = bar_x;
         const float text_y = bar_y - 4.0f/360.0f;
         const Character *player = playing_gamestate->getPlayer();
@@ -1945,19 +1945,34 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         QGridLayout *g_layout = new QGridLayout();
         layout->addLayout(g_layout);
 
-        g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), 0, 0 );
-        g_layout->addWidget( new QLabel("Hand-to-hand combat"), 1, 0 );
-        g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), 2, 0 );
-        g_layout->addWidget( new QLabel("Ranged combat: bows and thrown weapons"), 3, 0 );
-        g_layout->addWidget( addProfileCheckBox(profile_key_S_c), 4, 0 );
-        g_layout->addWidget( new QLabel("How strong you are"), 5, 0 );
+        int row = 0;
+        g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), row++, 0 );
+        // mobile platforms may be too small to fit the labels (e.g., Symbian 640x360)
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("Hand-to-hand combat"), row++, 0 );
+        }
+        g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), row++, 0 );
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("Ranged combat: bows and thrown weapons"), row++, 0 );
+        }
+        g_layout->addWidget( addProfileCheckBox(profile_key_S_c), row++, 0 );
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("How strong you are"), row++, 0 );
+        }
 
-        g_layout->addWidget( addProfileCheckBox(profile_key_M_c), 0, 1 );
-        g_layout->addWidget( new QLabel("Your mental and psychic abilities"), 1, 1 );
-        g_layout->addWidget( addProfileCheckBox(profile_key_D_c), 2, 1 );
-        g_layout->addWidget( new QLabel("Useful for avoiding traps"), 3, 1 );
-        g_layout->addWidget( addProfileCheckBox(profile_key_B_c), 4, 1 );
-        g_layout->addWidget( new QLabel("Courage against terrifying enemies"), 5, 1 );
+        row = 0;
+        g_layout->addWidget( addProfileCheckBox(profile_key_M_c), row++, 1 );
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("Your mental and psychic abilities"), row++, 1 );
+        }
+        g_layout->addWidget( addProfileCheckBox(profile_key_D_c), row++, 1 );
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("Useful for avoiding traps"), row++, 1 );
+        }
+        g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
+        if( !mobile_c ) {
+            g_layout->addWidget( new QLabel("Courage against terrifying enemies"), row++, 1 );
+        }
     }
 
     int initial_level = player->getInitialLevel();
@@ -2487,7 +2502,7 @@ void SaveGameWindow::clickedSaveNew() {
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
-    main_stacked_widget(NULL), quickSaveButton(NULL),
+    /*main_stacked_widget(NULL),*/ quickSaveButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
@@ -2561,12 +2576,20 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     LOG("mainwindow: %d\n", mainwindow);
     centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
     window->setCentralWidget(centralWidget);*/
-    this->main_stacked_widget = new QStackedWidget();
-    main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(main_stacked_widget);
+    /*if( mobile_c ) {
+        this->main_stacked_widget = new QStackedWidget();
+        main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+        window->setCentralWidget(main_stacked_widget);
+    }*/
 
     QWidget *centralWidget = new QWidget();
-    main_stacked_widget->addWidget(centralWidget);
+    /*if( mobile_c ) {
+        main_stacked_widget->addWidget(centralWidget);
+    }
+    else*/ {
+        window->setCentralWidget(centralWidget);
+    }
+    this->widget_stack.push_back(centralWidget);
 
     QHBoxLayout *layout = new QHBoxLayout();
     centralWidget->setLayout(layout);
@@ -2960,11 +2983,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         }
     }
 
-    this->portrait_images["portrait_barbarian"] = game_g->loadImage("gfx/portraits/barbarian_m0.png");
-    this->portrait_images["portrait_elf"] = game_g->loadImage("gfx/portraits/elf_f0.png");
-    this->portrait_images["portrait_halfling"] = game_g->loadImage("gfx/portraits/halfling_f0.png");
-    this->portrait_images["portrait_ranger"] = game_g->loadImage("gfx/portraits/ranger_m0.png");
-    this->portrait_images["portrait_warrior"] = game_g->loadImage("gfx/portraits/warrior_m0.png");
+    this->portrait_images["portrait_barbarian"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/barbarian_m0.png");
+    this->portrait_images["portrait_elf"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/elf_f0.png");
+    this->portrait_images["portrait_halfling"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/halfling_f0.png");
+    this->portrait_images["portrait_ranger"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/ranger_m0.png");
+    this->portrait_images["portrait_warrior"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/warrior_m0.png");
 
     /*{
         // force all lazily loaded data to be loaded
@@ -3180,7 +3203,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     gui_overlay->setProgress(40);
     qApp->processEvents();
 
-    LOG("load Spells");
+    LOG("load Spells\n");
     {
         QFile file(QString(DEPLOYMENT_PATH) + "data/spells.xml");
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
@@ -3252,10 +3275,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     gui_overlay->setProgress(70);
     qApp->processEvents();
 
-    LOG("load sound effects\n");
     //if( !mobile_c )
     if( game_g->isSoundEnabled() )
     {
+        LOG("load sound effects\n");
         game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
         game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav");
         game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav");
@@ -3272,6 +3295,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav"); // strange pauses on Symbian?; conflicts with other sounds on Android
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
+    }
+    else {
+        LOG("sound is disabled\n");
     }
 
     gui_overlay->setProgress(90);
@@ -5799,7 +5825,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
 
 void PlayingGamestate::closeSubWindow() {
     LOG("closeSubWindow\n");
-    int n_stacked_widgets = this->main_stacked_widget->count();
+    /*int n_stacked_widgets = this->main_stacked_widget->count();
     if( n_stacked_widgets > 1 ) {
         QWidget *subwindow = this->main_stacked_widget->widget(n_stacked_widgets-1);
         this->main_stacked_widget->removeWidget(subwindow);
@@ -5809,15 +5835,38 @@ void PlayingGamestate::closeSubWindow() {
             this->view->setEnabled(true);
             this->view->grabKeyboard();
         }
+    }*/
+    int n_stacked_widgets = this->widget_stack.size();
+    if( n_stacked_widgets > 1 ) {
+        QWidget *subwindow = this->widget_stack.at(n_stacked_widgets-1);
+        /*if( this->main_stacked_widget != NULL ) {
+            this->main_stacked_widget->removeWidget(subwindow);
+        }*/
+        subwindow->deleteLater();
+        this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1);
+        if( n_stacked_widgets == 2 ) {
+            game_g->getScreen()->getMainWindow()->activateWindow(); // needed for Symbian at least
+            game_g->getScreen()->setPaused(false, true);
+            this->view->setEnabled(true);
+            this->view->grabKeyboard();
+        }
     }
 }
 
 void PlayingGamestate::closeAllSubWindows() {
     LOG("closeAllSubWindows");
-    while( this->main_stacked_widget->count() > 1 ) {
+    /*while( this->main_stacked_widget->count() > 1 ) {
         QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
         this->main_stacked_widget->removeWidget(subwindow);
         subwindow->deleteLater();
+    }*/
+    while( this->widget_stack.size() > 1 ) {
+        QWidget *subwindow = this->widget_stack.at(this->widget_stack.size()-1);
+        /*if( this->main_stacked_widget != NULL ) {
+            this->main_stacked_widget->removeWidget(subwindow);
+        }*/
+        subwindow->deleteLater();
+        this->widget_stack.erase(this->widget_stack.begin()+this->widget_stack.size()-1);
     }
     game_g->getScreen()->setPaused(false, true);
     this->view->setEnabled(true);
@@ -7710,8 +7759,33 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 }
 
 void PlayingGamestate::addWidget(QWidget *widget) {
-    this->main_stacked_widget->addWidget(widget);
-    this->main_stacked_widget->setCurrentWidget(widget);
+    this->widget_stack.push_back(widget);
+    /*if( mobile_c ) {
+        this->main_stacked_widget->addWidget(widget);
+        this->main_stacked_widget->setCurrentWidget(widget);
+    }
+    else*/ {
+        MainWindow *window = game_g->getScreen()->getMainWindow();
+        //widget->setParent(window);
+        widget->setParent(window->centralWidget());
+        widget->setWindowModality(Qt::ApplicationModal);
+        //widget->setWindowFlags(Qt::Dialog);
+        //widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+        if( mobile_c ) {
+            // always fullscreen
+            widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+            widget->showFullScreen();
+        }
+        else if( window->isFullScreen() ) {
+            widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+            //widget->showFullScreen();
+            widget->show();
+        }
+        else {
+            widget->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+            widget->show();
+        }
+    }
     this->view->setEnabled(false);
     this->view->releaseKeyboard();
 }
