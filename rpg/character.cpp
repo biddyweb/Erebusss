@@ -1399,6 +1399,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
     if( this == playing_gamestate->getPlayer() ) {
         LOG("player advances to level %d (xp %d)\n", level, xp);
         new LevelUpWindow(playing_gamestate);
+        game_g->getScreen()->setPaused(true, true);
     }
 }
 
