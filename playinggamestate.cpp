@@ -795,7 +795,7 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
 StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate)
 {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, true);
 
     const Character *player = playing_gamestate->getPlayer();
 
@@ -950,7 +950,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     armButton(NULL), wearButton(NULL), useButton(NULL), dropButton(NULL), infoButton(NULL),
     view_type(VIEWTYPE_ALL)
 {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, true);
 
     Character *player = playing_gamestate->getPlayer();
 
@@ -1455,7 +1455,7 @@ void ItemsWindow::itemIsDeleted(size_t index) {
 TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs) :
     playing_gamestate(playing_gamestate), goldLabel(NULL), weightLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
 {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, true);
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -1701,7 +1701,7 @@ void TradeWindow::clickedInfo() {
 ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items) :
     playing_gamestate(playing_gamestate), list(NULL), items(items), player_list(NULL), weightLabel(NULL)
 {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, false);
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -1922,7 +1922,7 @@ const int n_level_up_stats_c = 2;
 
 LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate), closeButton(NULL) {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, false);
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -2158,7 +2158,7 @@ void LevelUpWindow::clickedLevelUp() {
 CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
     playing_gamestate(playing_gamestate)
 {
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, true);
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -2286,7 +2286,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
         return;
     }
 
-    playing_gamestate->addWidget(this);
+    playing_gamestate->addWidget(this, false);
 
     QFont font = game_g->getFontBig();
     this->setFont(font);
@@ -2370,7 +2370,7 @@ void SaveGameWindow::requestNewSaveGame() {
     }*/
 
     QWidget *subwindow = new QWidget();
-    playing_gamestate->addWidget(subwindow);
+    playing_gamestate->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -5686,7 +5686,7 @@ void PlayingGamestate::clickedOptions() {
     game_g->getScreen()->setPaused(true, true);
 
     QWidget *subwindow = new QWidget();
-    this->addWidget(subwindow);
+    this->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -5819,7 +5819,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
 
-    this->addWidget(subwindow); // should be last, so resizing is already correct - needed for things like scrolling to bottom to work
+    this->addWidget(subwindow, false); // should be last, so resizing is already correct - needed for things like scrolling to bottom to work
     return label;
 }
 
@@ -6418,7 +6418,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                     }
                     buttons.push_back("Goodbye");
                     InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true, true);
-                    this->addWidget(dialog);
+                    this->addWidget(dialog, false);
                     dialog->scrollToBottom();
                     int result = dialog->exec();
                     this->closeSubWindow();
@@ -6693,7 +6693,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                         //if( this->askQuestionDialog(dialog_text) ) {
                         //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
                         InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false, true);
-                        this->addWidget(dialog);
+                        this->addWidget(dialog, false);
                         int result = dialog->exec();
                         LOG("scenery iteraction dialog returns %d\n", result);
                         this->closeSubWindow();
@@ -7758,7 +7758,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
     return true;
 }
 
-void PlayingGamestate::addWidget(QWidget *widget) {
+void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
     this->widget_stack.push_back(widget);
     /*if( mobile_c ) {
         this->main_stacked_widget->addWidget(widget);
@@ -7778,10 +7778,15 @@ void PlayingGamestate::addWidget(QWidget *widget) {
         }
         else if( window->isFullScreen() ) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-            //widget->showFullScreen();
-            widget->show();
+            if( fullscreen_hint ) {
+                widget->showFullScreen();
+            }
+            else {
+                widget->show();
+            }
         }
         else {
+            // always windowed
             widget->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
             widget->show();
         }
@@ -7975,7 +7980,7 @@ void PlayingGamestate::showInfoDialog(const string &message) {
 void PlayingGamestate::showInfoDialog(const string &message, const string &picture) {
     LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
     InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message, picture);
-    this->addWidget(dialog);
+    this->addWidget(dialog, false);
     dialog->exec();
     this->closeSubWindow();
 }
@@ -7983,7 +7988,7 @@ void PlayingGamestate::showInfoDialog(const string &message, const string &pictu
 bool PlayingGamestate::askQuestionDialog(const string &message) {
     LOG("PlayingGamestate::askQuestionDialog(%s)\n", message.c_str());
     InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(message);
-    this->addWidget(dialog);
+    this->addWidget(dialog, false);
     int result = dialog->exec();
     LOG("askQuestionDialog returns %d\n", result);
     this->closeSubWindow();
