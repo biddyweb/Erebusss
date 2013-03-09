@@ -576,6 +576,7 @@ public:
     void actionCommand(bool pickup_only);
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget, bool fullscreen_hint);
+    void addTextEffect(const string &text, int duration_ms);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b);
     void playSound(const string &sound_effect);
