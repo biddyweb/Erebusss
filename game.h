@@ -10,6 +10,14 @@
 
 #include "androidaudio/androidaudio.h"
 
+// hack for Android, as moc doesn't seem to recognise precompiler, so can't be made to ignore stateChanged().
+
+class Phonon {
+ public:
+    enum State {
+    };
+};
+
 #else
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
@@ -402,9 +410,7 @@ protected:
     void runTest(const string &filename, int test_id);
 
 private slots:
-#ifndef Q_OS_ANDROID
     void stateChanged(Phonon::State newstate, Phonon::State oldstate) const;
-#endif
 
 public:
     Game();

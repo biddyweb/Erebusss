@@ -1317,12 +1317,14 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
 }
 
 void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
+#ifndef Q_OS_ANDROID
     if( newstate == Phonon::ErrorState ) {
         LOG("Game::stateChanged received Phonon::ErrorState\n");
         Phonon::MediaObject *mediaObject = static_cast<Phonon::MediaObject *>(this->sender());
         LOG("    error code %d\n", mediaObject->errorType());
         LOG("    error string: %s\n", mediaObject->errorString().toStdString().c_str());
     }
+#endif
 }
 
 void Game::loadSound(const string &id, const string &filename) {
