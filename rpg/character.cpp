@@ -908,9 +908,22 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     return false;
 }
 
+void Character::setTargetNPC(Character *target_npc) {
+    if( this->target_npc != target_npc ) {
+        this->target_npc = target_npc;
+        if( this->action != ACTION_NONE ) {
+            this->action = ACTION_NONE;
+            if( this->listener != NULL ) {
+                this->listener->characterSetAnimation(this, this->listener_data, "", true);
+            }
+        }
+    }
+}
+
 void Character::notifyDead(const Character *character) {
-    if( character == this->target_npc )
-        this->target_npc = NULL;
+    if( character == this->target_npc ) {
+        this->setTargetNPC(NULL);
+    }
     if( character == this->casting_spell_target )
         this->casting_spell_target = NULL;
 }

@@ -576,17 +576,7 @@ public:
     }
     Vector2D getDestination() const;
     bool update(PlayingGamestate *playing_gamestate);
-    void setTargetNPC(Character *target_npc) {
-        if( this->target_npc != target_npc ) {
-            this->target_npc = target_npc;
-            if( this->action != ACTION_NONE ) {
-                this->action = ACTION_NONE;
-                if( this->listener != NULL ) {
-                    this->listener->characterSetAnimation(this, this->listener_data, "", true);
-                }
-            }
-        }
-    }
+    void setTargetNPC(Character *target_npc);
     Character *getTargetNPC() const {
         return this->target_npc;
     }
