@@ -16,17 +16,26 @@ public:
 };
 
 bool MyApplication::event(QEvent *event) {
+    /* Activate/deactivate events aren't received on Android when we switch applications. But worse, we seem
+     * to receive these events on Android when we don't on Windows, e.g., when opening/closing dialogs, which
+     * can lead to a bug where the game pauses unexpectedly (e.g., talk to an NPC, say at least one thing, then
+     * close the talk window - the game will still be paused).
+     */
     if( event->type() == QEvent::ApplicationActivate ) {
+#if !defined(Q_OS_ANDROID)
         LOG("application activated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
             game_g->activate(true);
         }
+#endif
     }
     else if( event->type() == QEvent::ApplicationDeactivate ) {
+#if !defined(Q_OS_ANDROID)
         LOG("application deactivated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
             game_g->activate(false);
         }
+#endif
     }
     return QApplication::event(event);
 }
