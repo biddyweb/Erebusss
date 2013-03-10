@@ -5651,16 +5651,16 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
         object->setVisible(false);
     }
     int character_size = std::max(object->getWidth(), object->getHeight());
-    //const int off_x = 64;
+    float ratio_w = object->getWidth()/(float)character_size;
+    float ratio_h = object->getHeight()/(float)character_size;
     const int off_x = 64 - 32;
-    //const int off_y = 92;
     const int off_y = 94 - 40;
     if( this->view_transform_3d ) {
         const float desired_size = 0.75f;
         float character_scale = desired_size / (float)character_size;
         qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
         {
-            Vector2D scale_centre(-desired_size*off_x/64.0f, -2.0f*desired_size*off_y/64.0f);
+            Vector2D scale_centre(-desired_size*ratio_w*off_x/64.0f, -2.0f*desired_size*ratio_h*off_y/64.0f);
             QTransform transform;
             transform.translate(scale_centre.x, scale_centre.y);
             transform.scale(character_scale, 2.0f*character_scale);
@@ -5672,8 +5672,7 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
         const float desired_size = 1.0f;
         float character_scale = desired_size / (float)character_size;
         qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
-        //object->setTransformOriginPoint(-desired_size*off_x/128.0f, -desired_size*off_y/128.0f);
-        object->setTransformOriginPoint(-desired_size*off_x/64.0f, -desired_size*off_y/64.0f);
+        object->setTransformOriginPoint(-desired_size*ratio_w*off_x/64.0f, -desired_size*ratio_h*off_y/64.0f);
         object->setScale(character_scale);
     }
 
