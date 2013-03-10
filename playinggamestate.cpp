@@ -6888,6 +6888,8 @@ void PlayingGamestate::cycleTargetNPC() {
             Character *character = *iter;
             if( character == player )
                 continue;
+            if( !character->isHostile() )
+                continue;
             if( !character->isVisible() )
                 continue;
             if( first_npc == NULL ) {
