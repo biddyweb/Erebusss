@@ -3328,6 +3328,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav"); // strange pauses on Symbian?; conflicts with other sounds on Android
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
+        LOG("done loading sound effects\n");
     }
     else {
         LOG("sound is disabled\n");
