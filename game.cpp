@@ -1330,12 +1330,22 @@ void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
 void Game::loadSound(const string &id, const string &filename) {
 #ifndef Q_OS_ANDROID
     Phonon::MediaObject *mediaObject = new Phonon::MediaObject(qApp);
-    connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(stateChanged(Phonon::State, Phonon::State)));
-    mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
-    Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
-    Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);
-    Sound *sound = new Sound(mediaObject, audioOutput);
-    this->sound_effects[id] = sound;
+    if( mediaObject == NULL ) {
+        LOG("failed to create media object for: %s\n", filename.c_str());
+    }
+    else {
+        connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(stateChanged(Phonon::State, Phonon::State)));
+        mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
+        Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
+        if( audioOutput == NULL ) {
+            LOG("failed to create audio output for: %s\n", filename.c_str());
+        }
+        else {
+            Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);
+            Sound *sound = new Sound(mediaObject, audioOutput);
+            this->sound_effects[id] = sound;
+        }
+    }
 #else
 
     Sound *sound = androidAudio.loadSound(filename.c_str());
