@@ -471,6 +471,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QPixmap smoke_pixmap;
     QPixmap fireball_pixmap;
+    QPixmap target_pixmap;
+    QGraphicsItem *target_item;
 
     int time_last_complex_update_ms; // see update() for details
 
@@ -614,8 +616,8 @@ public:
     void addCharacterAction(CharacterAction *character_action) {
         this->character_actions.push_back(character_action);
     }
-    void addGraphicsItem(QGraphicsItem *object, float width);
-    QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width);
+    void addGraphicsItem(QGraphicsItem *object, float width, bool undo_3d);
+    QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width, bool undo_3d, bool on_ground);
     QGraphicsItem *addSpellGraphic(Vector2D pos);
 
     void addStandardItem(Item *item);

@@ -21,6 +21,11 @@
 #define DEBUG_SHOW_PATH
 #endif
 
+const float z_value_tilemap = E_TOL_LINEAR;
+const float z_value_scenery_background = 2.0f*E_TOL_LINEAR;
+const float z_value_items = 3.0f*E_TOL_LINEAR; // so items appear above DRAWTYPE_BACKGROUND Scenery
+const float z_value_gui = 4.0f*E_TOL_LINEAR; // so items appear above DRAWTYPE_BACKGROUND Scenery
+
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
@@ -151,7 +156,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     AnimatedObject *object = new AnimatedObject();
     character_action->object = object;
     object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(projectile_key) );
-    playing_gamestate->addGraphicsItem(object, icon_width);
+    playing_gamestate->addGraphicsItem(object, icon_width, true);
 
     Vector2D dir = character_action->dest_pos - character_action->source_pos;
     Direction direction = directionFromVecDir(dir);
@@ -2504,7 +2509,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     /*main_stacked_widget(NULL),*/ quickSaveButton(NULL),
-    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL), time_last_complex_update_ms(0),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
+    target_item(NULL),
+    time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
@@ -2549,6 +2556,26 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         painter.fillRect(0, 0, res_c, res_c, radialGrad);
         painter.end();
         this->fireball_pixmap = pixmap;
+    }
+    {
+#if defined(Q_OS_SYMBIAN)
+        const int res_c = 15;
+#else
+        const int res_c = 63;
+#endif
+        QPixmap pixmap(res_c, res_c);
+        pixmap.fill(Qt::transparent);
+        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+        radialGrad.setColorAt(0.0, QColor(255, 0, 0, 0));
+        radialGrad.setColorAt(0.7, QColor(255, 0, 0, 0));
+        radialGrad.setColorAt(0.75, QColor(255, 0, 0, 160));
+        radialGrad.setColorAt(0.95, QColor(255, 0, 0, 160));
+        radialGrad.setColorAt(1.0, QColor(255, 0, 0, 0));
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.fillRect(0, 0, res_c, res_c, radialGrad);
+        painter.end();
+        this->target_pixmap = pixmap;
     }
 
     // create UI
@@ -3911,7 +3938,7 @@ void PlayingGamestate::setupView() {
                     //qDebug("### %d, %d :")
                     QGraphicsPixmapItem *item = new QGraphicsPixmapItem(tile);
                     item->setPos(tilemap->getX() + x, tilemap->getY() + y);
-                    item->setZValue(E_TOL_LINEAR);
+                    item->setZValue(z_value_tilemap);
                     float item_scale = 1.0f / item->boundingRect().width();
                     item->setScale(item_scale);
                     scene->addItem(item);
@@ -5453,9 +5480,9 @@ void PlayingGamestate::createRandomQuest() {
     LOG("done\n");
 }
 
-void PlayingGamestate::addGraphicsItem(QGraphicsItem *object, float width) {
+void PlayingGamestate::addGraphicsItem(QGraphicsItem *object, float width, bool undo_3d) {
     float item_scale = width / object->boundingRect().width();
-    if( this->view_transform_3d ) {
+    if( this->view_transform_3d && undo_3d ) {
         // undo the 3D transform
         float centre_x = 0.5f*object->boundingRect().width();
         float centre_y = 0.5f*object->boundingRect().height();
@@ -5484,9 +5511,9 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item, boo
         }*/
         float icon_width = item->getIconWidth();
         object->setPos(item->getX(), item->getY());
-        object->setZValue(2.0f*E_TOL_LINEAR); // so items appear above DRAWTYPE_BACKGROUND Scenery
+        object->setZValue(z_value_items);
         object->setVisible(visible);
-        this->addGraphicsItem(object, icon_width);
+        this->addGraphicsItem(object, icon_width, true);
     }
 }
 
@@ -5522,7 +5549,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         }
         else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
             //qDebug("background: %s", scenery->getName().c_str());
-            z_value = E_TOL_LINEAR;
+            z_value = z_value_scenery_background;
         }
         object->setZValue(z_value);
         float scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
@@ -5898,6 +5925,31 @@ void PlayingGamestate::testFogOfWar() {
 }
 
 void PlayingGamestate::update() {
+    // update target item
+    if( this->player != NULL ) {
+        if( this->player->getTargetNPC() != NULL ) {
+            Vector2D target_pos = this->player->getTargetNPC()->getPos();
+            if( this->target_item == NULL ) {
+                this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
+            }
+            else {
+                this->target_item->setPos(target_pos.x, target_pos.y);
+            }
+        }
+        else {
+            if( this->target_item != NULL ) {
+                delete this->target_item;
+                this->target_item = NULL;
+            }
+        }
+    }
+    else {
+        if( this->target_item != NULL ) {
+            delete this->target_item;
+            this->target_item = NULL;
+        }
+    }
+
     if( this->player == NULL ) {
         return;
     }
@@ -6185,6 +6237,7 @@ void PlayingGamestate::update() {
         qDebug("deleted characters took %d", timer_dcharacters.elapsed());
 #endif
     //qDebug("PlayingGamestate::update() exit");
+
 }
 
 void PlayingGamestate::updateInput() {
@@ -7866,19 +7919,24 @@ void PlayingGamestate::advanceQuest() {
     ASSERT_LOGGER(this->c_quest_indx < this->quest_list.size());
 }
 
-QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width) {
+QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width, bool undo_3d, bool on_ground) {
     qDebug("PlayingGamestate::addPixmapGraphic(%f, %f, %f)", pos.x, pos.y, width);
     QGraphicsPixmapItem *object = new QGraphicsPixmapItem();
     object->setPixmap(pixmap);
     object->setPos(pos.x, pos.y);
-    object->setZValue(pos.y + 1000.0f);
-    this->addGraphicsItem(object, width);
+    if( on_ground ) {
+        object->setZValue(z_value_gui);
+    }
+    else {
+        object->setZValue(pos.y + 1000.0f);
+    }
+    this->addGraphicsItem(object, width, undo_3d);
     return object;
 }
 
 QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
     qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
-    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.5f);
+    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.5f, true, false);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
