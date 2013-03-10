@@ -6937,7 +6937,8 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         // search for clicking on an NPC
         if( !done )
         {
-            //float min_dist = 0.0f;
+            //qDebug("look for clicking on NPCs");
+            float min_dist = 0.0f;
             Character *target_npc = NULL;
             for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
                 Character *character = *iter;
@@ -6960,10 +6961,13 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                 AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
                 if( object->contains(object->mapFromScene(QPointF(scene_x, scene_y)) ) ) {
                     // clicked on this character
+                    float this_dist = (character->getPos() - dest).magnitude();
+                    //qDebug("  clicked on npc, dist: %f", this_dist);
+                    if( !done || this_dist < min_dist )
                     {
                         done = true;
                         target_npc = character;
-                        //min_dist = 0.0f;
+                        min_dist = this_dist;
                     }
                 }
             }
