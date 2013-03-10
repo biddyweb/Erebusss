@@ -576,6 +576,7 @@ public:
     virtual void locationAddCharacter(const Location *location, Character *character);
 
     void actionCommand(bool pickup_only);
+    void cycleTargetNPC();
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget, bool fullscreen_hint);
     void addTextEffect(const string &text, int duration_ms);

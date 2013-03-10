@@ -437,6 +437,11 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
             this->playing_gamestate->actionCommand(true);
         }
         break;
+    case Qt::Key_N:
+        done = true;
+        if( done ) {
+            this->playing_gamestate->cycleTargetNPC();
+        }
     case Qt::Key_PageDown:
     case Qt::Key_PageUp:
         // we don't need to record these keys, but we set done to true, so that it isn't processed by the QGraphicsView
@@ -6871,6 +6876,41 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
         }
 
     }
+}
+
+void PlayingGamestate::cycleTargetNPC() {
+    if( this->player != NULL ) {
+        Character *current_target = this->player->getTargetNPC();
+        this->player->setTargetNPC(NULL);
+        bool was_last = false;
+        Character *first_npc = NULL;
+        for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
+            Character *character = *iter;
+            if( character == player )
+                continue;
+            if( !character->isVisible() )
+                continue;
+            if( first_npc == NULL ) {
+                first_npc = character;
+            }
+            if( current_target == NULL ) {
+                this->player->setTargetNPC(character);
+                break;
+            }
+            else if( current_target == character ) {
+                was_last = true;
+            }
+            else if( was_last ) {
+                this->player->setTargetNPC(character);
+                break;
+            }
+        }
+        if( this->player->getTargetNPC() == NULL && first_npc != NULL ) {
+            // reset to first NPC
+            this->player->setTargetNPC(first_npc);
+        }
+    }
+
 }
 
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
