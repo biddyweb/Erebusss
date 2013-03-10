@@ -337,7 +337,7 @@ void OptionsGamestate::clickedStartGame() {
     int difficulty_id = this->difficultyComboBox->currentIndex();
     LOG("difficulty_id: %d\n", difficulty_id);
     bool permadeath = this->permadeathCheckBox->isChecked();
-    ASSERT_LOGGER(difficulty_id > 0);
+    ASSERT_LOGGER(difficulty_id >= 0);
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
     Difficulty difficulty = (Difficulty)difficulty_id;
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
