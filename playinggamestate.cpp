@@ -5932,7 +5932,7 @@ void PlayingGamestate::testFogOfWar() {
 void PlayingGamestate::update() {
     // update target item
     if( this->player != NULL ) {
-        if( this->player->getTargetNPC() != NULL ) {
+        if( this->player->getTargetNPC() != NULL && this->player->getTargetNPC()->isHostile() ) {
             Vector2D target_pos = this->player->getTargetNPC()->getPos();
             if( this->target_item == NULL ) {
                 this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
