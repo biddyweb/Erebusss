@@ -2718,8 +2718,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         v_layout->addWidget(optionsButton);
     }
 
-    //layout->addWidget(view);
-    {
+    layout->addWidget(view);
+    /*{
         QVBoxLayout *v_layout = new QVBoxLayout();
         layout->addLayout(v_layout);
 
@@ -2773,6 +2773,63 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
             connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
             h_layout->addWidget(centreButton);
         }
+    }*/
+
+    {
+        QGridLayout *layout = new QGridLayout();
+        view->setLayout(layout);
+
+        layout->setColumnStretch(0, 1);
+        layout->setRowStretch(1, 1);
+        int col = 1;
+
+        if( !this->permadeath ) {
+            quickSaveButton = new QPushButton("QS");
+            game_g->initButton(quickSaveButton);
+            quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            quickSaveButton->setToolTip("Quick-save");
+#endif
+            quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
+            layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
+        }
+
+        QPushButton *zoomoutButton = new QPushButton("-");
+        game_g->initButton(zoomoutButton);
+        zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        zoomoutButton->setToolTip("Zoom out");
+#endif
+        zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
+        layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
+
+        QPushButton *zoominButton = new QPushButton("+");
+        game_g->initButton(zoominButton);
+        zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        zoominButton->setToolTip("Zoom in");
+#endif
+        zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
+        layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
+
+        QPushButton *centreButton = new QPushButton("O");
+        game_g->initButton(centreButton);
+        centreButton->setShortcut(QKeySequence(Qt::Key_C));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        centreButton->setToolTip("Centre view on your player's location");
+#endif
+        centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
+        layout->addWidget(centreButton, 0, col++, Qt::AlignCenter);
+
+        //v_layout->addStretch();
     }
 
     view->showFullScreen();
