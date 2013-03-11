@@ -472,6 +472,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     QPixmap smoke_pixmap;
     QPixmap fireball_pixmap;
     QPixmap target_pixmap;
+    AnimationLayer *target_animation_layer;
     QGraphicsItem *target_item;
 
     int time_last_complex_update_ms; // see update() for details

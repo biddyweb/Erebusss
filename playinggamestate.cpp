@@ -2515,7 +2515,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     view_transform_3d(false), view_walls_3d(false),
     /*main_stacked_widget(NULL),*/ quickSaveButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
-    target_item(NULL),
+    target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
     cheat_mode(cheat_mode)
 {
@@ -2568,7 +2568,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
 #else
         const int res_c = 63;
 #endif
-        QPixmap pixmap(res_c, res_c);
+        /*QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
         QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
         radialGrad.setColorAt(0.0, QColor(255, 0, 0, 0));
@@ -2580,7 +2580,33 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         painter.setPen(Qt::NoPen);
         painter.fillRect(0, 0, res_c, res_c, radialGrad);
         painter.end();
-        this->target_pixmap = pixmap;
+        this->target_pixmap = pixmap;*/
+        int n_frames = 4;
+        QPixmap full_pixmap(n_frames*res_c, res_c);
+        full_pixmap.fill(Qt::transparent);
+        for(int i=0;i<n_frames;i++) {
+            QPixmap pixmap(res_c, res_c);
+            pixmap.fill(Qt::transparent);
+            QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+            float alpha = i/(float)(n_frames-1);
+            float size = (1.0f-alpha)*0.6f + alpha*1.0f;
+            radialGrad.setColorAt(0.0*size, QColor(255, 0, 0, 0));
+            radialGrad.setColorAt(0.7*size, QColor(255, 0, 0, 0));
+            radialGrad.setColorAt(0.75*size, QColor(255, 0, 0, 160));
+            radialGrad.setColorAt(0.95*size, QColor(255, 0, 0, 160));
+            radialGrad.setColorAt(1.0*size, QColor(255, 0, 0, 0));
+            QPainter painter(&pixmap);
+            painter.setPen(Qt::NoPen);
+            painter.fillRect(0, 0, res_c, res_c, radialGrad);
+            painter.end();
+            QPainter full_painter(&full_pixmap);
+            full_painter.drawPixmap(i*res_c, 0, pixmap);
+            full_painter.end();
+        }
+        this->target_pixmap = full_pixmap;
+        vector<AnimationLayerDefinition> target_animation_layer_definition;
+        target_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, n_frames, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+        this->target_animation_layer = AnimationLayer::create(this->target_pixmap, target_animation_layer_definition, true, 0, 0, res_c, res_c, res_c, res_c, n_frames*res_c, 1);
     }
 
     // create UI
@@ -3439,6 +3465,9 @@ PlayingGamestate::~PlayingGamestate() {
     for(vector<CharacterAction *>::iterator iter = this->character_actions.begin(); iter != this->character_actions.end(); ++iter) {
         CharacterAction *character_action = *iter;
         delete character_action;
+    }
+    if( this->target_animation_layer != NULL ) {
+        delete this->target_animation_layer;
     }
     /*for(map<string, AnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
         AnimationLayer *animation_layer = (*iter).second;
@@ -5935,7 +5964,12 @@ void PlayingGamestate::update() {
         if( this->player->getTargetNPC() != NULL && this->player->getTargetNPC()->isHostile() ) {
             Vector2D target_pos = this->player->getTargetNPC()->getPos();
             if( this->target_item == NULL ) {
-                this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
+                //this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
+                AnimatedObject *object = new AnimatedObject();
+                this->target_item = object;
+                object->addAnimationLayer( target_animation_layer );
+                object->setZValue(z_value_gui);
+                this->addGraphicsItem(object, 0.5f, false);
             }
             else {
                 this->target_item->setPos(target_pos.x, target_pos.y);
