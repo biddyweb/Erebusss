@@ -153,7 +153,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     character_action->weapon_no_effect_holy = weapon_no_effect_holy;
     character_action->weapon_damage = weapon_damage;
 
-    AnimatedObject *object = new AnimatedObject();
+    AnimatedObject *object = new AnimatedObject(100);
     character_action->object = object;
     object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(projectile_key) );
     playing_gamestate->addGraphicsItem(object, icon_width, true);
@@ -2564,9 +2564,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     }
     {
 #if defined(Q_OS_SYMBIAN)
-        const int res_c = 15;
+        const int res_c = 16;
 #else
-        const int res_c = 63;
+        const int res_c = 64;
 #endif
         /*QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
@@ -2584,24 +2584,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         int n_frames = 4;
         QPixmap full_pixmap(n_frames*res_c, res_c);
         full_pixmap.fill(Qt::transparent);
+        QPainter painter(&full_pixmap);
         for(int i=0;i<n_frames;i++) {
-            QPixmap pixmap(res_c, res_c);
-            pixmap.fill(Qt::transparent);
-            QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-            float alpha = i/(float)(n_frames-1);
+            QRadialGradient radialGrad(i*res_c+(res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+            float alpha = n_frames==1 ? 1.0f : i/(float)(n_frames-1);
             float size = (1.0f-alpha)*0.6f + alpha*1.0f;
             radialGrad.setColorAt(0.0*size, QColor(255, 0, 0, 0));
             radialGrad.setColorAt(0.7*size, QColor(255, 0, 0, 0));
             radialGrad.setColorAt(0.75*size, QColor(255, 0, 0, 160));
             radialGrad.setColorAt(0.95*size, QColor(255, 0, 0, 160));
             radialGrad.setColorAt(1.0*size, QColor(255, 0, 0, 0));
-            QPainter painter(&pixmap);
-            painter.setPen(Qt::NoPen);
-            painter.fillRect(0, 0, res_c, res_c, radialGrad);
-            painter.end();
-            QPainter full_painter(&full_pixmap);
-            full_painter.drawPixmap(i*res_c, 0, pixmap);
-            full_painter.end();
+            QBrush brush(radialGrad);
+            painter.fillRect(i*res_c, 0, res_c, res_c, brush);
         }
         this->target_pixmap = full_pixmap;
         vector<AnimationLayerDefinition> target_animation_layer_definition;
@@ -5623,7 +5617,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
     if( this->c_location == location ) {
         QGraphicsItem *object = NULL;
         if( scenery->isAnimation() ) {
-            object = new AnimatedObject();
+            object = new AnimatedObject(100);
         }
         else {
             object = new QGraphicsPixmapItem();
@@ -5725,7 +5719,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
 }
 
 void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
-    AnimatedObject *object = new AnimatedObject();
+    AnimatedObject *object = new AnimatedObject(100);
     object->setBounce( character->isBounce() );
     this->characterUpdateGraphics(character, object);
     this->characterTurn(character, object);
@@ -6022,10 +6016,11 @@ void PlayingGamestate::update() {
             Vector2D target_pos = this->player->getTargetNPC()->getPos();
             if( this->target_item == NULL ) {
                 //this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
-                AnimatedObject *object = new AnimatedObject();
+                AnimatedObject *object = new AnimatedObject(100);
                 this->target_item = object;
                 object->addAnimationLayer( target_animation_layer );
                 object->setZValue(z_value_gui);
+                object->setPos(target_pos.x, target_pos.y);
                 this->addGraphicsItem(object, 0.5f, false);
             }
             else {

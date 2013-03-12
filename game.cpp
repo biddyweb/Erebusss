@@ -230,8 +230,8 @@ AnimationLayer *AnimationLayer::create(const string &filename, const vector<Anim
     return create(image, animation_layer_definitions, clip, off_x, off_y, width, height,stride_x, stride_y, expected_total_width, n_dimensions);
 }
 
-AnimatedObject::AnimatedObject() : /*animation_layer(NULL), c_animation_set(NULL),*/
-    set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false)
+AnimatedObject::AnimatedObject(int ms_per_frame) : /*animation_layer(NULL), c_animation_set(NULL),*/
+    ms_per_frame(ms_per_frame), set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false)
 {
 }
 
@@ -241,8 +241,6 @@ AnimatedObject::~AnimatedObject() {
 void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
-        const int ms_per_frame = 100;
-        //const int ms_per_frame = 1000;
         //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
         int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );

@@ -176,6 +176,7 @@ public:
 };
 
 class AnimatedObject : public QGraphicsItem {
+    int ms_per_frame;
     vector<AnimationLayer *> animation_layers;
     bool set_c_animation_name;
     string c_animation_name;
@@ -190,7 +191,7 @@ class AnimatedObject : public QGraphicsItem {
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 public:
-    AnimatedObject();
+    AnimatedObject(int ms_per_frame);
     virtual ~AnimatedObject();
 
     void addAnimationLayer(AnimationLayer *animation_layer);
