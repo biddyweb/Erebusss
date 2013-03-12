@@ -564,7 +564,7 @@ void MainGraphicsView::createLightingMap(unsigned char lighting_min) {
     this->darkness_alpha = (unsigned char)(255 - (int)lighting_min);
     if( game_g->isLightingEnabled() )
     {
-        const int res_c = 127;
+        const int res_c = 128;
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
         QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
@@ -2530,9 +2530,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
 
     {
 #if defined(Q_OS_SYMBIAN)
-        const int res_c = 15;
+        const int res_c = 16;
 #else
-        const int res_c = 63;
+        const int res_c = 64;
 #endif
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
@@ -2547,9 +2547,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     }
     {
 #if defined(Q_OS_SYMBIAN)
-        const int res_c = 15;
+        const int res_c = 16;
 #else
-        const int res_c = 63;
+        const int res_c = 64;
 #endif
         QPixmap pixmap(res_c, res_c);
         pixmap.fill(Qt::transparent);
