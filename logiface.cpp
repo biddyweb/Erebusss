@@ -5,8 +5,7 @@
 
 void log(const char *text, ...) {
     va_list vlist;
-    char buffer[65536] = "";
     va_start(vlist, text);
-    vsprintf(buffer,text,vlist);
-    game_g->log(buffer);
+    game_g->log(text, vlist);
+    va_end(vlist);
 }

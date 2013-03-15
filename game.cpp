@@ -1234,35 +1234,16 @@ QString Game::getApplicationFilename(const QString &name) {
     return nativePath;
 }
 
-/*void Game::log(const char *text, ...) {
-    FILE *logfile = fopen(logfilename.c_str(), "at+");
-    va_list vlist;
+void Game::log(const char *text, va_list vlist) {
     char buffer[65536] = "";
-    va_start(vlist, text);
     vsprintf(buffer,text,vlist);
-    if( logfile != NULL )
-        fprintf(logfile,buffer);
-    //printf(buffer);
-    qDebug("%s", buffer);
-    va_end(vlist);
-    if( logfile != NULL )
-        fclose(logfile);
-}*/
 
-void Game::log(const char *text) {
-    //FILE *logfile = fopen(logfilename.c_str(), "at+");
-    /*FILE *logfile = fopen(logfilename.toUtf8().data(), "at+");
-    if( logfile != NULL )
-        fprintf(logfile, text);
-    qDebug("%s", text);
-    if( logfile != NULL )
-        fclose(logfile);*/
     QFile logfile(logfilename);
     if( logfile.open(QIODevice::Append | QIODevice::Text) ) {
         QTextStream stream(&logfile);
-        stream << text;
+        stream << buffer;
     }
-    qDebug("%s", text);
+    qDebug("%s", buffer);
 }
 
 QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const {

@@ -464,7 +464,7 @@ public:
     //void mouseClick(int m_x, int m_y);
     QString getApplicationFilename(const QString &name);
     //void log(const char *text, ...);
-    void log(const char *text);
+    void log(const char *text, va_list vlist);
     QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const;
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0, 0);
