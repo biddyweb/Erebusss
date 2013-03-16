@@ -4411,7 +4411,13 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
         pos->set(pos_x, pos_y);
     }
 
-    if( template_s.length() > 0 ) {
+    if( reader.name() == "gold" ) {
+        // special case
+        QStringRef amount_s = reader.attributes().value("amount");
+        int amount = parseInt(amount_s.toString());
+        item = this->cloneGoldItem(amount);
+    }
+    else if( template_s.length() > 0 ) {
         // load from template
         qDebug("load item from template");
         if( reader.name() != "item" ) {
@@ -5031,7 +5037,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     int count = parseInt(count_s.toString());
                     npc->addSpell(name_s.toString().toStdString(), count);
                 }
-                else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" ) {
+                else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
                     if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
@@ -5046,37 +5052,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                             throw string("unexpected quest xml: item element outside of location");
                         }
                         location->addItem(item, pos.x, pos.y);
-                    }
-                }
-                else if( reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: gold element wasn't expected here");
-                    }
-                    QStringRef amount_s = reader.attributes().value("amount");
-                    int amount = parseInt(amount_s.toString());
-                    Item *item = this->cloneGoldItem(amount);
-                    if( item == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        LOG("can't find gold item\n");
-                        throw string("can't find gold item");
-                    }
-                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
-                        scenery->addItem(item);
-                    }
-                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
-                        npc->addItem(item);
-                    }
-                    else {
-                        QStringRef pos_x_s = reader.attributes().value("x");
-                        float pos_x = parseFloat(pos_x_s.toString());
-                        QStringRef pos_y_s = reader.attributes().value("y");
-                        float pos_y = parseFloat(pos_y_s.toString());
-                        if( location == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("unexpected quest xml: gold element outside of location");
-                        }
-                        location->addItem(item, pos_x, pos_y);
                     }
                 }
                 else if( reader.name() == "scenery" ) {
