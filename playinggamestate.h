@@ -479,9 +479,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     bool cheat_mode;
 
-    void parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key);
-    void parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key);
-    Item *parseXMLItem(QXmlStreamReader &reader);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
     void moveToLocation(Location *location, Vector2D pos);
@@ -506,7 +503,11 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void saveItem(QTextStream &stream, const Item *item, const Character *character) const;
     void saveTrap(QTextStream &stream, const Trap *trap) const;
 
+    void parseXMLItemProfileAttributeInt(Item *item, const QXmlStreamReader &reader, const string &key) const;
+    void parseXMLItemProfileAttributeFloat(Item *item, const QXmlStreamReader &reader, const string &key) const;
+    Item *parseXMLItem(QXmlStreamReader &reader) const;
     Character *loadNPC(bool *is_player, Vector2D *pos, const QXmlStreamReader &reader) const;
+    Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const;
 
 #ifdef _DEBUG
     vector<QGraphicsItem *> debug_items;

@@ -3620,7 +3620,7 @@ void PlayingGamestate::quickSave() {
     }
 }
 
-void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, QXmlStreamReader &reader, const string &key) {
+void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, const QXmlStreamReader &reader, const string &key) const {
     string attribute = "bonus_" + key;
     QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
     if( attribute_sr.length() > 0 ) {
@@ -3629,7 +3629,7 @@ void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, QXmlStreamRea
     }
 }
 
-void PlayingGamestate::parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamReader &reader, const string &key) {
+void PlayingGamestate::parseXMLItemProfileAttributeFloat(Item *item, const QXmlStreamReader &reader, const string &key) const {
     string attribute = "bonus_" + key;
     QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
     if( attribute_sr.length() > 0 ) {
@@ -3638,7 +3638,7 @@ void PlayingGamestate::parseXMLItemProfileAttributeFloat(Item *item, QXmlStreamR
     }
 }
 
-Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) {
+Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
     Item *item = NULL;
 
     QStringRef base_template_sr = reader.attributes().value("base_template");
@@ -4373,7 +4373,114 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, const QXmlS
         npc->setDefaultPosition(default_pos_x, default_pos_y);
     }
 
+    // now read remaining elements
+
     return npc;
+}
+
+Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const {
+    Item *item = NULL;
+    pos->set(0.0f, 0.0f);
+
+    if( scenery != NULL && npc != NULL ) {
+        throw string("loadItem called with both scenery and npc specified");
+    }
+
+    // need to read everything we want from the reader, before calling parseXMLItem.
+    QStringRef template_s = reader.attributes().value("template");
+    bool current_weapon = false, current_ammo = false, current_shield = false, current_armour = false, current_ring = false;
+    if( scenery != NULL ) {
+    }
+    else if( npc != NULL ) {
+        QStringRef current_weapon_s = reader.attributes().value("current_weapon");
+        current_weapon = parseBool(current_weapon_s.toString(), true);
+        QStringRef current_ammo_s = reader.attributes().value("current_ammo");
+        current_ammo = parseBool(current_ammo_s.toString(), true);
+        QStringRef current_shield_s = reader.attributes().value("current_shield");
+        current_shield = parseBool(current_shield_s.toString(), true);
+        QStringRef current_armour_s = reader.attributes().value("current_armour");
+        current_armour = parseBool(current_armour_s.toString(), true);
+        QStringRef current_ring_s = reader.attributes().value("current_ring");
+        current_ring = parseBool(current_ring_s.toString(), true);
+    }
+    else {
+        QStringRef pos_x_s = reader.attributes().value("x");
+        float pos_x = parseFloat(pos_x_s.toString());
+        QStringRef pos_y_s = reader.attributes().value("y");
+        float pos_y = parseFloat(pos_y_s.toString());
+        pos->set(pos_x, pos_y);
+    }
+
+    if( template_s.length() > 0 ) {
+        // load from template
+        qDebug("load item from template");
+        if( reader.name() != "item" ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("only allowed item element type when loading as template");
+        }
+        item = this->cloneStandardItem(template_s.toString().toStdString());
+        if( item == NULL ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
+            throw string("can't find item");
+        }
+    }
+    else {
+        item = parseXMLItem(reader); // n.b., reader will advance to end element!
+        if( item == NULL ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("unknown item element");
+        }
+    }
+
+    if( scenery != NULL ) {
+        scenery->addItem(item);
+    }
+    else if( npc != NULL ) {
+        npc->addItem(item, npc != this->player);
+        if( current_weapon ) {
+            if( item->getType() != ITEMTYPE_WEAPON ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                throw string("current_weapon is not a weapon");
+            }
+            Weapon *weapon = static_cast<Weapon *>(item);
+            npc->armWeapon(weapon);
+        }
+        else if( current_ammo ) {
+            if( item->getType() != ITEMTYPE_AMMO ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                throw string("current_weapon is not an ammo");
+            }
+            Ammo *ammo = static_cast<Ammo *>(item);
+            npc->selectAmmo(ammo);
+        }
+        else if( current_shield ) {
+            if( item->getType() != ITEMTYPE_SHIELD ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                throw string("current_shield is not a shield");
+            }
+            Shield *shield = static_cast<Shield *>(item);
+            npc->armShield(shield);
+        }
+        else if( current_armour ) {
+            if( item->getType() != ITEMTYPE_ARMOUR ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                throw string("current_armour is not an armour");
+            }
+            Armour *armour = static_cast<Armour *>(item);
+            npc->wearArmour(armour);
+        }
+        else if( current_ring ) {
+            if( item->getType() != ITEMTYPE_RING ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                throw string("current_ring is not a ring");
+            }
+            Ring *ring = static_cast<Ring *>(item);
+            npc->wearRing(ring);
+        }
+    }
+
+    return item;
 }
 
 void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
@@ -4929,106 +5036,16 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
                     }
-                    QStringRef template_s = reader.attributes().value("template");
-                    Item *item = NULL;
-                    // need to read everything we want from the reader, before calling parseXMLItem.
-                    bool current_weapon = false, current_ammo = false, current_shield = false, current_armour = false, current_ring = false;
-                    float pos_x = 0.0f, pos_y = 0.0f;
-                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
-                    }
-                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
-                        QStringRef current_weapon_s = reader.attributes().value("current_weapon");
-                        current_weapon = parseBool(current_weapon_s.toString(), true);
-                        QStringRef current_ammo_s = reader.attributes().value("current_ammo");
-                        current_ammo = parseBool(current_ammo_s.toString(), true);
-                        QStringRef current_shield_s = reader.attributes().value("current_shield");
-                        current_shield = parseBool(current_shield_s.toString(), true);
-                        QStringRef current_armour_s = reader.attributes().value("current_armour");
-                        current_armour = parseBool(current_armour_s.toString(), true);
-                        QStringRef current_ring_s = reader.attributes().value("current_ring");
-                        current_ring = parseBool(current_ring_s.toString(), true);
-                    }
-                    else {
-                        QStringRef pos_x_s = reader.attributes().value("x");
-                        pos_x = parseFloat(pos_x_s.toString());
-                        QStringRef pos_y_s = reader.attributes().value("y");
-                        pos_y = parseFloat(pos_y_s.toString());
-                    }
 
-                    if( template_s.length() > 0 ) {
-                        // load from template
-                        qDebug("load item from template");
-                        if( reader.name() != "item" ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("only allowed item element type when loading as template");
-                        }
-                        item = this->cloneStandardItem(template_s.toString().toStdString());
-                        if( item == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
-                            throw string("can't find item");
-                        }
-                    }
-                    else {
-                        item = parseXMLItem(reader); // n.b., reader will advance to end element!
-                        if( item == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("unknown item element");
-                        }
-                    }
+                    Vector2D pos;
+                    Item *item = this->loadItem(&pos, reader, scenery, npc);
 
-                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
-                        scenery->addItem(item);
-                    }
-                    else if( questXMLType == QUEST_XML_TYPE_NPC ) {
-                        npc->addItem(item, npc != this->player);
-                        if( current_weapon ) {
-                            if( item->getType() != ITEMTYPE_WEAPON ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_weapon is not a weapon");
-                            }
-                            Weapon *weapon = static_cast<Weapon *>(item);
-                            npc->armWeapon(weapon);
-                        }
-                        else if( current_ammo ) {
-                            if( item->getType() != ITEMTYPE_AMMO ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_weapon is not an ammo");
-                            }
-                            Ammo *ammo = static_cast<Ammo *>(item);
-                            npc->selectAmmo(ammo);
-                        }
-                        else if( current_shield ) {
-                            if( item->getType() != ITEMTYPE_SHIELD ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_shield is not a shield");
-                            }
-                            Shield *shield = static_cast<Shield *>(item);
-                            npc->armShield(shield);
-                        }
-                        else if( current_armour ) {
-                            if( item->getType() != ITEMTYPE_ARMOUR ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_armour is not an armour");
-                            }
-                            Armour *armour = static_cast<Armour *>(item);
-                            npc->wearArmour(armour);
-                        }
-                        else if( current_ring ) {
-                            if( item->getType() != ITEMTYPE_RING ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("current_ring is not a ring");
-                            }
-                            Ring *ring = static_cast<Ring *>(item);
-                            npc->wearRing(ring);
-                        }
-                    }
-                    else {
+                    if( questXMLType == QUEST_XML_TYPE_NONE ) {
                         if( location == NULL ) {
                             LOG("error at line %d\n", reader.lineNumber());
                             throw string("unexpected quest xml: item element outside of location");
                         }
-                        location->addItem(item, pos_x, pos_y);
+                        location->addItem(item, pos.x, pos.y);
                     }
                 }
                 else if( reader.name() == "gold" ) {
