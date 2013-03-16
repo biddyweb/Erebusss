@@ -4170,7 +4170,7 @@ void PlayingGamestate::refreshDebugItems() {
 }
 #endif
 
-Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, const QXmlStreamReader &reader) const {
+Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const {
     Character *npc = NULL;
     *is_player = false;
     pos->set(0.0f, 0.0f);
@@ -4374,6 +4374,64 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, const QXmlS
     }
 
     // now read remaining elements
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+        if( reader.isStartElement() ) {
+            if( reader.name() == "opening_initial") {
+                QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                npc->setTalkOpeningInitial(text.toStdString());
+            }
+            else if( reader.name() == "opening_later") {
+                QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                npc->setTalkOpeningLater(text.toStdString());
+            }
+            else if( reader.name() == "opening_interaction_complete") {
+                QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                npc->setTalkOpeningInteractionComplete(text.toStdString());
+            }
+            else if( reader.name() == "talk") {
+                QStringRef question_s = reader.attributes().value("question");
+                QString question = question_s.toString();
+                QStringRef action_s = reader.attributes().value("action");
+                QString action = action_s.toString();
+                QStringRef journal_s = reader.attributes().value("journal");
+                QString journal = journal_s.toString();
+                QStringRef while_not_done_s = reader.attributes().value("while_not_done");
+                bool while_not_done = parseBool(while_not_done_s.toString(), true);
+                QStringRef objective_s = reader.attributes().value("objective");
+                bool objective = parseBool(objective_s.toString(), true);
+                QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+                npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), journal.toStdString(), while_not_done, objective);
+            }
+            else if( reader.name() == "spell") {
+                QStringRef name_s = reader.attributes().value("name");
+                QStringRef count_s = reader.attributes().value("count");
+                int count = parseInt(count_s.toString());
+                npc->addSpell(name_s.toString().toStdString(), count);
+            }
+            else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
+                Vector2D pos;
+                this->loadItem(&pos, reader, NULL, npc);
+            }
+        }
+        else if( reader.isEndElement() ) {
+            if( reader.name() == "npc" ) {
+                if( *is_player ) {
+                    LOG("error at line %d\n", reader.lineNumber());
+                    throw string("mismatched tag: opened with player, closed with npc");
+                }
+                break;
+            }
+            else if( reader.name() == "player" ) {
+                if( !(*is_player) ) {
+                    LOG("error at line %d\n", reader.lineNumber());
+                    throw string("mismatched tag: opened with npc, closed with player");
+                }
+                break;
+            }
+        }
+    }
 
     return npc;
 }
@@ -4383,6 +4441,7 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
     pos->set(0.0f, 0.0f);
 
     if( scenery != NULL && npc != NULL ) {
+        LOG("error at line %d\n", reader.lineNumber());
         throw string("loadItem called with both scenery and npc specified");
     }
 
@@ -4540,15 +4599,12 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         bool done_player_start = false;
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
-            //QUEST_XML_TYPE_BOUNDARY = 1,
             QUEST_XML_TYPE_SCENERY = 2,
-            QUEST_XML_TYPE_NPC = 3,
-            QUEST_XML_TYPE_FLOORREGION = 4
+            QUEST_XML_TYPE_FLOORREGION = 3
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         Polygon2D boundary;
         Scenery *scenery = NULL;
-        Character *npc = NULL;
         FloorRegion *floor_region = NULL;
         QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
@@ -4964,7 +5020,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
                     bool is_player = false;
                     Vector2D pos;
-                    npc = this->loadNPC(&is_player, &pos, reader);
+                    Character *npc = this->loadNPC(&is_player, &pos, reader);
                     if( is_player ) {
                         this->player = npc;
                     }
@@ -4983,68 +5039,15 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         throw string("unexpected quest xml: npc/player element outside of location");
                     }
                     location->addCharacter(npc, pos.x, pos.y);
-                    questXMLType = QUEST_XML_TYPE_NPC;
-                }
-                else if( reader.name() == "opening_initial") {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: opening_initial element wasn't expected here");
-                    }
-                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->setTalkOpeningInitial(text.toStdString());
-                }
-                else if( reader.name() == "opening_later") {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: opening_later element wasn't expected here");
-                    }
-                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->setTalkOpeningLater(text.toStdString());
-                }
-                else if( reader.name() == "opening_interaction_complete") {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: opening_interaction_complete element wasn't expected here");
-                    }
-                    QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->setTalkOpeningInteractionComplete(text.toStdString());
-                }
-                else if( reader.name() == "talk") {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: talk element wasn't expected here");
-                    }
-                    QStringRef question_s = reader.attributes().value("question");
-                    QString question = question_s.toString();
-                    QStringRef action_s = reader.attributes().value("action");
-                    QString action = action_s.toString();
-                    QStringRef journal_s = reader.attributes().value("journal");
-                    QString journal = journal_s.toString();
-                    QStringRef while_not_done_s = reader.attributes().value("while_not_done");
-                    bool while_not_done = parseBool(while_not_done_s.toString(), true);
-                    QStringRef objective_s = reader.attributes().value("objective");
-                    bool objective = parseBool(objective_s.toString(), true);
-                    QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
-                    npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), journal.toStdString(), while_not_done, objective);
-                }
-                else if( reader.name() == "spell") {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: spell element wasn't expected here");
-                    }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef count_s = reader.attributes().value("count");
-                    int count = parseInt(count_s.toString());
-                    npc->addSpell(name_s.toString().toStdString(), count);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_NPC ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
                     }
 
                     Vector2D pos;
-                    Item *item = this->loadItem(&pos, reader, scenery, npc);
+                    Item *item = this->loadItem(&pos, reader, scenery, NULL);
 
                     if( questXMLType == QUEST_XML_TYPE_NONE ) {
                         if( location == NULL ) {
@@ -5357,14 +5360,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         throw string("unexpected quest xml: location end element wasn't expected here");
                     }
                     location = NULL;
-                }
-                else if( reader.name() == "npc" || reader.name() == "player" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NPC ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: npc/player end element wasn't expected here");
-                    }
-                    npc = NULL;
-                    questXMLType = QUEST_XML_TYPE_NONE;
                 }
                 else if( reader.name() == "scenery" ) {
                     if( questXMLType != QUEST_XML_TYPE_SCENERY ) {

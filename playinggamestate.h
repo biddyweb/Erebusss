@@ -506,7 +506,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void parseXMLItemProfileAttributeInt(Item *item, const QXmlStreamReader &reader, const string &key) const;
     void parseXMLItemProfileAttributeFloat(Item *item, const QXmlStreamReader &reader, const string &key) const;
     Item *parseXMLItem(QXmlStreamReader &reader) const;
-    Character *loadNPC(bool *is_player, Vector2D *pos, const QXmlStreamReader &reader) const;
+    Character *loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const;
     Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const;
 
 #ifdef _DEBUG
