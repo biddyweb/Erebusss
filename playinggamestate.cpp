@@ -4170,6 +4170,212 @@ void PlayingGamestate::refreshDebugItems() {
 }
 #endif
 
+Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, const QXmlStreamReader &reader) const {
+    Character *npc = NULL;
+    *is_player = false;
+    pos->set(0.0f, 0.0f);
+
+    QStringRef name_s = reader.attributes().value("name");
+    QStringRef template_s = reader.attributes().value("template");
+    QStringRef pos_x_s = reader.attributes().value("x");
+    float pos_x = parseFloat(pos_x_s.toString());
+    QStringRef pos_y_s = reader.attributes().value("y");
+    float pos_y = parseFloat(pos_y_s.toString());
+    pos->set(pos_x, pos_y);
+
+    QStringRef default_pos_x_s = reader.attributes().value("default_x");
+    QStringRef default_pos_y_s = reader.attributes().value("default_y");
+    if( template_s.length() > 0 ) {
+        if( reader.name() == "player" ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("didn't expect player element to load by template");
+        }
+        // load from template
+        npc = this->createCharacter(name_s.toString().toStdString(), template_s.toString().toStdString());
+        QStringRef is_hostile_s = reader.attributes().value("is_hostile");
+        bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
+        npc->setHostile(is_hostile);
+    }
+    else {
+        if( reader.name() == "player" ) {
+            qDebug("player: %s", name_s.toString().toStdString().c_str());
+            npc = new Character(name_s.toString().toStdString(), "", false);
+            *is_player = true;
+        }
+        else {
+            qDebug("npc: %s", name_s.toString().toStdString().c_str());
+            QStringRef animation_name_s = reader.attributes().value("animation_name");
+            if( animation_name_s.length() == 0 ) {
+                throw string("npc has no animation_name");
+            }
+            QStringRef static_image_s = reader.attributes().value("static_image");
+            bool static_image = parseBool(static_image_s.toString(), true);
+            QStringRef bounce_s = reader.attributes().value("bounce");
+            bool bounce = parseBool(bounce_s.toString(), true);
+            QStringRef is_hostile_s = reader.attributes().value("is_hostile");
+            bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
+
+            npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), true);
+            npc->setStaticImage(static_image);
+            npc->setBounce(bounce);
+            npc->setHostile(is_hostile);
+        }
+        QStringRef portrait_s = reader.attributes().value("portrait");
+        if( portrait_s.length() > 0 ) {
+            npc->setPortrait(portrait_s.toString().toStdString());
+        }
+        QStringRef is_dead_s = reader.attributes().value("is_dead");
+        npc->setDead( parseBool(is_dead_s.toString(), true) );
+        QStringRef health_s = reader.attributes().value("health");
+        QStringRef max_health_s = reader.attributes().value("max_health");
+        npc->initialiseHealth( parseInt( max_health_s.toString()) );
+        npc->setHealth( parseInt( health_s.toString()) );
+
+        QStringRef FP_s = reader.attributes().value("FP");
+        int FP = parseInt(FP_s.toString());
+        QStringRef BS_s = reader.attributes().value("BS");
+        int BS = parseInt(BS_s.toString());
+        QStringRef S_s = reader.attributes().value("S");
+        int S = parseInt(S_s.toString());
+        QStringRef A_s = reader.attributes().value("A");
+        int A = parseInt(A_s.toString());
+        QStringRef M_s = reader.attributes().value("M");
+        int M = parseInt(M_s.toString());
+        QStringRef D_s = reader.attributes().value("D");
+        int D = parseInt(D_s.toString());
+        QStringRef B_s = reader.attributes().value("B");
+        int B = parseInt(B_s.toString());
+        QStringRef Sp_s = reader.attributes().value("Sp");
+        float Sp = parseFloat(Sp_s.toString());
+
+        QStringRef level_s = reader.attributes().value("level");
+        int level = parseInt(level_s.toString(), true);
+        npc->setLevel(level);
+        QStringRef xp_s = reader.attributes().value("xp");
+        int xp = parseInt(xp_s.toString(), true);
+        npc->setXP(xp);
+        npc->setProfile(FP, BS, S, A, M, D, B, Sp); // must be done after setting level, so that the initial level is set correctly
+
+        QStringRef initial_level_s = reader.attributes().value("initial_level");
+        if( initial_level_s.length() > 0 ) {
+            int initial_level = parseInt(initial_level_s.toString());
+            QStringRef initial_FP_s = reader.attributes().value("initial_FP");
+            int initial_FP = parseInt(initial_FP_s.toString());
+            QStringRef initial_BS_s = reader.attributes().value("initial_BS");
+            int initial_BS = parseInt(initial_BS_s.toString());
+            QStringRef initial_S_s = reader.attributes().value("initial_S");
+            int initial_S = parseInt(initial_S_s.toString());
+            QStringRef initial_A_s = reader.attributes().value("initial_A");
+            int initial_A = parseInt(initial_A_s.toString());
+            QStringRef initial_M_s = reader.attributes().value("initial_M");
+            int initial_M = parseInt(initial_M_s.toString());
+            QStringRef initial_D_s = reader.attributes().value("initial_D");
+            int initial_D = parseInt(initial_D_s.toString());
+            QStringRef initial_B_s = reader.attributes().value("initial_B");
+            int initial_B = parseInt(initial_B_s.toString());
+            QStringRef initial_Sp_s = reader.attributes().value("initial_Sp");
+            float initial_Sp = parseFloat(initial_Sp_s.toString());
+            npc->setInitialProfile(initial_level, initial_FP, initial_BS, initial_S, initial_A, initial_M, initial_D, initial_B, initial_Sp);
+        }
+
+        QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
+        QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
+        QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
+        if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
+            int natural_damageX = parseInt(natural_damageX_s.toString());
+            int natural_damageY = parseInt(natural_damageY_s.toString());
+            int natural_damageZ = parseInt(natural_damageZ_s.toString());
+            npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
+        }
+        QStringRef can_fly_s = reader.attributes().value("can_fly");
+        bool can_fly = parseBool(can_fly_s.toString(), true);
+        npc->setCanFly(can_fly);
+        QStringRef is_paralysed_s = reader.attributes().value("is_paralysed");
+        bool is_paralysed = parseBool(is_paralysed_s.toString(), true);
+        if( is_paralysed ) {
+            QStringRef paralysed_time_s = reader.attributes().value("paralysed_time");
+            int paralysed_time = parseInt(paralysed_time_s.toString());
+            npc->paralyse(paralysed_time);
+        }
+        QStringRef is_diseased_s = reader.attributes().value("is_diseased");
+        bool is_diseased = parseBool(is_diseased_s.toString(), true);
+        npc->setDiseased(is_diseased);
+        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
+        int xp_worth = parseInt(xp_worth_s.toString());
+        npc->setXPWorth(xp_worth);
+        QStringRef causes_terror_s = reader.attributes().value("causes_terror");
+        bool causes_terror = parseBool(causes_terror_s.toString(), true);
+        if( causes_terror ) {
+            QStringRef terror_effect_s = reader.attributes().value("terror_effect");
+            int terror_effect = parseInt(terror_effect_s.toString());
+            npc->setCausesTerror(terror_effect);
+        }
+        QStringRef done_terror_s = reader.attributes().value("done_terror");
+        bool done_terror = parseBool(done_terror_s.toString(), true);
+        npc->setDoneTerror(done_terror);
+        QStringRef is_fleeing_s = reader.attributes().value("is_fleeing");
+        bool is_fleeing = parseBool(is_fleeing_s.toString(), true);
+        npc->setFleeing(is_fleeing);
+        QStringRef causes_disease_s = reader.attributes().value("causes_disease");
+        int causes_disease = parseInt(causes_disease_s.toString(), true);
+        npc->setCausesDisease(causes_disease);
+        QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
+        int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
+        npc->setCausesParalysis(causes_paralysis);
+        QStringRef requires_magical_s = reader.attributes().value("requires_magical");
+        bool requires_magical = parseBool(requires_magical_s.toString(), true);
+        npc->setRequiresMagical(requires_magical);
+        QStringRef unholy_s = reader.attributes().value("unholy");
+        bool unholy = parseBool(unholy_s.toString(), true);
+        npc->setUnholy(unholy);
+        QStringRef gold_s = reader.attributes().value("gold");
+        npc->addGold( parseInt( gold_s.toString(), true) );
+    }
+
+    QStringRef can_talk_s = reader.attributes().value("can_talk");
+    if( can_talk_s.length() > 0 ) {
+        bool can_talk = parseBool(can_talk_s.toString());
+        npc->setCanTalk(can_talk);
+    }
+    QStringRef has_talked_s = reader.attributes().value("has_talked");
+    if( has_talked_s.length() > 0 ) {
+        bool has_talked = parseBool(has_talked_s.toString());
+        npc->setHasTalked(has_talked);
+    }
+    QStringRef interaction_completed_s = reader.attributes().value("interaction_completed");
+    if( interaction_completed_s.length() > 0 ) {
+        bool interaction_completed = parseBool(interaction_completed_s.toString());
+        npc->setInteractionCompleted(interaction_completed);
+    }
+    QStringRef interaction_type_s = reader.attributes().value("interaction_type");
+    npc->setInteractionType(interaction_type_s.toString().toStdString());
+    QStringRef interaction_data_s = reader.attributes().value("interaction_data");
+    npc->setInteractionData(interaction_data_s.toString().toStdString());
+    QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
+    int interaction_xp = parseInt(interaction_xp_s.toString(), true);
+    npc->setInteractionXP(interaction_xp);
+    QStringRef interaction_reward_item_s = reader.attributes().value("interaction_reward_item");
+    npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
+    QStringRef interaction_journal_s = reader.attributes().value("interaction_journal");
+    npc->setInteractionJournal(interaction_journal_s.toString().toStdString());
+    QStringRef shop_s = reader.attributes().value("shop");
+    if( shop_s.length() > 0 ) {
+        npc->setShop(shop_s.toString().toStdString());
+    }
+    QStringRef objective_id_s = reader.attributes().value("objective_id");
+    if( objective_id_s.length() > 0 ) {
+        npc->setObjectiveId(objective_id_s.toString().toStdString());
+    }
+
+    if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
+        float default_pos_x = parseFloat(default_pos_x_s.toString());
+        float default_pos_y = parseFloat(default_pos_y_s.toString());
+        npc->setDefaultPosition(default_pos_x, default_pos_y);
+    }
+
+    return npc;
+}
+
 void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.toUtf8().data());
     // filename should be full path
@@ -4642,213 +4848,28 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: npc/player element wasn't expected here");
                     }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef template_s = reader.attributes().value("template");
-                    QStringRef pos_x_s = reader.attributes().value("x");
-                    float pos_x = parseFloat(pos_x_s.toString());
-                    QStringRef pos_y_s = reader.attributes().value("y");
-                    float pos_y = parseFloat(pos_y_s.toString());
-                    QStringRef default_pos_x_s = reader.attributes().value("default_x");
-                    QStringRef default_pos_y_s = reader.attributes().value("default_y");
-                    if( template_s.length() > 0 ) {
-                        if( reader.name() == "player" ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("didn't expect player element to load by template");
-                        }
-                        // load from template
-                        npc = this->createCharacter(name_s.toString().toStdString(), template_s.toString().toStdString());
-                        QStringRef is_hostile_s = reader.attributes().value("is_hostile");
-                        bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
-                        npc->setHostile(is_hostile);
+
+                    bool is_player = false;
+                    Vector2D pos;
+                    npc = this->loadNPC(&is_player, &pos, reader);
+                    if( is_player ) {
+                        this->player = npc;
                     }
                     else {
-                        if( reader.name() == "player" ) {
-                            qDebug("player: %s", name_s.toString().toStdString().c_str());
-                            this->player = npc = new Character(name_s.toString().toStdString(), "", false);
+                        if( !npc->isStaticImage() ) {
+                            this->animation_layers[ npc->getAnimationName() ]->getAnimationLayer(); // force animation to be loaded
                         }
-                        else {
-                            qDebug("npc: %s", name_s.toString().toStdString().c_str());
-                            QStringRef animation_name_s = reader.attributes().value("animation_name");
-                            if( animation_name_s.length() == 0 ) {
-                                throw string("npc has no animation_name");
-                            }
-                            QStringRef static_image_s = reader.attributes().value("static_image");
-                            bool static_image = parseBool(static_image_s.toString(), true);
-                            QStringRef bounce_s = reader.attributes().value("bounce");
-                            bool bounce = parseBool(bounce_s.toString(), true);
-                            QStringRef is_hostile_s = reader.attributes().value("is_hostile");
-                            bool is_hostile = is_hostile_s.length() == 0 ? true : parseBool(is_hostile_s.toString());
-
-                            npc = new Character(name_s.toString().toStdString(), animation_name_s.toString().toStdString(), true);
-                            npc->setStaticImage(static_image);
-                            npc->setBounce(bounce);
-                            npc->setHostile(is_hostile);
-
-                            if( !static_image ) {
-                                this->animation_layers[ npc->getAnimationName() ]->getAnimationLayer(); // force animation to be loaded
-                            }
-                        }
-                        QStringRef portrait_s = reader.attributes().value("portrait");
-                        if( portrait_s.length() > 0 ) {
-                            npc->setPortrait(portrait_s.toString().toStdString());
-                        }
-                        QStringRef is_dead_s = reader.attributes().value("is_dead");
-                        npc->setDead( parseBool(is_dead_s.toString(), true) );
-                        QStringRef health_s = reader.attributes().value("health");
-                        QStringRef max_health_s = reader.attributes().value("max_health");
-                        npc->initialiseHealth( parseInt( max_health_s.toString()) );
-                        npc->setHealth( parseInt( health_s.toString()) );
-
-                        QStringRef FP_s = reader.attributes().value("FP");
-                        int FP = parseInt(FP_s.toString());
-                        QStringRef BS_s = reader.attributes().value("BS");
-                        int BS = parseInt(BS_s.toString());
-                        QStringRef S_s = reader.attributes().value("S");
-                        int S = parseInt(S_s.toString());
-                        QStringRef A_s = reader.attributes().value("A");
-                        int A = parseInt(A_s.toString());
-                        QStringRef M_s = reader.attributes().value("M");
-                        int M = parseInt(M_s.toString());
-                        QStringRef D_s = reader.attributes().value("D");
-                        int D = parseInt(D_s.toString());
-                        QStringRef B_s = reader.attributes().value("B");
-                        int B = parseInt(B_s.toString());
-                        QStringRef Sp_s = reader.attributes().value("Sp");
-                        float Sp = parseFloat(Sp_s.toString());
-
-                        QStringRef level_s = reader.attributes().value("level");
-                        int level = parseInt(level_s.toString(), true);
-                        npc->setLevel(level);
-                        QStringRef xp_s = reader.attributes().value("xp");
-                        int xp = parseInt(xp_s.toString(), true);
-                        npc->setXP(xp);
-                        npc->setProfile(FP, BS, S, A, M, D, B, Sp); // must be done after setting level, so that the initial level is set correctly
-
-                        QStringRef initial_level_s = reader.attributes().value("initial_level");
-                        if( initial_level_s.length() > 0 ) {
-                            int initial_level = parseInt(initial_level_s.toString());
-                            QStringRef initial_FP_s = reader.attributes().value("initial_FP");
-                            int initial_FP = parseInt(initial_FP_s.toString());
-                            QStringRef initial_BS_s = reader.attributes().value("initial_BS");
-                            int initial_BS = parseInt(initial_BS_s.toString());
-                            QStringRef initial_S_s = reader.attributes().value("initial_S");
-                            int initial_S = parseInt(initial_S_s.toString());
-                            QStringRef initial_A_s = reader.attributes().value("initial_A");
-                            int initial_A = parseInt(initial_A_s.toString());
-                            QStringRef initial_M_s = reader.attributes().value("initial_M");
-                            int initial_M = parseInt(initial_M_s.toString());
-                            QStringRef initial_D_s = reader.attributes().value("initial_D");
-                            int initial_D = parseInt(initial_D_s.toString());
-                            QStringRef initial_B_s = reader.attributes().value("initial_B");
-                            int initial_B = parseInt(initial_B_s.toString());
-                            QStringRef initial_Sp_s = reader.attributes().value("initial_Sp");
-                            float initial_Sp = parseFloat(initial_Sp_s.toString());
-                            npc->setInitialProfile(initial_level, initial_FP, initial_BS, initial_S, initial_A, initial_M, initial_D, initial_B, initial_Sp);
-                        }
-
-                        QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
-                        QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
-                        QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
-                        if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
-                            int natural_damageX = parseInt(natural_damageX_s.toString());
-                            int natural_damageY = parseInt(natural_damageY_s.toString());
-                            int natural_damageZ = parseInt(natural_damageZ_s.toString());
-                            npc->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
-                        }
-                        QStringRef can_fly_s = reader.attributes().value("can_fly");
-                        bool can_fly = parseBool(can_fly_s.toString(), true);
-                        npc->setCanFly(can_fly);
-                        QStringRef is_paralysed_s = reader.attributes().value("is_paralysed");
-                        bool is_paralysed = parseBool(is_paralysed_s.toString(), true);
-                        if( is_paralysed ) {
-                            QStringRef paralysed_time_s = reader.attributes().value("paralysed_time");
-                            int paralysed_time = parseInt(paralysed_time_s.toString());
-                            npc->paralyse(paralysed_time);
-                        }
-                        QStringRef is_diseased_s = reader.attributes().value("is_diseased");
-                        bool is_diseased = parseBool(is_diseased_s.toString(), true);
-                        npc->setDiseased(is_diseased);
-                        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
-                        int xp_worth = parseInt(xp_worth_s.toString());
-                        npc->setXPWorth(xp_worth);
-                        QStringRef causes_terror_s = reader.attributes().value("causes_terror");
-                        bool causes_terror = parseBool(causes_terror_s.toString(), true);
-                        if( causes_terror ) {
-                            QStringRef terror_effect_s = reader.attributes().value("terror_effect");
-                            int terror_effect = parseInt(terror_effect_s.toString());
-                            npc->setCausesTerror(terror_effect);
-                        }
-                        QStringRef done_terror_s = reader.attributes().value("done_terror");
-                        bool done_terror = parseBool(done_terror_s.toString(), true);
-                        npc->setDoneTerror(done_terror);
-                        QStringRef is_fleeing_s = reader.attributes().value("is_fleeing");
-                        bool is_fleeing = parseBool(is_fleeing_s.toString(), true);
-                        npc->setFleeing(is_fleeing);
-                        QStringRef causes_disease_s = reader.attributes().value("causes_disease");
-                        int causes_disease = parseInt(causes_disease_s.toString(), true);
-                        npc->setCausesDisease(causes_disease);
-                        QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
-                        int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
-                        npc->setCausesParalysis(causes_paralysis);
-                        QStringRef requires_magical_s = reader.attributes().value("requires_magical");
-                        bool requires_magical = parseBool(requires_magical_s.toString(), true);
-                        npc->setRequiresMagical(requires_magical);
-                        QStringRef unholy_s = reader.attributes().value("unholy");
-                        bool unholy = parseBool(unholy_s.toString(), true);
-                        npc->setUnholy(unholy);
-                        QStringRef gold_s = reader.attributes().value("gold");
-                        npc->addGold( parseInt( gold_s.toString(), true) );
-                    }
-
-                    QStringRef can_talk_s = reader.attributes().value("can_talk");
-                    if( can_talk_s.length() > 0 ) {
-                        bool can_talk = parseBool(can_talk_s.toString());
-                        npc->setCanTalk(can_talk);
-                    }
-                    QStringRef has_talked_s = reader.attributes().value("has_talked");
-                    if( has_talked_s.length() > 0 ) {
-                        bool has_talked = parseBool(has_talked_s.toString());
-                        npc->setHasTalked(has_talked);
-                    }
-                    QStringRef interaction_completed_s = reader.attributes().value("interaction_completed");
-                    if( interaction_completed_s.length() > 0 ) {
-                        bool interaction_completed = parseBool(interaction_completed_s.toString());
-                        npc->setInteractionCompleted(interaction_completed);
-                    }
-                    QStringRef interaction_type_s = reader.attributes().value("interaction_type");
-                    npc->setInteractionType(interaction_type_s.toString().toStdString());
-                    QStringRef interaction_data_s = reader.attributes().value("interaction_data");
-                    npc->setInteractionData(interaction_data_s.toString().toStdString());
-                    QStringRef interaction_xp_s = reader.attributes().value("interaction_xp");
-                    int interaction_xp = parseInt(interaction_xp_s.toString(), true);
-                    npc->setInteractionXP(interaction_xp);
-                    QStringRef interaction_reward_item_s = reader.attributes().value("interaction_reward_item");
-                    npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
-                    QStringRef interaction_journal_s = reader.attributes().value("interaction_journal");
-                    npc->setInteractionJournal(interaction_journal_s.toString().toStdString());
-                    QStringRef shop_s = reader.attributes().value("shop");
-                    if( shop_s.length() > 0 ) {
-                        npc->setShop(shop_s.toString().toStdString());
-                    }
-                    QStringRef objective_id_s = reader.attributes().value("objective_id");
-                    if( objective_id_s.length() > 0 ) {
-                        npc->setObjectiveId(objective_id_s.toString().toStdString());
                     }
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
-                    if( default_pos_x_s.length() > 0 && default_pos_y_s.length() > 0 ) {
-                        float default_pos_x = parseFloat(default_pos_x_s.toString());
-                        float default_pos_y = parseFloat(default_pos_y_s.toString());
-                        npc->setDefaultPosition(default_pos_x, default_pos_y);
-                    }
-                    else {
-                        npc->setDefaultPosition(pos_x, pos_y);
+                    if( !npc->hasDefaultPosition() ) {
+                        npc->setDefaultPosition(pos.x, pos.y);
                     }
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: npc/player element outside of location");
                     }
-                    location->addCharacter(npc, pos_x, pos_y);
+                    location->addCharacter(npc, pos.x, pos.y);
                     questXMLType = QUEST_XML_TYPE_NPC;
                 }
                 else if( reader.name() == "opening_initial") {

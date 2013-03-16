@@ -506,6 +506,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void saveItem(QTextStream &stream, const Item *item, const Character *character) const;
     void saveTrap(QTextStream &stream, const Trap *trap) const;
 
+    Character *loadNPC(bool *is_player, Vector2D *pos, const QXmlStreamReader &reader) const;
+
 #ifdef _DEBUG
     vector<QGraphicsItem *> debug_items;
 
