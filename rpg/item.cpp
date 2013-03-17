@@ -16,9 +16,6 @@ Item::Item(const string &name, const string &image_name, int weight) :
 {
 }
 
-Item::~Item() {
-}
-
 Item *Item::clone() const {
     return new Item(*this);
 }

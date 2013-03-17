@@ -45,9 +45,9 @@ protected:
 
     string getProfileBonusDescriptionInt(const string &key) const;
     string getProfileBonusDescriptionFloat(const string &key) const;
+
 public:
     Item(const string &name, const string &image_name, int weight);
-    virtual ~Item();
 
     virtual ItemType getType() const {
         return ITEMTYPE_GENERAL;
