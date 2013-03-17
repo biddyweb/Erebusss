@@ -937,6 +937,9 @@ public:
     vector<Character *>::const_iterator charactersEnd() const {
         return this->npcs.end();
     }
+    size_t size() const {
+        return this->npcs.size();
+    }
 };
 
 class NPCTableLevel {
