@@ -4178,10 +4178,12 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
     QStringRef name_s = reader.attributes().value("name");
     QStringRef template_s = reader.attributes().value("template");
     QStringRef pos_x_s = reader.attributes().value("x");
-    float pos_x = parseFloat(pos_x_s.toString());
     QStringRef pos_y_s = reader.attributes().value("y");
-    float pos_y = parseFloat(pos_y_s.toString());
-    pos->set(pos_x, pos_y);
+    if( pos_x_s.length() > 0 && pos_y_s.length() > 0 ) {
+        float pos_x = parseFloat(pos_x_s.toString());
+        float pos_y = parseFloat(pos_y_s.toString());
+        pos->set(pos_x, pos_y);
+    }
 
     QStringRef default_pos_x_s = reader.attributes().value("default_x");
     QStringRef default_pos_y_s = reader.attributes().value("default_y");
@@ -5506,8 +5508,82 @@ void PlayingGamestate::createRandomQuest() {
     this->view_transform_3d = true;
     this->view_walls_3d = true;
 
+    // load random quest definitions
+    map<string, NPCTable *> npc_tables;
+    {
+        LOG("load random quest definitions\n");
+        QFile file(QString(DEPLOYMENT_PATH) + "data/randomquest.xml");
+        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+            throw string("Failed to open quest xml file");
+        }
+        QXmlStreamReader reader(&file);
+        NPCTable *npc_table = NULL;
+        NPCTableLevel *npc_table_level = NULL;
+        NPCGroup *npc_group = NULL;
+        while( !reader.atEnd() && !reader.hasError() ) {
+            reader.readNext();
+            //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+            if( reader.isStartElement() ) {
+                if( reader.name() == "npc_table" ) {
+                    QStringRef type_s = reader.attributes().value("type");
+                    qDebug("found npc table, type: %s", type_s.toString().toStdString().c_str());
+                    npc_table = new NPCTable();
+                    npc_tables[type_s.toString().toStdString()] = npc_table;
+                }
+                else if( reader.name() == "level" ) {
+                    if( npc_table == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("level tag not inside npc_table");
+                    }
+                    QStringRef value_s = reader.attributes().value("value");
+                    int value = parseInt(value_s.toString());
+                    qDebug("    found level %d", value);
+                    npc_table_level = new NPCTableLevel();
+                    npc_table->addLevel(value, npc_table_level);
+                }
+                else if( reader.name() == "npc_group" ) {
+                    if( npc_table_level == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("npc_group tag not inside level");
+                    }
+                    qDebug("        found npc group");
+                    npc_group = new NPCGroup();
+                    npc_table_level->addNPCGroup(npc_group);
+                }
+                else if( reader.name() == "npc" ) {
+                    bool is_player = false;
+                    Vector2D pos;
+                    Character *npc = this->loadNPC(&is_player, &pos, reader);
+                    npc_group->addNPC(npc);
+                }
+            }
+            else if( reader.isEndDocument() ) {
+                if( reader.name() == "npc_table" ) {
+                    npc_table = NULL;
+                }
+                else if( reader.name() == "level" ) {
+                    npc_table_level = NULL;
+                }
+                else if( reader.name() == "npc_group" ) {
+                    npc_group = NULL;
+                }
+            }
+        }
+        if( reader.hasError() ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            LOG("error reading randomquest xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+            throw string("error reading randomquest xml file");
+        }
+
+    }
+
     Vector2D player_start;
-    Location *location = LocationGenerator::generateLocation(&player_start);
+    Location *location = LocationGenerator::generateLocation(&player_start, npc_tables);
+
+    for(map<string, NPCTable *>::iterator iter = npc_tables.begin(); iter != npc_tables.end(); ++iter) {
+        NPCTable *npc_table = iter->second;
+        delete npc_table;
+    }
 
     this->quest->addLocation(location);
     this->c_location = location;

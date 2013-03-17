@@ -4,6 +4,8 @@
 using std::vector;
 #include <set>
 using std::set;
+#include <map>
+using std::map;
 #include <string>
 using std::string;
 
@@ -88,6 +90,13 @@ protected:
     string popup_text; // not saved at the moment (only set internally by the engine)
     string description;
 
+    // rule of three
+    Scenery& operator=(const Scenery &scenery) {
+        throw string("Scenery assignment operator disallowed");
+    }
+    Scenery(const Scenery &scenery) {
+        throw string("Scenery copy constructor disallowed");
+    }
 public:
     Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height);
     virtual ~Scenery();
@@ -346,8 +355,6 @@ protected:
 public:
     Trap(const string &type);
     Trap(const string &type, float width, float height);
-    virtual ~Trap() {
-    }
 
     /*void setLocation(Location *location) {
         this->location = location;
@@ -577,6 +584,14 @@ protected:
 
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
     bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const;
+
+    // rule of three
+    Location& operator=(const Location &location) {
+        throw string("Location assignment operator disallowed");
+    }
+    Location(const Location &location) {
+        throw string("Location copy constructor disallowed");
+    }
 public:
     Location(const string &name);
     ~Location();
@@ -793,6 +808,14 @@ class Quest {
     string info;
     string completed_text;
     bool is_completed;
+
+    // rule of three
+    Quest& operator=(const Quest &quest) {
+        throw string("Quest assignment operator disallowed");
+    }
+    Quest(const Quest &quest) {
+        throw string("Quest copy constructor disallowed");
+    }
 public:
     Quest();
     ~Quest();
@@ -884,12 +907,102 @@ public:
     }
 };
 
+class NPCGroup {
+    vector<Character *> npcs;
+
+    // rule of three
+    NPCGroup& operator=(const NPCGroup &npc_group) {
+        throw string("NPCGroup assignment operator disallowed");
+    }
+    NPCGroup(const NPCGroup &npc_group) {
+        throw string("NPCGroup copy constructor disallowed");
+    }
+public:
+    NPCGroup() {
+    }
+    ~NPCGroup();
+
+    void addNPC(Character *npc) {
+        this->npcs.push_back(npc);
+    }
+    vector<Character *>::iterator charactersBegin() {
+        return this->npcs.begin();
+    }
+    vector<Character *>::const_iterator charactersBegin() const {
+        return this->npcs.begin();
+    }
+    vector<Character *>::iterator charactersEnd() {
+        return this->npcs.end();
+    }
+    vector<Character *>::const_iterator charactersEnd() const {
+        return this->npcs.end();
+    }
+};
+
+class NPCTableLevel {
+    vector<NPCGroup *> npc_groups;
+
+    // rule of three
+    NPCTableLevel& operator=(const NPCTableLevel &npc_table_level) {
+        throw string("NPCTableLevel assignment operator disallowed");
+    }
+    NPCTableLevel(const NPCTableLevel &npc_table_level) {
+        throw string("NPCTableLevel copy constructor disallowed");
+    }
+public:
+    NPCTableLevel() {
+    }
+    ~NPCTableLevel();
+
+    void addNPCGroup(NPCGroup *npc_group) {
+        this->npc_groups.push_back(npc_group);
+    }
+    const NPCGroup *chooseGroup() const {
+        int r = rand() % npc_groups.size();
+        const NPCGroup *npc_group = npc_groups.at(r);
+        return npc_group;
+    }
+};
+
+class NPCTable {
+    map<int, NPCTableLevel *> levels;
+
+    const NPCTableLevel *getLevel(int level) const {
+        map<int, NPCTableLevel *>::const_iterator iter = levels.find(level);
+        if( iter == levels.end() ) {
+            return NULL;
+        }
+        return iter->second;
+    }
+
+    // rule of three
+    NPCTable& operator=(const NPCTable &npc_table) {
+        throw string("NPCTable assignment operator disallowed");
+    }
+    NPCTable(const NPCTable &npc_table) {
+        throw string("NPCTable copy constructor disallowed");
+    }
+public:
+    NPCTable() {
+    }
+    ~NPCTable();
+
+    void addLevel(int value, NPCTableLevel *level) {
+        this->levels[value] = level;
+    }
+    const NPCGroup *chooseGroup(int level) const {
+        const NPCTableLevel *npc_table_level = this->getLevel(level);
+        const NPCGroup *npc_group = npc_table_level->chooseGroup();
+        return npc_group;
+    }
+};
+
 class LocationGenerator {
     static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap);
     static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
     static void exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
-    static void exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
+    static void exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables);
 
 public:
-    static Location *generateLocation(Vector2D *player_start);
+    static Location *generateLocation(Vector2D *player_start, const map<string, NPCTable *> &npc_tables);
 };

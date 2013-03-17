@@ -214,6 +214,49 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     this->initial_profile = this->profile;
 }
 
+/*name(character.getName()),
+is_ai(character.isAI()), is_hostile(character.isHostile()),
+static_image(character.isStaticImage()),
+bounce(character.isBounce()),
+location(NULL), listener(NULL), listener_data(NULL),
+is_dead(false), time_of_death_ms(0), is_visible(false),
+//has_destination(false),
+has_path(false),
+target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+profile(character.profile),
+health(character.getHealth()), max_health(character.getMaxHealth()),
+natural_damageX(character.natural_damageX, natural_damageY(character.natural_damageY), natural_damageZ(character.natural_damageZ),
+can_fly(character.canFly()),
+is_paralysed(false), paralysed_until(0),
+is_diseased(character.isDiseased()),
+initial_level(character.initial_level), initial_profile(character.initial_profile),
+current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL),
+gold(character.getGold()), level(character.getLevel()), xp(character.getXP()), xp_worth(character.getXPWorth()),
+causes_terror(character.getCausesTerror()), terror_effect(character.getTerrorEffect()), done_terror(false),
+is_fleeing(false), causes_disease(character.getCausesDisease()), causes_paralysis(character.getCausesParalysis()),
+requires_magical(character.requiresMagical()), unholy(character.isUnholy()),
+can_talk(character.canTalk()), has_talked(false), interaction_xp(character.getInteractionXP()), interaction_completed(false)*/
+// n.b., the copy constructor doesn't copy identically, but leaves some things at default - things to do with how the Character is used in the game engine
+Character::Character(const Character &character)
+{
+    qDebug("Character::Character(): copy constructor: %s", character.name.c_str());
+    *this = character;
+
+    this->listener = NULL;
+    this->listener_data = NULL;
+
+    this->current_weapon = NULL;
+    this->current_armour = NULL;
+    this->current_shield = NULL;
+    this->current_ammo = NULL;
+    this->current_ring = NULL;
+    for(set<Item *>::const_iterator iter = character.items.begin(); iter != character.items.end(); ++iter) {
+        const Item *item = *iter;
+        Item *item_copy = item->clone();
+        this->items.insert(item_copy);
+    }
+}
+
 Character::~Character() {
     qDebug("Character::~Character(): %s", this->name.c_str());
     if( this->listener != NULL ) {

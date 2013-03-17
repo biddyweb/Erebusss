@@ -1887,6 +1887,27 @@ bool Quest::testIfComplete(const PlayingGamestate *playing_gamestate) {
 QuestInfo::QuestInfo(const string &filename) : filename(filename) {
 }
 
+NPCGroup::~NPCGroup() {
+    for(vector<Character *>::iterator iter = this->npcs.begin(); iter != this->npcs.end(); ++iter) {
+        Character *npc = *iter;
+        delete npc;
+    }
+}
+
+NPCTableLevel::~NPCTableLevel() {
+    for(vector<NPCGroup *>::iterator iter = this->npc_groups.begin(); iter != this->npc_groups.end(); ++iter) {
+        NPCGroup *npc_group = *iter;
+        delete npc_group;
+    }
+}
+
+NPCTable::~NPCTable() {
+    for(map<int, NPCTableLevel *>::iterator iter = this->levels.begin(); iter != this->levels.end(); ++iter) {
+        NPCTableLevel *level = iter->second;
+        delete level;
+    }
+}
+
 Direction4 rotateDirection4(Direction4 dir, int turn) {
     int i_dir = (int)dir;
     i_dir += turn;
@@ -2074,7 +2095,7 @@ void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &see
     }
 }
 
-void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
+void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
     qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     if( seed.type == Seed::TYPE_X_ROOM ) {
@@ -2178,6 +2199,20 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
         }
         else {
             // TODO: wandering monster!
+            int passage_section = rand() % passage_length_i;
+            float pos = (passage_section+0.5f)*base_passage_length;
+            map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
+            if( iter != npc_tables.end() ) {
+                const NPCTable *npc_table = iter->second;
+                const NPCGroup *npc_group = npc_table->chooseGroup(0);
+                for(vector<Character *>::const_iterator iter2 = npc_group->charactersBegin(); iter2 != npc_group->charactersEnd(); ++iter2) {
+                    const Character *npc = *iter2;
+                    Character *copy = new Character(*npc);
+                    Vector2D npc_pos = seed.pos + dir_vec * pos;
+                    location->addCharacter(copy, npc_pos.x, npc_pos.y);
+                    break;
+                }
+            }
         }
     }
     for(int i=0;i<n_doors;i++) {
@@ -2186,8 +2221,8 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
         bool side = rand() % 2 == 0;
         Direction4 room_dir = rotateDirection4(seed.dir, side ? -1 : 1);
         Vector2D room_dir_vec = directionFromEnum(room_dir);
-        //Vector2D door_centre = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * ( passage_hwidth + 0.5f*door_depth );
-        Vector2D door_pos = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * passage_hwidth;
+        //Vector2D door_pos = seed.pos + dir_vec * ( pos + 0.5f*door_width ) + room_dir_vec * passage_hwidth;
+        Vector2D door_pos = seed.pos + dir_vec * pos + room_dir_vec * passage_hwidth;
         Seed new_seed(Seed::TYPE_X_ROOM, door_pos, room_dir);
         new_seed.addIgnoreRect(floor_region_rect);
         qDebug("    add new room from passage at %f, %f", new_seed.pos.x, new_seed.pos.y);
@@ -2280,7 +2315,7 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
     }
 }
 
-Location *LocationGenerator::generateLocation(Vector2D *player_start) {
+Location *LocationGenerator::generateLocation(Vector2D *player_start, const map<string, NPCTable *> &npc_tables) {
     Location *location = new Location("");
     location->setBackgroundImageName("background_brown");
     location->setFloorImageName("floor_rock");
@@ -2304,7 +2339,7 @@ Location *LocationGenerator::generateLocation(Vector2D *player_start) {
 
         for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
             Seed seed = *iter;
-            exploreFromSeed(location, seed, &seeds, &floor_regions_rects, count==0);
+            exploreFromSeed(location, seed, &seeds, &floor_regions_rects, count==0, npc_tables);
         }
     }
 

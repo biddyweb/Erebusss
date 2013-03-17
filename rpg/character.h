@@ -442,9 +442,15 @@ class Character {
     bool useAmmo(Ammo *ammo);
     int getNaturalDamage() const;
 
+    // rule of three
+    /*Character& operator=(const Character &character) {
+        throw string("Character assignment operator disallowed");
+    }*/
+
 public:
     Character(const string &name, string animation_name, bool is_ai);
     Character(const string &name, bool is_ai, const CharacterTemplate &character_template);
+    explicit Character(const Character &character);
     ~Character();
 
     void setPortrait(const string &portrait) {
