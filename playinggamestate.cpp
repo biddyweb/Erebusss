@@ -3762,6 +3762,15 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
     }
     // else ignore unknown element - leave item as NULL
     if( item != NULL ) {
+        if( name_s.length() == 0 ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("no name specified for item");
+        }
+        else if( image_name_s.length() == 0 ) {
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("no image name specified for item");
+        }
+
         if( icon_width_s.length() > 0 ) {
             float icon_width = parseFloat(icon_width_s.toString());
             //LOG("icon_width: %f\n", icon_width);
