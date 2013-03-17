@@ -250,6 +250,7 @@ Character::Character(const Character &character)
     this->current_shield = NULL;
     this->current_ammo = NULL;
     this->current_ring = NULL;
+    this->items.clear();
     for(set<Item *>::const_iterator iter = character.items.begin(); iter != character.items.end(); ++iter) {
         const Item *item = *iter;
         Item *item_copy = item->clone();
