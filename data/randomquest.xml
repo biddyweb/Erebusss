@@ -6,7 +6,7 @@
 <level value="0">
     <npc_group>
         <npc name="Goblin" template="Goblin">
-            <item tempate="Leather Armour"/>
+            <item template="Leather Armour"/>
         </npc>
     </npc_group>
 </level>
