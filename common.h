@@ -18,6 +18,11 @@ const bool mobile_c = false;
 const int versionMajor = 0;
 const int versionMinor = 6;
 
+enum GameType {
+    GAMETYPE_CAMPAIGN = 0,
+    GAMETYPE_RANDOM = 1
+};
+
 enum Difficulty {
     DIFFICULTY_EASY = 0,
     DIFFICULTY_MEDIUM = 1,
