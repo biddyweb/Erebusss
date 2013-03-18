@@ -188,6 +188,12 @@ public:
     bool operator== (const Rect2D& v) const {
         return (v.top_left == top_left && v.bottom_right==bottom_right);
     }
+    Vector2D getTopLeft() const {
+        return this->top_left;
+    }
+    Vector2D getBottomRight() const {
+        return this->bottom_right;
+    }
     float getX() const {
         return top_left.x;
     }
