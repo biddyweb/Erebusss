@@ -22,7 +22,75 @@
 <level value="2">
     <npc_group>
         <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin">
+            <item template="Leather Armour"/>
+        </npc>
+    </npc_group>
+    <npc_group>
+        <npc name="Orc" template="Orc"/>
+        <npc name="Orc Archer" template="Orc">
+            <item template="Shortbow"/>
+            <item template="Arrows"/>
+        </npc>
+    </npc_group>
+</level>
+
+</npc_table>
+
+<npc_table type="lair">
+
+<level value="0">
+    <npc_group>
         <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin Mage" template="Goblin Mage">
+            <spell name="Fire bolt" count="6"/>
+            <spell name="Heal" count="1"/>
+        </npc>
+    </npc_group>
+</level>
+
+<level value="1">
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin Champion" template="Goblin Champion"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin Mage" template="Goblin Mage">
+            <spell name="Fire bolt" count="6"/>
+            <spell name="Heal" count="1"/>
+        </npc>
+    </npc_group>
+</level>
+
+<level value="2">
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin" template="Goblin"/>
+        <npc name="Goblin Mage" template="Goblin Mage">
+            <spell name="Fire bolt" count="6"/>
+            <spell name="Heal" count="1"/>
+        </npc>
+    </npc_group>
+    <npc_group>
+        <npc name="Orc" template="Orc"/>
+        <npc name="Orc" template="Orc"/>
     </npc_group>
     <npc_group>
         <npc name="Orc" template="Orc"/>
