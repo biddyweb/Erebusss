@@ -21,6 +21,7 @@ class OptionsGamestate : public Gamestate {
 
     int options_page_index;
 
+    QComboBox *gametypeComboBox;
     QComboBox *characterComboBox;
     QComboBox *difficultyComboBox;
     //QButtonGroup *difficultyButtonGroup;

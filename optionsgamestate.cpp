@@ -13,7 +13,7 @@
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), options_page_index(0), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
+    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
     nameLineEdit(NULL),
     load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
@@ -188,8 +188,7 @@ void OptionsGamestate::keyPress(QKeyEvent *key_event) {
     }
 }
 
-//const int n_options_pages = 1;
-const int n_options_pages = 2;
+const int n_options_pages = 3;
 
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
@@ -207,6 +206,24 @@ void OptionsGamestate::clickedStart() {
     widget->setLayout(layout);
 
     if( options_page_index == 0 ) {
+        {
+            QLabel *label = new QLabel("Select a game type: ");
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
+
+            label->setAlignment(Qt::AlignCenter);
+            h_layout->addWidget(label);
+
+            gametypeComboBox = new QComboBox();
+            gametypeComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
+            gametypeComboBox->setFont(game_g->getFontBig());
+            gametypeComboBox->addItem("Begin Campaign");
+            gametypeComboBox->addItem("Random Dungeon");
+            gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            h_layout->addWidget(gametypeComboBox);
+        }
+    }
+    else if( options_page_index == 1 ) {
         {
             QHBoxLayout *h_layout = new QHBoxLayout();
             layout->addLayout(h_layout);
@@ -266,7 +283,7 @@ void OptionsGamestate::clickedStart() {
         layout->addWidget(permadeathCheckBox);
 
     }
-    else if( options_page_index == 1 ) {
+    else if( options_page_index == 2 ) {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
@@ -333,17 +350,24 @@ void OptionsGamestate::clickedCancel() {
 void OptionsGamestate::clickedStartGame() {
     LOG("OptionsGamestate::clickedStartGame()\n");
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    int gametype_id = this->gametypeComboBox->currentIndex();
+    LOG("gametype_id: %d\n", gametype_id);
+    ASSERT_LOGGER(gametype_id >= 0 && gametype_id <= 1);
+    GameType gametype = (GameType)gametype_id;
+
     //int difficulty_id = this->difficultyButtonGroup->checkedId();
     int difficulty_id = this->difficultyComboBox->currentIndex();
     LOG("difficulty_id: %d\n", difficulty_id);
-    bool permadeath = this->permadeathCheckBox->isChecked();
     ASSERT_LOGGER(difficulty_id >= 0);
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
     Difficulty difficulty = (Difficulty)difficulty_id;
+
+    bool permadeath = this->permadeathCheckBox->isChecked();
+
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
-    StartGameMessage *game_message = new StartGameMessage(difficulty, this->characterComboBox->currentIndex(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
+    StartGameMessage *game_message = new StartGameMessage(gametype, difficulty, this->characterComboBox->currentIndex(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }
 
