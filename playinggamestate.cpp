@@ -724,12 +724,14 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     painter.setFont( game_g->getFontScene() );
+
+    const float bar_x = 16.0f/640.0f;
+    const float bar_y = 48.0f/360.0f;
+    const float portrait_size = 160.0f/1080.f;
+    float text_x = bar_x;
+    const float text_y = bar_y - 4.0f/360.0f;
+    const float location_name_y = 4.0f/360.0f;
     if( playing_gamestate->getPlayer() != NULL ) {
-        const float bar_x = 16.0f/640.0f;
-        const float bar_y = 48.0f/360.0f;
-        const float portrait_size = 160.0f/1080.f;
-        float text_x = bar_x;
-        const float text_y = bar_y - 4.0f/360.0f;
         const Character *player = playing_gamestate->getPlayer();
         if( player->getPortrait().length() > 0 ) {
             QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
@@ -770,6 +772,13 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         painter.setPen(Qt::red);
         //float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
         painter.drawText(8, height() - 16, QString::number(fps));
+    }
+
+    if( playing_gamestate->getCLocation() != NULL && playing_gamestate->getCLocation()->isDisplayName() ) {
+        painter.setPen(Qt::white);
+        QFontMetrics fm(painter.font());
+        int font_height = fm.height();
+        painter.drawText(bar_x*width(), font_height, playing_gamestate->getCLocation()->getName().c_str());
     }
 }
 
@@ -5090,11 +5099,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     if( is_player ) {
                         this->player = npc;
                     }
-                    else {
-                        if( !npc->isStaticImage() ) {
-                            this->animation_layers[ npc->getAnimationName() ]->getAnimationLayer(); // force animation to be loaded
-                        }
-                    }
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
                     if( !npc->hasDefaultPosition() ) {
@@ -5267,9 +5271,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
                         LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
                         throw string("Failed to find scenery's image");
-                    }
-                    else {
-                        animation_iter->second->getAnimationLayer(); // force animation to be loaded
                     }
                     const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                     if( animation_layer->getAnimationSet("opened") != NULL ) {
@@ -5472,29 +5473,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     qApp->processEvents();
 
     int progress_lo = 50, progress_hi = 100;
-    int progress_count = 0;
-    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
-        Location *loc = *iter;
-        qDebug("process location: %s", loc->getName().c_str());
-        if( loc->getBackgroundImageName().length() == 0 ) {
-            throw string("Location doesn't define background image name");
-        }
-        else if( loc->getFloorImageName().length() == 0 ) {
-            throw string("Location doesn't define floor image name");
-        }
-
-        loc->createBoundariesForRegions();
-        loc->createBoundariesForScenery();
-        loc->addSceneryToFloorRegions();
-        loc->calculateDistanceGraph();
-
-        progress_count++;
-        if( progress_count % 4 == 0 ) {
-            float progress = ((float)progress_count) / ((float)quest->getNLocations());
-            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
-            qApp->processEvents();
-        }
-    }
+    this->processLocations(progress_lo, progress_hi);
 
     gui_overlay->unsetProgress();
     qApp->processEvents();
@@ -5625,14 +5604,24 @@ void PlayingGamestate::createRandomQuest() {
 
     }
 
+    const int progress_lo = 10, progress_mid = 60, progress_hi = 100;
+
+    gui_overlay->setProgress(progress_lo);
+    qApp->processEvents();
+
+    const int n_levels_c = 3;
     string previous_level_name;
     Scenery *previous_exit_down = NULL;
     Vector2D first_player_start;
     Location *first_location;
     for(int level=0;;level++) {
+        float progress = ((float)level) / ((float)n_levels_c);
+        gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_mid);
+        qApp->processEvents();
+
         Vector2D player_start;
         Scenery *exit_down = NULL, *exit_up = NULL;
-        Location *location = LocationGenerator::generateLocation(&exit_down, &exit_up, this, &player_start, npc_tables, level);
+        Location *location = LocationGenerator::generateLocation(&exit_down, &exit_up, this, &player_start, npc_tables, level, n_levels_c);
         this->quest->addLocation(location);
         if( level == 0 ) {
             first_player_start = player_start;
@@ -5659,6 +5648,7 @@ void PlayingGamestate::createRandomQuest() {
 
         previous_level_name = location->getName();
         previous_exit_down = exit_down;
+
     }
 
     for(map<string, NPCTable *>::iterator iter = npc_tables.begin(); iter != npc_tables.end(); ++iter) {
@@ -5669,33 +5659,10 @@ void PlayingGamestate::createRandomQuest() {
     this->c_location = first_location;
     this->c_location->addCharacter(player, first_player_start.x, first_player_start.y);
 
-    gui_overlay->setProgress(50);
+    gui_overlay->setProgress(progress_mid);
     qApp->processEvents();
 
-    int progress_lo = 50, progress_hi = 100;
-    int progress_count = 0;
-    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
-        Location *loc = *iter;
-        qDebug("process location: %s", loc->getName().c_str());
-        if( loc->getBackgroundImageName().length() == 0 ) {
-            throw string("Location doesn't define background image name");
-        }
-        else if( loc->getFloorImageName().length() == 0 ) {
-            throw string("Location doesn't define floor image name");
-        }
-
-        loc->createBoundariesForRegions();
-        loc->createBoundariesForScenery();
-        loc->addSceneryToFloorRegions();
-        loc->calculateDistanceGraph();
-
-        progress_count++;
-        if( progress_count % 4 == 0 ) {
-            float progress = ((float)progress_count) / ((float)quest->getNLocations());
-            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
-            qApp->processEvents();
-        }
-    }
+    this->processLocations(progress_mid, progress_hi);
 
     gui_overlay->unsetProgress();
     qApp->processEvents();
@@ -5728,6 +5695,44 @@ void PlayingGamestate::createRandomQuest() {
 
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
+}
+
+void PlayingGamestate::processLocations(int progress_lo, int progress_hi) {
+    int progress_count = 0;
+    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
+        Location *loc = *iter;
+        qDebug("process location: %s", loc->getName().c_str());
+        if( loc->getBackgroundImageName().length() == 0 ) {
+            throw string("Location doesn't define background image name");
+        }
+        else if( loc->getFloorImageName().length() == 0 ) {
+            throw string("Location doesn't define floor image name");
+        }
+
+        loc->createBoundariesForRegions();
+        loc->createBoundariesForScenery();
+        loc->addSceneryToFloorRegions();
+        loc->calculateDistanceGraph();
+        for(set<Character *>::iterator iter2 = loc->charactersBegin(); iter2 != loc->charactersEnd(); ++iter2) {
+            Character *character = *iter2;
+            if( character != player && !character->isStaticImage() ) {
+                map<string, LazyAnimationLayer *>::const_iterator iter3 = this->animation_layers.find( character->getAnimationName() );
+                if( iter3 == this->animation_layers.end() ) {
+                    LOG("can't find animation layer %s for %s\n", character->getAnimationName().c_str(), character->getName().c_str());
+                    throw string("can't find animation layer");
+                }
+                LazyAnimationLayer *animation_layer = iter3->second;
+                animation_layer->getAnimationLayer(); // force animation to be loaded
+            }
+        }
+
+        progress_count++;
+        if( progress_count % 4 == 0 ) {
+            float progress = ((float)progress_count) / ((float)quest->getNLocations());
+            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
+            qApp->processEvents();
+        }
+    }
 }
 
 void PlayingGamestate::addGraphicsItem(QGraphicsItem *object, float width, bool undo_3d) {

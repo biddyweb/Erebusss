@@ -459,7 +459,7 @@ char Tilemap::getTileAt(int x, int y) const {
 }
 
 Location::Location(const string &name) :
-    name(name), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
+    name(name), display_name(false), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
     distance_graph(NULL), wall_x_scale(3.0f), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
 {
 }
@@ -1962,8 +1962,6 @@ bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_reg
     return false;
 }
 
-const int n_levels_c = 3;
-
 const float base_passage_length = 7.0f;
 const int max_passage_enemies = 6;
 const float base_room_size = base_passage_length - 2.0f;
@@ -2009,7 +2007,7 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
     }
 }
 
-void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info) {
+void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
     const float room_size = base_room_size;
     Vector2D room_dir_vec = directionFromEnum(seed.dir);
     Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
@@ -2166,7 +2164,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 int gold = rollDice(5, 10, 50);
                 scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
 
-                if( level == n_levels_c-1 ) {
+                if( level == n_levels-1 ) {
                     // TODO: final quest location
                 }
                 else if( *exit_down == NULL ) {
@@ -2273,11 +2271,11 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
     }
 }
 
-void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info) {
+void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
     qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     if( seed.type == Seed::TYPE_X_ROOM ) {
-        exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, npc_tables, level, generator_info);
+        exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, npc_tables, level, n_levels, generator_info);
         return;
     }
     else if( seed.type == Seed::TYPE_ROOM_PASSAGEWAY ) {
@@ -2394,7 +2392,10 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
             n_doors = 2;
         }
         else if( roll <= 75 ) {
-        //else if( roll <= 30 ) {
+            // doors more likely if haven't found any rooms yet
+            if( generator_info->nRooms() == 0 ) {
+                n_doors = 1;
+            }
         }
         else {
             int passage_section = rand() % passage_length_i;
@@ -2538,15 +2539,16 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     }
 }
 
-Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level) {
+Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels) {
     LOG("LocationGenerator::generateLocation create level %d\n", level);
     stringstream str;
-    str << "Level " << level;
+    str << "Level " << (level+1);
     Location *location = NULL;
 
     for(;;) {
         *exit_down = *exit_up = NULL;
         location = new Location(str.str());
+        location->setDisplayName(true);
         location->setBackgroundImageName("background_brown");
         location->setFloorImageName("floor_rock");
         location->setWallImageName("wall");
@@ -2571,7 +2573,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
 
             for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
                 Seed seed = *iter;
-                exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, npc_tables, level, &generator_info);
+                exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, npc_tables, level, n_levels, &generator_info);
             }
         }
 
