@@ -547,6 +547,7 @@ public:
     QString getPermadeathSavefilename() const {
         return this->permadeath_savefilename;
     }
+    void querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h);
     void loadQuest(const QString &filename, bool is_savegame);
     void createRandomQuest();
     bool saveGame(const QString &filename, bool already_fullpath);

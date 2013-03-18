@@ -1908,6 +1908,16 @@ NPCTable::~NPCTable() {
     }
 }
 
+const NPCGroup *NPCTable::chooseGroup(int level) const {
+    const NPCTableLevel *npc_table_level = this->getLevel(level);
+    if( npc_table_level == NULL ) {
+        LOG("NPCTable::chooseGroup no table for level %d\n", level);
+        throw string("no table for this level");
+    }
+    const NPCGroup *npc_group = npc_table_level->chooseGroup();
+    return npc_group;
+}
+
 Direction4 rotateDirection4(Direction4 dir, int turn) {
     int i_dir = (int)dir;
     i_dir += turn;
@@ -1952,15 +1962,17 @@ bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_reg
     return false;
 }
 
-const float base_passage_length = 5.0f;
-const int max_passage_enemies = 4;
+const int n_levels_c = 3;
+
+const float base_passage_length = 7.0f;
+const int max_passage_enemies = 6;
 const float base_room_size = base_passage_length - 2.0f;
 const float passage_width = 1.0f;
 const float passage_hwidth = 0.5f * passage_width;
 const float door_width = 1.0f;
 const float door_depth = 1.0f;
 
-void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
+void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
     //Vector2D door_centre = seed.pos + dir_vec * 0.5f * door_depth;
     //Vector2D door_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
@@ -1974,37 +1986,6 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
         Vector2D passageway_centre = door_centre + dir_vec * ( 0.5f*door_depth + passage_hwidth );
-        /*float passageway_w = 0.0f, passageway_h = 0.0f;
-        if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
-            passageway_w = base_passage_length;
-            //passageway_w = 2.0f;
-            passageway_h = passage_width;
-        }
-        else {
-            passageway_w = passage_width;
-            passageway_h = base_passage_length;
-            //passageway_h = 2.0f;
-        }
-        //passageway_w = 1.0f;
-        //passageway_h = 1.0f;
-        Rect2D passageway_rect(passageway_centre - Vector2D(0.5f*passageway_w, 0.5f*passageway_h), passageway_centre + Vector2D(0.5f*passageway_w, 0.5f*passageway_h));
-        if( passageway_rect.getX() < 0.0f )
-            return;
-        if( passageway_rect.getY() < 0.0f )
-            return;
-        bool collides_passageway = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, NULL, passageway_rect, 1.0f);
-        if( !collides_passageway ) {
-            FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
-            location->addFloorRegion(floor_region);
-            floor_regions_rects->push_back(door_rect);
-
-            floor_region = FloorRegion::createRectangle(passageway_rect);
-            location->addFloorRegion(floor_region);
-            floor_regions_rects->push_back(passageway_rect);
-
-            // TODO: passageway contents?
-            // TODO: explore from passageway
-        }*/
         FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
         location->addFloorRegion(floor_region);
         floor_regions_rects->push_back(door_rect);
@@ -2028,8 +2009,7 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
     }
 }
 
-void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first) {
-    // TODO: different room sizes
+void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info) {
     const float room_size = base_room_size;
     Vector2D room_dir_vec = directionFromEnum(seed.dir);
     Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
@@ -2041,8 +2021,74 @@ void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &see
         return;
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
-        Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*room_size );
-        Rect2D room_rect(room_centre - Vector2D(0.5f*room_size, 0.5f*room_size), room_centre + Vector2D(0.5f*room_size, 0.5f*room_size));
+        enum RoomType {
+            ROOMTYPE_NORMAL = 0,
+            ROOMTYPE_HAZARD = 1,
+            ROOMTYPE_LAIR = 2,
+            ROOMTYPE_QUEST = 3
+        };
+        RoomType room_type = ROOMTYPE_NORMAL;
+        float room_size_w = room_size;
+        float room_size_h = room_size;
+        int roll = rollDice(1, 12, 0);
+        //roll = 11;
+        string enemy_table;
+        if( roll <= 6 ) {
+            // normal room
+            room_type = ROOMTYPE_NORMAL;
+        }
+        else if( roll <= 8 ) {
+            // hazard
+            room_type = ROOMTYPE_HAZARD;
+        }
+        else if( roll <= 10 ) {
+            // lair
+            room_type = ROOMTYPE_LAIR;
+        }
+        else {
+            // quest room
+            room_type = ROOMTYPE_QUEST;
+        }
+
+        if( room_type == ROOMTYPE_QUEST && generator_info->n_rooms_quest > 0 ) {
+            // only 1 quest room per level
+            room_type = ROOMTYPE_LAIR;
+        }
+        else if( room_type == ROOMTYPE_QUEST && ( generator_info->n_rooms_normal == 0 || generator_info->n_rooms_hazard == 0 || generator_info->n_rooms_lair == 0 ) ) {
+            // need at least 1 of each of the other room types, before having a quest room
+            if( generator_info->n_rooms_normal == 0 ) {
+                room_type = ROOMTYPE_NORMAL;
+            }
+            else if( generator_info->n_rooms_hazard == 0 ) {
+                room_type = ROOMTYPE_HAZARD;
+            }
+            else {
+                room_type = ROOMTYPE_LAIR;
+            }
+        }
+
+        if( room_type == ROOMTYPE_LAIR ) {
+            enemy_table = "lair";
+            if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
+                room_size_h *= 2.0f;
+            }
+            else {
+                room_size_w *= 2.0f;
+            }
+        }
+        else if( room_type == ROOMTYPE_QUEST ) {
+            enemy_table = "lair"; // using same table as lairs for now
+            if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
+                room_size_h *= 2.0f;
+            }
+            else {
+                room_size_w *= 2.0f;
+            }
+        }
+
+        float into_room_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? room_size_h : room_size_w;
+        Vector2D room_centre = door_centre + room_dir_vec * ( 0.5f*door_depth + 0.5f*into_room_size );
+        Rect2D room_rect(room_centre - Vector2D(0.5f*room_size_w, 0.5f*room_size_h), room_centre + Vector2D(0.5f*room_size_w, 0.5f*room_size_h));
         if( room_rect.getX() < 0.0f )
             return;
         if( room_rect.getY() < 0.0f )
@@ -2057,8 +2103,138 @@ void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &see
             location->addFloorRegion(floor_region);
             floor_regions_rects->push_back(room_rect);
 
+            if( room_type == ROOMTYPE_NORMAL ) {
+                generator_info->n_rooms_normal++;
+            }
+            else if( room_type == ROOMTYPE_HAZARD ) {
+                generator_info->n_rooms_hazard++;
+            }
+            else if( room_type == ROOMTYPE_LAIR ) {
+                generator_info->n_rooms_lair++;
+            }
+            else if( room_type == ROOMTYPE_QUEST ) {
+                generator_info->n_rooms_quest++;
+            }
+
             // TODO: place door scenery itself
-            // TODO: room contents
+            Scenery *scenery = NULL;
+            if( room_type == ROOMTYPE_NORMAL ) {
+                // normal room
+                // 50% chance of barrel or crate in corner
+                if( rollDice(1, 2, 0) == 1 )
+                {
+                    string name, image_name;
+                    if( rollDice(1, 2, 0) == 1 ) {
+                        name = "Barrel";
+                        image_name = "barrel";
+                    }
+                    else {
+                        name = "Crate";
+                        image_name = "crate";
+                    }
+                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
+                    scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                    scenery->setBlocking(true, false);
+                    scenery->setCanBeOpened(true);
+                    int gold = rollDice(1, 12, 0);
+                    scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+                }
+            }
+            else if( room_type == ROOMTYPE_HAZARD ) {
+                // hazard
+            }
+            else if( room_type == ROOMTYPE_LAIR ) {
+                // lair
+                string name = "Chest", image_name = "chest";
+                float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
+                scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                scenery->setBlocking(true, false);
+                scenery->setCanBeOpened(true);
+                int gold = rollDice(4, 10, 10);
+                scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+            }
+            else {
+                // quest room
+                string name = "Chest", image_name = "chest";
+                float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
+                scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                scenery->setBlocking(true, false);
+                scenery->setCanBeOpened(true);
+                int gold = rollDice(5, 10, 50);
+                scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+
+                if( level == n_levels_c-1 ) {
+                    // TODO: final quest location
+                }
+                else if( *exit_down == NULL ) {
+                    // also place stairs down, if not already found
+                    name = "Stairs";
+                    image_name = "stairsdown_indoors";
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+                    Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                    scenery_stairs_down->setBlocking(true, false);
+                    location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
+                    *exit_down = scenery_stairs_down;
+                }
+            }
+
+            if( scenery != NULL ) {
+                int dir_i = rand() % 4;
+                int sign_x = (rand() % 2)==0 ? -1 : 1;
+                int sign_y = (rand() % 2)==0 ? -1 : 1;
+                Vector2D scenery_pos = room_centre + Vector2D(1.0f, 0.0f) * ( 0.5f*room_size_w - 0.5f ) * sign_x + Vector2D(0.0f, 1.0f) * ( 0.5f*room_size_h - 0.5f ) * sign_y;
+                location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
+            }
+
+            if( enemy_table.length() > 0 ) {
+                const int n_slots_w = 5, n_slots_h = 5;
+                bool slot_filled[n_slots_w*n_slots_h];
+                for(int i=0;i<n_slots_w*n_slots_h;i++) {
+                    slot_filled[i] = false;
+                }
+                float slot_scale_x = room_size_w/room_size;
+                float slot_scale_y = room_size_h/room_size;
+                map<string, NPCTable *>::const_iterator iter = npc_tables.find(enemy_table);
+                if( iter != npc_tables.end() ) {
+                    const NPCTable *npc_table = iter->second;
+                    const NPCGroup *npc_group = npc_table->chooseGroup(level);
+                    int count = 0;
+                    for(vector<Character *>::const_iterator iter2 = npc_group->charactersBegin(); iter2 != npc_group->charactersEnd(); ++iter2, count++) {
+                        Vector2D npc_pos;
+                        while(true) {
+                            int slot_x = rand() % n_slots_w;
+                            int slot_y = rand() % n_slots_h;
+                            if( (slot_x == 0 || slot_x == n_slots_w-1) && (slot_x == 0 || slot_x == n_slots_w-1) ) {
+                                // don't put in corners, as we may use them for scenery
+                                continue;
+                            }
+                            if( slot_x == (n_slots_w-1)/2 && slot_y == (n_slots_h-1)/2 ) {
+                                // don't put in centre, as we may use it for scenery
+                                continue;
+                            }
+                            if( !slot_filled[slot_y*n_slots_w + slot_x] ) {
+                                slot_filled[slot_y*n_slots_w + slot_x] = true;
+                                npc_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(slot_x+0.5f)*slot_scale_x + Vector2D(0.0f, 1.0f)*(slot_y+0.5f)*slot_scale_y;
+                                break;
+                            }
+                        }
+
+                        if( npc_pos.x >= room_rect.getBottomRight().x || npc_pos.y >= room_rect.getBottomRight().y ) {
+                            LOG("about to place NPC at %f, %f in room %f, %f to %f, %f\n", npc_pos.x, npc_pos.y, room_rect.getTopLeft().x, room_rect.getTopLeft().y, room_rect.getBottomRight().x, room_rect.getBottomRight().y);
+                            throw string("invalid location for NPC");
+                        }
+                        const Character *npc = *iter2;
+                        Character *copy = new Character(*npc);
+                        location->addCharacter(copy, npc_pos.x, npc_pos.y);
+                        if( count == n_slots_w*n_slots_h - 4 - 1 ) { // -4 for corners, -1 for centre
+                            break;
+                        }
+                    }
+                }
+            }
 
             //int n_room_doors = rollDice(1, 3, -1);
             int n_room_doors = rollDice(1, 2, 0); // not necessarily the actual number of doors, as we may fail to find room, when exploring from the seed
@@ -2085,7 +2261,8 @@ void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &see
                 done_dirs.push_back(new_room_dir);
 
                 Vector2D new_room_dir_vec = directionFromEnum(new_room_dir);
-                Vector2D door_pos = room_centre + new_room_dir_vec * 0.5 * room_size;
+                float door_dist = ( new_room_dir == DIRECTION4_NORTH || new_room_dir == DIRECTION4_SOUTH ) ? room_size_h : room_size_w;
+                Vector2D door_pos = room_centre + new_room_dir_vec * 0.5 * door_dist;
                 Seed::Type seed_type = rollDice(1, 2, 0) == 1 ? Seed::TYPE_X_ROOM : Seed::TYPE_ROOM_PASSAGEWAY;
                 Seed new_seed(seed_type, door_pos, new_room_dir);
                 new_seed.addIgnoreRect(room_rect);
@@ -2096,15 +2273,15 @@ void LocationGenerator::exploreFromSeedXRoom(Location *location, const Seed &see
     }
 }
 
-void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables) {
+void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
     qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     if( seed.type == Seed::TYPE_X_ROOM ) {
-        exploreFromSeedXRoom(location, seed, seeds, floor_regions_rects, first);
+        exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, npc_tables, level, generator_info);
         return;
     }
     else if( seed.type == Seed::TYPE_ROOM_PASSAGEWAY ) {
-        exploreFromSeedRoomPassageway(location, seed, seeds, floor_regions_rects, first);
+        exploreFromSeedRoomPassageway(location, seed, seeds, floor_regions_rects);
         return;
     }
 
@@ -2112,9 +2289,9 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
     int passage_length_i = 0;
     {
         int roll = first ? 2 : rollDice(1, 6, 0);
-        if( roll == 1 )
+        if( roll <= 2 )
             passage_length_i = 1;
-        else if( roll >= 2 && roll <= 4 )
+        else if( roll <= 5 )
             passage_length_i = 2;
         else
             passage_length_i = 3;
@@ -2183,6 +2360,17 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
         floor_regions_rects->push_back(floor_region_rect);
         ignore_rects.push_back(floor_region_rect);
     }
+    if( first ) {
+        string name = "Stairs";
+        string image_name = "stairsup_indoors";
+        float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+        Scenery *scenery_stairs_up = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+        scenery_stairs_up->setBlocking(true, false);
+        Vector2D scenery_pos = seed.pos + dir_vec*size_w*0.5f;
+        location->addScenery(scenery_stairs_up, scenery_pos.x, scenery_pos.y);
+        *exit_up = scenery_stairs_up;
+    }
 
     // contents
     int n_doors = 0;
@@ -2213,7 +2401,7 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
             map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
             if( iter != npc_tables.end() ) {
                 const NPCTable *npc_table = iter->second;
-                const NPCGroup *npc_group = npc_table->chooseGroup(0);
+                const NPCGroup *npc_group = npc_table->chooseGroup(level);
                 int count = 0;
                 int spare = max_passage_enemies - npc_group->size();
                 int shift = 0;
@@ -2292,7 +2480,6 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
             right_turn = true;
         }
     }
-    // TODO: stairs
 
     Direction4 l_dir = rotateDirection4(seed.dir, -1);
     Direction4 r_dir = rotateDirection4(seed.dir, 1);
@@ -2351,32 +2538,49 @@ void LocationGenerator::exploreFromSeed(Location *location, const Seed &seed, ve
     }
 }
 
-Location *LocationGenerator::generateLocation(Vector2D *player_start, const map<string, NPCTable *> &npc_tables) {
-    Location *location = new Location("");
-    location->setBackgroundImageName("background_brown");
-    location->setFloorImageName("floor_rock");
-    location->setWallImageName("wall");
+Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level) {
+    LOG("LocationGenerator::generateLocation create level %d\n", level);
+    stringstream str;
+    str << "Level " << level;
+    Location *location = NULL;
 
-    Vector2D start_pos(0.0f, 100.0f);
-    Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, DIRECTION4_EAST);
-    *player_start = Vector2D(start_pos + Vector2D(0.5f, 0.0f));
+    for(;;) {
+        *exit_down = *exit_up = NULL;
+        location = new Location(str.str());
+        location->setBackgroundImageName("background_brown");
+        location->setFloorImageName("floor_rock");
+        location->setWallImageName("wall");
 
-    vector<Seed> seeds;
-    seeds.push_back(seed);
-    vector<Rect2D> floor_regions_rects;
+        Vector2D start_pos(0.0f, 100.0f);
+        Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, DIRECTION4_EAST);
+        *player_start = Vector2D(start_pos + Vector2D(1.5f, 0.0f));
 
-    for(int count=0;count<10 && seeds.size() > 0;count++) {
-        vector<Seed> c_seeds;
-        for(vector<Seed>::iterator iter = seeds.begin(); iter != seeds.end(); ++iter) {
-            Seed seed = *iter;
-            c_seeds.push_back(seed);
+        vector<Seed> seeds;
+        seeds.push_back(seed);
+        vector<Rect2D> floor_regions_rects;
+
+        LocationGeneratorInfo generator_info;
+
+        for(int count=0;count<10 && seeds.size() > 0;count++) {
+            vector<Seed> c_seeds;
+            for(vector<Seed>::iterator iter = seeds.begin(); iter != seeds.end(); ++iter) {
+                Seed seed = *iter;
+                c_seeds.push_back(seed);
+            }
+            seeds.clear();
+
+            for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
+                Seed seed = *iter;
+                exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, npc_tables, level, &generator_info);
+            }
         }
-        seeds.clear();
 
-        for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
-            Seed seed = *iter;
-            exploreFromSeed(location, seed, &seeds, &floor_regions_rects, count==0, npc_tables);
+        if( generator_info.n_rooms_quest > 0 ) {
+            // okay!
+            break;
         }
+        LOG("level %d didn't create a quest room, delete and try again\n", level);
+        delete location;
     }
 
     return location;

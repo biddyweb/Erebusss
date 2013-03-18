@@ -993,19 +993,30 @@ public:
     void addLevel(int value, NPCTableLevel *level) {
         this->levels[value] = level;
     }
-    const NPCGroup *chooseGroup(int level) const {
-        const NPCTableLevel *npc_table_level = this->getLevel(level);
-        const NPCGroup *npc_group = npc_table_level->chooseGroup();
-        return npc_group;
+    const NPCGroup *chooseGroup(int level) const;
+};
+
+class LocationGeneratorInfo {
+public:
+    int n_rooms_normal;
+    int n_rooms_hazard;
+    int n_rooms_lair;
+    int n_rooms_quest;
+
+    LocationGeneratorInfo() {
+        n_rooms_normal = 0;
+        n_rooms_hazard = 0;
+        n_rooms_lair = 0;
+        n_rooms_quest = 0;
     }
 };
 
 class LocationGenerator {
     static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap);
-    static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
-    static void exploreFromSeedXRoom(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first);
-    static void exploreFromSeed(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables);
+    static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects);
+    static void exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info);
+    static void exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, LocationGeneratorInfo *generator_info);
 
 public:
-    static Location *generateLocation(Vector2D *player_start, const map<string, NPCTable *> &npc_tables);
+    static Location *generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level);
 };

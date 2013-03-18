@@ -4559,6 +4559,61 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
     return item;
 }
 
+void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h) {
+    // side-effect: pre-loads any lazy images
+    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name);
+    if( animation_iter == this->scenery_animation_layers.end() ) {
+        LOG("failed to find image for scenery\n");
+        LOG("    image name: %s\n", image_name.c_str());
+        throw string("Failed to find scenery's image");
+    }
+    else {
+        animation_iter->second->getAnimationLayer(); // force animation to be loaded
+    }
+
+    if( has_size ) {
+        const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
+        QPixmap image = animation_layer->getAnimationSet("")->getFrame(0, 0);
+        int image_w = image.width();
+        int image_h = image.height();
+        if( image_w > image_h ) {
+            size_w = size;
+            size_h = (size*image_h)/(float)image_w;
+        }
+        else {
+            size_h = size;
+            size_w = (size*image_w)/(float)image_h;
+        }
+        qDebug("size: %f size_w: %f size_h: %f", size, size_w, size_h);
+    }
+
+    if( !has_visual_h ) {
+        // default to size_
+        visual_h = size_h;
+    }
+
+    if( this->view_transform_3d ) {
+        // hack to get height right in 3D mode!
+        if( !has_size ) {
+            // if we have specified w/h values explicitly, we assume these are in world coordinates already
+        }
+        else {
+            // otherwise we assume the width/height of the image are already in "isometric"/3D format
+            if( !has_visual_h )
+                visual_h *= 2.0f; // to counter the QGraphicsView scaling
+            size_h = size_w;
+            if( !has_visual_h ) {
+                visual_h = std::max(visual_h, size_h);
+                ASSERT_LOGGER( visual_h - size_h >= 0.0f );
+            }
+        }
+    }
+
+    *ret_size_w = size_w;
+    *ret_size_h = size_h;
+    *ret_visual_h = visual_h;
+}
+
 void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.toUtf8().data());
     // filename should be full path
@@ -5115,48 +5170,34 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QStringRef unlock_text_s = reader.attributes().value("unlock_text");
                     QStringRef unlock_xp_s = reader.attributes().value("unlock_xp");
                     QStringRef confirm_text_s = reader.attributes().value("confirm_text");
-                    float size_w = 0.0f, size_h = 0.0f;
                     QStringRef size_s = reader.attributes().value("size");
-                   /* bool is_animation = false;
-                   *map<string, QPixmap>::iterator image_iter = this->scenery_images.find(image_name_s.toString().toStdString());
-                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
-                    if( image_iter == this->scenery_images.end() ) {
-                        if( animation_iter == this->scenery_animation_layers.end() ) {
-                            LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
-                            LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
-                            throw string("Failed to find scenery's image");
-                        }
-                        else {
-                            is_animation = true;
-                            animation_iter->second->getAnimationLayer(); // force animation to be loaded
-                        }
+
+                    bool has_size = false;
+                    float size = 0.0f, size_w = 0.0f, size_h = 0.0f;
+                    if( size_s.length() > 0 ) {
+                        has_size = true;
+                        size = parseFloat(size_s.toString());
                     }
                     else {
-                        is_animation = false;
-                    }*/
-                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
-                    if( animation_iter == this->scenery_animation_layers.end() ) {
-                        LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
-                        LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
-                        throw string("Failed to find scenery's image");
+                        QStringRef size_w_s = reader.attributes().value("w");
+                        QStringRef size_h_s = reader.attributes().value("h");
+                        size_w = parseFloat(size_w_s.toString());
+                        size_h = parseFloat(size_h_s.toString());
                     }
-                    else {
-                        animation_iter->second->getAnimationLayer(); // force animation to be loaded
+                    bool has_visual_h = false;
+                    float visual_h = 0.0f;
+                    QStringRef visual_h_s = reader.attributes().value("visual_h");
+                    if( visual_h_s.length() > 0 ) {
+                        has_visual_h = true;
+                        visual_h = parseFloat(visual_h_s.toString());
                     }
 
-                    if( size_s.length() > 0 ) {
+                    this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
+
+                    /*if( size_s.length() > 0 ) {
                         float size = parseFloat(size_s.toString());
-                        /*QPixmap image;
-                        if( is_animation ) {
-                            const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
-                            image = animation_layer->getAnimationSet("")->getFrame(0, 0);
-                        }
-                        else {
-                            image = image_iter->second;
-                        }*/
                         const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                         QPixmap image = animation_layer->getAnimationSet("")->getFrame(0, 0);
-                        //QPixmap image = this->scenery_images[image_name_s.toString().toStdString()];
                         int image_w = image.width();
                         int image_h = image.height();
                         if( image_w > image_h ) {
@@ -5187,7 +5228,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
                     if( this->view_transform_3d ) {
                         // hack to get height right in 3D mode!
-                        //if( door || exit /*|| draw_type_s.length() > 0*/ ) {
                         if( size_s.length() == 0 ) {
                             // if we have specified w/h values explicitly, we assume these are in world coordinates already
                         }
@@ -5201,9 +5241,8 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                                 ASSERT_LOGGER( visual_h - size_h >= 0.0f );
                             }
                         }
-                    }
+                    }*/
 
-                    //scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), is_animation, size_w, size_h, visual_h);
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5223,15 +5262,15 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         throw string("scenery can't be both an exit_location and a door");
                     }
 
-                    /*if( is_animation ) {
-                        map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(scenery->getImageName());
-                        if( animation_iter != this->scenery_animation_layers.end() ) {
-                            const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
-                            if( animation_layer->getAnimationSet("opened") != NULL ) {
-                                scenery->setCanBeOpened(true);
-                            }
-                        }
-                    }*/
+                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
+                    if( animation_iter == this->scenery_animation_layers.end() ) {
+                        LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
+                        LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
+                        throw string("Failed to find scenery's image");
+                    }
+                    else {
+                        animation_iter->second->getAnimationLayer(); // force animation to be loaded
+                    }
                     const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
                     if( animation_layer->getAnimationSet("opened") != NULL ) {
                         scenery->setCanBeOpened(true);
@@ -5586,17 +5625,49 @@ void PlayingGamestate::createRandomQuest() {
 
     }
 
-    Vector2D player_start;
-    Location *location = LocationGenerator::generateLocation(&player_start, npc_tables);
+    string previous_level_name;
+    Scenery *previous_exit_down = NULL;
+    Vector2D first_player_start;
+    Location *first_location;
+    for(int level=0;;level++) {
+        Vector2D player_start;
+        Scenery *exit_down = NULL, *exit_up = NULL;
+        Location *location = LocationGenerator::generateLocation(&exit_down, &exit_up, this, &player_start, npc_tables, level);
+        this->quest->addLocation(location);
+        if( level == 0 ) {
+            first_player_start = player_start;
+            first_location = location;
+        }
+        if( exit_up != NULL ) {
+            if( level == 0 ) {
+                // out of dungeon
+                exit_up->setExit(true);
+            }
+            else {
+                // exit to previous level
+                Vector2D previous_exit_down_pos = previous_exit_down->getPos() + Vector2D(1.0f, 0.0f);
+                exit_up->setExitLocation(previous_level_name, previous_exit_down_pos);
+
+                Vector2D exit_up_pos = exit_up->getPos() + Vector2D(1.0f, 0.0f);
+                previous_exit_down->setExitLocation(location->getName(), exit_up_pos);
+            }
+        }
+        if( exit_down == NULL ) {
+            // reached bottom of dungeon
+            break;
+        }
+
+        previous_level_name = location->getName();
+        previous_exit_down = exit_down;
+    }
 
     for(map<string, NPCTable *>::iterator iter = npc_tables.begin(); iter != npc_tables.end(); ++iter) {
         NPCTable *npc_table = iter->second;
         delete npc_table;
     }
 
-    this->quest->addLocation(location);
-    this->c_location = location;
-    this->c_location->addCharacter(player, player_start.x, player_start.y);
+    this->c_location = first_location;
+    this->c_location->addCharacter(player, first_player_start.x, first_player_start.y);
 
     gui_overlay->setProgress(50);
     qApp->processEvents();
