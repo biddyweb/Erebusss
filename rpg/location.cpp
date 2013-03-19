@@ -2374,67 +2374,48 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     int n_doors = 0;
     if( !first )
     {
-        /*int roll = rollDice(2, 12, 0);
-        // n.b., modified to make doors more likely, and wandering monsters more likely
-        if( roll >= 5 && roll <= 14 ) {
-        }
-        else if( roll >= 15 && roll <= 19 ) {
-            n_doors = 1;
-        }
-        else if( roll >= 20 && roll <= 21 ) {
-            n_doors = 2;
-        }*/
-        int roll = rollDice(1, 100, 0);
-        if( roll <= 20 ) {
-            n_doors = 1;
-        }
-        else if( roll <= 30 ) {
-            n_doors = 2;
-        }
-        else if( roll <= 75 ) {
-            // doors more likely if haven't found any rooms yet
-            if( generator_info->nRooms() == 0 ) {
+        {
+            // doors
+            int roll = rollDice(1, 100, 0);
+            if( roll <= 20 ) {
                 n_doors = 1;
             }
-        }
-        else {
-            int passage_section = rand() % passage_length_i;
-            map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
-            if( iter != npc_tables.end() ) {
-                const NPCTable *npc_table = iter->second;
-                const NPCGroup *npc_group = npc_table->chooseGroup(level);
-                int count = 0;
-                int spare = max_passage_enemies - npc_group->size();
-                int shift = 0;
-                if( spare > 0 ) {
-                    shift = rand() % (spare+1);
+            else if( roll <= 30 ) {
+                n_doors = 2;
+            }
+            else if( roll <= 75 ) {
+                // doors more likely if haven't found any rooms yet
+                if( generator_info->nRooms() == 0 ) {
+                    n_doors = 1;
                 }
-                for(vector<Character *>::const_iterator iter2 = npc_group->charactersBegin(); iter2 != npc_group->charactersEnd(); ++iter2, count++) {
-                    const Character *npc = *iter2;
-                    /*qDebug("npc:");
-                    qDebug("name: %s", npc->getName().c_str());
-                    for(set<Item *>::const_iterator iter = npc->itemsBegin(); iter != npc->itemsEnd(); ++iter) {
-                        const Item *item = *iter;
-                        qDebug("### item %s image name %s\n", item->getName().c_str(), item->getImageName().c_str());
-                        if( item->getImageName().length() == 0 ) {
-                            throw string("###");
+            }
+        }
+        {
+            // wandering monsters
+            int roll = rollDice(1, 100, 0);
+            if( roll <= 75 ) {
+            }
+            else {
+                int passage_section = rand() % passage_length_i;
+                map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
+                if( iter != npc_tables.end() ) {
+                    const NPCTable *npc_table = iter->second;
+                    const NPCGroup *npc_group = npc_table->chooseGroup(level);
+                    int count = 0;
+                    int spare = max_passage_enemies - npc_group->size();
+                    int shift = 0;
+                    if( spare > 0 ) {
+                        shift = rand() % (spare+1);
+                    }
+                    for(vector<Character *>::const_iterator iter2 = npc_group->charactersBegin(); iter2 != npc_group->charactersEnd(); ++iter2, count++) {
+                        const Character *npc = *iter2;
+                        Character *copy = new Character(*npc);
+                        float pos = passage_section*base_passage_length + (float)(count + shift) + 0.5f;
+                        Vector2D npc_pos = seed.pos + dir_vec * pos;
+                        location->addCharacter(copy, npc_pos.x, npc_pos.y);
+                        if( count == max_passage_enemies ) {
+                            break;
                         }
-                    }*/
-                    Character *copy = new Character(*npc);
-                    float pos = passage_section*base_passage_length + (float)(count + shift) + 0.5f;
-                    Vector2D npc_pos = seed.pos + dir_vec * pos;
-                    location->addCharacter(copy, npc_pos.x, npc_pos.y);
-                    /*qDebug("copy:");
-                    qDebug("name: %s", copy->getName().c_str());
-                    for(set<Item *>::const_iterator iter = copy->itemsBegin(); iter != copy->itemsEnd(); ++iter) {
-                        const Item *item = *iter;
-                        qDebug("### item %s image name %s\n", item->getName().c_str(), item->getImageName().c_str());
-                        if( item->getImageName().length() == 0 ) {
-                            throw string("###");
-                        }
-                    }*/
-                    if( count == max_passage_enemies ) {
-                        break;
                     }
                 }
             }
