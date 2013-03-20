@@ -2029,8 +2029,10 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         float room_size_w = room_size;
         float room_size_h = room_size;
         int roll = rollDice(1, 12, 0);
-        //roll = 11;
         string enemy_table;
+        /*if( rollDice(1, 2, 0) == 1 ) {
+            roll = 9;
+        }*/
         if( roll <= 6 ) {
             // normal room
             room_type = ROOMTYPE_NORMAL;
@@ -2152,6 +2154,45 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 scenery->setCanBeOpened(true);
                 int gold = rollDice(4, 10, 10);
                 scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+
+                string scenery_centre_name, scenery_centre_image_name;
+                float scenery_centre_size = 0.0f;
+                bool scenery_centre_is_blocking = true;
+                bool scenery_centre_blocks_visibility = false;
+                Scenery::DrawType draw_type = Scenery::DRAWTYPE_NORMAL;
+                string scenery_centre_description;
+                int roll = rollDice(1, 100, 0);
+                //roll = 50;
+                if( roll <= 25 ) {
+                    scenery_centre_name = "Fire";
+                    scenery_centre_image_name = "fire";
+                    scenery_centre_size = 1.0;
+                }
+                else if( roll <= 50 ) {
+                    scenery_centre_name = "Trapdoor";
+                    scenery_centre_image_name = "grate";
+                    scenery_centre_size = 0.5;
+                    draw_type = Scenery::DRAWTYPE_BACKGROUND;
+                    if( rollDice(1, 2, 0) == 1 ) {
+                        scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.";
+                    }
+                    else {
+                        scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. You see nothing but blackness beneath.";
+                    }
+                }
+
+                if( scenery_centre_name.length() > 0 ) {
+                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
+                    Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
+                    scenery_centre->setDrawType(draw_type);
+                    scenery->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
+                    if( scenery_centre_description.length() > 0 ) {
+                        scenery_centre->setDescription(scenery_centre_description);
+                    }
+                    Vector2D scenery_pos = room_centre;
+                    location->addScenery(scenery_centre, scenery_pos.x, scenery_pos.y);
+                }
             }
             else {
                 // quest room
