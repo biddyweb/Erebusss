@@ -2391,11 +2391,52 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
             }
         }
         {
+            // traps
+            int roll = rollDice(1, 100, 0);
+            if( roll <= 10 ) {
+                string trap_type;
+                int rating = 1;
+                roll = rollDice(1, 9, 0);
+                if( roll <= 2 ) {
+                    trap_type = "arrow";
+                    rating = level+1;
+                }
+                else if( roll <= 4 ) {
+                    trap_type = "mantrap";
+                    rating = level+1;
+                }
+                else if( roll <= 6 ) {
+                    trap_type = "acid";
+                    rating = level+1;
+                }
+                else if( roll <= 8 ) {
+                    trap_type = "darts";
+                    rating = level+1;
+                }
+                else {
+                    trap_type = "gas";
+                    rating = 2;
+                }
+                int difficulty = level;
+                Trap *trap = new Trap(trap_type, passage_width, passage_width);
+                trap->setRating(rating);
+                trap->setDifficulty(difficulty);
+                float pos_x = rect_pos.x;
+                float pos_y = rect_pos.y;
+                int passage_section = rand() % (int)(passage_length_i*base_passage_length);
+                if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
+                    pos_y += passage_section;
+                }
+                else {
+                    pos_x += passage_section;
+                }
+                location->addTrap(trap, pos_x, pos_y);
+            }
+        }
+        {
             // wandering monsters
             int roll = rollDice(1, 100, 0);
-            if( roll <= 75 ) {
-            }
-            else {
+            if( roll <= 25 ) {
                 int passage_section = rand() % passage_length_i;
                 map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
                 if( iter != npc_tables.end() ) {
