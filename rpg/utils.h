@@ -194,6 +194,12 @@ public:
     Vector2D getBottomRight() const {
         return this->bottom_right;
     }
+    Vector2D getTopRight() const {
+        return Vector2D(bottom_right.x, top_left.y);
+    }
+    Vector2D getBottomLeft() const {
+        return Vector2D(top_left.x, bottom_right.y);
+    }
     float getX() const {
         return top_left.x;
     }

@@ -2099,7 +2099,31 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             location->addFloorRegion(floor_region);
             floor_regions_rects->push_back(door_rect);
 
-            floor_region = FloorRegion::createRectangle(room_rect);
+            bool rounded_rectangle = false;
+            if( room_type == ROOMTYPE_NORMAL && rollDice(1, 2, 0) == 1 ) {
+                rounded_rectangle = true;
+            }
+            floor_region = NULL;
+            if( rounded_rectangle ) {
+                const float corner_dist = 1.0f;
+                floor_region = new FloorRegion();
+                floor_region->addPoint(room_rect.getTopLeft() + Vector2D(0.0f, corner_dist));
+                floor_region->addPoint(room_rect.getBottomLeft() - Vector2D(0.0f, corner_dist));
+                floor_region->addPoint(room_rect.getBottomLeft() + Vector2D(corner_dist, 0.0f));
+                floor_region->addPoint(room_rect.getBottomRight() - Vector2D(corner_dist, 0.0f));
+                floor_region->addPoint(room_rect.getBottomRight() - Vector2D(0.0f, corner_dist));
+                floor_region->addPoint(room_rect.getTopRight() + Vector2D(0.0f, corner_dist));
+                floor_region->addPoint(room_rect.getTopRight() - Vector2D(corner_dist, 0.0f));
+                floor_region->addPoint(room_rect.getTopLeft() + Vector2D(corner_dist, 0.0f));
+
+                /*for(size_t i=0;i<floor_region->getNPoints();i++) {
+                    Vector2D vec = floor_region->getPoint(i);
+                    qDebug("%d : %f, %f", i, vec.x, vec.y);
+                }*/
+            }
+            else {
+                floor_region = FloorRegion::createRectangle(room_rect);
+            }
             location->addFloorRegion(floor_region);
             floor_regions_rects->push_back(room_rect);
 
@@ -2233,7 +2257,14 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 int dir_i = rand() % 4;
                 int sign_x = (rand() % 2)==0 ? -1 : 1;
                 int sign_y = (rand() % 2)==0 ? -1 : 1;
-                Vector2D scenery_pos = room_centre + Vector2D(1.0f, 0.0f) * ( 0.5f*room_size_w - 0.5f ) * sign_x + Vector2D(0.0f, 1.0f) * ( 0.5f*room_size_h - 0.5f ) * sign_y;
+                Vector2D scenery_pos;
+                if( rounded_rectangle ) {
+                    scenery_pos = room_centre;
+                }
+                else {
+                    const float offset = 0.5f;
+                    scenery_pos = room_centre + Vector2D(1.0f, 0.0f) * ( 0.5f*room_size_w - offset ) * sign_x + Vector2D(0.0f, 1.0f) * ( 0.5f*room_size_h - offset ) * sign_y;
+                }
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
 
@@ -2267,6 +2298,20 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 }
                 int pos_x = rand() % (int)room_size_w;
                 int pos_y = rand() % (int)room_size_h;
+                if( rounded_rectangle ) {
+                    if( pos_x == 0 && pos_y == 0 ) {
+                        pos_x++;
+                    }
+                    else if( pos_x == room_size_w-1 && pos_y == 0 ) {
+                        pos_x--;
+                    }
+                    else if( pos_x == 0 && pos_y == room_size_h-1 ) {
+                        pos_x++;
+                    }
+                    else if( pos_x == room_size_w-1 && pos_y == room_size_h-1 ) {
+                        pos_x--;
+                    }
+                }
                 Vector2D scenery_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(pos_x + 0.5f) + Vector2D(0.0f, 1.0f)*(pos_y + 0.5f);
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 if( size_flat ) {
