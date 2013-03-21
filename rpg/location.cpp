@@ -2157,6 +2157,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
 
                 string scenery_centre_name, scenery_centre_image_name;
                 float scenery_centre_size = 0.0f;
+                bool size_flat = false;
                 bool scenery_centre_is_blocking = true;
                 bool scenery_centre_blocks_visibility = false;
                 Scenery::DrawType draw_type = Scenery::DRAWTYPE_NORMAL;
@@ -2172,6 +2173,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_centre_name = "Trapdoor";
                     scenery_centre_image_name = "grate";
                     scenery_centre_size = 0.5;
+                    size_flat = true;
                     draw_type = Scenery::DRAWTYPE_BACKGROUND;
                     if( rollDice(1, 2, 0) == 1 ) {
                         scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.";
@@ -2183,7 +2185,14 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
 
                 if( scenery_centre_name.length() > 0 ) {
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
-                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
+                    if( size_flat ) {
+                        size_w = scenery_centre_size;
+                        size_h = scenery_centre_size;
+                        visual_h = scenery_centre_size;
+                    }
+                    else {
+                        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
+                    }
                     Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
                     scenery_centre->setDrawType(draw_type);
                     scenery->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
@@ -2228,6 +2237,50 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
 
+            if( rollDice(1, 2, 0) == 1 )
+            {
+                // place random background scenery
+                string scenery_name;
+                float scenery_size = 0.5f;
+                bool size_flat = false;
+                int r = rollDice(1, 100, 0);
+                if( r <= 5 ) {
+                    scenery_name = "bloodstain";
+                    scenery_size = 0.7f;
+                    size_flat = true;
+                }
+                else if( r <= 10 ) {
+                    scenery_name = "bloodstain2";
+                    scenery_size = 0.7f;
+                    size_flat = true;
+                }
+                else if( r <= 40 ) {
+                    scenery_name = "bones";
+                }
+                else if( r <= 70 ) {
+                    scenery_name = "rock1";
+                    scenery_size = 0.2f;
+                }
+                else {
+                    scenery_name = "skulls";
+                    scenery_size = 0.3f;
+                }
+                int pos_x = rand() % (int)room_size_w;
+                int pos_y = rand() % (int)room_size_h;
+                Vector2D scenery_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(pos_x + 0.5f) + Vector2D(0.0f, 1.0f)*(pos_y + 0.5f);
+                float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                if( size_flat ) {
+                    size_w = scenery_size;
+                    size_h = scenery_size;
+                    visual_h = scenery_size;
+                }
+                else {
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_name, true, scenery_size, 0.0f, 0.0f, false, 0.0f);
+                }
+                Scenery *scenery = new Scenery(scenery_name, scenery_name, true, size_w, size_h, visual_h);
+                scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
+                location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
+            }
             if( enemy_table.length() > 0 ) {
                 const int n_slots_w = 5, n_slots_h = 5;
                 bool slot_filled[n_slots_w*n_slots_h];
