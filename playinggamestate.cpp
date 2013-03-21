@@ -8206,6 +8206,7 @@ void PlayingGamestate::playSound(const string &sound_effect) {
             }
             else {
                 //sound->stop();
+
                 sound->seek(0);
                 sound->play();
             }
@@ -8237,7 +8238,7 @@ QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2
 
 QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
     qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
-    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.5f, true, false);
+    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.25f, true, false);
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
