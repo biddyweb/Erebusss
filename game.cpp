@@ -670,10 +670,14 @@ void Game::run(bool fullscreen) {
     }
     else {
         qDebug("setting up fonts for non-mobile");
-        this->font_scene = QFont("Verdana", 12);
+        /*this->font_scene = QFont("Verdana", 12);
         this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
-        this->font_big = QFont("Verdana", 24, QFont::Bold);
+        this->font_big = QFont("Verdana", 24, QFont::Bold);*/
+        this->font_scene = QFont("Centaur", 12);
+        this->font_small = QFont("Centaur", 12);
+        this->font_std = QFont("Centaur", 16);
+        this->font_big = QFont("Centaur", 24, QFont::Bold);
 
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize());
@@ -685,12 +689,14 @@ void Game::run(bool fullscreen) {
     // and doesn't work on Symbian
     // see Game::initButton()
 #else*/
-    unsigned char filter_max[] = {220, 220, 220};
-    unsigned char filter_min[] = {120, 120, 120};
+    /*unsigned char filter_max[] = {220, 220, 220};
+    unsigned char filter_min[] = {120, 120, 120};*/
+    unsigned char filter_max[] = {228, 217, 206};
+    unsigned char filter_min[] = {160, 153, 143};
     QPixmap gui_pixmap_buttons = createNoise(256, 256, 16.0f, 16.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
     this->gui_brush_buttons.setTexture(gui_pixmap_buttons);
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
-    this->gui_palette.setColor(QPalette::ButtonText, Qt::black);
+    this->gui_palette.setColor(QPalette::ButtonText, QColor(76, 0, 0));
 //#endif
 
     gamestate = new OptionsGamestate();
