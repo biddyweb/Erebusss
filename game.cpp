@@ -674,9 +674,9 @@ void Game::run(bool fullscreen) {
         this->font_small = QFont("Verdana", 12);
         this->font_std = QFont("Verdana", 16);
         this->font_big = QFont("Verdana", 24, QFont::Bold);*/
-        this->font_scene = QFont("Centaur", 12);
-        this->font_small = QFont("Centaur", 12);
-        this->font_std = QFont("Centaur", 16);
+        this->font_scene = QFont("Centaur", 16);
+        this->font_small = QFont("Centaur", 16);
+        this->font_std = QFont("Centaur", 18);
         this->font_big = QFont("Centaur", 24, QFont::Bold);
 
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
