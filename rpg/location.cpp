@@ -1962,13 +1962,14 @@ bool LocationGenerator::collidesWithFloorRegions(const vector<Rect2D> *floor_reg
     return false;
 }
 
-const float base_passage_length = 7.0f;
+const float base_passage_length = 7.5f;
 const int max_passage_enemies = 6;
-const float base_room_size = base_passage_length - 2.0f;
+//const float base_room_size = base_passage_length - 2.5f;
+const int base_room_size = 5;
 const float passage_width = 1.0f;
 const float passage_hwidth = 0.5f * passage_width;
 const float door_width = 1.0f;
-const float door_depth = 1.0f;
+const float door_depth = 1.25f;
 
 void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
@@ -2008,7 +2009,6 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
 }
 
 void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
-    const float room_size = base_room_size;
     Vector2D room_dir_vec = directionFromEnum(seed.dir);
     Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
     Vector2D door_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
@@ -2026,8 +2026,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             ROOMTYPE_QUEST = 3
         };
         RoomType room_type = ROOMTYPE_NORMAL;
-        float room_size_w = room_size;
-        float room_size_h = room_size;
+        float room_size_w = base_room_size;
+        float room_size_h = base_room_size;
         int roll = rollDice(1, 12, 0);
         string enemy_table;
         /*if( rollDice(1, 2, 0) == 1 ) {
@@ -2282,13 +2282,13 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
             if( enemy_table.length() > 0 ) {
-                const int n_slots_w = 5, n_slots_h = 5;
+                const int n_slots_w = base_room_size, n_slots_h = base_room_size;
                 bool slot_filled[n_slots_w*n_slots_h];
                 for(int i=0;i<n_slots_w*n_slots_h;i++) {
                     slot_filled[i] = false;
                 }
-                float slot_scale_x = room_size_w/room_size;
-                float slot_scale_y = room_size_h/room_size;
+                float slot_scale_x = room_size_w/(float)base_room_size;
+                float slot_scale_y = room_size_h/(float)base_room_size;
                 map<string, NPCTable *>::const_iterator iter = npc_tables.find(enemy_table);
                 if( iter != npc_tables.end() ) {
                     const NPCTable *npc_table = iter->second;
@@ -2380,10 +2380,10 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     vector<Rect2D> ignore_rects = seed.ignore_rects;
     int passage_length_i = 0;
     {
-        int roll = first ? 2 : rollDice(1, 6, 0);
-        if( roll <= 2 )
+        int roll = first ? 2 : rollDice(1, 8, 0);
+        if( roll <= 4 )
             passage_length_i = 1;
-        else if( roll <= 5 )
+        else if( roll <= 7 )
             passage_length_i = 2;
         else
             passage_length_i = 3;
