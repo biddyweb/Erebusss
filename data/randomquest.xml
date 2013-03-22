@@ -106,4 +106,26 @@
 
 </npc_table>
 
+<npc_table type="hazard">
+
+<level value="0">
+    <npc_group>
+        <npc name="Baby Wyvern" template="Baby Wyvern"/>
+    </npc_group>
+</level>
+
+<level value="1">
+    <npc_group>
+        <npc name="Wyvern" template="Wyvern"/>
+    </npc_group>
+</level>
+
+<level value="2">
+    <npc_group>
+        <npc name="Wyvern" template="Wyvern"/>
+    </npc_group>
+</level>
+
+</npc_table>
+
 </randomquest>
