@@ -2199,6 +2199,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_centre_size = 0.5;
                     size_flat = true;
                     draw_type = Scenery::DRAWTYPE_BACKGROUND;
+                    scenery_centre_is_blocking = false;
                     if( rollDice(1, 2, 0) == 1 ) {
                         scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.";
                     }
@@ -2219,7 +2220,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
                     scenery_centre->setDrawType(draw_type);
-                    scenery->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
+                    scenery_centre->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
                     if( scenery_centre_description.length() > 0 ) {
                         scenery_centre->setDescription(scenery_centre_description);
                     }
