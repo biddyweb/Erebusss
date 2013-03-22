@@ -2029,9 +2029,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         float room_size_w = base_room_size;
         float room_size_h = base_room_size;
         int roll = rollDice(1, 12, 0);
-        string enemy_table;
         /*if( rollDice(1, 2, 0) == 1 ) {
-            roll = 9;
+            roll = 8;
         }*/
         if( roll <= 6 ) {
             // normal room
@@ -2068,7 +2067,6 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         }
 
         if( room_type == ROOMTYPE_LAIR ) {
-            enemy_table = "lair";
             if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
                 room_size_h *= 2.0f;
             }
@@ -2077,7 +2075,6 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
         }
         else if( room_type == ROOMTYPE_QUEST ) {
-            enemy_table = "lair"; // using same table as lairs for now
             if( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) {
                 room_size_h *= 2.0f;
             }
@@ -2100,7 +2097,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             floor_regions_rects->push_back(door_rect);
 
             bool rounded_rectangle = false;
-            if( room_type == ROOMTYPE_NORMAL && rollDice(1, 2, 0) == 1 ) {
+            if( (room_type == ROOMTYPE_NORMAL || room_type == ROOMTYPE_HAZARD) && rollDice(1, 2, 0) == 1 ) {
                 rounded_rectangle = true;
             }
             floor_region = NULL;
@@ -2141,7 +2138,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
 
             // TODO: place door scenery itself
-            Scenery *scenery = NULL;
+            Scenery *scenery_corner = NULL;
+            string enemy_table;
             if( room_type == ROOMTYPE_NORMAL ) {
                 // normal room
                 // 50% chance of barrel or crate in corner
@@ -2158,26 +2156,112 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                    scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
-                    scenery->setBlocking(true, false);
-                    scenery->setCanBeOpened(true);
+                    scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                    scenery_corner->setBlocking(true, false);
+                    scenery_corner->setCanBeOpened(true);
                     int gold = rollDice(1, 12, 0);
-                    scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+                    scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
                 }
             }
             else if( room_type == ROOMTYPE_HAZARD ) {
                 // hazard
+                int r = rollDice(1, 7, 0);
+                //r = 7;
+                if( r == 1 ) {
+                    // wandering monster
+                    enemy_table = "isolated";
+                }
+                else if( r == 2 ) {
+                    // npc - trader
+                    string npc_animation_name = (rollDice(1, 2, 0) == 1) ? "man" : "peasant_woman";
+                    Character *npc = new Character("Trader", npc_animation_name, true);
+                    npc->setHostile(false);
+                    Shop *shop = playing_gamestate->getRandomShop();
+                    npc->setShop(shop->getName());
+                    location->addCharacter(npc, room_centre.x, room_centre.y);
+                }
+                else if( r == 3 ) {
+                    // hazard monster
+                    enemy_table = "hazard";
+                }
+                else if( r == 4 ) {
+                    // mushrooms
+                    int n_mushrooms = rollDice(2, 4, 0);
+                    for(int i=0;i<n_mushrooms;i++) {
+                        int pos_x = rand() % (int)room_size_w;
+                        int pos_y = rand() % (int)room_size_h;
+                        if( rounded_rectangle ) {
+                            if( pos_x == 0 && pos_y == 0 ) {
+                                pos_x++;
+                            }
+                            else if( pos_x == room_size_w-1 && pos_y == 0 ) {
+                                pos_x--;
+                            }
+                            else if( pos_x == 0 && pos_y == room_size_h-1 ) {
+                                pos_x++;
+                            }
+                            else if( pos_x == room_size_w-1 && pos_y == room_size_h-1 ) {
+                                pos_x--;
+                            }
+                        }
+                        Vector2D item_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(pos_x + 0.5f) + Vector2D(0.0f, 1.0f)*(pos_y + 0.5f);
+                        Item *item = playing_gamestate->cloneStandardItem("Mushroom");
+                        location->addItem(item, item_pos.x, item_pos.y);
+                    }
+                }
+                else if( r == 5 || r == 6 ) {
+                    // shrine or bell
+                    string scenery_name, scenery_image_name, interact_type;
+                    if( r == 5 ) {
+                        scenery_name = "Shrine";
+                        scenery_image_name = "shrine";
+                        interact_type ="INTERACT_TYPE_SHRINE";
+                    }
+                    else {
+                        scenery_name = "Bell";
+                        scenery_image_name = "church_bell";
+                        interact_type = "INTERACT_TYPE_BELL";
+                    }
+                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+                    Scenery *scenery = new Scenery(scenery_name, scenery_image_name, true, size_w, size_h, visual_h);
+                    scenery->setInteractType(interact_type);
+                    scenery->setBlocking(true, false);
+                    location->addScenery(scenery, room_centre.x, room_centre.y);
+                }
+                else if( r == 7 ) {
+                    // tomb
+                    string scenery_image_name = "tomb";
+                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+                    Scenery *scenery = new Scenery("Tomb", scenery_image_name, true, size_w, size_h, visual_h);
+                    scenery->setBlocking(true, false);
+                    if( rollDice(1, 2, 0) == 1 ) {
+                        int gold = rollDice(3, 6, 0);
+                        scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+                    }
+                    if( rollDice(1, 2, 0) == 1 ) {
+                        int rating = level+1;
+                        int difficulty = level;
+                        Trap *trap = new Trap("acid", passage_width, passage_width);
+                        trap->setRating(rating);
+                        trap->setDifficulty(difficulty);
+                        scenery->setTrap(trap);
+                    }
+                    location->addScenery(scenery, room_centre.x, room_centre.y);
+                }
             }
             else if( room_type == ROOMTYPE_LAIR ) {
                 // lair
+                enemy_table = "lair";
                 string name = "Chest", image_name = "chest";
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
-                scenery->setBlocking(true, false);
-                scenery->setCanBeOpened(true);
+                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                scenery_corner->setBlocking(true, false);
+                scenery_corner->setCanBeOpened(true);
                 int gold = rollDice(4, 10, 10);
-                scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+                scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
 
                 string scenery_centre_name, scenery_centre_image_name;
                 float scenery_centre_size = 0.0f;
@@ -2230,14 +2314,15 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
             else {
                 // quest room
+                enemy_table = "lair"; // using same table as lairs for now
                 string name = "Chest", image_name = "chest";
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                scenery = new Scenery(name, image_name, true, size_w, size_h, visual_h);
-                scenery->setBlocking(true, false);
-                scenery->setCanBeOpened(true);
+                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                scenery_corner->setBlocking(true, false);
+                scenery_corner->setCanBeOpened(true);
                 int gold = rollDice(5, 10, 50);
-                scenery->addItem( playing_gamestate->cloneGoldItem(gold) );
+                scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
 
                 if( level == n_levels-1 ) {
                     // TODO: final quest location
@@ -2254,7 +2339,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 }
             }
 
-            if( scenery != NULL ) {
+            if( scenery_corner != NULL ) {
                 int dir_i = rand() % 4;
                 int sign_x = (rand() % 2)==0 ? -1 : 1;
                 int sign_y = (rand() % 2)==0 ? -1 : 1;
@@ -2266,7 +2351,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     const float offset = 0.5f;
                     scenery_pos = room_centre + Vector2D(1.0f, 0.0f) * ( 0.5f*room_size_w - offset ) * sign_x + Vector2D(0.0f, 1.0f) * ( 0.5f*room_size_h - offset ) * sign_y;
                 }
-                location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
+                location->addScenery(scenery_corner, scenery_pos.x, scenery_pos.y);
             }
 
             if( rollDice(1, 2, 0) == 1 )
