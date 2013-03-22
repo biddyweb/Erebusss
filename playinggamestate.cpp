@@ -5532,6 +5532,13 @@ void PlayingGamestate::createRandomQuest() {
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
 
+    this->quest->setName("Random dungeon");
+
+    stringstream str;
+    str << "This game type allows you to explore a randomly generated dungeon. Explore the dungeon, kill any monsters you find, and collect the loot!\n\n";
+    str << "There is no specific objective, but see how much XP you can obtain, or how much gold you can find.";
+    this->quest->setInfo(str.str());
+
     this->view_transform_3d = true;
     this->view_walls_3d = true;
 
@@ -8206,6 +8213,7 @@ void PlayingGamestate::playSound(const string &sound_effect) {
             }
             else {
                 //sound->stop();
+
 
                 sound->seek(0);
                 sound->play();
