@@ -238,6 +238,11 @@ public:
     string getAmmoKey() const {
         return this->requires_ammo ? this->ammo_key : "";
     }
+    void setDamage(int damageX, int damageY, int damageZ) {
+        this->damageX = damageX;
+        this->damageY = damageY;
+        this->damageZ = damageZ;
+    }
     void getDamage(int *damageX, int *damageY, int *damageZ) const {
         *damageX = this->damageX;
         *damageY = this->damageY;

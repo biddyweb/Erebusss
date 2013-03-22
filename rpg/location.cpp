@@ -2163,7 +2163,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
                     if( rollDice(1, 4, 0) == 1 ) {
                         // also add an item
-                        int r = rollDice(1, 8, 0);
+                        int r = rollDice(1, 10, 0);
                         Item *item = NULL;
                         if( r <= 2 ) {
                             item = playing_gamestate->cloneStandardItem("Arrows");
@@ -2174,14 +2174,17 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         else if( r == 4 ) {
                             item = playing_gamestate->cloneStandardItem("Shield");
                         }
-                        else if( r == 5 ) {
+                        else if( r == 5 || r == 6 ) {
                             item = playing_gamestate->cloneStandardItem("Dagger");
                         }
-                        else if( r == 6 ) {
+                        else if( r == 7 ) {
                             item = playing_gamestate->cloneStandardItem("Short Sword");
                         }
-                        else if( r == 7 ) {
+                        else if( r == 8 ) {
                             item = playing_gamestate->cloneStandardItem("Gold Ring");
+                        }
+                        else if( r == 9 ) {
+                            item = playing_gamestate->cloneStandardItem("Wyvern Egg");
                         }
                         else {
                             item = playing_gamestate->cloneStandardItem("Red Gem");
@@ -2278,91 +2281,146 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     location->addScenery(scenery, room_centre.x, room_centre.y);
                 }
             }
-            else if( room_type == ROOMTYPE_LAIR ) {
-                // lair
-                enemy_table = "lair";
-                string name = "Chest", image_name = "chest";
-                float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
-                playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
-                scenery_corner->setBlocking(true, false);
-                scenery_corner->setCanBeOpened(true);
-                int gold = rollDice(4, 10, 10);
-                scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
-
-                string scenery_centre_name, scenery_centre_image_name;
-                float scenery_centre_size = 0.0f;
-                bool size_flat = false;
-                bool scenery_centre_is_blocking = true;
-                bool scenery_centre_blocks_visibility = false;
-                Scenery::DrawType draw_type = Scenery::DRAWTYPE_NORMAL;
-                string scenery_centre_description;
-                int roll = rollDice(1, 100, 0);
-                //roll = 50;
-                if( roll <= 25 ) {
-                    scenery_centre_name = "Fire";
-                    scenery_centre_image_name = "fire";
-                    scenery_centre_size = 1.0;
-                }
-                else if( roll <= 50 ) {
-                    scenery_centre_name = "Trapdoor";
-                    scenery_centre_image_name = "grate";
-                    scenery_centre_size = 0.5;
-                    size_flat = true;
-                    draw_type = Scenery::DRAWTYPE_BACKGROUND;
-                    scenery_centre_is_blocking = false;
-                    if( rollDice(1, 2, 0) == 1 ) {
-                        scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.";
-                    }
-                    else {
-                        scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. You see nothing but blackness beneath.";
-                    }
-                }
-
-                if( scenery_centre_name.length() > 0 ) {
-                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
-                    if( size_flat ) {
-                        size_w = scenery_centre_size;
-                        size_h = scenery_centre_size;
-                        visual_h = scenery_centre_size;
-                    }
-                    else {
-                        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
-                    }
-                    Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
-                    scenery_centre->setDrawType(draw_type);
-                    scenery_centre->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
-                    if( scenery_centre_description.length() > 0 ) {
-                        scenery_centre->setDescription(scenery_centre_description);
-                    }
-                    Vector2D scenery_pos = room_centre;
-                    location->addScenery(scenery_centre, scenery_pos.x, scenery_pos.y);
-                }
-            }
-            else {
-                // quest room
+            else if( room_type == ROOMTYPE_LAIR || room_type == ROOMTYPE_QUEST ) {
+                // lair/quest
                 enemy_table = "lair"; // using same table as lairs for now
+
                 string name = "Chest", image_name = "chest";
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
                 scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
                 scenery_corner->setBlocking(true, false);
                 scenery_corner->setCanBeOpened(true);
-                int gold = rollDice(5, 10, 50);
-                scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
-
-                if( level == n_levels-1 ) {
-                    // TODO: final quest location
+                int gold = room_type == ROOMTYPE_LAIR ? rollDice(4, 10, 10) : rollDice(5, 10, 50);
+                if( room_type == ROOMTYPE_QUEST && level == n_levels-1 ) {
+                    gold += 300;
                 }
-                else if( *exit_down == NULL ) {
-                    // also place stairs down, if not already found
-                    name = "Stairs";
-                    image_name = "stairsdown_indoors";
-                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                    Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h);
-                    scenery_stairs_down->setBlocking(true, false);
-                    location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
-                    *exit_down = scenery_stairs_down;
+                scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
+                if( rollDice(1, 2, 0) == 1 )
+                {
+                    // also add an item
+                    int r = rollDice(1, 14, 0);
+                    //r = 13;
+                    Item *item = NULL;
+                    if( r == 1 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Healing");
+                    }
+                    else if( r == 2 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Combat");
+                    }
+                    else if( r == 3 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Archery");
+                    }
+                    else if( r == 4 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Strength");
+                    }
+                    else if( r == 5 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Speed");
+                    }
+                    else if( r == 6 ) {
+                        item = playing_gamestate->cloneStandardItem("Potion of Cure Disease");
+                    }
+                    else if( r == 7 ) {
+                        item = playing_gamestate->cloneStandardItem("Holy Water");
+                    }
+                    else if( r == 8 ) {
+                        item = playing_gamestate->cloneStandardItem("Acid");
+                    }
+                    else if( r == 9 ) {
+                        item = playing_gamestate->cloneStandardItem("Green Gem");
+                    }
+                    else if( r == 10 ) {
+                        item = playing_gamestate->cloneStandardItem("Blue Gem");
+                    }
+                    else if( r == 11 ) {
+                        item = playing_gamestate->cloneStandardItem("Gold Gem");
+                    }
+                    else if( r == 12 ) {
+                        item = playing_gamestate->cloneStandardItem("White Gem");
+                    }
+                    else if( r == 13 || r == 14 ) {
+                        if( r == 13 ) {
+                            item = playing_gamestate->cloneStandardItem("Dagger");
+                            item->setName("Magic Dagger");
+                        }
+                        else {
+                            item = playing_gamestate->cloneStandardItem("Short Sword");
+                            item->setName("Magic Short Sword");
+                        }
+                        item->setMagical(true);
+                        int damageX = 0, damageY = 0, damageZ = 0;
+                        Weapon *weapon = static_cast<Weapon *>(item);
+                        weapon->getDamage(&damageX, &damageY, &damageZ);
+                        damageZ += level;
+                        weapon->setDamage(damageX, damageY, damageZ);
+                    }
+                    scenery_corner->addItem(item);
+                }
+
+                if( room_type == ROOMTYPE_LAIR ) {
+                    string scenery_centre_name, scenery_centre_image_name;
+                    float scenery_centre_size = 0.0f;
+                    bool size_flat = false;
+                    bool scenery_centre_is_blocking = true;
+                    bool scenery_centre_blocks_visibility = false;
+                    Scenery::DrawType draw_type = Scenery::DRAWTYPE_NORMAL;
+                    string scenery_centre_description;
+                    int roll = rollDice(1, 100, 0);
+                    //roll = 50;
+                    if( roll <= 25 ) {
+                        scenery_centre_name = "Fire";
+                        scenery_centre_image_name = "fire";
+                        scenery_centre_size = 1.0;
+                    }
+                    else if( roll <= 50 ) {
+                        scenery_centre_name = "Trapdoor";
+                        scenery_centre_image_name = "grate";
+                        scenery_centre_size = 0.5;
+                        size_flat = true;
+                        draw_type = Scenery::DRAWTYPE_BACKGROUND;
+                        scenery_centre_is_blocking = false;
+                        if( rollDice(1, 2, 0) == 1 ) {
+                            scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. Peering down, in the darkness you make out a chamber with bones strewn across the floor.";
+                        }
+                        else {
+                            scenery_centre_description = "This grate seems stuck or locked, and you are unable to budge it. You see nothing but blackness beneath.";
+                        }
+                    }
+
+                    if( scenery_centre_name.length() > 0 ) {
+                        float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                        if( size_flat ) {
+                            size_w = scenery_centre_size;
+                            size_h = scenery_centre_size;
+                            visual_h = scenery_centre_size;
+                        }
+                        else {
+                            playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
+                        }
+                        Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
+                        scenery_centre->setDrawType(draw_type);
+                        scenery_centre->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
+                        if( scenery_centre_description.length() > 0 ) {
+                            scenery_centre->setDescription(scenery_centre_description);
+                        }
+                        Vector2D scenery_pos = room_centre;
+                        location->addScenery(scenery_centre, scenery_pos.x, scenery_pos.y);
+                    }
+                }
+                else {
+                    if( level == n_levels-1 ) {
+                        // final quest location
+                    }
+                    else if( *exit_down == NULL ) {
+                        // also place stairs down, if not already found
+                        name = "Stairs";
+                        image_name = "stairsdown_indoors";
+                        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+                        Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                        scenery_stairs_down->setBlocking(true, false);
+                        location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
+                        *exit_down = scenery_stairs_down;
+                    }
                 }
             }
 
