@@ -13,6 +13,7 @@ class GameClock {
     int game_time_total_ms;
     int game_time_frame_ms;
     int accumulator;
+    int multiplier;
 
 public:
     GameClock();
@@ -32,6 +33,9 @@ public:
     int update(int time_now_ms);
     void callingUpdate();
     void restart();
+    void setMultiplier(int multiplier) {
+        this->multiplier = multiplier;
+    }
 };
 
 class Screen : public QObject {
@@ -74,6 +78,9 @@ public:
     }
     int getInputTimeFrameMS() const {
         return this->input_clock.getGameTimeFrameMS();
+    }
+    void setGameTimeMultiplier(int multiplier) {
+        this->game_clock.setMultiplier(multiplier);
     }
 
 public slots:
