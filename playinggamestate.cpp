@@ -714,7 +714,8 @@ void MainGraphicsView::removeTextEffect(TextEffect *text_effect) {
 }
 
 GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
-    QWidget(view), playing_gamestate(playing_gamestate), fps(-1.0f)
+    QWidget(view), playing_gamestate(playing_gamestate), fps(-1.0f),
+    has_fade(false), fade_in(false), fade_time_start_ms(0)
 {
     //this->setAttribute(Qt::WA_NoSystemBackground);
 }
@@ -780,6 +781,33 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         int font_height = fm.height();
         painter.drawText(bar_x*width(), font_height, playing_gamestate->getCLocation()->getName().c_str());
     }
+
+    if( this->has_fade ) {
+        const int duration_ms = 1000;
+        int time_diff_ms = game_g->getScreen()->getGameTimeTotalMS() - this->fade_time_start_ms;
+        if( time_diff_ms >= duration_ms ) {
+            if( this->fade_in ) {
+                this->has_fade = false;
+            }
+            else {
+                painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0, 255));
+            }
+        }
+        else if( time_diff_ms < 0 ) {
+            ASSERT_LOGGER(time_diff_ms >= 0);
+            // shouldn't happen?
+            this->has_fade = false;
+        }
+        else {
+            float alpha = ((float)time_diff_ms)/(float)duration_ms;
+            int alpha_i = 255*alpha;
+            if( this->fade_in ) {
+                alpha_i = 255 - alpha_i;
+            }
+            qDebug("fade: time %d alpha_i %d", time_diff_ms, alpha_i);
+            painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0, alpha_i));
+        }
+    }
 }
 
 void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {
@@ -799,6 +827,18 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
     painter.fillRect(x2, y2, width2, height2, brush_bg);
     painter.fillRect(x2, y2, width2*fraction, height2, brush_fg);
     painter.setOpacity(1.0f);
+}
+
+void GUIOverlay::setFadeIn() {
+    this->has_fade = true;
+    this->fade_in = true;
+    this->fade_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
+}
+
+void GUIOverlay::setFadeOut() {
+    this->has_fade = true;
+    this->fade_in = false;
+    this->fade_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
 }
 
 /*void GUIOverlayItem::advance(int phase) {
@@ -2840,6 +2880,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     gui_overlay = new GUIOverlay(this, view);
     gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
     view->setGUIOverlay(gui_overlay);
+    gui_overlay->setFadeIn();
 
     LOG("display UI\n");
     gui_overlay->setProgress(0);

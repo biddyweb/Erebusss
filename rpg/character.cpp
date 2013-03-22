@@ -1119,6 +1119,9 @@ void Character::kill(PlayingGamestate *playing_gamestate) {
             playing_gamestate->addTextEffect(!any_items ? "Dropped some gold!" : "Dropped some items!", this->getPos(), 2000);
         }
     }
+    if( this == playing_gamestate->getPlayer() ) {
+        playing_gamestate->getView()->getGUIOverlay()->setFadeOut();
+    }
 }
 
 void Character::armWeapon(Weapon *item) {

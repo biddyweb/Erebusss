@@ -155,6 +155,9 @@ public:
         //this->gui_overlay_item = gui_overlay_item;
         this->gui_overlay = gui_overlay;
     }
+    GUIOverlay *getGUIOverlay() {
+        return this->gui_overlay;
+    }
     void createLightingMap(unsigned char lighting_min);
     void updateInput();
     void setScale(float c_scale);
@@ -191,6 +194,10 @@ class GUIOverlay : public QWidget {
 
     float fps;
 
+    bool has_fade;
+    bool fade_in;
+    int fade_time_start_ms;
+
     void drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color);
 public:
     GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view);
@@ -208,6 +215,8 @@ public:
     void setFPS(float fps) {
         this->fps = fps;
     }
+    void setFadeIn();
+    void setFadeOut();
 };
 
 /*class GUIOverlayItem : public QGraphicsProxyWidget {
@@ -618,6 +627,9 @@ public:
     void advanceQuest();
     Location *getCLocation() const {
         return this->c_location;
+    }
+    MainGraphicsView *getView() {
+        return this->view;
     }
 
     void addCharacterAction(CharacterAction *character_action) {
