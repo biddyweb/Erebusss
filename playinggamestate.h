@@ -534,6 +534,7 @@ private slots:
     void clickedSave();
     void clickedQuit();
     void playBackgroundMusic();
+    void turboToggled(bool checked);
     void quickSave();
 
 public:

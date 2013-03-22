@@ -1126,7 +1126,7 @@ void Game::runTests() {
 
 }
 
-void Game::initButton(QPushButton *button) const {
+void Game::initButton(QAbstractButton *button) const {
     MainWindow *window = this->screen->getMainWindow();
     button->setFont(window->font()); // needed for Android at least
     button->setStyle(style);

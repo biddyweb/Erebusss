@@ -2826,6 +2826,19 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->setRowStretch(1, 1);
         int col = 1;
 
+        QToolButton *turboButton = new QToolButton();
+        turboButton->setText("T");
+        game_g->initButton(turboButton);
+        turboButton->setShortcut(QKeySequence(Qt::Key_T));
+        turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        turboButton->setToolTip("Toggle turbo mode: make game time go faster");
+#endif
+        turboButton->setCheckable(true);
+        connect(turboButton, SIGNAL(toggled(bool)), this, SLOT(turboToggled(bool)));
+        layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
+
         if( !this->permadeath ) {
             quickSaveButton = new QPushButton("QS");
             game_g->initButton(quickSaveButton);
@@ -3650,6 +3663,11 @@ void PlayingGamestate::playBackgroundMusic() {
         this->sound_effects["background"]->play();
     }
 #endif*/
+}
+
+void PlayingGamestate::turboToggled(bool checked) {
+    LOG("PlayingGamestate::turboToggled(%d)\n", checked);
+    game_g->getScreen()->setGameTimeMultiplier(checked ? 2 : 1);
 }
 
 void PlayingGamestate::quickSave() {
