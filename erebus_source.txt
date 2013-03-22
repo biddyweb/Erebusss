@@ -48,6 +48,8 @@ It should be possible to compile Erebus on any other platform that Qt supports, 
 History
 =======
 
+Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
+
 0.2 - Switched to using Necessitas alpha 4 for Android.
 0.1 - First release.
 
@@ -58,4 +60,6 @@ The source code is released under the GPL v3 or later.
 
 Please contact me if you have suggestions, bug fixes or whatever: mark dot harman at ntlworld dot com .
 
-Mark Harman 29 December 2012
+Erebus homepage: http://erebusrpg.sourceforge.net
+
+Mark Harman 22 March 2013
