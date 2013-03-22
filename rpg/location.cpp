@@ -2161,6 +2161,33 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_corner->setCanBeOpened(true);
                     int gold = rollDice(1, 12, 0);
                     scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
+                    if( rollDice(1, 4, 0) == 1 ) {
+                        // also add an item
+                        int r = rollDice(1, 8, 0);
+                        Item *item = NULL;
+                        if( r <= 2 ) {
+                            item = playing_gamestate->cloneStandardItem("Arrows");
+                        }
+                        else if( r == 3 ) {
+                            item = playing_gamestate->cloneStandardItem("Leather Armour");
+                        }
+                        else if( r == 4 ) {
+                            item = playing_gamestate->cloneStandardItem("Shield");
+                        }
+                        else if( r == 5 ) {
+                            item = playing_gamestate->cloneStandardItem("Dagger");
+                        }
+                        else if( r == 6 ) {
+                            item = playing_gamestate->cloneStandardItem("Short Sword");
+                        }
+                        else if( r == 7 ) {
+                            item = playing_gamestate->cloneStandardItem("Gold Ring");
+                        }
+                        else {
+                            item = playing_gamestate->cloneStandardItem("Red Gem");
+                        }
+                        scenery_corner->addItem(item);
+                    }
                 }
             }
             else if( room_type == ROOMTYPE_HAZARD ) {
