@@ -155,6 +155,7 @@ That's the one! Here, have one of my potions as a reward.
     <gold amount="12"/>
 </scenery>
 <scenery name="Barrel" image_name="barrel" x="22.5" y="26.5" size="0.8" blocking="true">
+    <item template="Plain Ring"/>
 </scenery>
 
 <!-- north route -->

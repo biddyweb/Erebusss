@@ -70,6 +70,8 @@ Plate armour provides excellent protection, but it is also heavy to carry and we
 <ammo name="Arrows" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
     amount="20"/>
 
+<ring name="Plain Ring" image_name="ring_plain" weight="0"/>
+
 <ring name="Gold Ring" image_name="ring_gold" weight="0"/>
 
 <item name="Potion of Healing" image_name="potion_green" weight="2"
@@ -147,6 +149,7 @@ A small wooden chess piece, the Knight.
 </shop>
 
 <shop name="General Stores">
+    <purchase template="Plain Ring" cost="1"/>
     <purchase template="Gold Ring" cost="10"/>
     <purchase template="Red Gem" cost="50"/>
     <purchase template="Green Gem" cost="100"/>
