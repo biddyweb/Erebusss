@@ -21,11 +21,25 @@
 
 <floorregion shape="rect" rect_x="0.0" rect_y="8.0" rect_w="1.0" rect_h="2.0" />
 
+<!--<gold amount="101" x="1.0" y="9.0"/>-->
+
 <scenery name="Door" image_name="door_wood_n" x="0.5" y="7.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 
 <floorregion shape="rect" rect_x="0.0" rect_y="10.0" rect_w="12.0" rect_h="1.0" />
 
 <scenery name="Torch" image_name="torch" x="2.0" y="9.55" w="0.75" h="0.75"/>
+
+<!--<item template="Holy Water" x="0.5" y="10.0"/>-->
+<!--<item template="Acid" x="0.5" y="10.0"/>-->
+<!--<item template="Potion of Cure Disease" x="0.5" y="10.0"/>-->
+<!--<item template="Longbow" x="0.5" y="9.5"/>
+<item template="Arrows" x="0.5" y="10.0"/>
+<ammo name="Arrows +1" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
+    rating="2"
+    magical="true"
+    base_template="Arrows" worth_bonus="50"
+    x="0.5" y="10.5"
+    amount="5"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="5.0" y="5.0" />
@@ -35,6 +49,9 @@
 </floorregion>
 <floorregion shape="rect" rect_x="5.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="6.0" rect_y="4.0" rect_w="5.0" rect_h="1.0" />
+
+<!--<npc name="Zombie" template="Zombie" x="10.0" y="4.5"/>-->
+<!--<npc name="Giant Spider" template="Giant Spider" x="10.0" y="4.5"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="11.0" y="1.0" />
@@ -80,6 +97,9 @@
     <floorregion_point x="22.0" y="4.0" />
 </floorregion>
 <floorregion shape="rect" rect_x="5.0" rect_y="11.0" rect_w="1.0" rect_h="6.0" />
+
+<npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
+
 <floorregion shape="rect" rect_x="11.0" rect_y="11.0" rect_w="1.0" rect_h="6.0" />
 <floorregion shape="rect" rect_x="5.0" rect_y="17.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="6.0" rect_y="17.0" rect_w="5.0" rect_h="1.0" />
@@ -160,7 +180,6 @@
 <!--<item template="Gold Ring" x="4.0" y="10.5"/>-->
 
 <npc name="Goblin" template="Goblin" x="21.5" y="15.5"/>
-<npc name="Goblin" template="Goblin" x="5.5" y="15.5"/>
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
@@ -181,6 +200,8 @@
 
     <floorregion shape="rect" rect_x="19.6" rect_y="10.5" rect_w="0.8" rect_h="2.0" />
 <floorregion shape="rect" rect_x="15.0" rect_y="7.25" rect_w="5.5" rect_h="3.25" />
+
+<!--<player_start x="20.0" y="9.0"/>-->
 
 <scenery name="Torch" image_name="torch" x="17.0" y="6.8" w="0.75" h="0.75"/>
 
