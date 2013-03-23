@@ -567,7 +567,7 @@ This painting is titled, "The Fortress".
 
 <scenery name="Cabinet" image_name="cabinet" x="30.0" y="10.5" size="0.8" blocking="true">
     <item name="Necromancy for Beginners" image_name="book" icon_width="0.25" weight="2">
-This old and heavy tome describes the black arts of Necromancy.
+This old and heavy tome describes the black arts of Necromancy. Early chapters talk of death, and give background information on the different spirit planes. Later chapters discuss necromantic magic, from spells that cure and cause disease, to magic for reanimating the dead.
     </item>
 </scenery>
 
@@ -978,6 +978,7 @@ The journal claims that each of the nearby teleporters is linked to a different 
 <floorregion shape="rect" rect_x="15.0" rect_y="0.0" rect_w="8.0" rect_h="10.0"/>
 
 <!--<player_start x="25.0" y="24.0"/>-->
+<!--<player_start x="30.0" y="26.0"/>-->
 
 <!--<item name="Missing Teleporter Piece" image_name="clockwork" icon_width="0.5" weight="50" x="25.0" y="23.0">
 A complex piece of machinery. You wonder if this is the essential piece missing from the teleporter...
