@@ -641,8 +641,9 @@ public:
     }
     int modifyStatForDifficulty(PlayingGamestate *playing_gamestate, int value) const;
     void initialiseHealth(int max_health) {
-        if( max_health <= 0 ) {
-            throw string("max health must be greater than 0");
+        if( max_health < 0 ) {
+            // allow 0 for friendly NPCs
+            throw string("max health must not be negative");
         }
         this->health = max_health;
         this->max_health = max_health;
@@ -651,8 +652,9 @@ public:
         if( health > max_health ) {
             throw string("health set to greater than max_health");
         }
-        else if( health <= 0 ) {
-            throw string("health must be greater than 0");
+        else if( health < 0 ) {
+            // allow 0 for friendly NPCs
+            throw string("health must not be negative");
         }
         this->health = health;
     }
