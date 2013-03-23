@@ -7103,7 +7103,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     done = true;
                     string description = scenery->getDescription();
                     description = convertToHTML(description);
-                    this->showInfoDialog(description, scenery->getBigImageName());
+                    this->showInfoDialog(description, string(DEPLOYMENT_PATH) + scenery->getBigImageName());
                 }
             }
         }
