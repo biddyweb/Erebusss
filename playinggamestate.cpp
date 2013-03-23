@@ -756,32 +756,6 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         }
     }
 
-    if( this->display_progress ) {
-        /*const int x_off = 16;
-        const int hgt = 64;
-        this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);*/
-        const float x_off = 16.0f/640.0f;
-        const float hgt = 64.0f/360.0f;
-        painter.setPen(Qt::white);
-        painter.drawText(x_off*width(), (100.0f/360.0f)*height(), "Please wait...");
-        this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
-        qDebug(">>> draw progress: %d", this->progress_percent);
-    }
-
-    if( this->fps >= 0.0f )
-    {
-        painter.setPen(Qt::red);
-        //float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
-        painter.drawText(8, height() - 16, QString::number(fps));
-    }
-
-    if( playing_gamestate->getCLocation() != NULL && playing_gamestate->getCLocation()->isDisplayName() ) {
-        painter.setPen(Qt::white);
-        QFontMetrics fm(painter.font());
-        int font_height = fm.height();
-        painter.drawText(bar_x*width(), font_height, playing_gamestate->getCLocation()->getName().c_str());
-    }
-
     if( this->has_fade ) {
         const int duration_ms = 1000;
         int time_diff_ms = game_g->getScreen()->getGameTimeTotalMS() - this->fade_time_start_ms;
@@ -808,6 +782,34 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
             painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0, alpha_i));
         }
     }
+    // fade must be before things that we don't want affected by the fade, e.g., progress bar
+
+    if( this->display_progress ) {
+        /*const int x_off = 16;
+        const int hgt = 64;
+        this->drawBar(painter, x_off, this->height()/2 - hgt/2, this->width() - 2*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);*/
+        const float x_off = 16.0f/640.0f;
+        const float hgt = 64.0f/360.0f;
+        painter.setPen(Qt::white);
+        painter.drawText(x_off*width(), (100.0f/360.0f)*height(), "Please wait...");
+        this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
+        qDebug(">>> draw progress: %d", this->progress_percent);
+    }
+
+    if( this->fps >= 0.0f )
+    {
+        painter.setPen(Qt::red);
+        //float fps = 1000.0f / game_g->getScreen()->getGameTimeFrameMS();
+        painter.drawText(8, height() - 16, QString::number(fps));
+    }
+
+    if( playing_gamestate->getCLocation() != NULL && playing_gamestate->getCLocation()->isDisplayName() ) {
+        painter.setPen(Qt::white);
+        QFontMetrics fm(painter.font());
+        int font_height = fm.height();
+        painter.drawText(bar_x*width(), font_height, playing_gamestate->getCLocation()->getName().c_str());
+    }
+
 }
 
 void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {
