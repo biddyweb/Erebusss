@@ -556,9 +556,21 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     qDebug("logfilename: %s", logfilename.toUtf8().data());
     qDebug("oldlogfilename: %s", oldlogfilename.toUtf8().data());
 
-    /*remove(oldlogfilename.c_str());
-    rename(logfilename.c_str(), oldlogfilename.c_str());
-    remove(logfilename.c_str());*/
+    {
+        QFile logfile(logfilename);
+        if( !logfile.open(QIODevice::Append | QIODevice::Text) ) {
+            qDebug("Failed to open logfile! Try in program folder");
+            logfilename = "log.txt";
+            oldlogfilename = "log_old.txt";
+            qDebug("logfilename: %s", logfilename.toUtf8().data());
+            qDebug("oldlogfilename: %s", oldlogfilename.toUtf8().data());
+            QFile logfile2(logfilename);
+            if( !logfile2.open(QIODevice::Append | QIODevice::Text) ) {
+                qDebug("Still failed to open logfile!");
+            }
+        }
+    }
+
     QFile::remove(oldlogfilename);
     QFile::rename(logfilename, oldlogfilename);
     QFile::remove(logfilename); // just in case we failed to rename, make sure the old log file is removed
