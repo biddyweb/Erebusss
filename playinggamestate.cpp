@@ -3453,9 +3453,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->setRowStretch(1, 1);
         int col = 1;
 
-        QToolButton *turboButton = new QToolButton();
-        turboButton->setText("T");
-        game_g->initButton(turboButton);
+        //QToolButton *turboButton = new QToolButton();
+        //turboButton->setText("T");
+        //game_g->initButton(turboButton);
+        QIcon turboIcon(this->builtin_images["gui_time"]);
+        //QToolButton *turboButton = new QToolButton();
+        //turboButton->setIcon(turboIcon);
+        QPushButton *turboButton = new QPushButton(turboIcon, "");
         turboButton->setShortcut(QKeySequence(Qt::Key_T));
         turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 #ifndef Q_OS_ANDROID
@@ -3467,8 +3471,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
 
         if( !this->permadeath ) {
-            quickSaveButton = new QPushButton("QS");
-            game_g->initButton(quickSaveButton);
+            //quickSaveButton = new QPushButton("QS");
+            //game_g->initButton(quickSaveButton);
+            QIcon quickSaveIcon(this->builtin_images["gui_quicksave"]);
+            QPushButton *quickSaveButton = new QPushButton(quickSaveIcon, "");
             quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3479,8 +3485,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
             layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
         }
 
-        QPushButton *zoomoutButton = new QPushButton("-");
-        game_g->initButton(zoomoutButton);
+        //QPushButton *zoomoutButton = new QPushButton("-");
+        //game_g->initButton(zoomoutButton);
+        QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
+        QPushButton *zoomoutButton = new QPushButton(zoomoutIcon, "");
+        //QToolButton *zoomoutButton = new QToolButton();
+        //zoomoutButton->setIcon(zoomoutIcon);
         zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3490,8 +3500,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
         layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
 
-        QPushButton *zoominButton = new QPushButton("+");
-        game_g->initButton(zoominButton);
+        //QPushButton *zoominButton = new QPushButton("+");
+        //game_g->initButton(zoominButton);
+        QIcon zoominIcon(this->builtin_images["gui_zoomin"]);
+        QPushButton *zoominButton = new QPushButton(zoominIcon, "");
         zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3501,8 +3513,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
         layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
 
-        QPushButton *centreButton = new QPushButton("O");
-        game_g->initButton(centreButton);
+        //QPushButton *centreButton = new QPushButton("O");
+        //game_g->initButton(centreButton);
+        QIcon centreIcon(this->builtin_images["gui_centre"]);
+        QPushButton *centreButton = new QPushButton(centreIcon, "");
         centreButton->setShortcut(QKeySequence(Qt::Key_C));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?

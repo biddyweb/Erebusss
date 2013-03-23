@@ -1,6 +1,12 @@
 <?xml version="1.0" ?>
 <images>
 
+<image type="generic" name="gui_centre" filename="gfx/textures/gui/centre.png"/>
+<image type="generic" name="gui_quicksave" filename="gfx/textures/gui/quicksave.png"/>
+<image type="generic" name="gui_time" filename="gfx/textures/gui/time.png"/>
+<image type="generic" name="gui_zoomin" filename="gfx/textures/gui/zoomin.png"/>
+<image type="generic" name="gui_zoomout" filename="gfx/textures/gui/zoomout.png"/>
+
 <image type="generic" name="wall" filename="gfx/textures/wall.png"/>
 <image type="generic" name="wall_redbricks" filename="gfx/textures/wall_redbricks.png"/>
 <image type="generic" name="wall_rock" filename="gfx/textures/wall_rock.png"/>
