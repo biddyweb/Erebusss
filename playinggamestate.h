@@ -433,6 +433,8 @@ public:
 class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Q_OBJECT
 
+    friend class MainGraphicsView;
+
     static PlayingGamestate *playingGamestate; // singleton pointer, needed for static member functions
 
     QGraphicsScene *scene;
@@ -445,7 +447,11 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     //QStackedWidget *main_stacked_widget;
     vector<QWidget *> widget_stack;
 
+    QPushButton *turboButton;
     QPushButton *quickSaveButton;
+    QPushButton *zoomoutButton;
+    QPushButton *zoominButton;
+    QPushButton *centreButton;
 
     Difficulty difficulty;
     bool permadeath;

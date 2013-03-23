@@ -187,16 +187,19 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
 }
 
 void MainGraphicsView::zoomOut() {
+    playing_gamestate->zoomoutButton->clearFocus(); // workaround for Android still showing selection
     QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
     this->zoom(zoom_centre, false);
 }
 
 void MainGraphicsView::zoomIn() {
+    playing_gamestate->zoominButton->clearFocus(); // workaround for Android still showing selection
     QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
     this->zoom(zoom_centre, true);
 }
 
 void MainGraphicsView::centreOnPlayer() {
+    playing_gamestate->centreButton->clearFocus(); // workaround for Android still showing selection
     Character *character = playing_gamestate->getPlayer();
     AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
     this->centerOn(object);
@@ -2564,7 +2567,8 @@ void SaveGameWindow::clickedSaveNew() {
 PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
-    /*main_stacked_widget(NULL),*/ quickSaveButton(NULL),
+    /*main_stacked_widget(NULL),*/
+    turboButton(NULL), quickSaveButton(NULL), zoomoutButton(NULL), zoominButton(NULL), centreButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
@@ -3453,13 +3457,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->setRowStretch(1, 1);
         int col = 1;
 
-        //QToolButton *turboButton = new QToolButton();
-        //turboButton->setText("T");
-        //game_g->initButton(turboButton);
         QIcon turboIcon(this->builtin_images["gui_time"]);
-        //QToolButton *turboButton = new QToolButton();
-        //turboButton->setIcon(turboIcon);
-        QPushButton *turboButton = new QPushButton(turboIcon, "");
+        turboButton = new QPushButton(turboIcon, "");
         turboButton->setShortcut(QKeySequence(Qt::Key_T));
         turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 #ifndef Q_OS_ANDROID
@@ -3471,8 +3470,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
 
         if( !this->permadeath ) {
-            //quickSaveButton = new QPushButton("QS");
-            //game_g->initButton(quickSaveButton);
             QIcon quickSaveIcon(this->builtin_images["gui_quicksave"]);
             quickSaveButton = new QPushButton(quickSaveIcon, "");
             quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
@@ -3485,12 +3482,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
             layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
         }
 
-        //QPushButton *zoomoutButton = new QPushButton("-");
-        //game_g->initButton(zoomoutButton);
         QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
-        QPushButton *zoomoutButton = new QPushButton(zoomoutIcon, "");
-        //QToolButton *zoomoutButton = new QToolButton();
-        //zoomoutButton->setIcon(zoomoutIcon);
+        zoomoutButton = new QPushButton(zoomoutIcon, "");
         zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3500,10 +3493,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
         layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
 
-        //QPushButton *zoominButton = new QPushButton("+");
-        //game_g->initButton(zoominButton);
         QIcon zoominIcon(this->builtin_images["gui_zoomin"]);
-        QPushButton *zoominButton = new QPushButton(zoominIcon, "");
+        zoominButton = new QPushButton(zoominIcon, "");
         zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3513,10 +3504,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
         layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
 
-        //QPushButton *centreButton = new QPushButton("O");
-        //game_g->initButton(centreButton);
         QIcon centreIcon(this->builtin_images["gui_centre"]);
-        QPushButton *centreButton = new QPushButton(centreIcon, "");
+        centreButton = new QPushButton(centreIcon, "");
         centreButton->setShortcut(QKeySequence(Qt::Key_C));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
@@ -3683,11 +3672,15 @@ void PlayingGamestate::playBackgroundMusic() {
 
 void PlayingGamestate::turboToggled(bool checked) {
     LOG("PlayingGamestate::turboToggled(%d)\n", checked);
+    turboButton->clearFocus(); // workaround for Android still showing selection
     game_g->getScreen()->setGameTimeMultiplier(checked ? 2 : 1);
 }
 
 void PlayingGamestate::quickSave() {
     qDebug("quickSave()");
+    if( quickSaveButton != NULL ) {
+        quickSaveButton->clearFocus(); // workaround for Android still showing selection
+    }
     if( !this->permadeath ) {
         if( this->canSaveHere() ) {
             this->showInfoDialog("You cannot save here - enemies are nearby.");
