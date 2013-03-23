@@ -2881,9 +2881,44 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         *exit_down = *exit_up = NULL;
         location = new Location(str.str());
         location->setDisplayName(true);
-        location->setBackgroundImageName("background_brown");
-        location->setFloorImageName("floor_rock");
-        location->setWallImageName("wall");
+
+        string background_name, floor_name, wall_name;
+        int back_r = rollDice(1, 3, 0);
+        if( back_r == 1 ) {
+            background_name = "background_brown";
+        }
+        else if( back_r == 2 ) {
+            background_name = "background_dark";
+        }
+        else if( back_r == 3 ) {
+            background_name = "background_black";
+        }
+        int floor_r = rollDice(1, 10, 0);
+        if( floor_r <= 3 ) {
+            floor_name = "floor_dirt";
+        }
+        else if( floor_r <= 6 ) {
+            floor_name = "floor_rock";
+        }
+        else if( floor_r <= 9 ) {
+            floor_name = "floor_paved";
+        }
+        else {
+            floor_name = "floor_paved_blood";
+        }
+        int wall_r = rollDice(1, 6, 0);
+        if( wall_r <= 3 ) {
+            wall_name = "wall";
+        }
+        else if( wall_r <= 5 ) {
+            wall_name = "wall_rock";
+        }
+        else {
+            wall_name = "wall_redbricks";
+        }
+        location->setBackgroundImageName(background_name);
+        location->setFloorImageName(floor_name);
+        location->setWallImageName(wall_name);
 
         Vector2D start_pos(0.0f, 100.0f);
         Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, DIRECTION4_EAST);
