@@ -86,6 +86,7 @@
 <image type="scenery" name="painting_fortress" filename="gfx/textures/scenery/scenery_painting_fortress.png"/>
 <image type="scenery" name="painting_gate" filename="gfx/textures/scenery/scenery_painting_gate.png"/>
 <image type="scenery" name="painting_sword" filename="gfx/textures/scenery/scenery_painting_sword.png"/>
+<image type="scenery" name="painting_dwarf" filename="gfx/textures/scenery/scenery_painting_dwarf.png"/>
 <image type="scenery" name="plant" filename="gfx/textures/scenery/plant.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
