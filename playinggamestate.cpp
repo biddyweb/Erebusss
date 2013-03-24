@@ -3403,8 +3403,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
         game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
 #endif
-#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID)
-        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav"); // strange pauses on Symbian?; conflicts with other sounds on Android
+#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID) && !defined(__linux)
+        // strange pauses on Symbian?
+        // conflicts with other sounds on Android
+        // also causes pauses on Linux
+        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav");
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
         LOG("done loading sound effects\n");
@@ -6206,6 +6209,7 @@ void PlayingGamestate::closeSubWindow() {
         /*if( this->main_stacked_widget != NULL ) {
             this->main_stacked_widget->removeWidget(subwindow);
         }*/
+        subwindow->hide(); // ensure window is hidden immediately - e.g., needed when a quest is completed and we start a new quest
         subwindow->deleteLater();
         this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1);
         if( n_stacked_widgets == 2 ) {
