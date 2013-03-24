@@ -20,9 +20,11 @@ bool MyApplication::event(QEvent *event) {
      * to receive these events on Android when we don't on Windows, e.g., when opening/closing dialogs, which
      * can lead to a bug where the game pauses unexpectedly (e.g., talk to an NPC, say at least one thing, then
      * close the talk window - the game will still be paused).
+     * Also disabled for Linux, as we get an inactive message when the game first starts - probably best to
+     * disable, until we understand what's happening.
      */
     if( event->type() == QEvent::ApplicationActivate ) {
-#if !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_ANDROID) && !defined(__linux)
         LOG("application activated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
             game_g->activate(true);
@@ -30,7 +32,7 @@ bool MyApplication::event(QEvent *event) {
 #endif
     }
     else if( event->type() == QEvent::ApplicationDeactivate ) {
-#if !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_ANDROID) && !defined(__linux)
         LOG("application deactivated\n");
         if( game_g != NULL && game_g->getScreen() != NULL ) {
             game_g->activate(false);
