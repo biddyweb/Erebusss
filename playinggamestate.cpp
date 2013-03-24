@@ -4916,6 +4916,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     }
                     QStringRef type_s = reader.attributes().value("type");
                     QStringRef lighting_min_s = reader.attributes().value("lighting_min");
+                    QStringRef display_name_s = reader.attributes().value("display_name");
                     location = new Location(name_s.toString().toStdString());
                     if( type_s.length() > 0 ) {
                         if( type_s.toString() == "indoors" ) {
@@ -4939,6 +4940,8 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         }
                         location->setLightingMin(static_cast<unsigned char>(lighting_min));
                     }
+                    bool display_name = parseBool(display_name_s.toString(), true);
+                    location->setDisplayName(display_name);
                     quest->addLocation(location);
                 }
                 else if( reader.name() == "floor" ) {
@@ -7722,7 +7725,11 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             break;
         }
         //fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
-        stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\">\n\n";
+        stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\"";
+        if( location->isDisplayName() ) {
+            stream << " display_name=\"true\"";
+        }
+        stream << ">\n\n";
 
         qDebug("save location images");
         //fprintf(file, "<background image_name=\"%s\"/>\n", location->getBackgroundImageName().c_str());
