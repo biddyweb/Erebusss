@@ -28,6 +28,8 @@
     </npc_group>
     <npc_group>
         <npc name="Orc" template="Orc"/>
+    </npc_group>
+    <npc_group>
         <npc name="Orc Archer" template="Orc">
             <item template="Shortbow"/>
             <item template="Arrows"/>
