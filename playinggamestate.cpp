@@ -731,10 +731,10 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     const float bar_x = 16.0f/640.0f;
     const float bar_y = 48.0f/360.0f;
+    const float bar_h = 16.0f/360.0f;
     const float portrait_size = 160.0f/1080.f;
     float text_x = bar_x;
     const float text_y = bar_y - 4.0f/360.0f;
-    const float location_name_y = 4.0f/360.0f;
     if( playing_gamestate->getPlayer() != NULL ) {
         const Character *player = playing_gamestate->getPlayer();
         if( player->getPortrait().length() > 0 ) {
@@ -755,7 +755,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
             painter.setPen(Qt::white);
             painter.drawText(bar_x2*width(), text_y*height(), enemy->getName().c_str());
             fraction = ((float)enemy->getHealthPercent()) / (float)100.0f;
-            this->drawBar(painter, bar_x2, bar_y, 100.0f/640.0f, 16.0f/360.0f, fraction, Qt::darkRed);
+            this->drawBar(painter, bar_x2, bar_y, 100.0f/640.0f, bar_h, fraction, Qt::darkRed);
         }
     }
 
@@ -810,7 +810,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         painter.setPen(Qt::white);
         QFontMetrics fm(painter.font());
         int font_height = fm.height();
-        painter.drawText(bar_x*width(), font_height, playing_gamestate->getCLocation()->getName().c_str());
+        painter.drawText(bar_x*width(), (bar_y + bar_h)*height() + font_height, playing_gamestate->getCLocation()->getName().c_str());
     }
 
 }
@@ -2572,7 +2572,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
-    cheat_mode(cheat_mode)
+    cheat_mode(cheat_mode),
+    need_visibility_update(false)
 {
     LOG("PlayingGamestate::PlayingGamestate()\n");
     playingGamestate = this;
@@ -6296,6 +6297,12 @@ void PlayingGamestate::update() {
     bool do_complex_update = false;
     int complex_time_ms = 0; // time since last "complex" update
 
+#if defined(Q_OS_SYMBIAN)
+    // use longer updates on Symbian, due to older devices on average having lower performance
+    const int complex_update_time_ms = 200;
+#else
+    const int complex_update_time_ms = 100;
+#endif
     if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
         if( time_last_complex_update_ms == 0 ) {
             complex_time_ms = game_g->getScreen()->getGameTimeFrameMS();
@@ -6317,6 +6324,11 @@ void PlayingGamestate::update() {
 #endif
         // we can get away with not updating this every call
         this->testFogOfWar();
+
+        if( this->need_visibility_update ) {
+            // important for performance not to be called every frame (especially on older devices like Nokia 5800, with large locations)
+            this->updateVisibility(player->getPos());
+        }
 
         for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
             Scenery *scenery = *iter;
@@ -6743,7 +6755,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         }
 
         if( !character->isDead() ) {
-            this->updateVisibility(character->getPos());
+            this->need_visibility_update = true;
         }
     }
 }
@@ -7382,6 +7394,7 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
 }
 
 void PlayingGamestate::updateVisibility(Vector2D pos) {
+    this->need_visibility_update = false;
     vector<FloorRegion *> update_regions = this->c_location->updateVisibility(pos);
     for(vector<FloorRegion *>::iterator iter = update_regions.begin(); iter != update_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;

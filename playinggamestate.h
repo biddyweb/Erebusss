@@ -494,6 +494,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     bool cheat_mode;
 
+    bool need_visibility_update;
+
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
