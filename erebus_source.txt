@@ -56,6 +56,7 @@ History
 
 Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
 
+0.6 - Add "make install" support for Linux.
 0.2 - Switched to using Necessitas alpha 4 for Android.
 0.1 - First release.
 
