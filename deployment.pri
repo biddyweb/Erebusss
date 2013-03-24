@@ -133,7 +133,7 @@ symbian {
         INSTALLS += icon desktopfile
     }
 
-    target.path = $${installPrefix}/bin
+    target.path = $${installPrefix}
     export(target.path)
     INSTALLS += target
 }
