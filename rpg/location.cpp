@@ -2613,10 +2613,10 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     vector<Rect2D> ignore_rects = seed.ignore_rects;
     int passage_length_i = 0;
     {
-        int roll = first ? 2 : rollDice(1, 8, 0);
-        if( roll <= 4 )
+        int roll = first ? 1 : rollDice(1, 10, 0);
+        if( roll <= 6 )
             passage_length_i = 1;
-        else if( roll <= 7 )
+        else if( roll <= 9 )
             passage_length_i = 2;
         else
             passage_length_i = 3;
