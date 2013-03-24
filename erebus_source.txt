@@ -21,7 +21,13 @@ This should then produce the executable file erebus. To run, type:
 
 ./erebus
 
-The Linux version has been tested on Ubuntu 12.04 Precise Pangolin 32-bit.
+You can also install using:
+
+sudo make install
+
+This means you can run by typing erebus from a terminal (from any folder), as well as launch from the application menu.
+
+The Linux version has been tested on Ubuntu 12.04 Precise Pangolin 64-bit.
 
 Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to have version 4.6.3 of libqt4-dev, where as Erebus requires 4.7.3 or later. You need to download from the testing or unstable repositories. This should be fixed in version 7.0 "wheezy".
 
@@ -62,4 +68,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 22 March 2013
+Mark Harman 24 March 2013
