@@ -190,6 +190,7 @@ class GUIOverlay : public QWidget {
     }*/
 
     bool display_progress;
+    string progress_message;
     int  progress_percent;
 
     float fps;
@@ -205,8 +206,12 @@ public:
     }
 
     void setProgress(int progress_percent) {
+        this->setProgress(progress_percent, "Please wait...");
+    }
+    void setProgress(int progress_percent, const string &progress_message) {
         this->display_progress = true;
         this->progress_percent = progress_percent;
+        this->progress_message = progress_message;
         this->repaint();
     }
     void unsetProgress() {

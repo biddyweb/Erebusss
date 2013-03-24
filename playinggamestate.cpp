@@ -717,7 +717,9 @@ void MainGraphicsView::removeTextEffect(TextEffect *text_effect) {
 }
 
 GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *view) :
-    QWidget(view), playing_gamestate(playing_gamestate), fps(-1.0f),
+    QWidget(view), playing_gamestate(playing_gamestate),
+    display_progress(false), progress_percent(0),
+    fps(-1.0f),
     has_fade(false), fade_in(false), fade_time_start_ms(0)
 {
     //this->setAttribute(Qt::WA_NoSystemBackground);
@@ -794,7 +796,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         const float x_off = 16.0f/640.0f;
         const float hgt = 64.0f/360.0f;
         painter.setPen(Qt::white);
-        painter.drawText(x_off*width(), (100.0f/360.0f)*height(), "Please wait...");
+        painter.drawText(x_off*width(), (132.0f/360.0f)*height(), progress_message.c_str());
         this->drawBar(painter, x_off, 0.5f - 0.5f*hgt, 1.0f - 2.0f*x_off, hgt, ((float)this->progress_percent)/100.0f, Qt::darkRed);
         qDebug(">>> draw progress: %d", this->progress_percent);
     }
@@ -5692,7 +5694,9 @@ void PlayingGamestate::createRandomQuest() {
     Location *first_location;
     for(int level=0;;level++) {
         float progress = ((float)level) / ((float)n_levels_c);
-        gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_mid);
+        stringstream progress_message;
+        progress_message << "Generating random dungeon level " << (level+1) << "...";
+        gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_mid, progress_message.str());
         qApp->processEvents();
 
         Vector2D player_start;
@@ -5775,9 +5779,16 @@ void PlayingGamestate::createRandomQuest() {
 
 void PlayingGamestate::processLocations(int progress_lo, int progress_hi) {
     int progress_count = 0;
-    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
+    for(vector<Location *>::iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter, progress_count++) {
         Location *loc = *iter;
         qDebug("process location: %s", loc->getName().c_str());
+
+        float progress = ((float)progress_count) / ((float)quest->getNLocations());
+        stringstream progress_message;
+        progress_message << "Processing locations: " << (progress_count+1) << " / " << quest->getNLocations() << "...";
+        gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi, progress_message.str());
+        qApp->processEvents();
+
         if( loc->getBackgroundImageName().length() == 0 ) {
             throw string("Location doesn't define background image name");
         }
@@ -5801,14 +5812,8 @@ void PlayingGamestate::processLocations(int progress_lo, int progress_hi) {
                 animation_layer->getAnimationLayer(); // force animation to be loaded
             }
         }
-
-        progress_count++;
-        if( progress_count % 4 == 0 ) {
-            float progress = ((float)progress_count) / ((float)quest->getNLocations());
-            gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi);
-            qApp->processEvents();
-        }
     }
+    gui_overlay->setProgress(progress_hi);
 }
 
 void PlayingGamestate::addGraphicsItem(QGraphicsItem *object, float width, bool undo_3d) {
