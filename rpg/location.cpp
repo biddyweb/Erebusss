@@ -2947,7 +2947,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
 
         LocationGeneratorInfo generator_info;
 
-        for(int count=0;count<10 && seeds.size() > 0;count++) {
+        for(int count=0;count<8 && seeds.size() > 0;count++) {
             vector<Seed> c_seeds;
             for(vector<Seed>::iterator iter = seeds.begin(); iter != seeds.end(); ++iter) {
                 Seed seed = *iter;
