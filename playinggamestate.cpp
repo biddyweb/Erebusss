@@ -2557,6 +2557,7 @@ void SaveGameWindow::clickedSaveNew() {
                 //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
                 //playing_gamestate->showInfoDialog("The game has been successfully saved.");
                 //playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
+                playing_gamestate->addTextEffect("The game has been successfully saved", 5000);
             }
             else {
                 game_g->showErrorDialog("Failed to save game!");
