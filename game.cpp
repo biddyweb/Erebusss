@@ -749,7 +749,8 @@ enum TestID {
     TEST_PERF_PATHFINDING_0 = 21,
     TEST_PERF_REMOVE_SCENERY_0 = 22,
     TEST_PERF_REMOVE_SCENERY_1 = 23,
-    N_TESTS = 24
+    TEST_PERF_UPDATE_VISIBILITY_0 = 24,
+    N_TESTS = 25
 };
 
 /**
@@ -777,6 +778,7 @@ enum TestID {
   TEST_PERF_PATHFINDING_0 - performance test for calculating a shortest path
   TEST_PERF_REMOVE_SCENERY_0 - performance test for removing scenery (including recalculating distance graph)
   TEST_PERF_REMOVE_SCENERY_1 - performance test for removing scenery that was blocking important waypoint (including recalculating distance graph)
+  TEST_PERF_UPDATE_VISIBILITY_0 - performance test for updating visibility
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -984,7 +986,7 @@ void Game::runTest(const string &filename, int test_id) {
                 score /= 1000.0;
             }
         }
-        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
+        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 || test_id == TEST_PERF_UPDATE_VISIBILITY_0 ) {
             Location location("");
 
             FloorRegion *floor_region = NULL;
@@ -1076,6 +1078,14 @@ void Game::runTest(const string &filename, int test_id) {
                         throw string("failed to find path");
                     }
                 }
+                else if( test_id == TEST_PERF_UPDATE_VISIBILITY_0 ) {
+                    Vector2D pos(1.0f, 1.0f);
+                    location.clearVisibility();
+                    vector<FloorRegion *> floor_regions = location.updateVisibility(pos);
+                    if( floor_regions.size() == 0 ) {
+                        throw string("didn't find any floor regions");
+                    }
+                }
             }
             has_score = true;
             score = ((double)timer.elapsed()) / ((double)n_times);
@@ -1133,7 +1143,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, TEST_PERF_REMOVE_SCENERY_0);
+    //runTest(filename, TEST_PERF_UPDATE_VISIBILITY_0);
 
 }
 

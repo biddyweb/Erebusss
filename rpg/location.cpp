@@ -1747,11 +1747,21 @@ void Location::initVisibility(Vector2D pos) {
 }
 #endif
 
+void Location::clearVisibility() {
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        floor_region->setVisible(false);
+    }
+}
+
 vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     //qDebug("Location::updateVisibility for %f, %f", pos.x, pos.y);
     vector<FloorRegion *> update_floor_regions;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
+        if( floor_region->isVisible() ) {
+            continue;
+        }
 
         Vector2D top_left = floor_region->getTopLeft();
         Vector2D bottom_right = floor_region->getBottomRight();
@@ -1768,6 +1778,7 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
         if( dist2 - E_TOL_LINEAR > npc_visibility_c*npc_visibility_c ) {
             continue;
         }
+        //qDebug("TEST");
 
         for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
             //Vector2D point = floor_region->getPoint(j);

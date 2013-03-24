@@ -785,6 +785,7 @@ public:
 #if 0
     void initVisibility(Vector2D pos);
 #endif
+    void clearVisibility();
     vector<FloorRegion *> updateVisibility(Vector2D pos);
 };
 
