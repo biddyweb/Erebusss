@@ -1752,6 +1752,23 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     vector<FloorRegion *> update_floor_regions;
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
+
+        Vector2D top_left = floor_region->getTopLeft();
+        Vector2D bottom_right = floor_region->getBottomRight();
+        float xdiff = 0.0f, ydiff = 0.0f;
+        if( pos.x < top_left.x )
+            xdiff = top_left.x - pos.x;
+        else if( pos.x > bottom_right.x )
+            xdiff = pos.x - bottom_right.x;
+        if( pos.y < top_left.y )
+            ydiff = top_left.y - pos.y;
+        else if( pos.y > bottom_right.y )
+            ydiff = pos.y - bottom_right.y;
+        float dist2 = xdiff*xdiff + ydiff*ydiff;
+        if( dist2 - E_TOL_LINEAR > npc_visibility_c*npc_visibility_c ) {
+            continue;
+        }
+
         for(size_t j=0;j<floor_region->getNPoints() && !floor_region->isVisible();j++) {
             //Vector2D point = floor_region->getPoint(j);
             int p_j = j==0 ? floor_region->getNPoints()-1 : j-1;
