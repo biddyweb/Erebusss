@@ -79,6 +79,12 @@ symbian {
 else:win32 {
     RC_FILE = resource.rc # Windows icon
 }
+else:unix {
+    icon.files = erebus64.png
+    icon.path = /usr/share/pixmaps
+    desktopfile.files = erebus.desktop
+    desktopfile.path = /usr/share/applications
+}
 
 SOURCES += main.cpp mainwindow.cpp \
     game.cpp \

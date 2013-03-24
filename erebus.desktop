@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Terminal=false
+Name=erebus
+Comment=2D real-time Role-Playing Game
+Exec=/opt/erebus/erebus
+Path=/opt/erebus/
+Icon=erebus64
+Categories=Game;

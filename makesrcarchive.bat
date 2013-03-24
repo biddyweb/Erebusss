@@ -15,6 +15,8 @@ copy %src%\deployment.pri %dst%
 copy %src%\erebus.ico %dst%
 copy %src%\resource.rc %dst%
 copy %src%\erebus.svg %dst%
+copy %src%\erebus64.png %dst%
+copy %src%\erebus.desktop %dst%
 
 copy %src%\game.cpp %dst%
 copy %src%\gamestate.cpp %dst%

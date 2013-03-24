@@ -18,7 +18,6 @@ ABLD.BAT
 Makefile
 Makefile_erebus_exe.mk
 bld.inf
-erebus.desktop
 erebus.loc
 erebus.pro.user
 erebus.rss
