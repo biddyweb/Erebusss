@@ -102,6 +102,16 @@
     causes_terror="true" terror_effect="2"
 />
 
+<!--Weapon hardcoded as natural damage: Short Sword-->
+<npc name="Weak Skeleton" animation_name="skeleton"
+    FP="7" BS="5" S="6" A="1" M="2" D="7" B="12" Sp="2.2"
+    natural_damageX="2" natural_damageY="6" natural_damageZ="0"
+    health_min="20" health_max="25" gold_min="0" gold_max="0"
+    xp_worth="10"
+    unholy="true"
+    causes_terror="true" terror_effect="1"
+/>
+
 <!--Natural damage-->
 <npc name="Zombie" animation_name="zombie"
     FP="8" BS="0" S="8" A="1" M="1" D="5" B="12" Sp="1.8"

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <randomquest>
 
-<npc_table type="isolated">
+<npc_table group="goblinoid" type="isolated">
 
 <level value="0">
     <npc_group>
@@ -39,7 +39,41 @@
 
 </npc_table>
 
-<npc_table type="lair">
+<npc_table group="undead" type="isolated">
+
+<level value="0">
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+    </npc_group>
+</level>
+
+<level value="1">
+    <npc_group>
+        <npc name="Zombie" template="Zombie"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+    </npc_group>
+</level>
+
+<level value="2">
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Zombie" template="Zombie"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Skeleton" template="Skeleton"/>
+    </npc_group>
+</level>
+
+</npc_table>
+
+<npc_table group="goblinoid" type="lair">
 
 <level value="0">
     <npc_group>
@@ -102,6 +136,67 @@
         <npc name="Orc Archer" template="Orc">
             <item template="Shortbow"/>
             <item template="Arrows"/>
+        </npc>
+    </npc_group>
+</level>
+
+</npc_table>
+
+<npc_table group="undead" type="lair">
+
+<level value="0">
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Weak Skeletal Mage" template="Weak Skeleton">
+            <spell name="Fire bolt" count="6"/>
+            <spell name="Heal" count="1"/>
+        </npc>
+    </npc_group>
+</level>
+
+<level value="1">
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Skeleton" template="Skeleton"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Zombie" template="Zombie"/>
+        <npc name="Zombie" template="Zombie"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Weak Skeleton" template="Weak Skeleton"/>
+        <npc name="Weak Skeletal Mage" template="Weak Skeleton">
+            <spell name="Fire bolt" count="5"/>
+            <spell name="Agony" count="1"/>
+            <spell name="Heal" count="1"/>
+        </npc>
+    </npc_group>
+</level>
+
+<level value="2">
+    <npc_group>
+        <npc name="Skeleton" template="Skeleton"/>
+        <npc name="Skeleton" template="Skeleton"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Skeleton" template="Skeleton"/>
+        <npc name="Zombie" template="Zombie"/>
+        <npc name="Zombie" template="Zombie"/>
+    </npc_group>
+    <npc_group>
+        <npc name="Skeleton" template="Weak Skeleton"/>
+        <npc name="Skeletal Mage" template="Skeleton">
+            <spell name="Fire bolt" count="4"/>
+            <spell name="Agony" count="2"/>
+            <spell name="Paralyse" count="1"/>
+            <spell name="Heal" count="1"/>
         </npc>
     </npc_group>
 </level>

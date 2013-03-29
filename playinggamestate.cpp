@@ -5620,6 +5620,10 @@ void PlayingGamestate::createRandomQuest() {
     this->view_transform_3d = true;
     this->view_walls_3d = true;
 
+    string monster_type = rollDice(1, 3, 0) <= 2 ? "goblinoid" : "undead";
+    //string monster_type = "goblinoid";
+    LOG("monster type: %s\n", monster_type.c_str());
+
     // load random quest definitions
     map<string, NPCTable *> npc_tables;
     {
@@ -5637,39 +5641,54 @@ void PlayingGamestate::createRandomQuest() {
             //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
             if( reader.isStartElement() ) {
                 if( reader.name() == "npc_table" ) {
+                    QStringRef group_s = reader.attributes().value("group");
                     QStringRef type_s = reader.attributes().value("type");
-                    qDebug("found npc table, type: %s", type_s.toString().toStdString().c_str());
-                    npc_table = new NPCTable();
-                    npc_tables[type_s.toString().toStdString()] = npc_table;
+                    qDebug("found npc table, group: %s, type: %s", group_s.toString().toStdString().c_str(), type_s.toString().toStdString().c_str());
+                    if( group_s.length() == 0 || group_s.toString().toStdString() == monster_type ) {
+                        qDebug("    matches group");
+                        if( npc_tables.find( type_s.toString().toStdString() ) != npc_tables.end() ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("more than one table specified for a given group and type");
+                        }
+                        npc_table = new NPCTable();
+                        npc_tables[type_s.toString().toStdString()] = npc_table;
+                    }
                 }
                 else if( reader.name() == "level" ) {
-                    if( npc_table == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("level tag not inside npc_table");
+                    if( npc_table != NULL ) {
+                        QStringRef value_s = reader.attributes().value("value");
+                        int value = parseInt(value_s.toString());
+                        qDebug("    found level %d", value);
+                        npc_table_level = new NPCTableLevel();
+                        npc_table->addLevel(value, npc_table_level);
                     }
-                    QStringRef value_s = reader.attributes().value("value");
-                    int value = parseInt(value_s.toString());
-                    qDebug("    found level %d", value);
-                    npc_table_level = new NPCTableLevel();
-                    npc_table->addLevel(value, npc_table_level);
                 }
                 else if( reader.name() == "npc_group" ) {
-                    if( npc_table_level == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("npc_group tag not inside level");
+                    if( npc_table != NULL ) {
+                        if( npc_table_level == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("npc_group tag not inside level");
+                        }
+                        qDebug("        found npc group");
+                        npc_group = new NPCGroup();
+                        npc_table_level->addNPCGroup(npc_group);
                     }
-                    qDebug("        found npc group");
-                    npc_group = new NPCGroup();
-                    npc_table_level->addNPCGroup(npc_group);
                 }
                 else if( reader.name() == "npc" ) {
-                    bool is_player = false;
-                    Vector2D pos;
-                    Character *npc = this->loadNPC(&is_player, &pos, reader);
-                    npc_group->addNPC(npc);
+                    if( npc_table != NULL ) {
+                        if( npc_group == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("npc tag not inside npc_group");
+                        }
+                        bool is_player = false;
+                        Vector2D pos;
+                        Character *npc = this->loadNPC(&is_player, &pos, reader);
+                        qDebug("            found NPC: %s", npc->getName().c_str());
+                        npc_group->addNPC(npc);
+                    }
                 }
             }
-            else if( reader.isEndDocument() ) {
+            else if( reader.isEndElement() ) {
                 if( reader.name() == "npc_table" ) {
                     npc_table = NULL;
                 }
