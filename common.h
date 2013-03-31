@@ -16,7 +16,7 @@ const bool mobile_c = false;
 
 // remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;
-const int versionMinor = 6;
+const int versionMinor = 7;
 
 enum GameType {
     GAMETYPE_CAMPAIGN = 0,
