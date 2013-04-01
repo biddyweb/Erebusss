@@ -7155,9 +7155,9 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
     vector<Scenery *> clicked_scenerys;
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
-        Vector2D scenery_pos = scenery->getPos();
-        float scenery_width = scenery->getWidth();
-        float scenery_height = is_click ? scenery->getVisualHeight() : scenery->getHeight();
+        Vector2D scenery_pos;
+        float scenery_width = 0.0f, scenery_height = 0.0f;
+        scenery->getBox(&scenery_pos, &scenery_width, &scenery_height, is_click);
         float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
         //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
         if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
@@ -7166,6 +7166,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
         }
         if( dist_from_click <= click_tol_scenery_c ) {
             // clicked on this scenery
+            //LOG("    scenery pos: %f, %f : width %f height %f\n", scenery_pos.x, scenery_pos.y, scenery_width, scenery_height);
             float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
             //qDebug("    player_dist from %s: %f", scenery->getName().c_str(), player_dist);
             if( player_dist <= npc_radius_c + 0.5f ) {

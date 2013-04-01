@@ -301,6 +301,7 @@ public:
     float getVisualHeight() const {
         return this->visual_height;
     }
+    void getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const;
 
     void addItem(Item *item);
     void removeItem(Item *item);

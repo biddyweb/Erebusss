@@ -45,6 +45,16 @@ void Scenery::setBlocking(bool is_blocking, bool blocks_visibility) {
     }
 }
 
+void Scenery::getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const {
+    *box_centre = this->pos;
+    *box_width = this->width;
+    *box_height = include_visual ? this->visual_height : this->height;
+    if( include_visual ) {
+        // adjust for the "visual" part being purely above the centre (i.e., the scenery pos is not the centre of the visual box region)
+        box_centre->y -= 0.5f*(this->visual_height - this->height);
+    }
+}
+
 void Scenery::addItem(Item *item) {
     this->items.insert(item);
 }
