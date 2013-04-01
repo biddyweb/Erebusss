@@ -1001,7 +1001,7 @@ cddddd2b
  9b
  9b
  9b
- 9b
+ 9b+
  9b
  9b
  9b
@@ -1024,7 +1024,7 @@ cddddd2b
 
 <scenery name="Boulders" image_name="boulders" x="22.8" y="42.3" size="0.58" blocking="true"/>
 
-<scenery name="Armourer" image_name="building" x="25.0" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
+<scenery name="Armourer" image_name="building" x="25.0" y="16.5" size="4.0" blocking="true" block_visibility="true" exit_location="armourer" exit_location_x="2.0" exit_location_y="3.0" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
 
 <scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
