@@ -1820,6 +1820,13 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
                 update_floor_regions.push_back(floor_region);
             }
         }
+        if( !floor_region->isVisible() ) {
+            // also test if we're inside this region!
+            if( floor_region->pointInside(pos) ) {
+                floor_region->setVisible(true);
+                update_floor_regions.push_back(floor_region);
+            }
+        }
     }
     //qDebug("Location::updateVisibility done");
     return update_floor_regions;
