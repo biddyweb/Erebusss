@@ -79,6 +79,7 @@
 <image type="scenery" name="cabinet" filename="gfx/textures/scenery/cabinet.png"/>
 <image type="scenery" name="campfire" filename="gfx/textures/scenery/campfire.png"/>
 <image type="scenery" name="carpet" filename="gfx/textures/scenery/carpet.png"/>
+<image type="scenery" name="church" filename="gfx/textures/scenery/church.png"/>
 <image type="scenery" name="church_bell" filename="gfx/textures/scenery/church_bell.png"/>
 <image type="scenery" name="experimental_chamber" filename="gfx/textures/scenery/experimental_chamber.png"/>
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
