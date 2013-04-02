@@ -19,15 +19,178 @@ You are eager to do what you can to help.
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
 
-<location name="entrance">
+<location name="Axbury" display_name="true" lighting_min="160">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
+
+<player_start x="16.0" y="22.0"/>
+
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
+         68           68
+         9b           9b
+         9b           9b
+         9b           9b
+677777777547777777777754777778
+cdddddddddddd21dddddddddddddde
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             9b
+             ce
+</tilemap>
+
+<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="2.0" exit_location_y="3.0"/>
+
+<scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" locked="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
+
+<scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="4.0" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="2.5"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="32.5" y="38.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="31.0" y="43.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="27.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church" exit_location_x="2.0" exit_location_y="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="27.0" y="33.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="22.5" y="32.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="18.0" y="27.6" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="30.9" y="17.8" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="20.6" y="34.9" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="23.3" y="37.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="22.7" y="40.1" size="3.0"/>
+
+<scenery name="Grass" image_name="grass" x="20.5" y="31.8" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="25.0" y="34.2" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="31.4" y="36.7" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="36.5" y="32.7" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="37.5" y="27.7" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="40.5" y="31.4" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="38.6" y="28.9" size="1.0" draw_type="background"/>
+
+<scenery name="Grass" image_name="grass" x="40.1" y="24.3" size="1.0" draw_type="background"/>
+
+<npc name="Peasant" animation_name="peasant_woman" static_image="true" x="30.0" y="29.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello - have you heard the news about the dead coming out of their graves?
+</opening_initial>
+<opening_later>Hello - have you heard the news about the dead coming out of their graves?
+</opening_later>
+</npc>
+
+</location>
+
+<location name="Armourer" display_name="true">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="1.0" y="1.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="1.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="5.0"/>
+<scenery name="Door" image_name="door_wood_n" x="1.5" y="5.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="25.0" exit_location_y="19.0"/>
+
+<scenery name="Table" image_name="table" x="2.5" y="1.0" size="0.8" blocking="true"/>
+
+<npc name="Shopkeeper" animation_name="man" static_image="true" x="1.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Armourer"/>
+
+</location>
+
+<location name="general_stores">
+
+<floor image_name="floor_dirt"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="31.0" exit_location_y="34.5"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="2.2"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="General Stores"/>
+
+</location>
+
+<location name="peasant_hut">
+
+<floor image_name="floor_dirt"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="34.0" exit_location_y="32.75"/>
+
+<npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="2.2"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello.
+</opening_initial>
+<opening_later>Hello.
+</opening_later>
+</npc>
 
 </location>
 
