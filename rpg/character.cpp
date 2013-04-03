@@ -1462,11 +1462,21 @@ bool Character::canCompleteInteraction(PlayingGamestate *playing_gamestate) cons
     }
     else if( this->interaction_type == "KILL_NPCS" ) {
         bool all_dead = true;
-        for(set<Character *>::iterator iter = playing_gamestate->getCLocation()->charactersBegin(); iter != playing_gamestate->getCLocation()->charactersEnd() && all_dead; ++iter) {
+        /*for(set<Character *>::iterator iter = playing_gamestate->getCLocation()->charactersBegin(); iter != playing_gamestate->getCLocation()->charactersEnd() && all_dead; ++iter) {
             Character *character = *iter;
             if( character != playing_gamestate->getPlayer() && character != this && character->getObjectiveId() == this->getInteractionData() && !character->isDead()) {
                 //qDebug("not dead: %s at %f, %f, objective id %s equals %s", character->getName().c_str(), character->getX(), character->getY(), character->getObjectiveId().c_str(), this->getInteractionData().c_str());
                 all_dead = false;
+            }
+        }*/
+        for(vector<Location *>::const_iterator iter = playing_gamestate->getQuest()->locationsBegin(); iter != playing_gamestate->getQuest()->locationsEnd() && all_dead; ++iter) {
+            const Location *location = *iter;
+            for(set<Character *>::const_iterator iter = location->charactersBegin(); iter != location->charactersEnd() && all_dead; ++iter) {
+                const Character *character = *iter;
+                if( character != playing_gamestate->getPlayer() && character != this && character->getObjectiveId() == this->getInteractionData() && !character->isDead()) {
+                    //qDebug("not dead: %s at %f, %f, objective id %s equals %s", character->getName().c_str(), character->getX(), character->getY(), character->getObjectiveId().c_str(), this->getInteractionData().c_str());
+                    all_dead = false;
+                }
             }
         }
         if( all_dead ) {
