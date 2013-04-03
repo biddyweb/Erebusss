@@ -5824,6 +5824,7 @@ void PlayingGamestate::processLocations(int progress_lo, int progress_hi) {
 
         loc->createBoundariesForRegions();
         loc->createBoundariesForScenery();
+        loc->createBoundariesForFixedNPCs();
         loc->addSceneryToFloorRegions();
         loc->calculateDistanceGraph();
         for(set<Character *>::iterator iter2 = loc->charactersBegin(); iter2 != loc->charactersEnd(); ++iter2) {

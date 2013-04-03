@@ -22,6 +22,7 @@ class Quest;
 // source types for boundaries
 const int SOURCETYPE_FLOOR = 0;
 const int SOURCETYPE_SCENERY = 1;
+const int SOURCETYPE_FIXED_NPC = 2;
 
 class LocationListener {
 public:
@@ -587,6 +588,8 @@ protected:
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
     bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const;
 
+    void createBoundaryForRect(Vector2D pos, float width, float height, void *source, int source_type);
+
     // rule of three
     Location& operator=(const Location &location) {
         throw string("Location assignment operator disallowed");
@@ -768,6 +771,7 @@ public:
 
     void createBoundariesForRegions();
     void createBoundariesForScenery();
+    void createBoundariesForFixedNPCs();
     void addSceneryToFloorRegions();
 
     bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;

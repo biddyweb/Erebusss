@@ -345,6 +345,7 @@ class Character {
     string biography;
     bool is_ai; // not saved
     bool is_hostile;
+    bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
     string portrait;
     string animation_name; // for NPCs (player is handled separately)
     bool static_image; // for NPCs
@@ -537,6 +538,15 @@ public:
     }
     void setHostile(bool is_hostile) {
         this->is_hostile = is_hostile;
+        if( !is_hostile && this->is_ai ) {
+            this->is_fixed = true;
+        }
+        else {
+            this->is_fixed = false;
+        }
+    }
+    bool isFixed() const {
+        return this->is_fixed;
     }
     bool isDead() const {
         return this->is_dead;

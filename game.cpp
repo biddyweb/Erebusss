@@ -817,6 +817,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
+            location.createBoundariesForFixedNPCs();
             location.addSceneryToFloorRegions();
             location.calculateDistanceGraph();
 
@@ -1038,6 +1039,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
+            location.createBoundariesForFixedNPCs();
             location.addSceneryToFloorRegions();
             location.calculateDistanceGraph();
 

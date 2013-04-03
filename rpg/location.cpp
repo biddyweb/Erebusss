@@ -963,6 +963,42 @@ void Location::createBoundariesForRegions() {
     }
 }
 
+void Location::createBoundaryForRect(Vector2D pos, float width, float height, void *source, int source_type) {
+    Polygon2D boundary;
+    boundary.setSourceType(source_type);
+    boundary.setSource(source);
+    // clockwise, as "inside" should be on the left
+    Vector2D p0 = pos; p0.x -= 0.5f*width; p0.y -= 0.5f*height;
+    Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
+    Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
+    Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
+    if( this->findFloorRegionAt(p0) == NULL ) {
+        LOG("can't find floor region for p0 at: %f, %f\n", p0.x, p0.y);
+        LOG("rect at %f, %f: %d\n", pos.x, pos.y, source);
+        throw string("can't find floor region for p0");
+    }
+    if( this->findFloorRegionAt(p1) == NULL ) {
+        LOG("can't find floor region for p1 at: %f, %f\n", p1.x, p1.y);
+        LOG("rect at %f, %f: %d\n", pos.x, pos.y, source);
+        throw string("can't find floor region for p1");
+    }
+    if( this->findFloorRegionAt(p2) == NULL ) {
+        LOG("can't find floor region for p2 at: %f, %f\n", p2.x, p2.y);
+        LOG("rect at %f, %f: %d\n", pos.x, pos.y, source);
+        throw string("can't find floor region for p2");
+    }
+    if( this->findFloorRegionAt(p3) == NULL ) {
+        LOG("can't find floor region for p3 at: %f, %f\n", p3.x, p3.y);
+        LOG("rect at %f, %f: %d\n", pos.x, pos.y, source);
+        throw string("can't find floor region for p3");
+    }
+    boundary.addPoint(p0);
+    boundary.addPoint(p1);
+    boundary.addPoint(p2);
+    boundary.addPoint(p3);
+    this->addBoundary(boundary);
+}
+
 void Location::createBoundariesForScenery() {
     //qDebug("Location::createBoundariesForScenery()");
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
@@ -971,48 +1007,22 @@ void Location::createBoundariesForScenery() {
             continue;
         }
         //qDebug(">>> set scenery %d", scenery);
-        Polygon2D boundary;
-        boundary.setSourceType((int)SOURCETYPE_SCENERY);
-        boundary.setSource(scenery);
-        /*Vector2D pos = scenery->getPos();
-        // clockwise, as "inside" should be on the left
-        boundary.addPoint(pos);
-        boundary.addPoint(pos + Vector2D(1.0f, 0.0f));
-        boundary.addPoint(pos + Vector2D(1.0f, 1.0f));
-        boundary.addPoint(pos + Vector2D(0.0f, 1.0f));*/
         float width = scenery->getWidth(), height = scenery->getHeight();
         Vector2D pos = scenery->getPos();
+        this->createBoundaryForRect(pos, width, height, scenery, (int)SOURCETYPE_SCENERY);
         //qDebug("scenery at %f, %f", pos.x, pos.y);
-        // clockwise, as "inside" should be on the left
-        Vector2D p0 = pos; p0.x -= 0.5f*width; p0.y -= 0.5f*height;
-        Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
-        Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
-        Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
-        if( this->findFloorRegionAt(p0) == NULL ) {
-            LOG("can't find floor region for p0 at: %f, %f\n", p0.x, p0.y);
-            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
-            throw string("can't find floor region for p0");
+    }
+    qDebug("    done");
+}
+
+void Location::createBoundariesForFixedNPCs() {
+    for(set<Character *>::iterator iter = characters.begin(); iter != characters.end(); ++iter) {
+        Character *character = *iter;
+        if( !character->isFixed() ) {
+            continue;
         }
-        if( this->findFloorRegionAt(p1) == NULL ) {
-            LOG("can't find floor region for p1 at: %f, %f\n", p1.x, p1.y);
-            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
-            throw string("can't find floor region for p1");
-        }
-        if( this->findFloorRegionAt(p2) == NULL ) {
-            LOG("can't find floor region for p2 at: %f, %f\n", p2.x, p2.y);
-            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
-            throw string("can't find floor region for p2");
-        }
-        if( this->findFloorRegionAt(p3) == NULL ) {
-            LOG("can't find floor region for p3 at: %f, %f\n", p3.x, p3.y);
-            LOG("scenery at %f, %f: %s\n", pos.x, pos.y, scenery->getName().c_str());
-            throw string("can't find floor region for p3");
-        }
-        boundary.addPoint(p0);
-        boundary.addPoint(p1);
-        boundary.addPoint(p2);
-        boundary.addPoint(p3);
-        this->addBoundary(boundary);
+        Vector2D pos = character->getPos();
+        this->createBoundaryForRect(pos, 2.0f*npc_radius_c, 2.0f*npc_radius_c, character, (int)SOURCETYPE_FIXED_NPC);
     }
     qDebug("    done");
 }
@@ -1208,6 +1218,10 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
             if( this->type == TYPE_OUTDOORS && ( flying || intersect_type == INTERSECTTYPE_VISIBILITY ) ) {
                 continue;
             }
+        }
+        else if( boundary->getSourceType() == (int)SOURCETYPE_FIXED_NPC ) {
+            if( intersect_type == INTERSECTTYPE_VISIBILITY )
+                continue; // can always see past NPCs
         }
         if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
             continue;

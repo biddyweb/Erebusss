@@ -156,6 +156,7 @@ const int default_natural_damageZ = -1;
 Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
+    is_fixed(false),
     animation_name(animation_name), static_image(false), bounce(false),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
@@ -180,6 +181,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
 Character::Character(const string &name, bool is_ai, const CharacterTemplate &character_template) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
+    is_fixed(false),
     static_image(character_template.isStaticImage()),
     bounce(character_template.isBounce()),
     location(NULL), listener(NULL), listener_data(NULL),
