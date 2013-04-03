@@ -51,7 +51,7 @@ cdddddddddddd21dddddddddddddde
              ce
 </tilemap>
 
-<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="2.0" exit_location_y="3.0"/>
+<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="1.5" exit_location_y="4.5"/>
 
 <scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" locked="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
 
@@ -67,7 +67,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church" exit_location_x="2.0" exit_location_y="3.0"/>
+<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="3.5" exit_location_y="8.5"/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -132,13 +132,75 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Table" image_name="table" x="2.5" y="1.0" size="0.8" blocking="true"/>
 
-<npc name="Shopkeeper" animation_name="man" static_image="true" x="1.5" y="1.0"
+<npc name="Shopkeeper" animation_name="peasant_man" static_image="true" x="1.5" y="1.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+</location>
+
+<location name="Axbury, Church" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="1.0" rect_y="0.0" rect_w="5.0" rect_h="9.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="9.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="0.4" rect_y="0.0" rect_w="0.6" rect_h="1.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="3.5" y="9.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="36.5" exit_location_y="19.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="0.6" y="0.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="Axbury, Graveyard" exit_location_x="6.0" exit_location_y="11.5"/>
+
+<scenery name="Table" image_name="table" x="1.5" y="3.0" size="0.8" blocking="true"/>
+
+<scenery name="Table" image_name="table" x="5.5" y="3.0" size="0.8" blocking="true"/>
+
+<npc name="Priest" animation_name="man" static_image="true" x="2.5" y="4.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="KILL_NPCS"
+    interaction_data="Axbury_Priest"
+    interaction_xp="75"
+    interaction_journal="I killed the Zombies for the Priest."
+>
+<opening_initial>Hello - you look like someone who could help me!
+</opening_initial>
+<opening_later>Hello, again - please, are you able to help me?
+</opening_later>
+<opening_interaction_complete>Thank you again for ridding this church of those foul zombies!
+</opening_interaction_complete>
+<talk question="How can I help you?" while_not_done="true" journal="The priest of Axbury asked if I could kill the Zombies in the church graveyard.">The dead are coming out graves! At this very moment, there are two rotting corpses out in the graveyard, walking around. Please can you do something about it!
+</talk>
+<talk question="I have killed the Zombies for you" objective="true">
+Thank you for helping me!
+</talk>
+</npc>
+
+</location>
+
+<location name="Axbury, Graveyard" display_name="true" lighting_min="120">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="1.0" rect_y="1.0" rect_w="10.0" rect_h="12.0"/>
+<floorregion shape="rect" rect_x="6.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="6.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="1.5" exit_location_y="0.5"/>
+
+<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
+
+<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="7.0" y="5.1"/>
 
 </location>
 
