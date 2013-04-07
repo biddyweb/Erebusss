@@ -5890,7 +5890,7 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
 }
 
 void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
-    //qDebug("PlayingGamestate::locationAddScenery(%d, %d)", location, scenery);
+    //qDebug("PlayingGamestate::locationAddScenery(%d, %d): %s", location, scenery, scenery->getName().c_str());
     if( this->c_location == location ) {
         QGraphicsItem *object = NULL;
         if( scenery->isAnimation() ) {
@@ -5915,6 +5915,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
             z_value = z_value_scenery_background;
         }
         object->setZValue(z_value);
+        //qDebug("    z value: %f", z_value);
         float scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
         float scenery_scale_h = scenery->getVisualHeight() / object->boundingRect().height();
         float centre_x = 0.5f*object->boundingRect().width();
@@ -7187,6 +7188,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
         bool done = false;
         Vector2D forward_dest1 = player->getPos() + player->getDirection() * npc_radius_c * 1.1f;
+        Vector2D forward_dest4 = player->getPos() + player->getDirection() * npc_radius_c * 1.4f; // useful for doors, which have thickness 0.1
         Vector2D forward_dest2 = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
         Vector2D forward_dest3 = player->getPos() + player->getDirection() * npc_radius_c * 3.0f;
 
@@ -7242,6 +7244,13 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
             if( !done && player->getDirection().y < 0.0f ) {
                 // needed for scenery on walls
                 done = handleClickForScenerys(&move, &ignore_scenery, forward_dest3, false);
+            }
+            if( !done ) {
+                done = handleClickForScenerys(&move, &ignore_scenery, forward_dest4, false);
+            }
+            if( !done ) {
+                // needed for when on top of non-blocking sceneries
+                done = handleClickForScenerys(&move, &ignore_scenery, player->getPos(), false);
             }
         }
 
