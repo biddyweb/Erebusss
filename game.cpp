@@ -749,8 +749,9 @@ enum TestID {
     TEST_PERF_PATHFINDING_0 = 21,
     TEST_PERF_REMOVE_SCENERY_0 = 22,
     TEST_PERF_REMOVE_SCENERY_1 = 23,
-    TEST_PERF_UPDATE_VISIBILITY_0 = 24,
-    N_TESTS = 25
+    TEST_PERF_REMOVE_SCENERY_2 = 24,
+    TEST_PERF_UPDATE_VISIBILITY_0 = 25,
+    N_TESTS = 26
 };
 
 /**
@@ -778,6 +779,7 @@ enum TestID {
   TEST_PERF_PATHFINDING_0 - performance test for calculating a shortest path
   TEST_PERF_REMOVE_SCENERY_0 - performance test for removing scenery (including recalculating distance graph)
   TEST_PERF_REMOVE_SCENERY_1 - performance test for removing scenery that was blocking important waypoint (including recalculating distance graph)
+  TETS_PERF_REMOVE_SCENERY_2 - performance test for removing scenery, also tests the bug (fixed in 0.7) where we weren't updating the nodes correctly
   TEST_PERF_UPDATE_VISIBILITY_0 - performance test for updating visibility
   */
 
@@ -987,43 +989,53 @@ void Game::runTest(const string &filename, int test_id) {
                 score /= 1000.0;
             }
         }
-        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 || test_id == TEST_PERF_UPDATE_VISIBILITY_0 ) {
+        else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 || test_id == TEST_PERF_REMOVE_SCENERY_2 || test_id == TEST_PERF_UPDATE_VISIBILITY_0 ) {
             Location location("");
 
             FloorRegion *floor_region = NULL;
-            floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(14.0f, 2.0f, 5.0f, 1.0f);
-            location.addFloorRegion(floor_region);
+            if( test_id == TEST_PERF_REMOVE_SCENERY_2 ) {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.0f, 0.0f, 1.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(0.0f, 3.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+            }
+            else {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(14.0f, 2.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
 
-            floor_region = FloorRegion::createRectangle(1.0f, 5.0f, 2.0f, 5.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(0.0f, 10.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(1.0f, 5.0f, 2.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(0.0f, 10.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
 
-            floor_region = FloorRegion::createRectangle(1.0f, 15.0f, 2.0f, 5.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(0.0f, 20.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(1.0f, 15.0f, 2.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(0.0f, 20.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
 
-            floor_region = FloorRegion::createRectangle(1.0f, 25.0f, 2.0f, 5.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(0.0f, 30.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(1.0f, 25.0f, 2.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(0.0f, 30.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
 
-            floor_region = FloorRegion::createRectangle(5.0f, 22.0f, 5.0f, 1.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(10.0f, 20.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.0f, 22.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(10.0f, 20.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
 
-            floor_region = FloorRegion::createRectangle(15.0f, 22.0f, 5.0f, 1.0f);
-            location.addFloorRegion(floor_region);
-            floor_region = FloorRegion::createRectangle(20.0f, 20.0f, 5.0f, 5.0f);
-            location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(15.0f, 22.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(20.0f, 20.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+            }
 
             Scenery *scenery = NULL;
             if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
@@ -1036,6 +1048,11 @@ void Game::runTest(const string &filename, int test_id) {
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 4.25f, 22.5f);
             }
+            else if( test_id == TEST_PERF_REMOVE_SCENERY_2 ) {
+                scenery = new Scenery("", "", false, 0.1f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 4.95f, 3.5f);
+            }
 
             location.createBoundariesForRegions();
             location.createBoundariesForScenery();
@@ -1046,7 +1063,7 @@ void Game::runTest(const string &filename, int test_id) {
             QElapsedTimer timer;
             timer.start();
             int n_times = 1000;
-            if( test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
+            if( test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 || test_id == TEST_PERF_REMOVE_SCENERY_2 ) {
                 n_times = 1; // test can only be run once!
             }
             for(int i=0;i<n_times;i++) {
@@ -1064,6 +1081,25 @@ void Game::runTest(const string &filename, int test_id) {
                 else if( test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
                     Vector2D src(1.0f, 1.0f);
                     Vector2D dest(21.0f, 21.0f);
+                    vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+                    if( path.size() != 0 ) {
+                        for(vector<Vector2D>::const_iterator iter = path.begin(); iter != path.end(); ++iter) {
+                            Vector2D pos = *iter;
+                            LOG("path pos: %f, %f\n", pos.x, pos.y);
+                        }
+                        throw string("unexpectedly found a path");
+                    }
+
+                    location.removeScenery(scenery);
+
+                    path = location.calculatePathTo(src, dest, NULL, false);
+                    if( path.size() == 0 ) {
+                        throw string("failed to find path");
+                    }
+                }
+                else if( test_id == TEST_PERF_REMOVE_SCENERY_2 ) {
+                    Vector2D src(0.5f, 0.5f);
+                    Vector2D dest(0.5f, 3.5f);
                     vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
                     if( path.size() != 0 ) {
                         for(vector<Vector2D>::const_iterator iter = path.begin(); iter != path.end(); ++iter) {

@@ -726,18 +726,18 @@ void Location::removeScenery(Scenery *scenery) {
             }
         }
 
+        Vector2D top_left = scenery->getPos();
+        Vector2D bottom_right = scenery->getPos();
+        top_left.x -= (0.5f*scenery->getWidth()+npc_radius_c+E_TOL_LINEAR);
+        bottom_right.x += (0.5f*scenery->getWidth()+npc_radius_c+E_TOL_LINEAR);
+        top_left.y -= (0.5f*scenery->getHeight()+npc_radius_c+E_TOL_LINEAR);
+        bottom_right.y += (0.5f*scenery->getHeight()+npc_radius_c+E_TOL_LINEAR);
         for(size_t i=0;i<this->distance_graph->getNVertices();i++) {
             GraphVertex *v_A = this->distance_graph->getVertex(i);
             Vector2D A_pos = v_A->getPos();
             for(size_t j=i+1;j<this->distance_graph->getNVertices();j++) {
                 //qDebug("### update %d vs %d?", i, j);
                 GraphVertex *v_B = this->distance_graph->getVertex(j);
-                Vector2D top_left = scenery->getPos();
-                Vector2D bottom_right = scenery->getPos();
-                top_left.x -= scenery->getWidth();
-                bottom_right.x += scenery->getWidth();
-                top_left.y -= scenery->getHeight();
-                bottom_right.y += scenery->getHeight();
                 Vector2D B_pos = v_B->getPos();
                 if( A_pos.x < top_left.x && B_pos.x < top_left.x ) {
                     continue;
