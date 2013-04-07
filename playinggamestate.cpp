@@ -4232,6 +4232,7 @@ void PlayingGamestate::refreshDebugItems() {
                 //scene->addLine(p0.x, p0.y + offset_y, p1.x, p1.y + offset_y, wall_pen);
                 //qDebug("    %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
                 QGraphicsItem *item = scene->addLine(p0.x, p0.y, p1.x, p1.y, wall_pen);
+                item->setZValue(1000.0f);
                 this->debug_items.push_back(item);
             }
         }
