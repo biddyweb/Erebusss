@@ -786,6 +786,7 @@ public:
         return this->distance_graph;
     }
     vector<Vector2D> calculatePathTo(Vector2D src, Vector2D dest, const void *ignore, bool can_fly) const;
+    static float distanceOfPath(Vector2D src, const vector<Vector2D> &path, bool has_max_dist, float max_dist);
 
 #if 0
     void initVisibility(Vector2D pos);

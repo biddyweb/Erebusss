@@ -591,6 +591,21 @@ void Location::removeCharacter(Character *character) {
     this->characters.erase(character);
 }
 
+float Location::distanceOfPath(Vector2D src, const vector<Vector2D> &path, bool has_max_dist, float max_dist) {
+    float dist = 0.0f;
+    if( path.size() > 0 ) {
+        Vector2D last_pos = src;
+        for(vector<Vector2D>::const_iterator iter = path.begin(); iter != path.end(); ++iter) {
+            Vector2D pos = *iter;
+            dist += (pos - last_pos).magnitude();
+            last_pos = pos;
+            if( has_max_dist && dist > max_dist )
+                break;
+        }
+    }
+    return dist;
+}
+
 bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
     bool has_enemies = false;
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !has_enemies; ++iter) {
@@ -602,7 +617,7 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
             if( dist <= npc_visibility_c ) {
                 vector<Vector2D> new_path = this->calculatePathTo(character->getPos(), playing_gamestate->getPlayer()->getPos(), NULL, character->canFly());
                 if( new_path.size() > 0 ) {
-                    float dist = 0.0f;
+                    /*float dist = 0.0f;
                     Vector2D last_pos = character->getPos();
                     for(vector<Vector2D>::const_iterator iter = new_path.begin(); iter != new_path.end(); ++iter) {
                         Vector2D pos = *iter;
@@ -610,7 +625,8 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
                         last_pos = pos;
                         if( dist > npc_visibility_c )
                             break;
-                    }
+                    }*/
+                    float dist = Location::distanceOfPath(character->getPos(), new_path, true, npc_visibility_c);
                     if( dist <= npc_visibility_c ) {
                         has_enemies = true;
                     }
@@ -1470,7 +1486,7 @@ bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_f
     vector<Vector2D> new_path2 = this->calculatePathTo(fleeing_from, flee_pos, NULL, can_fly); // note, still use can_fly flag here
     bool ok = true;
     if( new_path2.size() > 0 ) {
-        float dist = (new_path.at(0) - from).magnitude();
+        /*float dist = (new_path.at(0) - from).magnitude();
         for(size_t i=0;i<new_path.size()-1;i++) {
             Vector2D p0 = new_path.at(i);
             Vector2D p1 = new_path.at(i+1);
@@ -1483,7 +1499,9 @@ bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_f
             Vector2D p1 = new_path2.at(i+1);
             float this_dist = (p1 - p0).magnitude();
             dist2 += this_dist;
-        }
+        }*/
+        float dist = Location::distanceOfPath(from, new_path, false, 0.0f);
+        float dist2 = Location::distanceOfPath(fleeing_from, new_path2, false, 0.0f);
         //qDebug("%f : %f", dist, dist2);
         if( dist > dist2 + E_TOL_LINEAR ) {
             ok = false;
