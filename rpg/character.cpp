@@ -1321,7 +1321,7 @@ Vector2D Character::getDestination() const {
     return Vector2D();
 }
 
-void Character::setDestination(float xdest, float ydest, const Scenery *ignore_scenery) {
+void Character::setDestination(float xdest, float ydest, const void *ignore) {
     //qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
     /*if( is_fleeing ) {
         qDebug("Character::setDestination(%f, %f) for %s , currently at %f, %f", xdest, ydest, this->getName().c_str(), this->pos.x, this->pos.y);
@@ -1333,7 +1333,7 @@ void Character::setDestination(float xdest, float ydest, const Scenery *ignore_s
 
     Vector2D dest(xdest, ydest);
 
-    vector<Vector2D> new_path = location->calculatePathTo(this->pos, dest, ignore_scenery, this->can_fly);
+    vector<Vector2D> new_path = location->calculatePathTo(this->pos, dest, ignore, this->can_fly);
     if( new_path.size() > 0 ) {
         //LOG("set path\n");
         this->setPath(new_path);

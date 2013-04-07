@@ -511,11 +511,11 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
             this->saveGame("autosave.xml", false);
         }
     }
-    void requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery);
+    void requestPlayerMove(Vector2D dest, const void *ignore);
     void clickedOnNPC(Character *character);
     bool handleClickForItems(Vector2D dest);
-    bool clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys);
-    bool handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click);
+    bool clickedOnScenerys(bool *move, void **ignore, const vector<Scenery *> &clicked_scenerys);
+    bool handleClickForScenerys(bool *move, void **ignore, Vector2D dest, bool is_click);
     void testFogOfWar();
     bool canSaveHere();
     int getRestTime() const;

@@ -1199,7 +1199,7 @@ void Location::intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, b
     }
 }
 
-void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const {
+void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const void *ignore_one, bool flying) const {
     for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end() && !(*done); ++iter) {
         const Polygon2D *boundary = &*iter;
         /*if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
@@ -1223,7 +1223,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
             if( intersect_type == INTERSECTTYPE_VISIBILITY )
                 continue; // can always see past NPCs
         }
-        if( ignore_one_scenery != NULL && boundary->getSource() == ignore_one_scenery ) {
+        if( ignore_one != NULL && boundary->getSource() == ignore_one ) {
             continue;
         }
         Vector2D top_left = boundary->getTopLeft();
@@ -1273,7 +1273,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
     }
 }
 
-bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const {
+bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const void *ignore_one, bool flying) const {
     //LOG("Location::intersectSweptSquareWithBoundaries from %f, %f to %f, %f, width %f\n", start.x, start.y, end.x, end.y, width);
     bool done = false;
     bool hit = false;
@@ -1300,7 +1300,7 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
     //float ymax = dv_length + width;
     float ymax = dv_length;
 
-    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, find_earliest, start, end, du, dv, width, xmin, xmax, ymin, ymax, intersect_type, ignore_one_scenery, flying);
+    intersectSweptSquareWithBoundaries(&done, &hit, &hit_dist, find_earliest, start, end, du, dv, width, xmin, xmax, ymin, ymax, intersect_type, ignore_one, flying);
 
     if( hit ) {
         *hit_pos = start + dv * hit_dist;
@@ -1673,11 +1673,11 @@ void Location::calculateDistanceGraph() {
     //qDebug("Location::calculateDistanceGraph() total time taken: %d", clock() - time_s);
 }
 
-vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Scenery *ignore_scenery, bool can_fly) const {
+vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const void *ignore, bool can_fly) const {
     vector<Vector2D> new_path;
 
     Vector2D hit_pos;
-    if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore_scenery, can_fly) ) {
+    if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore, can_fly) ) {
         // easy
         //qDebug("direct path from %f, %f to %f, %f", src.x, src.y, dest.x, dest.y);
         //qDebug("ignoring: %d", ignore_scenery);
@@ -1725,7 +1725,7 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const Sc
 
     if( new_path.size() > 0 ) {
         //LOG("set path\n");
-        if( ignore_scenery != NULL ) {
+        if( ignore != NULL ) {
             Vector2D p0 = src;
             if( new_path.size() >= 2 ) {
                 p0 = new_path.at( new_path.size() - 2 );

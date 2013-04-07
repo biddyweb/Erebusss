@@ -6440,7 +6440,8 @@ void PlayingGamestate::update() {
         // n.b., we need to call setDirection() on the player, so that the direction still gets set even if the player can't move in that direction (e.g., blocked by NPC or scenery) - needed to we can still do Action on that NPC or scenery!
         bool moved = false;
         Vector2D dest = player->getPos();
-        const float step = 0.25f;
+        const float step = 0.25f; // should be <= npc_radius_c
+        ASSERT_LOGGER( step <= npc_radius_c );
         if( this->view->keyDown(MainGraphicsView::KEY_L) ) {
             moved = true;
             dest.x -= step;
@@ -6952,7 +6953,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     return done;
 }
 
-bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, const vector<Scenery *> &clicked_scenerys) {
+bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector<Scenery *> &clicked_scenerys) {
     bool done = false;
     for(vector<Scenery *>::const_iterator iter = clicked_scenerys.begin(); iter != clicked_scenerys.end() && !done; ++iter) {
         Scenery *scenery = *iter;
@@ -7067,7 +7068,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
                     c_location->removeScenery(scenery);
                     delete scenery;
                     scenery = NULL;
-                    *ignore_scenery = NULL;
+                    *ignore = NULL;
                 }
                 else if( scenery->isExit() ) {
                     done = true;
@@ -7150,7 +7151,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, Scenery **ignore_scenery, c
     return done;
 }
 
-bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scenery, Vector2D dest, bool is_click) {
+bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2D dest, bool is_click) {
     //qDebug("PlayingGamestate::handleClickForScenerys(): %f, %f", dest.x, dest.y);
     // search for clicking on a scenery
     const float click_tol_scenery_c = 0.0f;
@@ -7164,7 +7165,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
         //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
         if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
             // clicked on or near this scenery
-            *ignore_scenery = scenery;
+            *ignore = scenery;
         }
         if( dist_from_click <= click_tol_scenery_c ) {
             // clicked on this scenery
@@ -7177,7 +7178,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, Scenery **ignore_scene
         }
     }
 
-    bool done = clickedOnScenerys(move, ignore_scenery, clicked_scenerys);
+    bool done = clickedOnScenerys(move, ignore, clicked_scenerys);
     return done;
 
 }
@@ -7188,7 +7189,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
         bool done = false;
         Vector2D forward_dest1 = player->getPos() + player->getDirection() * npc_radius_c * 1.1f;
-        Vector2D forward_dest4 = player->getPos() + player->getDirection() * npc_radius_c * 1.4f; // useful for doors, which have thickness 0.1
+        Vector2D forward_dest4 = player->getPos() + player->getDirection() * (npc_radius_c * 1.0f + 0.1f - E_TOL_LINEAR); // useful for doors, which have thickness 0.1
         Vector2D forward_dest2 = player->getPos() + player->getDirection() * npc_radius_c * 2.0f;
         Vector2D forward_dest3 = player->getPos() + player->getDirection() * npc_radius_c * 3.0f;
 
@@ -7236,7 +7237,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
 
         if( !done && !pickup_only ) {
             bool move = false;
-            Scenery *ignore_scenery = NULL;
+            void *ignore_scenery = NULL;
             done = handleClickForScenerys(&move, &ignore_scenery, forward_dest1, false);
             if( !done ) {
                 done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2, false);
@@ -7318,6 +7319,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             done = handleClickForItems(dest);
         }
 
+        void *ignore = NULL; // item to ignore for collision detection - so we can move towards an item that blocks
         // search for clicking on an NPC
         if( !done )
         {
@@ -7351,6 +7353,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
                     {
                         done = true;
                         target_npc = character;
+                        ignore = target_npc;
                         min_dist = this_dist;
                     }
                 }
@@ -7358,23 +7361,21 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             this->clickedOnNPC(target_npc); // call even if target_npc is NULL
         }
 
-        Scenery *ignore_scenery = NULL; // scenery to ignore for collision detection - so we can move towards a scenery that blocks
         if( !done ) {
-            done = handleClickForScenerys(&move, &ignore_scenery, dest, true);
+            done = handleClickForScenerys(&move, &ignore, dest, true);
         }
 
         if( move && !player->isDead() ) {
-            this->requestPlayerMove(dest, ignore_scenery);
+            this->requestPlayerMove(dest, ignore);
         }
     }
 }
 
-void PlayingGamestate::requestPlayerMove(Vector2D dest, const Scenery *ignore_scenery) {
+void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
     // nudge position due to boundaries
     dest = this->c_location->nudgeToFreeSpace(player->getPos(), dest, npc_radius_c);
     if( dest != player->getPos() ) {
-        //qDebug("ignoring scenery: %s", ignore_scenery==NULL ? "NULL" : ignore_scenery->getName().c_str());
-        player->setDestination(dest.x, dest.y, ignore_scenery);
+        player->setDestination(dest.x, dest.y, ignore);
         if( player->carryingTooMuch() ) {
             this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
         }

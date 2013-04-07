@@ -586,7 +586,7 @@ public:
         }
     }*/
     void setPath(vector<Vector2D> &path);
-    void setDestination(float xdest, float ydest, const Scenery *ignore_scenery);
+    void setDestination(float xdest, float ydest, const void *ignore);
     bool hasPath() const {
         return this->has_path;
     }

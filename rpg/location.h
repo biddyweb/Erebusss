@@ -570,7 +570,7 @@ protected:
     set<Trap *> traps;
 
     void intersectSweptSquareWithBoundarySeg(bool *hit, float *hit_dist, bool *done, bool find_earliest, Vector2D p0, Vector2D p1, Vector2D start, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax) const;
-    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
+    void intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *hit_dist, bool find_earliest, Vector2D start, Vector2D end, Vector2D du, Vector2D dv, float width, float xmin, float xmax, float ymin, float ymax, IntersectType intersect_type, const void *ignore_one, bool flying) const;
 
     struct PathWayPoint {
         Vector2D origin_point;
@@ -774,7 +774,7 @@ public:
     void createBoundariesForFixedNPCs();
     void addSceneryToFloorRegions();
 
-    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const Scenery *ignore_one_scenery, bool flying) const;
+    bool intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_earliest, Vector2D start, Vector2D end, float width, IntersectType intersect_type, const void *ignore_one, bool flying) const;
     Vector2D nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const;
     bool findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_from, bool can_fly) const;
     bool findFreeWayPoint(Vector2D *result, Vector2D from, bool visible, bool can_fly) const;
@@ -785,7 +785,7 @@ public:
     const Graph *getDistanceGraph() const {
         return this->distance_graph;
     }
-    vector<Vector2D> calculatePathTo(Vector2D src, Vector2D dest, const Scenery *ignore_scenery, bool can_fly) const;
+    vector<Vector2D> calculatePathTo(Vector2D src, Vector2D dest, const void *ignore, bool can_fly) const;
 
 #if 0
     void initVisibility(Vector2D pos);
