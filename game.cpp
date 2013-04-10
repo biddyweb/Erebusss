@@ -751,7 +751,21 @@ enum TestID {
     TEST_PERF_REMOVE_SCENERY_1 = 23,
     TEST_PERF_REMOVE_SCENERY_2 = 24,
     TEST_PERF_UPDATE_VISIBILITY_0 = 25,
-    N_TESTS = 26
+    TEST_PERF_NUDGE_0 = 26,
+    TEST_PERF_NUDGE_1 = 27,
+    TEST_PERF_NUDGE_2 = 28,
+    TEST_PERF_NUDGE_3 = 29,
+    TEST_PERF_NUDGE_4 = 30,
+    TEST_PERF_NUDGE_5 = 31,
+    TEST_PERF_NUDGE_6 = 32,
+    TEST_PERF_NUDGE_7 = 33,
+    TEST_PERF_NUDGE_8 = 34,
+    TEST_PERF_NUDGE_9 = 35,
+    TEST_PERF_NUDGE_10 = 36,
+    TEST_PERF_NUDGE_11 = 37,
+    TEST_PERF_NUDGE_12 = 38,
+    TEST_PERF_NUDGE_13 = 39,
+    N_TESTS = 40
 };
 
 /**
@@ -781,6 +795,20 @@ enum TestID {
   TEST_PERF_REMOVE_SCENERY_1 - performance test for removing scenery that was blocking important waypoint (including recalculating distance graph)
   TETS_PERF_REMOVE_SCENERY_2 - performance test for removing scenery, also tests the bug (fixed in 0.7) where we weren't updating the nodes correctly
   TEST_PERF_UPDATE_VISIBILITY_0 - performance test for updating visibility
+  TEST_PERF_NUDGE_0 - performance test for nudging: clicking far side on a west/east door (there exists another route, but we should nudge to the near side)
+  TEST_PERF_NUDGE_1 - performance test for nudging: clicking near side on a west/east door (there exists another route, but we should nudge to the near side)
+  TEST_PERF_NUDGE_2 - performance test for nudging: clicking far side on a north/south door (there exists another route, but we should nudge to the near side)
+  TEST_PERF_NUDGE_3 - performance test for nudging: clicking near side on a north/south door (there exists another route, but we should nudge to the near side)
+  TEST_PERF_NUDGE_4 - performance test for nudging: clicking far side outside a west/east door (there isn't another route, so we should internal-nudge to the near side)
+  TEST_PERF_NUDGE_5 - performance test for nudging: clicking near side outside a west/east door
+  TEST_PERF_NUDGE_6 - performance test for nudging: clicking far side outside a north/south door (there isn't another route, so we should internal-nudge to the near side)
+  TEST_PERF_NUDGE_7 - performance test for nudging: clicking near side outside a north/south door
+  TEST_PERF_NUDGE_8 - performance test for nudging: clicking on west side of u-shaped narrow passageway, away from wall
+  TEST_PERF_NUDGE_9 - performance test for nudging: clicking on west side of u-shaped narrow passageway, close to wall
+  TEST_PERF_NUDGE_10 - performance test for nudging: clicking on east side of u-shaped narrow passageway, away from wall
+  TEST_PERF_NUDGE_11 - performance test for nudging: clicking on east side of u-shaped narrow passageway, close to wall
+  TEST_PERF_NUDGE_12 - performance test for nudging: clicking on east side of scenery, src is on east side
+  TEST_PERF_NUDGE_13 - performance test for nudging: clicking on west side of scenery, src is on east side
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -1132,6 +1160,166 @@ void Game::runTest(const string &filename, int test_id) {
             //vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
 
         }
+        else if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 || test_id == TEST_PERF_NUDGE_8 || test_id == TEST_PERF_NUDGE_9 || test_id == TEST_PERF_NUDGE_10 || test_id == TEST_PERF_NUDGE_11 || test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
+            Location location("");
+
+            FloorRegion *floor_region = NULL;
+            if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 ) {
+                floor_region = FloorRegion::createRectangle(0.0f, 2.0f, 5.0f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 ) {
+                    floor_region = FloorRegion::createRectangle(0.0f, 3.0f, 1.0f, 1.0f);
+                    location.addFloorRegion(floor_region);
+                    floor_region = FloorRegion::createRectangle(0.0f, 4.0f, 5.0f, 1.0f);
+                    location.addFloorRegion(floor_region);
+                }
+            }
+            else if( test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 ) {
+                floor_region = FloorRegion::createRectangle(2.0f, 0.0f, 1.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(0.0f, 5.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                if( test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 ) {
+                    floor_region = FloorRegion::createRectangle(3.0f, 0.0f, 1.0f, 1.0f);
+                    location.addFloorRegion(floor_region);
+                    floor_region = FloorRegion::createRectangle(4.0f, 0.0f, 1.0f, 5.0f);
+                    location.addFloorRegion(floor_region);
+                }
+            }
+            else if( test_id == TEST_PERF_NUDGE_8 || test_id == TEST_PERF_NUDGE_9 || test_id == TEST_PERF_NUDGE_10 || test_id == TEST_PERF_NUDGE_11 ) {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.0f, 4.0f, 0.01f, 1.0f);
+                location.addFloorRegion(floor_region);
+                floor_region = FloorRegion::createRectangle(5.01f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+            }
+            else if( test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+            }
+
+            Scenery *scenery = NULL;
+            if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 ) {
+                scenery = new Scenery("", "", false, 0.1f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 4.95f, 2.5f);
+            }
+            else if( test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 ) {
+                scenery = new Scenery("", "", false, 1.0f, 0.1f, 0.9f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 2.5f, 4.95f);
+            }
+            else if( test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 2.5f, 2.5f);
+            }
+
+            location.createBoundariesForRegions();
+            location.createBoundariesForScenery();
+            location.createBoundariesForFixedNPCs();
+            location.addSceneryToFloorRegions();
+            location.calculateDistanceGraph();
+            for(size_t i=0;i<location.getNFloorRegions();i++) {
+                FloorRegion *floor_region = location.getFloorRegion(i);
+                floor_region->setVisible(true);
+            }
+
+            QElapsedTimer timer;
+            timer.start();
+            int n_times = 1000;
+            for(int i=0;i<n_times;i++) {
+                Vector2D src, pos, expected_nudge;
+                if( test_id == TEST_PERF_NUDGE_0 ) {
+                    src = Vector2D(6.0f, 2.5f);
+                    pos = Vector2D(4.91f, 2.5f);
+                    expected_nudge = Vector2D(5.0f + npc_radius_c + E_TOL_LINEAR, 2.5f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_1 ) {
+                    src = Vector2D(6.0f, 2.5f);
+                    pos = Vector2D(4.99f, 2.5f);
+                    expected_nudge = Vector2D(5.0f + npc_radius_c + E_TOL_LINEAR, 2.5f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_2 ) {
+                    src = Vector2D(2.5f, 6.0f);
+                    pos = Vector2D(2.5f, 4.91f);
+                    expected_nudge = Vector2D(2.5f, 5.0f + npc_radius_c + E_TOL_LINEAR);
+                }
+                else if( test_id == TEST_PERF_NUDGE_3 ) {
+                    src = Vector2D(2.5f, 6.0f);
+                    pos = Vector2D(2.5f, 4.99f);
+                    expected_nudge = Vector2D(2.5f, 5.0f + npc_radius_c + E_TOL_LINEAR);
+                }
+                else if( test_id == TEST_PERF_NUDGE_4 ) {
+                    src = Vector2D(6.0f, 3.5f);
+                    pos = Vector2D(4.85f, 3.5f);
+                    expected_nudge = Vector2D(5.0f + npc_radius_c + E_TOL_LINEAR, 3.5f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_5 ) {
+                    src = Vector2D(6.0f, 3.5f);
+                    pos = Vector2D(5.05f, 3.5f);
+                    expected_nudge = Vector2D(5.0f + npc_radius_c + E_TOL_LINEAR, 3.5f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_6 ) {
+                    src = Vector2D(3.5f, 6.0f);
+                    pos = Vector2D(3.5f, 4.85f);
+                    expected_nudge = Vector2D(3.5f, 5.0f + npc_radius_c + E_TOL_LINEAR);
+                }
+                else if( test_id == TEST_PERF_NUDGE_7 ) {
+                    src = Vector2D(3.5f, 6.0f);
+                    pos = Vector2D(3.5f, 5.05f);
+                    expected_nudge = Vector2D(3.5f, 5.0f + npc_radius_c + E_TOL_LINEAR);
+                }
+                else if( test_id == TEST_PERF_NUDGE_8 ) {
+                    src = Vector2D(4.5f, 2.0f);
+                    pos = Vector2D(4.5f, 3.0f);
+                    expected_nudge = Vector2D(4.5f, 3.0f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_9 ) {
+                    src = Vector2D(4.5f, 2.0f);
+                    pos = Vector2D(4.9f, 2.0f);
+                    expected_nudge = Vector2D(5.0f - npc_radius_c - E_TOL_LINEAR, 2.0f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_10 ) {
+                    src = Vector2D(4.5f, 2.0f);
+                    pos = Vector2D(5.5f, 3.0f);
+                    expected_nudge = Vector2D(5.5f, 3.0f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_11 ) {
+                    src = Vector2D(4.5f, 2.0f);
+                    pos = Vector2D(5.11f, 2.0f);
+                    expected_nudge = Vector2D(5.01f + npc_radius_c + E_TOL_LINEAR, 2.0f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_12 ) {
+                    src = Vector2D(3.5f, 2.5f);
+                    pos = Vector2D(3.1f, 2.5f);
+                    expected_nudge = Vector2D(3.0f + npc_radius_c + E_TOL_LINEAR, 2.5f);
+                }
+                else if( test_id == TEST_PERF_NUDGE_13 ) {
+                    src = Vector2D(3.5f, 2.5f);
+                    pos = Vector2D(1.9f, 2.6f);
+                    expected_nudge = Vector2D(2.0f - npc_radius_c - E_TOL_LINEAR, 2.6f);
+                }
+                Vector2D nudge = location.nudgeToFreeSpace(src, pos, npc_radius_c);
+                if( (nudge - expected_nudge).magnitude() > E_TOL_LINEAR ) {
+                    LOG("src: %f, %f\n", src.x, src.y);
+                    LOG("pos: %f, %f\n", pos.x, pos.y);
+                    LOG("nudge: %f, %f\n", nudge.x, nudge.y);
+                    LOG("expected_nudge: %f, %f\n", expected_nudge.x, expected_nudge.y);
+                    throw string("unexpected nudge");
+                }
+                vector<Vector2D> path = location.calculatePathTo(src, nudge, NULL, false);
+                if( path.size() == 0 ) {
+                    throw string("failed to find path");
+                }
+            }
+            has_score = true;
+            score = ((double)timer.elapsed()) / ((double)n_times);
+            score /= 1000.0;
+        }
         else {
             throw string("unknown test");
         }
@@ -1181,7 +1369,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, TEST_PERF_UPDATE_VISIBILITY_0);
+    //runTest(filename, TEST_PERF_NUDGE_0);
 
 }
 
