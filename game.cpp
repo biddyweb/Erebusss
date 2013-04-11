@@ -765,7 +765,8 @@ enum TestID {
     TEST_PERF_NUDGE_11 = 37,
     TEST_PERF_NUDGE_12 = 38,
     TEST_PERF_NUDGE_13 = 39,
-    N_TESTS = 40
+    TEST_PERF_NUDGE_14 = 40,
+    N_TESTS = 41
 };
 
 /**
@@ -809,6 +810,7 @@ enum TestID {
   TEST_PERF_NUDGE_11 - performance test for nudging: clicking on east side of u-shaped narrow passageway, close to wall
   TEST_PERF_NUDGE_12 - performance test for nudging: clicking on east side of scenery, src is on east side
   TEST_PERF_NUDGE_13 - performance test for nudging: clicking on west side of scenery, src is on east side
+  TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -1160,7 +1162,7 @@ void Game::runTest(const string &filename, int test_id) {
             //vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
 
         }
-        else if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 || test_id == TEST_PERF_NUDGE_8 || test_id == TEST_PERF_NUDGE_9 || test_id == TEST_PERF_NUDGE_10 || test_id == TEST_PERF_NUDGE_11 || test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
+        else if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 || test_id == TEST_PERF_NUDGE_8 || test_id == TEST_PERF_NUDGE_9 || test_id == TEST_PERF_NUDGE_10 || test_id == TEST_PERF_NUDGE_11 || test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 || test_id == TEST_PERF_NUDGE_14 ) {
             Location location("");
 
             FloorRegion *floor_region = NULL;
@@ -1196,7 +1198,7 @@ void Game::runTest(const string &filename, int test_id) {
                 floor_region = FloorRegion::createRectangle(5.01f, 0.0f, 5.0f, 5.0f);
                 location.addFloorRegion(floor_region);
             }
-            else if( test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
+            else if( test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 || test_id == TEST_PERF_NUDGE_14 ) {
                 floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
                 location.addFloorRegion(floor_region);
             }
@@ -1303,6 +1305,11 @@ void Game::runTest(const string &filename, int test_id) {
                     pos = Vector2D(1.9f, 2.6f);
                     expected_nudge = Vector2D(2.0f - npc_radius_c - E_TOL_LINEAR, 2.6f);
                 }
+                else if( test_id == TEST_PERF_NUDGE_14 ) {
+                    src = Vector2D(2.5f, 2.5f);
+                    pos = Vector2D(0.1f, 4.95f);
+                    expected_nudge = Vector2D(npc_radius_c + E_TOL_LINEAR, 5.0f - npc_radius_c - E_TOL_LINEAR);
+                }
                 Vector2D nudge = location.nudgeToFreeSpace(src, pos, npc_radius_c);
                 if( (nudge - expected_nudge).magnitude() > E_TOL_LINEAR ) {
                     LOG("src: %f, %f\n", src.x, src.y);
@@ -1369,8 +1376,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, TEST_PERF_NUDGE_0);
-
+    //runTest(filename, TEST_PERF_NUDGE_14);
 }
 
 void Game::initButton(QAbstractButton *button) const {
