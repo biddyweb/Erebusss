@@ -1324,6 +1324,103 @@ bool Location::intersectSweptSquareWithBoundaries(Vector2D *hit_pos, bool find_e
     return hit;
 }
 
+//#if 0
+Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const {
+    {
+        // rule out cases that we can move to without needing any nudges - must be done first
+        vector<Vector2D> new_path = this->calculatePathTo(src, pos, NULL, false);
+        if( new_path.size() > 0 ) {
+            return pos;
+        }
+    }
+    Vector2D saved_pos = pos;
+    bool nudged = false;
+    vector<Vector2D> internal_nudges;
+    for(vector<Polygon2D>::const_iterator iter = this->boundaries.begin(); iter != this->boundaries.end(); ++iter) {
+        const Polygon2D *boundary = &*iter;
+        for(size_t j=0;j<boundary->getNPoints();j++) {
+            Vector2D p0 = boundary->getPoint(j);
+            Vector2D p1 = boundary->getPoint((j+1) % boundary->getNPoints());
+            Vector2D dp = p1 - p0;
+            float dp_length = dp.magnitude();
+            if( dp_length == 0.0f ) {
+                continue;
+            }
+            // n.b., dp is kept as non-unit vector
+
+            Vector2D diff = pos - p0;
+            float dt = ( diff % dp ) / (dp_length*dp_length);
+            if( dt >= 0.0f && dt <= 1.0f ) {
+                Vector2D closest_pt = p0 + dp * dt; // point on line seg closest to end
+                //double dist = (closest_pt - pos).magnitude();
+                Vector2D normal_from_wall = dp.perpendicularYToX(); // since walls are defined anti-clockwise, this vector must point away from the wall
+                normal_from_wall /= dp_length;
+                double dist = (pos - closest_pt) % normal_from_wall;
+                //qDebug("    closest_pt %f, %f; dist = %f", closest_pt.x, closest_pt.y, dist);
+                //if( fabs(dist) <= width ) {
+                if( dist >= -0.9f && dist <= width ) {
+                    // we allow as far as -0.9f "inside" the wall, to handle doors
+                    float move_dist = width - dist;
+                    move_dist += E_TOL_LINEAR;
+                    Vector2D test_pos = pos + normal_from_wall * move_dist;
+                    //qDebug("    nudge to %f, %f?", test_pos.x, test_pos.y);
+
+                    if( dist < -E_TOL_LINEAR ) {
+                        // internal?
+                        internal_nudges.push_back(test_pos);
+                        //qDebug("    candidate internal nudge %f, %f to %f, %f (dist %f)", saved_pos.x, saved_pos.y, pos.x, pos.y, dist);
+                        //qDebug("        due to %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
+                    }
+                    else {
+                        pos = test_pos;
+                        //qDebug("    nudged %f, %f to %f, %f (dist %f)", saved_pos.x, saved_pos.y, pos.x, pos.y, dist);
+                        //qDebug("        due to %f, %f to %f, %f", p0.x, p0.y, p1.x, p1.y);
+                        nudged = true;
+                    }
+                }
+            }
+            // n.b., only care about the closest point on the line seg, and not the end points of the line seg - as we'll look at the adjacent boundary segments to find the real closest point
+        }
+    }
+
+    if( nudged ) {
+        // test we can get to the nudged position - otherwise we may meant to be looking at internal nudges
+        vector<Vector2D> new_path = this->calculatePathTo(src, pos, NULL, false);
+        if( new_path.size() == 0 ) {
+            nudged = false;
+            pos = saved_pos;
+        }
+    }
+    if( !nudged && internal_nudges.size() > 0 ) {
+        // if the point has been nudged, then this wasn't really a click point in an "internal" region
+        // if it was internal, we pick the closest
+        float closest_dist = -1.0f;
+        //qDebug("    internal nudge");
+        for(vector<Vector2D>::const_iterator iter = internal_nudges.begin(); iter!= internal_nudges.end(); ++iter) {
+            Vector2D test_pos = *iter;
+            //double dist = (test_pos - saved_pos).magnitude();
+            vector<Vector2D> new_path = this->calculatePathTo(src, test_pos, NULL, false);
+            if( new_path.size() == 0 ) {
+                continue; // can't even get to this position
+            }
+            // pick closest point to get to
+            float dist = Location::distanceOfPath(src, new_path, false, 0.0f);
+            if( !nudged || dist < closest_dist - E_TOL_LINEAR ) {
+                nudged = true;
+                pos = test_pos;
+                closest_dist = dist;
+            }
+        }
+    }
+
+    if( nudged ) {
+        //qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
+    }
+    return pos;
+}
+//#endif
+
+#if 0
 Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) const {
     Vector2D saved_pos = pos; // saved for debugging
     bool nudged = false;
@@ -1369,11 +1466,13 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
         }
     }
 
+
     if( nudged ) {
         //qDebug("nudged %f, %f to %f, %f", saved_pos.x, saved_pos.y, pos.x, pos.y);
     }
     return pos;
 }
+#endif
 
 bool Location::findFleePoint(Vector2D *result, Vector2D from, Vector2D fleeing_from, bool can_fly) const {
     //qDebug("findFleePoint");
@@ -1693,6 +1792,7 @@ void Location::calculateDistanceGraph() {
 
 vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const void *ignore, bool can_fly) const {
     vector<Vector2D> new_path;
+    //qDebug("ignore: %d", ignore);
 
     Vector2D hit_pos;
     if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore, can_fly) ) {
