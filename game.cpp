@@ -730,43 +730,45 @@ enum TestID {
     TEST_PATHFINDING_2 = 2,
     TEST_PATHFINDING_3 = 3,
     TEST_PATHFINDING_4 = 4,
-    TEST_POINTINPOLYGON_0 = 5,
-    TEST_POINTINPOLYGON_1 = 6,
-    TEST_POINTINPOLYGON_2 = 7,
-    TEST_POINTINPOLYGON_3 = 8,
-    TEST_POINTINPOLYGON_4 = 9,
-    TEST_POINTINPOLYGON_5 = 10,
-    TEST_POINTINPOLYGON_6 = 11,
-    TEST_POINTINPOLYGON_7 = 12,
-    TEST_POINTINPOLYGON_8 = 13,
-    TEST_POINTINPOLYGON_9 = 14,
-    TEST_POINTINPOLYGON_10 = 15,
-    TEST_POINTINPOLYGON_11 = 16,
-    TEST_PERF_POINTINPOLYGON_0 = 17,
-    TEST_PERF_POINTINPOLYGON_1 = 18,
-    TEST_PERF_POINTINPOLYGON_2 = 19,
-    TEST_PERF_DISTANCEGRAPH_0 = 20,
-    TEST_PERF_PATHFINDING_0 = 21,
-    TEST_PERF_REMOVE_SCENERY_0 = 22,
-    TEST_PERF_REMOVE_SCENERY_1 = 23,
-    TEST_PERF_REMOVE_SCENERY_2 = 24,
-    TEST_PERF_UPDATE_VISIBILITY_0 = 25,
-    TEST_PERF_NUDGE_0 = 26,
-    TEST_PERF_NUDGE_1 = 27,
-    TEST_PERF_NUDGE_2 = 28,
-    TEST_PERF_NUDGE_3 = 29,
-    TEST_PERF_NUDGE_4 = 30,
-    TEST_PERF_NUDGE_5 = 31,
-    TEST_PERF_NUDGE_6 = 32,
-    TEST_PERF_NUDGE_7 = 33,
-    TEST_PERF_NUDGE_8 = 34,
-    TEST_PERF_NUDGE_9 = 35,
-    TEST_PERF_NUDGE_10 = 36,
-    TEST_PERF_NUDGE_11 = 37,
-    TEST_PERF_NUDGE_12 = 38,
-    TEST_PERF_NUDGE_13 = 39,
-    TEST_PERF_NUDGE_14 = 40,
-    N_TESTS = 41
+    TEST_PATHFINDING_5 = 5,
+    TEST_PATHFINDING_6 = 6,
+    TEST_POINTINPOLYGON_0 = 7,
+    TEST_POINTINPOLYGON_1 = 8,
+    TEST_POINTINPOLYGON_2 = 9,
+    TEST_POINTINPOLYGON_3 = 10,
+    TEST_POINTINPOLYGON_4 = 11,
+    TEST_POINTINPOLYGON_5 = 12,
+    TEST_POINTINPOLYGON_6 = 13,
+    TEST_POINTINPOLYGON_7 = 14,
+    TEST_POINTINPOLYGON_8 = 15,
+    TEST_POINTINPOLYGON_9 = 16,
+    TEST_POINTINPOLYGON_10 = 17,
+    TEST_POINTINPOLYGON_11 = 18,
+    TEST_PERF_POINTINPOLYGON_0 = 19,
+    TEST_PERF_POINTINPOLYGON_1 = 20,
+    TEST_PERF_POINTINPOLYGON_2 = 21,
+    TEST_PERF_DISTANCEGRAPH_0 = 22,
+    TEST_PERF_PATHFINDING_0 = 23,
+    TEST_PERF_REMOVE_SCENERY_0 = 24,
+    TEST_PERF_REMOVE_SCENERY_1 = 25,
+    TEST_PERF_REMOVE_SCENERY_2 = 26,
+    TEST_PERF_UPDATE_VISIBILITY_0 = 27,
+    TEST_PERF_NUDGE_0 = 28,
+    TEST_PERF_NUDGE_1 = 29,
+    TEST_PERF_NUDGE_2 = 30,
+    TEST_PERF_NUDGE_3 = 31,
+    TEST_PERF_NUDGE_4 = 32,
+    TEST_PERF_NUDGE_5 = 33,
+    TEST_PERF_NUDGE_6 = 34,
+    TEST_PERF_NUDGE_7 = 35,
+    TEST_PERF_NUDGE_8 = 36,
+    TEST_PERF_NUDGE_9 = 37,
+    TEST_PERF_NUDGE_10 = 38,
+    TEST_PERF_NUDGE_11 = 39,
+    TEST_PERF_NUDGE_12 = 40,
+    TEST_PERF_NUDGE_13 = 41,
+    TEST_PERF_NUDGE_14 = 42,
+    N_TESTS = 43
 };
 
 /**
@@ -775,6 +777,8 @@ enum TestID {
   TEST_PATHFINDING_2 - can't find a path as no route available
   TEST_PATHFINDING_3 - can't find a path, as start isn't in valid floor region
   TEST_PATHFINDING_4 - can't find a path, as destination isn't in valid floor region
+  TEST_PATHFINDING_5 - find a path, with scenery being ignored
+  TEST_PATHFINDING_6 - can't find a path - scenery is ignored but still blocking, as it doesn't block the last segment
   TEST_POINTINPOLYGON_0 - tests that a point is inside a convex polygon (triangle)
   TEST_POINTINPOLYGON_1 - tests that a point is on a convex polygon (triangle)
   TEST_POINTINPOLYGON_2 - tests that a point is not inside a convex polygon (triangle)
@@ -830,21 +834,46 @@ void Game::runTest(const string &filename, int test_id) {
     double score = 0;
 
     try {
-        if( test_id == TEST_PATHFINDING_0 || test_id == TEST_PATHFINDING_1 || test_id == TEST_PATHFINDING_2 || test_id == TEST_PATHFINDING_3 || test_id == TEST_PATHFINDING_4 ) {
+        if( test_id == TEST_PATHFINDING_0 || test_id == TEST_PATHFINDING_1 || test_id == TEST_PATHFINDING_2 || test_id == TEST_PATHFINDING_3 || test_id == TEST_PATHFINDING_4 || test_id == TEST_PATHFINDING_5 || test_id == TEST_PATHFINDING_6 ) {
             Location location("");
 
-            {
-                FloorRegion *floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+            FloorRegion *floor_region = NULL;
+            if( test_id == TEST_PATHFINDING_5 || test_id == TEST_PATHFINDING_6 ) {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 10.0f);
                 location.addFloorRegion(floor_region);
             }
-            if( test_id != TEST_PATHFINDING_2 )
-            {
-                FloorRegion *floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
+            else {
+                floor_region = FloorRegion::createRectangle(0.0f, 0.0f, 5.0f, 5.0f);
+                location.addFloorRegion(floor_region);
+                if( test_id != TEST_PATHFINDING_2 ) {
+                    FloorRegion *floor_region = FloorRegion::createRectangle(10.0f, 1.0f, 4.0f, 3.0f);
+                    location.addFloorRegion(floor_region);
+                }
+                floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
                 location.addFloorRegion(floor_region);
             }
-            {
-                FloorRegion *floor_region = FloorRegion::createRectangle(5.0f, 3.0f, 5.0f, 1.0f);
-                location.addFloorRegion(floor_region);
+
+            void *ignore = NULL;
+            Scenery *scenery = NULL;
+            if( test_id == TEST_PATHFINDING_5 ) {
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 2.5f, 2.0f);
+                ignore = scenery;
+
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 2.5f, 4.0f);
+            }
+            else if( test_id == TEST_PATHFINDING_6 ) {
+                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 2.5f, 2.0f);
+                ignore = scenery;
+
+                scenery = new Scenery("", "", false, 1.0f, 8.0f, 8.0f);
+                scenery->setBlocking(true, true);
+                location.addScenery(scenery, 1.5f, 5.5f);
             }
 
             location.createBoundariesForRegions();
@@ -875,10 +904,20 @@ void Game::runTest(const string &filename, int test_id) {
                 dest = Vector2D(15.0f, 2.0f);
                 expected_points = 0;
             }
+            else if( test_id == TEST_PATHFINDING_5 ) {
+                src = Vector2D(2.5f, 6.0f);
+                dest = Vector2D(2.5f, 2.0f);
+                expected_points = 3;
+            }
+            else if( test_id == TEST_PATHFINDING_6 ) {
+                src = Vector2D(2.5f, 6.0f);
+                dest = Vector2D(1.5f, 1.0f);
+                expected_points = 3;
+            }
             else {
                 throw string("missing case for this test_id");
             }
-            vector<Vector2D> path = location.calculatePathTo(src, dest, NULL, false);
+            vector<Vector2D> path = location.calculatePathTo(src, dest, ignore, false);
 
             LOG("path has %d points\n", path.size());
             for(size_t i=0;i<path.size();i++) {
@@ -889,7 +928,7 @@ void Game::runTest(const string &filename, int test_id) {
             if( path.size() != expected_points ) {
                 throw string("Unexpected number of path points");
             }
-            else if( path.size() > 0 && path.at( path.size()-1 ) != dest ) {
+            else if( ignore == NULL && path.size() > 0 && path.at( path.size()-1 ) != dest ) {
                 throw string("Unexpected end of path");
             }
         }
@@ -1376,7 +1415,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, TEST_PERF_NUDGE_14);
+    //runTest(filename, ::TEST_PATHFINDING_6);
 }
 
 void Game::initButton(QAbstractButton *button) const {

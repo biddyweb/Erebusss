@@ -586,7 +586,7 @@ protected:
     void testActivatePathWayPoint(PathWayPoint *path_way_point) const;
 
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
-    bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const;
+    bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B, const void *ignore, bool can_fly) const;
 
     void createBoundaryForRect(Vector2D pos, float width, float height, void *source, int source_type);
 

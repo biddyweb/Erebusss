@@ -777,7 +777,7 @@ void Location::removeScenery(Scenery *scenery) {
                 // only need to test if not already visible (since we're moving scenery)
                 if( !already_visible ) {
                     float dist = 0.0f;
-                    bool hit = testGraphVerticesHit(&dist, v_A, v_B);
+                    bool hit = testGraphVerticesHit(&dist, v_A, v_B, NULL, false);
                     if( !hit ) {
                         v_A->addNeighbour(j, dist);
                         v_B->addNeighbour(i, dist);
@@ -1405,6 +1405,7 @@ Vector2D Location::nudgeToFreeSpace(Vector2D src, Vector2D pos, float width) con
             }
             // pick closest point to get to
             float dist = Location::distanceOfPath(src, new_path, false, 0.0f);
+
             if( !nudged || dist < closest_dist - E_TOL_LINEAR ) {
                 nudged = true;
                 pos = test_pos;
@@ -1735,7 +1736,7 @@ void Location::calculatePathWayPoints() {
     LOG("Location::refreshDistanceGraph()\n");
 }*/
 
-bool Location::testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B) const {
+bool Location::testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B, const void *ignore, bool can_fly) const {
     bool hit = false;
     Vector2D A = v_A->getPos();
     Vector2D B = v_B->getPos();
@@ -1747,7 +1748,7 @@ bool Location::testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *
     }
     else {
         Vector2D hit_pos;
-        hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, NULL, false);
+        hit = this->intersectSweptSquareWithBoundaries(&hit_pos, false, A, B, npc_radius_c, INTERSECTTYPE_MOVE, ignore, can_fly);
     }
     return hit;
 }
@@ -1778,7 +1779,7 @@ void Location::calculateDistanceGraph() {
         for(size_t j=i+1;j<this->distance_graph->getNVertices();j++) {
             GraphVertex *v_B = this->distance_graph->getVertex(j);
             float dist = 0.0f;
-            bool hit = testGraphVerticesHit(&dist, v_A, v_B);
+            bool hit = testGraphVerticesHit(&dist, v_A, v_B, NULL, false);
             if( !hit ) {
                 v_A->addNeighbour(j, dist);
                 v_B->addNeighbour(i, dist);
@@ -1798,7 +1799,6 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const vo
     if( src == dest || !this->intersectSweptSquareWithBoundaries(&hit_pos, false, src, dest, npc_radius_c, Location::INTERSECTTYPE_MOVE, ignore, can_fly) ) {
         // easy
         //qDebug("direct path from %f, %f to %f, %f", src.x, src.y, dest.x, dest.y);
-        //qDebug("ignoring: %d", ignore_scenery);
         new_path.push_back(dest);
     }
     else {
@@ -1818,7 +1818,7 @@ vector<Vector2D> Location::calculatePathTo(Vector2D src, Vector2D dest, const vo
             for(size_t j=n_old_vertices;j<graph->getNVertices();j++) {
                 GraphVertex *v_B = graph->getVertex(j);
                 float dist = 0.0f;
-                bool hit = testGraphVerticesHit(&dist, v_A, v_B);
+                bool hit = testGraphVerticesHit(&dist, v_A, v_B, j==end_index ? ignore : NULL, can_fly); // only the last segment of the path should ignore the "ignore"
                 if( !hit ) {
                     v_A->addNeighbour(j, dist);
                     v_B->addNeighbour(i, dist);
