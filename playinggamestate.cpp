@@ -442,7 +442,7 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
         break;
     case Qt::Key_N:
         done = true;
-        if( done ) {
+        if( down ) {
             this->playing_gamestate->cycleTargetNPC();
         }
     case Qt::Key_PageDown:
