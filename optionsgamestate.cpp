@@ -25,7 +25,7 @@ OptionsGamestate::OptionsGamestate() :
 
 //#ifndef Q_OS_ANDROID
     //this->music = NULL;
-    if( !mobile_c ) {
+    if( !lightdistribution_c ) {
         /*music = new Phonon::MediaObject(qApp);
         connect(music, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
         music->setCurrentSource(Phonon::MediaSource("music/no_more_magic.ogg"));

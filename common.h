@@ -2,10 +2,19 @@
 
 #include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
+/** Platform #defines:
+  * smallscreen_c: whether the platform has a smallscreen or not (phones, handhelds) - at some point, we may want to detect larger Android tablets as non-smallscreen.
+  * touchscreen_c: whether to optimise the UI for a touchscreen rather than mouse/touchpad.
+  * lightdistribution_c: whether the distribution misses large non-essential files (currently this means the intro music)
+  */
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
-const bool mobile_c = true;
+const bool smallscreen_c = true;
+const bool touchscreen_c = true;
+const bool lightdistribution_c = true;
 #else
-const bool mobile_c = false;
+const bool smallscreen_c = false;
+const bool touchscreen_c = false;
+const bool lightdistribution_c = false;
 #endif
 
 #if defined(Q_OS_ANDROID)

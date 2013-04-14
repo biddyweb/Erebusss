@@ -74,8 +74,8 @@ void MainWindow::showExpanded(bool fullscreen)
 #else
     show();
 #endif*/
-    if( mobile_c || fullscreen ) {
-        // mobile platforms always fullscreen
+    if( smallscreen_c || fullscreen ) {
+        // smallscreen platforms always fullscreen
         showFullScreen();
     }
     else {

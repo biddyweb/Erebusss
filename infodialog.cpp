@@ -61,14 +61,14 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
         int index = 0;
         for(vector<string>::const_iterator iter = buttons.begin(); iter != buttons.end(); ++iter, index++) {
             string button_text = *iter;
-            if( numbered_shortcuts && !mobile_c && index < buttons.size()-1 ) {
+            if( numbered_shortcuts && !smallscreen_c && index < buttons.size()-1 ) {
                 stringstream str;
                 str << (index+1) << ": " << button_text;
                 button_text = str.str();
             }
             QPushButton *button = new QPushButton(button_text.c_str());
             game_g->initButton(button);
-            if( numbered_shortcuts && !mobile_c ) {
+            if( numbered_shortcuts && !smallscreen_c ) {
                 if( index < buttons.size()-1 ) {
                     button->setShortcut(QKeySequence(QString::number(index+1)));
                 }

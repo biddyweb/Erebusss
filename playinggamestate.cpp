@@ -370,7 +370,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 }
 
 void MainGraphicsView::wheelEvent(QWheelEvent *event) {
-    if( !mobile_c ) {
+    if( !touchscreen_c ) {
         // mobile UI needs to be done via multitouch instead
         QPointF zoom_centre = this->mapToScene( this->mapFromGlobal( QCursor::pos() ) );
         if( event->delta() > 0 ) {
@@ -490,7 +490,7 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
-    if( !mobile_c )
+    if( !smallscreen_c )
     {
         if( fps_timer.isValid() ) {
             int time_ms = fps_timer.elapsed();
@@ -1090,7 +1090,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
     list = new ScrollingListWidget();
     //list->setViewMode(QListView::IconMode);
-    if( !mobile_c ) {
+    if( !smallscreen_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
         list->setFont(list_font);
@@ -1564,7 +1564,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         layout->addLayout(h_layout);
 
         player_list = new ScrollingListWidget();
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             QFont list_font = player_list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );
             player_list->setFont(list_font);
@@ -1595,7 +1595,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         }
 
         list = new ScrollingListWidget();
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             QFont list_font = list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );
             list->setFont(list_font);
@@ -1809,7 +1809,7 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
 
         list = new ScrollingListWidget();
         list->grabKeyboard();
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             QFont list_font = list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );
             list->setFont(list_font);
@@ -1830,7 +1830,7 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
         connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(clickedPickUp()));
 
         player_list = new ScrollingListWidget();
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             QFont list_font = player_list->font();
             list_font.setPointSize( list_font.pointSize() + 8 );
             player_list->setFont(list_font);
@@ -2014,29 +2014,29 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         int row = 0;
         g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), row++, 0 );
         // mobile platforms may be too small to fit the labels (e.g., Symbian 640x360)
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("Hand-to-hand combat"), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), row++, 0 );
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("Ranged combat: bows and thrown weapons"), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_S_c), row++, 0 );
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("How strong you are"), row++, 0 );
         }
 
         row = 0;
         g_layout->addWidget( addProfileCheckBox(profile_key_M_c), row++, 1 );
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("Your mental and psychic abilities"), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_D_c), row++, 1 );
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("Useful for avoiding traps"), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
-        if( !mobile_c ) {
+        if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel("Courage against terrifying enemies"), row++, 1 );
         }
     }
@@ -2362,7 +2362,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
     list = new ScrollingListWidget();
     list->grabKeyboard();
-    if( !mobile_c ) {
+    if( !smallscreen_c ) {
         QFont list_font = list->font();
         list_font.setPointSize( list_font.pointSize() + 8 );
         list->setFont(list_font);
@@ -3465,8 +3465,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->setRowStretch(1, 1);
         int col = 1;
         MainWindow *window = game_g->getScreen()->getMainWindow();
-        const int icon_resolution_independent_size = mobile_c ? 24 : 12;
-        const int button_resolution_independent_size = mobile_c ? 32 : 16;
+        const int icon_resolution_independent_size = smallscreen_c ? 24 : 12;
+        const int button_resolution_independent_size = smallscreen_c ? 32 : 16;
         const int icon_size = (icon_resolution_independent_size*window->width())/640;
         const int button_size = (button_resolution_independent_size*window->width())/640;
         LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
@@ -3959,7 +3959,7 @@ void PlayingGamestate::setupView() {
     //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
     {
-        float desired_width_c = mobile_c ? 10.0f : 20.0f;
+        float desired_width_c = smallscreen_c ? 10.0f : 20.0f;
         if( this->view_transform_3d ) {
             desired_width_c /= 1.5f;
         }
@@ -6658,7 +6658,7 @@ void PlayingGamestate::updateInput() {
     bool scrolled = false;
     int real_time_ms = game_g->getScreen()->getInputTimeFrameMS();
     float speed = (4.0f * real_time_ms)/1000.0f;
-    if( !mobile_c ) {
+    if( !touchscreen_c ) {
         // scroll due to mouse at edge of screen
         int m_x = QCursor::pos().x();
         int m_y = QCursor::pos().y();
@@ -6688,7 +6688,7 @@ void PlayingGamestate::updateInput() {
             scrolled = true;
         }
     }
-    if( !scrolled && !mobile_c ) {
+    if( !scrolled && !touchscreen_c ) {
         // scroll due to player near the edge
         // disabed for touchscreens, as makes drag-scrolling harder
         QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
@@ -7181,7 +7181,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
 bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2D dest, bool is_click) {
     //qDebug("PlayingGamestate::handleClickForScenerys(): %f, %f", dest.x, dest.y);
     // search for clicking on a scenery
-    const float click_tol_scenery_c = mobile_c ? 0.2f : 0.0f;
+    const float click_tol_scenery_c = touchscreen_c ? 0.2f : 0.0f;
     vector<Scenery *> clicked_scenerys;
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
@@ -8291,7 +8291,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
         widget->setWindowModality(Qt::ApplicationModal);
         //widget->setWindowFlags(Qt::Dialog);
         //widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-        if( mobile_c ) {
+        if( smallscreen_c ) {
             // always fullscreen
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             widget->showFullScreen();

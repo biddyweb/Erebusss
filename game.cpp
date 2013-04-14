@@ -653,7 +653,7 @@ void Game::run(bool fullscreen) {
     int screen_w = QApplication::desktop()->width();
     int screen_h = QApplication::desktop()->height();
     LOG("resolution %d x %d\n", screen_w, screen_h);
-    if( mobile_c ) {
+    if( smallscreen_c ) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
         qDebug("setting up fonts for Android");
@@ -679,7 +679,7 @@ void Game::run(bool fullscreen) {
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
 #else
-        qDebug("setting up fonts for non-Android mobile");
+        qDebug("setting up fonts for non-Android smallscreen");
         if( screen_w == 640 && screen_h == 480 ) {
             // hackery for Nokia E6 - almost all Symbian^1 phones or later are 640x360, but things don't look right with the E6, which is 640x480
             LOG("Nokia E6 font hackery\n");
@@ -1843,7 +1843,7 @@ void Game::fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filena
         if( *list == NULL ) {
             *list = new ScrollingListWidget();
             (*list)->grabKeyboard();
-            if( !mobile_c ) {
+            if( !smallscreen_c ) {
                 QFont list_font = (*list)->font();
                 list_font.setPointSize( list_font.pointSize() + 8 );
                 (*list)->setFont(list_font);
