@@ -2452,7 +2452,7 @@ void SaveGameWindow::requestNewSaveGame() {
     this->edit->setValidator(validator);
     layout->addWidget(edit);
     this->edit->setFocus();
-    this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour; probably useful on other platforms
+    this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
     connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
     QPushButton *saveButton = new QPushButton("Save game");

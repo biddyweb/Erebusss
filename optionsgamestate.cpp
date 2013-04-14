@@ -291,7 +291,7 @@ void OptionsGamestate::clickedStart() {
         nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
         h_layout->addWidget(nameLineEdit);
         nameLineEdit->setFocus();
-        nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour; probably useful on other platforms
+        nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
         nameLineEdit->selectAll();
         if( options_page_index == n_options_pages-1 ) {
             connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
