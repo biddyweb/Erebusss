@@ -3486,6 +3486,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         turboButton->setToolTip("Toggle turbo mode: make game time go faster");
 #endif
         turboButton->setCheckable(true);
+        turboToggled(false); // initialise game speed to standard
         connect(turboButton, SIGNAL(toggled(bool)), this, SLOT(turboToggled(bool)));
         layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
 
