@@ -2537,6 +2537,7 @@ void SaveGameWindow::clickedSaveNew() {
 
     if( filename.length() == 0 ) {
         playing_gamestate->showInfoDialog("Please enter a filename.");
+        edit->grabKeyboard(); // needed on Symbian at least
     }
     else {
         filename += savegame_ext;
@@ -6263,12 +6264,16 @@ void PlayingGamestate::closeSubWindow() {
         }*/
         subwindow->hide(); // ensure window is hidden immediately - e.g., needed when a quest is completed and we start a new quest
         subwindow->deleteLater();
-        this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1);
+        this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1 );
         if( n_stacked_widgets == 2 ) {
             game_g->getScreen()->getMainWindow()->activateWindow(); // needed for Symbian at least
             game_g->getScreen()->setPaused(false, true);
             this->view->setEnabled(true);
             this->view->grabKeyboard();
+        }
+        else {
+            QWidget *subwindow2 = this->widget_stack.at(this->widget_stack.size()-1);
+            subwindow2->activateWindow(); // needed for Symbian at least
         }
     }
 }
