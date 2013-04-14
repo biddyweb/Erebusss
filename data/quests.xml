@@ -2,7 +2,7 @@
 <quests>
 
 <!--<quest filename="data/quest_test.xml"/>-->
-<!--<quest filename="data/quest_necromancer.xml"/> <!-- 4th -->-->
+<!--<quest filename="data/quest_necromancer.xml"/>--> <!-- 4th -->
 <quest filename="data/quest_kill_goblins.xml"/> <!-- 1st -->
 <quest filename="data/quest_wizard_dungeon_find_item.xml"/> <!-- 2nd -->
 <quest filename="data/quest_through_mountains.xml"/> <!-- 3rd -->
