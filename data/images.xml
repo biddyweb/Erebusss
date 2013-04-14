@@ -102,6 +102,7 @@
 <image type="scenery" name="painting_dwarf" filename="gfx/textures/scenery/scenery_painting_dwarf.png"/>
 <image type="scenery" name="plant" filename="gfx/textures/scenery/plant.png"/>
 <image type="scenery" name="rock1" filename="gfx/textures/scenery/rock1.png"/>
+<image type="scenery" name="scarecrow" filename="gfx/textures/scenery/scarecrow.png"/>
 <image type="scenery" name="shrine" filename="gfx/textures/scenery/shrine.png"/>
 <image type="scenery" name="signpost" filename="gfx/textures/scenery/signpost.png"/>
 <image type="scenery" name="skeleton" filename="gfx/textures/scenery/skeleton.png"/>
