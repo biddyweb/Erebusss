@@ -1479,7 +1479,7 @@ void Game::handleMessages() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, 0, "", false, false, 0);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
                 gamestate = playing_gamestate;
                 try {
                     LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
