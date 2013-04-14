@@ -38,7 +38,7 @@ You will receive three hundred gold pieces for completing the quest.
 </floorregion>
 
 <floorregion shape="rect" rect_x="1.0" rect_y="31.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="South Exit" image_name="door_wood_n" x="1.5" y="31.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit="true"/>
+<scenery name="South Exit" image_name="door_wood_n" x="1.5" y="31.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit="true"/>
 
 <!-- centre -->
 
@@ -189,7 +189,7 @@ That's the one! Here, have one of my potions as a reward.
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="14.0" exit_location_y="13.0"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="entrance" exit_location_x="14.0" exit_location_y="13.0"/>
 
 <scenery name="Bones" image_name="bones" x="23.5" y="36.8" size="0.5" draw_type="background"/>
 
@@ -203,7 +203,7 @@ That's the one! Here, have one of my potions as a reward.
 <floorregion shape="rect" rect_x="29.0" rect_y="28.0" rect_w="8.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="29.5" rect_y="26.5" rect_w="1.0" rect_h="1.5"/>
-<scenery name="Door" image_name="door_wood_n" x="30.0" y="27.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="30.0" y="27.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="22.5" rect_w="4.0" rect_h="4.0"/>
 
@@ -279,7 +279,7 @@ Thank you for helping me!
 <floorregion shape="rect" rect_x="37.0" rect_y="20.0" rect_w="2.0" rect_h="8.0"/>
 
 <floorregion shape="rect" rect_x="36.0" rect_y="23.5" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="36.75" y="24.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="36.95" y="24.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="33.0" rect_y="22.0" rect_w="3.0" rect_h="4.0"/>
 
@@ -293,7 +293,7 @@ Thank you for helping me!
 <floorregion shape="rect" rect_x="42.0" rect_y="13.0" rect_w="2.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="44.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="44.25" y="14.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="44.05" y="14.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="45.0" rect_y="12.0" rect_w="4.0" rect_h="4.0"/>
 <npc name="Orc" template="Orc" x="48.5" y="13.0">
@@ -331,7 +331,7 @@ Thank you for helping me!
 </floorregion>
 
 <floorregion shape="rect" rect_x="18.0" rect_y="25.5" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="18.75" y="26.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="18.95" y="26.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="14.0" rect_y="24.0" rect_w="4.0" rect_h="4.0"/>
 <npc name="Orc" template="Orc" x="15.0" y="24.5">
@@ -344,7 +344,7 @@ Thank you for helping me!
 <scenery name="Bones" image_name="bones" x="15.0" y="24.7" size="0.5" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="13.0" rect_y="25.5" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="13.75" y="26.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="13.95" y="26.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="9.0" rect_y="24.0" rect_w="4.0" rect_h="4.0"/>
 
@@ -405,7 +405,7 @@ Thank you for helping me!
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="35.5" exit_location_y="7.5"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="35.5" exit_location_y="7.5"/>
 
 <!-- surrounding passages -->
 
@@ -471,7 +471,7 @@ An inscription reads, "Derrin, 946-1028. The great warrior, slain in battle".
 <floorregion shape="rect" rect_x="5.0" rect_y="22.0" rect_w="8.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="6.0" rect_y="20.5" rect_w="1.0" rect_h="1.5"/>
-<scenery name="Door" image_name="door_wood_n" x="6.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_wood_n" x="6.5" y="21.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Dwarven Key"/>
 
 <floorregion shape="rect" rect_x="4.0" rect_y="12.5" rect_w="5.0" rect_h="8.0"/>
@@ -500,7 +500,7 @@ This painting is titled, "Derrin", and dated the year 1006.
     x="8.5" y="17.5"
     />
 
-<!--<player_start x="9.0" y="17.0"/>-->
+<!--<player_start x="8.0" y="17.0"/>-->
 
 <gold amount="4" x="5.0" y="17.5"/>
 
@@ -559,7 +559,7 @@ The last few entries documents how many of the surviving dwarves decided to flee
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="34.0" exit_location_y="14.5"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="34.0" exit_location_y="14.5"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="24.0" y="27.0" />
@@ -690,7 +690,7 @@ This grate seems stuck or locked, and you are unable to budge it. Peering down, 
 </floorregion>
 
 <floorregion shape="rect" rect_x="19.0" rect_y="40.0" rect_w="2.0" rect_h="2.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="41.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="31.5" exit_location_y="13.5"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="41.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="31.5" exit_location_y="13.5"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="29.0" y="32.0" />
@@ -749,7 +749,7 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
 <wandering_monster template="Orc" time="60000" rest_chance="20"/>
 
 <floorregion shape="rect" rect_x="19.5" rect_y="40.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_4" exit_location_x="31.0" exit_location_y="15.5"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="40.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_4" exit_location_x="31.0" exit_location_y="15.5"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="19.0" y="40.0" />
