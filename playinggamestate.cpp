@@ -2234,7 +2234,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 
     QString close_text;
     if( playing_gamestate->getQuest()->isCompleted() && playing_gamestate->isLastQuest() ) {
-        QLabel *label = new QLabel("You have completed all the quests!");
+        QLabel *label = new QLabel("Congratulations, you have completed all the quests!\n\nErebus is still under development, with more quests planned to be added in future. Thanks for playing!");
         label->setFont(game_g->getFontSmall());
         label->setWordWrap(true);
         label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
