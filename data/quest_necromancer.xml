@@ -27,7 +27,7 @@ You are eager to do what you can to help.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -55,6 +55,8 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" locked="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
 
+<scenery name="Well" image_name="well" x="29.0" y="20.0" size="1.0" blocking="true"/>
+
 <scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="4.0" blocking="true" block_visibility="true" locked="true"/>
 
 <scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="2.5"/>
@@ -67,7 +69,9 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="3.5" exit_location_y="8.5"/>
+<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="3.5" exit_location_y="9.5"/>
+
+<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0"/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -128,7 +132,7 @@ cdddddddddddd21dddddddddddddde
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
 <floorregion shape="rect" rect_x="1.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.5" y="5.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="25.0" exit_location_y="19.0"/>
+<scenery name="Door" image_name="door_wood_n" x="1.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="25.0" exit_location_y="19.0"/>
 
 <scenery name="Table" image_name="table" x="2.5" y="1.0" size="0.8" blocking="true"/>
 
@@ -148,19 +152,21 @@ cdddddddddddd21dddddddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<floorregion shape="rect" rect_x="1.0" rect_y="0.0" rect_w="5.0" rect_h="9.0"/>
-<floorregion shape="rect" rect_x="3.0" rect_y="9.0" rect_w="1.0" rect_h="1.0"/>
-<floorregion shape="rect" rect_x="0.4" rect_y="0.0" rect_w="0.6" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="1.0" rect_y="1.0" rect_w="5.0" rect_h="9.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="3.5" y="9.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="36.5" exit_location_y="19.0"/>
+<scenery name="Torch" image_name="torch" x="5.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="0.6" y="0.5" w="0.4" h="1.0" blocking="true" block_visibility="true" exit_location="Axbury, Graveyard" exit_location_x="6.0" exit_location_y="11.5"/>
+<scenery name="Door" image_name="door_wood_n" x="3.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="36.5" exit_location_y="19.0"/>
 
-<scenery name="Table" image_name="table" x="1.5" y="3.0" size="0.8" blocking="true"/>
+<scenery name="Door" image_name="door_metal_n" x="2.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury, Graveyard" exit_location_x="6.0" exit_location_y="12.0"/>
 
-<scenery name="Table" image_name="table" x="5.5" y="3.0" size="0.8" blocking="true"/>
+<scenery name="Table" image_name="table" x="1.5" y="4.0" size="0.8" blocking="true"/>
 
-<npc name="Priest" animation_name="man" static_image="true" x="2.5" y="4.5"
+<scenery name="Table" image_name="table" x="5.5" y="4.0" size="0.8" blocking="true"/>
+
+<scenery name="Shrine" image_name="shrine" x="3.5" y="2.0" size="1.0" blocking="true"/>
+
+<npc name="Priest" animation_name="man" static_image="true" x="2.5" y="5.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
@@ -187,20 +193,67 @@ Thank you for helping me!
 
 </location>
 
-<location name="Axbury, Graveyard" display_name="true" lighting_min="120">
+<location name="Axbury, Graveyard" display_name="true" lighting_min="90">
+
+<player_start x="6.0" y="12.0"/>
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
 <background image_name="background_green"/>
 
 <floorregion shape="rect" rect_x="1.0" rect_y="1.0" rect_w="10.0" rect_h="12.0"/>
-<floorregion shape="rect" rect_x="6.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Door" image_name="door_metal_n" x="6.0" y="13.05" w="1.0" h="0.1" visual_h="0.9" exit_location="Axbury, Church" exit_location_x="2.0" exit_location_y="1.5"/>
 
-<scenery name="Door" image_name="door_wood_n" x="6.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="1.5" exit_location_y="0.5"/>
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="5.0" y="4.0">
+68
+9b
+947778
+91ddde
+9b
+9b
+9b
+9b
+ce
+</tilemap>
 
-<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
+<scenery name="Tomb" image_name="tomb" x="8.0" y="3.1" size="1.0" blocking="true">
+    <gold amount="2"/>
+</scenery>
 
-<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="7.0" y="5.1"/>
+<scenery name="Tomb" image_name="tomb" x="10.0" y="3.0" size="1.0" blocking="true"/>
+
+<scenery name="Plant" image_name="plant" x="9.0" y="3.5" size="0.5" draw_type="background"/>
+
+<scenery name="Grave" image_name="grave2" x="8.6" y="5.0" size="0.5" blocking="true"/>
+
+<scenery name="Grave" image_name="grave0" x="6.0" y="3.0" size="1.0" blocking="true"/>
+
+<scenery name="Grave" image_name="grave1" x="9.0" y="9.0" size="0.75" blocking="true"/>
+
+<scenery name="Grave" image_name="grave3" x="7.5" y="9.0" size="0.5" blocking="true"/>
+
+<scenery name="Grave" image_name="grave2" x="7.56" y="11.0" size="0.5" blocking="true"/>
+
+<scenery name="Grave" image_name="grave2" x="9.1" y="10.9" size="0.5" blocking="true"/>
+
+<scenery name="Tree" image_name="tree2" x="2.5" y="2.0" size="3.0"/>
+
+<scenery name="Grave" image_name="grave2" x="3.0" y="2.8" size="0.5" blocking="true"/>
+
+<scenery name="Grave" image_name="grave3" x="2.0" y="5.0" size="0.5" blocking="true"/>
+<scenery name="Grass" image_name="grass" x="2.1" y="5.5" size="0.5"/>
+
+<scenery name="Grave" image_name="grave2" x="3.7" y="7.0" size="0.5" blocking="true"/>
+
+<scenery name="Grass" image_name="grass" x="3.1" y="7.1" size="0.5"/>
+
+<scenery name="Grave" image_name="grave1" x="2.0" y="10.0" size="0.75" blocking="true"/>
+
+<scenery name="Grave" image_name="grave1" x="4.0" y="10.1" size="0.75" blocking="true"/>
+
+<!--<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
+
+<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="3.0" y="6.1"/>-->
 
 </location>
 
@@ -215,7 +268,7 @@ Thank you for helping me!
 
 <scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="31.0" exit_location_y="34.5"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="4.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="31.0" exit_location_y="34.5"/>
 
 <npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -238,7 +291,7 @@ Thank you for helping me!
 
 <scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="Axbury" exit_location_x="34.0" exit_location_y="32.75"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="4.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="34.0" exit_location_y="32.75"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
