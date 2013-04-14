@@ -70,8 +70,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <!--western route, goblins-->
 
     <floorregion shape="rect" rect_x="27.5" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
-    <scenery name="Door" image_name="door_wood_n" x="27.75" y="4.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="27.95" y="4.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="3.0" rect_w="5.5" rect_h="2.0" />
+<scenery name="Torch" image_name="torch" x="25.0" y="2.55" w="0.75" h="0.75"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="2.0" rect_h="9.0" />
 <npc name="Goblin" template="Goblin" x="22.5" y="6.0"/>
 <npc name="Goblin" template="Goblin" x="23.5" y="8.5"/>
@@ -80,6 +81,7 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="7.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="11.0" rect_y="9.0" rect_w="4.0" rect_h="3.0" />
+<scenery name="Torch" image_name="torch" x="13.0" y="8.55" w="0.75" h="0.75"/>
 
 <npc name="Goblin" template="Goblin" x="12.0" y="9.5"/>
 <npc name="Goblin" template="Goblin" x="13.0" y="9.5"/>
@@ -92,8 +94,8 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <!--southern route, poisonous fog-->
 <floorregion shape="rect" rect_x="32.0" rect_y="6.0" rect_w="1.0" rect_h="8.0" />
-<scenery name="Door" image_name="door_wood_n" x="32.5" y="6.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="32.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="13.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="33.0" rect_y="10.0" rect_w="8.0" rect_h="1.0" />
 
 <scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="0.9999" h="7.9999" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
@@ -101,8 +103,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <!--eastern rooms, goblins-->
     <floorregion shape="rect" rect_x="37.0" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
-    <scenery name="Door" image_name="door_wood_n" x="37.25" y="4.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="37.05" y="4.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="37.5" rect_y="3.0" rect_w="8.5" rect_h="2.0" />
+<scenery name="Torch" image_name="torch" x="42.0" y="2.55" w="0.75" h="0.75"/>
 <floorregion shape="rect" rect_x="44.0" rect_y="5.0" rect_w="2.0" rect_h="4.0" />
 <floorregion shape="rect" rect_x="44.0" rect_y="9.0" rect_w="5.0" rect_h="4.0" />
 <npc name="Goblin" template="Goblin" x="45.0" y="10.0"/>
@@ -130,16 +133,18 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <!--southern passage-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="14.0" rect_w="15.0" rect_h="1.0" />
+<scenery name="Torch" image_name="torch" x="28.5" y="13.55" w="0.75" h="0.75"/>
 
 <floorregion shape="rect" rect_x="20.5" rect_y="15.0" rect_w="1.0" rect_h="1.0" />
 
-<scenery name="Door" image_name="door_wood_n" x="21.0" y="15.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="21.0" y="15.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_1" exit_location_x="12.5" exit_location_y="2.0"/>
 
 <!--room with goblin champion-->
 
     <floorregion shape="rect" rect_x="26.5" rect_y="13.0" rect_w="1.0" rect_h="1.0" />
 <floorregion shape="rect" rect_x="25.0" rect_y="9.0" rect_w="4.0" rect_h="4.0" />
-<scenery name="Door" image_name="door_wood_n" x="27.0" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Torch" image_name="torch" x="27.0" y="8.55" w="0.75" h="0.75"/>
+<scenery name="Door" image_name="door_wood_n" x="27.0" y="13.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <npc name="Goblin Champion" template="Goblin Champion" x="27.0" y="11.0"/>
 <scenery name="Chest" image_name="chest" x="28.0" y="10.0" size="0.8" blocking="true">
@@ -149,7 +154,8 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <!--room with chairs-->
 
 <floorregion shape="rect" rect_x="35.0" rect_y="12.5" rect_w="6.0" rect_h="5.0" />
-<scenery name="Door" image_name="door_wood_n" x="35.0" y="14.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Torch" image_name="torch" x="38.0" y="12.05" w="0.75" h="0.75"/>
+<scenery name="Door" image_name="door_wood" x="35.05" y="14.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Throne" image_name="throne" x="37.0" y="14.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_FP"/>
 <scenery name="Throne" image_name="throne" x="39.0" y="14.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_GOLD"/>
 <scenery name="Throne" image_name="throne" x="37.0" y="16.0" size="0.8" blocking="true" interact_type="INTERACT_TYPE_THRONE_M"/>
@@ -195,11 +201,11 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 <floorregion shape="rect" rect_x="35.0" rect_y="1.0" rect_w="5.0" rect_h="12.0" />
 
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="2.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="40.05" y="2.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="4.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="4.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="40.05" y="4.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <scenery name="Skeleton" image_name="skeleton" x="40.5" y="4.5" size="0.7" draw_type="background"/>
 <item name="Book" x="40.6" y="4.7" image_name="book" icon_width="0.25" weight="1">
@@ -221,16 +227,16 @@ Food is no longer given to me. I note that I no longer hear any noises - whether
 </item>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="6.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="6.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="40.05" y="6.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <scenery name="Blood Stain" image_name="bloodstain" x="40.5" y="6.5" w="0.7" h="0.7" opacity="0.9" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="8.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="8.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="40.05" y="8.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
-<scenery name="Door" image_name="door_metal" x="40.0" y="10.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal" x="40.05" y="10.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
 <item template="Skull" x="40.5" y="10.3"/>
 <gold amount="4" x="40.6" y="10.5"/>
@@ -275,7 +281,7 @@ F43 - Suspected of witchcraft, sent here until the prisoner confesses his crime.
 
 <floorregion shape="rect" rect_x="50.0" rect_y="12.0" rect_w="0.5" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="50.5" rect_y="11.0" rect_w="5.0" rect_h="3.0"/>
-    <scenery name="Door" image_name="door_metal" x="50.25" y="12.5" w="0.4" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_metal" x="50.05" y="12.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Blood Stain" image_name="bloodstain2" x="53.0" y="12.2" w="0.7" h="0.7" opacity="0.9" draw_type="background"/>
 <scenery name="Skeleton" image_name="skeleton" x="51.5" y="11.4" size="0.65" draw_type="background"/>
@@ -293,7 +299,7 @@ This journal seems to be a record of grisly torture that took place in this room
 <!--exit to next location-->
 
 <floorregion shape="rect" rect_x="48.0" rect_y="13.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="48.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="48.5" y="13.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_2" exit_location_x="12.5" exit_location_y="2.0"/>
 
 </location>
 
@@ -371,7 +377,7 @@ This journal seems to be a record of grisly torture that took place in this room
 
 <floorregion shape="rect" rect_x="5.0" rect_y="19.0" rect_w="15.0" rect_h="2.0"/>
 <floorregion shape="rect" rect_x="12.0" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="12.5" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="12.5" exit_location_y="2.0"/>
+<scenery name="Door" image_name="door_wood_n" x="12.5" y="21.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="12.5" exit_location_y="2.0"/>
 
 </location>
 
@@ -583,7 +589,7 @@ This old and heavy tome describes the black arts of Necromancy. Early chapters t
 
 <npc name="Shadow" template="Shadow" x="45.0" y="8.5"/>
 
-    <scenery name="Door" image_name="door_wood_n" x="45.75" y="8.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="45.95" y="8.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="46.0" rect_y="7.0" rect_w="4.0" rect_h="4.0"/>
 
@@ -595,7 +601,7 @@ This old and heavy tome describes the black arts of Necromancy. Early chapters t
 <!--exit-->
 
 <floorregion shape="rect" rect_x="38.0" rect_y="15.0" rect_w="8.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="45.75" y="15.5" w="0.5" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="1.0" exit_location_y="1.5"/>
+<scenery name="Door" image_name="door_wood" x="45.95" y="15.5" w="0.1" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_1" exit_location_x="1.0" exit_location_y="1.5"/>
 
 </location>
 
@@ -609,7 +615,7 @@ This old and heavy tome describes the black arts of Necromancy. Early chapters t
 
 <floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="1.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="1.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
-<scenery name="Door" image_name="door_wood_n" x="0.25" y="1.5" w="0.5" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
+<scenery name="Door" image_name="door_wood" x="0.05" y="1.5" w="0.1" h="1.0" blocking="true" block_visibility="true" exit_location="level_3" exit_location_x="45.0" exit_location_y="15.5"/>
 
 <scenery name="Teleport" image_name="teleport" x="5.5" y="0.5" size="1.0" blocking="true" exit_location="level_4_2" exit_location_x="2.5" exit_location_y="1.5"/>
 <scenery name="Teleport" image_name="teleport" x="5.5" y="2.5" size="1.0" blocking="true" exit_location="level_4_3" exit_location_x="2.5" exit_location_y="1.5"/>
@@ -721,7 +727,7 @@ This old and heavy tome describes the black arts of Necromancy. Early chapters t
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="5.0" rect_h="3.0"/>
 <floorregion shape="rect" rect_x="5.0" rect_y="1.0" rect_w="1.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="5.75" y="1.5" w="0.5" h="1.0" blocking="true" block_visibility="true" exit_location="level_5" exit_location_x="1.0" exit_location_y="5.5"/>
+<scenery name="Door" image_name="door_wood" x="5.95" y="1.5" w="0.1" h="1.0" blocking="true" block_visibility="true" exit_location="level_5" exit_location_x="1.0" exit_location_y="5.5"/>
 
 <scenery name="Teleport" image_name="teleport" x="0.5" y="1.5" size="1.0" blocking="true" exit_location="level_4_1" exit_location_x="2.5" exit_location_y="1.5"/>
 
@@ -738,7 +744,7 @@ This old and heavy tome describes the black arts of Necromancy. Early chapters t
 <!--<player_start x="1.0" y="5.5"/>-->
 
 <floorregion shape="rect" rect_x="0.0" rect_y="5.0" rect_w="5.0" rect_h="1.0"/>
-<scenery name="Door" image_name="door_wood_n" x="0.25" y="5.5" w="0.5" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="4.0" exit_location_y="1.5"/>
+<scenery name="Door" image_name="door_wood" x="0.05" y="5.5" w="0.1" h="1.0" blocking="true" block_visibility="true" exit_location="level_4_8" exit_location_x="5.0" exit_location_y="1.5"/>
 
 <scenery name="Torch" image_name="torch" x="2.5" y="4.55" w="0.75" h="0.75"/>
 
@@ -770,7 +776,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 </scenery>
 
     <floorregion shape="rect" rect_x="18.0" rect_y="0.5" rect_w="0.5" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="18.25" y="1.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="18.45" y="1.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="18.5" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
 
 <scenery name="Table" image_name="table" x="21.0" y="0.5" size="0.8" blocking="true"/>
@@ -778,7 +784,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 <npc name="Zombie" template="Zombie" x="21.0" y="1.5"/>
 
     <floorregion shape="rect" rect_x="16.0" rect_y="2.0" rect_w="1.0" rect_h="1.5"/>
-    <scenery name="Door" image_name="door_wood_n" x="16.5" y="2.75" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="16.5" y="3.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="15.0" rect_y="3.5" rect_w="3.0" rect_h="2.0"/>
 
 <scenery name="Cabinet" image_name="cabinet" x="15.5" y="4.0" size="0.8" blocking="true">
@@ -803,6 +809,8 @@ This is a heavy book, that starts talking about the subject matter of the dead, 
 <scenery name="Barrel" image_name="barrel" x="0.5" y="19.5" size="0.8" blocking="true">
     <trap type="acid" rating="4"/>
 </scenery>
+
+<!--<player_start x="1.5" y="17.5"/>-->
 
 <scenery name="Trapdoor" image_name="grate" x="1.5" y="18.5" w="0.5" h="0.5" exit_location="level_6" exit_location_x="1.0" exit_location_y="1.0" confirm_text="There is a trapdoor in this room. Do you want to drop down into the room below?" draw_type="background"/>
 
@@ -884,7 +892,7 @@ This is a heavy book, that starts talking about the subject matter of the dead, 
 <npc name="Shadow" template="Shadow" x="22.5" y="20.5"/>
 
     <floorregion shape="rect" rect_x="25.0" rect_y="18.0" rect_w="0.5" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="25.25" y="18.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="25.45" y="18.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="25.5" rect_y="18.0" rect_w="3.0" rect_h="2.0"/>
 
 <npc name="Goblin" x="28.0" y="18.5"
@@ -904,7 +912,7 @@ Gakk!
 <floorregion shape="rect" rect_x="24.0" rect_y="10.0" rect_w="1.0" rect_h="8.0"/>
 <trap x="24.0" y="16.0" w="1.0" h="1.0" type="acid"/>
 
-    <scenery name="Door" image_name="door_wood_n" x="24.5" y="10.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="24.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="22.0" rect_y="5.0" rect_w="5.0" rect_h="5.0"/>
 
 <npc name="Orc" template="Orc" x="23.0" y="7.0"/>
@@ -1134,7 +1142,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
 <floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="19.0"/>
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="25.0" exit_location_y="19.0"/>
 
 <scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
 
@@ -1161,7 +1169,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="28.75"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="28.75"/>
 
 <npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1184,7 +1192,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 
 <scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="32.75"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="34.0" exit_location_y="32.75"/>
 
 <npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="2.2"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1211,7 +1219,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="2.0"/>
 <floorregion shape="rect" rect_x="0.5" rect_y="2.0" rect_w="1.0" rect_h="1.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="2.55" w="1.0" h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="44.75"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="2.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="44.75"/>
 
 <npc name="Shopkeeper" animation_name="man" static_image="true" x="2.5" y="1.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -1295,7 +1303,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="27.0" rect_y="23.0" rect_w="1.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="17.5" rect_w="8.0" rect_h="5.5"/>
-    <scenery name="Door" image_name="door_wood_n" x="27.5" y="24.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="27.5" y="24.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Bed" image_name="bed" x="21.0" y="18.5" size="1.2" blocking="true"/>
 
@@ -1327,7 +1335,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <floorregion shape="rect" rect_x="33.0" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="34.0" rect_y="25.0" rect_w="3.0" rect_h="3.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="33.25" y="25.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"
+    <scenery name="Door" image_name="door_wood" x="33.05" y="25.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Orc Warlord's Key" unlock_xp="80"
     />
 
@@ -1383,14 +1391,15 @@ I am a peasant from the nearby village, but I was captured by the Orcs attacking
 <floorregion shape="rect" rect_x="26.0" rect_y="12.0" rect_w="6.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="10.5" rect_w="1.0" rect_h="1.5"/>
-    <scenery name="Door" image_name="door_wood_n" x="28.5" y="11.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="28.5" y="11.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="26.0" rect_y="6.5" rect_w="5.0" rect_h="4.0"/>
 
 <npc name="Orc" template="Orc" x="28.0" y="7.5"/>
 
 <floorregion shape="rect" rect_x="28.0" rect_y="13.0" rect_w="1.0" rect_h="1.5"/>
-    <scenery name="Door" image_name="door_wood_n" x="28.5" y="13.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Orc Warlord's Key"/>
+    <scenery name="Door" image_name="door_wood_n" x="28.5" y="13.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Orc Warlord's Key"
+    />
 <floorregion shape="rect" rect_x="28.0" rect_y="14.5" rect_w="3.0" rect_h="2.0"/>
 
 <scenery name="Crate" image_name="crate" x="30.5" y="16.0" size="0.8" blocking="true">
@@ -1407,12 +1416,12 @@ Every so often, one of the prisoners was taken away, never to be returned.
 </scenery>
 
 <floorregion shape="rect" rect_x="21.5" rect_y="11.0" rect_w="4.5" rect_h="4.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="26.25" y="12.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="26.05" y="12.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <npc name="Goblin Champion" template="Goblin Champion" x="25.5" y="11.5"/>
 
 <floorregion shape="rect" rect_x="21.0" rect_y="12.5" rect_w="0.5" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="21.25" y="13.0" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="21.45" y="13.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="10.0" rect_w="5.0" rect_h="5.0"/>
 <scenery name="Barrel" image_name="barrel" x="16.5" y="14.5" size="0.8" blocking="true">
@@ -1424,7 +1433,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
 </npc>
 
 <floorregion shape="rect" rect_x="18.0" rect_y="15.0" rect_w="1.0" rect_h="1.5"/>
-    <scenery name="Door" image_name="door_wood_n" x="18.5" y="16.05" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood_n" x="18.5" y="16.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="16.5" rect_w="3.0" rect_h="3.0"/>
 <scenery name="Crate" image_name="crate" x="16.5" y="18.5" size="0.8" blocking="true">
@@ -1444,7 +1453,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
 </scenery>
 
 <floorregion shape="rect" rect_x="11.0" rect_y="12.0" rect_w="5.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="16.0" y="12.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="15.95" y="12.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <!--route to Orc Warlord-->
 
@@ -1476,7 +1485,7 @@ Every so often, one of the prisoners was taken away, never to be returned.
 </npc>
 
 <floorregion shape="rect" rect_x="45.0" rect_y="17.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="45.25" y="17.5" w="0.5" h="1.0" blocking="true" block_visibility="true" door="true"/>
+    <scenery name="Door" image_name="door_wood" x="45.05" y="17.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="46.0" rect_y="16.0" rect_w="3.0" rect_h="3.0"/>
 
@@ -1581,7 +1590,7 @@ There seems to be no information on the cause of the war, or who the enemy is.
 
 <floorregion shape="rect" rect_x="2.0" rect_y="5.0" rect_w="1.0" rect_h="12.0"/>
 
-<scenery name="Door" image_name="door_metal" x="2.5" y="5.45" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal_n" x="2.5" y="5.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Maze Key"/>
 
 <!--Maze area-->
@@ -1601,7 +1610,7 @@ There seems to be no information on the cause of the war, or who the enemy is.
 
 <floorregion shape="rect" rect_x="3.0" rect_y="11.0" rect_w="5.0" rect_h="1.0"/>
 <floorregion shape="rect" rect_x="5.0" rect_y="12.0" rect_w="1.0" rect_h="2.0"/>
-<scenery name="Door" image_name="door_metal" x="5.5" y="13.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_metal_n" x="5.5" y="13.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true"/>
 
 <floorregion shape="rect" rect_x="7.0" rect_y="10.0" rect_w="5.0" rect_h="1.0"/>
@@ -1705,7 +1714,7 @@ A small bronze statuette of a humanoid bull-like creature.
 <floorregion shape="rect" rect_x="15.0" rect_y="20.0" rect_w="8.5" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="18.5" rect_w="1.0" rect_h="1.5"/>
-    <scenery name="Door" image_name="door_metal" x="19.0" y="19.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
+    <scenery name="Door" image_name="door_metal_n" x="19.0" y="19.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Bull Statuette" unlock_text="The bull statuette that you carry shakes..."
     />
 <floorregion shape="rect" rect_x="16.5" rect_y="11.5" rect_w="5.5" rect_h="7.0"/>
@@ -1730,8 +1739,9 @@ A small bronze statuette of a humanoid bull-like creature.
 <scenery name="Skulls" image_name="skulls" x="18.1" y="14.9" size="0.3" draw_type="background"/>
 
 <floorregion shape="rect" rect_x="18.5" rect_y="21.0" rect_w="1.0" rect_h="1.0"/>
-    <scenery name="Door" image_name="door_wood_n" x="19.0" y="21.55" w="1.0" h="0.9" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Minotaur's Key"/>
+    <scenery name="Door" image_name="door_wood_n" x="19.0" y="21.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Minotaur's Key"
+    />
 <floorregion shape="rect" rect_x="17.5" rect_y="22.0" rect_w="3.0" rect_h="3.0"/>
 
 <scenery name="Chest" image_name="chest" x="20.0" y="24.5" size="0.8" blocking="true">
