@@ -2452,6 +2452,7 @@ void SaveGameWindow::requestNewSaveGame() {
     this->edit->setValidator(validator);
     layout->addWidget(edit);
     this->edit->setFocus();
+    this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour; probably useful on other platforms
     connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
     QPushButton *saveButton = new QPushButton("Save game");
@@ -3463,11 +3464,23 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         layout->setColumnStretch(0, 1);
         layout->setRowStretch(1, 1);
         int col = 1;
+        MainWindow *window = game_g->getScreen()->getMainWindow();
+        const int icon_resolution_independent_size = mobile_c ? 24 : 12;
+        const int button_resolution_independent_size = mobile_c ? 32 : 16;
+        const int icon_size = (icon_resolution_independent_size*window->width())/640;
+        const int button_size = (button_resolution_independent_size*window->width())/640;
+        LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
+        LOG("button_resolution_independent_size: %d\n", button_resolution_independent_size);
+        LOG("icon_size: %d\n", icon_size);
+        LOG("button_size: %d\n", button_size);
 
         QIcon turboIcon(this->builtin_images["gui_time"]);
         turboButton = new QPushButton(turboIcon, "");
         turboButton->setShortcut(QKeySequence(Qt::Key_T));
         turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        turboButton->setIconSize(QSize(icon_size, icon_size));
+        turboButton->setMinimumSize(button_size, button_size);
+        turboButton->setMaximumSize(button_size, button_size);
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
         turboButton->setToolTip("Toggle turbo mode: make game time go faster");
@@ -3485,6 +3498,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
             quickSaveButton->setToolTip("Quick-save");
 #endif
             quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            quickSaveButton->setIconSize(QSize(icon_size, icon_size));
+            quickSaveButton->setMinimumSize(button_size, button_size);
+            quickSaveButton->setMaximumSize(button_size, button_size);
             connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
             layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
         }
@@ -3497,6 +3513,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         zoomoutButton->setToolTip("Zoom out");
 #endif
         zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        zoomoutButton->setIconSize(QSize(icon_size, icon_size));
+        zoomoutButton->setMinimumSize(button_size, button_size);
+        zoomoutButton->setMaximumSize(button_size, button_size);
         connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
         layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
 
@@ -3508,6 +3527,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         zoominButton->setToolTip("Zoom in");
 #endif
         zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        zoominButton->setIconSize(QSize(icon_size, icon_size));
+        zoominButton->setMinimumSize(button_size, button_size);
+        zoominButton->setMaximumSize(button_size, button_size);
         connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
         layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
 
@@ -3519,6 +3541,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
         centreButton->setToolTip("Centre view on your player's location");
 #endif
         centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        centreButton->setIconSize(QSize(icon_size, icon_size));
+        centreButton->setMinimumSize(button_size, button_size);
+        centreButton->setMaximumSize(button_size, button_size);
         connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
         layout->addWidget(centreButton, 0, col++, Qt::AlignCenter);
 
@@ -7155,7 +7180,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
 bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2D dest, bool is_click) {
     //qDebug("PlayingGamestate::handleClickForScenerys(): %f, %f", dest.x, dest.y);
     // search for clicking on a scenery
-    const float click_tol_scenery_c = 0.0f;
+    const float click_tol_scenery_c = mobile_c ? 0.2f : 0.0f;
     vector<Scenery *> clicked_scenerys;
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
@@ -7367,6 +7392,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
         }
 
         if( move && !player->isDead() ) {
+            //qDebug("ignore: %d", ignore);
             this->requestPlayerMove(dest, ignore);
         }
     }
