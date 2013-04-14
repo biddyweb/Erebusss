@@ -11,7 +11,7 @@ News has been received from other villages of a spreading evil across the land -
 
 Many suspect the work of a necromancer to be the cause, and fear that a great army of undead will soon sweep across the land.
 
-You are eager to do what you can to help.
+You are eager to do what you can to help. You head east towards the village of Axbury. There you should seek out a person named Borin, who is known for being knowledgable in these matters.
 </info>
 
 <completed_text>
@@ -27,7 +27,7 @@ You are eager to do what you can to help.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -59,7 +59,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="4.0" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="general_stores" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="General Stores" exit_location_x="1.0" exit_location_y="2.5"/>
 
 <scenery name="Peasant's Hut" image_name="hut" x="32.5" y="38.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
@@ -106,6 +106,11 @@ cdddddddddddd21dddddddddddddde
 <scenery name="Grass" image_name="grass" x="38.6" y="28.9" size="1.0" draw_type="background"/>
 
 <scenery name="Grass" image_name="grass" x="40.1" y="24.3" size="1.0" draw_type="background"/>
+
+<scenery name="Scarecrow" image_name="scarecrow" x="40.0" y="32.0" size="0.8">
+This worn and battered old scarecrow watches over the fields. As you examine it, for a moment you are sure that there is some movement - a slight turn of the head, a movement of its makeshift eyes, and you have a feeling of being watched. It must be your eyes playing tricks on you.
+</scenery>
+<scenery name="Grass" image_name="grass" x="39.5" y="33.0" size="1.0" draw_type="background"/>
 
 <npc name="Peasant" animation_name="peasant_woman" static_image="true" x="30.0" y="29.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
@@ -195,7 +200,7 @@ Thank you for helping me!
 
 <location name="Axbury, Graveyard" display_name="true" lighting_min="90">
 
-<player_start x="6.0" y="12.0"/>
+<!--<player_start x="6.0" y="12.0"/>-->
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -257,7 +262,7 @@ ce
 
 </location>
 
-<location name="general_stores">
+<location name="General Stores" display_name="true">
 
 <floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
@@ -277,35 +282,6 @@ ce
     is_hostile="false"
     xp_worth="0"
     shop="General Stores"/>
-
-</location>
-
-<location name="peasant_hut">
-
-<floor image_name="floor_dirt"/>
-<wall image_name="wall"/>
-<background image_name="background_dark"/>
-
-<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
-<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
-
-<scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
-
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="4.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="34.0" exit_location_y="32.75"/>
-
-<npc name="Peasant" animation_name="peasant_man" static_image="true" x="2.5" y="2.2"
-    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
-    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
-    health="10" max_health="10"
-    is_hostile="false"
-    xp_worth="0"
-    can_talk="true"
->
-<opening_initial>Hello.
-</opening_initial>
-<opening_later>Hello.
-</opening_later>
-</npc>
 
 </location>
 
