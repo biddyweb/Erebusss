@@ -443,7 +443,7 @@ public:
         return this->gui_brush_buttons;
     }*/
 
-    void initButton(QAbstractButton *button) const;
+    void initButton(QWidget *button) const;
 
     void pushMessage(GameMessage *message) {
         message_queue.push(message);

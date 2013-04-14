@@ -215,7 +215,6 @@ void OptionsGamestate::clickedStart() {
             h_layout->addWidget(label);
 
             gametypeComboBox = new QComboBox();
-            gametypeComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
             gametypeComboBox->setFont(game_g->getFontBig());
             gametypeComboBox->addItem("Begin Campaign");
             gametypeComboBox->addItem("Random Dungeon");
@@ -233,7 +232,6 @@ void OptionsGamestate::clickedStart() {
             h_layout->addWidget(label);
 
             characterComboBox = new QComboBox();
-            characterComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
             characterComboBox->setFont(game_g->getFontBig());
             for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
                 characterComboBox->addItem(game_g->getPlayerType(i).c_str());
@@ -252,7 +250,6 @@ void OptionsGamestate::clickedStart() {
             h_layout->addWidget(label);
 
             difficultyComboBox = new QComboBox();
-            difficultyComboBox->setStyleSheet("color: black;"); // workaround for Android color bug
             difficultyComboBox->setFont(game_g->getFontBig());
             for(int i=0;i<N_DIFFICULTIES;i++) {
                 Difficulty test_difficulty = (Difficulty)i;
@@ -294,6 +291,7 @@ void OptionsGamestate::clickedStart() {
         nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
         h_layout->addWidget(nameLineEdit);
         nameLineEdit->setFocus();
+        nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour; probably useful on other platforms
         nameLineEdit->selectAll();
         if( options_page_index == n_options_pages-1 ) {
             connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));

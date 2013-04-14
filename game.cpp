@@ -468,7 +468,6 @@ void SmokeParticleSystem::update() {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    this->setStyleSheet("color: black; background-color: white"); // workaround for Android color bug, also needed for Symbian
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
@@ -636,12 +635,20 @@ void Game::run(bool fullscreen) {
 
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
-    {
+    // palettes disabled for now - problems with differences between platforms, plus setting it for this window doesn't apply to the subwindows that we open up
+    /*{
         QPalette palette = window->palette();
         palette.setColor(QPalette::Window, Qt::black);
         palette.setColor(QPalette::WindowText, Qt::gray);
+        // we should also set sensible defaults (note that buttons usually have Button and ButtonText set via gui_palette, but we should still set a sensible default
+        palette.setColor(QPalette::Button, Qt::lightGray);
+        palette.setColor(QPalette::ButtonText, Qt::black);
+        // n.b., on Android, Comboboxes uses "Text" for the text, but uses "Window" (instead of "Base") for the background)
+        // so for consistency between platforms we set Window and Base to be the same
+        palette.setColor(QPalette::Base, Qt::black);
+        palette.setColor(QPalette::Text, Qt::white);
         window->setPalette(palette);
-    }
+    }*/
     QWebSettings *web_settings = QWebSettings::globalSettings();
     int screen_w = QApplication::desktop()->width();
     int screen_h = QApplication::desktop()->height();
@@ -1428,7 +1435,7 @@ void Game::runTests() {
     //runTest(filename, ::TEST_PATHFINDING_6);
 }
 
-void Game::initButton(QAbstractButton *button) const {
+void Game::initButton(QWidget *button) const {
     MainWindow *window = this->screen->getMainWindow();
     button->setFont(window->font()); // needed for Android at least
     button->setStyle(style);
