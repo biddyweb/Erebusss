@@ -332,13 +332,13 @@ public:
 class StartGameMessage : public GameMessage {
     GameType gametype;
     Difficulty difficulty;
-    size_t player_type;
+    string player_type;
     bool permadeath;
     string name;
     bool cheat_mode;
     int cheat_start_level;
 public:
-    StartGameMessage(GameType gametype, Difficulty difficulty, size_t player_type, bool permadeath, const string &name, bool cheat_mode, int cheat_start_level) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), gametype(gametype), difficulty(difficulty), player_type(player_type), permadeath(permadeath), name(name), cheat_mode(cheat_mode), cheat_start_level(cheat_start_level) {
+    StartGameMessage(GameType gametype, Difficulty difficulty, const string &player_type, bool permadeath, const string &name, bool cheat_mode, int cheat_start_level) : GameMessage(GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING), gametype(gametype), difficulty(difficulty), player_type(player_type), permadeath(permadeath), name(name), cheat_mode(cheat_mode), cheat_start_level(cheat_start_level) {
     }
 
     GameType getGametype() const {
@@ -347,7 +347,7 @@ public:
     Difficulty getDifficulty() const {
         return this->difficulty;
     }
-    size_t getPlayerType() const {
+    string getPlayerType() const {
         return this->player_type;
     }
     string getName() const {
@@ -493,7 +493,7 @@ public:
     string getPlayerType(size_t i) const {
         return player_types.at(i);
     }
-    Character *createPlayer(size_t i, const string &player_name) const;
+    Character *createPlayer(const string &player_type, const string &player_name) const;
     void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);

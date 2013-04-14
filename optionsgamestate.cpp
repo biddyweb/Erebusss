@@ -365,7 +365,7 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
-    StartGameMessage *game_message = new StartGameMessage(gametype, difficulty, this->characterComboBox->currentIndex(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
+    StartGameMessage *game_message = new StartGameMessage(gametype, difficulty, this->characterComboBox->currentText().toStdString(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }
 

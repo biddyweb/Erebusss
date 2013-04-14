@@ -2568,7 +2568,7 @@ void SaveGameWindow::clickedSaveNew() {
     }
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     /*main_stacked_widget(NULL),*/
@@ -3179,7 +3179,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, size_t player_type, const s
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected items xml: player_default_item element wasn't expected here");
                     }
-                    if( !is_savegame && player_default_type == player->getName() ) {
+                    if( !is_savegame && player_default_type == player_type ) {
                         QStringRef template_s = reader.attributes().value("template");
                         if( template_s.length() == 0 ) {
                             LOG("error at line %d\n", reader.lineNumber());

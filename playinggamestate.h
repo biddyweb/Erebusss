@@ -551,7 +551,7 @@ private slots:
     void quickSave();
 
 public:
-    PlayingGamestate(bool is_savegame, size_t player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level);
+    PlayingGamestate(bool is_savegame, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level);
     virtual ~PlayingGamestate();
 
     float getDifficultyModifier() const;
