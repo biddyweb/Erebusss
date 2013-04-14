@@ -6989,6 +6989,9 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
         bool confirm_ok = true;
         if( scenery->getConfirmText().length() > 0 ) {
             confirm_ok = this->askQuestionDialog(scenery->getConfirmText());
+            if( !confirm_ok ) {
+                done = true; // important so that we don't repeatedly ask (e.g., needed for the keyboard input actionCommand() which calls this function at multiple positions)
+            }
         }
 
         if( confirm_ok ) {
@@ -7206,6 +7209,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2
     }
 
     bool done = clickedOnScenerys(move, ignore, clicked_scenerys);
+    //qDebug("clickedOnScenerys returns: %d", done);
     return done;
 
 }
