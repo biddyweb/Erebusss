@@ -194,14 +194,13 @@
 
 <npc name="Goblin" template="Goblin" x="17.0" y="13.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="6.25" y="8.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="12.25" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="10.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"
-    locked="true" unlocked_by_template="Goblin's Key"/>
-<scenery name="Door" image_name="door_wood_n" x="14.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="17.75" y="14.0" w="0.4" h="0.8" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="16.5" w="0.8" h="0.9" blocking="true" block_visibility="true" door="true"/>
-<scenery name="Door" image_name="door_wood_n" x="20.0" y="12" w="0.8" h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="6.05" y="8.0" w="0.1" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="12.05" y="14.0" w="0.1" h="0.8" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="10.95" y="14.0" w="0.1" h="0.8" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Goblin's Key"
+    />
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="16.9" w="0.8" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="20.0" y="12.4" w="0.8" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2" draw_type="background"/>
 
