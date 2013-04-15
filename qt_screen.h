@@ -41,6 +41,7 @@ public:
 class Screen : public QObject {
     Q_OBJECT
 
+    bool fullscreen;
     QTimer timer; // used to call update() per frame
     MainWindow *mainWindow;
     QElapsedTimer elapsed_timer; // used to measure game time
@@ -57,6 +58,9 @@ public:
     Screen(bool fullscreen);
     ~Screen();
 
+    bool isFullscreen() const {
+        return this->fullscreen;
+    }
     MainWindow *getMainWindow() {
         return mainWindow;
     }

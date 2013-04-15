@@ -93,7 +93,7 @@ void GameClock::restart() {
 }
 
 Screen::Screen(bool fullscreen) :
-    mainWindow(NULL)
+    fullscreen(fullscreen), mainWindow(NULL)
 {
     LOG("Screen::Screen()\n");
     mainWindow = new MainWindow();

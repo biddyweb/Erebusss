@@ -8288,6 +8288,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 }
 
 void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
+    ASSERT_LOGGER( widget->isWindow() );
     this->widget_stack.push_back(widget);
     /*if( mobile_c ) {
         this->main_stacked_widget->addWidget(widget);
@@ -8305,7 +8306,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             widget->showFullScreen();
         }
-        else if( window->isFullScreen() ) {
+        else if( game_g->getScreen()->isFullscreen() ) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             if( fullscreen_hint ) {
                 widget->showFullScreen();
