@@ -2767,7 +2767,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *optionsButton = new QPushButton("Options");
         game_g->initButton(optionsButton);
         optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
-        optionsButton->setToolTip("Options to save game or quit");
+        optionsButton->setToolTip("Options to save game or quit (Escape)");
         optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
         v_layout->addWidget(optionsButton);
@@ -8310,6 +8310,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             if( fullscreen_hint ) {
                 widget->showFullScreen();
+                widget->resize( QApplication::desktop()->size() ); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
             }
             else {
                 widget->show();
