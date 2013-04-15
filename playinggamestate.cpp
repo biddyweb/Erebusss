@@ -3484,7 +3484,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         turboButton->setMaximumSize(button_size, button_size);
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        turboButton->setToolTip("Toggle turbo mode: make game time go faster");
+        turboButton->setToolTip("Toggle turbo mode: make game time go faster (T)");
 #endif
         turboButton->setCheckable(true);
         turboToggled(false); // initialise game speed to standard
@@ -3497,7 +3497,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            quickSaveButton->setToolTip("Quick-save");
+            quickSaveButton->setToolTip("Quick-save (F5)");
 #endif
             quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             quickSaveButton->setIconSize(QSize(icon_size, icon_size));
@@ -3509,10 +3509,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 
         QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
         zoomoutButton = new QPushButton(zoomoutIcon, "");
-        zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
+        zoomoutButton->setShortcut(QKeySequence(Qt::Key_Minus));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        zoomoutButton->setToolTip("Zoom out");
+        zoomoutButton->setToolTip("Zoom out (-)");
 #endif
         zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         zoomoutButton->setIconSize(QSize(icon_size, icon_size));
@@ -3523,10 +3523,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 
         QIcon zoominIcon(this->builtin_images["gui_zoomin"]);
         zoominButton = new QPushButton(zoominIcon, "");
-        zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
+        zoominButton->setShortcut(QKeySequence(Qt::Key_Plus));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        zoominButton->setToolTip("Zoom in");
+        zoominButton->setToolTip("Zoom in (+)");
 #endif
         zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         zoominButton->setIconSize(QSize(icon_size, icon_size));
@@ -3540,7 +3540,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         centreButton->setShortcut(QKeySequence(Qt::Key_C));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        centreButton->setToolTip("Centre view on your player's location");
+        centreButton->setToolTip("Centre view on your player's location (C)");
 #endif
         centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         centreButton->setIconSize(QSize(icon_size, icon_size));
