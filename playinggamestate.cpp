@@ -3466,8 +3466,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         layout->setRowStretch(1, 1);
         int col = 1;
         MainWindow *window = game_g->getScreen()->getMainWindow();
-        const int icon_resolution_independent_size = smallscreen_c ? 24 : 12;
-        const int button_resolution_independent_size = smallscreen_c ? 32 : 16;
+        const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
+        const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
         const int icon_size = (icon_resolution_independent_size*window->width())/640;
         const int button_size = (button_resolution_independent_size*window->width())/640;
         LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
