@@ -657,7 +657,6 @@ void Game::run(bool fullscreen) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
         qDebug("setting up fonts for Android");
-        /*
         // old behaviour with earlier Ministro versions
         this->font_scene = new_font;
         this->font_small = QFont(new_font);
@@ -666,14 +665,14 @@ void Game::run(bool fullscreen) {
         this->font_std.setPointSize(font_std.pointSize() + 10);
         this->font_big = QFont(new_font);
         this->font_big.setPointSize(font_big.pointSize() + 14);
-        */
-        // new behaviour with newer Ministro versions (~April 2013)
+        /* Hack for Ministro 9.4, which didn't have Android look and feel
         this->font_scene = QFont(new_font);
         this->font_scene.setPointSize(font_scene.pointSize() - 4);
         this->font_small = QFont(new_font);
         this->font_small.setPointSize(font_small.pointSize() - 2);
         this->font_std = new_font;
         this->font_big = new_font;
+        */
 
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
