@@ -51,9 +51,11 @@ cdddddddddddd21dddddddddddddde
              ce
 </tilemap>
 
+<scenery name="Magic Shop" image_name="building3" x="20.0" y="18.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop" exit_location_x="1.0" exit_location_y="2.5"/>
+
 <scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="1.5" exit_location_y="4.5"/>
 
-<scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" locked="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
+<scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Borin's Home" exit_location_x="2.5" exit_location_y="4.5"/>
 
 <scenery name="Well" image_name="well" x="29.0" y="20.0" size="1.0" blocking="true"/>
 
@@ -126,6 +128,28 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
 </opening_later>
 </npc>
 
+<floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="6.0" rect_h="20.0"/>
+
+<floorregion shape="rect" rect_x="36.0" rect_y="64.0" rect_w="6.0" rect_h="6.0"/>
+
+<scenery name="Tree" image_name="tree2" x="32.0" y="53.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="31.7" y="58.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="31.6" y="66.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="34.4" y="60.0" size="3.0"/>
+
+<scenery name="Boulders" image_name="boulders" x="35.1" y="55.1" size="0.58" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders2" x="41.0" y="69.0" size="0.58" blocking="true"/>
+
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="39.0" y="67.0" size="2.0" blocking="true" exit_location="Dungeons near Axbury" exit_location_x="30.0" exit_location_y="3.5"/>
+
+<npc name="Zombie" template="Zombie" x="37.0" y="64.5"/>
+
+<scenery name="Bones" image_name="bones" x="39.5" y="68.5" size="0.5" draw_type="background"/>
+
 </location>
 
 <location name="Armourer" display_name="true">
@@ -148,6 +172,54 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+</location>
+
+<location name="Borin's Home" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="32.0" exit_location_y="27.5"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
+
+<scenery name="Bed" image_name="bed" x="4.25" y="2.5" size="1.2" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<npc name="Borin" animation_name="peasant_man" static_image="true" x="2.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Scrying Orb"
+    interaction_xp="100"
+    interaction_journal="I found Borin's Scryin Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Ravencrag Fort, also to the east, for more help."
+>
+<opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
+</opening_initial>
+<opening_later>Hello, again.
+</opening_later>
+<opening_interaction_complete>Hello, again. I'm afraid I have nothing more of help to tell you.
+</opening_interaction_complete>
+<talk question="I'm trying to find the source of this evil - do you have any information?" while_not_done="true" journal="Borin asked me to find a Scrying Orb, located in some dungeons to the south.">Unfortunately I don't yet know. But you could help me by finding one of my Scrying Orbs - I put one in a dungeon to the south for safe keeping. I can then use it to identify the source of this evil.
+</talk>
+<talk question="I have found the Scrying Orb for you" objective="true">
+Ah, thank you. Now let's see - it's been a while since I've used this old orb. Yes - ah, I see it now. There is indeed great evil, the dead walk across the land.
+
+A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
+
+They are led by a Skeleton Lord, who needs to be slain, but it is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Ravencrag Fort, also to the east.
+</talk>
+</npc>
 
 </location>
 
@@ -262,6 +334,29 @@ ce
 
 </location>
 
+<location name="Magic Shop" display_name="true">
+
+<floor image_name="floor_dirt"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Torch" image_name="torch" x="1.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="4.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="19.0" exit_location_y="21.0"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="2.5" y="2.2"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Magic Shop"/>
+
+</location>
+
 <location name="General Stores" display_name="true">
 
 <floor image_name="floor_dirt"/>
@@ -282,6 +377,20 @@ ce
     is_hostile="false"
     xp_worth="0"
     shop="General Stores"/>
+
+</location>
+
+<location name="Dungeons near Axbury" display_name="true">
+
+<floor image_name="floor_rock"/>
+<wall image_name="wall_rock" image_x_scale="1.0"/>
+<background image_name="background_brown"/>
+
+<wandering_monster template="Weak Skeleton" time="180000" rest_chance="10"/>
+
+<floorregion shape="rect" rect_x="28.0" rect_y="0.0" rect_w="4.0" rect_h="12.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="30.0" y="2.0" size="2.0" blocking="true" exit_location="Axbury" exit_location_x="37.5" exit_location_y="67.0"/>
 
 </location>
 
