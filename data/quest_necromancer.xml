@@ -51,9 +51,9 @@ cdddddddddddd21dddddddddddddde
              ce
 </tilemap>
 
-<scenery name="Magic Shop" image_name="building3" x="20.0" y="18.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="Magic Shop" image_name="building3" x="20.0" y="18.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="1.5" exit_location_y="4.5"/>
+<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer, Axbury" exit_location_x="1.5" exit_location_y="4.5"/>
 
 <scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Borin's Home" exit_location_x="2.5" exit_location_y="4.5"/>
 
@@ -61,7 +61,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="4.0" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="General Stores" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="General Stores, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
 
 <scenery name="Peasant's Hut" image_name="hut" x="32.5" y="38.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
@@ -71,7 +71,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Axbury, Church" exit_location_x="3.5" exit_location_y="9.5"/>
+<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
 <scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0"/>
 
@@ -152,7 +152,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
 
 </location>
 
-<location name="Armourer" display_name="true">
+<location name="Armourer, Axbury" display_name="true">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -223,7 +223,7 @@ They are led by a Skeleton Lord, who needs to be slain, but it is protected by p
 
 </location>
 
-<location name="Axbury, Church" display_name="true">
+<location name="Church, Axbury" display_name="true">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -235,7 +235,7 @@ They are led by a Skeleton Lord, who needs to be slain, but it is protected by p
 
 <scenery name="Door" image_name="door_wood_n" x="3.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="36.5" exit_location_y="19.0"/>
 
-<scenery name="Door" image_name="door_metal_n" x="2.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury, Graveyard" exit_location_x="6.0" exit_location_y="12.0"/>
+<scenery name="Door" image_name="door_metal_n" x="2.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Graveyard, Axbury" exit_location_x="6.0" exit_location_y="12.0"/>
 
 <scenery name="Table" image_name="table" x="1.5" y="4.0" size="0.8" blocking="true"/>
 
@@ -270,7 +270,7 @@ Thank you for helping me!
 
 </location>
 
-<location name="Axbury, Graveyard" display_name="true" lighting_min="90">
+<location name="Graveyard, Axbury" display_name="true" lighting_min="90">
 
 <!--<player_start x="6.0" y="12.0"/>-->
 
@@ -279,7 +279,7 @@ Thank you for helping me!
 <background image_name="background_green"/>
 
 <floorregion shape="rect" rect_x="1.0" rect_y="1.0" rect_w="10.0" rect_h="12.0"/>
-<scenery name="Door" image_name="door_metal_n" x="6.0" y="13.05" w="1.0" h="0.1" visual_h="0.9" exit_location="Axbury, Church" exit_location_x="2.0" exit_location_y="1.5"/>
+<scenery name="Door" image_name="door_metal_n" x="6.0" y="13.05" w="1.0" h="0.1" visual_h="0.9" exit_location="Church, Axbury" exit_location_x="2.0" exit_location_y="1.5"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="5.0" y="4.0">
 68
@@ -334,7 +334,7 @@ ce
 
 </location>
 
-<location name="Magic Shop" display_name="true">
+<location name="Magic Shop, Axbury" display_name="true">
 
 <floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
@@ -357,7 +357,7 @@ ce
 
 </location>
 
-<location name="General Stores" display_name="true">
+<location name="General Stores, Axbury" display_name="true">
 
 <floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
