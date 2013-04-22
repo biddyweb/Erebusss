@@ -2051,7 +2051,7 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         // see which can be improved
         int n_levels = player->getLevel() - initial_level;
         qDebug("player has advanced %d levels to level %d", n_levels, player->getLevel());
-        int max_stat_inc = (n_levels+1)/2;
+        int max_stat_inc = (n_levels+1)/3;
         max_stat_inc++;
         qDebug("max_stat_inc = %d", max_stat_inc);
         for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
@@ -3580,7 +3580,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             for(int i=0;i<114;i++) {
                 player->addXP(this, 10);
             }
-            player->addGold( 1541 );
+            player->addGold( 1241 + 300 );
             player->deleteItem("Leather Armour");
             player->deleteItem("Long Sword");
             player->armWeapon(NULL);
@@ -3595,6 +3595,61 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                 item->setName("Magical Long Sword");
                 item->setMagical(true);
                 item->setBaseTemplate("Long Sword");
+                player->addItem(item, true);
+            }
+        }
+        else if( this->c_quest_indx == 3 ) {
+            // CHEAT, simulate start of quest 4:
+            for(int i=0;i<211;i++) {
+                player->addXP(this, 10);
+            }
+            player->addGold( 1998 + 350 );
+            player->deleteItem("Leather Armour");
+            player->deleteItem("Long Sword");
+            player->armWeapon(NULL);
+            player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
+            player->addItem(this->cloneStandardItem("Longbow"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            player->addItem(this->cloneStandardItem("Arrows"), true);
+            {
+                Item *item = this->cloneStandardItem("Long Sword");
+                item->setName("Magical Long Sword");
+                item->setMagical(true);
+                item->setBaseTemplate("Long Sword");
+                player->addItem(item, true);
+            }
+            {
+                Item *item = this->cloneStandardItem("Long Sword");
+                item->setBaseTemplate("Long Sword");
+                Weapon *weapon = static_cast<Weapon *>(item);
+                weapon->setDamage(2, 10, 2);
+                player->addItem(item, true);
+            }
+            {
+                Item *item = this->cloneStandardItem("Plate Armour");
+                item->setName("Derrin's Armour");
+                item->setRating(7);
+                item->setMagical(true);
+                item->setBaseTemplate("Plate Armour");
+                player->addItem(item, true);
+            }
+            {
+                Item *item = this->cloneStandardItem("Gold Ring");
+                item->setName("Derrin's Ring");
+                item->setProfileBonusIntProperty(profile_key_D_c, 1);
+                item->setMagical(true);
+                item->setBaseTemplate("Gold Ring");
+                player->addItem(item, true);
+            }
+            {
+                Item *item = this->cloneStandardItem("Arrows");
+                item->setName("Arrows +1");
+                item->setRating(2);
+                item->setMagical(true);
+                item->setBaseTemplate("Arrows");
+                Ammo *ammo = static_cast<Ammo *>(item);
+                ammo->setAmount(10);
                 player->addItem(item, true);
             }
         }
