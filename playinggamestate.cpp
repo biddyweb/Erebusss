@@ -6443,6 +6443,15 @@ void PlayingGamestate::update() {
         QElapsedTimer timer_complex;
         timer_complex.start();
 #endif
+
+        {
+            int next_level_xp = this->player->getXPForNextLevel();
+            if( this->player->getXP() >= next_level_xp ) {
+                // we only advance one level at any given increase
+                this->player->advanceLevel(this);
+            }
+        }
+
         // we can get away with not updating this every call
         this->testFogOfWar();
 

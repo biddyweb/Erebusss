@@ -1403,11 +1403,12 @@ void Character::addXP(PlayingGamestate *playing_gamestate, int change) {
         xp_str << change << " XP";
         playing_gamestate->addTextEffect(xp_str.str(), this->getPos(), 2000, 255, 0, 0);
     }
-    int next_level_xp = this->getXPForNextLevel();
+    /*int next_level_xp = this->getXPForNextLevel();
     if( xp >= next_level_xp ) {
         // we only advance one level at any given increase
         this->advanceLevel(playing_gamestate);
-    }
+    }*/
+    // levelling up is done in main loop (useful for cheat mode where we can advance several levels in one go - don't want to open several level up windows all at once!)
 }
 
 void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
