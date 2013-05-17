@@ -3607,23 +3607,23 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             player->deleteItem("Leather Armour");
             player->deleteItem("Long Sword");
             player->armWeapon(NULL);
-            player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
-            player->addItem(this->cloneStandardItem("Longbow"), true);
+            //player->addItem(this->cloneStandardItem("Two Handed Sword"), true); // lose this, as no better than the Long Sword 2D10+2
+            player->addItem(this->cloneStandardItem("Shield"), true);
             player->addItem(this->cloneStandardItem("Arrows"), true);
             player->addItem(this->cloneStandardItem("Arrows"), true);
             player->addItem(this->cloneStandardItem("Arrows"), true);
-            {
-                Item *item = this->cloneStandardItem("Long Sword");
-                item->setName("Magical Long Sword");
-                item->setMagical(true);
-                item->setBaseTemplate("Long Sword");
-                player->addItem(item, true);
-            }
             {
                 Item *item = this->cloneStandardItem("Long Sword");
                 item->setBaseTemplate("Long Sword");
                 Weapon *weapon = static_cast<Weapon *>(item);
                 weapon->setDamage(2, 10, 2);
+                player->addItem(item, true);
+            }
+            {
+                Item *item = this->cloneStandardItem("Long Sword");
+                item->setName("Magical Long Sword");
+                item->setMagical(true);
+                item->setBaseTemplate("Long Sword");
                 player->addItem(item, true);
             }
             {
@@ -3652,6 +3652,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                 ammo->setAmount(10);
                 player->addItem(item, true);
             }
+            player->addItem(this->cloneStandardItem("Longbow"), true);
         }
     }
 }
