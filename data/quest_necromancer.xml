@@ -412,7 +412,7 @@ ce
 <floorregion shape="rect" rect_x="11.0" rect_y="28.0" rect_w="5.0" rect_h="5.0"/>
 
 <scenery name="Chest" image_name="chest" x="11.5" y="28.5" size="0.8" blocking="true">
-    <item name="Smashed Scrying Orb" image_name="smashed_orb" icon_width="0.25" weight="2"/>
+    <item name="Broken Scrying Orb" image_name="orb_broken" icon_width="0.25" weight="2"/>
 </scenery>
 
 </location>
