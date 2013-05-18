@@ -16,8 +16,10 @@
 
 Game *game_g = NULL;
 
-const QString sound_enabled_key_c = "sound_enabled";
-const int default_sound_enabled_c = true;
+/*const QString sound_enabled_key_c = "sound_enabled";
+const int default_sound_enabled_c = true;*/
+const QString sound_volume_key_c = "sound_volume";
+const int default_sound_volume_c = 100;
 const QString lighting_enabled_key_c = "lighting_enabled";
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 const int default_lighting_enabled_c = false; // lighting effects can be a bit too slow on mobile platforms
@@ -488,7 +490,7 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     saved_y = event->y();
 }
 
-Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), sound_enabled(default_sound_enabled_c), lighting_enabled(default_lighting_enabled_c) {
+Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/ sound_volume(default_sound_volume_c), lighting_enabled(default_lighting_enabled_c) {
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
@@ -500,13 +502,21 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 
     bool ok = true;
 
-    int sound_enabled_i = settings->value(sound_enabled_key_c, default_sound_enabled_c).toInt(&ok);
+    /*int sound_enabled_i = settings->value(sound_enabled_key_c, default_sound_enabled_c).toInt(&ok);
     if( !ok ) {
         qDebug("settings sound_enabled not ok, set to default");
         this->sound_enabled = default_sound_enabled_c;
     }
     else {
         this->sound_enabled = sound_enabled_i != 0;
+    }*/
+    int sound_volume_i = settings->value(sound_volume_key_c, default_sound_volume_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings sound_volume not ok, set to default");
+        this->sound_volume = default_sound_volume_c;
+    }
+    else {
+        this->sound_volume = sound_volume_i;
     }
 
     int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
@@ -1670,7 +1680,8 @@ void Game::loadSound(const string &id, const string &filename) {
 
 void Game::playSound(const string &sound_effect) {
     //qDebug("play sound: %s\n", sound_effect.c_str());
-    if( game_g->isSoundEnabled() ) {
+    //if( game_g->isSoundEnabled() )
+    {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
@@ -1678,11 +1689,13 @@ void Game::playSound(const string &sound_effect) {
                 //qDebug("    already playing");
             }
             else {
+                sound->setVolume(((float)game_g->getSoundVolume())/100.0f);
                 //sound->stop();
                 sound->seek(0);
                 sound->play();
             }
 #else
+            androidAudio.setVolume(game_g->getSoundVolume());
             androidAudio.playSound(sound);
 #endif
         }
@@ -1710,9 +1723,25 @@ void Game::freeSound(const string &sound_effect) {
     }
 }
 
-void Game::setSoundEnabled(bool sound_enabled) {
+void Game::updateSoundVolume(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    Sound *sound = this->sound_effects[sound_effect];
+    if( sound != NULL ) {
+        sound->setVolume(((float)game_g->getSoundVolume())/100.0f);
+    }
+#else
+    androidAudio.setVolume(game_g->getSoundVolume());
+#endif
+}
+
+/*void Game::setSoundEnabled(bool sound_enabled) {
     this->sound_enabled = sound_enabled;
     this->settings->setValue(sound_enabled_key_c, sound_enabled ? 1 : 0);
+}*/
+
+void Game::setSoundVolume(int sound_volume) {
+    this->sound_volume = sound_volume;
+    this->settings->setValue(sound_volume_key_c, sound_volume);
 }
 
 void Game::setLightingEnabled(bool lighting_enabled) {

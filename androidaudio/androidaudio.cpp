@@ -9,6 +9,8 @@
 
 #include <QDebug>
 
+#include <cmath>
+
 AndroidAudio::AndroidAudio(QObject *parent) :
     QObject(parent), sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mPlayerObject(NULL)
 {
@@ -90,6 +92,7 @@ void AndroidAudio::destroyEngine()
         (*mPlayerObject)->Destroy(mPlayerObject);
     }
 
+
     qDebug() << "Destroyed Android Audio Engine";
 }
 
@@ -142,9 +145,9 @@ bool AndroidAudio::startSoundPlayer()
     lDataSink.pFormat = NULL;
 
     //Create the sound player
-    const SLuint32 lSoundPlayerIIDCount = 2;
-    const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_BUFFERQUEUE };
-    const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
+    const SLuint32 lSoundPlayerIIDCount = 3;
+    const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_BUFFERQUEUE, SL_IID_VOLUME };
+    const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
     qDebug() << "Configured Sound Player";
 
@@ -186,8 +189,39 @@ bool AndroidAudio::startSoundPlayer()
         return false;
     }
 
+    lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_VOLUME, &mVolume);
+    Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to obtain volume interface");
+        return false;
+    }
+
     qDebug() << "Created Buffer Player";
     return true;
+}
+
+void AndroidAudio::setVolume(int volume) {
+    if( !sound_ok ) {
+        return;
+    }
+
+    if( volume == 0 ) {
+        (*this->mVolume)->SetVolumeLevel(mVolume, SL_MILLIBEL_MIN);
+    }
+    else if( volume == 100 ) {
+        (*this->mVolume)->SetVolumeLevel(mVolume, 0);
+    }
+    else {
+        float alpha = ((float)volume)/100.0f;
+        //float alpha = log((float)volume)/log(100.0f);
+        /*int android_volume = (int)((1.0f-alpha)*SL_MILLIBEL_MIN);*/
+        // from http://stackoverflow.com/questions/14453674/audio-output-level-in-a-form-that-can-be-converted-to-decibel
+        int android_volume = M_LN2/log(1.0f/(1.0f-alpha))*-1000.0f;
+        if( android_volume < SL_MILLIBEL_MIN )
+            android_volume = SL_MILLIBEL_MIN;
+        qDebug("volume: %d alpha %f android_volume: %d", volume, alpha, android_volume);
+        (*this->mVolume)->SetVolumeLevel(mVolume, android_volume);
+    }
 }
 
 void AndroidAudio::playSound(const AndroidSoundEffect *sound) {

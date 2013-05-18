@@ -3391,7 +3391,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     qApp->processEvents();
 
     //if( !mobile_c )
-    if( game_g->isSoundEnabled() )
+    //if( game_g->isSoundEnabled() )
+    if( game_g->getSoundVolume() > 0 )
     {
         LOG("load sound effects\n");
         game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
@@ -3713,7 +3714,9 @@ PlayingGamestate::~PlayingGamestate() {
         Shop *shop = *iter;
         delete shop;
     }
-    if( game_g->isSoundEnabled() )
+
+    //if( game_g->isSoundEnabled() )
+    if( game_g->getSoundVolume() )
     {
         game_g->freeSound("click");
         game_g->freeSound("coin");

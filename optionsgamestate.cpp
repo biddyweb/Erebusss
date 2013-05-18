@@ -15,7 +15,7 @@ OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 OptionsGamestate::OptionsGamestate() :
     main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
     nameLineEdit(NULL),
-    load_list(NULL), soundCheck(NULL), lightingCheck(NULL),
+    load_list(NULL), /*soundCheck(NULL),*/ soundSlider(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
     //cheat_mode = true;
@@ -207,10 +207,10 @@ void OptionsGamestate::clickedStart() {
 
     if( options_page_index == 0 ) {
         {
-            QLabel *label = new QLabel("Select a game type: ");
             QHBoxLayout *h_layout = new QHBoxLayout();
             layout->addLayout(h_layout);
 
+            QLabel *label = new QLabel("Select a game type: ");
             label->setAlignment(Qt::AlignCenter);
             h_layout->addWidget(label);
 
@@ -440,9 +440,24 @@ void OptionsGamestate::clickedOptions() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    soundCheck = new QCheckBox("Sound");
+    /*soundCheck = new QCheckBox("Sound");
     soundCheck->setChecked(game_g->isSoundEnabled());
-    layout->addWidget(soundCheck);
+    layout->addWidget(soundCheck);*/
+
+    {
+        QHBoxLayout *h_layout = new QHBoxLayout();
+        layout->addLayout(h_layout);
+
+        QLabel *label = new QLabel("Volume: ");
+        //label->setAlignment(Qt::AlignCenter);
+        h_layout->addWidget(label);
+
+        soundSlider = new QSlider(Qt::Horizontal);
+        soundSlider->setMinimum(0);
+        soundSlider->setMaximum(100);
+        soundSlider->setValue(game_g->getSoundVolume());
+        h_layout->addWidget(soundSlider);
+    }
 
     lightingCheck = new QCheckBox("Lighting Effects (uncheck if too slow)");
     lightingCheck->setChecked(game_g->isLightingEnabled());
@@ -466,24 +481,18 @@ void OptionsGamestate::clickedOptions() {
 void OptionsGamestate::clickedOptionsOkay() {
     LOG("OptionsGamestate::clickedOptionsOkay");
 
-    bool new_sound_enabled = soundCheck->isChecked();
+    /*bool new_sound_enabled = soundCheck->isChecked();
     if( new_sound_enabled != game_g->isSoundEnabled() ) {
         game_g->setSoundEnabled(new_sound_enabled);
-        /*if( music != NULL ) {
-            if( new_sound_enabled ) {
-                this->music->play();
-            }
-            else {
-                this->music->pause();
-            }
-        }*/
         if( new_sound_enabled ) {
             game_g->playSound("music_intro");
         }
         else {
             game_g->pauseSound("music_intro");
         }
-    }
+    }*/
+    game_g->setSoundVolume( soundSlider->value() );
+    game_g->updateSoundVolume("music_intro");
 
     bool new_lighting_enabled = lightingCheck->isChecked();
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {

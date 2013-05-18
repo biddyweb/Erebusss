@@ -36,6 +36,7 @@ signals:
 
 public slots:
 
+    void setVolume(int volume);
     void playSound(const AndroidSoundEffect *sound);
     AndroidSoundEffect *loadSound(const QString &filename);
 
@@ -57,6 +58,9 @@ private:
     SLObjectItf mPlayerObject;
     SLPlayItf mPlayerPlay;
     SLBufferQueueItf mPlayerQueue;
+
+    // output volume interface
+    SLVolumeItf mVolume;
 
 #endif
 };

@@ -65,6 +65,9 @@ public:
         delete audioOutput;
     }
 
+    void setVolume(float volume) {
+        this->audioOutput->setVolume(volume);
+    }
     void play() {
         this->mediaObject->play();
     }
@@ -406,7 +409,8 @@ protected:
     Screen *screen;
     queue<GameMessage *> message_queue;
 
-    bool sound_enabled;
+    //bool sound_enabled;
+    int sound_volume;
     bool lighting_enabled;
 
     vector<string> player_types;
@@ -477,10 +481,15 @@ public:
     void playSound(const string &sound_effect);
     void pauseSound(const string &sound_effect);
     void freeSound(const string &sound_effect);
-    bool isSoundEnabled() const {
+    void updateSoundVolume(const string &sound_effect);
+    /*bool isSoundEnabled() const {
         return this->sound_enabled;
     }
-    void setSoundEnabled(bool sound_enabled);
+    void setSoundEnabled(bool sound_enabled);*/
+    int getSoundVolume() const {
+        return this->sound_volume;
+    }
+    void setSoundVolume(int sound_volume);
     bool isLightingEnabled() const {
         return this->lighting_enabled;
     }
