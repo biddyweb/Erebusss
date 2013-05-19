@@ -145,6 +145,9 @@ bool AndroidAudio::startSoundPlayer()
     lDataSink.pFormat = NULL;
 
     //Create the sound player
+    /*const SLuint32 lSoundPlayerIIDCount = 4;
+    const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_BUFFERQUEUE, SL_IID_VOLUME, SL_IID_SEEK };
+    const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };*/
     const SLuint32 lSoundPlayerIIDCount = 3;
     const SLInterfaceID lSoundPlayerIIDs[] = { SL_IID_PLAY, SL_IID_BUFFERQUEUE, SL_IID_VOLUME };
     const SLboolean lSoundPlayerReqs[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
@@ -175,6 +178,20 @@ bool AndroidAudio::startSoundPlayer()
         return false;
     }
 
+    lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_VOLUME, &mPlayerVolume);
+    Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to obtain volume interface");
+        return false;
+    }
+
+    /*lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_VOLUME, &mPlayerSeek);
+    Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+    if( lRes != SL_RESULT_SUCCESS ) {
+        qDebug("failed to obtain seek interface");
+        return false;
+    }*/
+
     lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_BUFFERQUEUE, &mPlayerQueue);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
     if( lRes != SL_RESULT_SUCCESS ) {
@@ -189,13 +206,6 @@ bool AndroidAudio::startSoundPlayer()
         return false;
     }
 
-    lRes = (*mPlayerObject)->GetInterface(mPlayerObject, SL_IID_VOLUME, &mVolume);
-    Q_ASSERT(SL_RESULT_SUCCESS == lRes);
-    if( lRes != SL_RESULT_SUCCESS ) {
-        qDebug("failed to obtain volume interface");
-        return false;
-    }
-
     qDebug() << "Created Buffer Player";
     return true;
 }
@@ -206,10 +216,10 @@ void AndroidAudio::setVolume(int volume) {
     }
 
     if( volume == 0 ) {
-        (*this->mVolume)->SetVolumeLevel(mVolume, SL_MILLIBEL_MIN);
+        (*this->mPlayerVolume)->SetVolumeLevel(mPlayerVolume, SL_MILLIBEL_MIN);
     }
     else if( volume == 100 ) {
-        (*this->mVolume)->SetVolumeLevel(mVolume, 0);
+        (*this->mPlayerVolume)->SetVolumeLevel(mPlayerVolume, 0);
     }
     else {
         float alpha = ((float)volume)/100.0f;
@@ -220,11 +230,12 @@ void AndroidAudio::setVolume(int volume) {
         if( android_volume < SL_MILLIBEL_MIN )
             android_volume = SL_MILLIBEL_MIN;
         qDebug("volume: %d alpha %f android_volume: %d", volume, alpha, android_volume);
-        (*this->mVolume)->SetVolumeLevel(mVolume, android_volume);
+        (*this->mPlayerVolume)->SetVolumeLevel(mPlayerVolume, android_volume);
     }
 }
 
-void AndroidAudio::playSound(const AndroidSoundEffect *sound) {
+void AndroidAudio::playSound(const AndroidSoundEffect *sound, bool loop) {
+    //qDebug("AndroidAudio::playSound(%d, %d)\n", sound, loop);
     SLresult lRes;
     SLuint32 lPlayerState;
 
@@ -254,6 +265,11 @@ void AndroidAudio::playSound(const AndroidSoundEffect *sound) {
             //Remove any sound from the queue
             lRes = (*mPlayerQueue)->Clear(mPlayerQueue);
             Q_ASSERT(SL_RESULT_SUCCESS == lRes);
+
+            // Set loop
+            /*if( loop ) {
+                (*mPlayerSeek)->SetLoop(mPlayerSeek, SL_BOOLEAN_TRUE, 0, SL_TIME_UNKNOWN);
+            }*/
 
             //Play the new sound
             (*mPlayerQueue)->Enqueue(mPlayerQueue, lBuffer, lLength);

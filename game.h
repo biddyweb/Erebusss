@@ -53,12 +53,24 @@ class Character;
 const QString savegame_ext = ".xml";
 const QString savegame_folder = "savegames/";
 
+class Sound : public QObject {
+    Q_OBJECT
+
 #ifndef Q_OS_ANDROID
-class Sound {
+    bool loop;
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
+private slots:
+    void aboutToFinish() {
+        qDebug("soundAboutToFinish");
+        if( loop ) {
+            this->mediaObject->enqueue( this->mediaObject->currentSource() );
+        }
+    }
+
 public:
-    Sound(Phonon::MediaObject *mediaObject, Phonon::AudioOutput *audioOutput) : mediaObject(mediaObject), audioOutput(audioOutput) {
+    Sound(Phonon::MediaObject *mediaObject, Phonon::AudioOutput *audioOutput) : mediaObject(mediaObject), audioOutput(audioOutput), loop(false) {
+        connect(mediaObject, SIGNAL(aboutToFinish()), this, SLOT(aboutToFinish()));
     }
     ~Sound() {
         delete mediaObject;
@@ -68,7 +80,8 @@ public:
     void setVolume(float volume) {
         this->audioOutput->setVolume(volume);
     }
-    void play() {
+    void play(bool loop) {
+        this->loop = loop;
         this->mediaObject->play();
     }
     void pause() {
@@ -83,10 +96,25 @@ public:
     Phonon::State state() const {
         return this->mediaObject->state();
     }
-};
 #else
-typedef AndroidSoundEffect Sound;
+    AndroidSoundEffect *android_sound;
+
+private slots:
+    void aboutToFinish() {
+    }
+public:
+    Sound(AndroidSoundEffect *android_sound) : android_sound(android_sound) {
+    }
+    ~Sound() {
+        delete android_sound;
+    }
+
+    AndroidSoundEffect *getAndroidSound() const {
+        return android_sound;
+    }
 #endif
+
+};
 
 class WebViewEventFilter : public QObject {
     Q_OBJECT
@@ -478,7 +506,10 @@ public:
         return loadImage(filename, false, 0, 0, 0, 0, 0);
     }
     void loadSound(const string &id, const string &filename);
-    void playSound(const string &sound_effect);
+    void playSound(const string &sound_effect) {
+        this->playSound(sound_effect, false);
+    }
+    void playSound(const string &sound_effect, bool loop);
     void pauseSound(const string &sound_effect);
     void freeSound(const string &sound_effect);
     void updateSoundVolume(const string &sound_effect);

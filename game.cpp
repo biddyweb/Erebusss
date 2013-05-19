@@ -1661,7 +1661,9 @@ void Game::loadSound(const string &id, const string &filename) {
     }
 #else
 
-    Sound *sound = androidAudio.loadSound(filename.c_str());
+    AndroidSoundEffect *android_sound = androidAudio.loadSound(filename.c_str());
+    Sound *sound = new Sound(android_sound);
+    qDebug("loadSound: %s : %s : %d : %d", id.c_str(), filename.c_str(), android_sound, sound);
     this->sound_effects[id] = sound;
 
 #endif
@@ -1681,7 +1683,7 @@ void Game::loadSound(const string &id, const string &filename) {
 }*/
 #endif
 
-void Game::playSound(const string &sound_effect) {
+void Game::playSound(const string &sound_effect, bool loop) {
     //qDebug("play sound: %s\n", sound_effect.c_str());
     //if( game_g->isSoundEnabled() )
     {
@@ -1693,13 +1695,12 @@ void Game::playSound(const string &sound_effect) {
             }
             else {
                 sound->setVolume(((float)game_g->getSoundVolume())/100.0f);
-                //sound->stop();
                 sound->seek(0);
-                sound->play();
+                sound->play(loop);
             }
 #else
             androidAudio.setVolume(game_g->getSoundVolume());
-            androidAudio.playSound(sound);
+            androidAudio.playSound(sound->getAndroidSound(), loop);
 #endif
         }
     }
