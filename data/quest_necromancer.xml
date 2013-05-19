@@ -9,7 +9,7 @@ You should have noticed the warning signs sooner, but they seemed isolated incid
 
 News has been received from other villages of a spreading evil across the land - the dead are rising from their graves, say the reports, and some villages have completely fallen under the control of undead legions.
 
-Many suspect the work of a necromancer to be the cause, and fear that a great army of undead will soon sweep across the land.
+Many suspect the work of a necromancer to be the cause, and there are rumours that that a great army of undead will soon sweep across the land.
 
 You are eager to do what you can to help. You head east towards the village of Axbury. There you should seek out a person named Borin, who is known for being knowledgable in these matters.
 </info>
@@ -399,7 +399,8 @@ ce
 <floorregion shape="rect" rect_x="24.0" rect_y="10.0" rect_w="4.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="9.0" rect_w="4.0" rect_h="4.0"/>
-<!-- put zombie-->
+
+<npc name="Zombie" template="Zombie" x="23.0" y="10.0"/>
 
 <floorregion shape="rect" rect_x="16.0" rect_y="10.0" rect_w="4.0" rect_h="2.0"/>
 
@@ -412,7 +413,95 @@ ce
 <floorregion shape="rect" rect_x="11.0" rect_y="28.0" rect_w="5.0" rect_h="5.0"/>
 
 <scenery name="Chest" image_name="chest" x="11.5" y="28.5" size="0.8" blocking="true">
-    <item name="Broken Scrying Orb" image_name="orb_broken" icon_width="0.25" weight="2"/>
+    <item name="Broken Scrying Orb" image_name="orb_broken" icon_width="0.25" weight="2">
+When you stare into this Orb, it shows nothing but blackness.
+    </item>
+</scenery>
+
+<npc name="Zombie" template="Zombie" x="15.0" y="29.0"/>
+
+<npc name="Zombie" template="Zombie" x="15.0" y="32.0"/>
+
+<!--south route-->
+
+<floorregion shape="rect" rect_x="30.0" rect_y="12.0" rect_w="1.0" rect_h="6.0"/>
+
+<floorregion shape="rect" rect_x="31.0" rect_y="17.0" rect_w="1.0" rect_h="5.0"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="22.0" rect_w="4.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="32.0" rect_y="26.0" rect_w="1.0" rect_h="5.0"/>
+
+<floorregion shape="rect" rect_x="28.0" rect_y="31.0" rect_w="9.0" rect_h="1.0"/>
+
+<!--south route/side passage for key-->
+
+<floorregion shape="rect" rect_x="25.0" rect_y="17.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="25.0" rect_y="18.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="23.0" rect_y="19.0" rect_w="4.0" rect_h="4.0"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="24.0" y="20.0">
+    <item name="Axbury Dungeon Key" image_name="key" icon_width="0.5" weight="0"/>
+</npc>
+
+<!--south route/left-->
+
+<floorregion shape="rect" rect_x="28.0" rect_y="32.0" rect_w="1.0" rect_h="3.0"/>
+
+<floorregion shape="rect" rect_x="27.0" rect_y="35.0" rect_w="3.0" rect_h="4.0"/>
+
+<!--south route/right-->
+
+<floorregion shape="rect" rect_x="36.0" rect_y="32.0" rect_w="1.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="35.0" rect_y="35.0" rect_w="1.0" rect_h="7.0"/>
+
+<!--south route/door left, locked-->
+
+    <floorregion shape="rect" rect_x="34.0" rect_y="38.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="32.0" rect_y="37.5" rect_w="2.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="34.95" y="38.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Axbury Dungeon Key"
+    />
+
+<scenery name="Barrel" image_name="barrel" x="32.5" y="38.0" size="0.8" blocking="true">
+    <gold amount="41"/>
+</scenery>
+
+<!--south route/door right, locked-->
+
+    <floorregion shape="rect" rect_x="36.0" rect_y="38.0" rect_w="1.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="37.0" rect_y="37.5" rect_w="2.0" rect_h="2.0"/>
+
+<scenery name="Door" image_name="door_wood" x="36.05" y="38.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Axbury Dungeon Key"
+    />
+
+<npc name="Zombie" template="Zombie" x="38.0" y="38.5"/>
+
+<!--continuing south route-->
+
+<floorregion shape="rect" rect_x="31.0" rect_y="42.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="27.0" rect_y="42.0" rect_w="4.0" rect_h="3.0"/>
+
+<npc name="Zombie" template="Zombie" x="30.0" y="44.5"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="27.5" y="44.5"/>
+
+<scenery name="Crate" image_name="crate" x="27.5" y="42.5" size="0.8" blocking="true">
+    <gold amount="5"/>
+    <item name="Scrying Orb" image_name="orb" icon_width="0.25" weight="2">
+When you stare into this Orb, you see swirling lights of many different colours.
+    </item>
+    <armour name="Borin's Armour" image_name="metal_armour" x="29.0" y="38.0" weight="150"
+        min_strength="7" rating="6" magical="true"
+        base_template="Plate Armour" worth_bonus="200">
+This magical plate armour is as strong as regular plate, but much lighter.
+    </armour>
 </scenery>
 
 </location>
