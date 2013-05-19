@@ -123,6 +123,17 @@
     causes_terror="true" terror_effect="1"
 />
 
+<!--Natural damage-->
+<npc name="Zombie Champion" animation_name="zombie"
+    FP="9" BS="0" S="9" A="1" M="1" D="5" B="12" Sp="2.0"
+    natural_damageX="2" natural_damageY="6" natural_damageZ="0"
+    health_min="60" health_max="80" gold_min="0" gold_max="0"
+    xp_worth="40"
+    unholy="true"
+    causes_disease="15"
+    causes_terror="true" terror_effect="2"
+/>
+
 <!--Weapon hardcoded as natural damage: Long Sword-->
 <npc name="Skeleton" animation_name="skeleton"
     FP="10" BS="9" S="8" A="1" M="2" D="8" B="12" Sp="2.8"
