@@ -470,6 +470,9 @@ void SmokeParticleSystem::update() {
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
     this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+#ifdef Q_OS_ANDROID
+    this->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
 }
 
 void ScrollingListWidget::mouseMoveEvent(QMouseEvent *event) {
