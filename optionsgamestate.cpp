@@ -108,7 +108,6 @@ OptionsGamestate::OptionsGamestate() :
         layout->addLayout(h_layout);
 
         QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
-        //titleLabel->setAlignment(Qt::AlignCenter);
         //titleLabel->setStyleSheet("QLabel { color : red; }");
         titleLabel->setFont(game_g->getFontStd());
         h_layout->addWidget(titleLabel);
@@ -207,77 +206,83 @@ void OptionsGamestate::clickedStart() {
 
     if( options_page_index == 0 ) {
         {
-            QHBoxLayout *h_layout = new QHBoxLayout();
-            layout->addLayout(h_layout);
+            {
+                int n_row = 0;
+                QGridLayout *g_layout = new QGridLayout();
+                layout->addLayout(g_layout);
 
-            QLabel *label = new QLabel("Select a game type: ");
-            label->setAlignment(Qt::AlignCenter);
-            h_layout->addWidget(label);
-
-            gametypeComboBox = new QComboBox();
-            gametypeComboBox->setFont(game_g->getFontBig());
-            gametypeComboBox->addItem("Begin Campaign");
-            gametypeComboBox->addItem("Random Dungeon");
-            gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            h_layout->addWidget(gametypeComboBox);
+                QLabel *label = new QLabel("Select a game type: ");
+                g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+                gametypeComboBox = new QComboBox();
+#ifdef Q_OS_ANDROID
+                gametypeComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
+                gametypeComboBox->setFont(game_g->getFontBig());
+                gametypeComboBox->addItem("Begin Campaign");
+                gametypeComboBox->addItem("Random Dungeon");
+                gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                g_layout->addWidget(gametypeComboBox, n_row, 1);
+                n_row++;
+            }
         }
     }
     else if( options_page_index == 1 ) {
+        if( !smallscreen_c )
         {
-            QHBoxLayout *h_layout = new QHBoxLayout();
-            layout->addLayout(h_layout);
+            QLabel *label = new QLabel("Choose game settings: ");
+            label->setAlignment(Qt::AlignCenter);
+            label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            layout->addWidget(label);
+        }
+
+        {
+            int n_row = 0;
+            QGridLayout *g_layout = new QGridLayout();
+            layout->addLayout(g_layout);
 
             QLabel *label = new QLabel("Character: ");
-            label->setAlignment(Qt::AlignCenter);
-            h_layout->addWidget(label);
-
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
             characterComboBox = new QComboBox();
+#ifdef Q_OS_ANDROID
+            characterComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
             characterComboBox->setFont(game_g->getFontBig());
             for(size_t i=0;i<game_g->getNPlayerTypes();i++) {
                 characterComboBox->addItem(game_g->getPlayerType(i).c_str());
             }
             characterComboBox->setCurrentIndex(4); // select Warrior
-            characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            h_layout->addWidget(characterComboBox);
-        }
+            characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            g_layout->addWidget(characterComboBox, n_row, 1);
+            n_row++;
 
-        {
-            QHBoxLayout *h_layout = new QHBoxLayout();
-            layout->addLayout(h_layout);
-
-            QLabel *label = new QLabel("Difficulty: ");
-            label->setAlignment(Qt::AlignCenter);
-            h_layout->addWidget(label);
-
+            label = new QLabel("Difficulty: ");
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
             difficultyComboBox = new QComboBox();
+#ifdef Q_OS_ANDROID
+            difficultyComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
             difficultyComboBox->setFont(game_g->getFontBig());
             for(int i=0;i<N_DIFFICULTIES;i++) {
                 Difficulty test_difficulty = (Difficulty)i;
                 difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
             }
             difficultyComboBox->setCurrentIndex(1);
-            difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            h_layout->addWidget(difficultyComboBox);
+            difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            g_layout->addWidget(difficultyComboBox, n_row, 1);
+            n_row++;
 
-            /*QVBoxLayout *v_layout = new QVBoxLayout();
-            h_layout->addLayout(v_layout);
-
-            difficultyButtonGroup = new QButtonGroup(this);
-            for(int i=0;i<N_DIFFICULTIES;i++) {
-                Difficulty test_difficulty = (Difficulty)i;
-                QRadioButton *radio = new QRadioButton( game_g->getDifficultyString(test_difficulty).c_str() );
-                v_layout->addWidget(radio);
-                difficultyButtonGroup->addButton(radio, i);
-                if( test_difficulty == DIFFICULTY_MEDIUM ) {
-                    radio->setChecked(true);
-                }
-            }*/
+            label = new QLabel("Permadeath: ");
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+#ifdef Q_OS_ANDROID
+            permadeathCheckBox = new QCheckBox("        "); // needed for workaround due to Android bug
+            permadeathCheckBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
+#else
+            permadeathCheckBox = new QCheckBox("");
+#endif
+            permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
+            g_layout->addWidget(permadeathCheckBox, n_row, 1);
+            n_row++;
         }
-
-        permadeathCheckBox = new QCheckBox("Permadeath");
-        permadeathCheckBox->setFont(game_g->getFontBig());
-        permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
-        layout->addWidget(permadeathCheckBox);
 
     }
     else if( options_page_index == 2 ) {
@@ -440,28 +445,32 @@ void OptionsGamestate::clickedOptions() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-    /*soundCheck = new QCheckBox("Sound");
-    soundCheck->setChecked(game_g->isSoundEnabled());
-    layout->addWidget(soundCheck);*/
-
     {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
+        int n_row = 0;
+        QGridLayout *g_layout = new QGridLayout();
+        layout->addLayout(g_layout);
 
         QLabel *label = new QLabel("Volume: ");
-        //label->setAlignment(Qt::AlignCenter);
-        h_layout->addWidget(label);
-
+        g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
         soundSlider = new QSlider(Qt::Horizontal);
         soundSlider->setMinimum(0);
         soundSlider->setMaximum(100);
         soundSlider->setValue(game_g->getSoundVolume());
-        h_layout->addWidget(soundSlider);
-    }
+        g_layout->addWidget(soundSlider, n_row, 1);
+        n_row++;
 
-    lightingCheck = new QCheckBox("Lighting Effects (uncheck if too slow)");
-    lightingCheck->setChecked(game_g->isLightingEnabled());
-    layout->addWidget(lightingCheck);
+        label = new QLabel("Lighting (uncheck if too slow): ");
+        g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+#ifdef Q_OS_ANDROID
+        lightingCheck = new QCheckBox("        "); // needed for workaround due to Android bug
+        lightingCheck->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
+#else
+        lightingCheck = new QCheckBox("");
+#endif
+        lightingCheck->setChecked(game_g->isLightingEnabled());
+        g_layout->addWidget(lightingCheck, n_row, 1);
+        n_row++;
+    }
 
     QPushButton *okayButton = new QPushButton("Okay");
     game_g->initButton(okayButton);
