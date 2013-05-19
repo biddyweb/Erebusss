@@ -2435,7 +2435,7 @@ void SaveGameWindow::requestNewSaveGame() {
         //filename += date_time.toString();
     }*/
 
-    QWidget *subwindow = new QWidget();
+    QWidget *subwindow = new UncloseWidget();
     playing_gamestate->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -5666,6 +5666,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
+    /*if( !lightdistribution_c ) {
+        game_g->loadSound("ingame_music", "music/short_loop.ogg");
+        game_g->playSound("ingame_music", true);
+    }*/
+
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
 }
@@ -6164,7 +6169,7 @@ void PlayingGamestate::clickedOptions() {
 
     game_g->getScreen()->setPaused(true, true);
 
-    QWidget *subwindow = new QWidget();
+    QWidget *subwindow = new UncloseWidget();
     this->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -6281,7 +6286,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
 
     game_g->getScreen()->setPaused(true, true);
 
-    QWidget *subwindow = new QWidget();
+    QWidget *subwindow = new UncloseWidget();
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
@@ -8193,11 +8198,18 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             //fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
             //fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
             //fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
-            stream << " action_last_time=\"" << scenery->getActionLastTime() << "\" action_delay=\"" << scenery->getActionDelay() << "\"";
-            stream << " action_type=\"" << scenery->getActionType().c_str() << "\"";
-            stream << " action_value=\"" << scenery->getActionValue() << "\"";
-            stream << " interact_type=\"" << scenery->getInteractType().c_str() << "\"";
-            stream << " interact_state=\"" << scenery->getInteractState() << "\"";
+            if( scenery->getActionLastTime() != 0 )
+                stream << " action_last_time=\"" << scenery->getActionLastTime();
+            if( scenery->getActionDelay() != 0 )
+                stream << "\" action_delay=\"" << scenery->getActionDelay() << "\"";
+            if( scenery->getActionType().length() > 0 )
+                stream << " action_type=\"" << scenery->getActionType().c_str() << "\"";
+            if( scenery->getActionValue() != 0 )
+                stream << " action_value=\"" << scenery->getActionValue() << "\"";
+            if( scenery->getInteractType().length() > 0 )
+                stream << " interact_type=\"" << scenery->getInteractType().c_str() << "\"";
+            if( scenery->getInteractState() != 0 )
+                stream << " interact_state=\"" << scenery->getInteractState() << "\"";
             if( scenery->isBlocking() ) {
                 //fprintf(file, " blocking=\"true\"");
                 stream << " blocking=\"true\"";

@@ -76,6 +76,15 @@ public:
     static CharacterAction *createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage, const string &projectile_key, float icon_width);
 };
 
+class UncloseWidget : public QWidget {
+protected:
+    void closeEvent(QCloseEvent *event) {
+        // prevent unexpected behaviour from Alt+F4, Escape, Android back button, etc - we handle closing via keypresses via key shortcuts
+        event->ignore();
+    }
+public:
+};
+
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
     MainGraphicsView *view;
@@ -249,7 +258,7 @@ public:
     }
 };*/
 
-class StatsWindow : public QWidget {
+class StatsWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -263,7 +272,7 @@ public:
     }
 };
 
-class ItemsWindow : public QWidget {
+class ItemsWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -317,7 +326,7 @@ public:
     }
 };
 
-class TradeWindow : public QWidget {
+class TradeWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -348,7 +357,7 @@ public:
     }
 };
 
-class ItemsPickerWindow : public QWidget {
+class ItemsPickerWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -377,7 +386,7 @@ public:
     }
 };
 
-class LevelUpWindow : public QWidget {
+class LevelUpWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -398,7 +407,7 @@ public:
 };
 
 
-class CampaignWindow : public QWidget {
+class CampaignWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;
@@ -414,7 +423,7 @@ public:
     }
 };
 
-class SaveGameWindow : public QWidget {
+class SaveGameWindow : public UncloseWidget {
     Q_OBJECT
 
     PlayingGamestate *playing_gamestate;

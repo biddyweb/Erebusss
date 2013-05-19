@@ -43,4 +43,9 @@ public:
 
     void scrollToBottom();
     virtual int exec();
+
+public slots:
+    virtual void reject() {
+        // prevent unexpected behaviour from Alt+F4, Escape, Android back button, etc - we handle closing via keypresses via key shortcuts
+    }
 };
