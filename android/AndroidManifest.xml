@@ -22,4 +22,5 @@
     <supports-screens android:xlargeScreens="true" android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="false"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-sdk android:minSdkVersion="10"/>
+    <uses-sdk android:targetSdkVersion="15"/><!-- 16 or higher causes bug with textfields, can't delete!-->
 </manifest>
