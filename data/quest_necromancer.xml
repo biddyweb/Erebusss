@@ -402,6 +402,8 @@ ce
 
 <npc name="Zombie" template="Zombie" x="23.0" y="10.0"/>
 
+<trap x="22.0" y="10.0" w="1.0" h="1.0" type="acid" rating="4"/>
+
 <floorregion shape="rect" rect_x="16.0" rect_y="10.0" rect_w="4.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="12.0" rect_y="9.0" rect_w="4.0" rect_h="4.0"/>
@@ -516,30 +518,48 @@ This magical plate armour is as strong as regular plate, but much lighter.
 
 <floorregion shape="rect" rect_x="32.0" rect_y="9.0" rect_w="6.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="37.0" rect_y="10.0" rect_w="4.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="37.0" rect_y="10.0" rect_w="7.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="40.0" rect_y="11.0" rect_w="1.0" rect_h="6.0"/>
+<floorregion shape="rect" rect_x="43.0" rect_y="11.0" rect_w="1.0" rect_h="6.0"/>
 
-<floorregion shape="rect" rect_x="38.0" rect_y="17.0" rect_w="5.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="41.0" rect_y="17.0" rect_w="5.0" rect_h="1.0"/>
 
 <!--east route/left, safe-->
 
-<floorregion shape="rect" rect_x="38.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
+<floorregion shape="rect" rect_x="41.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
 
 <!--east route/right, safe-->
 
-<floorregion shape="rect" rect_x="42.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
+<floorregion shape="rect" rect_x="45.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
 
-<trap x="42.0" y="19.0" w="1.0" h="1.0" type="acid" rating="10"/>
-<scenery name="Skeleton" image_name="skeleton" x="42.5" y="20.5" size="0.7" draw_type="background"/>
+<trap x="45.0" y="19.0" w="1.0" h="1.0" type="acid" rating="10"/>
+<scenery name="Skeleton" image_name="skeleton" x="45.5" y="20.5" size="0.7" draw_type="background"/>
 
-<trap x="42.0" y="22.0" w="1.0" h="1.0" type="death"/>
-<scenery name="Skeleton" image_name="skeleton" x="42.5" y="22.5" size="0.7" draw_type="background"/>
-<gold amount="17" x="42.5" y="22.5"/>
+<trap x="45.0" y="22.0" w="1.0" h="1.0" type="death"/>
+<scenery name="Skeleton" image_name="skeleton" x="45.5" y="22.5" size="0.7" draw_type="background"/>
+<gold amount="17" x="45.5" y="22.5"/>
 
 <!--east route/continuing-->
 
-<floorregion shape="rect" rect_x="38.0" rect_y="24.0" rect_w="5.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="41.0" rect_y="24.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="43.0" rect_y="25.0" rect_w="1.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="39.0" rect_y="29.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="35.0" rect_y="27.0" rect_w="4.0" rect_h="3.0"/>
+
+<scenery name="Door" image_name="door_wood" x="38.95" y="29.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Crate" image_name="crate" x="35.5" y="27.5" size="0.8" blocking="true">
+    <item name="Scrying Orb" image_name="orb" icon_width="0.25" weight="2">
+When you stare into this Orb, you see swirling lights of many different colours.
+    </item>
+</scenery>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="37.0" y="27.5"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="36.5" y="29.5"/>
 
 </location>
 
