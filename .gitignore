@@ -19,7 +19,6 @@ Makefile
 Makefile_erebus_exe.mk
 bld.inf
 erebus.loc
-erebus.pro.user
 erebus.rss
 erebus_exe.mmp
 erebus_harmattan.desktop
