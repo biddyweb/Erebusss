@@ -2,7 +2,7 @@
 <qtcreator>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
-  <value type="int">1</value>
+  <value type="int">2</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.EditorSettings</variable>
@@ -643,14 +643,14 @@
      <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">ProjectExplorer.BuildSteps.Deploy</value>
     </valuemap>
     <value key="ProjectExplorer.BuildConfiguration.BuildStepListCount" type="int">1</value>
-    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Deploy erebus-build-simulator to Symbian device</value>
+    <value key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName" type="QString">Deploy to Symbian device</value>
     <value key="ProjectExplorer.ProjectConfiguration.DisplayName" type="QString"></value>
     <value key="ProjectExplorer.ProjectConfiguration.Id" type="QString">Qt4ProjectManager.S60DeployConfiguration</value>
     <value key="Qt4ProjectManager.S60DeployConfiguration.CommunicationChannel" type="int">0</value>
     <value key="Qt4ProjectManager.S60DeployConfiguration.DeviceAddress" type="QString"></value>
     <value key="Qt4ProjectManager.S60DeployConfiguration.DevicePort" type="QString">65029</value>
     <value key="Qt4ProjectManager.S60DeployConfiguration.InstallationDriveLetter" type="QChar">C</value>
-    <value key="Qt4ProjectManager.S60DeployConfiguration.SerialPortName" type="QString">COM5</value>
+    <value key="Qt4ProjectManager.S60DeployConfiguration.SerialPortName" type="QString"></value>
     <value key="Qt4ProjectManager.S60DeployConfiguration.SilentInstall" type="bool">true</value>
    </valuemap>
    <value key="ProjectExplorer.Target.DeployConfigurationCount" type="int">1</value>
