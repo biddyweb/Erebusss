@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -202,7 +202,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
     interaction_type="WANT_OBJECT"
     interaction_data="Scrying Orb"
     interaction_xp="100"
-    interaction_journal="I found Borin's Scryin Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Ravencrag Fort, also to the east, for more help."
+    interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Ravencrag Fort, also to the east, for more help."
 >
 <opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
 </opening_initial>
@@ -210,14 +210,14 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
 </opening_later>
 <opening_interaction_complete>Hello, again. I'm afraid I have nothing more of help to tell you.
 </opening_interaction_complete>
-<talk question="I'm trying to find the source of this evil - do you have any information?" while_not_done="true" journal="Borin asked me to find a Scrying Orb, located in some dungeons to the south.">Unfortunately I don't yet know. But you could help me by finding one of my Scrying Orbs - I put one in a dungeon to the south for safe keeping. I can then use it to identify the source of this evil.
+<talk question="I'm trying to find the source of this evil - do you have any information?" while_not_done="true" journal="Borin asked me to find a Scrying Orb, located in some dungeons to the south.">Unfortunately I don't yet know. But you could help me by finding one of my Scrying Orbs - I put them in a dungeon to the south for safe keeping. I can then use it to identify the source of this evil.
 </talk>
 <talk question="I have found the Scrying Orb for you" objective="true">
 Ah, thank you. Now let's see - it's been a while since I've used this old orb. Yes - ah, I see it now. There is indeed great evil, the dead walk across the land.
 
 A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
 
-They are led by a Skeleton Lord, who needs to be slain, but it is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Ravencrag Fort, also to the east.
+They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Ravencrag Fort, also to the east.
 </talk>
 </npc>
 
@@ -328,9 +328,9 @@ ce
 
 <scenery name="Grave" image_name="grave1" x="4.0" y="10.1" size="0.75" blocking="true"/>
 
-<!--<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
+<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
 
-<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="3.0" y="6.1"/>-->
+<npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="3.0" y="6.1"/>
 
 </location>
 
@@ -390,7 +390,7 @@ ce
 
 <floorregion shape="rect" rect_x="28.0" rect_y="0.0" rect_w="4.0" rect_h="12.0"/>
 
-<player_start x="30.0" y="3.5"/>
+<!--<player_start x="30.0" y="3.5"/>-->
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="30.0" y="2.0" size="2.0" blocking="true" exit_location="Axbury" exit_location_x="37.5" exit_location_y="67.0"/>
 
@@ -399,6 +399,11 @@ ce
 <floorregion shape="rect" rect_x="24.0" rect_y="10.0" rect_w="4.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="9.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Barrel" image_name="barrel" x="20.5" y="9.5" size="0.8" blocking="true">
+    <gold amount="3"/>
+    <item name="Leaf" image_name="leaf" icon_width="0.25" weight="0"/>
+</scenery>
 
 <npc name="Zombie" template="Zombie" x="23.0" y="10.0"/>
 
@@ -447,6 +452,11 @@ When you stare into this Orb, it shows nothing but blackness.
 <npc name="Zombie Champion" template="Zombie Champion" x="24.0" y="20.0">
     <item name="Axbury Dungeon Key" image_name="key" icon_width="0.5" weight="0"/>
 </npc>
+
+<scenery name="Barrel" image_name="barrel" x="26.5" y="19.5" size="0.8" blocking="true">
+    <gold amount="5"/>
+    <item template="Plain Ring"/>
+</scenery>
 
 <!--south route/left-->
 
@@ -545,11 +555,11 @@ This magical plate armour is as strong as regular plate, but much lighter.
 
 <floorregion shape="rect" rect_x="43.0" rect_y="25.0" rect_w="1.0" rect_h="4.0"/>
 
-<floorregion shape="rect" rect_x="39.0" rect_y="29.0" rect_w="5.0" rect_h="1.0"/>
+<floorregion shape="rect" rect_x="39.0" rect_y="29.0" rect_w="9.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="35.0" rect_y="27.0" rect_w="4.0" rect_h="3.0"/>
 
-<scenery name="Door" image_name="door_wood" x="38.95" y="29.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood" x="39.05" y="29.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <scenery name="Crate" image_name="crate" x="35.5" y="27.5" size="0.8" blocking="true">
     <item name="Scrying Orb" image_name="orb" icon_width="0.25" weight="2">
@@ -560,6 +570,18 @@ When you stare into this Orb, you see swirling lights of many different colours.
 <npc name="Zombie Champion" template="Zombie Champion" x="37.0" y="27.5"/>
 
 <npc name="Zombie Champion" template="Zombie Champion" x="36.5" y="29.5"/>
+
+<floorregion shape="rect" rect_x="48.0" rect_y="27.0" rect_w="4.0" rect_h="3.0"/>
+
+<scenery name="Door" image_name="door_wood" x="47.95" y="29.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Barrel" image_name="barrel" x="51.5" y="27.5" size="0.8" blocking="true">
+    <gold amount="7"/>
+    <item template="Dagger"/>
+    <item template="Potion of Speed"/>
+</scenery>
+
+<npc name="Skeleton" template="Skeleton" x="51.0" y="27.0"/>
 
 </location>
 
