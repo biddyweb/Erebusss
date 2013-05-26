@@ -6698,12 +6698,15 @@ void PlayingGamestate::update() {
                 }
             }
             stringstream death_message;
-            int r = rand() % 3;
+            int r = rand() % 4;
             if( r == 0 ) {
                 death_message << "<p><b>Game over</b></p><p>You have died! Your noble quest has come to an end. Your corpse rots away, left for future brave adventurers to encounter.</p>";
             }
             else if( r == 1 ) {
                 death_message << "<p><b>Game over</b></p><p>You have died! Your adventure has met an untimely end. Better luck next time!</p>";
+            }
+            else if( r == 2 ) {
+                death_message << "<p><b>Game over</b></p><p>Ooh, nasty!</p>";
             }
             else {
                 death_message << "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
@@ -6898,6 +6901,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
             this->need_visibility_update = true;
         }
     }
+
 }
 
 void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart) {
