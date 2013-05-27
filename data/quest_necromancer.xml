@@ -73,7 +73,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
-<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0"/>
+<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0" requires_flag="borin_reveal_exit"/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -203,6 +203,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
     interaction_data="Scrying Orb"
     interaction_xp="100"
     interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Ravencrag Fort, also to the east, for more help."
+    interaction_set_flag="borin_reveal_exit"
 >
 <opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
 </opening_initial>
@@ -220,6 +221,10 @@ A necromancer is certainly behind this evil, but unfortuntely I cannot see his l
 They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Ravencrag Fort, also to the east.
 </talk>
 </npc>
+
+<!--<item name="Scrying Orb" image_name="orb" icon_width="0.25" weight="2" x="0.5" y="0.5">
+When you stare into this Orb, you see swirling lights of many different colours.
+</item>-->
 
 </location>
 
@@ -582,6 +587,16 @@ When you stare into this Orb, you see swirling lights of many different colours.
 </scenery>
 
 <npc name="Skeleton" template="Skeleton" x="51.0" y="27.0"/>
+
+</location>
+
+<location name="Middleham" display_name="true" lighting_min="160">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
 </location>
 
