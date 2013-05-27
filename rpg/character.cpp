@@ -1491,6 +1491,7 @@ bool Character::canCompleteInteraction(PlayingGamestate *playing_gamestate) cons
 }
 
 void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
+    LOG("Character::completeInteration(): %s\n", this->name.c_str());
     ASSERT_LOGGER( !this->interaction_completed );
     if( this->interaction_type == "WANT_OBJECT" ) {
         Item *item = playing_gamestate->getPlayer()->findItem(this->interaction_data);
@@ -1520,6 +1521,10 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
             LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
             ASSERT_LOGGER(false);
         }
+    }
+    if( this->interaction_set_flag.length() > 0 ) {
+        LOG("add quest flag: %s\n", this->interaction_set_flag.c_str());
+        playing_gamestate->getQuest()->addFlag(this->interaction_set_flag);
     }
     if( this->interaction_journal.length() > 0 ) {
         playing_gamestate->writeJournal("<hr/><p>");

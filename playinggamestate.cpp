@@ -4540,6 +4540,8 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
     npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
     QStringRef interaction_journal_s = reader.attributes().value("interaction_journal");
     npc->setInteractionJournal(interaction_journal_s.toString().toStdString());
+    QStringRef interaction_set_flag_s = reader.attributes().value("interaction_set_flag");
+    npc->setInteractionSetFlag(interaction_set_flag_s.toString().toStdString());
     QStringRef shop_s = reader.attributes().value("shop");
     if( shop_s.length() > 0 ) {
         npc->setShop(shop_s.toString().toStdString());
@@ -4990,6 +4992,21 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     qDebug("read permadeath: %s\n", permadeath_s.toString().toStdString().c_str());
                     this->permadeath = parseBool(permadeath_s.toString(), true);
                 }
+                else if( reader.name() == "flag" ) {
+                    if( location != NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: flag element wasn't expected here");
+                    }
+                    QStringRef name_s = reader.attributes().value("name");
+                    qDebug("read flag: %s\n", name_s.toString().toStdString().c_str());
+                    if( name_s.length() == 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: flag has no name");
+                    }
+                    else {
+                        quest->addFlag(name_s.toString().toStdString());
+                    }
+                }
                 else if( reader.name() == "location" ) {
                     if( location != NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5315,6 +5332,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QStringRef action_value_s = reader.attributes().value("action_value");
                     QStringRef interact_type_s = reader.attributes().value("interact_type");
                     QStringRef interact_state_s = reader.attributes().value("interact_state");
+                    QStringRef requires_flag_s = reader.attributes().value("requires_flag");
                     QStringRef blocking_s = reader.attributes().value("blocking");
                     bool blocking = parseBool(blocking_s.toString(), true);
                     QStringRef block_visibility_s = reader.attributes().value("block_visibility");
@@ -5500,6 +5518,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     if( interact_state_s.length() > 0 ) {
                         int interact_state = parseInt(interact_state_s.toString());
                         scenery->setInteractState(interact_state);
+                    }
+                    if( requires_flag_s.length() > 0 ) {
+                        scenery->setRequiresFlag(requires_flag_s.toString().toStdString());
                     }
                     scenery->setDoor(door);
                     scenery->setExit(exit);
@@ -7068,6 +7089,11 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
         Scenery *scenery = *iter;
         qDebug("clicked on scenery: %s", scenery->getName().c_str());
 
+        if( scenery->getRequiresFlag().length() > 0 && !this->quest->hasFlag( scenery->getRequiresFlag() ) ) {
+            qDebug("but doesn't have required flag: %s", scenery->getRequiresFlag().c_str());
+            continue;
+        }
+
         bool confirm_ok = true;
         if( scenery->getConfirmText().length() > 0 ) {
             confirm_ok = this->askQuestionDialog(scenery->getConfirmText());
@@ -7853,6 +7879,12 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
     stream << "<current_quest name=\"" << this->quest_list.at(this->c_quest_indx).getFilename().c_str() << "\"/>\n";
     stream << "\n";
 
+    qDebug("save flags");
+    for(set<string>::const_iterator iter_flags = quest->flagsBegin(); iter_flags != quest->flagsEnd(); ++iter_flags) {
+        const string flag = *iter_flags;
+        stream << "<flag name=\"" << flag.c_str() << "\"/>\n";
+    }
+
     qDebug("save locations");
     for(vector<Location *>::const_iterator iter_loc = quest->locationsBegin(); iter_loc != quest->locationsEnd(); ++iter_loc) {
         const Location *location = *iter_loc;
@@ -8076,6 +8108,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->getInteractionJournal().length() > 0 ) {
                 stream << " interaction_journal=\"" << character->getInteractionJournal().c_str() << "\"";
             }
+            if( character->getInteractionSetFlag().length() > 0 ) {
+                stream << " interaction_set_flag=\"" << character->getInteractionSetFlag().c_str() << "\"";
+            }
             if( character->getInteractionXP() != 0 ) {
                 //fprintf(file, " interaction_xp=\"%d\"", character->getInteractionXP());
                 stream << " interaction_xp=\"" << character->getInteractionXP() << "\"";
@@ -8214,6 +8249,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 stream << " interact_type=\"" << scenery->getInteractType().c_str() << "\"";
             if( scenery->getInteractState() != 0 )
                 stream << " interact_state=\"" << scenery->getInteractState() << "\"";
+            if( scenery->getRequiresFlag().length() > 0 ) {
+                stream << " requires_flag=\"" << scenery->getRequiresFlag().c_str() << "\"";
+            }
             if( scenery->isBlocking() ) {
                 //fprintf(file, " blocking=\"true\"");
                 stream << " blocking=\"true\"";

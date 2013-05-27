@@ -429,6 +429,7 @@ class Character {
     int interaction_xp;
     string interaction_reward_item;
     string interaction_journal;
+    string interaction_set_flag;
     bool interaction_completed;
     string talk_opening_initial;
     string talk_opening_later;
@@ -888,6 +889,12 @@ public:
     }
     void setInteractionJournal(const string &interaction_journal) {
         this->interaction_journal = interaction_journal;
+    }
+    string getInteractionSetFlag() const {
+        return this->interaction_set_flag;
+    }
+    void setInteractionSetFlag(const string &interaction_set_flag) {
+        this->interaction_set_flag = interaction_set_flag;
     }
     bool isInteractionCompleted() const {
         return this->interaction_completed;

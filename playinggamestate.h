@@ -638,6 +638,9 @@ public:
     const Location *getLocation() const {
         return this->location;
     }*/
+    Quest *getQuest() {
+        return this->quest;
+    }
     const Quest *getQuest() const {
         return this->quest;
     }

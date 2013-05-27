@@ -53,6 +53,7 @@ protected:
     Vector2D pos; // pos in Location (for centre)
     void *user_data_gfx; // not saved
 
+    string requires_flag; // used for various purposes - if door can be opened, if exit[_location] can be exited, if scenery can be interacted with
     bool is_blocking;
     bool blocks_visibility;
     bool is_door, is_exit;
@@ -147,6 +148,14 @@ public:
     string getBigImageName() const {
         return this->big_image_name;
     }
+
+    void setRequiresFlag(const string &requires_flag) {
+        this->requires_flag = requires_flag;
+    }
+    string getRequiresFlag() const {
+        return this->requires_flag;
+    }
+
     void setBlocking(bool is_blocking, bool blocks_visibility);
     bool isBlocking() const {
         return this->is_blocking;
@@ -154,6 +163,7 @@ public:
     bool blocksVisibility() const {
         return this->blocks_visibility;
     }
+
     void setDoor(bool is_door) {
         this->is_door = is_door;
     }
@@ -822,6 +832,7 @@ class Quest {
     string info;
     string completed_text;
     bool is_completed;
+    set<string> flags;
 
     // rule of three
     Quest& operator=(const Quest &quest) {
@@ -836,6 +847,18 @@ public:
 
     void addLocation(Location *location);
     Location *findLocation(const string &name);
+    void addFlag(const string &name) {
+        this->flags.insert(name);
+    }
+    bool hasFlag(const string &name) const {
+        return this->flags.find(name) != this->flags.end();
+    }
+    set<string>::const_iterator flagsBegin() const {
+        return this->flags.begin();
+    }
+    set<string>::const_iterator flagsEnd() const {
+        return this->flags.end();
+    }
     void setQuestObjective(QuestObjective *quest_objective) {
         this->quest_objective = quest_objective;
     }
