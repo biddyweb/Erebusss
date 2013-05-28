@@ -185,7 +185,7 @@ private:
     int gold_min, gold_max;
 protected:
     Profile profile;
-    bool has_natural_damage;
+    //bool has_natural_damage;
     int natural_damageX, natural_damageY, natural_damageZ;
     bool can_fly;
     int xp_worth;
@@ -209,18 +209,27 @@ public:
     }
     int getHealth() const;
     void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
-        this->has_natural_damage = true;
+        //this->has_natural_damage = true;
         this->natural_damageX = natural_damageX;
         this->natural_damageY = natural_damageY;
         this->natural_damageZ = natural_damageZ;
     }
-    bool hasNaturalDamage() const {
+    /*bool hasNaturalDamage() const {
         return this->has_natural_damage;
-    }
-    void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
+    }*/
+    /*void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
         *natural_damageX = this->natural_damageX;
         *natural_damageY = this->natural_damageY;
         *natural_damageZ = this->natural_damageZ;
+    }*/
+    int getNaturalDamageX() const {
+        return this->natural_damageX;
+    }
+    int getNaturalDamageY() const {
+        return this->natural_damageY;
+    }
+    int getNaturalDamageZ() const {
+        return this->natural_damageZ;
     }
     void setCanFly(bool can_fly) {
         this->can_fly = can_fly;

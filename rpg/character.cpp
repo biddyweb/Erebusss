@@ -12,6 +12,10 @@
 #include <cassert>
 #endif
 
+const int default_natural_damageX = 1;
+const int default_natural_damageY = 3;
+const int default_natural_damageZ = -1;
+
 string getLongString(const string &key) {
     if( key == profile_key_FP_c )
         return "Fighting Prowess";
@@ -126,7 +130,10 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis) :
     //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max),
+    //has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0),
+    natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50)
 {
 }
 
@@ -147,10 +154,6 @@ int CharacterTemplate::getGold() const {
 ProfileEffect::ProfileEffect(const Profile &profile, int duration_ms) : profile(profile), expires_ms(0) {
     this->expires_ms = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
 }
-
-const int default_natural_damageX = 1;
-const int default_natural_damageY = 3;
-const int default_natural_damageZ = -1;
 
 // this is not the only Character constructor!
 Character::Character(const string &name, string animation_name, bool is_ai) :
@@ -192,7 +195,8 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     //FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
     profile(character_template),
     health(0), max_health(0),
-    natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    //natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    natural_damageX(character_template.getNaturalDamageX()), natural_damageY(character_template.getNaturalDamageY()), natural_damageZ(character_template.getNaturalDamageZ()),
     can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
@@ -202,9 +206,9 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
 {
     this->animation_name = character_template.getAnimationName();
     this->initialiseHealth( character_template.getHealth() );
-    if( character_template.hasNaturalDamage() ) {
+    /*if( character_template.hasNaturalDamage() ) {
         character_template.getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
-    }
+    }*/
     this->gold = character_template.getGold();
     this->xp_worth = character_template.getXPWorth();
     this->causes_terror = character_template.getCausesTerror();
