@@ -126,7 +126,7 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis) :
     //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false)
+    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50)
 {
 }
 
@@ -157,7 +157,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
-    animation_name(animation_name), static_image(false), bounce(false),
+    animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
     //has_destination(false),
@@ -183,7 +183,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
     static_image(character_template.isStaticImage()),
-    bounce(character_template.isBounce()),
+    bounce(character_template.isBounce()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), is_visible(false),
     //has_destination(false),
@@ -622,6 +622,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                                 // -1 from rating, as default rating is 1, but this should mean no modification
                                                 weapon_damage += (ammo->getRating()-1);
                                             }
+                                            if( this->getCurrentWeapon() != NULL && target_npc->getWeaponResistClass().length() > 0 && target_npc->getWeaponResistClass() == this->getCurrentWeapon()->getWeaponClass() ) {
+                                                qDebug("weapon resist percentage %d, scale from %d", target_npc->getWeaponResistPercentage(), weapon_damage);
+                                                weapon_damage = (weapon_damage * target_npc->getWeaponResistPercentage() )/100;
+                                            }
+                                            qDebug("weapon_damage %d", weapon_damage);
                                         }
                                     }
                                 }

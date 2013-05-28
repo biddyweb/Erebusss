@@ -63,29 +63,6 @@ const float npc_radius_c = 0.25f;
 const float hit_range_c = sqrt(2.0f) * ( npc_radius_c + npc_radius_c );
 const float talk_range_c = hit_range_c;
 
-/*class Profile {
-public:
-    int FP, BS, S, A, M, D, B;
-    float Sp;
-
-    Profile() : FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0) {
-    }
-    Profile(const CharacterTemplate &character_template);
-    Profile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) : FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp) {
-    }
-
-    void set(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
-        this->FP = FP;
-        this->BS = BS;
-        this->S = S;
-        this->A = A;
-        this->M = M;
-        this->D = D;
-        this->B = B;
-        this->Sp = Sp;
-    }
-};*/
-
 const string profile_key_FP_c = "FP";
 const string profile_key_BS_c = "BS";
 const string profile_key_S_c = "S";
@@ -203,8 +180,6 @@ public:
 };
 
 class CharacterTemplate {
-    /*int FP, BS, S, A, M, D, B;
-    float Sp;*/
     Profile profile;
     int health_min, health_max;
     bool has_natural_damage;
@@ -221,44 +196,15 @@ class CharacterTemplate {
     string animation_name;
     bool static_image;
     bool bounce;
+    string weapon_resist_class; // resistance to this weapon class
+    int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
+
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis);
 
     const Profile *getProfile() const {
         return &this->profile;
     }
-    /*int getFP() const {
-        //return this->FP;
-        return this->profile.FP;
-    }
-    int getBS() const {
-        //return this->BS;
-        return this->profile.BS;
-    }
-    int getStrength() const {
-        //return this->S;
-        return this->profile.S;
-    }
-    int getAttacks() const {
-        //return this->A;
-        return this->profile.A;
-    }
-    int getMind() const {
-        //return this->M;
-        return this->profile.M;
-    }
-    int getDexterity() const {
-        //return this->D;
-        return this->profile.D;
-    }
-    int getBravery() const {
-        //return this->B;
-        return this->profile.B;
-    }
-    float getSpeed() const {
-        return this->profile.Sp;
-        //return this->Sp;
-    }*/
     int getHealth() const;
     void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
         this->has_natural_damage = true;
@@ -323,6 +269,16 @@ public:
     bool isBounce() const {
         return this->bounce;
     }
+    void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
+        this->weapon_resist_class = weapon_resist_class;
+        this->weapon_resist_percentage = weapon_resist_percentage;
+    }
+    string getWeaponResistClass() const {
+        return this->weapon_resist_class;
+    }
+    int getWeaponResistPercentage() const {
+        return this->weapon_resist_percentage;
+    }
 };
 
 class ProfileEffect {
@@ -350,6 +306,8 @@ class Character {
     string animation_name; // for NPCs (player is handled separately)
     bool static_image; // for NPCs
     bool bounce;
+    string weapon_resist_class; // resistance to this weapon class
+    int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
 
     // game data
     Location *location; // not saved
@@ -518,6 +476,17 @@ public:
     bool isBounce() const {
         return this->bounce;
     }
+    void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
+        this->weapon_resist_class = weapon_resist_class;
+        this->weapon_resist_percentage = weapon_resist_percentage;
+    }
+    string getWeaponResistClass() const {
+        return this->weapon_resist_class;
+    }
+    int getWeaponResistPercentage() const {
+        return this->weapon_resist_percentage;
+    }
+
     void setLocation(Location *location) {
         this->location = location;
     }

@@ -110,6 +110,8 @@
     xp_worth="10"
     unholy="true"
     causes_terror="true" terror_effect="1"
+    weapon_resist_class="bow"
+    weapon_resist_percentage="50"
 />
 
 <!--Natural damage-->
@@ -142,6 +144,8 @@
     xp_worth="60"
     unholy="true"
     causes_terror="true" terror_effect="2"
+    weapon_resist_class="bow"
+    weapon_resist_percentage="50"
 />
 
 <!--Natural damage-->

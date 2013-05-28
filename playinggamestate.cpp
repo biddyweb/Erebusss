@@ -3287,11 +3287,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                     bool requires_magical = parseBool(requires_magical_s.toString(), true);
                     QStringRef unholy_s = reader.attributes().value("unholy");
                     bool unholy = parseBool(unholy_s.toString(), true);
+
                     CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect, causes_disease, causes_paralysis);
+
                     character_template->setStaticImage(static_image);
                     character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
                     character_template->setUnholy(unholy);
+
                     QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
                     QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
                     QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
@@ -3301,9 +3304,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                         int natural_damageZ = parseInt(natural_damageZ_s.toString());
                         character_template->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
                     }
+
                     QStringRef can_fly_s = reader.attributes().value("can_fly");
                     bool can_fly = parseBool(can_fly_s.toString(), true);
                     character_template->setCanFly(can_fly);
+
+                    QStringRef weapon_resist_class_s = reader.attributes().value("weapon_resist_class");
+                    if( weapon_resist_class_s.length() > 0 ) {
+                        QStringRef weapon_resist_percentage_s = reader.attributes().value("weapon_resist_percentage");
+                        int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
+                        character_template->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
+                    }
+
                     this->character_templates[ name_s.toString().toStdString() ] = character_template;
                 }
             }
@@ -3889,6 +3901,11 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         }
         weapon->setMinStrength(min_strength);
         weapon->setUnholyOnly(unholy_only);
+
+        QStringRef weapon_class_s = reader.attributes().value("weapon_class");
+        if( weapon_class_s.length() > 0 ) {
+            weapon->setWeaponClass(weapon_class_s.toString().toStdString());
+        }
     }
     else if( reader.name() == "shield" ) {
         QStringRef animation_name_s = reader.attributes().value("animation_name");
@@ -4401,6 +4418,13 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
             npc->setStaticImage(static_image);
             npc->setBounce(bounce);
             npc->setHostile(is_hostile);
+
+            QStringRef weapon_resist_class_s = reader.attributes().value("weapon_resist_class");
+            if( weapon_resist_class_s.length() > 0 ) {
+                QStringRef weapon_resist_percentage_s = reader.attributes().value("weapon_resist_percentage");
+                int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
+                npc->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
+            }
         }
         QStringRef portrait_s = reader.attributes().value("portrait");
         if( portrait_s.length() > 0 ) {
@@ -7721,15 +7745,15 @@ void PlayingGamestate::saveItem(QTextStream &stream, const Item *item, const Cha
             stream << " min_strength=\"" << weapon->getMinStrength() << "\"";
         }
         if( weapon->isUnholyOnly() ) {
-            //fprintf(file, " unholy_only=\"true\"");
             stream << " unholy_only=\"true\"";
         }
+        if( weapon->getWeaponClass().length() > 0 ) {
+            stream << " weapon_class=\"" << weapon->getWeaponClass().c_str() << "\"";
+        }
         if( weapon->getRequiresAmmo() ) {
-            //fprintf(file, " ammo=\"%s\"", weapon->getAmmoKey().c_str());
             stream << " ammo=\"" << weapon->getAmmoKey().c_str() << "\"";
         }
         if( character != NULL && weapon == character->getCurrentWeapon() ) {
-            //fprintf(file, " current_weapon=\"true\"");
             stream << " current_weapon=\"true\"";
         }
         break;
@@ -7984,8 +8008,11 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 stream << " portrait=\"" << character->getPortrait().c_str() << "\"";
             }
             if( character->isBounce() ) {
-                //fprintf(file, " bounce=\"true\"");
                 stream << " bounce=\"true\"";
+            }
+            if( character->getWeaponResistClass().length() > 0 ) {
+                stream << " weapon_resist_class=\"" << character->getWeaponResistClass().c_str() << "\"";
+                stream << " weapon_resist_percentage=\"" << character->getWeaponResistPercentage() << "\"";
             }
             //fprintf(file, " name=\"%s\"", character->getName().c_str());
             stream << " name=\"" << character->getName().c_str() << "\"";

@@ -23,12 +23,14 @@
 <weapon name="Shortbow" image_name="longbow" weight="4"
     damageX="2" damageY="8" damageZ="-2"
     animation_name="longbow"
+    weapon_class="bow"
     two_handed="true" ranged="true" ammo="Arrows"/>
 
 <weapon name="Longbow" image_name="longbow" weight="5"
     damageX="2" damageY="12" damageZ="-1"
     min_strength="6"
     animation_name="longbow"
+    weapon_class="bow"
     two_handed="true" ranged="true" ammo="Arrows"/>
 
 <weapon name="Acid" image_name="vial_green" icon_width="0.15" weight="2"
