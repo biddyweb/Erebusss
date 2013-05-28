@@ -73,7 +73,10 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
-<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0" requires_flag="borin_reveal_exit"/>
+<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0"
+    confirm_text="Do you wish to travel east to the village of Middleham?"
+    requires_flag="borin_reveal_exit"
+/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -202,7 +205,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
     interaction_type="WANT_OBJECT"
     interaction_data="Scrying Orb"
     interaction_xp="100"
-    interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Ravencrag Fort, also to the east, for more help."
+    interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Wentbridge Fort, also to the east, for more help."
     interaction_set_flag="borin_reveal_exit"
 >
 <opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
@@ -218,7 +221,7 @@ Ah, thank you. Now let's see - it's been a while since I've used this old orb. Y
 
 A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
 
-They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Ravencrag Fort, also to the east.
+They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Wentbridge Fort, also to the east.
 </talk>
 </npc>
 
@@ -596,7 +599,15 @@ When you stare into this Orb, you see swirling lights of many different colours.
 <wall image_name="wall"/>
 <background image_name="background_green"/>
 
-<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="10.0" rect_h="40.0"/>
+
+<!--<player_start x="16.0" y="22.0"/>-->
+
+<!--<npc name="Skeleton" template="Skeleton" x="21.0" y="22.0"/>-->
+
+<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0"
+    confirm_text="Do you wish to travel west to the village of Axbury?"
+/>
 
 </location>
 
