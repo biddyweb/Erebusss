@@ -180,12 +180,14 @@ public:
 };
 
 class CharacterTemplate {
-    Profile profile;
+private:
     int health_min, health_max;
+    int gold_min, gold_max;
+protected:
+    Profile profile;
     bool has_natural_damage;
     int natural_damageX, natural_damageY, natural_damageZ;
     bool can_fly;
-    int gold_min, gold_max;
     int xp_worth;
     bool causes_terror;
     int terror_effect;
@@ -296,18 +298,30 @@ public:
 };
 
 class Character {
-    // basic info
+    // rpg data "inherited" from CharacterTemplate
+    Profile profile;
+    int natural_damageX, natural_damageY, natural_damageZ;
+    bool can_fly;
+    int xp_worth;
+    bool causes_terror;
+    int terror_effect;
+    int causes_disease;
+    int causes_paralysis;
+    bool requires_magical; // requires magical weapon to hit?
+    bool unholy;
+    string animation_name; // for NPCs (player is handled separately)
+    bool static_image; // for NPCs
+    bool bounce;
+    string weapon_resist_class; // resistance to this weapon class
+    int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
+
+    //   basic info
     string name;
     string biography;
     bool is_ai; // not saved
     bool is_hostile;
     bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
     string portrait;
-    string animation_name; // for NPCs (player is handled separately)
-    bool static_image; // for NPCs
-    bool bounce;
-    string weapon_resist_class; // resistance to this weapon class
-    int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
 
     // game data
     Location *location; // not saved
@@ -340,13 +354,8 @@ class Character {
     Vector2D last_known_player_position;
 
     // rpg data
-    //int FP, BS, S, A, M, D, B;
-    //float Sp;
-    Profile profile;
     int health;
     int max_health;
-    int natural_damageX, natural_damageY, natural_damageZ;
-    bool can_fly;
     bool is_paralysed;
     int paralysed_until;
     bool is_diseased;
@@ -369,15 +378,8 @@ class Character {
 
     int level;
     int xp;
-    int xp_worth;
-    bool causes_terror;
-    int terror_effect;
     bool done_terror;
     bool is_fleeing; // for NPCs
-    int causes_disease;
-    int causes_paralysis;
-    bool requires_magical; // requires magical weapon to hit?
-    bool unholy;
 
     // npc talk information
     bool can_talk;
