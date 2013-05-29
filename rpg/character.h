@@ -201,26 +201,20 @@ protected:
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
 
 public:
-    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis);
+    CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
+
+    int getTemplateHealth() const;
+    int getTemplateGold() const;
 
     const Profile *getProfile() const {
         return &this->profile;
     }
-    int getHealth() const;
     void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
         //this->has_natural_damage = true;
         this->natural_damageX = natural_damageX;
         this->natural_damageY = natural_damageY;
         this->natural_damageZ = natural_damageZ;
     }
-    /*bool hasNaturalDamage() const {
-        return this->has_natural_damage;
-    }*/
-    /*void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
-        *natural_damageX = this->natural_damageX;
-        *natural_damageY = this->natural_damageY;
-        *natural_damageZ = this->natural_damageZ;
-    }*/
     int getNaturalDamageX() const {
         return this->natural_damageX;
     }
@@ -236,9 +230,15 @@ public:
     bool canFly() const {
         return this->can_fly;
     }
-    int getGold() const;
+    void setXPWorth(int xp_worth) {
+        this->xp_worth = xp_worth;
+    }
     int getXPWorth() const {
         return xp_worth;
+    }
+    void setCausesTerror(int terror_effect) {
+        this->causes_terror = true;
+        this->terror_effect = terror_effect;
     }
     bool getCausesTerror() const {
         return this->causes_terror;
@@ -246,8 +246,14 @@ public:
     int getTerrorEffect() const {
         return this->terror_effect;
     }
+    void setCausesDisease(int causes_disease) {
+        this->causes_disease = causes_disease;
+    }
     int getCausesDisease() const {
         return this->causes_disease;
+    }
+    void setCausesParalysis(int causes_paralysis) {
+        this->causes_paralysis = causes_paralysis;
     }
     int getCausesParalysis() const {
         return this->causes_paralysis;
@@ -423,6 +429,95 @@ public:
     explicit Character(const Character &character);
     ~Character();
 
+    // copy of CharacterTemplate:
+    void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
+        //this->has_natural_damage = true;
+        this->natural_damageX = natural_damageX;
+        this->natural_damageY = natural_damageY;
+        this->natural_damageZ = natural_damageZ;
+    }
+    int getNaturalDamageX() const {
+        return this->natural_damageX;
+    }
+    int getNaturalDamageY() const {
+        return this->natural_damageY;
+    }
+    int getNaturalDamageZ() const {
+        return this->natural_damageZ;
+    }
+    void setCanFly(bool can_fly) {
+        this->can_fly = can_fly;
+    }
+    bool canFly() const {
+        return this->can_fly;
+    }
+    void setXPWorth(int xp_worth) {
+        this->xp_worth = xp_worth;
+    }
+    int getXPWorth() const {
+        return xp_worth;
+    }
+    void setCausesTerror(int terror_effect) {
+        this->causes_terror = true;
+        this->terror_effect = terror_effect;
+    }
+    bool getCausesTerror() const {
+        return this->causes_terror;
+    }
+    int getTerrorEffect() const {
+        return this->terror_effect;
+    }
+    void setCausesDisease(int causes_disease) {
+        this->causes_disease = causes_disease;
+    }
+    int getCausesDisease() const {
+        return this->causes_disease;
+    }
+    void setCausesParalysis(int causes_paralysis) {
+        this->causes_paralysis = causes_paralysis;
+    }
+    int getCausesParalysis() const {
+        return this->causes_paralysis;
+    }
+    void setRequiresMagical(bool requires_magical) {
+        this->requires_magical = requires_magical;
+    }
+    bool requiresMagical() const {
+        return requires_magical;
+    }
+    void setUnholy(bool unholy) {
+        this->unholy = unholy;
+    }
+    bool isUnholy() const {
+        return this->unholy;
+    }
+    string getAnimationName() const {
+        return this->animation_name;
+    }
+    void setStaticImage(bool static_image) {
+        this->static_image = static_image;
+    }
+    bool isStaticImage() const {
+        return this->static_image;
+    }
+    void setBounce(bool bounce) {
+        this->bounce = bounce;
+    }
+    bool isBounce() const {
+        return this->bounce;
+    }
+    void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
+        this->weapon_resist_class = weapon_resist_class;
+        this->weapon_resist_percentage = weapon_resist_percentage;
+    }
+    string getWeaponResistClass() const {
+        return this->weapon_resist_class;
+    }
+    int getWeaponResistPercentage() const {
+        return this->weapon_resist_percentage;
+    }
+    //
+
     void setPortrait(const string &portrait) {
         this->portrait = portrait;
     }
@@ -470,31 +565,6 @@ public:
     }
     string getName() const {
         return this->name;
-    }
-    string getAnimationName() const {
-        return this->animation_name;
-    }
-    void setStaticImage(bool static_image) {
-        this->static_image = static_image;
-    }
-    bool isStaticImage() const {
-        return this->static_image;
-    }
-    void setBounce(bool bounce) {
-        this->bounce = bounce;
-    }
-    bool isBounce() const {
-        return this->bounce;
-    }
-    void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
-        this->weapon_resist_class = weapon_resist_class;
-        this->weapon_resist_percentage = weapon_resist_percentage;
-    }
-    string getWeaponResistClass() const {
-        return this->weapon_resist_class;
-    }
-    int getWeaponResistPercentage() const {
-        return this->weapon_resist_percentage;
     }
 
     void setLocation(Location *location) {
@@ -662,22 +732,6 @@ public:
     void restoreHealth() {
         this->health = this->max_health;
     }
-    void setNaturalDamage(int natural_damageX, int natural_damageY, int natural_damageZ) {
-        this->natural_damageX = natural_damageX;
-        this->natural_damageY = natural_damageY;
-        this->natural_damageZ = natural_damageZ;
-    }
-    void getNaturalDamage(int *natural_damageX, int *natural_damageY, int *natural_damageZ) const {
-        *natural_damageX = this->natural_damageX;
-        *natural_damageY = this->natural_damageY;
-        *natural_damageZ = this->natural_damageZ;
-    }
-    void setCanFly(bool can_fly) {
-        this->can_fly = can_fly;
-    }
-    bool canFly() const {
-        return this->can_fly;
-    }
     int getArmourRating(bool armour, bool shield) const;
 
     const Weapon *getCurrentWeapon() const {
@@ -774,22 +828,6 @@ public:
     void addXP(PlayingGamestate *playing_gamestate, int change);
     void advanceLevel(PlayingGamestate *playing_gamestate);
     int getXPForNextLevel() const;
-    int getXPWorth() const {
-        return xp_worth;
-    }
-    void setXPWorth(int xp_worth) {
-        this->xp_worth = xp_worth;
-    }
-    bool getCausesTerror() const {
-        return this->causes_terror;
-    }
-    int getTerrorEffect() const {
-        return this->terror_effect;
-    }
-    void setCausesTerror(int terror_effect) {
-        this->causes_terror = true;
-        this->terror_effect = terror_effect;
-    }
     bool hasDoneTerror() const {
         return this->done_terror;
     }
@@ -801,30 +839,6 @@ public:
     }
     void setFleeing(bool is_fleeing) {
         this->is_fleeing = is_fleeing;
-    }
-    int getCausesDisease() const {
-        return this->causes_disease;
-    }
-    void setCausesDisease(int causes_disease) {
-        this->causes_disease = causes_disease;
-    }
-    int getCausesParalysis() const {
-        return this->causes_paralysis;
-    }
-    void setCausesParalysis(int causes_paralysis) {
-        this->causes_paralysis = causes_paralysis;
-    }
-    bool requiresMagical() const {
-        return requires_magical;
-    }
-    void setRequiresMagical(bool requires_magical) {
-        this->requires_magical = requires_magical;
-    }
-    void setUnholy(bool unholy) {
-        this->unholy = unholy;
-    }
-    bool isUnholy() const {
-        return this->unholy;
     }
 
     bool canTalk() const {

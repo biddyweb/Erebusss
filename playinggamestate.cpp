@@ -940,7 +940,10 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
         stringstream str;
         int damageX = 0, damageY = 0, damageZ = 0;
         if( player->getCurrentWeapon() == NULL ) {
-            player->getNaturalDamage(&damageX, &damageY, &damageZ);
+            //player->getNaturalDamage(&damageX, &damageY, &damageZ);
+            damageX = player->getNaturalDamageX();
+            damageY = player->getNaturalDamageY();
+            damageZ = player->getNaturalDamageZ();
             str << "<b>Current Weapon:</b> None ";
         }
         else {
@@ -3288,8 +3291,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                     QStringRef unholy_s = reader.attributes().value("unholy");
                     bool unholy = parseBool(unholy_s.toString(), true);
 
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max, xp_worth, causes_terror, terror_effect, causes_disease, causes_paralysis);
+                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max);
 
+                    character_template->setXPWorth(xp_worth);
+                    if( causes_terror ) {
+                        character_template->setCausesTerror(terror_effect);
+                    }
+                    character_template->setCausesDisease(causes_disease);
+                    character_template->setCausesParalysis(causes_paralysis);
                     character_template->setStaticImage(static_image);
                     character_template->setBounce(bounce);
                     character_template->setRequiresMagical(requires_magical);
@@ -8056,8 +8065,11 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                     stream << " initial_" << key.c_str() << "=\"" << value << "\"";
                 }
             }
-            int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
-            character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
+            //int natural_damageX = 0, natural_damageY = 0, natural_damageZ = 0;
+            //character->getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
+            int natural_damageX = character->getNaturalDamageX();
+            int natural_damageY = character->getNaturalDamageY();
+            int natural_damageZ = character->getNaturalDamageZ();
 
             //fprintf(file, " natural_damageX=\"%d\"", natural_damageX);
             //fprintf(file, " natural_damageY=\"%d\"", natural_damageY);

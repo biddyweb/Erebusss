@@ -124,23 +124,22 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
     }
 }
 
-CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max, int xp_worth, bool causes_terror, int terror_effect, int causes_disease, int causes_paralysis) :
-    //FP(FP), BS(BS), S(S), A(A), M(M), D(D), B(B), Sp(Sp), health_min(health_min), health_max(health_max), has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0), can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), requires_magical(false), animation_name(animation_name), static_image(false)
+CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max) :
     profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max),
     //has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(xp_worth), causes_terror(causes_terror), terror_effect(terror_effect), causes_disease(causes_disease), causes_paralysis(causes_paralysis), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50)
+    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50)
 {
 }
 
-int CharacterTemplate::getHealth() const {
+int CharacterTemplate::getTemplateHealth() const {
     if( health_min == health_max )
         return health_min;
     int r = rand() % (health_max - health_min + 1);
     return health_min + r;
 }
 
-int CharacterTemplate::getGold() const {
+int CharacterTemplate::getTemplateGold() const {
     if( gold_min == gold_max )
         return gold_min;
     int r = rand() % (gold_max - gold_min + 1);
@@ -200,11 +199,11 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
-    this->initialiseHealth( character_template.getHealth() );
+    this->initialiseHealth( character_template.getTemplateHealth() );
     /*if( character_template.hasNaturalDamage() ) {
         character_template.getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
     }*/
-    this->gold = character_template.getGold();
+    this->gold = character_template.getTemplateGold();
     this->xp_worth = character_template.getXPWorth();
     this->causes_terror = character_template.getCausesTerror();
     this->terror_effect = character_template.getTerrorEffect();
