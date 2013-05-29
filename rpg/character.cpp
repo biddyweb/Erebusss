@@ -37,10 +37,6 @@ string getLongString(const string &key) {
     throw string("unknown key");
 }
 
-Profile::Profile(const CharacterTemplate &character_template) {
-    *this = *character_template.getProfile();
-}
-
 int Profile::getIntProperty(const string &key) const {
     map<string, int>::const_iterator iter = this->int_properties.find(key);
     if( iter == this->int_properties.end() ) {
@@ -192,8 +188,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     //has_destination(false),
     has_path(false),
     target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
-    //FP(character_template.getFP()), BS(character_template.getBS()), S(character_template.getStrength()), A(character_template.getAttacks()), M(character_template.getMind()), D(character_template.getDexterity()), B(character_template.getBravery()), Sp(character_template.getSpeed()),
-    profile(character_template),
+    profile(*character_template.getProfile()),
     health(0), max_health(0),
     //natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
     natural_damageX(character_template.getNaturalDamageX()), natural_damageY(character_template.getNaturalDamageY()), natural_damageZ(character_template.getNaturalDamageZ()),

@@ -82,7 +82,6 @@ public:
     Profile() {
         // create dummy profile - should call set() before reading any of the properties
     }
-    Profile(const CharacterTemplate &character_template);
     Profile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->set(FP, BS, S, A, M, D, B, Sp);
     }
