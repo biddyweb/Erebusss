@@ -56,34 +56,34 @@ OptionsGamestate::OptionsGamestate() :
     QVBoxLayout *layout = new QVBoxLayout();
     centralWidget->setLayout(layout);
 
-    QPushButton *startButton = new QPushButton("Start game");
+    QPushButton *startButton = new QPushButton(tr("Start game"));
     game_g->initButton(startButton);
     startButton->setShortcut(QKeySequence(Qt::Key_Return));
 #ifndef Q_OS_ANDROID
     // for some reason, this sometimes shows on Android when it shouldn't?
-    startButton->setToolTip("Start playing a new game (Return)");
+    startButton->setToolTip(tr("Start playing a new game (Return)"));
 #endif
     startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(startButton);
     connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
 
-    QPushButton *loadButton = new QPushButton("Load game");
+    QPushButton *loadButton = new QPushButton(tr("Load game"));
     game_g->initButton(loadButton);
     loadButton->setShortcut(QKeySequence(Qt::Key_L));
 #ifndef Q_OS_ANDROID
     // for some reason, this sometimes shows on Android when it shouldn't?
-    loadButton->setToolTip("Load a previously saved game (L)");
+    loadButton->setToolTip(tr("Load a previously saved game (L)"));
 #endif
     loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(loadButton);
     connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
 
-    QPushButton *optionsButton = new QPushButton("Options");
+    QPushButton *optionsButton = new QPushButton(tr("Options"));
     game_g->initButton(optionsButton);
     optionsButton->setShortcut(QKeySequence(Qt::Key_O));
 #ifndef Q_OS_ANDROID
     // for some reason, this sometimes shows on Android when it shouldn't?
-    optionsButton->setToolTip("Configure various game options (O)");
+    optionsButton->setToolTip(tr("Configure various game options (O)"));
 #endif
     optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(optionsButton);
@@ -91,12 +91,12 @@ OptionsGamestate::OptionsGamestate() :
 
 #ifndef Q_OS_ANDROID
     // applications don't quit on Android.
-    QPushButton *quitButton = new QPushButton("Quit game");
+    QPushButton *quitButton = new QPushButton(tr("Quit game"));
     game_g->initButton(quitButton);
     quitButton->setShortcut(QKeySequence(Qt::Key_Escape));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        quitButton->setToolTip("Exit the game (Escape)");
+        quitButton->setToolTip(tr("Exit the game (Escape)"));
 #endif
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
@@ -112,23 +112,23 @@ OptionsGamestate::OptionsGamestate() :
         titleLabel->setFont(game_g->getFontStd());
         h_layout->addWidget(titleLabel);
 
-        QPushButton *offlineHelpButton = new QPushButton("Offline help");
+        QPushButton *offlineHelpButton = new QPushButton(tr("Offline help"));
         game_g->initButton(offlineHelpButton);
         offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        offlineHelpButton->setToolTip("View the game instructions (H)");
+        offlineHelpButton->setToolTip(tr("View the game instructions (H)"));
 #endif
         //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         offlineHelpButton->setFont(game_g->getFontStd());
         h_layout->addWidget(offlineHelpButton);
         connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
 
-        QPushButton *onlineHelpButton = new QPushButton("Online help");
+        QPushButton *onlineHelpButton = new QPushButton(tr("Online help"));
         game_g->initButton(onlineHelpButton);
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        onlineHelpButton->setToolTip("Visit the game's website");
+        onlineHelpButton->setToolTip(tr("Visit the game's website"));
 #endif
         //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         onlineHelpButton->setFont(game_g->getFontStd());
@@ -211,7 +211,7 @@ void OptionsGamestate::clickedStart() {
                 QGridLayout *g_layout = new QGridLayout();
                 layout->addLayout(g_layout);
 
-                QLabel *label = new QLabel("Select a game type: ");
+                QLabel *label = new QLabel(tr("Select a game type: "));
                 g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
                 gametypeComboBox = new QComboBox();
 #ifdef Q_OS_ANDROID
@@ -229,7 +229,7 @@ void OptionsGamestate::clickedStart() {
     else if( options_page_index == 1 ) {
         if( !smallscreen_c )
         {
-            QLabel *label = new QLabel("Choose game settings: ");
+            QLabel *label = new QLabel(tr("Choose game settings: "));
             label->setAlignment(Qt::AlignCenter);
             label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
             layout->addWidget(label);
@@ -240,7 +240,7 @@ void OptionsGamestate::clickedStart() {
             QGridLayout *g_layout = new QGridLayout();
             layout->addLayout(g_layout);
 
-            QLabel *label = new QLabel("Character: ");
+            QLabel *label = new QLabel(tr("Character: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
             characterComboBox = new QComboBox();
 #ifdef Q_OS_ANDROID
@@ -255,7 +255,7 @@ void OptionsGamestate::clickedStart() {
             g_layout->addWidget(characterComboBox, n_row, 1);
             n_row++;
 
-            label = new QLabel("Difficulty: ");
+            label = new QLabel(tr("Difficulty: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
             difficultyComboBox = new QComboBox();
 #ifdef Q_OS_ANDROID
@@ -289,7 +289,7 @@ void OptionsGamestate::clickedStart() {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QLabel *label = new QLabel("Your name:");
+        QLabel *label = new QLabel(tr("Your name:"));
         h_layout->addWidget(label);
 
         int character_id = this->characterComboBox->currentIndex();
@@ -310,12 +310,12 @@ void OptionsGamestate::clickedStart() {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *startButton = new QPushButton("Next");
+        QPushButton *startButton = new QPushButton(tr("Next"));
         game_g->initButton(startButton);
         startButton->setShortcut(QKeySequence(Qt::Key_Return));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        startButton->setToolTip("Accept the options and proceed to next step (Return)");
+        startButton->setToolTip(tr("Accept the options and proceed to next step (Return)"));
 #endif
         startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(startButton);
@@ -326,12 +326,12 @@ void OptionsGamestate::clickedStart() {
             connect(startButton, SIGNAL(clicked()), this, SLOT(clickedNext()));
         }
 
-        QPushButton *closeButton = new QPushButton("Cancel");
+        QPushButton *closeButton = new QPushButton(tr("Cancel"));
         game_g->initButton(closeButton);
         closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        closeButton->setToolTip("Return to main menu (Escape)");
+        closeButton->setToolTip(tr("Return to main menu (Escape)"));
 #endif
         closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(closeButton);
