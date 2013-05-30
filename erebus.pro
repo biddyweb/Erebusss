@@ -173,3 +173,4 @@ OTHER_FILES += \
     data/quest_test.xml
 
 RESOURCES +=
+TRANSLATIONS=ts/erebus_fr.ts

@@ -51,6 +51,13 @@ int main(int argc, char *argv[])
         QApplication::addLibraryPath(path.absolutePath());
     }
 
+    // Translation
+    QString locale = QLocale::system().name().section('_', 0, 0);
+    qDebug("locale: %s", locale.toStdString().c_str());
+    QTranslator translator;
+    translator.load(QString("ts/erebus_") + locale);
+    app.installTranslator(&translator);
+
     bool fullscreen = true;
     bool runtests = false;
     bool help = false;
