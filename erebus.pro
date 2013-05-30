@@ -9,7 +9,8 @@ android {
     dir2.source = docs
     dir3.source = gfx
     dir4.source = sound
-    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4
+    dir5.source = ts
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5
 }
 else:symbian {
     # no music on Symbian, to reduce file size
@@ -17,15 +18,17 @@ else:symbian {
     dir2.source = docs
     dir3.source = gfx
     dir4.source = sound
-    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4
+    dir5.source = ts
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5
 }
 else {
     dir1.source = data
     dir2.source = docs
     dir3.source = gfx
     dir4.source = sound
-    dir5.source = music
-    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5
+    dir5.source = ts
+    dir6.source = music
+    DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5 dir6
 }
 
 QT += webkit
