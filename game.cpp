@@ -531,28 +531,6 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
         this->lighting_enabled = lighting_enabled_i != 0;
     }
 
-    /*int difficulty_i = settings->value(difficulty_key_c, default_difficulty_c).toInt(&ok);
-    if( !ok ) {
-        qDebug("settings difficulty not ok, set to default");
-        this->difficulty = default_difficulty_c;
-    }
-    else {
-        this->difficulty = (Difficulty)difficulty_i;
-    }*/
-    /*string difficulty_s = settings->value(difficulty_key_c, getDifficultyString(default_difficulty_c)).toString().toStdString();
-    bool done_difficulty = false;
-    for(int i=0;i<N_DIFFICULTY && !done_difficulty;i++) {
-        Difficulty test_difficulty = (Difficulty)i;
-        if( difficulty_s = getDifficultyString(test_difficulty) ) {
-            done_difficulty = true;
-            this->difficulty = test_difficulty;
-        }
-    }
-    if( !done_difficulty ) {
-        qDebug("settings difficulty not ok, set to default");
-        this->difficulty = default_difficulty_c;
-    }*/
-
     // initialise paths
     // n.b., not safe to use logging until after copied/removed old log files!
     QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
