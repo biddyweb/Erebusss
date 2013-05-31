@@ -36,4 +36,7 @@ xcopy %src%\sound %dst%\sound /E /Y
 mkdir %dst%\music
 xcopy %src%\music %dst%\music /E /Y
 
+mkdir %dst%\ts\
+copy %src%\ts\ %dst%\ts\
+
 REM exit

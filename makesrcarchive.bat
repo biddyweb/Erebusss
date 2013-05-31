@@ -82,4 +82,7 @@ xcopy %src%\music %dst%\music /E /Y
 mkdir %dst%\android
 xcopy %src%\android %dst%\android /E /Y
 
+mkdir %dst%\ts\
+copy %src%\ts\ %dst%\ts\
+
 REM exit
