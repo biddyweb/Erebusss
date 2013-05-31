@@ -503,34 +503,6 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 
     webViewEventFilter = new WebViewEventFilter(this);
 
-    bool ok = true;
-
-    /*int sound_enabled_i = settings->value(sound_enabled_key_c, default_sound_enabled_c).toInt(&ok);
-    if( !ok ) {
-        qDebug("settings sound_enabled not ok, set to default");
-        this->sound_enabled = default_sound_enabled_c;
-    }
-    else {
-        this->sound_enabled = sound_enabled_i != 0;
-    }*/
-    int sound_volume_i = settings->value(sound_volume_key_c, default_sound_volume_c).toInt(&ok);
-    if( !ok ) {
-        qDebug("settings sound_volume not ok, set to default");
-        this->sound_volume = default_sound_volume_c;
-    }
-    else {
-        this->sound_volume = sound_volume_i;
-    }
-
-    int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
-    if( !ok ) {
-        qDebug("settings lighting_enabled not ok, set to default");
-        this->lighting_enabled = default_lighting_enabled_c;
-    }
-    else {
-        this->lighting_enabled = lighting_enabled_i != 0;
-    }
-
     // initialise paths
     // n.b., not safe to use logging until after copied/removed old log files!
     QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -594,6 +566,26 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 #else
     LOG("Platform: UNKNOWN\n");
 #endif
+
+    bool ok = true;
+
+    int sound_volume_i = settings->value(sound_volume_key_c, default_sound_volume_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings sound_volume not ok, set to default");
+        this->sound_volume = default_sound_volume_c;
+    }
+    else {
+        this->sound_volume = sound_volume_i;
+    }
+
+    int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings lighting_enabled not ok, set to default");
+        this->lighting_enabled = default_lighting_enabled_c;
+    }
+    else {
+        this->lighting_enabled = lighting_enabled_i != 0;
+    }
 
     QString savegame_path = getApplicationFilename(savegame_folder);
     if( !QDir(savegame_path).exists() ) {
