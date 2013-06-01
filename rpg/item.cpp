@@ -44,7 +44,7 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         LOG("Character: %s drinks potion of healing, heal %d\n", character->getName().c_str(), amount);
         character->increaseHealth( amount );
         LOG("    health is now: %d\n", character->getHealth());
-        playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
+        playing_gamestate->addTextEffect(playing_gamestate->tr("Gulp!").toStdString(), character->getPos(), 1000);
         if( character == playing_gamestate->getPlayer() ) {
             playing_gamestate->playSound("drink");
         }
@@ -74,7 +74,7 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
             ProfileEffect profile_effect(potion_profile, this->arg1);
             character->addProfileEffect(profile_effect);
         }
-        playing_gamestate->addTextEffect("Gulp!", character->getPos(), 1000);
+        playing_gamestate->addTextEffect(playing_gamestate->tr("Gulp!").toStdString(), character->getPos(), 1000);
         if( character == playing_gamestate->getPlayer() ) {
             playing_gamestate->playSound("drink");
         }
@@ -85,7 +85,7 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         LOG("Character: %s uses harmful item, damage %d\n", character->getName().c_str(), amount);
         character->decreaseHealth(playing_gamestate, amount, false, false);
         LOG("    health is now: %d\n", character->getHealth());
-        playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
+        playing_gamestate->addTextEffect(playing_gamestate->tr("Yuck!").toStdString(), character->getPos(), 1000);
         return true;
     }
     else if( this->use == "ITEMUSE_MUSHROOM" ) {
@@ -97,7 +97,7 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
             LOG("    heal %d\n", amount);
             character->increaseHealth( amount );
             LOG("    health is now: %d\n", character->getHealth());
-            playing_gamestate->addTextEffect("Yum!", character->getPos(), 1000);
+            playing_gamestate->addTextEffect(playing_gamestate->tr("Yum!").toStdString(), character->getPos(), 1000);
         }
         else {
             // harms
@@ -105,7 +105,7 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
             LOG("    harm %d\n", amount);
             character->decreaseHealth(playing_gamestate, amount, false, false);
             LOG("    health is now: %d\n", character->getHealth());
-            playing_gamestate->addTextEffect("Yuck!", character->getPos(), 1000);
+            playing_gamestate->addTextEffect(playing_gamestate->tr("Yuck!").toStdString(), character->getPos(), 1000);
         }
         return true;
     }

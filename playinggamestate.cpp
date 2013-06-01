@@ -7259,7 +7259,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
                     done = true;
                     LOG("interact_type: %s\n", scenery->getInteractType().c_str());
                     string dialog_text;
-                    vector<string> options = scenery->getInteractionText(&dialog_text);
+                    vector<string> options = scenery->getInteractionText(this, &dialog_text);
                     if( options.size() == 0 ) {
                         // auto-interact
                         scenery->interact(this, 0);

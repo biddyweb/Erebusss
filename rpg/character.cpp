@@ -362,12 +362,12 @@ void Character::hitEnemy(PlayingGamestate *playing_gamestate, Character *source,
     // source may be NULL, if attacker is no longer alive (for ranged attacks)
     if( weapon_no_effect_magical ) {
         if( source == playing_gamestate->getPlayer() ) {
-            playing_gamestate->addTextEffect("Weapon has no effect!", source->getPos(), 2000, 255, 0, 0);
+            playing_gamestate->addTextEffect(playing_gamestate->tr("Weapon has no effect!").toStdString(), source->getPos(), 2000, 255, 0, 0);
         }
     }
     else if( weapon_no_effect_holy ) {
         if( source == playing_gamestate->getPlayer() ) {
-            playing_gamestate->addTextEffect("Holy weapon has no effect!", source->getPos(), 2000, 255, 0, 0);
+            playing_gamestate->addTextEffect(playing_gamestate->tr("Holy weapon has no effect!").toStdString(), source->getPos(), 2000, 255, 0, 0);
         }
     }
     else if( weapon_damage > 0 ) {
@@ -663,7 +663,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                                     // infect!
                                                     target_npc->setDiseased(true);
                                                     if( target_npc == playing_gamestate->getPlayer() ) {
-                                                        playing_gamestate->addTextEffect("You have been infected with a disease!", playing_gamestate->getPlayer()->getPos(), 5000);
+                                                        playing_gamestate->addTextEffect(playing_gamestate->tr("You have been infected with a disease!").toStdString(), playing_gamestate->getPlayer()->getPos(), 5000);
                                                     }
                                                 }
                                             }
@@ -675,7 +675,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                                     // paralyse!
                                                     target_npc->paralyse(5000);
                                                     if( target_npc == playing_gamestate->getPlayer() ) {
-                                                        playing_gamestate->addTextEffect("You are paralysed by the enemy!", playing_gamestate->getPlayer()->getPos(), 5000);
+                                                        playing_gamestate->addTextEffect(playing_gamestate->tr("You are paralysed by the enemy!").toStdString(), playing_gamestate->getPlayer()->getPos(), 5000);
                                                     }
                                                 }
                                             }
@@ -697,7 +697,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         if( this->findAmmo(ammo_key) == NULL && this == playing_gamestate->getPlayer() ) {
                                             // really has used up all available ammo
                                             LOG("Character %s has run out of ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                            playing_gamestate->addTextEffect(playing_gamestate->tr("Run out of").toStdString() + " " + ammo_key + "!", this->getPos(), 1000);
                                             this->armWeapon(NULL); // disarm it
                                         }
                                     }
@@ -735,7 +735,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         if( this == playing_gamestate->getPlayer() ) {
                                             // this case occurs if the player arms a ranged weapon without having any ammo (as opposed to the check below, where we check for running out of ammo after firing)
                                             //LOG("Character %s has no ammo: %s\n", this->getName().c_str(), ammo_key.c_str());
-                                            playing_gamestate->addTextEffect("Run out of " + ammo_key + "!", this->getPos(), 1000);
+                                            playing_gamestate->addTextEffect(playing_gamestate->tr("Run out of").toStdString() + " " + ammo_key + "!", this->getPos(), 1000);
                                         }
                                         // for NPCs, this shouldn't happen, but put this check just in case!
                                         can_hit = false;
@@ -745,7 +745,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                 if( can_hit && this->tooWeakForWeapon() ) {
                                     can_hit = false;
                                     if( this == playing_gamestate->getPlayer() ) {
-                                        playing_gamestate->addTextEffect("You are not strong enough to use this weapon!", this->getPos(), 1000);
+                                        playing_gamestate->addTextEffect(playing_gamestate->tr("You are not strong enough to use this weapon!").toStdString(), this->getPos(), 1000);
                                         this->armWeapon(NULL); // disarm it
                                     }
                                 }

@@ -84,10 +84,10 @@ bool Scenery::isOn(const Character *character) const {
     return false;
 }
 
-vector<string> Scenery::getInteractionText(string *dialog_text) const {
+vector<string> Scenery::getInteractionText(PlayingGamestate *playing_gamestate, string *dialog_text) const {
     vector<string> options;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?";
+        *dialog_text = playing_gamestate->tr("One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?").toStdString();
         options.push_back("Yes, sit on the throne.");
         options.push_back("No.");
     }

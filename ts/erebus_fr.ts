@@ -27,6 +27,60 @@ Erebus is still under development, with more quests planned to be added in futur
     </message>
 </context>
 <context>
+    <name>Character</name>
+    <message>
+        <location filename="../rpg/character.cpp" line="365"/>
+        <source>Weapon has no effect!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="370"/>
+        <source>Holy weapon has no effect!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="666"/>
+        <source>You have been infected with a disease!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="678"/>
+        <source>You are paralysed by the enemy!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="700"/>
+        <location filename="../rpg/character.cpp" line="738"/>
+        <source>Run out of</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="748"/>
+        <source>You are not strong enough to use this weapon!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Item</name>
+    <message>
+        <location filename="../rpg/item.cpp" line="47"/>
+        <location filename="../rpg/item.cpp" line="77"/>
+        <source>Gulp!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/item.cpp" line="88"/>
+        <location filename="../rpg/item.cpp" line="108"/>
+        <source>Yuck!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/item.cpp" line="100"/>
+        <source>Yum!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ItemsPickerWindow</name>
     <message>
         <location filename="../playinggamestate.cpp" line="1784"/>
@@ -708,6 +762,16 @@ too heavy for you to move!</source>
     <message>
         <location filename="../playinggamestate.cpp" line="2530"/>
         <source>Are you sure you wish to overwrite an existing save game file?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Scenery</name>
+    <message>
+        <location filename="../rpg/location.cpp" line="90"/>
+        <source>One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.
+
+Do you wish to sit on the throne?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

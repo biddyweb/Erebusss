@@ -346,7 +346,7 @@ public:
         return this->opened;
     }
     bool isOn(const Character *character) const;
-    vector<string> getInteractionText(string *dialog_text) const;
+    vector<string> getInteractionText(PlayingGamestate *playing_gamestate, string *dialog_text) const;
     void interact(PlayingGamestate *playing_gamestate, int option);
     void setTrap(Trap *trap);
     Trap *getTrap() const {
