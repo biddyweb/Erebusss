@@ -218,8 +218,8 @@ void OptionsGamestate::clickedStart() {
                 gametypeComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
 #endif
                 gametypeComboBox->setFont(game_g->getFontBig());
-                gametypeComboBox->addItem("Begin Campaign");
-                gametypeComboBox->addItem("Random Dungeon");
+                gametypeComboBox->addItem(tr("Begin Campaign"));
+                gametypeComboBox->addItem(tr("Random Dungeon"));
                 gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
                 g_layout->addWidget(gametypeComboBox, n_row, 1);
                 n_row++;
@@ -271,7 +271,7 @@ void OptionsGamestate::clickedStart() {
             g_layout->addWidget(difficultyComboBox, n_row, 1);
             n_row++;
 
-            label = new QLabel("Permadeath: ");
+            label = new QLabel(tr("Permadeath: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
 #ifdef Q_OS_ANDROID
             permadeathCheckBox = new QCheckBox("        "); // needed for workaround due to Android bug
@@ -279,7 +279,7 @@ void OptionsGamestate::clickedStart() {
 #else
             permadeathCheckBox = new QCheckBox("");
 #endif
-            permadeathCheckBox->setToolTip("If checked, then once your player dies,\nyou won't be able to restore from a save game!");
+            permadeathCheckBox->setToolTip(tr("If checked, then once your player dies,\nyou won't be able to restore from a save game!"));
             g_layout->addWidget(permadeathCheckBox, n_row, 1);
             n_row++;
         }
@@ -394,7 +394,7 @@ void OptionsGamestate::clickedLoad() {
         layout->addWidget(load_list);
         load_list->setCurrentRow(0);
 
-        QPushButton *loadButton = new QPushButton("Load");
+        QPushButton *loadButton = new QPushButton(tr("Load"));
         game_g->initButton(loadButton);
         loadButton->setShortcut(QKeySequence(Qt::Key_Return));
         //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -403,12 +403,12 @@ void OptionsGamestate::clickedLoad() {
 
     }
     else {
-        QLabel *label = new QLabel("No save game files\navailable");
+        QLabel *label = new QLabel(tr("No save game files\navailable"));
         label->setAlignment(Qt::AlignCenter);
         layout->addWidget(label);
     }
 
-    QPushButton *closeButton = new QPushButton("Cancel");
+    QPushButton *closeButton = new QPushButton(tr("Cancel"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -450,7 +450,7 @@ void OptionsGamestate::clickedOptions() {
         QGridLayout *g_layout = new QGridLayout();
         layout->addLayout(g_layout);
 
-        QLabel *label = new QLabel("Volume: ");
+        QLabel *label = new QLabel(tr("Volume: "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
         soundSlider = new QSlider(Qt::Horizontal);
         soundSlider->setMinimum(0);
@@ -459,7 +459,7 @@ void OptionsGamestate::clickedOptions() {
         g_layout->addWidget(soundSlider, n_row, 1);
         n_row++;
 
-        label = new QLabel("Lighting (uncheck if too slow): ");
+        label = new QLabel(tr("Lighting (uncheck if too slow): "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
 #ifdef Q_OS_ANDROID
         lightingCheck = new QCheckBox("        "); // needed for workaround due to Android bug
@@ -472,14 +472,14 @@ void OptionsGamestate::clickedOptions() {
         n_row++;
     }
 
-    QPushButton *okayButton = new QPushButton("Okay");
+    QPushButton *okayButton = new QPushButton(tr("Okay"));
     game_g->initButton(okayButton);
     okayButton->setShortcut(QKeySequence(Qt::Key_Return));
     okayButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(okayButton);
     connect(okayButton, SIGNAL(clicked()), this, SLOT(clickedOptionsOkay()));
 
-    QPushButton *closeButton = new QPushButton("Cancel");
+    QPushButton *closeButton = new QPushButton(tr("Cancel"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -532,7 +532,7 @@ void OptionsGamestate::clickedOfflineHelp() {
     help->show();
     layout->addWidget(help);
 
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *closeButton = new QPushButton(tr("Close"));
     game_g->initButton(closeButton);
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //closeButton->setFont(game_g->getFontSmall());

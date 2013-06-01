@@ -69,6 +69,16 @@
         <translation>Selection du type de jeux: </translation>
     </message>
     <message>
+        <location filename="../optionsgamestate.cpp" line="221"/>
+        <source>Begin Campaign</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="222"/>
+        <source>Random Dungeon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../optionsgamestate.cpp" line="232"/>
         <source>Choose game settings: </source>
         <translation type="unfinished"></translation>
@@ -81,6 +91,17 @@
     <message>
         <location filename="../optionsgamestate.cpp" line="258"/>
         <source>Difficulty: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="274"/>
+        <source>Permadeath: </source>
+        <translation>Permadeath: </translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="282"/>
+        <source>If checked, then once your player dies,
+you won&apos;t be able to restore from a save game!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -100,6 +121,8 @@
     </message>
     <message>
         <location filename="../optionsgamestate.cpp" line="329"/>
+        <location filename="../optionsgamestate.cpp" line="411"/>
+        <location filename="../optionsgamestate.cpp" line="482"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -107,6 +130,37 @@
         <location filename="../optionsgamestate.cpp" line="334"/>
         <source>Return to main menu (Escape)</source>
         <translation>Retourner au menu principale (Echap)</translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="397"/>
+        <source>Load</source>
+        <translation>Charger jeux</translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="406"/>
+        <source>No save game files
+available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="453"/>
+        <source>Volume: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="462"/>
+        <source>Lighting (uncheck if too slow): </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="475"/>
+        <source>Okay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../optionsgamestate.cpp" line="535"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
