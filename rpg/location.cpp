@@ -88,49 +88,49 @@ vector<string> Scenery::getInteractionText(PlayingGamestate *playing_gamestate, 
     vector<string> options;
     if( this->interact_type == "INTERACT_TYPE_THRONE_FP" ) {
         *dialog_text = playing_gamestate->tr("One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.\n\nDo you wish to sit on the throne?").toStdString();
-        options.push_back("Yes, sit on the throne.");
-        options.push_back("No.");
+        options.push_back(playing_gamestate->tr("Yes, sit on the throne.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_GOLD" ) {
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\n\nDo you wish to sit on the throne?";
-        options.push_back("Yes, sit on the throne.");
-        options.push_back("No.");
+        *dialog_text = playing_gamestate->tr("One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.\n\nDo you wish to sit on the throne?").toStdString();
+        options.push_back(playing_gamestate->tr("Yes, sit on the throne.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_M" ) {
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\n\nDo you wish to sit on the throne?";
-        options.push_back("Yes, sit on the throne.");
-        options.push_back("No.");
+        *dialog_text = playing_gamestate->tr("One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.\n\nDo you wish to sit on the throne?").toStdString();
+        options.push_back(playing_gamestate->tr("Yes, sit on the throne.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_THRONE_H" ) {
-        *dialog_text = "One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\n\nDo you wish to sit on the throne?";
-        options.push_back("Yes, sit on the throne.");
-        options.push_back("No.");
+        *dialog_text = playing_gamestate->tr("One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.\n\nDo you wish to sit on the throne?").toStdString();
+        options.push_back(playing_gamestate->tr("Yes, sit on the throne.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
-        *dialog_text = "An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?";
-        options.push_back("Yes, pray.");
-        options.push_back("No.");
+        *dialog_text = playing_gamestate->tr("An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?").toStdString();
+        options.push_back(playing_gamestate->tr("Yes, pray.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_BELL" ) {
-        *dialog_text = "A large bell hangs here. Do you want to try ringing it?";
-        options.push_back("Yes, ring the bell.");
-        options.push_back("No.");
+        *dialog_text = playing_gamestate->tr("A large bell hangs here. Do you want to try ringing it?").toStdString();
+        options.push_back(playing_gamestate->tr("Yes, ring the bell.").toStdString());
+        options.push_back(playing_gamestate->tr("No.").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY" ) {
-        *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.";
-        options.push_back("Okay");
+        *dialog_text = playing_gamestate->tr("A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.").toStdString();
+        options.push_back(playing_gamestate->tr("Okay").toStdString());
     }
     else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER" ) {
         if( this->interact_state == 0 ) {
-            *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, suddenly the shape of a figure appears! It speaks, in a quiet, drawn out voice - \"Please...,\" it begs to you, \"End my suffering\".\n\nYou see that the glass chamber has a panel at the bottom with two buttons, red and green. You could press one - although you could also try smashing the glass.";
-            options.push_back("Press the red button.");
-            options.push_back("Press the green button.");
-            options.push_back("Smash the glass.");
-            options.push_back("Leave the creature to suffer.");
+            *dialog_text = playing_gamestate->tr("A large glass chamber filled with a murky liquid. As you look closely, suddenly the shape of a figure appears! It speaks, in a quiet, drawn out voice - \"Please...,\" it begs to you, \"End my suffering\".\n\nYou see that the glass chamber has a panel at the bottom with two buttons, red and green. You could press one - although you could also try smashing the glass.").toStdString();
+            options.push_back(playing_gamestate->tr("Press the red button.").toStdString());
+            options.push_back(playing_gamestate->tr("Press the green button.").toStdString());
+            options.push_back(playing_gamestate->tr("Smash the glass.").toStdString());
+            options.push_back(playing_gamestate->tr("Leave the creature to suffer.").toStdString());
         }
         else {
-            *dialog_text = "A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.";
-            options.push_back("Okay");
+            *dialog_text = playing_gamestate->tr("A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.").toStdString();
+            options.push_back(playing_gamestate->tr("Okay").toStdString());
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_PAINTING_SHATTER" ) {
@@ -149,7 +149,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
-            result_text = "As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!";
+            result_text = playing_gamestate->tr("As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!").toStdString();
             //int FP = playing_gamestate->getPlayer()->getFP();
             //playing_gamestate->getPlayer()->setFP( FP + 1 );
             //playing_gamestate->getPlayer()->changeBaseFP(1);
@@ -160,7 +160,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             playing_gamestate->getPlayer()->addProfileEffect(profile_effect);
         }
         else {
-            result_text = "As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.\nThen everything goes dark...";
+            result_text = playing_gamestate->tr("As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.\nThen everything goes dark...").toStdString();
             playing_gamestate->getPlayer()->kill(playing_gamestate);
         }
     }
@@ -168,16 +168,16 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
-            result_text = "As you sit, you suddenly feel something magically appear in your hands. Gold - 50 gold pieces!";
+            result_text = playing_gamestate->tr("As you sit, you suddenly feel something magically appear in your hands. Gold - 50 gold pieces!").toStdString();
             playing_gamestate->getPlayer()->addGold(50);
         }
         else {
             if( playing_gamestate->getPlayer()->getGold() > 0 ) {
-                result_text = "You sit, but nothing seems to happen this time. It is only later that you notice your gold has crumbled into a fine worthless dust!";
+                result_text = playing_gamestate->tr("You sit, but nothing seems to happen this time. It is only later that you notice your gold has crumbled into a fine worthless dust!").toStdString();
                 playing_gamestate->getPlayer()->setGold(0);
             }
             else {
-                result_text = "You sit, but nothing seems to happen this time.";
+                result_text = playing_gamestate->tr("You sit, but nothing seems to happen this time.").toStdString();
             }
         }
     }
@@ -185,7 +185,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         //dialog_title = "Throne";
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
-            result_text = "As you sit, you see a flash before your eyes. You have gained great intellectual insight!";
+            result_text = playing_gamestate->tr("As you sit, you see a flash before your eyes. You have gained great intellectual insight!").toStdString();
             //int M = playing_gamestate->getPlayer()->getMind();
             //playing_gamestate->getPlayer()->setMind( M + 1 );
             //playing_gamestate->getPlayer()->changeBaseM(1);
@@ -196,7 +196,7 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             playing_gamestate->getPlayer()->addProfileEffect(profile_effect);
         }
         else {
-            result_text = "As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!\nYour adventure ends here.";
+            result_text = playing_gamestate->tr("As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!\nYour adventure ends here.").toStdString();
             playing_gamestate->getPlayer()->kill(playing_gamestate);
         }
     }
@@ -205,38 +205,38 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         if( this->interact_state == 0 ) {
             if( playing_gamestate->getPlayer()->getHealth() < playing_gamestate->getPlayer()->getMaxHealth() ) {
                 this->interact_state = 1; // only set the state once the health benefit is used
-                result_text = "As you sit, you feel energy rush into you, and you see your wounds magically close up before your eyes!";
+                result_text = playing_gamestate->tr("As you sit, you feel energy rush into you, and you see your wounds magically close up before your eyes!").toStdString();
                 playing_gamestate->getPlayer()->restoreHealth();
             }
             else {
-                result_text = "You sit, but nothing seems to happen.";
+                result_text = playing_gamestate->tr("You sit, but nothing seems to happen.").toStdString();
             }
         }
         else {
-            result_text = "As you sit, you are suddenly gripped by a terrible pain over your entire body. Your watch in horror as old wounds open up before your eyes.";
+            result_text = playing_gamestate->tr("As you sit, you are suddenly gripped by a terrible pain over your entire body. Your watch in horror as old wounds open up before your eyes.").toStdString();
             int damage = rollDice(10, 6, 0);
             playing_gamestate->getPlayer()->decreaseHealth(playing_gamestate, damage, false, false);
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_SHRINE" ) {
-        result_text = "You pray, but nothing seems to happen.";
+        result_text = playing_gamestate->tr("You pray, but nothing seems to happen.").toStdString();
         if( this->interact_state == 0 ) {
             int roll = rollDice(1, 3, 0);
             LOG("shrine: roll a %d\n", roll);
             this->interact_state = 1;
             if( roll == 1 ) {
                 if( playing_gamestate->getPlayer()->getHealth() < playing_gamestate->getPlayer()->getMaxHealth() ) {
-                    result_text = "You have been blessed with healing!";
+                    result_text = playing_gamestate->tr("You have been blessed with healing!").toStdString();
                     playing_gamestate->getPlayer()->restoreHealth();
                 }
             }
             else if( roll == 2 ) {
-                result_text = "You are rewarded by the diety for your courage on this quest, with a gift of gold.";
+                result_text = playing_gamestate->tr("You are rewarded by the diety for your courage on this quest, with a gift of gold.").toStdString();
                 int gold = rollDice(3, 10, 0);
                 playing_gamestate->getPlayer()->addGold(gold);
             }
             else if( roll == 3 ) {
-                result_text = "You are granted the gift of wisdom by the diety.";
+                result_text = playing_gamestate->tr("You are granted the gift of wisdom by the diety.").toStdString();
                 playing_gamestate->getPlayer()->addXP(playing_gamestate, 30);
             }
         }
@@ -250,15 +250,15 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
                 this->interact_state = 1;
                 Character *enemy = NULL;
                 if( roll == 1 ) {
-                    result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                    result_text = playing_gamestate->tr("You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!").toStdString();
                     enemy = playing_gamestate->createCharacter("Goblin", "Goblin");
                 }
                 else if( roll == 2 ) {
-                    result_text = "You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!";
+                    result_text = playing_gamestate->tr("You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!").toStdString();
                     enemy = playing_gamestate->createCharacter("Orc", "Orc");
                 }
                 else if( roll == 3 ) {
-                    result_text = "You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!";
+                    result_text = playing_gamestate->tr("You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!").toStdString();
                     enemy = playing_gamestate->createCharacter("Goblin Mage", "Goblin Mage");
                     enemy->addSpell("Fire bolt", 6);
                 }
@@ -270,11 +270,11 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
                 }
             }
             else {
-                result_text = "You ring the bell, but nothing seems to happen.";
+                result_text = playing_gamestate->tr("You ring the bell, but nothing seems to happen.").toStdString();
             }
         }
         else {
-            result_text = "You ring the bell again, but nothing seems to happen this time.";
+            result_text = playing_gamestate->tr("You ring the bell again, but nothing seems to happen this time.").toStdString();
         }
     }
     else if( this->interact_type == "INTERACT_TYPE_EXPERIMENTAL_CHAMBER_EMPTY" ) {
@@ -284,14 +284,14 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         if( this->interact_state == 0 ) {
             this->interact_state = 1;
             if( option == 0 ) {
-                result_text = "The chamber flashes red. You hear a sudden but short scream from within, then it is over. At last, you have put the poor creature to rest.";
+                result_text = playing_gamestate->tr("The chamber flashes red. You hear a sudden but short scream from within, then it is over. At last, you have put the poor creature to rest.").toStdString();
                 playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
             }
             else if( option == 1 ) {
-                result_text = "You hear strange whirring sounds. After some moments, the chamber starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature's screams. Eventually the sounds subside, and it seem the creature is dead.\n\nYou have at least granted its wish, though you wonder if there was a better way to do it.";
+                result_text = playing_gamestate->tr("You hear strange whirring sounds. After some moments, the chamber starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature's screams. Eventually the sounds subside, and it seem the creature is dead.\n\nYou have at least granted its wish, though you wonder if there was a better way to do it.").toStdString();
             }
             else if( option == 2 ) {
-                result_text = "You smash the glass, and liquid drains out. Some of it spatters on you, causing you pain! The creature also screams as this happens, but then it seems the poor creature has died. At last, you have put the poor creature to rest.";
+                result_text = playing_gamestate->tr("You smash the glass, and liquid drains out. Some of it spatters on you, causing you pain! The creature also screams as this happens, but then it seems the poor creature has died. At last, you have put the poor creature to rest.").toStdString();
                 int damage = rollDice(4, 10, 0);
                 playing_gamestate->getPlayer()->decreaseHealth(playing_gamestate, damage, false, false);
                 playing_gamestate->getPlayer()->addXP(playing_gamestate, 100);
@@ -307,12 +307,12 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
     else if( this->interact_type == "INTERACT_TYPE_PAINTING_SHATTER" ) {
         if( playing_gamestate->getPlayer()->getCurrentWeapon() != NULL ) {
             Item *item = playing_gamestate->getPlayer()->getCurrentWeapon();
-            result_text = "As you cast your eyes on the painting, there is suddenly a smashing sound, and to your amazement, your " + item->getName() + " shatters!";
+            result_text = playing_gamestate->tr("As you cast your eyes on the painting, there is suddenly a smashing sound, and to your amazement, your weapon shatters!").toStdString();
             playing_gamestate->getPlayer()->takeItem(item);
             delete item;
         }
         else {
-            result_text = "You look at the interesting painting.";
+            result_text = playing_gamestate->tr("You look at the interesting painting.").toStdString();
         }
         picture = this->big_image_name;
     }
@@ -359,29 +359,29 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
         //if( rollD + difficulty <= character->getDexterity() ) {
         if( rollD + difficulty <= character->getProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
-            text = "You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!";
+            text = playing_gamestate->tr("You have set off a trap!\nAn arrow shoots out from the wall,\nbut you manage to avoid it!").toStdString();
         }
         else {
             LOG("affected\n");
-            text = "You have set off a trap!\nAn arrow shoots out from the\nwall and hits you!";
+            text = playing_gamestate->tr("You have set off a trap!\nAn arrow shoots out from the\nwall and hits you!").toStdString();
             int damage = rollDice(2, 12, rating-1);
             character->decreaseHealth(playing_gamestate, damage, true, true);
         }
     }
     else if( type == "darts" ) {
-        text = "You have set off a trap!\nDarts shoot out from the wall,\nhitting you multiple times!";
+        text = playing_gamestate->tr("You have set off a trap!\nDarts shoot out from the wall,\nhitting you multiple times!").toStdString();
         int damage = rollDice(rating+1, 12, 0);
         character->decreaseHealth(playing_gamestate, damage, true, true);
     }
     else if( type == "acid" ) {
         if( character->getCurrentShield() != NULL ) {
-            text = "You have set off a trap!\nAcid shoots out from jets in the walls!\nYour shield protects you,\nbut is destroyed in the process.";
+            text = playing_gamestate->tr("You have set off a trap!\nAcid shoots out from jets in the walls!\nYour shield protects you,\nbut is destroyed in the process.").toStdString();
             Item *item = character->getCurrentShield();
             character->takeItem(item);
             delete item;
         }
         else {
-            text = "You have set off a trap!\nA painful acid shoots out\nfrom jets in the walls,\nburning your flesh!";
+            text = playing_gamestate->tr("You have set off a trap!\nA painful acid shoots out\nfrom jets in the walls,\nburning your flesh!").toStdString();
             int damage = rollDice(4, 20, rating);
             character->decreaseHealth(playing_gamestate, damage, false, true);
         }
@@ -389,22 +389,22 @@ void Trap::setOff(PlayingGamestate *playing_gamestate, Character *character) con
     else if( type == "mantrap" ) {
         if( rollD + difficulty <= character->getProfileIntProperty(profile_key_D_c) ) {
             LOG("avoided\n");
-            text = "You manage to avoid the\nvicious bite of a mantrap that\nyou spot laying on the ground!";
+            text = playing_gamestate->tr("You manage to avoid the\nvicious bite of a mantrap that\nyou spot laying on the ground!").toStdString();
         }
         else {
             LOG("affected\n");
-            text = "You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!";
+            text = playing_gamestate->tr("You have set off a trap!\nYou feel agony in your leg, as you realise\nyou have stepped into a mantrap!").toStdString();
             int damage = rollDice(4, 12, rating);
             character->decreaseHealth(playing_gamestate, damage, true, false);
             character->setStateIdle();
         }
     }
     else if( type == "gas" ) {
-        text = "You have set off a trap!\nGas shoots from jets in the wall,\nand suddenly you find you are paralysed!";
+        text = playing_gamestate->tr("You have set off a trap!\nGas shoots from jets in the wall,\nand suddenly you find you are paralysed!").toStdString();
         character->paralyse((rating+1)*1000);
     }
     else if( type == "death" ) {
-        text = "You have set off a trap!\nThe last thing you hear is a\nmassive explosion in your ears!\nA bomb blows your body to pieces...";
+        text = playing_gamestate->tr("You have set off a trap!\nThe last thing you hear is a\nmassive explosion in your ears!\nA bomb blows your body to pieces...").toStdString();
         character->kill(playing_gamestate);
     }
     else {

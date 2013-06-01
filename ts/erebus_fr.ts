@@ -59,6 +59,26 @@ Erebus is still under development, with more quests planned to be added in futur
         <source>You are not strong enough to use this weapon!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="962"/>
+        <source>Argh!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="964"/>
+        <source>Ow!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="966"/>
+        <source>Ouch!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/character.cpp" line="968"/>
+        <source>Eek!</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Item</name>
@@ -774,6 +794,224 @@ too heavy for you to move!</source>
 Do you wish to sit on the throne?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="91"/>
+        <location filename="../rpg/location.cpp" line="96"/>
+        <location filename="../rpg/location.cpp" line="101"/>
+        <location filename="../rpg/location.cpp" line="106"/>
+        <source>Yes, sit on the throne.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="92"/>
+        <location filename="../rpg/location.cpp" line="97"/>
+        <location filename="../rpg/location.cpp" line="102"/>
+        <location filename="../rpg/location.cpp" line="107"/>
+        <location filename="../rpg/location.cpp" line="112"/>
+        <location filename="../rpg/location.cpp" line="117"/>
+        <source>No.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="95"/>
+        <source>One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a gold coin.
+
+Do you wish to sit on the throne?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="100"/>
+        <source>One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an eye.
+
+Do you wish to sit on the throne?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="105"/>
+        <source>One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of an tree.
+
+Do you wish to sit on the throne?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="110"/>
+        <source>An old shrine, to some unknown forgotten diety. The wording on the stone has long since faded away. Do you wish to take a few moments to offer a prayer?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="111"/>
+        <source>Yes, pray.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="115"/>
+        <source>A large bell hangs here. Do you want to try ringing it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="116"/>
+        <source>Yes, ring the bell.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="120"/>
+        <location filename="../rpg/location.cpp" line="132"/>
+        <source>A large glass chamber filled with a murky liquid. As you look closely, you can see dark shapes floating inside, though you are unable to identify them.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="121"/>
+        <location filename="../rpg/location.cpp" line="133"/>
+        <source>Okay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="125"/>
+        <source>A large glass chamber filled with a murky liquid. As you look closely, suddenly the shape of a figure appears! It speaks, in a quiet, drawn out voice - &quot;Please...,&quot; it begs to you, &quot;End my suffering&quot;.
+
+You see that the glass chamber has a panel at the bottom with two buttons, red and green. You could press one - although you could also try smashing the glass.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="126"/>
+        <source>Press the red button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="127"/>
+        <source>Press the green button.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="128"/>
+        <source>Smash the glass.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="129"/>
+        <source>Leave the creature to suffer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="152"/>
+        <source>As you sit, the chair buzzes, and you feel magical energy run into you. Your fighting prowess has increased!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="163"/>
+        <source>As you sit, you hear a click and feel something uncomfortable in your back. You look down in horror to see a knife protruding out from your chest, stained with your blood.
+Then everything goes dark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="171"/>
+        <source>As you sit, you suddenly feel something magically appear in your hands. Gold - 50 gold pieces!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="176"/>
+        <source>You sit, but nothing seems to happen this time. It is only later that you notice your gold has crumbled into a fine worthless dust!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="180"/>
+        <source>You sit, but nothing seems to happen this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="188"/>
+        <source>As you sit, you see a flash before your eyes. You have gained great intellectual insight!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="199"/>
+        <source>As you sit, you see a flash again before your eyes, but this time it is followed by darkness. You rub your eyes, but it remains. As you stand up, you realise you have been blinded!
+Your adventure ends here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="208"/>
+        <source>As you sit, you feel energy rush into you, and you see your wounds magically close up before your eyes!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="212"/>
+        <source>You sit, but nothing seems to happen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="216"/>
+        <source>As you sit, you are suddenly gripped by a terrible pain over your entire body. Your watch in horror as old wounds open up before your eyes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="222"/>
+        <source>You pray, but nothing seems to happen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="229"/>
+        <source>You have been blessed with healing!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="234"/>
+        <source>You are rewarded by the diety for your courage on this quest, with a gift of gold.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="239"/>
+        <source>You are granted the gift of wisdom by the diety.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="253"/>
+        <location filename="../rpg/location.cpp" line="261"/>
+        <source>You ring the bell, which makes an almighty clang. Suddenly a Goblin materialises out of thin air!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="257"/>
+        <source>You ring the bell, which makes an almighty clang. Suddenly an Orc materialises out of thin air!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="273"/>
+        <source>You ring the bell, but nothing seems to happen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="277"/>
+        <source>You ring the bell again, but nothing seems to happen this time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="287"/>
+        <source>The chamber flashes red. You hear a sudden but short scream from within, then it is over. At last, you have put the poor creature to rest.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="291"/>
+        <source>You hear strange whirring sounds. After some moments, the chamber starts to change different colours - green, then blue, then purple, and several more. As this happens, the creature inside starts to scream. The chamber starts to shake, causing a sound that becomes increasingly loud, though it is unable to cover the volume of the poor creature&apos;s screams. Eventually the sounds subside, and it seem the creature is dead.
+
+You have at least granted its wish, though you wonder if there was a better way to do it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="294"/>
+        <source>You smash the glass, and liquid drains out. Some of it spatters on you, causing you pain! The creature also screams as this happens, but then it seems the poor creature has died. At last, you have put the poor creature to rest.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="310"/>
+        <source>As you cast your eyes on the painting, there is suddenly a smashing sound, and to your amazement, your weapon shatters!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="315"/>
+        <source>You look at the interesting painting.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatsWindow</name>
@@ -849,6 +1087,75 @@ Do you wish to sit on the throne?</source>
     <message>
         <location filename="../playinggamestate.cpp" line="1718"/>
         <source>You do not have enough money to purchase this item.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Trap</name>
+    <message>
+        <location filename="../rpg/location.cpp" line="362"/>
+        <source>You have set off a trap!
+An arrow shoots out from the wall,
+but you manage to avoid it!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="366"/>
+        <source>You have set off a trap!
+An arrow shoots out from the
+wall and hits you!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="372"/>
+        <source>You have set off a trap!
+Darts shoot out from the wall,
+hitting you multiple times!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="378"/>
+        <source>You have set off a trap!
+Acid shoots out from jets in the walls!
+Your shield protects you,
+but is destroyed in the process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="384"/>
+        <source>You have set off a trap!
+A painful acid shoots out
+from jets in the walls,
+burning your flesh!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="392"/>
+        <source>You manage to avoid the
+vicious bite of a mantrap that
+you spot laying on the ground!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="396"/>
+        <source>You have set off a trap!
+You feel agony in your leg, as you realise
+you have stepped into a mantrap!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="403"/>
+        <source>You have set off a trap!
+Gas shoots from jets in the wall,
+and suddenly you find you are paralysed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="407"/>
+        <source>You have set off a trap!
+The last thing you hear is a
+massive explosion in your ears!
+A bomb blows your body to pieces...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

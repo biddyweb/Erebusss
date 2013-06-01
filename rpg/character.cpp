@@ -959,13 +959,13 @@ void Character::addPainTextEffect(PlayingGamestate *playing_gamestate) const {
     string text;
     int r = rand() % 4;
     if( r == 0 )
-        text = "Argh!";
+        text = playing_gamestate->tr("Argh!").toStdString();
     else if( r == 1 )
-        text = "Ow!";
+        text = playing_gamestate->tr("Ow!").toStdString();
     else if( r == 2 )
-        text = "Ouch!";
+        text = playing_gamestate->tr("Ouch!").toStdString();
     else
-        text = "Eek!";
+        text = playing_gamestate->tr("Eek!").toStdString();
     playing_gamestate->addTextEffect(text, this->getPos(), 500);
 }
 
