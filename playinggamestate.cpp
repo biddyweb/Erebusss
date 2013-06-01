@@ -969,7 +969,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     label->setHtml(html);
     layout->addWidget(label);
 
-    QPushButton *closeButton = new QPushButton("Continue");
+    QPushButton *closeButton = new QPushButton(tr("Continue"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
@@ -1034,58 +1034,58 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *viewAllButton = new QPushButton("All");
+        QPushButton *viewAllButton = new QPushButton(tr("All"));
         game_g->initButton(viewAllButton);
         viewAllButton->setFont(font_small);
-        viewAllButton->setToolTip("Display all items (F1)");
+        viewAllButton->setToolTip(tr("Display all items (F1)"));
         viewAllButton->setShortcut(QKeySequence(Qt::Key_F1));
         h_layout->addWidget(viewAllButton);
         connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
 
-        QPushButton *viewWeaponsButton = new QPushButton("Wpns");
+        QPushButton *viewWeaponsButton = new QPushButton(tr("Wpns"));
         game_g->initButton(viewWeaponsButton);
         viewWeaponsButton->setFont(font_small);
-        viewWeaponsButton->setToolTip("Display only weapons (F2)");
+        viewWeaponsButton->setToolTip(tr("Display only weapons (F2)"));
         viewWeaponsButton->setShortcut(QKeySequence(Qt::Key_F2));
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
 
-        QPushButton *viewAmmoButton = new QPushButton("Ammo");
+        QPushButton *viewAmmoButton = new QPushButton(tr("Ammo"));
         game_g->initButton(viewAmmoButton);
         viewAmmoButton->setFont(font_small);
-        viewAmmoButton->setToolTip("Display only ammunition (F3)");
+        viewAmmoButton->setToolTip(tr("Display only ammunition (F3)"));
         viewAmmoButton->setShortcut(QKeySequence(Qt::Key_F3));
         h_layout->addWidget(viewAmmoButton);
         connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
 
-        QPushButton *viewShieldsButton = new QPushButton("Shields");
+        QPushButton *viewShieldsButton = new QPushButton(tr("Shields"));
         game_g->initButton(viewShieldsButton);
         viewShieldsButton->setFont(font_small);
-        viewShieldsButton->setToolTip("Display only shields (F4)");
+        viewShieldsButton->setToolTip(tr("Display only shields (F4)"));
         viewShieldsButton->setShortcut(QKeySequence(Qt::Key_F4));
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
-        QPushButton *viewArmourButton = new QPushButton("Arm");
+        QPushButton *viewArmourButton = new QPushButton(tr("Arm"));
         game_g->initButton(viewArmourButton);
         viewArmourButton->setFont(font_small);
-        viewArmourButton->setToolTip("Display only armour (F5)");
+        viewArmourButton->setToolTip(tr("Display only armour (F5)"));
         viewArmourButton->setShortcut(QKeySequence(Qt::Key_F5));
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
 
-        QPushButton *viewMagicButton = new QPushButton("Magic");
+        QPushButton *viewMagicButton = new QPushButton(tr("Magic"));
         game_g->initButton(viewMagicButton);
         viewMagicButton->setFont(font_small);
-        viewMagicButton->setToolTip("Display only magical items (F6)");
+        viewMagicButton->setToolTip(tr("Display only magical items (F6)"));
         viewMagicButton->setShortcut(QKeySequence(Qt::Key_F6));
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
 
-        QPushButton *viewMiscButton = new QPushButton("Misc");
+        QPushButton *viewMiscButton = new QPushButton(tr("Misc"));
         game_g->initButton(viewMiscButton);
         viewMiscButton->setFont(font_small);
-        viewMiscButton->setToolTip("Display only miscellaneous items (F7)");
+        viewMiscButton->setToolTip(tr("Display only miscellaneous items (F7)"));
         viewMiscButton->setShortcut(QKeySequence(Qt::Key_F7));
         h_layout->addWidget(viewMiscButton);
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
@@ -1118,7 +1118,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QLabel *goldLabel = new QLabel("Gold: " + QString::number( player->getGold() ));
+        QLabel *goldLabel = new QLabel(tr("Gold") + ": " + QString::number( player->getGold() ));
         //goldLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed to fix problem of having too little vertical space (on Qt Smartphone Simulator at least)
         h_layout->addWidget(goldLabel);
 
@@ -1134,38 +1134,38 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
         armButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(armButton);
-        armButton->setToolTip("Arm/disarm weapon or shield (Space)");
+        armButton->setToolTip(tr("Arm/disarm weapon or shield (Space)"));
         h_layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
 
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(wearButton);
-        wearButton->setToolTip("Wear/take off armour (Space)");
+        wearButton->setToolTip(tr("Wear/take off armour (Space)"));
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWear()));
 
         useButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(useButton);
-        useButton->setToolTip("Use item (Space)");
+        useButton->setToolTip(tr("Use item (Space)"));
         h_layout->addWidget(useButton);
         connect(useButton, SIGNAL(clicked()), this, SLOT(clickedUseItem()));
 
-        dropButton = new QPushButton("Drop Item");
+        dropButton = new QPushButton(tr("Drop Item"));
         game_g->initButton(dropButton);
-        dropButton->setToolTip("Drop item onto the ground (D))");
+        dropButton->setToolTip(tr("Drop item onto the ground (D))"));
         dropButton->setShortcut(QKeySequence(Qt::Key_D));
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
-        infoButton = new QPushButton("Info");
+        infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
-        infoButton->setToolTip("More information on this item (I))");
+        infoButton->setToolTip(tr("More information on this item (I))"));
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
-    QPushButton *closeButton = new QPushButton("Continue");
+    QPushButton *closeButton = new QPushButton(tr("Continue"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
@@ -1275,10 +1275,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     if( item->getType() == ITEMTYPE_WEAPON ) {
         armButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
-            armButton->setText("Disarm Weapon");
+            armButton->setText(tr("Disarm Weapon"));
         }
         else {
-            armButton->setText("Arm Weapon");
+            armButton->setText(tr("Arm Weapon"));
         }
     }
     else if( item->getType() == ITEMTYPE_AMMO ) {
@@ -1287,7 +1287,7 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         }
         else {
             armButton->setVisible(true);
-            armButton->setText("Select Ammo");
+            armButton->setText(tr("Select Ammo"));
         }
     }
     else if( item->getType() == ITEMTYPE_SHIELD ) {
@@ -1297,10 +1297,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         else {
             armButton->setVisible(true);
             if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
-                armButton->setText("Disarm Shield");
+                armButton->setText(tr("Disarm Shield"));
             }
             else {
-                armButton->setText("Arm Shield");
+                armButton->setText(tr("Arm Shield"));
             }
         }
     }
@@ -1311,19 +1311,19 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     if( item->getType() == ITEMTYPE_ARMOUR ) {
         wearButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
-            wearButton->setText("Take Off Armour");
+            wearButton->setText(tr("Take Off Armour"));
         }
         else {
-            wearButton->setText("Wear Armour");
+            wearButton->setText(tr("Wear Armour"));
         }
     }
     else if( item->getType() == ITEMTYPE_RING ) {
         wearButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentRing() == item ) {
-            wearButton->setText("Take Off Ring");
+            wearButton->setText(tr("Take Off Ring"));
         }
         else {
-            wearButton->setText("Wear Ring");
+            wearButton->setText(tr("Wear Ring"));
         }
     }
     else {
@@ -1538,7 +1538,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QLabel *label = new QLabel("What would you like to buy?");
+        QLabel *label = new QLabel(tr("What would you like to buy?"));
         //label->setWordWrap(true);
         h_layout->addWidget(label);
 
@@ -1555,10 +1555,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QLabel *sellLabel = new QLabel("Your items:");
+        QLabel *sellLabel = new QLabel(tr("Your items:"));
         h_layout->addWidget(sellLabel);
 
-        QLabel *buyLabel = new QLabel("Items to buy:");
+        QLabel *buyLabel = new QLabel(tr("Items to buy:"));
         h_layout->addWidget(buyLabel);
     }
 
@@ -1612,7 +1612,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         for(size_t i=0;i<items.size();i++) {
             const Item *item = items.at(i);
             int cost = costs.at(i);
-            QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(cost) + QString(" gold)");
+            QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(cost) + QString(" " + tr("gold") + ")");
             QListWidgetItem *list_item = new QListWidgetItem(item_str);
             QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
             list_item->setIcon(icon);
@@ -1625,32 +1625,32 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *sellButton = new QPushButton("Sell");
+        QPushButton *sellButton = new QPushButton(tr("Sell"));
         game_g->initButton(sellButton);
         sellButton->setFocusPolicy(Qt::NoFocus);
-        sellButton->setToolTip("Sell the item selected of yours (on the left) (S)");
+        sellButton->setToolTip(tr("Sell the item selected of yours (on the left) (S)"));
         sellButton->setShortcut(QKeySequence(Qt::Key_S));
         h_layout->addWidget(sellButton);
         connect(sellButton, SIGNAL(clicked()), this, SLOT(clickedSell()));
 
-        QPushButton *buyButton = new QPushButton("Buy");
+        QPushButton *buyButton = new QPushButton(tr("Buy"));
         game_g->initButton(buyButton);
         buyButton->setFocusPolicy(Qt::NoFocus);
-        buyButton->setToolTip("Buy the item selected (on the right) (B)");
+        buyButton->setToolTip(tr("Buy the item selected (on the right) (B)"));
         buyButton->setShortcut(QKeySequence(Qt::Key_B));
         h_layout->addWidget(buyButton);
         connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
 
-        QPushButton *infoButton = new QPushButton("Info");
+        QPushButton *infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
         infoButton->setFocusPolicy(Qt::NoFocus);
-        infoButton->setToolTip("Display more information about the selected item for sale (I)");
+        infoButton->setToolTip(tr("Display more information about the selected item for sale (I)"));
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
-    QPushButton *closeButton = new QPushButton("Finish Trading");
+    QPushButton *closeButton = new QPushButton(tr("Finish Trading"));
     game_g->initButton(closeButton);
     closeButton->setFocusPolicy(Qt::NoFocus);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
@@ -1663,7 +1663,7 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
 
 void TradeWindow::updateGoldLabel() {
     Character *player = playing_gamestate->getPlayer();
-    goldLabel->setText("Gold: " + QString::number( player->getGold() ));
+    goldLabel->setText(tr("Gold") + ": " + QString::number( player->getGold() ));
 }
 
 void TradeWindow::setWeightLabel() {
@@ -1675,7 +1675,7 @@ void TradeWindow::setWeightLabel() {
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     buy_cost *= 0.5f;
     //QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
-    QString item_str = playing_gamestate->getItemString(item, false) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
+    QString item_str = playing_gamestate->getItemString(item, false) + QString(" (") + QString::number(buy_cost) + QString(" " + tr("gold") + ")");
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
     if( buy_cost == 0 ) {
         list_item->setTextColor(Qt::gray);
@@ -1715,7 +1715,7 @@ void TradeWindow::clickedBuy() {
     else {
         LOG("not enough money\n");
         //game_g->showInfoDialog("Trade", "You do not have enough money to purchase this item.");
-        playing_gamestate->showInfoDialog("You do not have enough money to purchase this item.");
+        playing_gamestate->showInfoDialog(tr("You do not have enough money to purchase this item.").toStdString());
     }
 }
 
@@ -1746,8 +1746,7 @@ void TradeWindow::clickedSell() {
     }
     /*else {
         // no longer needed, as items that can't be bought are grayed out
-        //game_g->showInfoDialog("Trade", "This shop doesn't buy that item.");
-        playing_gamestate->showInfoDialog("This shop doesn't buy that item.");
+        playing_gamestate->showInfoDialog(tr("This shop doesn't buy that item."));
     }*/
 }
 
@@ -1778,31 +1777,14 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    /*{
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
-
-        QLabel *label = new QLabel("What would you like to buy?");
-        label->setWordWrap(true);
-        h_layout->addWidget(label);
-
-        goldLabel = new QLabel("");
-        h_layout->addWidget(goldLabel);
-        this->updateGoldLabel();
-
-        weightLabel = new QLabel("");
-        h_layout->addWidget(weightLabel);
-        this->setWeightLabel();
-    }*/
-
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QLabel *groundLabel = new QLabel("Items to pick up:");
+        QLabel *groundLabel = new QLabel(tr("Items to pick up:"));
         h_layout->addWidget(groundLabel);
 
-        QLabel *playerLabel = new QLabel("Your items:");
+        QLabel *playerLabel = new QLabel(tr("Your items:"));
         h_layout->addWidget(playerLabel);
     }
 
@@ -1855,28 +1837,28 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *pickUpButton = new QPushButton("Pick Up");
+        QPushButton *pickUpButton = new QPushButton(tr("Pick Up"));
         game_g->initButton(pickUpButton);
-        pickUpButton->setToolTip("Pick up the selected item (Space)");
+        pickUpButton->setToolTip(tr("Pick up the selected item (Space)"));
         pickUpButton->setShortcut(QKeySequence(Qt::Key_Space));
         h_layout->addWidget(pickUpButton);
         connect(pickUpButton, SIGNAL(clicked()), this, SLOT(clickedPickUp()));
 
-        QPushButton *dropButton = new QPushButton("Drop");
+        QPushButton *dropButton = new QPushButton(tr("Drop"));
         game_g->initButton(dropButton);
-        dropButton->setToolTip("Drop the selected item of yours onto the ground");
+        dropButton->setToolTip(tr("Drop the selected item of yours onto the ground"));
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDrop()));
 
-        QPushButton *infoButton = new QPushButton("Info");
+        QPushButton *infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
-        infoButton->setToolTip("Display more information about the selected item (I)");
+        infoButton->setToolTip(tr("Display more information about the selected item (I)"));
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
     }
 
-    QPushButton *closeButton = new QPushButton("Close");
+    QPushButton *closeButton = new QPushButton(tr("Close"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
@@ -2001,8 +1983,8 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
 
     Character *player = playing_gamestate->getPlayer();
 
-    QString text = "You have advanced to level " + QString::number(player->getLevel()) + " (" + QString::number(player->getXP()) + " XP)";
-    text += "\n\n Select " + QString::number(n_level_up_stats_c) + " statistics that you wish to improve:";
+    QString text = tr("You have advanced to level") + " " + QString::number(player->getLevel()) + " (" + QString::number(player->getXP()) + " XP)";
+    text += "\n\n " + tr("Select") + " " + QString::number(n_level_up_stats_c) + " " + tr("statistics that you wish to improve:");
     QLabel *label = new QLabel(text);
     //label->setFont(game_g->getFontSmall());
     label->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
@@ -2018,29 +2000,29 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), row++, 0 );
         // mobile platforms may be too small to fit the labels (e.g., Symbian 640x360)
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("Hand-to-hand combat"), row++, 0 );
+            g_layout->addWidget( new QLabel(tr("Hand-to-hand combat")), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), row++, 0 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("Ranged combat: bows and thrown weapons"), row++, 0 );
+            g_layout->addWidget( new QLabel(tr("Ranged combat: bows and thrown weapons")), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_S_c), row++, 0 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("How strong you are"), row++, 0 );
+            g_layout->addWidget( new QLabel(tr("How strong you are")), row++, 0 );
         }
 
         row = 0;
         g_layout->addWidget( addProfileCheckBox(profile_key_M_c), row++, 1 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("Your mental and psychic abilities"), row++, 1 );
+            g_layout->addWidget( new QLabel(tr("Your mental and psychic abilities")), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_D_c), row++, 1 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("Useful for avoiding traps"), row++, 1 );
+            g_layout->addWidget( new QLabel(tr("Useful for avoiding traps")), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel("Courage against terrifying enemies"), row++, 1 );
+            g_layout->addWidget( new QLabel(tr("Courage against terrifying enemies")), row++, 1 );
         }
     }
 
@@ -2141,7 +2123,7 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         connect(check_box, SIGNAL(stateChanged(int)), this, SLOT(clickedCheckBox(int)));
     }
 
-    closeButton = new QPushButton("Level Up!");
+    closeButton = new QPushButton(tr("Level Up!"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     layout->addWidget(closeButton);
@@ -2237,7 +2219,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 
     QString close_text;
     if( playing_gamestate->getQuest()->isCompleted() && playing_gamestate->isLastQuest() ) {
-        QLabel *label = new QLabel("Congratulations, you have completed all the quests!\n\nErebus is still under development, with more quests planned to be added in future. Thanks for playing!");
+        QLabel *label = new QLabel(tr("Congratulations, you have completed all the quests!\n\nErebus is still under development, with more quests planned to be added in future. Thanks for playing!"));
         label->setFont(game_g->getFontSmall());
         label->setWordWrap(true);
         label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -2246,8 +2228,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
         close_text = "Finish game";
     }
     else {
-        //QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, sell any wares you have, as well as conducting training to improve your skills.");
-        QLabel *label = new QLabel("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, and sell any wares that you have.");
+        QLabel *label = new QLabel(tr("You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, and sell any wares that you have."));
         label->setFont(game_g->getFontSmall());
         label->setWordWrap(true);
         label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -2265,13 +2246,13 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
             connect(shopButton, SIGNAL(clicked()), this, SLOT(clickedShop()));
         }
 
-        /*QPushButton *trainingButton = new QPushButton("Training");
+        /*QPushButton *trainingButton = new QPushButton(tr("Training"));
         game_g->initButton(trainingButton);
         //trainingButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         layout->addWidget(trainingButton);
         connect(trainingButton, SIGNAL(clicked()), this, SLOT(clickedTraining()));*/
 
-        close_text = playing_gamestate->getQuest()->isCompleted() ? "Start next Quest" : "Continue your Quest";
+        close_text = playing_gamestate->getQuest()->isCompleted() ? tr("Start next Quest") : tr("Continue your Quest");
     }
 
     QPushButton *closeButton = new QPushButton(close_text);
@@ -2342,11 +2323,10 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
             QString filename = playing_gamestate->getPermadeathSavefilename();
             LOG("permadeath save mode: save as existing file: %s\n", filename.toUtf8().data());
             if( playing_gamestate->saveGame(filename, true) ) {
-                //playing_gamestate->showInfoDialog("The game has been successfully saved.");
-                playing_gamestate->addTextEffect("The game has been successfully saved", 5000);
+                playing_gamestate->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
             }
             else {
-                game_g->showErrorDialog("Failed to save game!");
+                game_g->showErrorDialog(tr("Failed to save game!").toStdString());
             }
         }
         else {
@@ -2373,7 +2353,7 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    list->addItem("New Save Game File");
+    list->addItem(tr("New Save Game File"));
     save_filenames.push_back(""); // dummy entry
 
     /*QDir dir( QString(game_g->getApplicationFilename(savegame_folder).c_str()) );
@@ -2393,23 +2373,23 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
         QHBoxLayout *h_layout = new QHBoxLayout();
         layout->addLayout(h_layout);
 
-        QPushButton *saveButton = new QPushButton("Save");
+        QPushButton *saveButton = new QPushButton(tr("Save"));
         game_g->initButton(saveButton);
         saveButton->setShortcut(QKeySequence(Qt::Key_Return));
         //saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(saveButton);
         connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
 
-        QPushButton *deleteButton = new QPushButton("Delete File");
+        QPushButton *deleteButton = new QPushButton(tr("Delete File"));
         game_g->initButton(deleteButton);
-        deleteButton->setToolTip("Delete the selected save game file (D)");
+        deleteButton->setToolTip(tr("Delete the selected save game file (D)"));
         deleteButton->setShortcut(QKeySequence(Qt::Key_D));
         //deleteButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(deleteButton);
         connect(deleteButton, SIGNAL(clicked()), this, SLOT(clickedDelete()));
     }
 
-    QPushButton *closeButton = new QPushButton("Cancel");
+    QPushButton *closeButton = new QPushButton(tr("Cancel"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -2444,7 +2424,7 @@ void SaveGameWindow::requestNewSaveGame() {
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
 
-    QLabel *label = new QLabel("Choose a filename:");
+    QLabel *label = new QLabel(tr("Choose a filename:"));
     layout->addWidget(label);
 
     this->edit = new QLineEdit(filename);
@@ -2458,7 +2438,7 @@ void SaveGameWindow::requestNewSaveGame() {
     this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
     connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
-    QPushButton *saveButton = new QPushButton("Save game");
+    QPushButton *saveButton = new QPushButton(tr("Save game"));
     game_g->initButton(saveButton);
     saveButton->setShortcut(QKeySequence(Qt::Key_Return));
     saveButton->setFont(game_g->getFontBig());
@@ -2466,7 +2446,7 @@ void SaveGameWindow::requestNewSaveGame() {
     layout->addWidget(saveButton);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSaveNew()));
 
-    QPushButton *closeButton = new QPushButton("Cancel");
+    QPushButton *closeButton = new QPushButton(tr("Cancel"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setFont(game_g->getFontBig());
@@ -2493,13 +2473,10 @@ void SaveGameWindow::clickedSave() {
         QString filename = save_filenames.at(index);
         LOG("save as existing file: %s\n", filename.toUtf8().data());
         if( playing_gamestate->saveGame(filename, false) ) {
-            //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
-            //playing_gamestate->showInfoDialog("The game has been successfully saved.");
-            //playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
-            playing_gamestate->addTextEffect("The game has been successfully saved", 5000);
+            playing_gamestate->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
         }
         else {
-            game_g->showErrorDialog("Failed to save game!");
+            game_g->showErrorDialog(tr("Failed to save game!").toStdString());
         }
         playing_gamestate->closeAllSubWindows();
     }
@@ -2518,8 +2495,7 @@ void SaveGameWindow::clickedDelete() {
     ASSERT_LOGGER(index >= 0 && index < save_filenames.size());
     if( index >= 1 ) {
         QString filename = save_filenames.at(index);
-        //if( game_g->askQuestionDialog("Delete Save Game", "Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
-        if( playing_gamestate->askQuestionDialog("Are you sure you wish to delete save game: " + filename.toStdString() + "?") ) {
+        if( playing_gamestate->askQuestionDialog(tr("Are you sure you wish to delete save game:").toStdString() + " " + filename.toStdString() + "?") ) {
             LOG("delete existing file: %s\n", filename.toUtf8().data());
             QString full_path = game_g->getApplicationFilename(savegame_folder + filename);
             LOG("full path: %s\n", full_path.toUtf8().data());
@@ -2539,7 +2515,7 @@ void SaveGameWindow::clickedSaveNew() {
     QString filename = this->edit->text();
 
     if( filename.length() == 0 ) {
-        playing_gamestate->showInfoDialog("Please enter a filename.");
+        playing_gamestate->showInfoDialog(tr("Please enter a filename.").toStdString());
         edit->grabKeyboard(); // needed on Symbian at least
     }
     else {
@@ -2551,21 +2527,17 @@ void SaveGameWindow::clickedSaveNew() {
         bool ok = true;
         if( qfile.exists() ) {
             LOG("file exists!\n");
-            //if( !game_g->askQuestionDialog("Save Game", "Are you sure you wish to overwrite an existing save game file?") ) {
-            if( !playing_gamestate->askQuestionDialog("Are you sure you wish to overwrite an existing save game file?") ) {
+            if( !playing_gamestate->askQuestionDialog(tr("Are you sure you wish to overwrite an existing save game file?").toStdString()) ) {
                 LOG("user says to not save\n");
                 ok = false;
             }
         }
         if( ok ) {
             if( playing_gamestate->saveGame(full_path, true) ) {
-                //game_g->showInfoDialog("Saved Game", "The game has been successfully saved.");
-                //playing_gamestate->showInfoDialog("The game has been successfully saved.");
-                //playing_gamestate->addTextEffect("The game has been successfully saved", playing_gamestate->getPlayer()->getPos(), 5000);
-                playing_gamestate->addTextEffect("The game has been successfully saved", 5000);
+                playing_gamestate->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
             }
             else {
-                game_g->showErrorDialog("Failed to save game!");
+                game_g->showErrorDialog(tr("Failed to save game!").toStdString());
             }
         }
         playing_gamestate->closeAllSubWindows();
@@ -2715,62 +2687,62 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QVBoxLayout *v_layout = new QVBoxLayout();
         layout->addLayout(v_layout);
 
-        QPushButton *statsButton = new QPushButton("Stats");
+        QPushButton *statsButton = new QPushButton(tr("Stats"));
         game_g->initButton(statsButton);
         statsButton->setShortcut(QKeySequence(Qt::Key_F1));
-        statsButton->setToolTip("Display statistics of your character (F1)");
+        statsButton->setToolTip(tr("Display statistics of your character (F1)"));
         statsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
         v_layout->addWidget(statsButton);
 
-        QPushButton *itemsButton = new QPushButton("Items");
+        QPushButton *itemsButton = new QPushButton(tr("Items"));
         game_g->initButton(itemsButton);
         itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
-        itemsButton->setToolTip("Display the items that you are carrying (F2)");
+        itemsButton->setToolTip(tr("Display the items that you are carrying (F2)"));
         itemsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
-        /*QPushButton *spellsButton = new QPushButton("Spells");
+        /*QPushButton *spellsButton = new QPushButton(tr("Spells"));
         game_g->initButton(spellsButton);
-        spellsButton->setToolTip("Not supported yet");
+        spellsButton->setToolTip(tr("Not supported yet"));
         spellsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);*/
 
-        QPushButton *journalButton = new QPushButton("Journal");
+        QPushButton *journalButton = new QPushButton(tr("Journal"));
         game_g->initButton(journalButton);
         journalButton->setShortcut(QKeySequence(Qt::Key_F3));
-        journalButton->setToolTip("Displays information about your quests (F3)");
+        journalButton->setToolTip(tr("Displays information about your quests (F3)"));
         journalButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
         v_layout->addWidget(journalButton);
 
-        /*QPushButton *quitButton = new QPushButton("Quit");
+        /*QPushButton *quitButton = new QPushButton(tr("Quit"));
         game_g->initButton(quitButton);
         quitButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         v_layout->addWidget(quitButton);
         connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
 
-        QPushButton *pauseButton = new QPushButton("Pause");
+        QPushButton *pauseButton = new QPushButton(tr("Pause"));
         game_g->initButton(pauseButton);
         pauseButton->setShortcut(QKeySequence(Qt::Key_P));
-        pauseButton->setToolTip("Pause the game (P)");
+        pauseButton->setToolTip(tr("Pause the game (P)"));
         pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
 
-        QPushButton *restButton = new QPushButton("Rest");
+        QPushButton *restButton = new QPushButton(tr("Rest"));
         game_g->initButton(restButton);
         restButton->setShortcut(QKeySequence(Qt::Key_R));
-        restButton->setToolTip("Rest until you are healed (R)");
+        restButton->setToolTip(tr("Rest until you are healed (R)"));
         restButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
 
-        QPushButton *optionsButton = new QPushButton("Options");
+        QPushButton *optionsButton = new QPushButton(tr("Options"));
         game_g->initButton(optionsButton);
         optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
-        optionsButton->setToolTip("Options to save game or quit (Escape)");
+        optionsButton->setToolTip(tr("Options to save game or quit (Escape)"));
         optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
         v_layout->addWidget(optionsButton);
@@ -2793,7 +2765,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                 quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
 #ifndef Q_OS_ANDROID
                 // for some reason, this sometimes shows on Android when it shouldn't?
-                quickSaveButton->setToolTip("Quick-save");
+                quickSaveButton->setToolTip(tr("Quick-save"));
 #endif
                 quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
                 connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
@@ -2805,7 +2777,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            zoomoutButton->setToolTip("Zoom out");
+            zoomoutButton->setToolTip(tr("Zoom out"));
 #endif
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             h_layout->addWidget(zoomoutButton);
@@ -2815,7 +2787,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            zoominButton->setToolTip("Zoom in");
+            zoominButton->setToolTip(tr("Zoom in"));
 #endif
             connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
             h_layout->addWidget(zoominButton);
@@ -2825,7 +2797,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             centreButton->setShortcut(QKeySequence(Qt::Key_C));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            centreButton->setToolTip("Centre view on your player's location");
+            centreButton->setToolTip(tr("Centre view on your player's location"));
 #endif
             centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
@@ -3506,7 +3478,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         turboButton->setMaximumSize(button_size, button_size);
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        turboButton->setToolTip("Toggle turbo mode: make game time go faster (T)");
+        turboButton->setToolTip(tr("Toggle turbo mode: make game time go faster (T)"));
 #endif
         turboButton->setCheckable(true);
         turboToggled(false); // initialise game speed to standard
@@ -3519,7 +3491,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            quickSaveButton->setToolTip("Quick-save (F5)");
+            quickSaveButton->setToolTip(tr("Quick-save (F5)"));
 #endif
             quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             quickSaveButton->setIconSize(QSize(icon_size, icon_size));
@@ -3534,7 +3506,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         zoomoutButton->setShortcut(QKeySequence(Qt::Key_Minus));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        zoomoutButton->setToolTip("Zoom out (-)");
+        zoomoutButton->setToolTip(tr("Zoom out (-)"));
 #endif
         zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         zoomoutButton->setIconSize(QSize(icon_size, icon_size));
@@ -3548,7 +3520,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         zoominButton->setShortcut(QKeySequence(Qt::Key_Plus));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        zoominButton->setToolTip("Zoom in (+)");
+        zoominButton->setToolTip(tr("Zoom in (+)"));
 #endif
         zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         zoominButton->setIconSize(QSize(icon_size, icon_size));
@@ -3562,7 +3534,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         centreButton->setShortcut(QKeySequence(Qt::Key_C));
 #ifndef Q_OS_ANDROID
         // for some reason, this sometimes shows on Android when it shouldn't?
-        centreButton->setToolTip("Centre view on your player's location (C)");
+        centreButton->setToolTip(tr("Centre view on your player's location (C)"));
 #endif
         centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         centreButton->setIconSize(QSize(icon_size, icon_size));
@@ -3797,16 +3769,14 @@ void PlayingGamestate::quickSave() {
     }
     if( !this->permadeath ) {
         if( this->canSaveHere() ) {
-            this->showInfoDialog("You cannot save here - enemies are nearby.");
+            this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
             return;
         }
         if( this->saveGame("quicksave.xml", false) )  {
-            //this->showInfoDialog("The game has been successfully saved.");
-            //this->addTextEffect("The game has been successfully saved", this->getPlayer()->getPos(), 5000);
-            this->addTextEffect("The game has been successfully saved", 5000);
+            this->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
         }
         else {
-            game_g->showErrorDialog("Failed to save game!");
+            game_g->showErrorDialog(tr("Failed to save game!").toStdString());
         }
     }
 }
@@ -4288,11 +4258,11 @@ void PlayingGamestate::setupView() {
     light_source->setZValue(10000.0f);*/
 
     /*{
-        TextEffect *text_effect = new TextEffect("Welcome to Erebus", 1000);
+        TextEffect *text_effect = new TextEffect(tr("Welcome to Erebus"), 1000);
         text_effect->setPos( player->getPos().x, player->getPos().y );
         scene->addItem(text_effect);
     }*/
-    //this->addTextEffect("Welcome to Erebus", player->getPos(), 2000);
+    //this->addTextEffect(tr("Welcome to Erebus"), player->getPos(), 2000);
 
     /*SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
     ps->setBirthRate(1.0f);
@@ -5756,7 +5726,7 @@ void PlayingGamestate::createRandomQuest() {
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
 
-    this->quest->setName("Random dungeon");
+    this->quest->setName(tr("Random dungeon").toStdString());
 
     stringstream str;
     str << "This game type allows you to explore a randomly generated dungeon. Explore the dungeon, kill any monsters you find, and collect the loot!\n\n";
@@ -5938,7 +5908,7 @@ void PlayingGamestate::createRandomQuest() {
         str << "</body></html>";
         this->showInfoWindow(str.str());
 
-        this->writeJournal("<hr/><p><b>Quest Details: ");
+        this->writeJournal("<hr/><p><b>" + tr("Quest Details:").toStdString() + " ");
         this->writeJournal(quest->getName());
         this->writeJournal("</b></p><p>");
         this->writeJournal(quest_info);
@@ -6229,25 +6199,25 @@ void PlayingGamestate::clickedOptions() {
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
 
-    QPushButton *quitButton = new QPushButton("Quit game");
+    QPushButton *quitButton = new QPushButton(tr("Quit game"));
     game_g->initButton(quitButton);
     quitButton->setShortcut(QKeySequence(Qt::Key_Q));
-    quitButton->setToolTip("Quit current game, and return to the main menu (Q)");
+    quitButton->setToolTip(tr("Quit current game, and return to the main menu (Q)"));
     quitButton->setFont(game_g->getFontBig());
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
     connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
 
-    QPushButton *saveButton = new QPushButton("Save game");
+    QPushButton *saveButton = new QPushButton(tr("Save game"));
     game_g->initButton(saveButton);
     saveButton->setShortcut(QKeySequence(Qt::Key_S));
-    saveButton->setToolTip("Save the current game (S)");
+    saveButton->setToolTip(tr("Save the current game (S)"));
     saveButton->setFont(game_g->getFontBig());
     saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(saveButton);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
 
-    QPushButton *closeButton = new QPushButton("Back to game");
+    QPushButton *closeButton = new QPushButton(tr("Back to game"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
     closeButton->setFont(game_g->getFontBig());
@@ -6271,12 +6241,10 @@ int PlayingGamestate::getRestTime() const {
 void PlayingGamestate::clickedRest() {
     LOG("clickedRest()\n");
     if( c_location->hasEnemies(this) ) {
-        //game_g->showInfoDialog("Rest", "You cannot rest here - enemies are nearby.");
-        this->showInfoDialog("You cannot rest here - enemies are nearby.");
+        this->showInfoDialog(tr("You cannot rest here - enemies are nearby.").toStdString());
         return;
     }
-    //if( game_g->askQuestionDialog("Rest", "Rest until fully healed?") ) {
-    if( this->askQuestionDialog("Rest until fully healed?") ) {
+    if( this->askQuestionDialog(tr("Rest until fully healed?").toStdString()) ) {
         bool rest_ok = true;
         if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance() > 0 ) {
             if( rand() % 100 < c_location->getWanderingMonsterRestChance() ) {
@@ -6284,7 +6252,7 @@ void PlayingGamestate::clickedRest() {
                 Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                 if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), true, enemy->canFly()) ) {
                     rest_ok = false;
-                    this->addTextEffect("You are disturbed by a\nwandering monster!", player->getPos(), 2000);
+                    this->addTextEffect(tr("You are disturbed by a\nwandering monster!").toStdString(), player->getPos(), 2000);
                     enemy->setDefaultPosition(free_pvec.x, free_pvec.y);
                     c_location->addCharacter(enemy, free_pvec.x, free_pvec.y);
                 }
@@ -6322,7 +6290,7 @@ bool PlayingGamestate::canSaveHere() {
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
     if( this->canSaveHere() ) {
-        this->showInfoDialog("You cannot save here - enemies are nearby.");
+        this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
         return;
     }
     new SaveGameWindow(this);
@@ -6350,7 +6318,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
     label->setHtml(html.c_str());
     layout->addWidget(label);
 
-    QPushButton *closeButton = new QPushButton("Continue");
+    QPushButton *closeButton = new QPushButton(tr("Continue"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
     closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -6419,8 +6387,7 @@ void PlayingGamestate::closeAllSubWindows() {
 void PlayingGamestate::quitGame() {
     //qApp->quit();
 
-    //if( game_g->askQuestionDialog("Quit", "Are you sure you wish to quit?") ) {
-    if( this->askQuestionDialog("Are you sure you wish to quit?") ) {
+    if( this->askQuestionDialog(tr("Are you sure you wish to quit?").toStdString()) ) {
         GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
         game_g->pushMessage(game_message);
     }
@@ -6557,7 +6524,7 @@ void PlayingGamestate::update() {
                 if( roll > bravery )
                 {
                     player->paralyse(5000);
-                    this->addTextEffect("You are too terrified to move!", player->getPos(), 5000);
+                    this->addTextEffect(tr("You are too terrified to move!").toStdString(), player->getPos(), 5000);
                 }
                 character->setDoneTerror(true);
             }
@@ -7016,7 +6983,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                             talk_items.push_back(talk_item);
                         }
                     }
-                    buttons.push_back("Goodbye");
+                    buttons.push_back(tr("Goodbye").toStdString());
                     InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true, true);
                     this->addWidget(dialog, false);
                     dialog->scrollToBottom();
@@ -7234,7 +7201,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
                     if( scenery->getName() == "Door" ) {
                         this->playSound("door");
                     }
-                    this->addTextEffect("Opening door...", scenery->getPos(), 1000);
+                    this->addTextEffect(tr("Opening door...").toStdString(), scenery->getPos(), 1000);
                     qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
                     c_location->removeScenery(scenery);
                     delete scenery;
@@ -7550,10 +7517,10 @@ void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
     if( dest != player->getPos() ) {
         player->setDestination(dest.x, dest.y, ignore);
         if( player->carryingTooMuch() ) {
-            this->addTextEffect("You are carrying too much weight to move!", player->getPos(), 2000);
+            this->addTextEffect(tr("You are carrying too much weight to move!").toStdString(), player->getPos(), 2000);
         }
         else if( player->tooWeakForArmour() ) {
-            this->addTextEffect("The armour you are wearing is\ntoo heavy for you to move!", player->getPos(), 2000);
+            this->addTextEffect(tr("The armour you are wearing is\ntoo heavy for you to move!").toStdString(), player->getPos(), 2000);
         }
     }
 }
@@ -7605,7 +7572,6 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
                 gfx_item2->setVisible( true );
             }
         }
-        //qDebug("ping");
     }
     //qDebug("updateVisibilityForFloorRegion done");
 }
