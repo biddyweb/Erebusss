@@ -93,6 +93,14 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
     this->setEnabled(true);
 }
 
+void InfoDialog::reject() {
+    // called when pressing Alt+F4 on Windows, Android back button, etc
+    if( this->buttons_list.size() > 0 ) {
+        QPushButton *button = this->buttons_list.at( this->buttons_list.size() - 1 );
+        button->click();
+    }
+}
+
 void InfoDialog::clicked() {
     int result = -1;
     QPushButton *button_sender = static_cast<QPushButton *>(this->sender());
