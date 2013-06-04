@@ -172,7 +172,12 @@ void OptionsGamestate::mediaStateChanged(Phonon::State newstate, Phonon::State o
 
 void OptionsGamestate::quitGame() {
     LOG("OptionsGamestate::quitGame()\n");
-    qApp->quit();
+    if( this->main_stacked_widget->count() > 1 ) {
+        this->closeAllSubWindows();
+    }
+    else {
+        qApp->quit();
+    }
 }
 
 void OptionsGamestate::keyPress(QKeyEvent *key_event) {
