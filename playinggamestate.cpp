@@ -166,6 +166,16 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     return character_action;
 }
 
+void CloseSubWindowWidget::closeEvent(QCloseEvent *event) {
+    event->ignore();
+    playing_gamestate->closeSubWindow();
+}
+
+void CloseAllSubWindowsWidget::closeEvent(QCloseEvent *event) {
+    event->ignore();
+    playing_gamestate->closeAllSubWindows();
+}
+
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
         if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
@@ -859,7 +869,7 @@ void GUIOverlay::setFadeOut() {
 }*/
 
 StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
-    playing_gamestate(playing_gamestate)
+    CloseSubWindowWidget(playing_gamestate)
 {
     playing_gamestate->addWidget(this, true);
 
@@ -1015,7 +1025,7 @@ QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
 }
 
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
-    playing_gamestate(playing_gamestate), list(NULL), weightLabel(NULL),
+    CloseSubWindowWidget(playing_gamestate), list(NULL), weightLabel(NULL),
     armButton(NULL), wearButton(NULL), useButton(NULL), dropButton(NULL), infoButton(NULL),
     view_type(VIEWTYPE_ALL)
 {
@@ -1522,7 +1532,7 @@ void ItemsWindow::itemIsDeleted(size_t index) {
 }
 
 TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const Item *> &items, const vector<int> &costs) :
-    playing_gamestate(playing_gamestate), goldLabel(NULL), weightLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
+    CloseSubWindowWidget(playing_gamestate), goldLabel(NULL), weightLabel(NULL), list(NULL), items(items), costs(costs), player_list(NULL)
 {
     playing_gamestate->addWidget(this, true);
 
@@ -1767,7 +1777,7 @@ void TradeWindow::clickedInfo() {
 }
 
 ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items) :
-    playing_gamestate(playing_gamestate), list(NULL), items(items), player_list(NULL), weightLabel(NULL)
+    CloseSubWindowWidget(playing_gamestate), list(NULL), items(items), player_list(NULL), weightLabel(NULL)
 {
     playing_gamestate->addWidget(this, false);
 
@@ -2316,7 +2326,7 @@ void CampaignWindow::clickedMagicShop() {
 }*/
 
 SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
-    playing_gamestate(playing_gamestate), list(NULL), edit(NULL)
+    CloseAllSubWindowsWidget(playing_gamestate), list(NULL), edit(NULL)
 {
     if( playing_gamestate->isPermadeath() ) {
         if( playing_gamestate->hasPermadeathSavefilename() ) {
@@ -2418,7 +2428,7 @@ void SaveGameWindow::requestNewSaveGame() {
         //filename += date_time.toString();
     }*/
 
-    QWidget *subwindow = new UncloseWidget();
+    QWidget *subwindow = new CloseAllSubWindowsWidget(playing_gamestate);
     playing_gamestate->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -6193,7 +6203,7 @@ void PlayingGamestate::clickedOptions() {
 
     game_g->getScreen()->setPaused(true, true);
 
-    QWidget *subwindow = new UncloseWidget();
+    QWidget *subwindow = new CloseSubWindowWidget(this);
     this->addWidget(subwindow, false);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -6308,7 +6318,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
 
     game_g->getScreen()->setPaused(true, true);
 
-    QWidget *subwindow = new UncloseWidget();
+    QWidget *subwindow = new CloseSubWindowWidget(this);
 
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);

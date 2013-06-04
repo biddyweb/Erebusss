@@ -85,6 +85,26 @@ protected:
 public:
 };
 
+class CloseSubWindowWidget : public QWidget {
+protected:
+    PlayingGamestate *playing_gamestate;
+
+    void closeEvent(QCloseEvent *event);
+public:
+    CloseSubWindowWidget(PlayingGamestate *playing_gamestate) : playing_gamestate(playing_gamestate) {
+    }
+};
+
+class CloseAllSubWindowsWidget : public QWidget {
+protected:
+    PlayingGamestate *playing_gamestate;
+
+    void closeEvent(QCloseEvent *event);
+public:
+    CloseAllSubWindowsWidget(PlayingGamestate *playing_gamestate) : playing_gamestate(playing_gamestate) {
+    }
+};
+
 class TextEffect : public QGraphicsTextItem {
     int time_expire;
     MainGraphicsView *view;
@@ -258,13 +278,10 @@ public:
     }
 };*/
 
-class StatsWindow : public UncloseWidget {
+class StatsWindow : public CloseSubWindowWidget {
     Q_OBJECT
 
-    PlayingGamestate *playing_gamestate;
-
     QString writeStat(const string &stat_key, bool is_float) const;
-private slots:
 
 public:
     StatsWindow(PlayingGamestate *playing_gamestate);
@@ -272,10 +289,9 @@ public:
     }
 };
 
-class ItemsWindow : public UncloseWidget {
+class ItemsWindow : public CloseSubWindowWidget {
     Q_OBJECT
 
-    PlayingGamestate *playing_gamestate;
     QListWidget *list;
     vector<Item *> list_items;
 
@@ -326,10 +342,8 @@ public:
     }
 };
 
-class TradeWindow : public UncloseWidget {
+class TradeWindow : public CloseSubWindowWidget {
     Q_OBJECT
-
-    PlayingGamestate *playing_gamestate;
 
     QLabel *goldLabel;
     QLabel *weightLabel;
@@ -357,10 +371,8 @@ public:
     }
 };
 
-class ItemsPickerWindow : public UncloseWidget {
+class ItemsPickerWindow : public CloseSubWindowWidget {
     Q_OBJECT
-
-    PlayingGamestate *playing_gamestate;
 
     QListWidget *list;
     vector<Item *> items;
@@ -423,10 +435,9 @@ public:
     }
 };
 
-class SaveGameWindow : public UncloseWidget {
+class SaveGameWindow : public CloseAllSubWindowsWidget {
     Q_OBJECT
 
-    PlayingGamestate *playing_gamestate;
     vector<QString> save_filenames;
     ScrollingListWidget *list;
     QLineEdit *edit;
