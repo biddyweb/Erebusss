@@ -397,6 +397,7 @@ QRectF ParticleSystem::boundingRect() const {
     //qDebug("ParticleSystem::boundingRect()");
     /*for(vector<Particle>::const_iterator iter = particles.begin(); iter != particles.end(); ++iter) {
     }*/
+    // Since we update the entire view every frame anyway, it doesn't matter what rect we return - and there's no point trying to return a more optimal rect.
     return QRectF(-100, -100, 200, 200);
 }
 
