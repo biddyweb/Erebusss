@@ -206,6 +206,7 @@
 
 <scenery name="Barrel" image_name="barrel" x="15.5" y="15.0" size="0.8" blocking="true">
     <gold amount="25"/>
+    <item template="Bowl"/>
 </scenery>
 
     <floorregion shape="rect" rect_x="19.6" rect_y="10.5" rect_w="0.8" rect_h="2.0" />
