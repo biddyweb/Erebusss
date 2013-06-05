@@ -58,6 +58,14 @@ Note, this history is only for changes related to the source code. See the Erebu
 0.2 - Switched to using Necessitas alpha 4 for Android.
 0.1 - First release.
 
+Save games
+==========
+
+Save games are stored as xml files in a savegames folder, stored in the application data folder:
+
+* For Windows, in %LOCALAPPDATA%\erebus .
+* For Linux, it should be in $HOME/.local/share/data/erebus
+
 General
 =======
 
@@ -67,4 +75,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 15 April 2013
+Mark Harman 5 June 2013
