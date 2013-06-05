@@ -51,6 +51,7 @@
 <image type="item" name="leaf_dire" filename="gfx/textures/items/leaf_dire.png"/>
 <image type="item" name="orb" filename="gfx/textures/items/orb.png"/>
 <image type="item" name="orb_broken" filename="gfx/textures/items/orb_broken.png"/>
+<image type="item" name="plate" filename="gfx/textures/items/plate.png"/>
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
 <image type="item" name="potion_green" filename="gfx/textures/items/potion_green.png"/>
 <image type="item" name="potion_blue" filename="gfx/textures/items/potion_blue.png"/>

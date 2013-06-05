@@ -123,6 +123,8 @@ A small wooden chess piece, the Knight.
 <item name="Mushroom" image_name="mushroom" icon_width="0.25" weight="0"
     use="ITEMUSE_MUSHROOM" use_verb="Eat"/>
 
+<item name="Plate" image_name="plate" icon_width="0.25" weight="1"/>
+
 <currency name="Gold" image_name="gold"/>
 
 <shop name="Armourer">

@@ -573,6 +573,7 @@ This magical plate armour is as strong as regular plate, but much lighter.
     <item name="Scrying Orb" image_name="orb" icon_width="0.25" weight="2">
 When you stare into this Orb, you see swirling lights of many different colours.
     </item>
+    <item template="Plate"/>
 </scenery>
 
 <npc name="Zombie Champion" template="Zombie Champion" x="37.0" y="27.5"/>

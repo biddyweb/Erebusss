@@ -144,6 +144,7 @@ That's the one! Here, have one of my potions as a reward.
     <gold amount="2"/>
 </scenery>
 <scenery name="Crate" image_name="crate" x="25.5" y="25.5" size="0.8" blocking="true">
+    <item template="Plate"/>
 </scenery>
 <scenery name="Crate" image_name="crate" x="25.5" y="26.5" size="0.8" blocking="true">
     <item template="Gold Ring"/>
