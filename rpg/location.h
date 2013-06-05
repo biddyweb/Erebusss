@@ -59,6 +59,7 @@ protected:
     bool is_door, is_exit;
     string exit_location;
     Vector2D exit_location_pos;
+    int exit_travel_time;
     bool is_locked; // relevant only for some types, e.g., containers, doors
     bool locked_silent; // whether sample is played when trying to unlock
     string locked_text;
@@ -179,15 +180,19 @@ public:
     bool isExit() const {
         return this->is_exit;
     }
-    void setExitLocation(const string &exit_location, Vector2D exit_location_pos) {
+    void setExitLocation(const string &exit_location, Vector2D exit_location_pos, int exit_travel_time) {
         this->exit_location = exit_location;
         this->exit_location_pos = exit_location_pos;
+        this->exit_travel_time = exit_travel_time;
     }
     string getExitLocation() const {
         return this->exit_location;
     }
     Vector2D getExitLocationPos() const {
         return this->exit_location_pos;
+    }
+    int getExitTravelTime() const {
+        return this->exit_travel_time;
     }
 
     void setLocked(bool is_locked) {

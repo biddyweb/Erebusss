@@ -5542,7 +5542,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         float exit_location_x = parseFloat(exit_location_x_s.toString());
                         QStringRef exit_location_y_s = reader.attributes().value("exit_location_y");
                         float exit_location_y = parseFloat(exit_location_y_s.toString());
-                        scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y));
+                        QStringRef exit_travel_time_s = reader.attributes().value("exit_travel_time");
+                        int exit_travel_time = parseInt(exit_travel_time_s.toString(), true);
+                        scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y), exit_travel_time);
                     }
                     scenery->setLocked(locked);
                     scenery->setLockedSilent(locked_silent);
@@ -5867,10 +5869,10 @@ void PlayingGamestate::createRandomQuest() {
             else {
                 // exit to previous level
                 Vector2D previous_exit_down_pos = previous_exit_down->getPos() + Vector2D(1.0f, 0.0f);
-                exit_up->setExitLocation(previous_level_name, previous_exit_down_pos);
+                exit_up->setExitLocation(previous_level_name, previous_exit_down_pos, 0);
 
                 Vector2D exit_up_pos = exit_up->getPos() + Vector2D(1.0f, 0.0f);
-                previous_exit_down->setExitLocation(location->getName(), exit_up_pos);
+                previous_exit_down->setExitLocation(location->getName(), exit_up_pos, 0);
             }
         }
         if( exit_down == NULL ) {
@@ -7254,7 +7256,8 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
                     if( scenery->getName() == "Door" ) {
                         this->playSound("door");
                     }
-                    LOG("clicked on an exit location: %s\n", scenery->getExitLocation().c_str());
+                    this->time_hours += scenery->getExitTravelTime();
+                    LOG("clicked on an exit location: %s travel time %d\n", scenery->getExitLocation().c_str(), scenery->getExitTravelTime());
                     Location *new_location = quest->findLocation(scenery->getExitLocation());
                     ASSERT_LOGGER(new_location != NULL);
                     if( new_location != NULL ) {
@@ -7263,6 +7266,14 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
 #endif
                         this->moveToLocation(new_location, scenery->getExitLocationPos());
                         *move = false;
+                        if( scenery->getExitTravelTime() >= 24 ) {
+                            int travel_time_days = scenery->getExitTravelTime() / 24;
+                            stringstream str;
+                            str << "Journey took " << travel_time_days << " day";
+                            if( travel_time_days > 1 )
+                                str << "s";
+                            this->addTextEffect(str.str(), player->getPos(), 2000);
+                        }
                     }
                 }
                 else if( scenery->getInteractType().length() > 0 ) {
@@ -8294,8 +8305,10 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 stream << " door=\"true\"";
             }
             if( scenery->getExitLocation().length() > 0 ) {
-                //fprintf(file, " exit_location=\"%s\" exit_location_x=\"%f\" exit_location_y=\"%f\"", scenery->getExitLocation().c_str(), scenery->getExitLocationPos().x, scenery->getExitLocationPos().y);
                 stream << " exit_location=\"" << scenery->getExitLocation().c_str() << "\" exit_location_x=\"" << scenery->getExitLocationPos().x << "\" exit_location_y=\"" << scenery->getExitLocationPos().y << "\"";
+                if( scenery->getExitTravelTime() > 0 ) {
+                    stream << " exit_travel_time=\"" << scenery->getExitTravelTime() << "\"";
+                }
             }
             if( scenery->isLocked() ) {
                 //fprintf(file, " locked=\"true\"");
@@ -8330,7 +8343,6 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 stream << " unlock_xp=\"" << scenery->getUnlockXP() << "\"";
             }
             if( scenery->getConfirmText().length() > 0 ) {
-                //fprintf(file, " confirm_text=\"%s\"", scenery->getConfirmText().c_str());
                 stream << " confirm_text=\"" << scenery->getConfirmText().c_str() << "\"";
             }
             //fprintf(file, ">");

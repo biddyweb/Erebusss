@@ -73,7 +73,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
-<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0"
+<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
     confirm_text="Do you wish to travel east to the village of Middleham?"
     requires_flag="borin_reveal_exit"
 />
@@ -606,7 +606,7 @@ When you stare into this Orb, you see swirling lights of many different colours.
 
 <!--<npc name="Skeleton" template="Skeleton" x="21.0" y="22.0"/>-->
 
-<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0"
+<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Axbury?"
 />
 
