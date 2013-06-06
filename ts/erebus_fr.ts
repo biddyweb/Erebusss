@@ -165,7 +165,7 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
     <message>
         <location filename="../playinggamestate.cpp" line="1055"/>
         <source>Wpns</source>
-        <translation>Armes</translation>
+        <translation>Arm</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="1058"/>
@@ -175,7 +175,7 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
     <message>
         <location filename="../playinggamestate.cpp" line="1063"/>
         <source>Ammo</source>
-        <translation>Munitions</translation>
+        <translation>Munit</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="1066"/>
