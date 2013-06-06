@@ -25,7 +25,7 @@ const bool lightdistribution_c = false;
 
 // remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;
-const int versionMinor = 8;
+const int versionMinor = 9;
 
 enum GameType {
     GAMETYPE_CAMPAIGN = 0,
