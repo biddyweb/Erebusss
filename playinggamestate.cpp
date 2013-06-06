@@ -8266,7 +8266,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( scenery->getActionLastTime() != 0 )
                 stream << " action_last_time=\"" << scenery->getActionLastTime();
             if( scenery->getActionDelay() != 0 )
-                stream << "\" action_delay=\"" << scenery->getActionDelay() << "\"";
+                stream << " action_delay=\"" << scenery->getActionDelay() << "\"";
             if( scenery->getActionType().length() > 0 )
                 stream << " action_type=\"" << scenery->getActionType().c_str() << "\"";
             if( scenery->getActionValue() != 0 )
