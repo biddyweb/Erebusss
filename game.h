@@ -443,6 +443,7 @@ protected:
 
     vector<string> player_types;
 
+    void init(bool fullscreen);
     void createPlayerNames();
     void runTest(const string &filename, int test_id);
 

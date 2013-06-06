@@ -601,6 +601,13 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 }
 
 Game::~Game() {
+    if( screen != NULL ) {
+        // hack to prevent the MyApplication::event() from calling screen functions when deactivating
+        Screen *local_screen = screen;
+        screen = NULL;
+        delete local_screen;
+    }
+
 #ifndef Q_OS_ANDROID
     for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
         Sound *sound = iter->second;
@@ -614,7 +621,7 @@ Game::~Game() {
     game_g = NULL;
 }
 
-void Game::run(bool fullscreen) {
+void Game::init(bool fullscreen) {
     screen = new Screen(fullscreen);
 
     // setup fonts
@@ -709,6 +716,11 @@ void Game::run(bool fullscreen) {
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
     this->gui_palette.setColor(QPalette::ButtonText, QColor(76, 0, 0));
 //#endif
+}
+
+void Game::run(bool fullscreen) {
+
+    this->init(fullscreen);
 
     gamestate = new OptionsGamestate();
 
@@ -716,12 +728,6 @@ void Game::run(bool fullscreen) {
 
     delete gamestate;
     gamestate = NULL;
-    {
-        // hack to prevent the MyApplication::event() from calling screen functions when deactivating
-        Screen *local_screen = screen;
-        screen = NULL;
-        delete local_screen;
-    }
 }
 
 enum TestID {
@@ -768,7 +774,11 @@ enum TestID {
     TEST_PERF_NUDGE_12 = 40,
     TEST_PERF_NUDGE_13 = 41,
     TEST_PERF_NUDGE_14 = 42,
-    N_TESTS = 43
+    TEST_LOADSAVEQUEST_0 = 43,
+    TEST_LOADSAVEQUEST_1 = 44,
+    TEST_LOADSAVEQUEST_2 = 45,
+    TEST_LOADSAVERANDOMQUEST_0 = 46,
+    N_TESTS = 47
 };
 
 /**
@@ -815,6 +825,8 @@ enum TestID {
   TEST_PERF_NUDGE_12 - performance test for nudging: clicking on east side of scenery, src is on east side
   TEST_PERF_NUDGE_13 - performance test for nudging: clicking on west side of scenery, src is on east side
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
+  TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
+  TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -1366,6 +1378,65 @@ void Game::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed()) / ((double)n_times);
             score /= 1000.0;
         }
+        else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 ) {
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
+            gamestate = playing_gamestate;
+
+            QString qt_filename;
+            if( test_id == TEST_LOADSAVEQUEST_0 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
+            }
+            else if( test_id == TEST_LOADSAVEQUEST_1 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
+            }
+            else if( test_id == TEST_LOADSAVEQUEST_2 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
+            }
+
+            playing_gamestate->loadQuest(qt_filename, false);
+
+            QString filename = "EREBUSTEST_" + QString::number(test_id - (int)TEST_LOADSAVEQUEST_0) + ".xml";
+            LOG("try saving as %s\n", filename.toStdString().c_str());
+            if( !playing_gamestate->saveGame(filename, false) ) {
+                throw string("failed to save game");
+            }
+
+            delete gamestate;
+            gamestate = NULL;
+
+            QString full_filename = this->getApplicationFilename(savegame_folder + filename);
+            LOG("now try loading %s\n", full_filename.toStdString().c_str());
+            playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
+            gamestate = playing_gamestate;
+            playing_gamestate->loadQuest(full_filename, true);
+
+            delete gamestate;
+            gamestate = NULL;
+        }
+        else if( test_id == TEST_LOADSAVERANDOMQUEST_0 ) {
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
+            gamestate = playing_gamestate;
+
+            playing_gamestate->createRandomQuest();
+
+            QString filename = "EREBUSTEST_RANDOM.xml";
+            LOG("try saving as %s\n", filename.toStdString().c_str());
+            if( !playing_gamestate->saveGame(filename, false) ) {
+                throw string("failed to save game");
+            }
+
+            delete gamestate;
+            gamestate = NULL;
+
+            QString full_filename = this->getApplicationFilename(savegame_folder + filename);
+            LOG("now try loading %s\n", full_filename.toStdString().c_str());
+            playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
+            gamestate = playing_gamestate;
+            playing_gamestate->loadQuest(full_filename, true);
+
+            delete gamestate;
+            gamestate = NULL;
+        }
         else {
             throw string("unknown test");
         }
@@ -1412,10 +1483,11 @@ void Game::runTests() {
         fclose(testfile);
     }
 
+    this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, ::TEST_PATHFINDING_6);
+    //runTest(filename, ::TEST_LOADSAVEQUEST_1);
 }
 
 void Game::initButton(QWidget *button) const {
