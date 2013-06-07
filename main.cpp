@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
         QApplication::addLibraryPath(path.absolutePath());
     }
 
+    QTranslator translator;
     if( !smallscreen_c ) {
         // not full tested on mobile platforms (Android doesn't pick up device language settings anyway; need to ensure that strings aren't too long for Android/Symbian)
         //qDebug("current dir path: %s", QDir::currentPath().toStdString().c_str());
@@ -58,7 +59,6 @@ int main(int argc, char *argv[])
         QString locale = QLocale::system().name().section('_', 0, 0);
         //locale = QLocale(QLocale::French, QLocale::France).name().section('_', 0, 0); // test
         qDebug("locale: %s", locale.toStdString().c_str());
-        QTranslator translator;
         if( !translator.load(DEPLOYMENT_PATH + QString("ts/erebus_") + locale) ) {
             qDebug("failed to load translator file");
         }
