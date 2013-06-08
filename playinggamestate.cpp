@@ -93,7 +93,7 @@ void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
     }
     if( type == CHARACTERACTION_RANGED_WEAPON ) {
         if( hits ) {
-            Character::hitEnemy(playing_gamestate, source, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
+            playing_gamestate->hitEnemy(source, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
         }
     }
     else if( type == CHARACTERACTION_SPELL ) {
@@ -7537,6 +7537,29 @@ void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
         else if( player->tooWeakForArmour() ) {
             this->addTextEffect(tr("The armour you are wearing is\ntoo heavy for you to move!").toStdString(), player->getPos(), 2000);
         }
+    }
+}
+
+void PlayingGamestate::hitEnemy(Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage) {
+    // source may be NULL, if attacker is no longer alive (for ranged attacks)
+    if( weapon_no_effect_magical ) {
+        if( source == this->getPlayer() ) {
+            this->addTextEffect(tr("Weapon has no effect!").toStdString(), source->getPos(), 2000, 255, 0, 0);
+        }
+    }
+    else if( weapon_no_effect_holy ) {
+        if( source == this->getPlayer() ) {
+            this->addTextEffect(tr("Holy weapon has no effect!").toStdString(), source->getPos(), 2000, 255, 0, 0);
+        }
+    }
+    else if( weapon_damage > 0 ) {
+        if( target->decreaseHealth(this, weapon_damage, true, true) ) {
+            target->addPainTextEffect(this);
+            if( target->isDead() && source == this->getPlayer() ) {
+                source->addXP(this, target->getXPWorth());
+            }
+        }
+        //qDebug("    damage %d remaining %d", weapon_damage, target->getHealth());
     }
 }
 

@@ -717,6 +717,8 @@ public:
         journal_ss << getJournalDate();
     }
 
+    void hitEnemy(Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage);
+
 public slots:
     void closeSubWindow();
     void closeAllSubWindows();

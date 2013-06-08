@@ -29,80 +29,6 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
     </message>
 </context>
 <context>
-    <name>Character</name>
-    <message>
-        <location filename="../rpg/character.cpp" line="365"/>
-        <source>Weapon has no effect!</source>
-        <translation>Cette arme n&apos;a aucun effet!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="370"/>
-        <source>Holy weapon has no effect!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="666"/>
-        <source>You have been infected with a disease!</source>
-        <translation>Vous avez été infecté par une maladie!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="678"/>
-        <source>You are paralysed by the enemy!</source>
-        <translation>Vous êtes paralysé par l&apos;ennemi!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="700"/>
-        <location filename="../rpg/character.cpp" line="738"/>
-        <source>Run out of</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="748"/>
-        <source>You are not strong enough to use this weapon!</source>
-        <translation>Vous n&apos;êtes pas assez fort pour utiliser cette arme!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="962"/>
-        <source>Argh!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="964"/>
-        <source>Ow!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="966"/>
-        <source>Ouch!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/character.cpp" line="968"/>
-        <source>Eek!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Item</name>
-    <message>
-        <location filename="../rpg/item.cpp" line="47"/>
-        <location filename="../rpg/item.cpp" line="77"/>
-        <source>Gulp!</source>
-        <translation>Gloups!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/item.cpp" line="88"/>
-        <location filename="../rpg/item.cpp" line="108"/>
-        <source>Yuck!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/item.cpp" line="100"/>
-        <source>Yum!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ItemsPickerWindow</name>
     <message>
         <location filename="../playinggamestate.cpp" line="1794"/>
@@ -625,12 +551,12 @@ available</source>
     <message>
         <location filename="../playinggamestate.cpp" line="3780"/>
         <source>The game has been successfully saved</source>
-        <translation type="unfinished">Le jeu a bien été sauvegardé</translation>
+        <translation>Le jeu a bien été sauvegardé</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="3783"/>
         <source>Failed to save game!</source>
-        <translation type="unfinished">Erreur de sauvegarde!</translation>
+        <translation>Erreur de sauvegarde!</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="5735"/>
@@ -645,7 +571,7 @@ available</source>
     <message>
         <location filename="../playinggamestate.cpp" line="6208"/>
         <source>Quit game</source>
-        <translation type="unfinished">Quitter</translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="6211"/>
@@ -655,7 +581,7 @@ available</source>
     <message>
         <location filename="../playinggamestate.cpp" line="6217"/>
         <source>Save game</source>
-        <translation type="unfinished">Sauvegarder jeu</translation>
+        <translation>Sauvegarder jeu</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="6220"/>
@@ -686,7 +612,7 @@ wandering monster!</source>
     <message>
         <location filename="../playinggamestate.cpp" line="6327"/>
         <source>Continue</source>
-        <translation type="unfinished">Continuer</translation>
+        <translation>Continuer</translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="6396"/>
@@ -719,83 +645,80 @@ wandering monster!</source>
 too heavy for you to move!</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SaveGameWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="2336"/>
-        <location filename="../playinggamestate.cpp" line="2486"/>
-        <location filename="../playinggamestate.cpp" line="2547"/>
-        <source>The game has been successfully saved</source>
-        <translation>Le jeu a bien été sauvegardé</translation>
+        <location filename="../playinggamestate.cpp" line="7547"/>
+        <source>Weapon has no effect!</source>
+        <translation>Cette arme n&apos;a aucun effet!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2339"/>
-        <location filename="../playinggamestate.cpp" line="2489"/>
-        <location filename="../playinggamestate.cpp" line="2550"/>
-        <source>Failed to save game!</source>
-        <translation>Erreur de sauvegarde!</translation>
+        <location filename="../playinggamestate.cpp" line="7552"/>
+        <source>Holy weapon has no effect!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2366"/>
-        <source>New Save Game File</source>
-        <translation>Nouveau fichier de sauvegarde</translation>
+        <location filename="../rpg/character.cpp" line="643"/>
+        <source>You have been infected with a disease!</source>
+        <translation>Vous avez été infecté par une maladie!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2386"/>
-        <source>Save</source>
-        <translation>Sauvegarde</translation>
+        <location filename="../rpg/character.cpp" line="655"/>
+        <source>You are paralysed by the enemy!</source>
+        <translation>Vous êtes paralysé par l&apos;ennemi!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2393"/>
-        <source>Delete File</source>
-        <translation>Effacer fichier</translation>
+        <location filename="../rpg/character.cpp" line="677"/>
+        <location filename="../rpg/character.cpp" line="715"/>
+        <source>Run out of</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2395"/>
-        <source>Delete the selected save game file (D)</source>
-        <translation>Effacer le fichier de sauvegarde sélectionné (D)</translation>
+        <location filename="../rpg/character.cpp" line="725"/>
+        <source>You are not strong enough to use this weapon!</source>
+        <translation>Vous n&apos;êtes pas assez fort pour utiliser cette arme!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2402"/>
-        <location filename="../playinggamestate.cpp" line="2459"/>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
+        <location filename="../rpg/character.cpp" line="939"/>
+        <source>Argh!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2437"/>
-        <source>Choose a filename:</source>
-        <translation>Choisir un nom de fichier:</translation>
+        <location filename="../rpg/character.cpp" line="941"/>
+        <source>Ow!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2451"/>
-        <source>Save game</source>
-        <translation>Sauvegarder jeu</translation>
+        <location filename="../rpg/character.cpp" line="943"/>
+        <source>Ouch!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2508"/>
-        <source>Are you sure you wish to delete save game:</source>
-        <translation>Etes-vous sûr de vouloir effacer le fichier de sauvegarde:</translation>
+        <location filename="../rpg/character.cpp" line="945"/>
+        <source>Eek!</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2528"/>
-        <source>Please enter a filename.</source>
-        <translation>Veuillez entrer un nom de fichier.</translation>
+        <location filename="../rpg/item.cpp" line="47"/>
+        <location filename="../rpg/item.cpp" line="77"/>
+        <source>Gulp!</source>
+        <translation>Gloups!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2540"/>
-        <source>Are you sure you wish to overwrite an existing save game file?</source>
-        <translation>Etes-vous sûr de vouloir écraser le fichier de sauvegarde existant?</translation>
+        <location filename="../rpg/item.cpp" line="88"/>
+        <location filename="../rpg/item.cpp" line="108"/>
+        <source>Yuck!</source>
+        <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>Scenery</name>
+    <message>
+        <location filename="../rpg/item.cpp" line="100"/>
+        <source>Yum!</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../rpg/location.cpp" line="90"/>
         <source>One of four manificant thrones in this room. They look out of place in this otherwise ruined location, and the settled dust suggests they have not been used in a long time. On the back of this chair is a symbol of a knife, gripped by a fist.
 
 Do you wish to sit on the throne?</source>
-        <translation type="unfinished">Un des quatre trônes de manificant dans cette salle. Ils ont l&apos;air à sa place dans cet endroit si en ruine, et la poussière suggère qu&apos;ils n&apos;ont pas été utilisés depuis longtemps. Sur le dos de cette chaise est un symbole d&apos;un couteau, saisi par un poing.
+        <translation>Un des quatre trônes de manificant dans cette salle. Ils ont l&apos;air à sa place dans cet endroit si en ruine, et la poussière suggère qu&apos;ils n&apos;ont pas été utilisés depuis longtemps. Sur le dos de cette chaise est un symbole d&apos;un couteau, saisi par un poing.
 
 Voulez-vous asseoir sur le trône?</translation>
     </message>
@@ -868,7 +791,7 @@ Do you wish to sit on the throne?</source>
         <location filename="../rpg/location.cpp" line="121"/>
         <location filename="../rpg/location.cpp" line="133"/>
         <source>Okay</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <location filename="../rpg/location.cpp" line="125"/>
@@ -1017,6 +940,149 @@ You have at least granted its wish, though you wonder if there was a better way 
         <source>You look at the interesting painting.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="362"/>
+        <source>You have set off a trap!
+An arrow shoots out from the wall,
+but you manage to avoid it!</source>
+        <translation>Vous avez déclenché un piège!
+Une flèche jaillit du mur,
+mais vous réussissez à l&apos;éviter!</translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="366"/>
+        <source>You have set off a trap!
+An arrow shoots out from the
+wall and hits you!</source>
+        <translation>Vous avez déclenché un piège!
+Une flèche jaillit du mur,
+et vous blesse!</translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="372"/>
+        <source>You have set off a trap!
+Darts shoot out from the wall,
+hitting you multiple times!</source>
+        <translation>Vous avez déclenché un piège!
+Une fléchettes jaillir du mur,
+et vous frappe plusieurs fois!</translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="378"/>
+        <source>You have set off a trap!
+Acid shoots out from jets in the walls!
+Your shield protects you,
+but is destroyed in the process.</source>
+        <translation>Vous avez déclenché un piège!
+Un jet d&apos;acide jaillit du murs!
+Votre bouclier vous protège,
+mais est détruit par l&apos;acide.</translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="384"/>
+        <source>You have set off a trap!
+A painful acid shoots out
+from jets in the walls,
+burning your flesh!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="392"/>
+        <source>You manage to avoid the
+vicious bite of a mantrap that
+you spot laying on the ground!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="396"/>
+        <source>You have set off a trap!
+You feel agony in your leg, as you realise
+you have stepped into a mantrap!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="403"/>
+        <source>You have set off a trap!
+Gas shoots from jets in the wall,
+and suddenly you find you are paralysed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../rpg/location.cpp" line="407"/>
+        <source>You have set off a trap!
+The last thing you hear is a
+massive explosion in your ears!
+A bomb blows your body to pieces...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SaveGameWindow</name>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2336"/>
+        <location filename="../playinggamestate.cpp" line="2486"/>
+        <location filename="../playinggamestate.cpp" line="2547"/>
+        <source>The game has been successfully saved</source>
+        <translation>Le jeu a bien été sauvegardé</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2339"/>
+        <location filename="../playinggamestate.cpp" line="2489"/>
+        <location filename="../playinggamestate.cpp" line="2550"/>
+        <source>Failed to save game!</source>
+        <translation>Erreur de sauvegarde!</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2366"/>
+        <source>New Save Game File</source>
+        <translation>Nouveau fichier de sauvegarde</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2386"/>
+        <source>Save</source>
+        <translation>Sauvegarde</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2393"/>
+        <source>Delete File</source>
+        <translation>Effacer fichier</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2395"/>
+        <source>Delete the selected save game file (D)</source>
+        <translation>Effacer le fichier de sauvegarde sélectionné (D)</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2402"/>
+        <location filename="../playinggamestate.cpp" line="2459"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2437"/>
+        <source>Choose a filename:</source>
+        <translation>Choisir un nom de fichier:</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2451"/>
+        <source>Save game</source>
+        <translation>Sauvegarder jeu</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2508"/>
+        <source>Are you sure you wish to delete save game:</source>
+        <translation>Etes-vous sûr de vouloir effacer le fichier de sauvegarde:</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2528"/>
+        <source>Please enter a filename.</source>
+        <translation>Veuillez entrer un nom de fichier.</translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2540"/>
+        <source>Are you sure you wish to overwrite an existing save game file?</source>
+        <translation>Etes-vous sûr de vouloir écraser le fichier de sauvegarde existant?</translation>
+    </message>
 </context>
 <context>
     <name>StatsWindow</name>
@@ -1093,84 +1159,6 @@ You have at least granted its wish, though you wonder if there was a better way 
         <location filename="../playinggamestate.cpp" line="1728"/>
         <source>You do not have enough money to purchase this item.</source>
         <translation>Vous n&apos;avez pas asser d&apos;argent pour acheter cet objet.</translation>
-    </message>
-</context>
-<context>
-    <name>Trap</name>
-    <message>
-        <location filename="../rpg/location.cpp" line="362"/>
-        <source>You have set off a trap!
-An arrow shoots out from the wall,
-but you manage to avoid it!</source>
-        <translation>Vous avez déclenché un piège!
-Une flèche jaillit du mur,
-mais vous réussissez à l&apos;éviter!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="366"/>
-        <source>You have set off a trap!
-An arrow shoots out from the
-wall and hits you!</source>
-        <translation>Vous avez déclenché un piège!
-Une flèche jaillit du mur,
-et vous blesse!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="372"/>
-        <source>You have set off a trap!
-Darts shoot out from the wall,
-hitting you multiple times!</source>
-        <translation>Vous avez déclenché un piège!
-Une fléchettes jaillir du mur,
-et vous frappe plusieurs fois!</translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="378"/>
-        <source>You have set off a trap!
-Acid shoots out from jets in the walls!
-Your shield protects you,
-but is destroyed in the process.</source>
-        <translation>Vous avez déclenché un piège!
-Un jet d&apos;acide jaillit du murs!
-Votre bouclier vous protège,
-mais est détruit par l&apos;acide.</translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="384"/>
-        <source>You have set off a trap!
-A painful acid shoots out
-from jets in the walls,
-burning your flesh!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="392"/>
-        <source>You manage to avoid the
-vicious bite of a mantrap that
-you spot laying on the ground!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="396"/>
-        <source>You have set off a trap!
-You feel agony in your leg, as you realise
-you have stepped into a mantrap!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="403"/>
-        <source>You have set off a trap!
-Gas shoots from jets in the wall,
-and suddenly you find you are paralysed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../rpg/location.cpp" line="407"/>
-        <source>You have set off a trap!
-The last thing you hear is a
-massive explosion in your ears!
-A bomb blows your body to pieces...</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
