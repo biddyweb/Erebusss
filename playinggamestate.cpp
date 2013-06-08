@@ -5933,7 +5933,7 @@ void PlayingGamestate::processLocations(int progress_lo, int progress_hi) {
 
         float progress = ((float)progress_count) / ((float)quest->getNLocations());
         stringstream progress_message;
-        progress_message << "Processing locations: " << (progress_count+1) << " / " << quest->getNLocations() << "...";
+        progress_message << tr("Processing locations: ").toStdString() << (progress_count+1) << " / " << quest->getNLocations() << "...";
         gui_overlay->setProgress((1.0f - progress) * progress_lo + progress * progress_hi, progress_message.str());
         qApp->processEvents();
 

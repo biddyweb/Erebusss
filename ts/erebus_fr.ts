@@ -29,6 +29,14 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
     </message>
 </context>
 <context>
+    <name>GUIOverlay</name>
+    <message>
+        <location filename="../playinggamestate.h" line="238"/>
+        <source>Please wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ItemsPickerWindow</name>
     <message>
         <location filename="../playinggamestate.cpp" line="1794"/>
@@ -566,6 +574,11 @@ available</source>
     <message>
         <location filename="../playinggamestate.cpp" line="5917"/>
         <source>Quest Details:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="5936"/>
+        <source>Processing locations: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
