@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -73,7 +73,7 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
-<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
+<scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel east to the village of Middleham?"
     requires_flag="borin_reveal_exit"
 />
@@ -187,7 +187,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
 <floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="2.5" y="4.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="32.0" exit_location_y="27.5"/>
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="5.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="32.0" exit_location_y="27.5"/>
 
 <scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
 
@@ -600,15 +600,108 @@ When you stare into this Orb, you see swirling lights of many different colours.
 <wall image_name="wall"/>
 <background image_name="background_green"/>
 
-<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="10.0" rect_h="40.0"/>
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="10.0" rect_h="60.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<floorregion shape="rect" rect_x="25.0" rect_y="10.0" rect_w="20.0" rect_h="10.0"/>
+
+<floorregion shape="rect" rect_x="25.0" rect_y="60.0" rect_w="20.0" rect_h="10.0"/>
+
+<floorregion shape="rect" rect_x="45.0" rect_y="10.0" rect_w="10.0" rect_h="60.0"/>
+
+<!-- town -->
+
+<floorregion shape="rect" rect_x="25.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
+
+<floorregion shape="rect" rect_x="26.0" rect_y="21.0" rect_w="18.0" rect_h="38.0" image_name="floor_paved"/>
+
+<floorregion shape="rect" rect_x="44.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
+
+<!--<player_start x="16.0" y="40.0"/>-->
+
+<!--<player_start x="26.0" y="40.0"/>-->
 
 <!--<npc name="Skeleton" template="Skeleton" x="21.0" y="22.0"/>-->
 
-<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0" exit_travel_time="24"
+<scenery name="Signpost" image_name="signpost" x="15.5" y="40.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Axbury?"
 />
+
+<!-- town, west side -->
+
+<scenery name="Private Home" image_name="building2" x="28.5" y="56.5" size="3.43" blocking="true" block_visibility="true" locked="true"/>
+
+<!-- town, central column -->
+
+<scenery name="The Sword and Talisman" image_name="building" x="35.5" y="46.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="The Sword and Talisman, Middleham" exit_location_x="2.5" exit_location_y="8.5"/>
+
+<!-- town, east side -->
+
+<scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Armourer" image_name="building" x="40.5" y="39.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Armourer, Middleham" exit_location_x="2.5" exit_location_y="4.5"/>
+
+<scenery name="Barrel" image_name="barrel" x="43.0" y="42.5" size="0.8" blocking="true">
+    <gold amount="5"/>
+</scenery>
+
+</location>
+
+<location name="The Sword and Talisman, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="2.5" y="8.5"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="9.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="8.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="9.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="35.5" exit_location_y="48.5"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
+
+<scenery name="Table" image_name="table" x="2.5" y="4.0" size="0.8" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="6.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<scenery name="Counter" image_name="counter_left" x="0.125" y="0.6" w="0.25" h="1.2" visual_h="1.7" blocking="true"/>
+<scenery name="Counter" image_name="counter_right" x="1.575" y="0.6" w="0.25" h="1.2" visual_h="1.7" blocking="true"/>
+<scenery name="Counter" image_name="counter_front" x="0.85" y="1.575" w="1.7" h="0.75" visual_h="0.75" blocking="true"/>
+<!--<scenery name="Counter" image_name="counter_front" x="0.85" y="1.825" w="1.7" h="0.25" visual_h="0.75" blocking="true"/>-->
+
+<npc name="Innkeeper" animation_name="peasant_man" static_image="true" x="0.85" y="0.75"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop=""/>
+
+</location>
+
+<location name="Armourer, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="5.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="41.5" exit_location_y="41.5"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<npc name="Shopkeeper" animation_name="peasant_man" static_image="true" x="1.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Armourer"/>
 
 </location>
 
