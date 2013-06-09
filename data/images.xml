@@ -35,6 +35,7 @@
     xpos="0" ypos="16" width="64" height="32" expected_width="64"
     />
 
+<image type="item" name="beer" filename="gfx/textures/items/beer.png"/>
 <image type="item" name="bowl" filename="gfx/textures/items/bowl.png"/>
 <image type="item" name="bull_statuette" filename="gfx/textures/items/bull_statuette.png"/>
 <image type="item" name="casket" filename="gfx/textures/items/casket.png"/>
