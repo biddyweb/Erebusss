@@ -86,6 +86,9 @@
 <image type="scenery" name="carpet" filename="gfx/textures/scenery/carpet.png"/>
 <image type="scenery" name="church" filename="gfx/textures/scenery/church.png"/>
 <image type="scenery" name="church_bell" filename="gfx/textures/scenery/church_bell.png"/>
+<image type="scenery" name="counter_left" filename="gfx/textures/scenery/counter_left.png"/>
+<image type="scenery" name="counter_right" filename="gfx/textures/scenery/counter_right.png"/>
+<image type="scenery" name="counter_front" filename="gfx/textures/scenery/counter_front.png"/>
 <image type="scenery" name="experimental_chamber" filename="gfx/textures/scenery/experimental_chamber.png"/>
 <image type="scenery" name="fire" filename="gfx/textures/scenery/fire.png" width="64" height="72" stride_x="64" expected_width="512">
     <animation name="" start="0" length="8" type="loop"/>
