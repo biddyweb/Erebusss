@@ -32,7 +32,7 @@ Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to
 Windows
 =======
 
-Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt.nokia.com/products/qt-sdk ). This has been tested on Windows 7. This should also work for Linux.
+Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt.nokia.com/products/qt-sdk ). This has been tested on Windows 7 and Windows 8. This should also work for Linux.
 
 Symbian
 =======
@@ -42,7 +42,7 @@ Use Qt SDK with Qt Creator to compile for Symbian ( http://qt.nokia.com/products
 Android
 =======
 
-Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 7. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
+Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 8. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
 
 Other platforms
 ===============
@@ -75,4 +75,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 5 June 2013
+Mark Harman 9 June 2013
