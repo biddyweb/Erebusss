@@ -429,6 +429,8 @@ protected:
     set<Scenery *> scenerys; // stored here as well as the Location, for visibility testing (note that scenerys may be in more than one FloorRegion)
     set<Item *> items; // stored here as well as the Location, for visibility testing
 
+    string floor_image_name; // if set, overrides the Location setting
+
 public:
     FloorRegion() : Polygon2D(), is_visible(false) {
     }
@@ -500,6 +502,12 @@ public:
     }
     void removeItem(Item *item) {
         this->items.erase(item);
+    }
+    void setFloorImageName(const string &floor_image_name) {
+        this->floor_image_name = floor_image_name;
+    }
+    string getFloorImageName() const {
+        return this->floor_image_name;
     }
 
     static FloorRegion *createRectangle(float x, float y, float w, float h);

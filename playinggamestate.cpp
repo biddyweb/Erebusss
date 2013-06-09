@@ -4030,36 +4030,31 @@ void PlayingGamestate::setupView() {
     }
 
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
+
     QBrush wall_brush;
     QBrush dropwall_brush;
-    //const float wall_brush_ratio = 1.0f;
     float wall_brush_ratio = 1.0f;
     const float dropwall_brush_ratio = 3.0f;
     float wall_scale = 1.0f;
     float dropwall_scale = 1.0f;
-    //{
-        /*int pixels_per_unit = 128;
-        float scale = 4.0f/(float)pixels_per_unit;*/
-        float floor_scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
-        floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
-        if( c_location->getWallImageName().length() > 0 ) {
-            wall_brush_ratio = c_location->getWallXScale();
-            wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
-            wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
-            wall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*wall_scale, wall_scale));
-        }
-        if( c_location->getDropWallImageName().length() > 0 ) {
-            dropwall_brush.setTexture(builtin_images[c_location->getDropWallImageName()]);
-            dropwall_scale = 0.9f/(float)builtin_images[c_location->getDropWallImageName()].height();
-            dropwall_brush.setTransform(QTransform::fromScale(dropwall_brush_ratio*dropwall_scale, dropwall_scale));
-        }
+    float floor_scale = 4.0f/(float)builtin_images[c_location->getFloorImageName()].width();
+    floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
+    if( c_location->getWallImageName().length() > 0 ) {
+        wall_brush_ratio = c_location->getWallXScale();
+        wall_brush.setTexture(builtin_images[c_location->getWallImageName()]);
+        wall_scale = 0.9f/(float)builtin_images[c_location->getWallImageName()].height();
+        wall_brush.setTransform(QTransform::fromScale(wall_brush_ratio*wall_scale, wall_scale));
+    }
+    if( c_location->getDropWallImageName().length() > 0 ) {
+        dropwall_brush.setTexture(builtin_images[c_location->getDropWallImageName()]);
+        dropwall_scale = 0.9f/(float)builtin_images[c_location->getDropWallImageName()].height();
+        dropwall_brush.setTransform(QTransform::fromScale(dropwall_brush_ratio*dropwall_scale, dropwall_scale));
+    }
 
-        float background_scale = 1.0f/32.0f;
-        QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
-        background_brush.setTransform(QTransform::fromScale(background_scale, background_scale));
-        view->setBackgroundBrush(background_brush);
-        //view->setBackgroundBrush(QBrush(Qt::white));
-    //}
+    float background_scale = 1.0f/32.0f;
+    QBrush background_brush(builtin_images[c_location->getBackgroundImageName()]);
+    background_brush.setTransform(QTransform::fromScale(background_scale, background_scale));
+    view->setBackgroundBrush(background_brush);
 
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
         FloorRegion *floor_region = c_location->getFloorRegion(i);
@@ -4070,7 +4065,12 @@ void PlayingGamestate::setupView() {
             QPointF qpoint(point.x, point.y);
             polygon.push_back(qpoint);
         }
-        QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, floor_brush);
+        QBrush this_floor_brush = floor_brush;
+        if( floor_region->getFloorImageName().length() > 0 ) {
+            this_floor_brush = QBrush(builtin_images[floor_region->getFloorImageName()]);
+            this_floor_brush.setTransform(QTransform::fromScale(floor_scale, floor_scale));
+        }
+        QGraphicsPolygonItem *item = scene->addPolygon(polygon, Qt::NoPen, this_floor_brush);
         floor_region->setUserGfxData(item);
         item->setVisible(false); // default to false, visibility is checked afterwards
         for(size_t j=0;j<floor_region->getNPoints();j++) {
@@ -5172,6 +5172,10 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     if( visible_s.length() > 0 ) {
                         bool visible = parseBool(visible_s.toString());
                         floor_region->setVisible(visible);
+                    }
+                    QStringRef image_name_s = reader.attributes().value("image_name");
+                    if( image_name_s.length() > 0 ) {
+                        floor_region->setFloorImageName(image_name_s.toString().toStdString());
                     }
                 }
                 else if( reader.name() == "floorregion_point" ) {
@@ -7875,7 +7879,7 @@ void PlayingGamestate::saveTrap(QTextStream &stream, const Trap *trap) const {
     stream << "<trap type=\"" << trap->getType().c_str() << "\" x=\"" << trap->getX() << "\" y=\"" << trap->getY() << "\"";
     stream << " w=\"" << trap->getWidth() << "\" h=\"" << trap->getHeight() << "\" difficulty=\"" << trap->getDifficulty() << "\"";
     stream << " rating=\"" << trap->getRating() << "\"";
-    stream << " />\n";
+    stream << "/>\n";
 }
 
 bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) {
@@ -7967,14 +7971,18 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 
         for(size_t i=0;i<location->getNFloorRegions();i++) {
             const FloorRegion *floor_region = location->getFloorRegion(i);
-            //fprintf(file, "<floorregion shape=\"polygon\" visible=\"%s\">\n", floor_region->isVisible() ? "true" : "false");
-            stream << "<floorregion shape=\"polygon\" visible=\"" << (floor_region->isVisible() ? "true" : "false") << "\">\n";
+            stream << "<floorregion shape=\"polygon\"";
+            if( floor_region->isVisible() ) {
+                stream << " visible=\"true\"";
+            }
+            if( floor_region->getFloorImageName().length() > 0 ) {
+                stream << " image_name=\"" << floor_region->getFloorImageName().c_str() << "\"";
+            }
+            stream << ">\n";
             for(size_t j=0;j<floor_region->getNPoints();j++) {
                 Vector2D point = floor_region->getPoint(j);
-                //fprintf(file, "    <floorregion_point x=\"%f\" y=\"%f\"/>\n", point.x, point.y);
                 stream << "    <floorregion_point x=\"" << point.x << "\" y=\"" << point.y << "\"/>\n";
             }
-            //fprintf(file, "</floorregion>\n");
             stream << "</floorregion>\n";
         }
         //fprintf(file, "\n");
