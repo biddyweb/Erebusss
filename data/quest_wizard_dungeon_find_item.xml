@@ -789,7 +789,7 @@ This is a vial of some murky green liquid, though you are unsure of its effect.
 
 <scenery name="Cabinet" image_name="cabinet" x="15.5" y="4.0" size="0.8" blocking="true">
     <item name="Book" image_name="book" icon_width="0.25" weight="1">
-This is a heavy book, that starts talking about the subject matter of the dead, and the arts of necromancy. You skim to the later pages, and find records of experiments. They refer to unfortunate subjects - prisoners who were sent here for various petty or dubious crimes - placed in chambers, with the aim of not permanently killing them, but to reanimate them as creatures of undead. From the descriptions and illustrations, you recognise these creatures as zombies. It is believed that such beings can be created from the dead with powerful magic from necromancers, though it seems that the wizard was experimenting with a more mechanical means to manufacture such monsters, for who knows what purpose.
+This is a heavy book, a journal full of written notes, that talks about experiments, claiming to find an alternative to magical means for raising the dead. You skim to the later pages, and find records of experiments. They refer to unfortunate subjects - prisoners who were sent here for various petty or dubious crimes - placed in chambers, with the aim of not permanently killing them, but to reanimate them as creatures of undead. From the descriptions and illustrations, you recognise these creatures as zombies. It is believed that such beings can be created from the dead with powerful magic from necromancers, though it seems that the wizard was experimenting with a more mechanical means to manufacture such monsters, for who knows what purpose.
     </item>
 </scenery>
 
