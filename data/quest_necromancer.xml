@@ -17,7 +17,7 @@ You are eager to do what you can to help. You head east towards the village of A
 <completed_text>
 </completed_text>
 
-<quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
+<quest_objective type="find_item" arg1="Vespar's Skull" gold="500"/>
 
 <location name="Axbury" display_name="true" lighting_min="160">
 
@@ -608,6 +608,16 @@ When you stare into this Orb, you see swirling lights of many different colours.
 
 <floorregion shape="rect" rect_x="45.0" rect_y="10.0" rect_w="10.0" rect_h="60.0"/>
 
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="39.0">
+6777777778
+cdddddddde
+</tilemap>
+
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="45.0" y="39.0">
+6777777778
+cdddddddde
+</tilemap>
+
 <!-- town -->
 
 <floorregion shape="rect" rect_x="25.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
@@ -636,6 +646,8 @@ When you stare into this Orb, you see swirling lights of many different colours.
 
 <!-- town, east side -->
 
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="41.0" y="24.0" size="2.0" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
+
 <scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" blocking="true" block_visibility="true" locked="true"/>
 
 <scenery name="Armourer" image_name="building" x="40.5" y="39.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Armourer, Middleham" exit_location_x="2.5" exit_location_y="4.5"/>
@@ -652,12 +664,12 @@ When you stare into this Orb, you see swirling lights of many different colours.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="2.5" y="9.5"/>
+<!--<player_start x="2.5" y="9.5"/>-->
 
 <floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="9.0"/>
 <floorregion shape="rect" rect_x="3.0" rect_y="1.0" rect_w="2.0" rect_h="8.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="2.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="35.5" exit_location_y="48.5"/>
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="35.5" exit_location_y="49.0"/>
 
 <scenery name="Torch" image_name="torch" x="4.0" y="0.55" w="0.75" h="0.75"/>
 
@@ -754,6 +766,43 @@ When you stare into this Orb, you see swirling lights of many different colours.
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+</location>
+
+<location name="Vaults, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall_rock" image_x_scale="1.0"/>
+<background image_name="background_brown"/>
+
+<wandering_monster template="Weak Skeleton" time="180000" rest_chance="10"/>
+
+<floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="8.0" rect_h="8.0"/>
+
+
+<scenery name="Torch" image_name="torch" x="22.0" y="19.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="26.0" y="19.55" w="0.75" h="0.75"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="24.0" y="24.0" size="2.0" blocking="true" exit_location="Middleham" exit_location_x="41.0" exit_location_y="25.5"/>
+
+<player_start x="24.0" y="25.5"/>
+
+<npc name="Skeleton" template="Skeleton" x="21.0" y="21.0"/>
+
+<npc name="Skeleton" template="Skeleton" x="27.0" y="21.0"/>
+
+<npc name="Skeleton" template="Skeleton" x="21.0" y="27.0"/>
+
+<npc name="Skeleton" template="Skeleton" x="27.0" y="27.0"/>
+
+<floorregion shape="rect" rect_x="23.0" rect_y="28.0" rect_w="2.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="17.0" rect_y="34.0" rect_w="6.0" rect_h="2.0"/>
+
+<scenery name="Chest" image_name="chest" x="17.5" y="35.0" size="0.8" blocking="true">
+    <gold amount="100"/>
+</scenery>
 
 </location>
 
