@@ -3983,6 +3983,7 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
         this->player->setListener(NULL, NULL);
     }
     view->clear();
+    this->target_item = NULL;
     for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
         Character *character = *iter;
         character->setListener(NULL, NULL);
@@ -4000,6 +4001,7 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
             character->setPos(character->getDefaultX(), character->getDefaultY());
         }
     }
+    this->player->setTargetNPC(NULL);
 
     this->setupView();
 }
@@ -4816,6 +4818,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     }
     // delete any items from previous quests
     view->clear();
+    this->target_item = NULL;
     //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
 
     if( !is_savegame ) {
@@ -5730,6 +5733,7 @@ void PlayingGamestate::createRandomQuest() {
     }
     // delete any items from previous quests
     view->clear();
+    this->target_item = NULL;
     //this->closeAllSubWindows(); // just to be safe - e.g., when moving onto next quest from campaign window
 
     qDebug("create random quest\n");
@@ -6416,6 +6420,7 @@ void PlayingGamestate::testFogOfWar() {
 }
 
 void PlayingGamestate::update() {
+    //qDebug("PlayingGamestate::update()");
     // update target item
     if( this->player != NULL ) {
         if( this->player->getTargetNPC() != NULL && this->player->getTargetNPC()->isHostile() && this->player->getTargetNPC()->isVisible() ) {
@@ -7319,7 +7324,7 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2
         float scenery_width = 0.0f, scenery_height = 0.0f;
         scenery->getBox(&scenery_pos, &scenery_width, &scenery_height, is_click);
         float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
-        //LOG("dist_from_click for scenery %s : %f", scenery->getName().c_str(), dist_from_click);
+        //qDebug("dist_from_click for scenery %s : %f : pos %f, %f size %f X %f", scenery->getName().c_str(), dist_from_click, scenery_pos.x, scenery_pos.y, scenery_width, scenery_height);
         if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
             // clicked on or near this scenery
             *ignore = scenery;
@@ -7528,6 +7533,7 @@ void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
             this->requestPlayerMove(dest, ignore);
         }
     }
+    //qDebug("done PlayingGamestate::clickedMainView()");
 }
 
 void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
