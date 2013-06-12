@@ -636,7 +636,7 @@ cdddddddde
 
 <!-- town, west side -->
 
-<scenery name="Private Home" image_name="house_brick" x="28.5" y="44.5" size="3.0" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Private Home" image_name="house_brick" x="28.5" y="44.5" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
 
 <scenery name="Magic Shop" image_name="building2" x="29.0" y="50.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop, Middleham" exit_location_x="1.5" exit_location_y="4.5"/>
 
