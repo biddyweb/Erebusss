@@ -628,13 +628,17 @@ cdddddddde
 
 <!--<player_start x="16.0" y="40.0"/>-->
 
-<player_start x="26.0" y="40.0"/>
+<!--<player_start x="26.0" y="40.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="40.0" size="1.0" blocking="false" block_visibility="false" exit_location="Axbury" exit_location_x="43.5" exit_location_y="21.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Axbury?"
 />
 
 <!-- town, west side -->
+
+<scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" locked="true"/>
+
+<scenery name="The Sword and Talisman" image_name="building" x="30.5" y="34.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="The Sword and Talisman, Middleham" exit_location_x="2.5" exit_location_y="9.5"/>
 
 <scenery name="Private Home" image_name="house_brick" x="28.5" y="44.5" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
 
@@ -644,7 +648,7 @@ cdddddddde
 
 <!-- town, central column -->
 
-<scenery name="The Sword and Talisman" image_name="building" x="35.5" y="46.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="The Sword and Talisman, Middleham" exit_location_x="2.5" exit_location_y="9.5"/>
+<scenery name="General Stores" image_name="building" x="35.5" y="46.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="General Stores, Middleham" exit_location_x="2.5" exit_location_y="4.5"/>
 
 <!-- town, east side -->
 
@@ -658,30 +662,9 @@ cdddddddde
     <gold amount="5"/>
 </scenery>
 
-</location>
+<scenery name="Jail" image_name="building4" x="39.5" y="50.5" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.7344" smoke_y="0.0574" exit_location="Jail, Middleham" exit_location_x="2.5" exit_location_y="5.5"/>
 
-<location name="Magic Shop, Middleham" display_name="true">
-
-<floor image_name="floor_paved"/>
-<wall image_name="wall"/>
-<background image_name="background_dark"/>
-
-<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
-<floorregion shape="rect" rect_x="1.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
-
-<scenery name="Door" image_name="door_wood_n" x="1.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="29.0" exit_location_y="52.5"/>
-
-<scenery name="Table" image_name="table" x="0.5" y="1.0" size="0.8" blocking="true"/>
-
-<scenery name="Fire" image_name="fire" x="2.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
-
-<npc name="Shopkeeper" animation_name="peasant_man" static_image="true" x="1.5" y="1.0"
-    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
-    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
-    health="10" max_health="10"
-    is_hostile="false"
-    xp_worth="0"
-    shop="Magic Shop"/>
+<scenery name="Gallows" image_name="gallows" x="42.0" y="55.0" size="2.0" blocking="true"/>
 
 </location>
 
@@ -696,7 +679,7 @@ cdddddddde
 <floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="9.0"/>
 <floorregion shape="rect" rect_x="3.0" rect_y="1.0" rect_w="2.0" rect_h="8.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="2.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="35.5" exit_location_y="49.0"/>
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="30.5" exit_location_y="37.0"/>
 
 <scenery name="Torch" image_name="torch" x="4.0" y="0.55" w="0.75" h="0.75"/>
 
@@ -771,6 +754,56 @@ cdddddddde
 
 </location>
 
+<location name="Magic Shop, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="1.0" rect_y="5.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="1.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="29.0" exit_location_y="52.5"/>
+
+<scenery name="Table" image_name="table" x="0.5" y="1.0" size="0.8" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="2.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<npc name="Shopkeeper" animation_name="peasant_man" static_image="true" x="1.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Magic Shop"/>
+
+</location>
+
+<location name="General Stores, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="5.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="35.5" exit_location_y="49.0"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="1.0" size="0.8" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="1.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="General Stores"/>
+
+</location>
+
 <location name="Armourer, Middleham" display_name="true">
 
 <floor image_name="floor_paved"/>
@@ -796,6 +829,26 @@ cdddddddde
 
 </location>
 
+<location name="Jail, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="2.5" y="5.5"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="39.5" exit_location_y="53.0"/>
+
+<scenery name="Torch" image_name="torch" x="4.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Door" image_name="door_metal_n" x="1.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false">
+Peering through a small hole in the cell door, you see a small dark room. After a few moments, you can make out the shape of someone sitting on the stone floor, chained to the wall.
+</scenery>
+
+</location>
+
 <location name="Vaults, Middleham" display_name="true">
 
 <floor image_name="floor_paved"/>
@@ -805,7 +858,6 @@ cdddddddde
 <wandering_monster template="Weak Skeleton" time="180000" rest_chance="10"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="20.0" rect_w="8.0" rect_h="8.0"/>
-
 
 <scenery name="Torch" image_name="torch" x="22.0" y="19.55" w="0.75" h="0.75"/>
 
