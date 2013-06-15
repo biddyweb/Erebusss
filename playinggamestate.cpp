@@ -2656,7 +2656,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 
     scene = new QGraphicsScene(window);
     //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
-    //scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+    //scene->setItemIndexMethod(QGraphicsScene::NoIndex); // doesn't seem to help
     //view = new QGraphicsView(scene, window);
     view = new MainGraphicsView(this, scene, window);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -2668,7 +2668,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     //view->grabGesture(Qt::PinchGesture);
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
-    //view->setOptimizationFlag(QGraphicsView::DontSavePainterState);
+    //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
 
     /*QWidget *centralWidget = new QWidget(window);
     this->mainwindow = centralWidget;
