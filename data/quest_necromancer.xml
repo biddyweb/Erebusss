@@ -835,7 +835,7 @@ cdddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="2.5" y="5.5"/>
+<!--<player_start x="2.5" y="5.5"/>-->
 
 <floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
 
@@ -882,6 +882,45 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 <scenery name="Chest" image_name="chest" x="17.5" y="35.0" size="0.8" blocking="true">
     <gold amount="100"/>
 </scenery>
+
+</location>
+
+<location name="Stockton" display_name="true" lighting_min="160">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
+
+<player_start x="16.0" y="22.0"/>
+
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="15.0">
+             68
+             9b
+             9b
+             9b
+    677777777547777777778
+    91dddddddddd21dddddde
+67775b          9b
+cdddde          9b
+                9b
+                9b
+                9b
+                9b
+                9b
+                9b
+                9b
+                ce
+</tilemap>
+
+<scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
+
+<scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.623" smoke_y="0.0147" locked="true"/>
+
+<scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" blocking="true" block_visibility="true" locked="true"/>
 
 </location>
 
