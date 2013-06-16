@@ -551,9 +551,11 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
         int sx = point.x() - pixmap_width/2;
         int sy = point.y() - pixmap_width/2;
         if( this->calculated_lighting_pixmap_scaled ) {
+            //qDebug("draw scaled lighting pixmap");
             painter.drawPixmap(sx, sy, lighting_pixmap_scaled);
         }
         else {
+            //qDebug("draw unscaled lighting pixmap");
             painter.drawPixmap(sx, sy, pixmap_width, pixmap_width, lighting_pixmap);
         }
         QBrush brush(QColor(0, 0, 0, darkness_alpha));
@@ -844,6 +846,10 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
     painter.fillRect(x2, y2, width2, height2, brush_bg);
     painter.fillRect(x2, y2, width2*fraction, height2, brush_fg);
     painter.setOpacity(1.0f);
+}
+
+void GUIOverlay::setProgress(int progress_percent) {
+    this->setProgress(progress_percent, playing_gamestate->tr("Please wait...").toStdString());
 }
 
 void GUIOverlay::setFadeIn() {
@@ -8182,6 +8188,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             }
             if( character->getObjectiveId().length() > 0 ) {
                 //fprintf(file, " objective_id=\"%s\"", character->getObjectiveId().c_str());
+
                 stream << " objective_id=\"" << character->getObjectiveId().c_str() << "\"";
             }
             //fprintf(file, ">\n");

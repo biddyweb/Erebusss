@@ -234,9 +234,7 @@ public:
     virtual ~GUIOverlay() {
     }
 
-    void setProgress(int progress_percent) {
-        this->setProgress(progress_percent, tr("Please wait...").toStdString());
-    }
+    void setProgress(int progress_percent);
     void setProgress(int progress_percent, const string &progress_message) {
         this->display_progress = true;
         this->progress_percent = progress_percent;
