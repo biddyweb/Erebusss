@@ -516,8 +516,33 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     }
     QString nativePath(QDir::toNativeSeparators(pathQt));
     application_path = nativePath;
+
+#if defined(Q_OS_ANDROID)
+    // on Android, try for the sdcard, so we can find somewhere more accessible to the user (and that I can read on my Galaxy Nexus!!!)
+    bool sdcard_okay = true;
+    QString nativePath = QString("/sdcard/net.sourceforge.erebusrpg");
+    qDebug("try sd card: %s", nativePath.toStdString().c_str());
+    if( !QDir(nativePath).exists() ) {
+        qDebug("try creating application folder in sdcard/");
+        // folder doesn't seem to exist - try creating it
+        QDir().mkdir(nativePath);
+        if( !QDir(nativePath).exists() ) {
+            qDebug("failed to create application folder in sdcard/");
+            sdcard_okay = false;
+        }
+    }
+    if( sdcard_okay ) {
+        logfilename = getFilename(nativePath, "log.txt");
+        oldlogfilename = getFilename(nativePath, "log_old.txt");
+    }
+    else {
+        logfilename = getApplicationFilename("log.txt");
+        oldlogfilename = getApplicationFilename("log_old.txt");
+    }
+#else
     logfilename = getApplicationFilename("log.txt");
     oldlogfilename = getApplicationFilename("log_old.txt");
+#endif
     qDebug("application_path: %s", application_path.toUtf8().data());
     qDebug("logfilename: %s", logfilename.toUtf8().data());
     qDebug("oldlogfilename: %s", oldlogfilename.toUtf8().data());
@@ -1607,12 +1632,17 @@ void Game::render() {
     gamestate->mouseClick(m_x, m_y);
 }*/
 
-QString Game::getApplicationFilename(const QString &name) {
+QString Game::getFilename(const QString &path, const QString &name) const {
     // not safe to use LOG here, as logfile may not have been initialised!
-    QString pathQt = application_path + QString("/") + name;
+    QString pathQt = path + QString("/") + name;
     QString nativePath(QDir::toNativeSeparators(pathQt));
-    qDebug("getApplicationFilename returns: %s", nativePath.toUtf8().data());
+    qDebug("getFilename returns: %s", nativePath.toUtf8().data());
     return nativePath;
+}
+
+QString Game::getApplicationFilename(const QString &name) const {
+    // not safe to use LOG here, as logfile may not have been initialised!
+    return getFilename(application_path, name);
 }
 
 void Game::log(const char *text, va_list vlist) {

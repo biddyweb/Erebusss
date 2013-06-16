@@ -499,7 +499,8 @@ public:
         return this->gamestate;
     }
     //void mouseClick(int m_x, int m_y);
-    QString getApplicationFilename(const QString &name);
+    QString getFilename(const QString &path, const QString &name) const;
+    QString getApplicationFilename(const QString &name) const;
     //void log(const char *text, ...);
     void log(const char *text, va_list vlist);
     QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const;
