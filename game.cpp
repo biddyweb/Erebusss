@@ -625,6 +625,7 @@ Game::~Game() {
 }
 
 void Game::init(bool fullscreen) {
+    LOG("fullscreen? %d\n", fullscreen);
     screen = new Screen(fullscreen);
 
     // setup fonts
