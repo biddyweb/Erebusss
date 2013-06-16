@@ -2670,6 +2670,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     view->setCacheMode(QGraphicsView::CacheBackground);
     //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
     view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
+    view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
 
     /*QWidget *centralWidget = new QWidget(window);
     this->mainwindow = centralWidget;
