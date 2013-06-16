@@ -81,6 +81,7 @@ void MainWindow::showExpanded(bool fullscreen)
     else {
         show();
     }
+    LOG("window size %d x %d\n", this->width(), this->height());
 }
 
 #if 0
