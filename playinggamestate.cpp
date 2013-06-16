@@ -849,7 +849,7 @@ void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, fl
 }
 
 void GUIOverlay::setProgress(int progress_percent) {
-    this->setProgress(progress_percent, playing_gamestate->tr("Please wait...").toStdString());
+    this->setProgress(progress_percent, PlayingGamestate::tr("Please wait...").toStdString());
 }
 
 void GUIOverlay::setFadeIn() {

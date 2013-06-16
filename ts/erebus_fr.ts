@@ -357,7 +357,7 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
     <message>
         <location filename="../optionsgamestate.cpp" line="219"/>
         <source>Select a game type: </source>
-        <translation>Selection du type de jeux: </translation>
+        <translation>Type de jeux: </translation>
     </message>
     <message>
         <location filename="../optionsgamestate.cpp" line="226"/>
