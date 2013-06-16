@@ -2669,7 +2669,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
     //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
-    view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // as we force an update every frame, anyway
+    view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
 
     /*QWidget *centralWidget = new QWidget(window);
     this->mainwindow = centralWidget;
@@ -6835,7 +6835,6 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
-    this->view->viewport()->update(); // force update every frame
 }
 
 void PlayingGamestate::checkQuestComplete() {
