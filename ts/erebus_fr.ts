@@ -4,7 +4,7 @@
 <context>
     <name>CampaignWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="2232"/>
+        <location filename="../playinggamestate.cpp" line="2238"/>
         <source>Congratulations, you have completed all the quests!
 
 Erebus is still under development, with more quests planned to be added in future. Thanks for playing!</source>
@@ -13,73 +13,65 @@ Erebus is still under development, with more quests planned to be added in futur
 Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;avenir. Merci de jouer!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2241"/>
+        <location filename="../playinggamestate.cpp" line="2247"/>
         <source>You have left the dungeon, and returned to your village to rest. You may also take the time to visit the local shops to buy supplies, and sell any wares that you have.</source>
         <translation>Vous avez quitté le donjon, et êtes retourné à votre village pour vous reposez. Vous pouvez également prendre le temps de visiter les magasins locaux pour acheter des fournitures et vendre des marchandises.</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2265"/>
+        <location filename="../playinggamestate.cpp" line="2271"/>
         <source>Start next Quest</source>
         <translation>Démarrer quête suivante</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2265"/>
+        <location filename="../playinggamestate.cpp" line="2271"/>
         <source>Continue your Quest</source>
         <translation>Continuer votre quête</translation>
     </message>
 </context>
 <context>
-    <name>GUIOverlay</name>
-    <message>
-        <location filename="../playinggamestate.h" line="238"/>
-        <source>Please wait...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ItemsPickerWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="1794"/>
+        <location filename="../playinggamestate.cpp" line="1800"/>
         <source>Items to pick up:</source>
         <translation>Objet à ramasser:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1797"/>
+        <location filename="../playinggamestate.cpp" line="1803"/>
         <source>Your items:</source>
         <translation>Vos objets:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1850"/>
+        <location filename="../playinggamestate.cpp" line="1856"/>
         <source>Pick Up</source>
         <translation>Prendre</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1852"/>
+        <location filename="../playinggamestate.cpp" line="1858"/>
         <source>Pick up the selected item (Space)</source>
         <translation>Prendre l&apos;objet sélectionné (Espace)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1857"/>
+        <location filename="../playinggamestate.cpp" line="1863"/>
         <source>Drop</source>
         <translation>Jeter</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1859"/>
+        <location filename="../playinggamestate.cpp" line="1865"/>
         <source>Drop the selected item of yours onto the ground</source>
         <translation>Jeter l&apos;objet séléctionné au sol</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1863"/>
+        <location filename="../playinggamestate.cpp" line="1869"/>
         <source>Info</source>
         <translation>Informations</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1865"/>
+        <location filename="../playinggamestate.cpp" line="1871"/>
         <source>Display more information about the selected item (I)</source>
         <translation>Afficher plus d&apos;informations sur l&apos;objet sélectionné (I)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1871"/>
+        <location filename="../playinggamestate.cpp" line="1877"/>
         <source>Close</source>
         <translation>Fermé</translation>
     </message>
@@ -87,162 +79,162 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
 <context>
     <name>ItemsWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="1047"/>
+        <location filename="../playinggamestate.cpp" line="1053"/>
         <source>All</source>
         <translation>Tout</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1050"/>
+        <location filename="../playinggamestate.cpp" line="1056"/>
         <source>Display all items (F1)</source>
         <translation>Afficher tout les objets (F1)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1055"/>
+        <location filename="../playinggamestate.cpp" line="1061"/>
         <source>Wpns</source>
         <translation>Arm</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1058"/>
+        <location filename="../playinggamestate.cpp" line="1064"/>
         <source>Display only weapons (F2)</source>
         <translation>Afficher que les armes (F2)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1063"/>
+        <location filename="../playinggamestate.cpp" line="1069"/>
         <source>Ammo</source>
         <translation>Munit</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1066"/>
+        <location filename="../playinggamestate.cpp" line="1072"/>
         <source>Display only ammunition (F3)</source>
         <translation>Afficher que les munitions (F3)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1071"/>
+        <location filename="../playinggamestate.cpp" line="1077"/>
         <source>Shields</source>
         <translation>Boucliers</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1074"/>
+        <location filename="../playinggamestate.cpp" line="1080"/>
         <source>Display only shields (F4)</source>
         <translation>Afficher que les boucliers (F4)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1079"/>
+        <location filename="../playinggamestate.cpp" line="1085"/>
         <source>Arm</source>
         <translation>Armures</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1082"/>
+        <location filename="../playinggamestate.cpp" line="1088"/>
         <source>Display only armour (F5)</source>
         <translation>Afficher que les armures (F5)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1087"/>
+        <location filename="../playinggamestate.cpp" line="1093"/>
         <source>Magic</source>
         <translation>Magie</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1090"/>
+        <location filename="../playinggamestate.cpp" line="1096"/>
         <source>Display only magical items (F6)</source>
         <translation>Afficher que les objets magiques (F6)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1095"/>
+        <location filename="../playinggamestate.cpp" line="1101"/>
         <source>Misc</source>
         <translation>Divers</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1098"/>
+        <location filename="../playinggamestate.cpp" line="1104"/>
         <source>Display only miscellaneous items (F7)</source>
         <translation>Afficher que les objets divers (F7)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1131"/>
+        <location filename="../playinggamestate.cpp" line="1137"/>
         <source>Gold</source>
         <translation>Or</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1147"/>
+        <location filename="../playinggamestate.cpp" line="1153"/>
         <source>Arm/disarm weapon or shield (Space)</source>
         <translation>Equiper/Deséquiper arme ou bouclier (Espace)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1153"/>
+        <location filename="../playinggamestate.cpp" line="1159"/>
         <source>Wear/take off armour (Space)</source>
         <translation>Mettre/Enlever armure (Espace)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1159"/>
+        <location filename="../playinggamestate.cpp" line="1165"/>
         <source>Use item (Space)</source>
         <translation>Utiliser objet (Espace)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1163"/>
+        <location filename="../playinggamestate.cpp" line="1169"/>
         <source>Drop Item</source>
         <translation>Jeter objet</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1165"/>
+        <location filename="../playinggamestate.cpp" line="1171"/>
         <source>Drop item onto the ground (D))</source>
         <translation>Jeter l&apos;objet au sol (D)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1170"/>
+        <location filename="../playinggamestate.cpp" line="1176"/>
         <source>Info</source>
         <translation>Info</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1172"/>
+        <location filename="../playinggamestate.cpp" line="1178"/>
         <source>More information on this item (I))</source>
         <translation>Plus d&apos;informations sur cet objet (I)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1178"/>
+        <location filename="../playinggamestate.cpp" line="1184"/>
         <source>Continue</source>
         <translation>Continuer</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1288"/>
+        <location filename="../playinggamestate.cpp" line="1294"/>
         <source>Disarm Weapon</source>
         <translation>Deséquiper arme</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1291"/>
+        <location filename="../playinggamestate.cpp" line="1297"/>
         <source>Arm Weapon</source>
         <translation>Equiper arme</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1300"/>
+        <location filename="../playinggamestate.cpp" line="1306"/>
         <source>Select Ammo</source>
         <translation>Selectionner munitions</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1310"/>
+        <location filename="../playinggamestate.cpp" line="1316"/>
         <source>Disarm Shield</source>
         <translation>Deséquiper bouclier</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1313"/>
+        <location filename="../playinggamestate.cpp" line="1319"/>
         <source>Arm Shield</source>
         <translation>Equiper bouclier</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1324"/>
+        <location filename="../playinggamestate.cpp" line="1330"/>
         <source>Take Off Armour</source>
         <translation>Enlever armure</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1327"/>
+        <location filename="../playinggamestate.cpp" line="1333"/>
         <source>Wear Armour</source>
         <translation>Mettre armure</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1333"/>
+        <location filename="../playinggamestate.cpp" line="1339"/>
         <source>Take Off Ring</source>
         <translation>Enlever l&apos;anneau</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1336"/>
+        <location filename="../playinggamestate.cpp" line="1342"/>
         <source>Wear Ring</source>
         <translation>Mettre l&apos;anneau</translation>
     </message>
@@ -250,52 +242,52 @@ Erebus est encore en développement,plus de quêtes sont prévues pour l&apos;av
 <context>
     <name>LevelUpWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="1996"/>
+        <location filename="../playinggamestate.cpp" line="2002"/>
         <source>You have advanced to level</source>
         <translation>Vous avez gagné un niveau</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1997"/>
+        <location filename="../playinggamestate.cpp" line="2003"/>
         <source>Select</source>
         <translation>Selectionner</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1997"/>
+        <location filename="../playinggamestate.cpp" line="2003"/>
         <source>statistics that you wish to improve:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2013"/>
+        <location filename="../playinggamestate.cpp" line="2019"/>
         <source>Hand-to-hand combat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2017"/>
+        <location filename="../playinggamestate.cpp" line="2023"/>
         <source>Ranged combat: bows and thrown weapons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2021"/>
+        <location filename="../playinggamestate.cpp" line="2027"/>
         <source>How strong you are</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2027"/>
+        <location filename="../playinggamestate.cpp" line="2033"/>
         <source>Your mental and psychic abilities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2031"/>
+        <location filename="../playinggamestate.cpp" line="2037"/>
         <source>Useful for avoiding traps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2035"/>
+        <location filename="../playinggamestate.cpp" line="2041"/>
         <source>Courage against terrifying enemies</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2136"/>
+        <location filename="../playinggamestate.cpp" line="2142"/>
         <source>Level Up!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -466,205 +458,210 @@ available</source>
 <context>
     <name>PlayingGamestate</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="2700"/>
-        <source>Stats</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../playinggamestate.cpp" line="2703"/>
-        <source>Display statistics of your character (F1)</source>
+        <location filename="../playinggamestate.cpp" line="852"/>
+        <source>Please wait...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="2708"/>
-        <source>Items</source>
+        <source>Stats</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../playinggamestate.cpp" line="2711"/>
+        <source>Display statistics of your character (F1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2716"/>
+        <source>Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../playinggamestate.cpp" line="2719"/>
         <source>Display the items that you are carrying (F2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2722"/>
+        <location filename="../playinggamestate.cpp" line="2730"/>
         <source>Journal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2725"/>
+        <location filename="../playinggamestate.cpp" line="2733"/>
         <source>Displays information about your quests (F3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2736"/>
+        <location filename="../playinggamestate.cpp" line="2744"/>
         <source>Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2739"/>
+        <location filename="../playinggamestate.cpp" line="2747"/>
         <source>Pause the game (P)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2744"/>
+        <location filename="../playinggamestate.cpp" line="2752"/>
         <source>Rest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2747"/>
+        <location filename="../playinggamestate.cpp" line="2755"/>
         <source>Rest until you are healed (R)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2752"/>
+        <location filename="../playinggamestate.cpp" line="2760"/>
         <source>Options</source>
         <translation>Options</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2755"/>
+        <location filename="../playinggamestate.cpp" line="2763"/>
         <source>Options to save game or quit (Escape)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3485"/>
+        <location filename="../playinggamestate.cpp" line="3493"/>
         <source>Toggle turbo mode: make game time go faster (T)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3498"/>
+        <location filename="../playinggamestate.cpp" line="3506"/>
         <source>Quick-save (F5)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3513"/>
+        <location filename="../playinggamestate.cpp" line="3521"/>
         <source>Zoom out (-)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3527"/>
+        <location filename="../playinggamestate.cpp" line="3535"/>
         <source>Zoom in (+)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3541"/>
+        <location filename="../playinggamestate.cpp" line="3549"/>
         <source>Centre view on your player&apos;s location (C)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3776"/>
-        <location filename="../playinggamestate.cpp" line="6299"/>
+        <location filename="../playinggamestate.cpp" line="3784"/>
+        <location filename="../playinggamestate.cpp" line="6309"/>
         <source>You cannot save here - enemies are nearby.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3780"/>
+        <location filename="../playinggamestate.cpp" line="3788"/>
         <source>The game has been successfully saved</source>
         <translation>Le jeu a bien été sauvegardé</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="3783"/>
+        <location filename="../playinggamestate.cpp" line="3791"/>
         <source>Failed to save game!</source>
         <translation>Erreur de sauvegarde!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="5735"/>
+        <location filename="../playinggamestate.cpp" line="5745"/>
         <source>Random dungeon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="5917"/>
+        <location filename="../playinggamestate.cpp" line="5927"/>
         <source>Quest Details:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="5936"/>
+        <location filename="../playinggamestate.cpp" line="5946"/>
         <source>Processing locations: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6208"/>
+        <location filename="../playinggamestate.cpp" line="6218"/>
         <source>Quit game</source>
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6211"/>
+        <location filename="../playinggamestate.cpp" line="6221"/>
         <source>Quit current game, and return to the main menu (Q)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6217"/>
+        <location filename="../playinggamestate.cpp" line="6227"/>
         <source>Save game</source>
         <translation>Sauvegarder jeu</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6220"/>
+        <location filename="../playinggamestate.cpp" line="6230"/>
         <source>Save the current game (S)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6226"/>
+        <location filename="../playinggamestate.cpp" line="6236"/>
         <source>Back to game</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6250"/>
+        <location filename="../playinggamestate.cpp" line="6260"/>
         <source>You cannot rest here - enemies are nearby.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6253"/>
+        <location filename="../playinggamestate.cpp" line="6263"/>
         <source>Rest until fully healed?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6261"/>
+        <location filename="../playinggamestate.cpp" line="6271"/>
         <source>You are disturbed by a
 wandering monster!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6327"/>
+        <location filename="../playinggamestate.cpp" line="6337"/>
         <source>Continue</source>
         <translation>Continuer</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6396"/>
+        <location filename="../playinggamestate.cpp" line="6406"/>
         <source>Are you sure you wish to quit?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6533"/>
+        <location filename="../playinggamestate.cpp" line="6544"/>
         <source>You are too terrified to move!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6992"/>
+        <location filename="../playinggamestate.cpp" line="7003"/>
         <source>Goodbye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7210"/>
+        <location filename="../playinggamestate.cpp" line="7221"/>
         <source>Opening door...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7535"/>
+        <location filename="../playinggamestate.cpp" line="7547"/>
         <source>You are carrying too much weight to move!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7538"/>
+        <location filename="../playinggamestate.cpp" line="7550"/>
         <source>The armour you are wearing is
 too heavy for you to move!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7547"/>
+        <location filename="../playinggamestate.cpp" line="7559"/>
         <source>Weapon has no effect!</source>
         <translation>Cette arme n&apos;a aucun effet!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7552"/>
+        <location filename="../playinggamestate.cpp" line="7564"/>
         <source>Holy weapon has no effect!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -690,22 +687,22 @@ too heavy for you to move!</source>
         <translation>Vous n&apos;êtes pas assez fort pour utiliser cette arme!</translation>
     </message>
     <message>
-        <location filename="../rpg/character.cpp" line="939"/>
+        <location filename="../rpg/character.cpp" line="940"/>
         <source>Argh!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rpg/character.cpp" line="941"/>
+        <location filename="../rpg/character.cpp" line="942"/>
         <source>Ow!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rpg/character.cpp" line="943"/>
+        <location filename="../rpg/character.cpp" line="944"/>
         <source>Ouch!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rpg/character.cpp" line="945"/>
+        <location filename="../rpg/character.cpp" line="946"/>
         <source>Eek!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1032,67 +1029,67 @@ A bomb blows your body to pieces...</source>
 <context>
     <name>SaveGameWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="2336"/>
-        <location filename="../playinggamestate.cpp" line="2486"/>
-        <location filename="../playinggamestate.cpp" line="2547"/>
+        <location filename="../playinggamestate.cpp" line="2342"/>
+        <location filename="../playinggamestate.cpp" line="2492"/>
+        <location filename="../playinggamestate.cpp" line="2553"/>
         <source>The game has been successfully saved</source>
         <translation>Le jeu a bien été sauvegardé</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2339"/>
-        <location filename="../playinggamestate.cpp" line="2489"/>
-        <location filename="../playinggamestate.cpp" line="2550"/>
+        <location filename="../playinggamestate.cpp" line="2345"/>
+        <location filename="../playinggamestate.cpp" line="2495"/>
+        <location filename="../playinggamestate.cpp" line="2556"/>
         <source>Failed to save game!</source>
         <translation>Erreur de sauvegarde!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2366"/>
+        <location filename="../playinggamestate.cpp" line="2372"/>
         <source>New Save Game File</source>
         <translation>Nouveau fichier de sauvegarde</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2386"/>
+        <location filename="../playinggamestate.cpp" line="2392"/>
         <source>Save</source>
         <translation>Sauvegarde</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2393"/>
+        <location filename="../playinggamestate.cpp" line="2399"/>
         <source>Delete File</source>
         <translation>Effacer fichier</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2395"/>
+        <location filename="../playinggamestate.cpp" line="2401"/>
         <source>Delete the selected save game file (D)</source>
         <translation>Effacer le fichier de sauvegarde sélectionné (D)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2402"/>
-        <location filename="../playinggamestate.cpp" line="2459"/>
+        <location filename="../playinggamestate.cpp" line="2408"/>
+        <location filename="../playinggamestate.cpp" line="2465"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2437"/>
+        <location filename="../playinggamestate.cpp" line="2443"/>
         <source>Choose a filename:</source>
         <translation>Choisir un nom de fichier:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2451"/>
+        <location filename="../playinggamestate.cpp" line="2457"/>
         <source>Save game</source>
         <translation>Sauvegarder jeu</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2508"/>
+        <location filename="../playinggamestate.cpp" line="2514"/>
         <source>Are you sure you wish to delete save game:</source>
         <translation>Etes-vous sûr de vouloir effacer le fichier de sauvegarde:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2528"/>
+        <location filename="../playinggamestate.cpp" line="2534"/>
         <source>Please enter a filename.</source>
         <translation>Veuillez entrer un nom de fichier.</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="2540"/>
+        <location filename="../playinggamestate.cpp" line="2546"/>
         <source>Are you sure you wish to overwrite an existing save game file?</source>
         <translation>Etes-vous sûr de vouloir écraser le fichier de sauvegarde existant?</translation>
     </message>
@@ -1100,7 +1097,7 @@ A bomb blows your body to pieces...</source>
 <context>
     <name>StatsWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="982"/>
+        <location filename="../playinggamestate.cpp" line="988"/>
         <source>Continue</source>
         <translation>Continuer</translation>
     </message>
@@ -1108,68 +1105,68 @@ A bomb blows your body to pieces...</source>
 <context>
     <name>TradeWindow</name>
     <message>
-        <location filename="../playinggamestate.cpp" line="1551"/>
+        <location filename="../playinggamestate.cpp" line="1557"/>
         <source>What would you like to buy?</source>
         <translation>Que voulez-vous acheter?</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1568"/>
+        <location filename="../playinggamestate.cpp" line="1574"/>
         <source>Your items:</source>
         <translation>Vos objets:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1571"/>
+        <location filename="../playinggamestate.cpp" line="1577"/>
         <source>Items to buy:</source>
         <translation>Objets à acheter:</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1625"/>
-        <location filename="../playinggamestate.cpp" line="1688"/>
+        <location filename="../playinggamestate.cpp" line="1631"/>
+        <location filename="../playinggamestate.cpp" line="1694"/>
         <source>gold</source>
         <translation>Or</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1638"/>
+        <location filename="../playinggamestate.cpp" line="1644"/>
         <source>Sell</source>
         <translation>Vendre</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1641"/>
+        <location filename="../playinggamestate.cpp" line="1647"/>
         <source>Sell the item selected of yours (on the left) (S)</source>
         <translation type="unfinished">Vendre l&apos;élément sélectionné (S)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1646"/>
+        <location filename="../playinggamestate.cpp" line="1652"/>
         <source>Buy</source>
         <translation>Acheter</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1649"/>
+        <location filename="../playinggamestate.cpp" line="1655"/>
         <source>Buy the item selected (on the right) (B)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1654"/>
+        <location filename="../playinggamestate.cpp" line="1660"/>
         <source>Info</source>
         <translation>Informations</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1657"/>
+        <location filename="../playinggamestate.cpp" line="1663"/>
         <source>Display more information about the selected item for sale (I)</source>
         <translation>Afficher plus d&apos;informations sur l&apos;objet sélectionné à vendre (I)</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1663"/>
+        <location filename="../playinggamestate.cpp" line="1669"/>
         <source>Finish Trading</source>
         <translation>Finir commerce</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1676"/>
+        <location filename="../playinggamestate.cpp" line="1682"/>
         <source>Gold</source>
         <translation>Or</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="1728"/>
+        <location filename="../playinggamestate.cpp" line="1734"/>
         <source>You do not have enough money to purchase this item.</source>
         <translation>Vous n&apos;avez pas asser d&apos;argent pour acheter cet objet.</translation>
     </message>
