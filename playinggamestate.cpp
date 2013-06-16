@@ -6619,7 +6619,7 @@ void PlayingGamestate::update() {
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
             // check if we need to update the target
-            bool need_update = true;
+            /*bool need_update = true;
             if( this->player->hasPath() ) {
                 Vector2D current_dest = this->player->getDestination();
                 Vector2D current_dir = current_dest - this->player->getPos();
@@ -6636,9 +6636,10 @@ void PlayingGamestate::update() {
                 //qDebug("update");
                 this->requestPlayerMove(dest, NULL);
             }
-            /*else {
-                qDebug("no update");
+            else {
+                //qDebug("no update");
             }*/
+            this->requestPlayerMove(dest, NULL);
         }
 #ifdef TIMING_INFO
         qDebug("keyboard input took %d", timer_kinput.elapsed());
