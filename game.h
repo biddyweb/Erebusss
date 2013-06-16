@@ -310,7 +310,7 @@ public:
     virtual void advance(int phase);
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     virtual QRectF boundingRect() const;
-    virtual void update()=0;
+    virtual void updatePS()=0;
 };
 
 class SmokeParticleSystem : public ParticleSystem {
@@ -321,7 +321,7 @@ public:
     SmokeParticleSystem(const QPixmap &pixmap);
     void setBirthRate(float birth_rate);
 
-    virtual void update();
+    virtual void updatePS();
 };
 
 class ScrollingListWidget : public QListWidget {

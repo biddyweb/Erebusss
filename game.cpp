@@ -248,7 +248,7 @@ void AnimatedObject::advance(int phase) {
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );
         if( n_frame != c_frame ) {
             c_frame = n_frame;
-            //this->update();
+            this->update();
         }
     }
 }
@@ -381,7 +381,7 @@ Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0), flag(false) {
 void ParticleSystem::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
-        this->update();
+        this->updatePS();
     }
 }
 
@@ -410,7 +410,8 @@ void SmokeParticleSystem::setBirthRate(float birth_rate) {
     this->birth_rate = birth_rate;
 }
 
-void SmokeParticleSystem::update() {
+void SmokeParticleSystem::updatePS() {
+    //qDebug("smoke update");
     // expire old particles
     int time_now = game_g->getScreen()->getGameTimeTotalMS();
     for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
@@ -467,6 +468,8 @@ void SmokeParticleSystem::update() {
                     particles.push_back(particle);
             }
     }
+
+    this->update();
 }
 
 ScrollingListWidget::ScrollingListWidget() : QListWidget(), saved_x(0), saved_y(0) {
