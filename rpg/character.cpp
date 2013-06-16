@@ -902,13 +902,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 if( next_seg ) {
                     this->path.erase(this->path.begin());
                     if( this->path.size() == 0 ) {
-                        this->setStateIdle();
+                        if( this == playing_gamestate->getPlayer() && playing_gamestate->isKeyboardMoving() ) {
+                            // don't set to idle, as player is still requesting keyboard movement
+                            this->has_path = false;
+                        }
+                        else {
+                            this->setStateIdle();
+                        }
                     }
                 }
             }
         }
     }
 
+    //qDebug("Character::update() done: %s", this->name.c_str());
     return false;
 }
 
@@ -947,6 +954,7 @@ void Character::addPainTextEffect(PlayingGamestate *playing_gamestate) const {
 }
 
 void Character::setStateIdle() {
+    //qDebug("set idle");
     //has_destination = false;
     has_path = false;
     //is_hitting = false;

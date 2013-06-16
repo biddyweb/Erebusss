@@ -2566,6 +2566,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     /*main_stacked_widget(NULL),*/
     turboButton(NULL), quickSaveButton(NULL), zoomoutButton(NULL), zoominButton(NULL), centreButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
+    is_keyboard_moving(false),
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
     cheat_mode(cheat_mode),
@@ -4253,6 +4254,7 @@ void PlayingGamestate::setupView() {
     radialGrad.setColorAt(1.0, Qt::transparent);
     //radialGrad.setColorAt(0.0, QColor(0, 0, 0, 0));
     //radialGrad.setColorAt(1.0, QColor(0, 0, 0, alpha));
+
     QPixmap pixmap(size_c, size_c);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
@@ -6622,10 +6624,11 @@ void PlayingGamestate::update() {
             dest.y += step;
         }
         if( moved ) {
+            this->is_keyboard_moving = true;
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
             // check if we need to update the target
-            /*bool need_update = true;
+            bool need_update = true;
             if( this->player->hasPath() ) {
                 Vector2D current_dest = this->player->getDestination();
                 Vector2D current_dir = current_dest - this->player->getPos();
@@ -6644,8 +6647,11 @@ void PlayingGamestate::update() {
             }
             else {
                 //qDebug("no update");
-            }*/
-            this->requestPlayerMove(dest, NULL);
+            }
+        }
+        else if( this->is_keyboard_moving ) {
+            this->is_keyboard_moving = false;
+            this->player->setStateIdle(); // needed, as for keyboard movement this may not have been done by the Character::update()
         }
 #ifdef TIMING_INFO
         qDebug("keyboard input took %d", timer_kinput.elapsed());

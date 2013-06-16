@@ -492,6 +492,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     vector<CharacterAction *> character_actions;
 
+    bool is_keyboard_moving;
+
     // character items in the view
     set<QGraphicsItem *> graphicsitems_characters;
 
@@ -665,6 +667,9 @@ public:
     }
     MainGraphicsView *getView() {
         return this->view;
+    }
+    bool isKeyboardMoving() const {
+        return this->is_keyboard_moving;
     }
 
     void addCharacterAction(CharacterAction *character_action) {
