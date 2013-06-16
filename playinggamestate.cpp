@@ -2669,6 +2669,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
     //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
+    view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // as we force an update every frame, anyway
 
     /*QWidget *centralWidget = new QWidget(window);
     this->mainwindow = centralWidget;
@@ -4289,13 +4290,7 @@ void PlayingGamestate::setupView() {
     }
     this->testFogOfWar();
 
-    /*gui_overlay->unsetProgress();
-    qApp->processEvents();
-    for(int i=0;i<10000;i++) {
-        LOG("blah\n");
-    }*/
     LOG("done\n");
-
 }
 
 #ifdef _DEBUG
@@ -6840,7 +6835,7 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
-    gui_overlay->update(); // force the GUI overlay to be updated every frame (otherwise causes drawing problems on Windows at least)
+    this->view->viewport()->update(); // force update every frame
 }
 
 void PlayingGamestate::checkQuestComplete() {
