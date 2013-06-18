@@ -520,20 +520,20 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 #if defined(Q_OS_ANDROID)
     // on Android, try for the sdcard, so we can find somewhere more accessible to the user (and that I can read on my Galaxy Nexus!!!)
     bool sdcard_okay = true;
-    QString nativePath = QString("/sdcard/net.sourceforge.erebusrpg");
-    qDebug("try sd card: %s", nativePath.toStdString().c_str());
-    if( !QDir(nativePath).exists() ) {
+    QString sdnativePath = QString("/sdcard/net.sourceforge.erebusrpg");
+    qDebug("try sd card: %s", sdnativePath.toStdString().c_str());
+    if( !QDir(sdnativePath).exists() ) {
         qDebug("try creating application folder in sdcard/");
         // folder doesn't seem to exist - try creating it
-        QDir().mkdir(nativePath);
-        if( !QDir(nativePath).exists() ) {
+        QDir().mkdir(sdnativePath);
+        if( !QDir(sdnativePath).exists() ) {
             qDebug("failed to create application folder in sdcard/");
             sdcard_okay = false;
         }
     }
     if( sdcard_okay ) {
-        logfilename = getFilename(nativePath, "log.txt");
-        oldlogfilename = getFilename(nativePath, "log_old.txt");
+        logfilename = getFilename(sdnativePath, "log.txt");
+        oldlogfilename = getFilename(sdnativePath, "log_old.txt");
     }
     else {
         logfilename = getApplicationFilename("log.txt");
