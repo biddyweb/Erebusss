@@ -75,6 +75,8 @@ protected:
     Vector2D smoke_pos;
     float width, height;
     float visual_height; // not saved
+    bool boundary_iso;
+    float boundary_iso_ratio;
 
     // actions are events which happen periodically
     int action_last_time;
@@ -318,6 +320,17 @@ public:
         return this->visual_height;
     }
     void getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const;
+
+    void setBoundaryIso(float boundary_iso_ratio) {
+        this->boundary_iso = true;
+        this->boundary_iso_ratio = boundary_iso_ratio;
+    }
+    bool isBoundaryIso() const {
+        return this->boundary_iso;
+    }
+    float getBoundaryIsoRatio() const {
+        return this->boundary_iso_ratio;
+    }
 
     void addItem(Item *item);
     void removeItem(Item *item);
@@ -611,7 +624,7 @@ protected:
     bool testVisibility(Vector2D pos, const FloorRegion *floor_region, size_t j) const;
     bool testGraphVerticesHit(float *dist, GraphVertex *v_A, GraphVertex *v_B, const void *ignore, bool can_fly) const;
 
-    void createBoundaryForRect(Vector2D pos, float width, float height, void *source, int source_type);
+    void createBoundaryForRect(Vector2D pos, float width, float height, bool boundary_iso, float boundary_iso_ratio, void *source, int source_type);
 
     // rule of three
     Location& operator=(const Location &location) {

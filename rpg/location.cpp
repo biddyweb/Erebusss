@@ -18,7 +18,7 @@ using std::swap;
 Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height) :
     location(NULL), name(name), image_name(image_name), is_animation(is_animation), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), exit_travel_time(0), is_locked(false), locked_silent(false), locked_used_up(false), key_always_needed(false), unlock_xp(20),
-    draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height),
+    draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height), boundary_iso(false), boundary_iso_ratio(0.0f),
     action_last_time(0), action_delay(0), action_value(0),
     interact_state(0),
     can_be_opened(false), opened(false),
@@ -979,7 +979,7 @@ void Location::createBoundariesForRegions() {
     }
 }
 
-void Location::createBoundaryForRect(Vector2D pos, float width, float height, void *source, int source_type) {
+void Location::createBoundaryForRect(Vector2D pos, float width, float height, bool boundary_iso, float boundary_iso_ratio, void *source, int source_type) {
     Polygon2D boundary;
     boundary.setSourceType(source_type);
     boundary.setSource(source);
@@ -988,6 +988,14 @@ void Location::createBoundaryForRect(Vector2D pos, float width, float height, vo
     Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
     Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
     Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
+
+    if( boundary_iso && width - height < E_TOL_LINEAR ) {
+        p0.y += (1.0f-boundary_iso_ratio)*height;
+        p1.x -= boundary_iso_ratio*width;
+        p2.y -= (1.0f-boundary_iso_ratio)*height;
+        p3.x += boundary_iso_ratio*width;
+    }
+
     if( this->findFloorRegionAt(p0) == NULL ) {
         LOG("can't find floor region for p0 at: %f, %f\n", p0.x, p0.y);
         LOG("rect at %f, %f: %d\n", pos.x, pos.y, source);
@@ -1025,7 +1033,7 @@ void Location::createBoundariesForScenery() {
         //qDebug(">>> set scenery %d", scenery);
         float width = scenery->getWidth(), height = scenery->getHeight();
         Vector2D pos = scenery->getPos();
-        this->createBoundaryForRect(pos, width, height, scenery, (int)SOURCETYPE_SCENERY);
+        this->createBoundaryForRect(pos, width, height, scenery->isBoundaryIso(), scenery->getBoundaryIsoRatio(), scenery, (int)SOURCETYPE_SCENERY);
         //qDebug("scenery at %f, %f", pos.x, pos.y);
     }
     qDebug("    done");
@@ -1038,7 +1046,7 @@ void Location::createBoundariesForFixedNPCs() {
             continue;
         }
         Vector2D pos = character->getPos();
-        this->createBoundaryForRect(pos, 2.0f*npc_radius_c, 2.0f*npc_radius_c, character, (int)SOURCETYPE_FIXED_NPC);
+        this->createBoundaryForRect(pos, 2.0f*npc_radius_c, 2.0f*npc_radius_c, false, 0.0f, character, (int)SOURCETYPE_FIXED_NPC);
     }
     qDebug("    done");
 }
@@ -2774,6 +2782,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     int passage_length_i = 0;
     {
         int roll = first ? 1 : rollDice(1, 10, 0);
+
         if( roll <= 6 )
             passage_length_i = 1;
         else if( roll <= 9 )

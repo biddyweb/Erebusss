@@ -4774,7 +4774,7 @@ void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, f
     }
 
     if( !has_visual_h ) {
-        // default to size_
+        // default to size_h
         visual_h = size_h;
     }
 
@@ -4795,6 +4795,7 @@ void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, f
         }
     }
 
+    qDebug("image %s: size_w: %f size_h: %f visual_h %f", image_name.c_str(), size_w, size_h, visual_h);
     *ret_size_w = size_w;
     *ret_size_h = size_h;
     *ret_visual_h = visual_h;
@@ -5396,59 +5397,21 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         has_visual_h = true;
                         visual_h = parseFloat(visual_h_s.toString());
                     }
+                    bool boundary_iso = false;
+                    float boundary_iso_ratio = 0.0f;
+                    QStringRef boundary_iso_s = reader.attributes().value("boundary_iso");
+                    if( boundary_iso_s.length() > 0 ) {
+                        boundary_iso = parseBool(boundary_iso_s.toString());
+                        QStringRef boundary_iso_ratio_s = reader.attributes().value("boundary_iso_ratio");
+                        boundary_iso_ratio = parseFloat(boundary_iso_ratio_s.toString());
+                    }
 
                     this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
 
-                    /*if( size_s.length() > 0 ) {
-                        float size = parseFloat(size_s.toString());
-                        const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
-                        QPixmap image = animation_layer->getAnimationSet("")->getFrame(0, 0);
-                        int image_w = image.width();
-                        int image_h = image.height();
-                        if( image_w > image_h ) {
-                            size_w = size;
-                            size_h = (size*image_h)/(float)image_w;
-                        }
-                        else {
-                            size_h = size;
-                            size_w = (size*image_w)/(float)image_h;
-                        }
-                        qDebug("size: %f size_w: %f size_h: %f", size, size_w, size_h);
-                    }
-                    else {
-                        QStringRef size_w_s = reader.attributes().value("w");
-                        QStringRef size_h_s = reader.attributes().value("h");
-                        size_w = parseFloat(size_w_s.toString());
-                        size_h = parseFloat(size_h_s.toString());
-                    }
-
-                    float visual_h = 0.0f;
-                    QStringRef visual_h_s = reader.attributes().value("visual_h");
-                    if( visual_h_s.length() > 0 ) {
-                        visual_h = parseFloat(visual_h_s.toString());
-                    }
-                    else {
-                        visual_h = size_h;
-                    }
-
-                    if( this->view_transform_3d ) {
-                        // hack to get height right in 3D mode!
-                        if( size_s.length() == 0 ) {
-                            // if we have specified w/h values explicitly, we assume these are in world coordinates already
-                        }
-                        else {
-                            // otherwise we assume the width/height of the image are already in "isometric"/3D format
-                            if( visual_h_s.length() == 0 )
-                                visual_h *= 2.0f; // to counter the QGraphicsView scaling
-                            size_h = size_w;
-                            if( visual_h_s.length() == 0 ) {
-                                visual_h = std::max(visual_h, size_h);
-                                ASSERT_LOGGER( visual_h - size_h >= 0.0f );
-                            }
-                        }
-                    }*/
-
                     scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h);
+                    if( boundary_iso ) {
+                        scenery->setBoundaryIso(boundary_iso_ratio);
+                    }
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -8276,11 +8239,11 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 //fprintf(file, " big_image_name=\"%s\"", scenery->getBigImageName().c_str());
                 stream << " big_image_name=\"" << scenery->getBigImageName().c_str() << "\"";
             }
-            //fprintf(file, " x=\"%f\" y=\"%f\"", scenery->getX(), scenery->getY());
             stream << " x=\"" << scenery->getX() << "\" y=\"" << scenery->getY() << "\"";
-            //fprintf(file, " w=\"%f\" h=\"%f\" visual_h=\"%f\"", scenery->getWidth(), scenery->getHeight(), scenery->getVisualHeight());
             stream << " w=\"" << scenery->getWidth() << "\" h=\"" << scenery->getHeight() << "\" visual_h=\"" << scenery->getVisualHeight() << "\"";
-            //fprintf(file, " opacity=\"%f\"", scenery->getOpacity());
+            if( scenery->isBoundaryIso() ) {
+                stream << " boundary_iso=\"true\" boundary_iso_ratio=\"" << scenery->getBoundaryIsoRatio() << "\"";
+            }
             stream << " opacity=\"" << scenery->getOpacity() << "\"";
             switch( scenery->getDrawType() ) {
             case Scenery::DRAWTYPE_NORMAL:
