@@ -187,7 +187,7 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0)
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0)
 {
     this->fps_timer.invalidate();
     for(int i=0;i<N_KEYS;i++) {
@@ -503,13 +503,19 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
     if( !smallscreen_c )
     {
         if( fps_timer.isValid() ) {
+            fps_frame_count++;
             int time_ms = fps_timer.elapsed();
-            if( time_ms > 0 ) {
-                float fps = 1000.0f/(float)time_ms;
+            if( time_ms > 1000 ) {
+                float fps = (fps_frame_count*1000.0f)/(float)time_ms;
                 this->gui_overlay->setFPS(fps);
+                fps_timer.start();
+                fps_frame_count = 0;
             }
         }
-        fps_timer.start();
+        else {
+            fps_timer.start();
+            fps_frame_count = 0;
+        }
     }
 
     QGraphicsView::paintEvent(event);
@@ -2677,6 +2683,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     view->setCacheMode(QGraphicsView::CacheBackground);
     //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
     view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
+    //view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time
     view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
 
     /*QWidget *centralWidget = new QWidget(window);
@@ -4293,6 +4300,7 @@ void PlayingGamestate::setupView() {
     // n.b., we look through all the regions rather than just those updated, so that this works when loading a game (as then, other floor regions may have been previously set to be visible)
     for(size_t i=0;i<c_location->getNFloorRegions();i++) {
         FloorRegion *floor_region = c_location->getFloorRegion(i);
+        //floor_region->setVisible(true); // test for all regions visible
         if( floor_region->isVisible() ) {
             this->updateVisibilityForFloorRegion(floor_region);
         }
@@ -6812,6 +6820,7 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
+    //this->view->viewport()->update();
 }
 
 void PlayingGamestate::checkQuestComplete() {
