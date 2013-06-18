@@ -2682,8 +2682,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
     view->setCacheMode(QGraphicsView::CacheBackground);
     //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
-    view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
-    //view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time
+    //view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
+    view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time (better performance than FullViewportUpdate)
     view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
 
     /*QWidget *centralWidget = new QWidget(window);
@@ -6820,7 +6820,7 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
-    //this->view->viewport()->update();
+    this->view->viewport()->update();
 }
 
 void PlayingGamestate::checkQuestComplete() {
