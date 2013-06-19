@@ -4079,7 +4079,6 @@ void PlayingGamestate::setupView() {
         QPolygonF polygon;
         for(size_t j=0;j<floor_region->getNPoints();j++) {
             Vector2D point = floor_region->getPoint(j);
-            //QPointF qpoint(point.x, point.y + offset_y);
             QPointF qpoint(point.x, point.y);
             polygon.push_back(qpoint);
         }
@@ -4108,60 +4107,57 @@ void PlayingGamestate::setupView() {
 
             if( c_location->getWallImageName().length() > 0 ) {
                 if( !this->view_walls_3d || normal_into_wall.y > -E_TOL_LINEAR ) {
-                    QPolygonF wall_polygon;
                     const float wall_dist = 0.1f;
-                    wall_polygon.push_back(QPointF(p0.x, p0.y));
-                    wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
-                    wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
-                    wall_polygon.push_back(QPointF(p1.x, p1.y));
-                    QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
-                    wall_item->setPen(Qt::NoPen);
-                    wall_item->setBrush(wall_brush);
+                    if( fabs(p0.y - p1.y) < E_TOL_LINEAR ) {
+                        QGraphicsRectItem *wall_item = new QGraphicsRectItem(std::min(p0.x, p1.x), std::min(p0.y, p0.y - wall_dist), fabs(p1.x - p0.x), wall_dist, item);
+                        wall_item->setPen(Qt::NoPen);
+                        wall_item->setBrush(wall_brush);
+                    }
+                    else {
+                        QPolygonF wall_polygon;
+                        wall_polygon.push_back(QPointF(p0.x, p0.y));
+                        wall_polygon.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y + wall_dist * normal_into_wall.y));
+                        wall_polygon.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y + wall_dist * normal_into_wall.y));
+                        wall_polygon.push_back(QPointF(p1.x, p1.y));
+                        QGraphicsPolygonItem *wall_item = new QGraphicsPolygonItem(wall_polygon, item);
+                        wall_item->setPen(Qt::NoPen);
+                        wall_item->setBrush(wall_brush);
+                    }
                 }
 
                 if( this->view_walls_3d ) {
                     const float wall_height = this->view_transform_3d ? 0.9f : 0.5f;
                     if( fabs(normal_into_wall.y) > E_TOL_LINEAR ) {
-                        QPolygonF wall_polygon_3d;
                         if( normal_into_wall.y < 0.0f )
                         {
-                            QBrush wall_brush_3d = wall_brush;
-                            QTransform transform;
-                            transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/wall_scale * (p1.y - p0.y) / (p1.x - p0.x));
-                            transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
-                            transform *= wall_brush_3d.transform();
-                            wall_brush_3d.setTransform(transform);
-                            wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
-                            wall_polygon_3d.push_back(QPointF(p0.x, p0.y - wall_height));
-                            wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
-                            wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
-                            QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
-                            wall_item_3d->setPen(Qt::NoPen);
-                            wall_item_3d->setBrush(wall_brush_3d);
-                            /*if( normal_into_wall.y > 0.0f ) {
-                                wall_item_3d->setZValue(1000000.0);
-                                wall_item_3d->setFlag(QGraphicsItem::ItemStacksBehindParent);
-                            }*/
+                            if( fabs(p0.y - p1.y) < E_TOL_LINEAR ) {
+                                QBrush wall_brush_3d = wall_brush;
+                                QTransform transform;
+                                transform.translate(0.0f, (p1.y - wall_height)/wall_scale);
+                                transform *= wall_brush_3d.transform();
+                                wall_brush_3d.setTransform(transform);
+                                QGraphicsRectItem *wall_item_3d = new QGraphicsRectItem(std::min(p0.x, p1.x), p0.y - wall_height, fabs(p1.x - p0.x), wall_height, item);
+                                wall_item_3d->setPen(Qt::NoPen);
+                                wall_item_3d->setBrush(wall_brush_3d);
+                            }
+                            else {
+                                QBrush wall_brush_3d = wall_brush;
+                                QTransform transform;
+                                transform.translate(0.0f, (p1.y - wall_height)/wall_scale - p1.x/wall_scale * (p1.y - p0.y) / (p1.x - p0.x));
+                                transform.shear(0.0f, wall_brush_ratio*(p1.y - p0.y) / (p1.x - p0.x));
+                                transform *= wall_brush_3d.transform();
+                                wall_brush_3d.setTransform(transform);
+                                QPolygonF wall_polygon_3d;
+                                wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
+                                wall_polygon_3d.push_back(QPointF(p0.x, p0.y - wall_height));
+                                wall_polygon_3d.push_back(QPointF(p1.x, p1.y - wall_height));
+                                wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
+                                QGraphicsPolygonItem *wall_item_3d = new QGraphicsPolygonItem(wall_polygon_3d, item);
+                                wall_item_3d->setPen(Qt::NoPen);
+                                wall_item_3d->setBrush(wall_brush_3d);
+                            }
                         }
-                        /*else {
-                            //wall_polygon_3d.push_back(QPointF(p0.x, p0.y));
-                            //wall_polygon_3d.push_back(QPointF(p0.x, p0.y + wall_height));
-                            //wall_polygon_3d.push_back(QPointF(p1.x, p1.y + wall_height));
-                            //wall_polygon_3d.push_back(QPointF(p1.x, p1.y));
-                        }*/
                     }
-                    /*if( normal_into_wall.y < E_TOL_LINEAR ) {
-                        QPolygonF wall_polygon_top;
-                        const float wall_dist = 0.1f;
-                        wall_polygon_top.push_back(QPointF(p0.x, p0.y - wall_height));
-                        wall_polygon_top.push_back(QPointF(p0.x + wall_dist * normal_into_wall.x, p0.y - wall_height + wall_dist * normal_into_wall.y));
-                        wall_polygon_top.push_back(QPointF(p1.x + wall_dist * normal_into_wall.x, p1.y - wall_height + wall_dist * normal_into_wall.y));
-                        wall_polygon_top.push_back(QPointF(p1.x, p1.y - wall_height));
-                        QGraphicsPolygonItem *wall_item_top = new QGraphicsPolygonItem(wall_polygon_top, item);
-                        wall_item_top->setPen(Qt::NoPen);
-                        wall_item_top->setBrush(wall_brush);
-                    }*/
-
                 }
             }
             if( c_location->getDropWallImageName().length() > 0 && view_walls_3d ) {
