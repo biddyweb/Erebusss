@@ -5983,7 +5983,7 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item, boo
 
 void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) {
     if( this->c_location == location ) {
-        QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+        QGraphicsItem *object = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
         item->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
@@ -6051,7 +6051,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
 
 void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
     if( this->c_location == location ) {
-        QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+        QGraphicsItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
         scenery->setUserGfxData(NULL);
         scene->removeItem(object);
         delete object;
@@ -7550,27 +7550,11 @@ void PlayingGamestate::hitEnemy(Character *source, Character *target, bool weapo
 }
 
 void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region) {
-    /*QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
-    gfx_item->setVisible( floor_region->isVisible() );
-    for(set<Scenery *>::iterator iter = floor_region->scenerysBegin(); iter != floor_region->scenerysEnd(); ++iter) {
-        Scenery *scenery = *iter;
-        QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-        if( gfx_item2 != NULL ) {
-            gfx_item2->setVisible( floor_region->isVisible() );
-        }
-    }
-    for(set<Item *>::iterator iter = floor_region->itemsBegin(); iter != floor_region->itemsEnd(); ++iter) {
-        Item *item = *iter;
-        QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
-        if( gfx_item2 != NULL ) {
-            gfx_item2->setVisible( floor_region->isVisible() );
-        }
-    }*/
     //qDebug("updateVisibilityForFloorRegion");
     ASSERT_LOGGER( floor_region->isVisible() );
     if( floor_region->isVisible() ) {
         //qDebug("floor_region %d", floor_region);
-        QGraphicsPolygonItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
+        QGraphicsItem *gfx_item = static_cast<QGraphicsPolygonItem *>(floor_region->getUserGfxData());
         //qDebug("gfx_item %d", gfx_item);
         ASSERT_LOGGER(gfx_item != NULL);
         gfx_item->setVisible( true );
@@ -7580,7 +7564,7 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
             //qDebug("scenery %d", scenery);
             //qDebug("    %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
             //qDebug("    at %f, %f", scenery->getX(), scenery->getY());
-            QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
+            QGraphicsItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
             //qDebug("gfx_item2 %d", gfx_item2);
             if( gfx_item2 != NULL ) {
                 gfx_item2->setVisible( true );
@@ -7590,7 +7574,7 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
         for(set<Item *>::iterator iter = floor_region->itemsBegin(); iter != floor_region->itemsEnd(); ++iter) {
             Item *item = *iter;
             //qDebug("item %d", item);
-            QGraphicsPixmapItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
+            QGraphicsItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(item->getUserGfxData());
             //qDebug("gfx_item2 %d", gfx_item2);
             if( gfx_item2 != NULL ) {
                 gfx_item2->setVisible( true );
