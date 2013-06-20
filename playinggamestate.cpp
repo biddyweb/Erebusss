@@ -1059,7 +1059,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewAllButton = new QPushButton(tr("All"));
         game_g->initButton(viewAllButton);
         viewAllButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewAllButton->setToolTip(tr("Display all items (F1)"));
+#endif
         viewAllButton->setShortcut(QKeySequence(Qt::Key_F1));
         h_layout->addWidget(viewAllButton);
         connect(viewAllButton, SIGNAL(clicked()), this, SLOT(clickedViewAll()));
@@ -1067,7 +1070,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewWeaponsButton = new QPushButton(tr("Wpns"));
         game_g->initButton(viewWeaponsButton);
         viewWeaponsButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewWeaponsButton->setToolTip(tr("Display only weapons (F2)"));
+#endif
         viewWeaponsButton->setShortcut(QKeySequence(Qt::Key_F2));
         h_layout->addWidget(viewWeaponsButton);
         connect(viewWeaponsButton, SIGNAL(clicked()), this, SLOT(clickedViewWeapons()));
@@ -1075,7 +1081,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewAmmoButton = new QPushButton(tr("Ammo"));
         game_g->initButton(viewAmmoButton);
         viewAmmoButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewAmmoButton->setToolTip(tr("Display only ammunition (F3)"));
+#endif
         viewAmmoButton->setShortcut(QKeySequence(Qt::Key_F3));
         h_layout->addWidget(viewAmmoButton);
         connect(viewAmmoButton, SIGNAL(clicked()), this, SLOT(clickedViewAmmo()));
@@ -1083,7 +1092,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewShieldsButton = new QPushButton(tr("Shields"));
         game_g->initButton(viewShieldsButton);
         viewShieldsButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewShieldsButton->setToolTip(tr("Display only shields (F4)"));
+#endif
         viewShieldsButton->setShortcut(QKeySequence(Qt::Key_F4));
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
@@ -1091,7 +1103,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewArmourButton = new QPushButton(tr("Arm"));
         game_g->initButton(viewArmourButton);
         viewArmourButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewArmourButton->setToolTip(tr("Display only armour (F5)"));
+#endif
         viewArmourButton->setShortcut(QKeySequence(Qt::Key_F5));
         h_layout->addWidget(viewArmourButton);
         connect(viewArmourButton, SIGNAL(clicked()), this, SLOT(clickedViewArmour()));
@@ -1099,7 +1114,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewMagicButton = new QPushButton(tr("Magic"));
         game_g->initButton(viewMagicButton);
         viewMagicButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewMagicButton->setToolTip(tr("Display only magical items (F6)"));
+#endif
         viewMagicButton->setShortcut(QKeySequence(Qt::Key_F6));
         h_layout->addWidget(viewMagicButton);
         connect(viewMagicButton, SIGNAL(clicked()), this, SLOT(clickedViewMagic()));
@@ -1107,7 +1125,10 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         QPushButton *viewMiscButton = new QPushButton(tr("Misc"));
         game_g->initButton(viewMiscButton);
         viewMiscButton->setFont(font_small);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         viewMiscButton->setToolTip(tr("Display only miscellaneous items (F7)"));
+#endif
         viewMiscButton->setShortcut(QKeySequence(Qt::Key_F7));
         h_layout->addWidget(viewMiscButton);
         connect(viewMiscButton, SIGNAL(clicked()), this, SLOT(clickedViewMisc()));
@@ -1156,32 +1177,47 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
 
         armButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(armButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         armButton->setToolTip(tr("Arm/disarm weapon or shield (Space)"));
+#endif
         h_layout->addWidget(armButton);
         connect(armButton, SIGNAL(clicked()), this, SLOT(clickedArmWeapon()));
 
         wearButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(wearButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         wearButton->setToolTip(tr("Wear/take off armour (Space)"));
+#endif
         h_layout->addWidget(wearButton);
         connect(wearButton, SIGNAL(clicked()), this, SLOT(clickedWear()));
 
         useButton = new QPushButton(""); // text set in changedSelectedItem()
         game_g->initButton(useButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         useButton->setToolTip(tr("Use item (Space)"));
+#endif
         h_layout->addWidget(useButton);
         connect(useButton, SIGNAL(clicked()), this, SLOT(clickedUseItem()));
 
-        dropButton = new QPushButton(tr("Drop Item"));
+        dropButton = new QPushButton(tr("Drop"));
         game_g->initButton(dropButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         dropButton->setToolTip(tr("Drop item onto the ground (D))"));
+#endif
         dropButton->setShortcut(QKeySequence(Qt::Key_D));
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDropItem()));
 
         infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         infoButton->setToolTip(tr("More information on this item (I))"));
+#endif
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
@@ -1297,10 +1333,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     if( item->getType() == ITEMTYPE_WEAPON ) {
         armButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentWeapon() == item ) {
-            armButton->setText(tr("Disarm Weapon"));
+            armButton->setText(tr("Disarm"));
         }
         else {
-            armButton->setText(tr("Arm Weapon"));
+            armButton->setText(tr("Arm"));
         }
     }
     else if( item->getType() == ITEMTYPE_AMMO ) {
@@ -1319,10 +1355,10 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
         else {
             armButton->setVisible(true);
             if( playing_gamestate->getPlayer()->getCurrentShield() == item ) {
-                armButton->setText(tr("Disarm Shield"));
+                armButton->setText(tr("Disarm"));
             }
             else {
-                armButton->setText(tr("Arm Shield"));
+                armButton->setText(tr("Arm"));
             }
         }
     }
@@ -1333,19 +1369,19 @@ void ItemsWindow::changedSelectedItem(int currentRow) {
     if( item->getType() == ITEMTYPE_ARMOUR ) {
         wearButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentArmour() == item ) {
-            wearButton->setText(tr("Take Off Armour"));
+            wearButton->setText(tr("Take Off"));
         }
         else {
-            wearButton->setText(tr("Wear Armour"));
+            wearButton->setText(tr("Wear"));
         }
     }
     else if( item->getType() == ITEMTYPE_RING ) {
         wearButton->setVisible(true);
         if( playing_gamestate->getPlayer()->getCurrentRing() == item ) {
-            wearButton->setText(tr("Take Off Ring"));
+            wearButton->setText(tr("Take Off"));
         }
         else {
-            wearButton->setText(tr("Wear Ring"));
+            wearButton->setText(tr("Wear"));
         }
     }
     else {
@@ -1650,7 +1686,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QPushButton *sellButton = new QPushButton(tr("Sell"));
         game_g->initButton(sellButton);
         sellButton->setFocusPolicy(Qt::NoFocus);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         sellButton->setToolTip(tr("Sell the item selected of yours (on the left) (S)"));
+#endif
         sellButton->setShortcut(QKeySequence(Qt::Key_S));
         h_layout->addWidget(sellButton);
         connect(sellButton, SIGNAL(clicked()), this, SLOT(clickedSell()));
@@ -1658,7 +1697,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QPushButton *buyButton = new QPushButton(tr("Buy"));
         game_g->initButton(buyButton);
         buyButton->setFocusPolicy(Qt::NoFocus);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         buyButton->setToolTip(tr("Buy the item selected (on the right) (B)"));
+#endif
         buyButton->setShortcut(QKeySequence(Qt::Key_B));
         h_layout->addWidget(buyButton);
         connect(buyButton, SIGNAL(clicked()), this, SLOT(clickedBuy()));
@@ -1666,7 +1708,10 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
         QPushButton *infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
         infoButton->setFocusPolicy(Qt::NoFocus);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         infoButton->setToolTip(tr("Display more information about the selected item for sale (I)"));
+#endif
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
@@ -1861,20 +1906,29 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
 
         QPushButton *pickUpButton = new QPushButton(tr("Pick Up"));
         game_g->initButton(pickUpButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         pickUpButton->setToolTip(tr("Pick up the selected item (Space)"));
+#endif
         pickUpButton->setShortcut(QKeySequence(Qt::Key_Space));
         h_layout->addWidget(pickUpButton);
         connect(pickUpButton, SIGNAL(clicked()), this, SLOT(clickedPickUp()));
 
         QPushButton *dropButton = new QPushButton(tr("Drop"));
         game_g->initButton(dropButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         dropButton->setToolTip(tr("Drop the selected item of yours onto the ground"));
+#endif
         h_layout->addWidget(dropButton);
         connect(dropButton, SIGNAL(clicked()), this, SLOT(clickedDrop()));
 
         QPushButton *infoButton = new QPushButton(tr("Info"));
         game_g->initButton(infoButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         infoButton->setToolTip(tr("Display more information about the selected item (I)"));
+#endif
         infoButton->setShortcut(QKeySequence(Qt::Key_I));
         h_layout->addWidget(infoButton);
         connect(infoButton, SIGNAL(clicked()), this, SLOT(clickedInfo()));
@@ -2404,7 +2458,10 @@ SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
 
         QPushButton *deleteButton = new QPushButton(tr("Delete File"));
         game_g->initButton(deleteButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         deleteButton->setToolTip(tr("Delete the selected save game file (D)"));
+#endif
         deleteButton->setShortcut(QKeySequence(Qt::Key_D));
         //deleteButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         h_layout->addWidget(deleteButton);
@@ -2716,7 +2773,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *statsButton = new QPushButton(tr("Stats"));
         game_g->initButton(statsButton);
         statsButton->setShortcut(QKeySequence(Qt::Key_F1));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         statsButton->setToolTip(tr("Display statistics of your character (F1)"));
+#endif
         statsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
         v_layout->addWidget(statsButton);
@@ -2724,21 +2784,30 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *itemsButton = new QPushButton(tr("Items"));
         game_g->initButton(itemsButton);
         itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         itemsButton->setToolTip(tr("Display the items that you are carrying (F2)"));
+#endif
         itemsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
         v_layout->addWidget(itemsButton);
 
         /*QPushButton *spellsButton = new QPushButton(tr("Spells"));
         game_g->initButton(spellsButton);
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         spellsButton->setToolTip(tr("Not supported yet"));
+#endif
         spellsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         v_layout->addWidget(spellsButton);*/
 
         QPushButton *journalButton = new QPushButton(tr("Journal"));
         game_g->initButton(journalButton);
         journalButton->setShortcut(QKeySequence(Qt::Key_F3));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         journalButton->setToolTip(tr("Displays information about your quests (F3)"));
+#endif
         journalButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
         v_layout->addWidget(journalButton);
@@ -2752,7 +2821,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *pauseButton = new QPushButton(tr("Pause"));
         game_g->initButton(pauseButton);
         pauseButton->setShortcut(QKeySequence(Qt::Key_P));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         pauseButton->setToolTip(tr("Pause the game (P)"));
+#endif
         pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
         v_layout->addWidget(pauseButton);
@@ -2760,7 +2832,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *restButton = new QPushButton(tr("Rest"));
         game_g->initButton(restButton);
         restButton->setShortcut(QKeySequence(Qt::Key_R));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         restButton->setToolTip(tr("Rest until you are healed (R)"));
+#endif
         restButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
         v_layout->addWidget(restButton);
@@ -2768,7 +2843,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         QPushButton *optionsButton = new QPushButton(tr("Options"));
         game_g->initButton(optionsButton);
         optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
         optionsButton->setToolTip(tr("Options to save game or quit (Escape)"));
+#endif
         optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
         v_layout->addWidget(optionsButton);
@@ -6187,7 +6265,10 @@ void PlayingGamestate::clickedOptions() {
     QPushButton *quitButton = new QPushButton(tr("Quit game"));
     game_g->initButton(quitButton);
     quitButton->setShortcut(QKeySequence(Qt::Key_Q));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
     quitButton->setToolTip(tr("Quit current game, and return to the main menu (Q)"));
+#endif
     quitButton->setFont(game_g->getFontBig());
     quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(quitButton);
@@ -6196,7 +6277,10 @@ void PlayingGamestate::clickedOptions() {
     QPushButton *saveButton = new QPushButton(tr("Save game"));
     game_g->initButton(saveButton);
     saveButton->setShortcut(QKeySequence(Qt::Key_S));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
     saveButton->setToolTip(tr("Save the current game (S)"));
+#endif
     saveButton->setFont(game_g->getFontBig());
     saveButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(saveButton);
