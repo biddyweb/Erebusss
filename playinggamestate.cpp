@@ -896,6 +896,13 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     if( player->getPortrait().length() > 0 ) {
         QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
         QLabel *portrait_label = new QLabel();
+        int height = QApplication::desktop()->height();
+        int max_pic_height = height/3;
+        qDebug("pixmap height %d , height %d , max_pic_height %d", pixmap.height(), height, max_pic_height);
+        if( pixmap.height() > max_pic_height ) {
+            qDebug("    scale...");
+            pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+        }
         portrait_label->setPixmap(pixmap);
         layout->addWidget(portrait_label);
     }
