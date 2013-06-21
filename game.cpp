@@ -677,6 +677,7 @@ void Game::init(bool fullscreen) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
         qDebug("setting up fonts for Android");
+        // n.b., need to set font size directly, as new_font.pointSize() returns -1 on Android!
         if( screen_w <= 480 ) {
             // optimise for smaller screens
             this->font_scene = new_font;
