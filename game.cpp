@@ -677,22 +677,25 @@ void Game::init(bool fullscreen) {
         QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
         qDebug("setting up fonts for Android");
-        // old behaviour with earlier Ministro versions
-        this->font_scene = new_font;
-        this->font_small = QFont(new_font);
-        this->font_small.setPointSize(font_small.pointSize() + 8);
-        this->font_std = QFont(new_font);
-        this->font_std.setPointSize(font_std.pointSize() + 10);
-        this->font_big = QFont(new_font);
-        this->font_big.setPointSize(font_big.pointSize() + 14);
-        /* Hack for Ministro 9.4, which didn't have Android look and feel
-        this->font_scene = QFont(new_font);
-        this->font_scene.setPointSize(font_scene.pointSize() - 4);
-        this->font_small = QFont(new_font);
-        this->font_small.setPointSize(font_small.pointSize() - 2);
-        this->font_std = new_font;
-        this->font_big = new_font;
-        */
+        if( screen_w <= 480 ) {
+            // optimise for smaller screens
+            this->font_scene = new_font;
+            this->font_small = QFont(new_font);
+            this->font_small.setPointSize(5);
+            this->font_std = QFont(new_font);
+            this->font_std.setPointSize(7);
+            this->font_big = QFont(new_font);
+            this->font_big.setPointSize(8);
+        }
+        else {
+            this->font_scene = new_font;
+            this->font_small = QFont(new_font);
+            this->font_small.setPointSize(7);
+            this->font_std = QFont(new_font);
+            this->font_std.setPointSize(9);
+            this->font_big = QFont(new_font);
+            this->font_big.setPointSize(13);
+        }
 
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
@@ -718,7 +721,7 @@ void Game::init(bool fullscreen) {
     }
     else {
         qDebug("setting up fonts for non-mobile");
-        //QString font_family = "Candara";
+        LOG("default font size: %d\n", window->font().pointSize());
         QString font_family = window->font().family();
         LOG("font family: %s\n", font_family.toStdString().c_str());
         this->font_scene = QFont(font_family, 16);
