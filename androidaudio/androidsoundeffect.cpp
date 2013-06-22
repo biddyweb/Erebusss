@@ -14,6 +14,7 @@ AndroidSoundEffect::AndroidSoundEffect(const QString& path, QObject *parent) :
 
 AndroidSoundEffect::~AndroidSoundEffect()
 {
+    qDebug("AndroidSoundEffect::~AndroidSoundEffect()");
     this->unload();
 }
 
@@ -131,6 +132,7 @@ bool AndroidSoundEffect::load()
 
 bool AndroidSoundEffect::unload()
 {
+    qDebug("AndroidSoundEffect::unload()");
     delete[] mBuffer;
     mBuffer = NULL;
     mLength = 0;
