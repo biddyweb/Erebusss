@@ -76,6 +76,12 @@ import dalvik.system.DexClassLoader;
 
 public class QtActivity extends Activity
 {
+    // modified from standard necessitas, to provide native methods
+    public static native void AndroidOnPause();
+    public static native void AndroidOnResume();
+    private boolean loadLibrary_ok = false;
+    // end of modified code
+
     private final static int MINISTRO_INSTALL_REQUEST_CODE = 0xf3ee; // request code used to know when Ministro instalation is finished
     private static final int MINISTRO_API_LEVEL=2; // Ministro api level (check IMinistro.aidl file)
     private static final int NECESSITAS_API_LEVEL=2; // Necessitas api level used by platform plugin
@@ -180,8 +186,12 @@ public class QtActivity extends Activity
             QtApplication.setQtActivityDelegate(qtLoader);
 
             // now load the application library so it's accessible from this class loader
-            if (libName != null)
+            if (libName != null) {
                 System.loadLibrary(libName);
+                // modified from standard necessitas, to provide native methods
+                loadLibrary_ok = true;
+                // end of modified code
+            }
 
             Method startAppMethod=qtLoader.getClass().getMethod("startApplication");
             if (!(Boolean)startAppMethod.invoke(qtLoader))
@@ -831,6 +841,11 @@ public class QtActivity extends Activity
     {
         super.onPause();
         QtApplication.invokeDelegate();
+        // modified from standard necessitas, to provide native methods
+        if( loadLibrary_ok ) {
+            AndroidOnPause();
+        }
+        // end of modified code
     }
     //---------------------------------------------------------------------------
 
@@ -917,6 +932,11 @@ public class QtActivity extends Activity
     {
         super.onResume();
         QtApplication.invokeDelegate();
+        // modified from standard necessitas, to provide native methods
+        if( loadLibrary_ok ) {
+            AndroidOnResume();
+        }
+        // end of modified code
     }
     //---------------------------------------------------------------------------
 

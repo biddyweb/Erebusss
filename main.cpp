@@ -20,6 +20,7 @@ bool MyApplication::event(QEvent *event) {
      * to receive these events on Android when we don't on Windows, e.g., when opening/closing dialogs, which
      * can lead to a bug where the game pauses unexpectedly (e.g., talk to an NPC, say at least one thing, then
      * close the talk window - the game will still be paused).
+     * Inactive/active for Android is handled via JNI, see below.
      * Also disabled for Linux, as we get an inactive message when the game first starts - probably best to
      * disable, until we understand what's happening.
      */
@@ -41,6 +42,63 @@ bool MyApplication::event(QEvent *event) {
     }
     return QApplication::event(event);
 }
+
+#if defined(Q_OS_ANDROID)
+
+// native methods for Android
+// see http://community.kde.org/Necessitas/JNI
+
+#include <jni.h>
+
+static void AndroidOnResume(JNIEnv * /*env*/, jobject /*thiz*/) {
+    LOG("application activated\n");
+    if( game_g != NULL && game_g->getScreen() != NULL ) {
+        game_g->activate(true);
+    }
+}
+
+static void AndroidOnPause(JNIEnv * /*env*/, jobject /*thiz*/) {
+    LOG("application deactivated\n");
+    if( game_g != NULL && game_g->getScreen() != NULL ) {
+        game_g->activate(false);
+    }
+}
+
+static JNINativeMethod methods[] = {
+    {"AndroidOnResume", "()V", (void *)AndroidOnResume},
+    {"AndroidOnPause", "()V", (void *)AndroidOnPause}
+};
+
+// this method is called immediately after the module is load
+JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
+    qDebug("JNI_OnLoad enter");
+    JNIEnv* env = NULL;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        qDebug("JNI: can't get environment");
+        return -1;
+    }
+
+    // search for our class
+    jclass clazz=env->FindClass("org/kde/necessitas/origo/QtActivity");
+    if (!clazz)
+    {
+        qDebug("JNI: can't find QtActivity class");
+        return -1;
+    }
+    // keep a global reference to it
+    jclass classID = (jclass)env->NewGlobalRef(clazz);
+
+    // register our native methods
+    if (env->RegisterNatives(classID, methods, sizeof(methods) / sizeof(methods[0])) < 0)
+    {
+        qDebug("JNI: failed to register methods");
+        return -1;
+    }
+
+    qDebug("JNI_OnLoad enter");
+    return JNI_VERSION_1_6;
+}
+#endif
 
 int main(int argc, char *argv[])
 {

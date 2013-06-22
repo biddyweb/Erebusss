@@ -81,8 +81,6 @@ Effects" (from the main menu, go to Options).</p>
 
 <p>There are some known issues:<ul>
 <li>Sound effects don't play on some Linux distributions.</li>
-<li>On Android, the game will still use CPU when idle or in the background (unless suspended by the OS) - it's best to quit back
-to the main menu if you won't be playing for a while.</li>
 <li>On Android, when switching back from another app, the display sometimes takes a while to resume. Switching to the homescreen then back to the game may help.</li>
 <li>On Android, on the options screen from the main menu, the volume slider sometimes moves when you try to click "Okay".
 As a workaround, try clicking on the right-most part of the Okay button.</li>
@@ -517,6 +515,9 @@ FIXED   Fatal signal on exit on Android.
 FIXED   Improved french translation for low resolution screens (e.g., 800x480).
 FIXED   Player animation would sometimes appear jerky when using keyboard
         movement.
+UPDATED Android version now pauses when app goes inactive; also should preserve
+        battery life better due to disabling updates and game logic when
+        inactive.
 UPDATED Performance improvements.
 UPDATED Android version now stores logfile in net.sourceforge.erebusrpg/ (so
         can be viewed without having root).
