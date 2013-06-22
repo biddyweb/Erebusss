@@ -629,24 +629,27 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 }
 
 Game::~Game() {
+    qDebug("Game::~Game()");
     if( screen != NULL ) {
+        qDebug("delete screen");
         // hack to prevent the MyApplication::event() from calling screen functions when deactivating
         Screen *local_screen = screen;
         screen = NULL;
         delete local_screen;
     }
 
-#ifndef Q_OS_ANDROID
+    qDebug("delete sounds");
     for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
         Sound *sound = iter->second;
         delete sound;
     }
-#endif
 
     if( style != NULL ) {
+        qDebug("delete style");
         delete style;
     }
     game_g = NULL;
+    qDebug("Game::~Game() done");
 }
 
 void Game::init(bool fullscreen) {
