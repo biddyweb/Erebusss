@@ -3490,7 +3490,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 
     //if( !mobile_c )
     //if( game_g->isSoundEnabled() )
+#ifndef Q_OS_ANDROID
     if( game_g->getSoundVolume() > 0 )
+#endif
     {
         LOG("load sound effects\n");
         game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
@@ -3514,9 +3516,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         // remember to call freeSound in the PlayingGamestate destructor!
         LOG("done loading sound effects\n");
     }
+#ifndef Q_OS_ANDROID
     else {
         LOG("sound is disabled\n");
     }
+#endif
 
     gui_overlay->setProgress(90);
     qApp->processEvents();
@@ -3814,7 +3818,9 @@ PlayingGamestate::~PlayingGamestate() {
     }
 
     //if( game_g->isSoundEnabled() )
+#ifndef Q_OS_ANDROID
     if( game_g->getSoundVolume() )
+#endif
     {
         game_g->freeSound("click");
         game_g->freeSound("coin");

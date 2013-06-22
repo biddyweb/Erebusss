@@ -452,10 +452,13 @@ void OptionsGamestate::clickedOptions() {
 
     {
         int n_row = 0;
+        QLabel *label = NULL;
         QGridLayout *g_layout = new QGridLayout();
         layout->addLayout(g_layout);
 
-        QLabel *label = new QLabel(tr("Volume: "));
+#ifndef Q_OS_ANDROID
+        // on Android, volume is handled by the volume control keys
+        label = new QLabel(tr("Volume: "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
         soundSlider = new QSlider(Qt::Horizontal);
         soundSlider->setMinimum(0);
@@ -463,6 +466,7 @@ void OptionsGamestate::clickedOptions() {
         soundSlider->setValue(game_g->getSoundVolume());
         g_layout->addWidget(soundSlider, n_row, 1);
         n_row++;
+#endif
 
         label = new QLabel(tr("Lighting (uncheck if too slow): "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
@@ -505,8 +509,10 @@ void OptionsGamestate::clickedOptionsOkay() {
             game_g->pauseSound("music_intro");
         }
     }*/
+#ifndef Q_OS_ANDROID
     game_g->setSoundVolume( soundSlider->value() );
     game_g->updateSoundVolume("music_intro");
+#endif
 
     bool new_lighting_enabled = lightingCheck->isChecked();
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {

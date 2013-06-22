@@ -437,8 +437,9 @@ protected:
     Screen *screen;
     queue<GameMessage *> message_queue;
 
-    //bool sound_enabled;
+#ifndef Q_OS_ANDROID
     int sound_volume;
+#endif
     bool lighting_enabled;
 
     vector<string> player_types;
@@ -514,6 +515,7 @@ public:
     void playSound(const string &sound_effect, bool loop);
     void pauseSound(const string &sound_effect);
     void freeSound(const string &sound_effect);
+#ifndef Q_OS_ANDROID
     void updateSoundVolume(const string &sound_effect);
     /*bool isSoundEnabled() const {
         return this->sound_enabled;
@@ -523,6 +525,7 @@ public:
         return this->sound_volume;
     }
     void setSoundVolume(int sound_volume);
+#endif
     bool isLightingEnabled() const {
         return this->lighting_enabled;
     }
