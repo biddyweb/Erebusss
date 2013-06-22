@@ -6,6 +6,8 @@
 void log(const char *text, ...) {
     va_list vlist;
     va_start(vlist, text);
-    game_g->log(text, vlist);
+    if( game_g != NULL ) {
+        game_g->log(text, vlist);
+    }
     va_end(vlist);
 }

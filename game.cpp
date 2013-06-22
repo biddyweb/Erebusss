@@ -1656,10 +1656,12 @@ void Game::log(const char *text, va_list vlist) {
     char buffer[65536] = "";
     vsprintf(buffer,text,vlist);
 
-    QFile logfile(logfilename);
-    if( logfile.open(QIODevice::Append | QIODevice::Text) ) {
-        QTextStream stream(&logfile);
-        stream << buffer;
+    if( logfilename.length() > 0 ) {
+        QFile logfile(logfilename);
+        if( logfile.open(QIODevice::Append | QIODevice::Text) ) {
+            QTextStream stream(&logfile);
+            stream << buffer;
+        }
     }
     qDebug("%s", buffer);
 }
