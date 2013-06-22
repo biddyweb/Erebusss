@@ -80,20 +80,24 @@ bool AndroidAudio::createEngine()
 
 void AndroidAudio::destroyEngine()
 {
+    qDebug("AndroidAudio::destroyEngine()");
+
+    if (mPlayerObject != NULL) {
+        qDebug("destroy player object %d", mPlayerObject);
+        (*mPlayerObject)->Destroy(mPlayerObject);
+    }
+
     if (mOutputMixObject != NULL) {
+        qDebug("destroy mix object %d", mOutputMixObject);
         (*mOutputMixObject)->Destroy(mOutputMixObject);
     }
 
     if (mEngineObject != NULL) {
+        qDebug("destroy engine object %d", mEngineObject);
         (*mEngineObject)->Destroy(mEngineObject);
     }
 
-    if (mPlayerObject != NULL) {
-        (*mPlayerObject)->Destroy(mPlayerObject);
-    }
-
-
-    qDebug() << "Destroyed Android Audio Engine";
+    qDebug("AndroidAudio::destroyEngine() done");
 }
 
 AndroidSoundEffect *AndroidAudio::loadSound(const QString &filename) {
