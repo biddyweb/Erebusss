@@ -577,6 +577,11 @@ public class QtActivity extends Activity
                 setContentView(m_activityInfo.metaData.getInt("android.app.splash_screen"));
             startApp(true);
         }
+
+        // modified from standard necessitas
+        // keep screen active - see http://stackoverflow.com/questions/2131948/force-screen-on
+        getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // end of modified code
     }
     //---------------------------------------------------------------------------
 
