@@ -6356,6 +6356,7 @@ void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
     if( this->canSaveHere() ) {
         this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
+        this->closeSubWindow();
         return;
     }
 
