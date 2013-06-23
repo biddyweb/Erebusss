@@ -2401,23 +2401,6 @@ void CampaignWindow::clickedMagicShop() {
 SaveGameWindow::SaveGameWindow(PlayingGamestate *playing_gamestate) :
     CloseAllSubWindowsWidget(playing_gamestate), list(NULL), edit(NULL)
 {
-    if( playing_gamestate->isPermadeath() ) {
-        if( playing_gamestate->hasPermadeathSavefilename() ) {
-            QString filename = playing_gamestate->getPermadeathSavefilename();
-            LOG("permadeath save mode: save as existing file: %s\n", filename.toUtf8().data());
-            if( playing_gamestate->saveGame(filename, true) ) {
-                playing_gamestate->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
-            }
-            else {
-                game_g->showErrorDialog(tr("Failed to save game!").toStdString());
-            }
-        }
-        else {
-            this->requestNewSaveGame();
-        }
-        return;
-    }
-
     playing_gamestate->addWidget(this, false);
 
     QFont font = game_g->getFontBig();
@@ -6375,7 +6358,27 @@ void PlayingGamestate::clickedSave() {
         this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
         return;
     }
-    new SaveGameWindow(this);
+
+    if( this->isPermadeath() ) {
+        if( this->hasPermadeathSavefilename() ) {
+            QString filename = this->getPermadeathSavefilename();
+            LOG("permadeath save mode: save as existing file: %s\n", filename.toUtf8().data());
+            if( this->saveGame(filename, true) ) {
+                this->addTextEffect(tr("The game has been successfully saved").toStdString(), 5000);
+            }
+            else {
+                game_g->showErrorDialog(tr("Failed to save game!").toStdString());
+            }
+            this->closeSubWindow();
+        }
+        else {
+            SaveGameWindow *saveGameWindow = new SaveGameWindow(this);
+            saveGameWindow->requestNewSaveGame();
+        }
+    }
+    else {
+        new SaveGameWindow(this);
+    }
 }
 
 void PlayingGamestate::clickedQuit() {

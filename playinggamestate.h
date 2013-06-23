@@ -441,8 +441,6 @@ class SaveGameWindow : public CloseAllSubWindowsWidget {
     ScrollingListWidget *list;
     QLineEdit *edit;
 
-    void requestNewSaveGame();
-
 private slots:
     void clickedSave();
     void clickedDelete();
@@ -452,6 +450,8 @@ public:
     SaveGameWindow(PlayingGamestate *playing_gamestate);
     virtual ~SaveGameWindow() {
     }
+
+    void requestNewSaveGame();
 };
 
 class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
@@ -606,6 +606,7 @@ public:
         /*if( !active ) {
             this->autoSave();
         }*/
+        //this->addTextEffect(active ? "activated" : "deactivated", 10000);
     }
     //virtual void mouseClick(int m_x, int m_y);
     void checkQuestComplete();
