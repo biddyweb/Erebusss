@@ -1107,7 +1107,7 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
         h_layout->addWidget(viewShieldsButton);
         connect(viewShieldsButton, SIGNAL(clicked()), this, SLOT(clickedViewShields()));
 
-        QPushButton *viewArmourButton = new QPushButton(tr("Arm"));
+        QPushButton *viewArmourButton = new QPushButton(tr("Arm", "Armour"));
         game_g->initButton(viewArmourButton);
         viewArmourButton->setFont(font_small);
 #ifndef Q_OS_ANDROID
