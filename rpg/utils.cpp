@@ -216,6 +216,45 @@ bool Polygon2D::pointInside(Vector2D pvec) const {
     */
 }
 
+float Polygon2D::distanceFrom(Vector2D pvec) const {
+    if( this->getNPoints() == 0 ) {
+        return 0.0f;
+    }
+    if( this->pointInside(pvec) ) {
+        return 0.0f;
+    }
+
+    bool set_min_dist = false;
+    float min_dist = 0.0f;
+    for(size_t i=0;i<this->getNPoints();i++) {
+        Vector2D p0 = points.at(i);
+        Vector2D p1 = points.at((i+1) % this->getNPoints());
+        float dist_from_p0 = (p0 - pvec).magnitude();
+        // distance from vertex
+        if( !set_min_dist || dist_from_p0 < min_dist - E_TOL_LINEAR ) {
+            set_min_dist = true;
+            min_dist = dist_from_p0;
+        }
+        // distance from line segment
+        Vector2D dir = p1 - p0;
+        float edge_len = dir.magnitude();
+        if( edge_len > E_TOL_LINEAR ) {
+            dir /= edge_len; // normalies dir
+            Vector2D proj_pvec = pvec;
+            proj_pvec.dropOnLine(p0, dir);
+            float edge_dist = (proj_pvec - p0).magnitude();
+            if( edge_dist > -E_TOL_LINEAR & edge_dist < edge_len + E_TOL_LINEAR ) {
+                // projects onto line
+                float perp_dist = (pvec - proj_pvec).magnitude();
+                if( perp_dist < min_dist - E_TOL_LINEAR ) {
+                    min_dist = perp_dist;
+                }
+            }
+        }
+    }
+    return min_dist;
+}
+
 GraphVertex *GraphVertex::getNeighbour(Graph *graph, float *distance, size_t i) const {
     *distance = distances.at(i);
     size_t id = neighbour_ids.at(i);
@@ -378,7 +417,7 @@ int rollDice(int X, int Y, int Z) {
     return value;
 }
 
-float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos) {
+/*float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos) {
     float dist_x = 0.0f, dist_y = 0.0f;
 
     if( pos.x < centre.x - 0.5f*width ) {
@@ -396,7 +435,7 @@ float distFromBox2D(const Vector2D &centre, float width, float height, const Vec
     }
 
     return sqrt( dist_x*dist_x + dist_y*dist_y );
-}
+}*/
 
 /* Return probability (as a proportion of RAND_MAX) that at least one poisson event
 * occurred within the time_interval, given the mean number of time units per event.

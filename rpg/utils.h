@@ -264,6 +264,7 @@ public:
     Vector2D offsetInwards(size_t indx, float dist) const;
 
     bool pointInside(Vector2D pvec) const;
+    float distanceFrom(Vector2D pvec) const;
 };
 
 class Graph;
@@ -355,7 +356,7 @@ public:
 
 int rollDice(int X, int Y, int Z);
 
-float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);
+//float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);
 
 int poisson(int mean_ticks_per_event, int time_interval);
 

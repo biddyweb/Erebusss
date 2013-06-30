@@ -15,10 +15,10 @@ using std::swap;
 #include <cassert>
 #endif
 
-Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height) :
+Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio) :
     location(NULL), name(name), image_name(image_name), is_animation(is_animation), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), exit_travel_time(0), is_locked(false), locked_silent(false), locked_used_up(false), key_always_needed(false), unlock_xp(20),
-    draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height), boundary_iso(false), boundary_iso_ratio(0.0f),
+    draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height), boundary_iso(boundary_iso), boundary_iso_ratio(boundary_iso_ratio),
     action_last_time(0), action_delay(0), action_value(0),
     interact_state(0),
     can_be_opened(false), opened(false),
@@ -37,6 +37,61 @@ Scenery::~Scenery() {
 
 }
 
+void Scenery::setPos(float xpos, float ypos) {
+    this->pos.set(xpos, ypos);
+
+    // set boundary polygons
+    boundary_base = Polygon2D();
+    boundary_visual = Polygon2D();
+    // clockwise, as "inside" should be on the left
+    Vector2D p0 = pos; p0.x -= 0.5f*width; p0.y -= 0.5f*height;
+    Vector2D p1 = pos; p1.x += 0.5f*width; p1.y -= 0.5f*height;
+    Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
+    Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
+    if( boundary_iso ) {
+        p0.y += (1.0f-boundary_iso_ratio)*height;
+        p1.x -= boundary_iso_ratio*width;
+        p2.y -= (1.0f-boundary_iso_ratio)*height;
+        p3.x += boundary_iso_ratio*width;
+    }
+    boundary_base.addPoint(p0);
+    boundary_base.addPoint(p1);
+    boundary_base.addPoint(p2);
+    boundary_base.addPoint(p3);
+
+    float extra_height = this->visual_height - this->height;
+    if( fabs(extra_height) < E_TOL_LINEAR ) {
+        this->boundary_visual = boundary_base;
+    }
+    else {
+        if( boundary_iso ) {
+            Vector2D p0_2 = p0;
+            p0_2.y -= extra_height;
+
+            p1.y -= extra_height;
+
+            Vector2D p2_2 = p2;
+            p2_2.y -= extra_height;
+
+            boundary_visual.addPoint(p0);
+            boundary_visual.addPoint(p0_2);
+            boundary_visual.addPoint(p1);
+            boundary_visual.addPoint(p2_2);
+            boundary_visual.addPoint(p2);
+            boundary_visual.addPoint(p3);
+        }
+        else {
+            p0.y -= extra_height;
+            p1.y -= extra_height;
+            boundary_visual.addPoint(p0);
+            boundary_visual.addPoint(p1);
+            boundary_visual.addPoint(p2);
+            boundary_visual.addPoint(p3);
+        }
+    }
+    //this->boundary_base = this->boundary_visual; // TEST
+}
+
 void Scenery::setBlocking(bool is_blocking, bool blocks_visibility) {
     this->is_blocking = is_blocking;
     this->blocks_visibility = blocks_visibility;
@@ -45,7 +100,7 @@ void Scenery::setBlocking(bool is_blocking, bool blocks_visibility) {
     }
 }
 
-void Scenery::getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const {
+/*void Scenery::getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const {
     *box_centre = this->pos;
     *box_width = this->width;
     *box_height = include_visual ? this->visual_height : this->height;
@@ -53,6 +108,16 @@ void Scenery::getBox(Vector2D *box_centre, float *box_width, float *box_height, 
         // adjust for the "visual" part being purely above the centre (i.e., the scenery pos is not the centre of the visual box region)
         box_centre->y -= 0.5f*(this->visual_height - this->height);
     }
+}*/
+
+float Scenery::distFromPoint(Vector2D point, bool include_visual) const {
+    /*Vector2D scenery_pos;
+    float scenery_width = 0.0f, scenery_height = 0.0f;
+    this->getBox(&scenery_pos, &scenery_width, &scenery_height, include_visual);
+    float dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, point);
+    return dist;*/
+    float dist = include_visual ? this->boundary_visual.distanceFrom(point) : this->boundary_base.distanceFrom(point);
+    return dist;
 }
 
 void Scenery::addItem(Item *item) {
@@ -989,7 +1054,7 @@ void Location::createBoundaryForRect(Vector2D pos, float width, float height, bo
     Vector2D p2 = pos; p2.x += 0.5f*width; p2.y += 0.5f*height;
     Vector2D p3 = pos; p3.x -= 0.5f*width; p3.y += 0.5f*height;
 
-    if( boundary_iso && width - height < E_TOL_LINEAR ) {
+    if( boundary_iso ) {
         p0.y += (1.0f-boundary_iso_ratio)*height;
         p1.x -= boundary_iso_ratio*width;
         p2.y -= (1.0f-boundary_iso_ratio)*height;
@@ -1031,9 +1096,21 @@ void Location::createBoundariesForScenery() {
             continue;
         }
         //qDebug(">>> set scenery %d", scenery);
-        float width = scenery->getWidth(), height = scenery->getHeight();
+        /*float width = scenery->getWidth(), height = scenery->getHeight();
         Vector2D pos = scenery->getPos();
-        this->createBoundaryForRect(pos, width, height, scenery->isBoundaryIso(), scenery->getBoundaryIsoRatio(), scenery, (int)SOURCETYPE_SCENERY);
+        this->createBoundaryForRect(pos, width, height, scenery->isBoundaryIso(), scenery->getBoundaryIsoRatio(), scenery, (int)SOURCETYPE_SCENERY);*/
+        Polygon2D boundary = scenery->getBoundary(false);
+        boundary.setSourceType((int)SOURCETYPE_SCENERY);
+        boundary.setSource(scenery);
+        for(size_t i=0;i<boundary.getNPoints();i++) {
+            Vector2D pvec = boundary.getPoint(i);
+            if( this->findFloorRegionAt(pvec) == NULL ) {
+                LOG("can't find floor region for scenery %s , %d th boundary point at: %f, %f\n", scenery->getName().c_str(), i, pvec.x, pvec.y);
+                LOG("scenery at at %f, %f\n", scenery->getX(), scenery->getY());
+                throw string("can't find floor region for scenery boundary point");
+            }
+        }
+        this->addBoundary(boundary);
         //qDebug("scenery at %f, %f", pos.x, pos.y);
     }
     qDebug("    done");
@@ -2341,7 +2418,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                    scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                    scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
                     scenery_corner->setBlocking(true, false);
                     scenery_corner->setCanBeOpened(true);
                     int gold = rollDice(1, 12, 0);
@@ -2439,7 +2516,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                    Scenery *scenery = new Scenery(scenery_name, scenery_image_name, true, size_w, size_h, visual_h);
+                    Scenery *scenery = new Scenery(scenery_name, scenery_image_name, true, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setInteractType(interact_type);
                     scenery->setBlocking(true, false);
                     location->addScenery(scenery, room_centre.x, room_centre.y);
@@ -2449,7 +2526,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     string scenery_image_name = "tomb";
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                    Scenery *scenery = new Scenery("Tomb", scenery_image_name, true, size_w, size_h, visual_h);
+                    Scenery *scenery = new Scenery("Tomb", scenery_image_name, true, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setBlocking(true, false);
                     if( rollDice(1, 2, 0) == 1 ) {
                         int gold = rollDice(3, 6, 0);
@@ -2473,7 +2550,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 string name = "Chest", image_name = "chest";
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
                 scenery_corner->setBlocking(true, false);
                 scenery_corner->setCanBeOpened(true);
                 int gold = room_type == ROOMTYPE_LAIR ? rollDice(4, 10, 10) : rollDice(5, 10, 50);
@@ -2582,7 +2659,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         else {
                             playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
                         }
-                        Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h);
+                        Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h, false, 0.0f);
                         scenery_centre->setDrawType(draw_type);
                         scenery_centre->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
                         if( scenery_centre_description.length() > 0 ) {
@@ -2601,7 +2678,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         name = "Stairs";
                         image_name = "stairsdown_indoors";
                         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                        Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+                        Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
                         scenery_stairs_down->setBlocking(true, false);
                         location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
                         *exit_down = scenery_stairs_down;
@@ -2678,7 +2755,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 else {
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_name, true, scenery_size, 0.0f, 0.0f, false, 0.0f);
                 }
-                Scenery *scenery = new Scenery(scenery_name, scenery_name, true, size_w, size_h, visual_h);
+                Scenery *scenery = new Scenery(scenery_name, scenery_name, true, size_w, size_h, visual_h, false, 0.0f);
                 scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
@@ -2859,7 +2936,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
         string image_name = "stairsup_indoors";
         float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-        Scenery *scenery_stairs_up = new Scenery(name, image_name, true, size_w, size_h, visual_h);
+        Scenery *scenery_stairs_up = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
         scenery_stairs_up->setBlocking(true, false);
         Vector2D scenery_pos = seed.pos + dir_vec*size_w*0.5f;
         location->addScenery(scenery_stairs_up, scenery_pos.x, scenery_pos.y);

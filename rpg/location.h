@@ -77,6 +77,8 @@ protected:
     float visual_height; // not saved
     bool boundary_iso;
     float boundary_iso_ratio;
+    Polygon2D boundary_base;
+    Polygon2D boundary_visual;
 
     // actions are events which happen periodically
     int action_last_time;
@@ -103,15 +105,13 @@ protected:
         throw string("Scenery copy constructor disallowed");
     }
 public:
-    Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height);
+    Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio);
     virtual ~Scenery();
 
     void setLocation(Location *location) {
         this->location = location;
     }
-    void setPos(float xpos, float ypos) {
-        this->pos.set(xpos, ypos);
-    }
+    void setPos(float xpos, float ypos);
     float getX() const {
         return this->pos.x;
     }
@@ -319,12 +319,16 @@ public:
     float getVisualHeight() const {
         return this->visual_height;
     }
-    void getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const;
+    Polygon2D getBoundary(bool include_visual) const {
+        return include_visual ? this->boundary_visual : this->boundary_base;
+    }
+    //void getBox(Vector2D *box_centre, float *box_width, float *box_height, bool include_visual) const;
+    float distFromPoint(Vector2D point, bool include_visual) const;
 
-    void setBoundaryIso(float boundary_iso_ratio) {
+    /*void setBoundaryIso(float boundary_iso_ratio) {
         this->boundary_iso = true;
         this->boundary_iso_ratio = boundary_iso_ratio;
-    }
+    }*/
     bool isBoundaryIso() const {
         return this->boundary_iso;
     }

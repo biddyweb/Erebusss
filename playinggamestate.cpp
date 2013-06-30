@@ -5486,10 +5486,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
                     this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
 
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h);
-                    if( boundary_iso ) {
-                        scenery->setBoundaryIso(boundary_iso_ratio);
-                    }
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h, boundary_iso, boundary_iso_ratio);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -7397,10 +7394,11 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2
     vector<Scenery *> clicked_scenerys;
     for(set<Scenery *>::iterator iter = c_location->scenerysBegin(); iter != c_location->scenerysEnd(); ++iter) {
         Scenery *scenery = *iter;
-        Vector2D scenery_pos;
+        /*Vector2D scenery_pos;
         float scenery_width = 0.0f, scenery_height = 0.0f;
         scenery->getBox(&scenery_pos, &scenery_width, &scenery_height, is_click);
-        float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);
+        float dist_from_click = distFromBox2D(scenery_pos, scenery_width, scenery_height, dest);*/
+        float dist_from_click = scenery->distFromPoint(dest, is_click);
         //qDebug("dist_from_click for scenery %s : %f : pos %f, %f size %f X %f", scenery->getName().c_str(), dist_from_click, scenery_pos.x, scenery_pos.y, scenery_width, scenery_height);
         if( dist_from_click <= npc_radius_c && scenery->isBlocking() ) {
             // clicked on or near this scenery
@@ -7409,7 +7407,8 @@ bool PlayingGamestate::handleClickForScenerys(bool *move, void **ignore, Vector2
         if( dist_from_click <= click_tol_scenery_c ) {
             // clicked on this scenery
             //LOG("    scenery pos: %f, %f : width %f height %f\n", scenery_pos.x, scenery_pos.y, scenery_width, scenery_height);
-            float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
+            //float player_dist = distFromBox2D(scenery_pos, scenery_width, scenery_height, player->getPos());
+            float player_dist = scenery->distFromPoint(player->getPos(), is_click);
             //qDebug("    player_dist from %s: %f", scenery->getName().c_str(), player_dist);
             if( player_dist <= npc_radius_c + 0.5f ) {
                 clicked_scenerys.push_back(scenery);
