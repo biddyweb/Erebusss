@@ -1423,6 +1423,8 @@ void Game::runTest(const string &filename, int test_id) {
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 ) {
+            QElapsedTimer timer;
+            timer.start();
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
             gamestate = playing_gamestate;
 
@@ -1456,8 +1458,14 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+
+            has_score = true;
+            score = ((double)timer.elapsed());
+            score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVERANDOMQUEST_0 ) {
+            QElapsedTimer timer;
+            timer.start();
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
             gamestate = playing_gamestate;
 
@@ -1480,6 +1488,10 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+
+            has_score = true;
+            score = ((double)timer.elapsed());
+            score /= 1000.0;
         }
         else {
             throw string("unknown test");
