@@ -532,6 +532,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
             this->saveGame("autosave.xml", false);
         }
     }
+    void displayPausedMessage();
     void requestPlayerMove(Vector2D dest, const void *ignore);
     void clickedOnNPC(Character *character);
     bool handleClickForItems(Vector2D dest);
@@ -563,6 +564,7 @@ private slots:
     void clickedStats();
     void clickedItems();
     void clickedJournal();
+    void clickedPause();
     void clickedOptions();
     void clickedRest();
     void clickedSave();
@@ -601,13 +603,7 @@ public:
     virtual void update();
     virtual void updateInput();
     virtual void render();
-    virtual void activate(bool active) {
-        // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
-        /*if( !active ) {
-            this->autoSave();
-        }*/
-        //this->addTextEffect(active ? "activated" : "deactivated", 10000);
-    }
+    virtual void activate(bool active);
     //virtual void mouseClick(int m_x, int m_y);
     void checkQuestComplete();
 

@@ -2816,7 +2816,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         pauseButton->setToolTip(tr("Pause the game (P)"));
 #endif
         pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(pauseButton, SIGNAL(clicked()), game_g->getScreen(), SLOT(togglePaused()));
+        connect(pauseButton, SIGNAL(clicked()), this, SLOT(clickedPause()));
         v_layout->addWidget(pauseButton);
 
         QPushButton *restButton = new QPushButton(tr("Rest"));
@@ -6243,6 +6243,14 @@ void PlayingGamestate::clickedJournal() {
     web_view->page()->mainFrame()->setScrollBarValue(Qt::Vertical, web_view->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
 }
 
+void PlayingGamestate::clickedPause() {
+    LOG("clickedPause()\n");
+    game_g->getScreen()->togglePaused();
+    if( game_g->getScreen()->isPaused() ) {
+        this->displayPausedMessage();
+    }
+}
+
 void PlayingGamestate::clickedOptions() {
     LOG("clickedOptions()\n");
     this->closeSubWindow();
@@ -6915,6 +6923,25 @@ void PlayingGamestate::updateInput() {
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
     this->view->viewport()->update();
+}
+
+void PlayingGamestate::displayPausedMessage() {
+    // note, we don't display a pause message every time the game is paused - e.g., when it's due to opening a subwindow - but only when it might not be clear to the user that the game is paused
+    string paused_message = touchscreen_c ?
+                "Game paused\nTouch screen to continue" :
+                "Game paused\nClick or press a key to continue";
+    this->addTextEffect(paused_message, 0); // 0 time, so the message disappears as soon as the game is unpaused
+}
+
+void PlayingGamestate::activate(bool active) {
+    // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
+    /*if( !active ) {
+        this->autoSave();
+    }*/
+    //this->addTextEffect(active ? "activated" : "deactivated", 10000);
+    if( !active ) {
+        this->displayPausedMessage();
+    }
 }
 
 void PlayingGamestate::checkQuestComplete() {
