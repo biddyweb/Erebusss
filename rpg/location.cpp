@@ -140,13 +140,7 @@ void Scenery::setOpened(bool opened) {
 
 bool Scenery::isOn(const Character *character) const {
     Vector2D ch_pos = character->getPos();
-    float hw = 0.5f * this->width;
-    float hh = 0.5f * this->height;
-    if( ch_pos.x >= this->pos.x - hw && ch_pos.x <= this->pos.x + hw &&
-            ch_pos.y >= this->pos.y - hh && ch_pos.y <= this->pos.y +hh ) {
-        return true;
-    }
-    return false;
+    return this->boundary_base.pointInside(ch_pos);
 }
 
 vector<string> Scenery::getInteractionText(PlayingGamestate *playing_gamestate, string *dialog_text) const {
