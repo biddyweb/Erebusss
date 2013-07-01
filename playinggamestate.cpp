@@ -5486,7 +5486,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
                     this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
 
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), true, size_w, size_h, visual_h, boundary_iso, boundary_iso_ratio);
+                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h, visual_h, boundary_iso, boundary_iso_ratio);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -6064,13 +6064,7 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
 void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
     //qDebug("PlayingGamestate::locationAddScenery(%d, %d): %s", location, scenery, scenery->getName().c_str());
     if( this->c_location == location ) {
-        QGraphicsItem *object = NULL;
-        if( scenery->isAnimation() ) {
-            object = new AnimatedObject(100);
-        }
-        else {
-            object = new QGraphicsPixmapItem();
-        }
+        QGraphicsItem *object = new AnimatedObject(100);
         //qDebug("set gfx data %d", object);
         scenery->setUserGfxData(object);
         this->locationUpdateScenery(scenery);
@@ -6138,34 +6132,16 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
 
 void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     //qDebug("### update for: %s", scenery->getName().c_str());
-    //AnimatedObject *object = new AnimatedObject();
-    //this->characterUpdateGraphics(character, object);
-    if( scenery->isAnimation() ) {
-        //qDebug("animation");
-        AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData());
-        object->clearAnimationLayers();
-        //qDebug("update scenery: %s", scenery->getName().c_str());
-        object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()]->getAnimationLayer() );
-        if( scenery->isOpened() ) {
-            object->setAnimationSet("opened", true);
-        }
-        else {
-            object->setAnimationSet("", true);
-        }
+    AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData());
+    object->clearAnimationLayers();
+    //qDebug("update scenery: %s", scenery->getName().c_str());
+    object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()]->getAnimationLayer() );
+    if( scenery->isOpened() ) {
+        object->setAnimationSet("opened", true);
     }
-    /*else {
-        QGraphicsPixmapItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-        if( object != NULL ) {
-            map<string, QPixmap>::iterator image_iter = this->scenery_images.find(scenery->getImageName());
-            if( image_iter == this->scenery_images.end() ) {
-                LOG("failed to find image for scenery: %s\n", scenery->getName().c_str());
-                LOG("    image name: %s\n", scenery->getImageName().c_str());
-                throw string("Failed to find scenery's image");
-            }
-            object->setPixmap( image_iter->second );
-            object->update();
-        }
-    }*/
+    else {
+        object->setAnimationSet("", true);
+    }
 }
 
 void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {

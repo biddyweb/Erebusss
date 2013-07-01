@@ -235,7 +235,8 @@ AnimationLayer *AnimationLayer::create(const string &filename, const vector<Anim
 }
 
 AnimatedObject::AnimatedObject(int ms_per_frame) : /*animation_layer(NULL), c_animation_set(NULL),*/
-    ms_per_frame(ms_per_frame), set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false)
+    ms_per_frame(ms_per_frame), set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false),
+    clip(false), clip_sx(0), clip_sy(0), clip_sw(0), clip_sh(0)
 {
 }
 
@@ -283,7 +284,12 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     for(vector<const AnimationSet *>::const_iterator iter = c_animation_sets.begin(); iter != c_animation_sets.end(); ++iter) {
         const AnimationSet *c_animation_set = *iter;
         const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
-        painter->drawPixmap(0, off_y, pixmap);
+        if( this->clip ) {
+            painter->drawPixmap(0, off_y, pixmap, clip_sx, clip_sy, clip_sw, clip_sh);
+        }
+        else {
+            painter->drawPixmap(0, off_y, pixmap);
+        }
     }
 }
 
@@ -912,22 +918,22 @@ void Game::runTest(const string &filename, int test_id) {
             void *ignore = NULL;
             Scenery *scenery = NULL;
             if( test_id == TEST_PATHFINDING_5 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 2.5f, 2.0f);
                 ignore = scenery;
 
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 2.5f, 4.0f);
             }
             else if( test_id == TEST_PATHFINDING_6 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 2.5f, 2.0f);
                 ignore = scenery;
 
-                scenery = new Scenery("", "", false, 1.0f, 8.0f, 8.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 8.0f, 8.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 1.5f, 5.5f);
             }
@@ -1164,17 +1170,17 @@ void Game::runTest(const string &filename, int test_id) {
 
             Scenery *scenery = NULL;
             if( test_id == TEST_PERF_REMOVE_SCENERY_0 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 5.5f, 22.5f);
             }
             else if( test_id == TEST_PERF_REMOVE_SCENERY_1 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 4.25f, 22.5f);
             }
             else if( test_id == TEST_PERF_REMOVE_SCENERY_2 ) {
-                scenery = new Scenery("", "", false, 0.1f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 0.1f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 4.95f, 3.5f);
             }
@@ -1300,17 +1306,17 @@ void Game::runTest(const string &filename, int test_id) {
 
             Scenery *scenery = NULL;
             if( test_id == TEST_PERF_NUDGE_0 || test_id == TEST_PERF_NUDGE_1 || test_id == TEST_PERF_NUDGE_4 || test_id == TEST_PERF_NUDGE_5 ) {
-                scenery = new Scenery("", "", false, 0.1f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 0.1f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 4.95f, 2.5f);
             }
             else if( test_id == TEST_PERF_NUDGE_2 || test_id == TEST_PERF_NUDGE_3 || test_id == TEST_PERF_NUDGE_6 || test_id == TEST_PERF_NUDGE_7 ) {
-                scenery = new Scenery("", "", false, 1.0f, 0.1f, 0.9f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 0.1f, 0.9f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 2.5f, 4.95f);
             }
             else if( test_id == TEST_PERF_NUDGE_12 || test_id == TEST_PERF_NUDGE_13 ) {
-                scenery = new Scenery("", "", false, 1.0f, 1.0f, 1.0f, false, 0.0f);
+                scenery = new Scenery("", "", 1.0f, 1.0f, 1.0f, false, 0.0f);
                 scenery->setBlocking(true, true);
                 location.addScenery(scenery, 2.5f, 2.5f);
             }

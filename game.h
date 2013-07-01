@@ -216,6 +216,8 @@ class AnimatedObject : public QGraphicsItem {
     size_t c_frame;
     int animation_time_start_ms;
     bool bounce; // whether to bounce up and down
+    bool clip; // whether to only draw a portion
+    bool clip_sx, clip_sy, clip_sw, clip_sh;
 
     virtual void advance(int phase);
     virtual QRectF boundingRect() const;
@@ -233,6 +235,13 @@ public:
     int getHeight() const;
     void setBounce(bool bounce) {
         this->bounce = bounce;
+    }
+    void setClip(int sx, int sy, int sw, int sh) {
+        this->clip = true;
+        this->clip_sx = sx;
+        this->clip_sy = sy;
+        this->clip_sw = sw;
+        this->clip_sh = sh;
     }
 };
 

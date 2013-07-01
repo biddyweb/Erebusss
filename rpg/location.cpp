@@ -15,8 +15,8 @@ using std::swap;
 #include <cassert>
 #endif
 
-Scenery::Scenery(const string &name, const string &image_name, bool is_animation, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio) :
-    location(NULL), name(name), image_name(image_name), is_animation(is_animation), user_data_gfx(NULL),
+Scenery::Scenery(const string &name, const string &image_name, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio) :
+    location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), exit_travel_time(0), is_locked(false), locked_silent(false), locked_used_up(false), key_always_needed(false), unlock_xp(20),
     draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height), boundary_iso(boundary_iso), boundary_iso_ratio(boundary_iso_ratio),
     action_last_time(0), action_delay(0), action_value(0),
@@ -2412,7 +2412,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                    scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                    scenery_corner = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
                     scenery_corner->setBlocking(true, false);
                     scenery_corner->setCanBeOpened(true);
                     int gold = rollDice(1, 12, 0);
@@ -2510,7 +2510,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                    Scenery *scenery = new Scenery(scenery_name, scenery_image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                    Scenery *scenery = new Scenery(scenery_name, scenery_image_name, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setInteractType(interact_type);
                     scenery->setBlocking(true, false);
                     location->addScenery(scenery, room_centre.x, room_centre.y);
@@ -2520,7 +2520,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     string scenery_image_name = "tomb";
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                    Scenery *scenery = new Scenery("Tomb", scenery_image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                    Scenery *scenery = new Scenery("Tomb", scenery_image_name, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setBlocking(true, false);
                     if( rollDice(1, 2, 0) == 1 ) {
                         int gold = rollDice(3, 6, 0);
@@ -2544,7 +2544,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 string name = "Chest", image_name = "chest";
                 float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                 playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 0.8f, 0.0f, 0.0f, false, 0.0f);
-                scenery_corner = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                scenery_corner = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
                 scenery_corner->setBlocking(true, false);
                 scenery_corner->setCanBeOpened(true);
                 int gold = room_type == ROOMTYPE_LAIR ? rollDice(4, 10, 10) : rollDice(5, 10, 50);
@@ -2653,7 +2653,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         else {
                             playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_centre_image_name, true, scenery_centre_size, 0.0f, 0.0f, false, 0.0f);
                         }
-                        Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                        Scenery *scenery_centre = new Scenery(scenery_centre_name, scenery_centre_image_name, size_w, size_h, visual_h, false, 0.0f);
                         scenery_centre->setDrawType(draw_type);
                         scenery_centre->setBlocking(scenery_centre_is_blocking, scenery_centre_blocks_visibility);
                         if( scenery_centre_description.length() > 0 ) {
@@ -2672,7 +2672,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         name = "Stairs";
                         image_name = "stairsdown_indoors";
                         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-                        Scenery *scenery_stairs_down = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
+                        Scenery *scenery_stairs_down = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
                         scenery_stairs_down->setBlocking(true, false);
                         location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
                         *exit_down = scenery_stairs_down;
@@ -2749,7 +2749,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 else {
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_name, true, scenery_size, 0.0f, 0.0f, false, 0.0f);
                 }
-                Scenery *scenery = new Scenery(scenery_name, scenery_name, true, size_w, size_h, visual_h, false, 0.0f);
+                Scenery *scenery = new Scenery(scenery_name, scenery_name, size_w, size_h, visual_h, false, 0.0f);
                 scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
@@ -2930,7 +2930,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
         string image_name = "stairsup_indoors";
         float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-        Scenery *scenery_stairs_up = new Scenery(name, image_name, true, size_w, size_h, visual_h, false, 0.0f);
+        Scenery *scenery_stairs_up = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
         scenery_stairs_up->setBlocking(true, false);
         Vector2D scenery_pos = seed.pos + dir_vec*size_w*0.5f;
         location->addScenery(scenery_stairs_up, scenery_pos.x, scenery_pos.y);
