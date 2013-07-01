@@ -285,7 +285,11 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         const AnimationSet *c_animation_set = *iter;
         const QPixmap &pixmap = c_animation_set->getFrame(c_dimension, c_frame);
         if( this->clip ) {
-            painter->drawPixmap(0, off_y, pixmap, clip_sx, clip_sy, clip_sw, clip_sh);
+            int i_sx = (int)(clip_sx * pixmap.width());
+            int i_sy = (int)(clip_sy * pixmap.height());
+            int i_sw = (int)(clip_sw * pixmap.width());
+            int i_sh = (int)(clip_sh * pixmap.height());
+            painter->drawPixmap(i_sx, i_sy+off_y, pixmap, i_sx, i_sy, i_sw, i_sh);
         }
         else {
             painter->drawPixmap(0, off_y, pixmap);

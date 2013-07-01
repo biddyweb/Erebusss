@@ -217,15 +217,16 @@ class AnimatedObject : public QGraphicsItem {
     int animation_time_start_ms;
     bool bounce; // whether to bounce up and down
     bool clip; // whether to only draw a portion
-    bool clip_sx, clip_sy, clip_sw, clip_sh;
+    float clip_sx, clip_sy, clip_sw, clip_sh;
 
     virtual void advance(int phase);
-    virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 public:
     AnimatedObject(int ms_per_frame);
     virtual ~AnimatedObject();
+
+    virtual QRectF boundingRect() const;
 
     void addAnimationLayer(AnimationLayer *animation_layer);
     void clearAnimationLayers();
@@ -236,7 +237,7 @@ public:
     void setBounce(bool bounce) {
         this->bounce = bounce;
     }
-    void setClip(int sx, int sy, int sw, int sh) {
+    void setClip(float sx, float sy, float sw, float sh) {
         this->clip = true;
         this->clip_sx = sx;
         this->clip_sy = sy;

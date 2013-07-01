@@ -5746,7 +5746,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     }
 
     /*if( !lightdistribution_c ) {
-        game_g->loadSound("ingame_music", "music/short_loop.ogg");
+        game_g->loadSound("ingame_music", "music/exploring_loop.ogg");
         game_g->playSound("ingame_music", true);
     }*/
 
@@ -6064,49 +6064,72 @@ void PlayingGamestate::locationRemoveItem(const Location *location, Item *item) 
 void PlayingGamestate::locationAddScenery(const Location *location, Scenery *scenery) {
     //qDebug("PlayingGamestate::locationAddScenery(%d, %d): %s", location, scenery, scenery->getName().c_str());
     if( this->c_location == location ) {
-        QGraphicsItem *object = new AnimatedObject(100);
-        //qDebug("set gfx data %d", object);
-        scenery->setUserGfxData(object);
-        this->locationUpdateScenery(scenery);
-        object->setOpacity(scenery->getOpacity());
-        object->setVisible(false); // default to false, visibility is checked afterwards
-        scene->addItem(object);
-        object->setPos(scenery->getX(), scenery->getY());
-        float z_value = object->pos().y();
-        if( scenery->getDrawType() == Scenery::DRAWTYPE_FLOATING ) {
-            z_value += 1000.0f;
-        }
-        else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
-            //qDebug("background: %s", scenery->getName().c_str());
-            z_value = z_value_scenery_background;
-        }
-        object->setZValue(z_value);
-        //qDebug("    z value: %f", z_value);
-        float scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
-        float scenery_scale_h = scenery->getVisualHeight() / object->boundingRect().height();
-        float centre_x = 0.5f*object->boundingRect().width();
-        float centre_y = 0.5f*object->boundingRect().height();
-        centre_y += 0.5f * (scenery->getVisualHeight() - scenery->getHeight()) / scenery_scale_h;
-        if( scenery->getVisualHeight() - scenery->getHeight() < 0.0f ) {
-            qDebug(">>> %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-            ASSERT_LOGGER( scenery->getVisualHeight() - scenery->getHeight() >= 0.0f );
-        }
+        int n_stripes = ( scenery->isBoundaryIso() && fabs(scenery->getBoundaryIsoRatio() - 0.5f) > E_TOL_LINEAR ) ? 4 : 1;
+        scenery->clearUserGfxData();
+        float stripe_width = 1.0f / (float)n_stripes;
+        AnimatedObject *top_object = NULL;
+        float scenery_scale_w = 0.0f, scenery_scale_h = 0.0f;
         QTransform transform;
-        transform = transform.scale(scenery_scale_w, scenery_scale_h);
-        transform = transform.translate(-centre_x, -centre_y);
-        object->setTransform(transform);
+        for(int stripe=0;stripe<n_stripes;stripe++) {
+            AnimatedObject *object = new AnimatedObject(100);
+            //scenery->setUserGfxData(object);
+            scenery->addUserGfxData(object);
+            if( n_stripes > 1 ) {
+                object->setClip(stripe*stripe_width, 0.0f, stripe_width, 1.0f);
+            }
+            this->locationUpdateScenery(scenery);
+            object->setOpacity(scenery->getOpacity());
+            object->setVisible(false); // default to false, visibility is checked afterwards
+            scene->addItem(object);
+            object->setPos(scenery->getX(), scenery->getY());
+            float z_value = object->pos().y();
+            if( n_stripes > 1 ) {
+                float boundary_iso_ratio = scenery->getBoundaryIsoRatio();
+                float y0 = (0.5f-boundary_iso_ratio) * scenery->getHeight();
+                float y1 = -y0;
+                float alpha = ((float)stripe + 0.5f)/((float)n_stripes);
+                float offset_z = (1.0f-alpha)*y0 + alpha*y1;
+                z_value += offset_z;
+                //qDebug("%d : %f -> %f : alpha %f offset %f", stripe, y0, y1, alpha, offset_z);
+            }
+            if( scenery->getDrawType() == Scenery::DRAWTYPE_FLOATING ) {
+                z_value += 1000.0f;
+            }
+            else if( scenery->getDrawType() == Scenery::DRAWTYPE_BACKGROUND ) {
+                //qDebug("background: %s", scenery->getName().c_str());
+                z_value = z_value_scenery_background;
+            }
+            object->setZValue(z_value);
+            //qDebug("    z value: %f", z_value);
+            if( top_object == NULL || z_value > top_object->zValue() + E_TOL_LINEAR ) {
+                top_object = object;
+            }
+            if( stripe == 0 ) {
+                scenery_scale_w = scenery->getWidth() / object->boundingRect().width();
+                scenery_scale_h = scenery->getVisualHeight() / object->boundingRect().height();
+                float centre_x = 0.5f*object->boundingRect().width();
+                float centre_y = 0.5f*object->boundingRect().height();
+                centre_y += 0.5f * (scenery->getVisualHeight() - scenery->getHeight()) / scenery_scale_h;
+                if( scenery->getVisualHeight() - scenery->getHeight() < 0.0f ) {
+                    qDebug(">>> %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+                    ASSERT_LOGGER( scenery->getVisualHeight() - scenery->getHeight() >= 0.0f );
+                }
+                transform = transform.scale(scenery_scale_w, scenery_scale_h);
+                transform = transform.translate(-centre_x, -centre_y);
+            }
+            object->setTransform(transform);
+        }
+
         if( scenery->hasSmoke() ) {
             SmokeParticleSystem *ps = new SmokeParticleSystem(smoke_pixmap);
             ps->setBirthRate(25.0f);
-            //ps->setPos(centre_x, 30.0f);
-            //ps->setPos(0.5f*object->boundingRect().width(), 0.4167f*object->boundingRect().height());
             Vector2D smoke_pos = scenery->getSmokePos();
-            ps->setPos(smoke_pos.x*object->boundingRect().width(), smoke_pos.y*object->boundingRect().height());
-            ps->setZValue(object->pos().y() + 2000.0f);
-            ps->setParentItem(object);
+            ps->setPos(smoke_pos.x*top_object->boundingRect().width(), smoke_pos.y*top_object->boundingRect().height());
+            ps->setZValue(top_object->pos().y() + 2000.0f);
+            ps->setParentItem(top_object);
             QTransform transform2;
             qDebug("### scenery scale %f , %f", scenery_scale_w, scenery_scale_h);
-            qDebug("### object %f x %f", object->boundingRect().width(), object->boundingRect().height());
+            qDebug("### object %f x %f", top_object->boundingRect().width(), top_object->boundingRect().height());
             const float mult_y = this->view_transform_3d ? 2.0f : 1.0f;
             transform2 = transform2.scale(1.0f/(64.0f*scenery_scale_w), mult_y/(64.0f*scenery_scale_h));
             ps->setTransform(transform2);
@@ -6116,10 +6139,12 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
 
 void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *scenery) {
     if( this->c_location == location ) {
-        QGraphicsItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-        scenery->setUserGfxData(NULL);
-        scene->removeItem(object);
-        delete object;
+        for(size_t i=0;i<scenery->getNUserGfxData();i++) {
+            QGraphicsItem *object = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData(i));
+            scene->removeItem(object);
+            delete object;
+        }
+        scenery->clearUserGfxData();
 
         if( scenery->blocksVisibility() ) {
             this->updateVisibility(player->getPos());
@@ -6132,15 +6157,17 @@ void PlayingGamestate::locationRemoveScenery(const Location *location, Scenery *
 
 void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     //qDebug("### update for: %s", scenery->getName().c_str());
-    AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData());
-    object->clearAnimationLayers();
-    //qDebug("update scenery: %s", scenery->getName().c_str());
-    object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()]->getAnimationLayer() );
-    if( scenery->isOpened() ) {
-        object->setAnimationSet("opened", true);
-    }
-    else {
-        object->setAnimationSet("", true);
+    for(size_t i=0;i<scenery->getNUserGfxData();i++) {
+        AnimatedObject *object = static_cast<AnimatedObject *>(scenery->getUserGfxData(i));
+        object->clearAnimationLayers();
+        //qDebug("update scenery: %s", scenery->getName().c_str());
+        object->addAnimationLayer( this->scenery_animation_layers[scenery->getImageName()]->getAnimationLayer() );
+        if( scenery->isOpened() ) {
+            object->setAnimationSet("opened", true);
+        }
+        else {
+            object->setAnimationSet("", true);
+        }
     }
 }
 
@@ -7667,9 +7694,9 @@ void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region)
             //qDebug("scenery %d", scenery);
             //qDebug("    %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
             //qDebug("    at %f, %f", scenery->getX(), scenery->getY());
-            QGraphicsItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData());
-            //qDebug("gfx_item2 %d", gfx_item2);
-            if( gfx_item2 != NULL ) {
+            for(size_t i=0;i<scenery->getNUserGfxData();i++) {
+                QGraphicsItem *gfx_item2 = static_cast<QGraphicsPixmapItem *>(scenery->getUserGfxData(i));
+                //qDebug("gfx_item2 %d", gfx_item2);
                 gfx_item2->setVisible( true );
             }
         }

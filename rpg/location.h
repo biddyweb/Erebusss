@@ -50,7 +50,7 @@ protected:
     string image_name;
     string big_image_name; // used for description
     Vector2D pos; // pos in Location (for centre)
-    void *user_data_gfx; // not saved
+    vector<void *> user_data_gfx;
 
     string requires_flag; // used for various purposes - if door can be opened, if exit[_location] can be exited, if scenery can be interacted with
     bool is_blocking;
@@ -126,11 +126,17 @@ public:
     string getImageName() const {
         return this->image_name;
     }
-    void setUserGfxData(void *user_data_gfx) {
-        this->user_data_gfx = user_data_gfx;
+    void clearUserGfxData() {
+        this->user_data_gfx.clear();
     }
-    void *getUserGfxData() {
-        return this->user_data_gfx;
+    void addUserGfxData(void *user_data_gfx) {
+        this->user_data_gfx.push_back(user_data_gfx);
+    }
+    size_t getNUserGfxData() const {
+        return this->user_data_gfx.size();
+    }
+    void *getUserGfxData(size_t i) const {
+        return this->user_data_gfx.at(i);
     }
     string getPopupText() const {
         return this->popup_text;
