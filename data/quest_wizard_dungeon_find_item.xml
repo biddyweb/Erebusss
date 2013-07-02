@@ -1034,19 +1034,19 @@ cddddd2b
 
 <scenery name="Armourer" image_name="building" x="25.0" y="16.5" size="4.0" blocking="true" block_visibility="true" exit_location="Armourer" exit_location_x="2.0" exit_location_y="3.0" has_smoke="true" smoke_x="0.337" smoke_y="0.0147"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="32.0" y="23.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" blocking="true" block_visibility="true" exit_location="General Stores" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="General Stores" image_name="hut" x="35.0" y="27.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" exit_location="General Stores" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="35.0" y="31.0" size="2.5" blocking="true" block_visibility="true" exit_location="peasant_hut" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="Peasant's Hut" image_name="hut" x="35.0" y="31.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" exit_location="peasant_hut" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="29.0" y="37.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="29.0" y="37.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="34.0" y="36.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="34.0" y="36.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="38.0" y="35.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="38.0" y="35.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Mage's Tent" image_name="tent" x="20.0" y="43.0" size="2.5" blocking="true" block_visibility="true" exit_location="mage_tent" exit_location_x="1.0" exit_location_y="1.5"/>
+<scenery name="Mage's Tent" image_name="tent" x="20.0" y="43.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.495" blocking="true" block_visibility="true" exit_location="mage_tent" exit_location_x="1.0" exit_location_y="1.5"/>
 
 <scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="1.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="6.3" exit_location_y="30.2"/>
 

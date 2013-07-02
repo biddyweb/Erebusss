@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -51,27 +51,27 @@ cdddddddddddd21dddddddddddddde
              ce
 </tilemap>
 
-<scenery name="Magic Shop" image_name="building3" x="20.0" y="18.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="Magic Shop" image_name="building3" x="20.0" y="18.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" exit_location="Magic Shop, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" blocking="true" block_visibility="true" exit_location="Armourer, Axbury" exit_location_x="1.5" exit_location_y="4.5"/>
+<scenery name="Armourer" image_name="building3" x="26.0" y="16.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" exit_location="Armourer, Axbury" exit_location_x="1.5" exit_location_y="4.5"/>
 
 <scenery name="Borin's Home" image_name="building" x="32.0" y="25.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Borin's Home" exit_location_x="2.5" exit_location_y="4.5"/>
 
 <scenery name="Well" image_name="well" x="29.0" y="20.0" size="1.0" blocking="true"/>
 
-<scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="4.0" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Home" image_name="building2" x="25.0" y="27.0" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" blocking="true" block_visibility="true" exit_location="General Stores, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
+<scenery name="General Stores" image_name="building3" x="32.0" y="32.0" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" exit_location="General Stores, Axbury" exit_location_x="1.0" exit_location_y="2.5"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="32.5" y="38.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="32.5" y="38.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="31.0" y="43.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="31.0" y="43.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="27.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="27.0" y="42.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Peasant's Hut" image_name="hut" x="20.0" y="42.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
+<scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.537" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
 <scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel east to the village of Middleham?"
@@ -636,15 +636,15 @@ cdddddddde
 
 <!-- town, west side -->
 
-<scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" locked="true"/>
+<scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" locked="true"/>
 
 <scenery name="The Sword and Talisman" image_name="building" x="30.5" y="34.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="The Sword and Talisman, Middleham" exit_location_x="2.5" exit_location_y="9.5"/>
 
-<scenery name="Private Home" image_name="house_brick" x="28.5" y="44.5" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
+<scenery name="Private Home" image_name="house_brick" x="28.5" y="44.5" size="3.0" boundary_iso="true" boundary_iso_ratio="0.545" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
 
-<scenery name="Magic Shop" image_name="building2" x="29.0" y="50.5" size="3.43" blocking="true" block_visibility="true" exit_location="Magic Shop, Middleham" exit_location_x="1.5" exit_location_y="4.5"/>
+<scenery name="Magic Shop" image_name="building2" x="29.0" y="50.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" exit_location="Magic Shop, Middleham" exit_location_x="1.5" exit_location_y="4.5"/>
 
-<scenery name="Private Home" image_name="building2" x="28.5" y="56.5" size="3.43" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Private Home" image_name="building2" x="28.5" y="56.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
 
 <!-- town, central column -->
 
@@ -654,7 +654,7 @@ cdddddddde
 
 <scenery name="Stairs" image_name="stairsdown_outdoors" x="41.0" y="24.0" size="2.0" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
 
-<scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" locked="true"/>
 
 <scenery name="Armourer" image_name="building" x="40.5" y="39.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Armourer, Middleham" exit_location_x="2.5" exit_location_y="4.5"/>
 
@@ -662,7 +662,7 @@ cdddddddde
     <gold amount="5"/>
 </scenery>
 
-<scenery name="Jail" image_name="building4" x="39.5" y="50.5" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.7344" smoke_y="0.0574" exit_location="Jail, Middleham" exit_location_x="2.5" exit_location_y="5.5"/>
+<scenery name="Jail" image_name="building4" x="39.5" y="50.5" size="3.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.7344" smoke_y="0.0574" exit_location="Jail, Middleham" exit_location_x="2.5" exit_location_y="5.5"/>
 
 <scenery name="Gallows" image_name="gallows" x="42.0" y="55.0" size="2.0" blocking="true"/>
 
@@ -893,7 +893,7 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="15.0">
              68
@@ -914,13 +914,13 @@ cdddde          9b
                 ce
 </tilemap>
 
-<scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.332" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
+<scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.545" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
 
-<scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.623" smoke_y="0.0147" locked="true"/>
+<scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.387" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.623" smoke_y="0.0147" locked="true"/>
 
-<scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.379" blocking="true" block_visibility="true" locked="true"/>
 
 </location>
 
