@@ -287,8 +287,11 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
         if( this->clip ) {
             int i_sx = (int)(clip_sx * pixmap.width());
             int i_sy = (int)(clip_sy * pixmap.height());
-            int i_sw = (int)(clip_sw * pixmap.width());
-            int i_sh = (int)(clip_sh * pixmap.height());
+            // do it this way, rather than scaling i_sw or i_sh directly, to avoid problems with rounding
+            int i_sx2 = (int)((clip_sx+clip_sw) * pixmap.width());
+            int i_sy2 = (int)((clip_sy+clip_sh) * pixmap.height());
+            int i_sw = i_sx2 - i_sx;
+            int i_sh = i_sy2 - i_sy;
             painter->drawPixmap(i_sx, i_sy+off_y, pixmap, i_sx, i_sy, i_sw, i_sh);
         }
         else {
