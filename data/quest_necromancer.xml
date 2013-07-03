@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -74,7 +74,7 @@ cdddddddddddd21dddddddddddddde
 <scenery name="Church" image_name="church" x="36.5" y="16.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.537" blocking="true" block_visibility="true" exit_location="Church, Axbury" exit_location_x="3.5" exit_location_y="9.5"/>
 
 <scenery name="Signpost" image_name="signpost" x="44.0" y="21.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="16.0" exit_location_y="40.0" exit_travel_time="24"
-    confirm_text="Do you wish to travel east to the village of Middleham?"
+    confirm_text="Do you wish to travel east to the town of Middleham?"
     requires_flag="borin_reveal_exit"
 />
 
@@ -634,6 +634,10 @@ cdddddddde
     confirm_text="Do you wish to travel west to the village of Axbury?"
 />
 
+<scenery name="Signpost" image_name="signpost" x="53.0" y="40.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
+    confirm_text="Do you wish to travel east to the town of Stockton?"
+/>
+
 <!-- town, west side -->
 
 <scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" locked="true"/>
@@ -893,7 +897,11 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
+
+<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
+    confirm_text="Do you wish to travel west to the town of Middleham?"
+/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="15.0">
              68
@@ -913,6 +921,8 @@ cdddde          9b
                 9b
                 ce
 </tilemap>
+
+<scenery name="Tree" image_name="deadtree2" x="20.0" y="15.0" size="3.0"/>
 
 <scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.332" blocking="true" block_visibility="true" locked="true"/>
 
