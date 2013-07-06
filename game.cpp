@@ -29,6 +29,110 @@ const int default_lighting_enabled_c = false; // lighting effects can be a bit t
 const int default_lighting_enabled_c = true;
 #endif
 
+Sound::Sound(const string &filename) {
+#ifdef USING_PHONON
+    this->mediaObject = NULL;
+    this->audioOutput = NULL;
+    this->mediaObject = new Phonon::MediaObject(qApp);
+    if( mediaObject == NULL ) {
+        throw string("failed to create media object");
+    }
+    else {
+        connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), game_g, SLOT(stateChanged(Phonon::State, Phonon::State)));
+        mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
+        this->audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
+        if( audioOutput == NULL ) {
+            delete mediaObject;
+            throw string("failed to create audio output");
+        }
+        else {
+            Phonon::createPath(mediaObject, audioOutput);
+        }
+    }
+#else
+    this->audioOutput = NULL;
+    inputFile.setFileName(filename.c_str());
+    inputFile.open(QIODevice::ReadOnly);
+
+    short n_channels = 0;
+    int sample_rate = 0;
+    short bits_per_sample = 0;
+    // parse WAV header
+    {
+        char id[4];
+        inputFile.read(id, 4);
+        if( strncmp(id, "RIFF", 4) != 0 ) {
+            inputFile.close();
+            throw string("not a WAV file - header not RIFF");
+        }
+
+        int size = 0;
+        inputFile.read((char *)&size, 4);
+        qDebug() << "    size:" << size;
+
+        inputFile.read(id, 4);
+        if( strncmp(id, "WAVE", 4) != 0 ) {
+            inputFile.close();
+            throw string("not a WAV file - header not WAVE");
+        }
+
+        inputFile.read(id, 4); // "fmt "
+
+        int format_length = 0;
+        inputFile.read((char *)&format_length, 4);
+        qDebug() << "    format_length:" << format_length;
+
+        short format_tag = 0;
+        inputFile.read((char *)&format_tag, 2);
+
+        inputFile.read((char *)&n_channels, 2);
+        qDebug() << "    n_channels:" << n_channels;
+
+        inputFile.read((char *)&sample_rate, 4);
+        qDebug() << "    sample_rate:" << sample_rate;
+
+        int avg_bytes_sec = 0;
+        inputFile.read((char *)&avg_bytes_sec, 4);
+        qDebug() << "    avg_bytes_sec:" << avg_bytes_sec;
+
+        short block_align = 0;
+        inputFile.read((char *)&block_align, 2);
+
+        inputFile.read((char *)&bits_per_sample, 2);
+        qDebug() << "    bits_per_sample:" << bits_per_sample;
+
+        inputFile.read(id, 4);
+        if( strncmp(id, "data", 4) != 0 ) {
+            inputFile.close();
+            throw string("not a WAV file - didn't find data");
+        }
+
+        int mLength = 0;
+        inputFile.read((char *)&mLength, 4);
+
+        qDebug("current file pos: %d", inputFile.pos());
+    }
+
+    QAudioFormat format;
+    // Set up the format, eg.
+    format.setFrequency(sample_rate);
+    format.setChannels(n_channels);
+    format.setSampleSize(bits_per_sample);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::UnSignedInt);
+
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if( !info.isFormatSupported(format) ) {
+        throw string("raw audio format not supported by backend");
+    }
+
+    audioOutput = new QAudioOutput(format);
+    connect(audioOutput,SIGNAL(stateChanged(QAudio::State)),SLOT(finishedPlaying(QAudio::State)));
+    //audioOutput->start(&inputFile);
+#endif
+}
+
 void WebViewEventFilter::setWebView(QWebView *webView) {
     qDebug("setWebView");
     this->webView = webView;
@@ -1748,6 +1852,7 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     return pixmap;
 }
 
+#ifdef USING_PHONON
 void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
 #ifndef Q_OS_ANDROID
     if( newstate == Phonon::ErrorState ) {
@@ -1758,28 +1863,19 @@ void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
     }
 #endif
 }
+#endif
 
 void Game::loadSound(const string &id, const string &filename) {
+    qDebug("load sound: %s : %s\n", id.c_str(), filename.c_str());
 #ifndef Q_OS_ANDROID
-    Phonon::MediaObject *mediaObject = new Phonon::MediaObject(qApp);
-    if( mediaObject == NULL ) {
-        LOG("failed to create media object for: %s\n", filename.c_str());
+    try {
+        this->sound_effects[id] = new Sound(filename);
     }
-    else {
-        connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(stateChanged(Phonon::State, Phonon::State)));
-        mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
-        Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
-        if( audioOutput == NULL ) {
-            LOG("failed to create audio output for: %s\n", filename.c_str());
-        }
-        else {
-            Phonon::Path audioPath = Phonon::createPath(mediaObject, audioOutput);
-            Sound *sound = new Sound(mediaObject, audioOutput);
-            this->sound_effects[id] = sound;
-        }
+    catch(const string &str) {
+        LOG("Error when loading %s\n", filename.c_str());
+        LOG("%s\n", str.c_str());
     }
 #else
-
     AndroidSoundEffect *android_sound = androidAudio.loadSound(filename.c_str());
     Sound *sound = new Sound(android_sound);
     qDebug("loadSound: %s : %s : %d : %d", id.c_str(), filename.c_str(), android_sound, sound);
@@ -1809,14 +1905,7 @@ void Game::playSound(const string &sound_effect, bool loop) {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
-            if( sound->state() == Phonon::PlayingState ) {
-                //qDebug("    already playing");
-            }
-            else {
-                sound->setVolume(((float)game_g->getSoundVolume())/100.0f);
-                sound->seek(0);
-                sound->play(loop);
-            }
+            sound->play(loop, true, ((float)game_g->getSoundVolume())/100.0f);
 #else
             androidAudio.playSound(sound->getAndroidSound(), loop);
 #endif

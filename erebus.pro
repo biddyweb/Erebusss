@@ -33,6 +33,7 @@ else {
 
 QT += webkit
 QT += xml
+#QT += multimedia # only if NOT USING_PHONON (see common.h)
 
 # Test UID only:
 #symbian:TARGET.UID3 = 0xE11B6032
@@ -73,7 +74,7 @@ android {
     LIBS += -lOpenSLES
 }
 else {
-    QT += phonon
+    QT += phonon # only if USING_PHONON (see common.h)
 }
 
 symbian {

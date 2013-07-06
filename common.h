@@ -23,6 +23,8 @@ const bool lightdistribution_c = false;
 #define DEPLOYMENT_PATH ""
 #endif
 
+#define USING_PHONON // also update whether using Phonon or multimedia libraries in PRO file
+
 // remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;
 const int versionMinor = 11;

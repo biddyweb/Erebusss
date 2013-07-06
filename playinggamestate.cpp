@@ -801,7 +801,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
             if( this->fade_in ) {
                 alpha_i = 255 - alpha_i;
             }
-            qDebug("fade: time %d alpha_i %d", time_diff_ms, alpha_i);
+            //qDebug("fade: time %d alpha_i %d", time_diff_ms, alpha_i);
             painter.fillRect(0, 0, width(), height(), QColor(0, 0, 0, alpha_i));
         }
     }
@@ -5745,10 +5745,13 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
-    /*if( !lightdistribution_c ) {
+    if( !lightdistribution_c ) {
+#ifndef USING_PHONON
         game_g->loadSound("ingame_music", "music/exploring_loop.ogg");
+        //game_g->loadSound("ingame_music", "music/exploring_loop.wav");
         game_g->playSound("ingame_music", true);
-    }*/
+#endif
+    }
 
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
