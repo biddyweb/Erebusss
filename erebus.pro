@@ -22,6 +22,7 @@ else:symbian {
     DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5
 }
 else {
+    # for other platforms, this is only really relevant to make runnable from QtCreator - actual deployment is done via scripts
     dir1.source = data
     dir2.source = docs
     dir3.source = gfx
@@ -29,11 +30,37 @@ else {
     dir5.source = ts
     dir6.source = music
     DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5 dir6
+    win32 {
+        #file1.source = ogg.dll
+        #file2.source = vorbis.dll
+        #file3.source = vorbisfile.dll
+        #DEPLOYMENTFOLDERS += file1 file2 file3
+    }
+}
+
+android {
+}
+else {
+    # if set, use Phonon library for sound; if commented out, use QAudioOutput
+    CONFIG += USING_PHONON
+    # if set, add support for Ogg files - only relevant if USING_PHONON not set
+    #CONFIG += USING_OGGVORBIS
+}
+
+USING_PHONON {
+    DEFINES += USING_PHONON
+}
+USING_OGGVORBIS {
+    DEFINES += USING_OGGVORBIS
 }
 
 QT += webkit
 QT += xml
-#QT += multimedia # only if NOT USING_PHONON (see common.h)
+USING_PHONON {
+}
+else {
+    QT += multimedia
+}
 
 # Test UID only:
 #symbian:TARGET.UID3 = 0xE11B6032
@@ -74,7 +101,12 @@ android {
     LIBS += -lOpenSLES
 }
 else {
-    QT += phonon # only if USING_PHONON (see common.h)
+    USING_PHONON {
+        QT += phonon
+    }
+    USING_OGGVORBIS {
+        LIBS += -l$$PWD\libvorbisfile
+    }
 }
 
 symbian {

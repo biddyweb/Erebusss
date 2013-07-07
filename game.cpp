@@ -31,7 +31,9 @@ const int default_lighting_enabled_c = true;
 
 #ifndef USING_PHONON
 
-//#include <vorbis/vorbisfile.h>
+#ifdef USING_OGGVORBIS
+#include <vorbis/vorbisfile.h>
+#endif
 
 qint64 SoundBuffer::readData(char *data, qint64 maxSize) {
     qint64 read = QBuffer::readData(data, maxSize);
@@ -168,8 +170,7 @@ Sound::Sound(const string &filename) {
             delete [] mBuffer;
             throw string("didn't read correct amount of data");
         }
-        // copy to QBuffer
-        //this->inputBuffer.buffer().append(mBuffer, mLength);
+        // copy to inputBuffer
         if( !this->inputBuffer.open(QIODevice::WriteOnly) ) {
             delete [] mBuffer;
             throw string("failed to open internal buffer");
@@ -179,17 +180,60 @@ Sound::Sound(const string &filename) {
         if( dataWritten != mLength ) {
             throw string("didn't write correct amount of data to internal buffer");
         }
+        inputBuffer.close();
     }
-    /*else if( stricmp(extension, "OGG") == 0 ) {
+#ifdef USING_OGGVORBIS
+    else if( stricmp(extension, "OGG") == 0 ) {
+        LOG("parse OGG file\n");
         // see http://www.gamedev.net/page/resources/_/technical/game-programming/introduction-to-ogg-vorbis-r2031
+        // but note, not save to use ov_open on Windows - see http://xiph.org/vorbis/doc/vorbisfile/ov_open.html
         FILE *f = fopen(filename.c_str(), "rb");
         if( f == NULL ) {
             throw string("failed to open sound file");
         }
         OggVorbis_File oggFile;
-        ov_open(f, &oggFile, NULL, 0); // n.b., no longer need for fclose file f
+        LOG("about to parse ogg file\n");
+        //int open_error = ov_open(f, &oggFile, NULL, 0); // n.b., no longer need for fclose file f
+        int open_error = ov_open_callbacks(f, &oggFile, NULL, 0, OV_CALLBACKS_DEFAULT); // n.b., no longer need for fclose file f
+        /*OggVorbis_File oggFile;
+        LOG("about to parse ogg file\n");
+        int open_error = ov_fopen(filename.c_str(), &oggFile);*/
+        if( open_error != 0 ) {
+            LOG("ov_open returned %d\n", open_error);
+            throw string("ov_open failed");
+        }
         vorbis_info *pInfo = ov_info(&oggFile, -1);
-    }*/
+        n_channels = pInfo->channels;
+        sample_rate = pInfo->rate;
+        bits_per_sample = 16;
+
+        // decode copy to inputBuffer
+        if( !this->inputBuffer.open(QIODevice::WriteOnly) ) {
+            ov_clear(&oggFile);
+            throw string("failed to open internal buffer");
+        }
+
+        const int endian = 0; // little endian
+        const int buffer_size_c = 32768;
+        char buffer[buffer_size_c] = "";
+        int bitStream = 0;
+        long bytes = 0;
+        do {
+            // Read up to a buffer's worth of decoded sound data
+            bytes = ov_read(&oggFile, buffer, buffer_size_c, endian, 2, 1, &bitStream);
+            if( bytes > 0 ) {
+                // Append to end of internalBuffer
+                int dataWritten = this->inputBuffer.write(buffer, bytes);
+                if( dataWritten != bytes ) {
+                    ov_clear(&oggFile);
+                    throw string("didn't write correct amount of data to internal buffer");
+                }
+            }
+        } while (bytes > 0);
+
+        inputBuffer.close();
+    }
+#endif
     else {
         throw string("unknown file extension");
     }
@@ -1951,7 +1995,7 @@ void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
 #endif
 
 void Game::loadSound(const string &id, const string &filename) {
-    qDebug("load sound: %s : %s\n", id.c_str(), filename.c_str());
+    LOG("load sound: %s : %s\n", id.c_str(), filename.c_str());
 #ifndef Q_OS_ANDROID
     try {
         this->sound_effects[id] = new Sound(filename);
