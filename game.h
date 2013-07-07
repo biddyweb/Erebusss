@@ -59,6 +59,23 @@ class Character;
 const QString savegame_ext = ".xml";
 const QString savegame_folder = "savegames/";
 
+#ifndef USING_PHONON
+class SoundBuffer : public QBuffer {
+    QAudioFormat format;
+    float volume;
+protected:
+    virtual qint64 readData(char *data, qint64 maxSize);
+public:
+    SoundBuffer() : QBuffer(), volume(1.0f) {
+    }
+
+    void setAudioFormat(QAudioFormat format); // may throw error if format not supported
+    void setVolume(float volume) {
+        this->volume = volume;
+    }
+};
+#endif
+
 class Sound : public QObject {
     Q_OBJECT
 
@@ -69,7 +86,7 @@ class Sound : public QObject {
     Phonon::AudioOutput *audioOutput;
 #else
     QAudioOutput *audioOutput;
-    QFile inputFile;
+    SoundBuffer inputBuffer;
 #endif
 private slots:
 #ifdef USING_PHONON
@@ -164,6 +181,7 @@ public:
             this->audioOutput->setVolume(volume);
         }
 #else
+        this->inputBuffer.setVolume(volume);
 #endif
     }
     void play(bool loop, bool set_volume, float volume) {
@@ -192,8 +210,8 @@ public:
                 if( set_volume ) {
                     this->setVolume(volume);
                 }
-                inputFile.seek(44); // seek past WAV header
-                audioOutput->start(&inputFile);
+                inputBuffer.seek(0);
+                audioOutput->start(&inputBuffer);
             }
         }
 #endif

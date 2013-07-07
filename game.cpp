@@ -29,6 +29,51 @@ const int default_lighting_enabled_c = false; // lighting effects can be a bit t
 const int default_lighting_enabled_c = true;
 #endif
 
+#ifndef USING_PHONON
+
+//#include <vorbis/vorbisfile.h>
+
+qint64 SoundBuffer::readData(char *data, qint64 maxSize) {
+    qint64 read = QBuffer::readData(data, maxSize);
+    if( this->volume < 0.99609375f ) {
+        if( format.sampleSize() == 16 ) {
+            int converted_read = read/2;
+            for(qint64 i=0;i<converted_read;i++) {
+                // little endian
+                short s = ((data[2*i+1] << 8) | data[2*i]);
+                if( s == 0 ) {
+                    continue;
+                }
+                int i_s = static_cast<int>(s);
+                i_s *= volume;
+                if( i_s >= 65536 ) {
+                    i_s = 65535;
+                }
+                /*LOG("i: %d\n", i);
+                LOG("vol: %f\n", volume);
+                LOG("s: %d\n", s);
+                LOG("i_s: %d\n", i_s);
+                LOG("data was: %d %d\n", data[2*i], data[2*i+1]);*/
+                data[2*i] = static_cast<char>(i_s % 256);
+                data[2*i+1] = static_cast<char>(i_s/256);
+                /*short s2 = ((data[2*i+1] << 8) | data[2*i]);
+                LOG("data now: %d %d\n", data[2*i], data[2*i+1]);
+                LOG("s2: %d\n", s2);*/
+            }
+        }
+    }
+    return read;
+}
+
+void SoundBuffer::setAudioFormat(QAudioFormat format) {
+    this->format = format;
+    if( /*this->format.sampleSize() != 8 */ this->format.sampleSize() != 16 ) {
+        throw string("sample size not supported");
+    }
+}
+
+#endif
+
 Sound::Sound(const string &filename) {
 #ifdef USING_PHONON
     this->mediaObject = NULL;
@@ -51,18 +96,25 @@ Sound::Sound(const string &filename) {
     }
 #else
     this->audioOutput = NULL;
-    inputFile.setFileName(filename.c_str());
-    inputFile.open(QIODevice::ReadOnly);
 
     short n_channels = 0;
     int sample_rate = 0;
     short bits_per_sample = 0;
-    // parse WAV header
-    {
+    if( filename.length() < 3 ) {
+        throw string("can't parse file extension");
+    }
+    const char *extension = filename.c_str() + filename.length() - 3;
+    if( stricmp(extension, "WAV") == 0 ) {
+        // parse WAV file
+        QFile inputFile;
+        inputFile.setFileName(filename.c_str());
+        if( !inputFile.open(QIODevice::ReadOnly) ) {
+            throw string("failed to open sound file");
+        }
+
         char id[4];
         inputFile.read(id, 4);
         if( strncmp(id, "RIFF", 4) != 0 ) {
-            inputFile.close();
             throw string("not a WAV file - header not RIFF");
         }
 
@@ -72,7 +124,6 @@ Sound::Sound(const string &filename) {
 
         inputFile.read(id, 4);
         if( strncmp(id, "WAVE", 4) != 0 ) {
-            inputFile.close();
             throw string("not a WAV file - header not WAVE");
         }
 
@@ -103,7 +154,6 @@ Sound::Sound(const string &filename) {
 
         inputFile.read(id, 4);
         if( strncmp(id, "data", 4) != 0 ) {
-            inputFile.close();
             throw string("not a WAV file - didn't find data");
         }
 
@@ -111,6 +161,37 @@ Sound::Sound(const string &filename) {
         inputFile.read((char *)&mLength, 4);
 
         qDebug("current file pos: %d", inputFile.pos());
+
+        char *mBuffer = (char*)malloc((mLength));
+        int dataRead = inputFile.read(mBuffer, mLength);
+        if( dataRead != mLength ) {
+            delete [] mBuffer;
+            throw string("didn't read correct amount of data");
+        }
+        // copy to QBuffer
+        //this->inputBuffer.buffer().append(mBuffer, mLength);
+        if( !this->inputBuffer.open(QIODevice::WriteOnly) ) {
+            delete [] mBuffer;
+            throw string("failed to open internal buffer");
+        }
+        int dataWritten = this->inputBuffer.write(mBuffer, mLength);
+        delete [] mBuffer;
+        if( dataWritten != mLength ) {
+            throw string("didn't write correct amount of data to internal buffer");
+        }
+    }
+    /*else if( stricmp(extension, "OGG") == 0 ) {
+        // see http://www.gamedev.net/page/resources/_/technical/game-programming/introduction-to-ogg-vorbis-r2031
+        FILE *f = fopen(filename.c_str(), "rb");
+        if( f == NULL ) {
+            throw string("failed to open sound file");
+        }
+        OggVorbis_File oggFile;
+        ov_open(f, &oggFile, NULL, 0); // n.b., no longer need for fclose file f
+        vorbis_info *pInfo = ov_info(&oggFile, -1);
+    }*/
+    else {
+        throw string("unknown file extension");
     }
 
     QAudioFormat format;
@@ -127,9 +208,13 @@ Sound::Sound(const string &filename) {
         throw string("raw audio format not supported by backend");
     }
 
+    inputBuffer.setAudioFormat(format);
+    if( !inputBuffer.open(QIODevice::ReadOnly) ) {
+        throw string("failed to open internal buffer");
+    }
+
     audioOutput = new QAudioOutput(format);
     connect(audioOutput,SIGNAL(stateChanged(QAudio::State)),SLOT(finishedPlaying(QAudio::State)));
-    //audioOutput->start(&inputFile);
 #endif
 }
 
