@@ -3816,6 +3816,7 @@ PlayingGamestate::~PlayingGamestate() {
         game_g->freeSound("wear_armour");
         game_g->freeSound("swing");
         game_g->freeSound("footsteps");
+        game_g->freeSound("ingame_music");
     }
     LOG("done\n");
 }
