@@ -1,4 +1,25 @@
-# Add files and directories to ship with the application 
+android {
+}
+else {
+    # if set, use Phonon library for sound; if commented out, use QAudioOutput
+    CONFIG += USING_PHONON
+    # if set, add support for Ogg files - only relevant if USING_PHONON not set
+    symbian {
+        # not supporting Ogg on Symbian
+    }
+    else {
+        #CONFIG += USING_OGGVORBIS
+    }
+}
+
+USING_PHONON {
+    DEFINES += USING_PHONON
+}
+USING_OGGVORBIS {
+    DEFINES += USING_OGGVORBIS
+}
+
+# Add files and directories to ship with the application
 # by adapting the examples below.
 # file1.source = myfile
 # dir1.source = mydir
@@ -31,27 +52,15 @@ else {
     dir6.source = music
     DEPLOYMENTFOLDERS += dir1 dir2 dir3 dir4 dir5 dir6
     win32 {
-        #file1.source = ogg.dll
-        #file2.source = vorbis.dll
-        #file3.source = vorbisfile.dll
-        #DEPLOYMENTFOLDERS += file1 file2 file3
+        # copy required DLLs
+        PWD_WIN = $${PWD}
+        PWD_WIN ~= s,/,\\,g
+        OUT_PWD_WIN = $${OUT_PWD}
+        OUT_PWD_WIN ~= s,/,\\,g
+        USING_OGGVORBIS {
+            QMAKE_POST_LINK = copy $${PWD_WIN}\libogg.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\libvorbis.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\libvorbisfile.dll $${OUT_PWD_WIN}\
+        }
     }
-}
-
-android {
-}
-else {
-    # if set, use Phonon library for sound; if commented out, use QAudioOutput
-    CONFIG += USING_PHONON
-    # if set, add support for Ogg files - only relevant if USING_PHONON not set
-    #CONFIG += USING_OGGVORBIS
-}
-
-USING_PHONON {
-    DEFINES += USING_PHONON
-}
-USING_OGGVORBIS {
-    DEFINES += USING_OGGVORBIS
 }
 
 QT += webkit
