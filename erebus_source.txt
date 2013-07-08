@@ -1,4 +1,4 @@
-Erebus is built using Nokia Qt Creator ( http://qt.nokia.com/products/qt-sdk ), available for Windows, Linux and OS X. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
+Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
 
 Linux
 =====
@@ -32,12 +32,12 @@ Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to
 Windows
 =======
 
-Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt.nokia.com/products/qt-sdk ). This has been tested on Windows 7 and Windows 8. This should also work for Linux.
+Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt-project.org/ ). This has been tested on Windows 7 and Windows 8. This should also work for Linux.
 
 Symbian
 =======
 
-Use Qt SDK with Qt Creator to compile for Symbian ( http://qt.nokia.com/products/qt-sdk ). Note that for Symbian, lower resolution graphics are used for some of the images - these are supplied in gfx_lores/ and should be copied to overwrite the corresponding files in the gfx/ folder. This is to help on low memory older Symbian phones (e.g., Nokia 5800), and the higher resolutions are less important on smartphone devices.
+Use Nokia Qt SDK with Qt Creator to compile for Symbian ( http://www.developer.nokia.com/Develop/Qt/Tools/ ). Note that for Symbian, lower resolution graphics are used for some of the images - these are supplied in gfx_lores/ and should be copied to overwrite the corresponding files in the gfx/ folder. This is to help on low memory older Symbian phones (e.g., Nokia 5800), and the higher resolutions are less important on smartphone devices.
 
 Android
 =======
@@ -47,7 +47,7 @@ Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has b
 Other platforms
 ===============
 
-It should be possible to compile Erebus on any other platform that Qt supports, though this is untested. See http://qt.nokia.com/products/qt-sdk .
+It should be possible to compile Erebus on any other platform that Qt supports, though this is untested.
 
 History
 =======
@@ -75,4 +75,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 9 June 2013
+Mark Harman 8 July 2013
