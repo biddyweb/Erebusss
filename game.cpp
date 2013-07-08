@@ -105,8 +105,10 @@ Sound::Sound(const string &filename) {
     if( filename.length() < 3 ) {
         throw string("can't parse file extension");
     }
-    const char *extension = filename.c_str() + filename.length() - 3;
-    if( stricmp(extension, "WAV") == 0 ) {
+    const char *extension_ptr = filename.c_str() + filename.length() - 3;
+    QString extension = QString(extension_ptr);
+    qDebug("extension: #%s#", extension.toStdString().c_str());
+    if( extension.compare("WAV", Qt::CaseInsensitive) == 0 ) {
         // parse WAV file
         QFile inputFile;
         inputFile.setFileName(filename.c_str());
@@ -183,7 +185,7 @@ Sound::Sound(const string &filename) {
         inputBuffer.close();
     }
 #ifdef USING_OGGVORBIS
-    else if( stricmp(extension, "OGG") == 0 ) {
+    else if( extension.compare("OGG", Qt::CaseInsensitive) == 0 ) {
         LOG("parse OGG file\n");
         // see http://www.gamedev.net/page/resources/_/technical/game-programming/introduction-to-ogg-vorbis-r2031
         // but note, not save to use ov_open on Windows - see http://xiph.org/vorbis/doc/vorbisfile/ov_open.html

@@ -24,7 +24,15 @@ class Phonon {
 #include <phonon/MediaObject>
 #include <phonon/AudioOutput>
 #else
+
+// faffing about, as we're using Qt-Mobility on Linux, but QtMultimedia on Windows!
+#ifdef _WIN32
 #include <QtMultimedia>
+#else
+#include <QtMultimedia/QAudioOutput>
+#include <QtMultimedia/QAudioFormat>
+#endif
+
 #endif
 
 #endif

@@ -68,7 +68,14 @@ QT += xml
 USING_PHONON {
 }
 else {
-    QT += multimedia
+    # On Windows, easier to use the built in Multimedia module than Qt-Mobility; on Linux, Multimedia only seems to be available in Qt-Mobility
+    win32 {
+        QT += multimedia
+    }
+    else {
+        CONFIG += mobility
+        MOBILITY += multimedia
+    }
 }
 
 # Test UID only:
@@ -114,7 +121,13 @@ else {
         QT += phonon
     }
     USING_OGGVORBIS {
-        LIBS += -l$$PWD\libvorbisfile
+        win32 {
+            # use lib in program folder
+            LIBS += -l$$PWD/libvorbisfile
+        }
+        else {
+            LIBS += -lvorbisfile
+        }
     }
 }
 
