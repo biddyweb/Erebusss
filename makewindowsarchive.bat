@@ -13,13 +13,20 @@ copy %dllsrc%\QtGui4.dll %dst%
 copy %dllsrc%\QtNetwork4.dll %dst%
 copy %dllsrc%\QtWebKit4.dll %dst%
 copy %dllsrc%\QtXml4.dll %dst%
+REM N.B., we still need phonon4.dll even when using SFML, as it's still needed for QtWebKit
 copy %dllsrc%\phonon4.dll %dst%
+REM For SFML:
+copy libsndfile-1.dll %dst%
+copy openal32.dll %dst%
+copy sfml-audio-2.dll %dst%
+copy sfml-system-2.dll %dst%
 
 mkdir %dst%\plugins\
 mkdir %dst%\plugins\imageformats\
 copy %dllsrc%\plugins\imageformats\qjpeg4.dll %dst%\plugins\imageformats\
-mkdir %dst%\plugins\phonon_backend\
-copy %dllsrc%\plugins\phonon_backend\phonon_ds94.dll %dst%\plugins\phonon_backend\
+REM For Phonon:
+REM mkdir %dst%\plugins\phonon_backend\
+REM copy %dllsrc%\plugins\phonon_backend\phonon_ds94.dll %dst%\plugins\phonon_backend\
 
 mkdir %dst%\docs\
 copy %src%\docs\ %dst%\docs\
