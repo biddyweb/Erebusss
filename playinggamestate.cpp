@@ -3478,23 +3478,22 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 #endif
     {
         LOG("load sound effects\n");
-        game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav");
-        game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav");
-        game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav");
-        game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav");
-        game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav");
-        game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav");
-        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav");
-        game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav");
-        game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav");
+        game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav", false);
+        game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav", false);
+        game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav", false);
+        game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav", false);
+        game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav", false);
+        game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav", false);
+        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav", false);
+        game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav", false);
+        game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav", false);
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
-        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav");  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
+        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav", false);  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
 #endif
-#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID) && !defined(__linux)
+#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID)
         // strange pauses on Symbian?
         // conflicts with other sounds on Android
-        // also causes pauses on Linux
-        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav");
+        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav", false);
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
         LOG("done loading sound effects\n");
@@ -5748,9 +5747,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
     if( !lightdistribution_c ) {
 #ifndef USING_PHONON
-        game_g->loadSound("ingame_music", "music/exploring_loop.ogg");
-        //game_g->loadSound("ingame_music", "music/exploring_loop.wav");
-        game_g->playSound("ingame_music", true);
+        // only supported for SFML, as Phonon doesn't support looping
+        //game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
+        //game_g->playSound("ingame_music", true);
 #endif
     }
 

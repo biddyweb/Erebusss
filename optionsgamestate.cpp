@@ -35,7 +35,7 @@ OptionsGamestate::OptionsGamestate() :
         if( game_g->isSoundEnabled() ) {
             music->play();
         }*/
-        game_g->loadSound("music_intro", "music/no_more_magic.ogg");
+        game_g->loadSound("music_intro", "music/no_more_magic.ogg", true);
         game_g->playSound("music_intro");
     }
 //#endif

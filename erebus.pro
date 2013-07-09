@@ -1,22 +1,17 @@
 android {
 }
 else {
-    # if set, use Phonon library for sound; if commented out, use QAudioOutput
-    CONFIG += USING_PHONON
-    # if set, add support for Ogg files - only relevant if USING_PHONON not set
+    # if set, use Phonon library for sound; if commented out, use SFML
     symbian {
-        # not supporting Ogg on Symbian
+        CONFIG += USING_PHONON
     }
     else {
-        #CONFIG += USING_OGGVORBIS
+        CONFIG += USING_PHONON
     }
 }
 
 USING_PHONON {
     DEFINES += USING_PHONON
-}
-USING_OGGVORBIS {
-    DEFINES += USING_OGGVORBIS
 }
 
 # Add files and directories to ship with the application
@@ -57,26 +52,21 @@ else {
         PWD_WIN ~= s,/,\\,g
         OUT_PWD_WIN = $${OUT_PWD}
         OUT_PWD_WIN ~= s,/,\\,g
-        USING_OGGVORBIS {
-            QMAKE_POST_LINK = copy $${PWD_WIN}\libogg.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\libvorbis.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\libvorbisfile.dll $${OUT_PWD_WIN}\
+        USING_PHONON {
+        }
+        else {
+            CONFIG(debug, debug|release) {
+                QMAKE_POST_LINK = copy $${PWD_WIN}\libsndfile-1.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\openal32.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-audio-d-2.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-system-d-2.dll $${OUT_PWD_WIN}\
+            }
+            else {
+                QMAKE_POST_LINK = copy $${PWD_WIN}\libsndfile-1.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\openal32.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-audio-2.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-system-2.dll $${OUT_PWD_WIN}\
+            }
         }
     }
 }
 
 QT += webkit
 QT += xml
-USING_PHONON {
-}
-else {
-    # On Windows, easier to use the built in Multimedia module than Qt-Mobility; on Linux, Multimedia only seems to be available in Qt-Mobility
-    win32 {
-        QT += multimedia
-    }
-    else {
-        CONFIG += mobility
-        MOBILITY += multimedia
-    }
-}
 
 # Test UID only:
 #symbian:TARGET.UID3 = 0xE11B6032
@@ -120,13 +110,15 @@ else {
     USING_PHONON {
         QT += phonon
     }
-    USING_OGGVORBIS {
+    else {
         win32 {
-            # use lib in program folder
-            LIBS += -l$$PWD/libvorbisfile
+            LIBS += -L$$PWD # add the source folder for libs
+        }
+        CONFIG(debug, debug|release) {
+            LIBS += -lsfml-audio-d -lsfml-system-d
         }
         else {
-            LIBS += -lvorbisfile
+            LIBS += -lsfml-audio -lsfml-system
         }
     }
 }

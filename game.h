@@ -25,13 +25,7 @@ class Phonon {
 #include <phonon/AudioOutput>
 #else
 
-// faffing about, as we're using Qt-Mobility on Linux, but QtMultimedia on Windows!
-#ifdef _WIN32
-#include <QtMultimedia>
-#else
-#include <QtMultimedia/QAudioOutput>
-#include <QtMultimedia/QAudioFormat>
-#endif
+#include <SFML/Audio.hpp>
 
 #endif
 
@@ -67,118 +61,28 @@ class Character;
 const QString savegame_ext = ".xml";
 const QString savegame_folder = "savegames/";
 
-#ifndef USING_PHONON
-class SoundBuffer : public QBuffer {
-    QAudioFormat format;
-    float volume;
-protected:
-    virtual qint64 readData(char *data, qint64 maxSize);
-public:
-    SoundBuffer() : QBuffer(), volume(1.0f) {
-    }
-
-    void setAudioFormat(QAudioFormat format); // may throw error if format not supported
-    void setVolume(float volume) {
-        this->volume = volume;
-    }
-};
-#endif
-
 class Sound : public QObject {
     Q_OBJECT
 
 #ifndef Q_OS_ANDROID
-    bool loop;
+
 #ifdef USING_PHONON
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
 #else
-    QAudioOutput *audioOutput;
-    SoundBuffer inputBuffer;
+    bool stream;
+    // if not streaming:
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
+    // if streaming:
+    sf::Music music;
 #endif
-private slots:
-#ifdef USING_PHONON
-#else
-    void finishedPlaying(QAudio::State state) {
-        qDebug("finishedPlaying, state: %d", state);
-        if( state == QAudio::IdleState ) {
-            audioOutput->stop();
-            if( loop ) {
-                this->play(true, false, 0.0f);
-            }
-        }
-    }
-#endif
-    /*void aboutToFinish() {
-        if( loop ) {
-            qDebug("sound::aboutToFinish");
-            //this->mediaObject->enqueue( this->mediaObject->currentSource() );
-            //this->mediaObject->seek(0);
-            //this->printDebug();
-        }
-    }
-    void finished() {
-        if( loop )
-        {
-            qDebug("sound::finished");
-            //this->mediaObject->enqueue(Phonon::MediaSource("music/exploring_loop.ogg"));
-            //this->mediaObject->enqueue( this->mediaObject->currentSource() );
-            //this->printDebug();
-            //this->mediaObject->seek(0);
-            //this->mediaObject->play();
-        }
-    }*/
-    /*void prefinishMarkReached(qint32 msecToEnd) {
-        qDebug("sound::prefinishMarkReached %d ( %d / %d )", msecToEnd, this->mediaObject->currentTime(), this->mediaObject->totalTime());
-        if( loop ) {
-            qDebug("    loop");
-            qDebug("current source type %d", this->mediaObject->currentSource().type());
-            if( this->mediaObject->currentSource().type() == Phonon::MediaSource::LocalFile ) {
-                qDebug("    filename: %s", this->mediaObject->currentSource().fileName().toStdString().c_str());
-            }
-            qDebug("queue was length %d:", this->mediaObject->queue().size());
-            for(int i=0;i<this->mediaObject->queue().size();i++) {
-                Phonon::MediaSource source = this->mediaObject->queue().at(i);
-                qDebug("    %d : %d : %s\n", i, source.type(), source.fileName().toStdString().c_str());
-            }
-            this->mediaObject->enqueue( this->mediaObject->currentSource() );
-            qDebug("queue is now length %d:", this->mediaObject->queue().size());
-            for(int i=0;i<this->mediaObject->queue().size();i++) {
-                Phonon::MediaSource source = this->mediaObject->queue().at(i);
-                qDebug("    %d : %d : %s\n", i, source.type(), source.fileName().toStdString().c_str());
-            }
-            //this->mediaObject->setCurrentSource( this->mediaObject->currentSource() );
-            //this->mediaObject->seek(0);
-            //this->mediaObject->play();
-        }
-    }*/
-    /*void update(qint64 time) {
-        if( loop && time >= this->mediaObject->totalTime() ) {
-            qDebug("loop");
-            this->mediaObject->seek(0);
-            this->mediaObject->play();
-        }
-        this->printDebug();
-        this->mediaObject->play();
-    }*/
 
 public:
-    /*Sound(Phonon::MediaObject *mediaObject, Phonon::AudioOutput *audioOutput) : mediaObject(mediaObject), audioOutput(audioOutput), loop(false) {
-        //this->buffer = NULL;
-        //connect(mediaObject, SIGNAL(aboutToFinish()), this, SLOT(aboutToFinish()));
-        //connect(mediaObject, SIGNAL(finished()), this, SLOT(finished()));
-        //connect(mediaObject, SIGNAL(prefinishMarkReached(qint32)), this, SLOT(prefinishMarkReached(qint32)));
-        //connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(update(qint64)));
-        //mediaObject->setTickInterval(10);
-        //mediaObject->setPrefinishMark(1);
-        //mediaObject->setTransitionTime(-2298);
-    }*/
-    Sound(const string &filename);
+    Sound(const string &filename, bool stream);
     ~Sound() {
 #ifdef USING_PHONON
         delete mediaObject;
-        delete audioOutput;
-#else
         delete audioOutput;
 #endif
     }
@@ -189,17 +93,19 @@ public:
             this->audioOutput->setVolume(volume);
         }
 #else
-        this->inputBuffer.setVolume(volume);
+        if( stream )
+            music.setVolume(100.0f*volume);
+        else
+            sound.setVolume(100.0f*volume);
 #endif
     }
     void play(bool loop, bool set_volume, float volume) {
         // if already playing, this function has no effect (neither restarts, nor changes volume)
-        qDebug("play");
-        this->loop = loop;
+        //qDebug("play");
 #ifdef USING_PHONON
         if( this->mediaObject != NULL ) {
             if( this->mediaObject->state() == Phonon::PlayingState ) {
-                qDebug("    already playing, pos %d", this->mediaObject->currentTime());
+                //qDebug("    already playing, pos %d", this->mediaObject->currentTime());
             }
             else {
                 if( set_volume ) {
@@ -210,22 +116,31 @@ public:
             }
         }
 #else
-        if( this->audioOutput != NULL ) {
-            if( this->audioOutput->state() == QAudio::ActiveState ) {
-                qDebug("    already playing");
+        if( stream ) {
+            if( music.getStatus() == sf::SoundSource::Playing ) {
+                //qDebug("    already playing");
             }
             else {
                 if( set_volume ) {
                     this->setVolume(volume);
                 }
-                inputBuffer.seek(0);
-                audioOutput->start(&inputBuffer);
+                music.setLoop(loop);
+                music.play();
+            }
+        }
+        else {
+            if( sound.getStatus() == sf::SoundSource::Playing ) {
+                //qDebug("    already playing");
+            }
+            else {
+                if( set_volume ) {
+                    this->setVolume(volume);
+                }
+                sound.setLoop(loop);
+                sound.play();
             }
         }
 #endif
-        /*if( loop ) {
-            this->mediaObject->enqueue( this->mediaObject->currentSource() );
-        }*/
     }
     void pause() {
 #ifdef USING_PHONON
@@ -233,51 +148,15 @@ public:
             this->mediaObject->pause();
         }
 #else
-        if( this->audioOutput != NULL ) {
-            this->audioOutput->stop();
+        if( stream ) {
+            music.pause();
+        }
+        else {
+            sound.pause();
         }
 #endif
     }
-    /*void stop() {
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            this->mediaObject->stop();
-        }
-#else
-#endif
-    }*/
-    /*void seek(qint64 time) {
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            this->mediaObject->seek(time);
-        }
-#else
-#endif
-    }*/
-    /*Phonon::State state() const {
-        return this->mediaObject->state();
-    }*/
-    /*void update() {
-        if( this->loop ) {
-            qint64 current_time = this->mediaObject->currentTime();
-            qint64 length = this->mediaObject->l
-        }
-    }*/
-    /*void printDebug() {
-        qDebug("printDebug:");
-        qDebug("    current source type %d", this->mediaObject->currentSource().type());
-        if( this->mediaObject->currentSource().type() == Phonon::MediaSource::LocalFile ) {
-            qDebug("    filename: %s", this->mediaObject->currentSource().fileName().toStdString().c_str());
-        }
-        qDebug("queue is length %d:", this->mediaObject->queue().size());
-        for(int i=0;i<this->mediaObject->queue().size();i++) {
-            Phonon::MediaSource source = this->mediaObject->queue().at(i);
-            qDebug("    %d : %d : %s\n", i, source.type(), source.fileName().toStdString().c_str());
-        }
-        qDebug("    state: %d", this->mediaObject->state());
-        qDebug("    current pos %d", this->mediaObject->currentTime());
-        qDebug("    transition time %d", this->mediaObject->transitionTime());
-    }*/
+
 #else
     AndroidSoundEffect *android_sound;
 
@@ -702,7 +581,7 @@ public:
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0, 0);
     }
-    void loadSound(const string &id, const string &filename);
+    void loadSound(const string &id, const string &filename, bool stream);
     void playSound(const string &sound_effect) {
         this->playSound(sound_effect, false);
     }
