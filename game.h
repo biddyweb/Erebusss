@@ -66,11 +66,11 @@ class Sound : public QObject {
 
 #ifndef Q_OS_ANDROID
 
+    float volume;
 #ifdef USING_PHONON
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
 #else
-    float volume;
     bool stream;
     // if not streaming:
     sf::SoundBuffer buffer;
