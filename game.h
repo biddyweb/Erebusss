@@ -70,6 +70,7 @@ class Sound : public QObject {
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
 #else
+    float volume;
     bool stream;
     // if not streaming:
     sf::SoundBuffer buffer;
@@ -87,20 +88,10 @@ public:
 #endif
     }
 
-    void setVolume(float volume) {
-#ifdef USING_PHONON
-        if( this->audioOutput != NULL ) {
-            this->audioOutput->setVolume(volume);
-        }
-#else
-        if( stream )
-            music.setVolume(100.0f*volume);
-        else
-            sound.setVolume(100.0f*volume);
-#endif
-    }
-    void play(bool loop, bool set_volume, float volume) {
-        // if already playing, this function has no effect (neither restarts, nor changes volume)
+    void updateVolume(); // updates the volume to take the global game volume into account
+    void setVolume(float volume);
+    void play(bool loop) {
+        // if already playing, this function has no effect (doesn't restart)
         //qDebug("play");
 #ifdef USING_PHONON
         if( this->mediaObject != NULL ) {
@@ -108,9 +99,7 @@ public:
                 //qDebug("    already playing, pos %d", this->mediaObject->currentTime());
             }
             else {
-                if( set_volume ) {
-                    this->setVolume(volume);
-                }
+                this->updateVolume();
                 this->mediaObject->seek(0);
                 this->mediaObject->play();
             }
@@ -121,9 +110,7 @@ public:
                 //qDebug("    already playing");
             }
             else {
-                if( set_volume ) {
-                    this->setVolume(volume);
-                }
+                this->updateVolume();
                 music.setLoop(loop);
                 music.play();
             }
@@ -133,9 +120,7 @@ public:
                 //qDebug("    already playing");
             }
             else {
-                if( set_volume ) {
-                    this->setVolume(volume);
-                }
+                this->updateVolume();
                 sound.setLoop(loop);
                 sound.play();
             }
@@ -588,16 +573,17 @@ public:
     void playSound(const string &sound_effect, bool loop);
     void pauseSound(const string &sound_effect);
     void freeSound(const string &sound_effect);
-#ifndef Q_OS_ANDROID
     void updateSoundVolume(const string &sound_effect);
+    void setSoundVolume(const string &sound_effect, float volume);
     /*bool isSoundEnabled() const {
         return this->sound_enabled;
     }
     void setSoundEnabled(bool sound_enabled);*/
-    int getSoundVolume() const {
+#ifndef Q_OS_ANDROID
+    int getGlobalSoundVolume() const {
         return this->sound_volume;
     }
-    void setSoundVolume(int sound_volume);
+    void setGlobalSoundVolume(int sound_volume);
 #endif
     bool isLightingEnabled() const {
         return this->lighting_enabled;

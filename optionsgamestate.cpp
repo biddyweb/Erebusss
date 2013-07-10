@@ -463,7 +463,7 @@ void OptionsGamestate::clickedOptions() {
         soundSlider = new QSlider(Qt::Horizontal);
         soundSlider->setMinimum(0);
         soundSlider->setMaximum(100);
-        soundSlider->setValue(game_g->getSoundVolume());
+        soundSlider->setValue(game_g->getGlobalSoundVolume());
         g_layout->addWidget(soundSlider, n_row, 1);
         n_row++;
 #endif
@@ -510,7 +510,7 @@ void OptionsGamestate::clickedOptionsOkay() {
         }
     }*/
 #ifndef Q_OS_ANDROID
-    game_g->setSoundVolume( soundSlider->value() );
+    game_g->setGlobalSoundVolume( soundSlider->value() );
     game_g->updateSoundVolume("music_intro");
 #endif
 

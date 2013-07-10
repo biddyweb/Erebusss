@@ -3474,7 +3474,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     //if( !mobile_c )
     //if( game_g->isSoundEnabled() )
 #ifndef Q_OS_ANDROID
-    if( game_g->getSoundVolume() > 0 )
+    if( game_g->getGlobalSoundVolume() > 0 )
 #endif
     {
         LOG("load sound effects\n");
@@ -3801,7 +3801,7 @@ PlayingGamestate::~PlayingGamestate() {
 
     //if( game_g->isSoundEnabled() )
 #ifndef Q_OS_ANDROID
-    if( game_g->getSoundVolume() )
+    if( game_g->getGlobalSoundVolume() )
 #endif
     {
         game_g->freeSound("click");
@@ -5748,8 +5748,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     if( !lightdistribution_c ) {
 #ifndef USING_PHONON
         // only supported for SFML, as Phonon doesn't support looping
-        //game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
-        //game_g->playSound("ingame_music", true);
+        game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
+        game_g->setSoundVolume("ingame_music", 0.1f);
+        game_g->playSound("ingame_music", true);
 #endif
     }
 

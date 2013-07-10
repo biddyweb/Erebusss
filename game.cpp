@@ -30,7 +30,7 @@ const int default_lighting_enabled_c = true;
 #endif
 
 #ifndef Q_OS_ANDROID
-Sound::Sound(const string &filename, bool stream) {
+Sound::Sound(const string &filename, bool stream) : volume(1.0f) {
 #ifdef USING_PHONON
     this->mediaObject = NULL;
     this->audioOutput = NULL;
@@ -64,6 +64,26 @@ Sound::Sound(const string &filename, bool stream) {
         sound.setBuffer(buffer);
     }
 #endif
+}
+
+void Sound::updateVolume() {
+    // multiply with the global volume
+    float real_volume = ((float)game_g->getGlobalSoundVolume())/100.0f * volume;
+#ifdef USING_PHONON
+    if( this->audioOutput != NULL ) {
+        this->audioOutput->setVolume(real_volume);
+    }
+#else
+    if( stream )
+        music.setVolume(100.0f*real_volume);
+    else
+        sound.setVolume(100.0f*real_volume);
+#endif
+}
+
+void Sound::setVolume(float volume) {
+    this->volume = volume;
+    this->updateVolume();
 }
 #endif
 
@@ -1837,7 +1857,7 @@ void Game::playSound(const string &sound_effect, bool loop) {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
-            sound->play(loop, true, ((float)game_g->getSoundVolume())/100.0f);
+            sound->play(loop);
 #else
             androidAudio.playSound(sound->getAndroidSound(), loop);
 #endif
@@ -1866,14 +1886,25 @@ void Game::freeSound(const string &sound_effect) {
     }
 }
 
-#ifndef Q_OS_ANDROID
 void Game::updateSoundVolume(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
     Sound *sound = this->sound_effects[sound_effect];
     if( sound != NULL ) {
-        sound->setVolume(((float)game_g->getSoundVolume())/100.0f);
+        sound->updateVolume();
     }
-}
 #endif
+    // not yet supported on Android
+}
+
+void Game::setSoundVolume(const string &sound_effect, float volume) {
+#ifndef Q_OS_ANDROID
+    Sound *sound = this->sound_effects[sound_effect];
+    if( sound != NULL ) {
+        sound->setVolume(volume);
+    }
+#endif
+    // not yet supported on Android
+}
 
 /*void Game::setSoundEnabled(bool sound_enabled) {
     this->sound_enabled = sound_enabled;
@@ -1881,7 +1912,7 @@ void Game::updateSoundVolume(const string &sound_effect) {
 }*/
 
 #ifndef Q_OS_ANDROID
-void Game::setSoundVolume(int sound_volume) {
+void Game::setGlobalSoundVolume(int sound_volume) {
     this->sound_volume = sound_volume;
     this->settings->setValue(sound_volume_key_c, sound_volume);
 }
