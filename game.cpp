@@ -30,7 +30,7 @@ const int default_lighting_enabled_c = true;
 #endif
 
 #ifndef Q_OS_ANDROID
-Sound::Sound(const string &filename, bool stream) : volume(1.0f) {
+Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream) {
 #ifdef USING_PHONON
     this->mediaObject = NULL;
     this->audioOutput = NULL;
@@ -51,7 +51,6 @@ Sound::Sound(const string &filename, bool stream) : volume(1.0f) {
         }
     }
 #else
-    this->stream = stream;
     if( this->stream ) {
         if( !music.openFromFile(filename.c_str()) ) {
             throw string("SFML failed to openFromFile");
@@ -1857,7 +1856,18 @@ void Game::playSound(const string &sound_effect, bool loop) {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
+            if( sound->isStream() && this->current_stream_sound_effect.c_str() != NULL ) {
+                // cancel current stream
+                Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
+                ASSERT_LOGGER(current_sound != NULL);
+                if( current_sound != NULL ) {
+                    current_sound->stop();
+                }
+            }
             sound->play(loop);
+            if( sound->isStream() ) {
+                this->current_stream_sound_effect = sound_effect;
+            }
 #else
             androidAudio.playSound(sound->getAndroidSound(), loop);
 #endif
@@ -1883,6 +1893,9 @@ void Game::freeSound(const string &sound_effect) {
     if( sound != NULL ) {
         this->sound_effects.erase( this->sound_effects.find(sound_effect) );
         delete sound;
+    }
+    if( current_stream_sound_effect == sound_effect ) {
+        this->current_stream_sound_effect = "";
     }
 }
 

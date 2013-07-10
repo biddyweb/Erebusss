@@ -2294,6 +2294,8 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 {
     playing_gamestate->addWidget(this, true);
 
+    game_g->playSound("trade", true);
+
     QFont font = game_g->getFontStd();
     this->setFont(font);
 
@@ -2368,6 +2370,7 @@ void CampaignWindow::clickedClose() {
     /*else {
         this->playing_gamestate->closeSubWindow();
     }*/
+    game_g->playSound("ingame_music", true);
 }
 
 void CampaignWindow::clickedShop() {
@@ -3497,6 +3500,18 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
 #endif
         // remember to call freeSound in the PlayingGamestate destructor!
         LOG("done loading sound effects\n");
+
+        if( !lightdistribution_c ) {
+#ifndef USING_PHONON
+            // only supported for SFML, as Phonon doesn't support looping
+            game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
+            game_g->setSoundVolume("ingame_music", 0.1f);
+            game_g->loadSound("trade", "music/traide.ogg", true);
+            game_g->setSoundVolume("trade", 0.1f);
+            game_g->loadSound("game_over", "music/your_fail.ogg", true);
+            game_g->setSoundVolume("game_over", 1.0f);
+#endif
+        }
     }
 #ifndef Q_OS_ANDROID
     else {
@@ -3816,6 +3831,8 @@ PlayingGamestate::~PlayingGamestate() {
         game_g->freeSound("swing");
         game_g->freeSound("footsteps");
         game_g->freeSound("ingame_music");
+        game_g->freeSound("trade");
+        game_g->freeSound("game_over");
     }
     LOG("done\n");
 }
@@ -5745,14 +5762,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
-    if( !lightdistribution_c ) {
-#ifndef USING_PHONON
-        // only supported for SFML, as Phonon doesn't support looping
-        game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
-        game_g->setSoundVolume("ingame_music", 0.1f);
-        game_g->playSound("ingame_music", true);
-#endif
-    }
+    game_g->playSound("ingame_music", true);
 
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
@@ -6837,6 +6847,7 @@ void PlayingGamestate::update() {
                 death_message << "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
             }
             death_message << "<p><b>Achieved Level:</b> " << player->getLevel() << "<br/><b>Achieved XP:</b> " << player->getXP() << "</p>";
+            game_g->playSound("game_over", false);
             this->showInfoDialog(death_message.str(), string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
 
             this->player = NULL;

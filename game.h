@@ -67,11 +67,11 @@ class Sound : public QObject {
 #ifndef Q_OS_ANDROID
 
     float volume;
+    bool stream;
 #ifdef USING_PHONON
     Phonon::MediaObject *mediaObject;
     Phonon::AudioOutput *audioOutput;
 #else
-    bool stream;
     // if not streaming:
     sf::SoundBuffer buffer;
     sf::Sound sound;
@@ -88,6 +88,9 @@ public:
 #endif
     }
 
+    bool isStream() const {
+        return this->stream;
+    }
     void updateVolume(); // updates the volume to take the global game volume into account
     void setVolume(float volume);
     void play(bool loop) {
@@ -138,6 +141,20 @@ public:
         }
         else {
             sound.pause();
+        }
+#endif
+    }
+    void stop() {
+#ifdef USING_PHONON
+        if( this->mediaObject != NULL ) {
+            this->mediaObject->stop();
+        }
+#else
+        if( stream ) {
+            music.stop();
+        }
+        else {
+            sound.stop();
         }
 #endif
     }
@@ -467,6 +484,7 @@ class Game : public QObject {
 
 protected:
     map<string, Sound *> sound_effects;
+    string current_stream_sound_effect;
 
 #ifdef Q_OS_ANDROID
     AndroidAudio androidAudio;
