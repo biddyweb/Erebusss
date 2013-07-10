@@ -6,7 +6,7 @@ else {
         CONFIG += USING_PHONON
     }
     else {
-        CONFIG += USING_PHONON
+        #CONFIG += USING_PHONON
     }
 }
 
