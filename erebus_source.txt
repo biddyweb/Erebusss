@@ -1,14 +1,20 @@
-Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
+Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. Windows and Linux use SFML 2 ( http://www.sfml-dev.org/ ) for the audio. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
 
 Linux
 =====
 
-To compile from the command line, you need to install Qt 4 and Phonon. On Ubuntu and Debian, you can install the required libraries with:
+To compile from the command line, you need to install Qt 4 and SFML 2. On Ubuntu and Debian, you can install the required Qt libraries with:
 
 sudo apt-get install g++
 sudo apt-get install libqt4-dev
-sudo apt-get install phonon
-sudo apt-get install libphonon-dev 
+
+And SFML can be installed as follows - this needs version 2, which isn't currently available in Ubuntu, hence you need to add the PPA as follows:
+
+sudo apt-add-repository ppa:sonkun/sfml-stable
+sudo apt-get update
+sudo apt-get install libsfml-dev
+
+(See http://en.sfml-dev.org/forums/index.php?topic=11338.0 )
 
 To compile, open a terminal window, cd to the Erebus directory (the one containing erebus.pro). You can then compile with:
 
@@ -32,7 +38,14 @@ Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to
 Windows
 =======
 
-Use the full Qt SDK with Qt Creator to compile for Windows ( http://qt-project.org/ ). This has been tested on Windows 7 and Windows 8. This should also work for Linux.
+Use the full Qt SDK with Qt Creator to compile for Windows. This has been tested on Windows 7 and Windows 8. This should also work for Linux.
+
+You also need SFML 2, which should be installed as follows:
+
+* Download the version that matches bit-ness and compiler being used in Qt (I use 32-bit, VS 2008).
+* Copy the Audio.hpp, Config.hpp and System.hpp files, and the Audio/ and System/ folders, from include/SFML/ to a SFML/ folder in the erebus/ folder (or copy the whole SFML include folder if you prefer; or alternatively, add the SFML include/ path to the .pro file)
+* Copy the sfml-audio.lib and sfml-system.lib files, and the "-d.lib" versions of those files, to the erebus/ folder (or add the SFML/ lib path the .pro file).
+* Copy the DLLs libsndfile-1.dll, openal32.dll, sfml-audio-2.dll, sfml-audio-d-2.dll, sfml-system-2.dll and sfml-system-d-2.dll to the erebus/ folder.
 
 Symbian
 =======
@@ -47,7 +60,9 @@ Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has b
 Other platforms
 ===============
 
-It should be possible to compile Erebus on any other platform that Qt supports, though this is untested.
+It should be possible to compile Erebus on any other platform that Qt supports, though this is untested. SFML 2.0 is also required for Audio, though you can configure to use Phonon (part of Qt) instead by adding:
+        CONFIG += USING_PHONON
+to the start of the erebus.pro file.
 
 History
 =======
@@ -75,4 +90,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 8 July 2013
+Mark Harman 10 July 2013
