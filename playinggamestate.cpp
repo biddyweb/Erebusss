@@ -7515,8 +7515,8 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
             if( !done ) {
                 done = handleClickForScenerys(&move, &ignore_scenery, forward_dest2, false);
             }
-            if( !done && player->getDirection().y < 0.0f ) {
-                // needed for scenery on walls
+            if( !done /*&& player->getDirection().y < 0.0f*/ ) {
+                // needed for scenery on walls, as well as improving for "isometric" objects
                 done = handleClickForScenerys(&move, &ignore_scenery, forward_dest3, false);
             }
             if( !done ) {
