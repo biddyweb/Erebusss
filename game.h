@@ -495,6 +495,10 @@ protected:
     QString application_path;
     QString logfilename;
     QString oldlogfilename;
+#ifdef Q_OS_ANDROID
+    bool sdcard_ok;
+    QString sdcard_path;
+#endif
 
     QStyle *style;
     QFont font_scene;
@@ -576,10 +580,18 @@ public:
         return this->gamestate;
     }
     //void mouseClick(int m_x, int m_y);
+
+#ifdef Q_OS_ANDROID
+    bool isSDCardOk() const {
+        return this->sdcard_ok;
+    }
+    void exportFilenameToSDCard(const QString &src_fullfilename, const QString &filename) const;
+#endif
     QString getFilename(const QString &path, const QString &name) const;
     QString getApplicationFilename(const QString &name) const;
     //void log(const char *text, ...);
     void log(const char *text, va_list vlist);
+
     QPixmap loadImage(const string &filename, bool clip, int xpos, int ypos, int width, int height, int expected_width) const;
     QPixmap loadImage(const string &filename) const {
         return loadImage(filename, false, 0, 0, 0, 0, 0);
@@ -619,8 +631,8 @@ public:
     void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);
-    /*void showInfoDialog(const string &title, const string &message);
-    bool askQuestionDialog(const string &title, const string &message);*/
+    void showInfoDialog(const string &title, const string &message);
+    //bool askQuestionDialog(const string &title, const string &message);
 };
 
 extern Game *game_g;

@@ -399,13 +399,26 @@ void OptionsGamestate::clickedLoad() {
         layout->addWidget(load_list);
         load_list->setCurrentRow(0);
 
-        QPushButton *loadButton = new QPushButton(tr("Load"));
-        game_g->initButton(loadButton);
-        loadButton->setShortcut(QKeySequence(Qt::Key_Return));
-        //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        layout->addWidget(loadButton);
-        connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
+        {
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
 
+            QPushButton *loadButton = new QPushButton(tr("Load"));
+            game_g->initButton(loadButton);
+            loadButton->setShortcut(QKeySequence(Qt::Key_Return));
+            //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            h_layout->addWidget(loadButton);
+            connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
+
+#ifdef Q_OS_ANDROID
+            if( game_g->isSDCardOk() ) {
+                QPushButton *exportButton = new QPushButton(tr("Export to SD Card"));
+                game_g->initButton(exportButton);
+                h_layout->addWidget(exportButton);
+                connect(exportButton, SIGNAL(clicked()), this, SLOT(clickedExportButton()));
+            }
+#endif
+        }
     }
     else {
         QLabel *label = new QLabel(tr("No save game files\navailable"));
@@ -439,6 +452,27 @@ void OptionsGamestate::clickedLoadGame() {
     game_g->pushMessage(game_message);
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 }
+
+#ifdef Q_OS_ANDROID
+void OptionsGamestate::clickedExportButton() {
+    LOG("OptionsGamestate::clickedExportButton()\n");
+    if( load_list == NULL ) {
+        return;
+    }
+    if( !game_g->isSDCardOk() ) {
+        return;
+    }
+    if( load_filenames.size() == 0 ) {
+        return;
+    }
+    for(size_t i=0;i<load_filenames.size();i++) {
+        QString filename = load_filenames.at(i);
+        QString full_filename = game_g->getApplicationFilename(savegame_folder + filename);
+        game_g->exportFilenameToSDCard(full_filename, filename);
+    }
+    game_g->showInfoDialog("", "Successfully saved files to SD card");
+}
+#endif
 
 void OptionsGamestate::clickedOptions() {
     LOG("OptionsGamestate::clickedOptions()\n");

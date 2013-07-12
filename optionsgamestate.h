@@ -50,6 +50,9 @@ private slots:
     void clickedCancel();
     void clickedLoad();
     void clickedLoadGame();
+#ifdef Q_OS_ANDROID
+    void clickedExportButton();
+#endif
     void clickedOptions();
     void clickedOptionsOkay();
     void clickedQuit();

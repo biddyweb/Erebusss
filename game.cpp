@@ -570,7 +570,9 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
-#ifndef Q_OS_ANDROID
+#ifdef Q_OS_ANDROID
+    sdcard_ok(false),
+#else
     sound_volume(default_sound_volume_c),
 #endif
     lighting_enabled(default_lighting_enabled_c) {
@@ -595,21 +597,21 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 
 #if defined(Q_OS_ANDROID)
     // on Android, try for the sdcard, so we can find somewhere more accessible to the user (and that I can read on my Galaxy Nexus!!!)
-    bool sdcard_okay = true;
-    QString sdnativePath = QString("/sdcard/net.sourceforge.erebusrpg");
-    qDebug("try sd card: %s", sdnativePath.toStdString().c_str());
-    if( !QDir(sdnativePath).exists() ) {
+    this->sdcard_ok = true;
+    sdcard_path = QString("/sdcard/net.sourceforge.erebusrpg");
+    qDebug("try sd card: %s", sdcard_path.toStdString().c_str());
+    if( !QDir(sdcard_path).exists() ) {
         qDebug("try creating application folder in sdcard/");
         // folder doesn't seem to exist - try creating it
-        QDir().mkdir(sdnativePath);
-        if( !QDir(sdnativePath).exists() ) {
+        QDir().mkdir(sdcard_path);
+        if( !QDir(sdcard_path).exists() ) {
             qDebug("failed to create application folder in sdcard/");
-            sdcard_okay = false;
+            sdcard_ok = false;
         }
     }
-    if( sdcard_okay ) {
-        logfilename = getFilename(sdnativePath, "log.txt");
-        oldlogfilename = getFilename(sdnativePath, "log_old.txt");
+    if( sdcard_ok ) {
+        logfilename = getFilename(sdcard_path, "log.txt");
+        oldlogfilename = getFilename(sdcard_path, "log_old.txt");
     }
     else {
         logfilename = getApplicationFilename("log.txt");
@@ -1652,7 +1654,6 @@ void Game::handleMessages() {
                 else {
                     ASSERT_LOGGER(false);
                 }
-
                 this->getScreen()->getMainWindow()->unsetCursor();
                 break;
             }
@@ -1662,9 +1663,9 @@ void Game::handleMessages() {
                 gamestate = NULL;
                 PlayingGamestate *playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
                 gamestate = playing_gamestate;
+                LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
+                QString full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
                 try {
-                    LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
-                    QString full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
                     playing_gamestate->loadQuest(full_filename, true);
                     this->getScreen()->getMainWindow()->unsetCursor();
                 }
@@ -1673,6 +1674,9 @@ void Game::handleMessages() {
                     this->getScreen()->getMainWindow()->unsetCursor();
                     stringstream str;
                     str << "Failed to load save game file:\n" << error;
+#ifdef Q_OS_ANDROID
+                    this->exportFilenameToSDCard(full_filename, load_message->getFilename());
+#endif
                     game_g->showErrorDialog(str.str());
                     delete gamestate;
                     gamestate = NULL;
@@ -1741,6 +1745,17 @@ QString Game::getApplicationFilename(const QString &name) const {
     // not safe to use LOG here, as logfile may not have been initialised!
     return getFilename(application_path, name);
 }
+
+#ifdef Q_OS_ANDROID
+void Game::exportFilenameToSDCard(const QString &src_fullfilename, const QString &filename) const {
+    if( this->sdcard_ok ) {
+        // also copy failed save game to sdcard on Android, so user can potentially access it to send it to me
+        QFile dir_file(this->getFilename(sdcard_path, filename));
+        dir_file.remove(); // in case already present
+        QFile::copy(src_fullfilename, dir_file.fileName());
+    }
+}
+#endif
 
 void Game::log(const char *text, va_list vlist) {
     char buffer[65536] = "";
@@ -1856,8 +1871,9 @@ void Game::playSound(const string &sound_effect, bool loop) {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
 #ifndef Q_OS_ANDROID
-            if( sound->isStream() && this->current_stream_sound_effect.c_str() != NULL ) {
+            if( sound->isStream() && this->current_stream_sound_effect.length() > 0 ) {
                 // cancel current stream
+                qDebug("cancel stream: %s", this->current_stream_sound_effect.c_str());
                 Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
                 ASSERT_LOGGER(current_sound != NULL);
                 if( current_sound != NULL ) {
@@ -2012,14 +2028,14 @@ void Game::showErrorDialog(const string &message) {
     this->getScreen()->enableUpdateTimer(true);
 }
 
-/*void Game::showInfoDialog(const string &title, const string &message) {
+void Game::showInfoDialog(const string &title, const string &message) {
     LOG("Game::showInfoDialog: %s\n", message.c_str());
     this->getScreen()->enableUpdateTimer(false);
     QMessageBox::information(this->getScreen()->getMainWindow(), title.c_str(), message.c_str());
     this->getScreen()->enableUpdateTimer(true);
 }
 
-bool Game::askQuestionDialog(const string &title, const string &message) {
+/*bool Game::askQuestionDialog(const string &title, const string &message) {
     LOG("Game::askQuestionWindow: %s\n", message.c_str());
     this->getScreen()->enableUpdateTimer(false);
     int res = QMessageBox::question(this->getScreen()->getMainWindow(), title.c_str(), message.c_str(), QMessageBox::Yes, QMessageBox::No);
