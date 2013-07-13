@@ -4646,6 +4646,11 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
     npc->setInteractionXP(interaction_xp);
     QStringRef interaction_reward_item_s = reader.attributes().value("interaction_reward_item");
     npc->setInteractionRewardItem(interaction_reward_item_s.toString().toStdString());
+    QStringRef interaction_reward_gold_s = reader.attributes().value("interaction_reward_gold");
+    if( interaction_reward_gold_s.length() > 0 ) {
+        int interaction_reward_gold = parseInt(interaction_reward_gold_s.toString());
+        npc->setInteractionRewardGold(interaction_reward_gold);
+    }
     QStringRef interaction_journal_s = reader.attributes().value("interaction_journal");
     npc->setInteractionJournal(interaction_journal_s.toString().toStdString());
     QStringRef interaction_set_flag_s = reader.attributes().value("interaction_set_flag");
@@ -8280,6 +8285,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->getInteractionRewardItem().length() > 0 ) {
                 //fprintf(file, " interaction_reward_item=\"%s\"", character->getInteractionRewardItem().c_str());
                 stream << " interaction_reward_item=\"" << character->getInteractionRewardItem().c_str() << "\"";
+            }
+            if( character->getInteractionRewardGold() > 0 ) {
+                stream << " interaction_reward_gold=\"" << character->getInteractionRewardGold() << "\"";
             }
             if( character->isInteractionCompleted() ) {
                 //fprintf(file, " interaction_completed=\"true\"");

@@ -1510,6 +1510,9 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
             ASSERT_LOGGER(false);
         }
     }
+    if( this->interaction_reward_gold > 0 ) {
+        playing_gamestate->getPlayer()->addGold(this->interaction_reward_gold);
+    }
     if( this->interaction_set_flag.length() > 0 ) {
         LOG("add quest flag: %s\n", this->interaction_set_flag.c_str());
         playing_gamestate->getQuest()->addFlag(this->interaction_set_flag);

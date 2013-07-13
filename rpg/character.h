@@ -402,6 +402,7 @@ class Character {
     string interaction_data;
     int interaction_xp;
     string interaction_reward_item;
+    int interaction_reward_gold;
     string interaction_journal;
     string interaction_set_flag;
     bool interaction_completed;
@@ -876,6 +877,12 @@ public:
     }
     void setInteractionRewardItem(const string &interaction_reward_item) {
         this->interaction_reward_item = interaction_reward_item;
+    }
+    int getInteractionRewardGold() const {
+        return this->interaction_reward_gold;
+    }
+    void setInteractionRewardGold(int interaction_reward_gold) {
+        this->interaction_reward_gold = interaction_reward_gold;
     }
     string getInteractionJournal() const {
         return this->interaction_journal;
