@@ -81,8 +81,6 @@ public class QtActivity extends Activity
     public static native void AndroidOnPause();
     public static native void AndroidOnResume();
     private boolean loadLibrary_ok = false;
-
-    private AudioManager audio;
     // end of modified code
 
     private final static int MINISTRO_INSTALL_REQUEST_CODE = 0xf3ee; // request code used to know when Ministro instalation is finished
@@ -718,11 +716,29 @@ public class QtActivity extends Activity
         // modified from standard necessitas
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+            {
+                AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                if( audio != null ) {
+                    System.out.println("audio up");
+                    audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                }
+                else {
+                    System.out.println("audio up - null");
+                }
                 return true;
+            }
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+            {
+                AudioManager audio = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+                if( audio != null ) {
+                    System.out.println("audio down");
+                    audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                }
+                else {
+                    System.out.println("audio down - null");
+                }
                 return true;
+            }
         }
         // end if modified code
         if (QtApplication.m_delegateObject != null && QtApplication.onKeyDown != null)
