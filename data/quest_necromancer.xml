@@ -926,11 +926,63 @@ cdddde          9b
 
 <scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.332" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.545" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.27" smoke_y="0.0147" locked="true"/>
+<!-- n.b., no smoke -->
+<scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.545" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.387" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.623" smoke_y="0.0147" locked="true"/>
+<!-- n.b., no smoke -->
+<scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.387" blocking="true" block_visibility="true" locked="true"/>
 
-<scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.379" blocking="true" block_visibility="true" locked="true"/>
+<scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.379" blocking="true" block_visibility="true" exit_location="Magnus's Home, Stockton" exit_location_x="3.5" exit_location_y="9.5"/>
+
+<npc name="Magnus" animation_name="peasant_man" static_image="true" x="40.0" y="26.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Magnus's Heirloom"
+    interaction_xp="30"
+    interaction_reward_gold="25"
+    interaction_journal="I found Magnus's heirloom for him, who in return gave me 50 gold pieces as a reward."
+>
+<opening_initial>Please ... will you help me?
+</opening_initial>
+<opening_later>Please ... will you help me?
+</opening_later>
+<opening_interaction_complete>
+Thank you again for your help.
+</opening_interaction_complete>
+<talk question="What happened here?">
+blah
+</talk>
+<talk question="What are you doing here?" while_not_done="true" journal="I met an alchemist named Anmareth who is looking for a leaf from the dire plant.">
+My home still has those awful creatures in there. I wonder ... I know it's silly to worry about material goods when I am lucky to be alive, but there is a treasured heirloom of mine that has been in my family for generations. I would be grateful if someone were to retrieve it for me from my home.
+</talk>
+<talk question="I have recovered your heirloom" objective="true">
+Thank you! Here, have 25 gold pieces as a reward.
+</talk>
+</npc>
+
+</location>
+
+<location name="Magnus's Home, Stockton" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="2.0" rect_y="1.0" rect_w="3.0" rect_h="9.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="3.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="36.0" exit_location_y="28.0"/>
+
+<scenery name="Table" image_name="table" x="4.5" y="4.0" size="0.8" blocking="true"/>
+
+<scenery name="Chest" image_name="chest" x="4.5" y="1.5" size="0.8" blocking="true">
+    <item name="Magnus's Heirloom" image_name="ring_gem_red" weight="0"/>
+    <gold amount="23"/>
+</scenery>
 
 </location>
 
