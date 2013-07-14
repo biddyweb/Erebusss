@@ -61,6 +61,7 @@
 <image type="item" name="skull" filename="gfx/textures/items/skull.png"/>
 <image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
 <image type="item" name="ring_plain" filename="gfx/textures/items/ring_plain.png"/>
+<image type="item" name="ring_gem_red" filename="gfx/textures/items/ring_gem_red.png"/>
 <image type="item" name="mushroom" filename="gfx/textures/items/mushroom.png"/>
 <image type="item" name="book" filename="gfx/textures/items/book.png"/>
 <image type="item" name="vial" filename="gfx/textures/items/vial.png"/>
