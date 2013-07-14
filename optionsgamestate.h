@@ -50,9 +50,7 @@ private slots:
     void clickedCancel();
     void clickedLoad();
     void clickedLoadGame();
-#ifdef Q_OS_ANDROID
-    void clickedExportButton();
-#endif
+    void clickedExportButton(); // although this is only used on Android, shouldn't be under an Android #define, as then we can't find the slot for some reason
     void clickedOptions();
     void clickedOptionsOkay();
     void clickedQuit();

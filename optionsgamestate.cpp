@@ -453,16 +453,19 @@ void OptionsGamestate::clickedLoadGame() {
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 }
 
-#ifdef Q_OS_ANDROID
 void OptionsGamestate::clickedExportButton() {
+#ifdef Q_OS_ANDROID
     LOG("OptionsGamestate::clickedExportButton()\n");
     if( load_list == NULL ) {
+        qDebug("no load list");
         return;
     }
     if( !game_g->isSDCardOk() ) {
+        qDebug("no SD Card access");
         return;
     }
     if( load_filenames.size() == 0 ) {
+        qDebug("no filenames");
         return;
     }
     for(size_t i=0;i<load_filenames.size();i++) {
@@ -471,8 +474,8 @@ void OptionsGamestate::clickedExportButton() {
         game_g->exportFilenameToSDCard(full_filename, filename);
     }
     game_g->showInfoDialog("", "Successfully saved files to SD card");
-}
 #endif
+}
 
 void OptionsGamestate::clickedOptions() {
     LOG("OptionsGamestate::clickedOptions()\n");
