@@ -466,8 +466,12 @@ with the argument "-windowed". E.g., on Windows, run with:
   window, and note if that gives any error messages.</li>
   <li>A description of what happened, and what steps you took that resulted in the bug.</li>
   <li>Does the bug happen every time?</li>
-  <li>A save game file, if relevant (in the savegames/ folder, in the same location as the log.txt file -
-  see above for details on the location, although note this isn't yet accessible on Android devices).</li>
+  <li>A save game file, if relevant. This is located in the savegames/ folder, in the same location as the log.txt file.
+  Note that on Android, you need to export the save game files by clicking "Export to SD Card"
+  from the Load menu. This will copy the save game files to the folder net.sourceforge.erebusrpg/ (in sdcard/),
+  which you can access the same way as the log.txt file (see above). Also note that if a save game file fails
+  to load, that file will automatically be copied to the folder. (The reason for doing it this way is that
+  it's not possible to view an Android application's folders on internal storage, unless you have root.)</li>
   <li>Any details of your system may also be helpful, e.g.: operating system and version, CPU, graphics
   card, Direct X version if relevant, make/model of smartphone/tablet if relevant.</li>
 </ul>
@@ -509,6 +513,9 @@ through Paypal below (Paypal account not required). Thanks!</p>
 Version 0.11 (Work in progress)
 
 FIXED   Potential crash when using volume control keys on Android.
+ADDED   Option to export save game files to SD card on Android.
+ADDED   If save game fails to load on Android, save game file will be copied to
+        SD card.
 UPDATED Now using SFML 2 instead of Phonon for audio on Windows and Linux
         (allows gapless looping, and fixes audio problems on Linux).
 UPDATED Added footsteps sounds for Linux (now work properly with SFML).
