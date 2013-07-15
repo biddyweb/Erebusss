@@ -635,7 +635,7 @@ cdddddddde
 />
 
 <scenery name="Signpost" image_name="signpost" x="53.0" y="40.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
-    confirm_text="Do you wish to travel east to the town of Stockton?"
+    confirm_text="Do you wish to travel east to the village of Stockton?"
 />
 
 <!-- town, west side -->
@@ -897,10 +897,14 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the town of Middleham?"
+/>
+
+<scenery name="Signpost" image_name="signpost" x="44.5" y="20.0" size="1.0" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
+    confirm_text="Do you wish to travel east to Wentbridge Fort?"
 />
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="15.0">
@@ -908,8 +912,8 @@ Peering through a small hole in the cell door, you see a small dark room. After 
              9b
              9b
              9b
-    677777777547777777778
-    91dddddddddd21dddddde
+    67777777754777777777777778
+    91dddddddddd21ddddddddddde
 67775b          9b
 cdddde          9b
                 9b
@@ -983,6 +987,38 @@ Thank you! Here, have 25 gold pieces as a reward.
     <item name="Magnus's Heirloom" image_name="ring_gem_red" weight="0"/>
     <gold amount="23"/>
 </scenery>
+
+</location>
+
+<location name="Wentbridge Fort" display_name="true" lighting_min="100">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="20.0"/>
+
+<player_start x="16.0" y="22.0"/>
+
+<scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="44.0" exit_location_y="20.0" exit_travel_time="24"
+    confirm_text="Do you wish to travel west to the village of Stockton?"
+/>
+
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="10.0">
+          68
+          9b
+          9b
+          9b
+          9b
+          9b
+          9b
+          9b
+          9b
+          9b
+          9b
+67777777775b
+cdddddddddde
+</tilemap>
 
 </location>
 
