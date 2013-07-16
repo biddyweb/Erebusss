@@ -998,7 +998,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="20.0" rect_h="20.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="44.0" exit_location_y="20.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Stockton?"
@@ -1019,6 +1019,60 @@ Thank you! Here, have 25 gold pieces as a reward.
 67777777775b
 cdddddddddde
 </tilemap>
+
+<scenery name="Door" image_name="door_wood_n" x="26.0" y="9.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Entrance, Wentbridge Fort" exit_location_x="32.5" exit_location_y="59.0"/>
+
+</location>
+
+<location name="Entrance, Wentbridge Fort" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<player_start x="32.5" y="59.0"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
+
+<scenery name="Torch" image_name="torch" x="31.0" y="49.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="34.0" y="49.55" w="0.75" h="0.75"/>
+
+<scenery name="Carpet" image_name="carpet" x="32.5" y="54.0" w="1.0" h="1.5" draw_type="background"/>
+
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="60.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="26.0" exit_location_y="11.0"/>
+
+<floorregion shape="rect" rect_x="32.0" rect_y="45.0" rect_w="1.0" rect_h="5.0"/>
+
+<floorregion shape="rect" rect_x="29.0" rect_y="35.0" rect_w="7.0" rect_h="10.0"/>
+
+<scenery name="Torch" image_name="torch" x="31.0" y="34.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="34.0" y="34.55" w="0.75" h="0.75"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="31.0" y="43.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Magic Shop"/>
+
+<npc name="Shopkeeper" animation_name="peasant_man" static_image="true" x="34.5" y="42.8"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="General Stores"/>
+
+<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="31.5" y="37.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    shop="Armourer"/>
 
 </location>
 
