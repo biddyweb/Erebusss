@@ -674,6 +674,8 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     LOG("Platform: UNKNOWN\n");
 #endif
 
+    LOG("Data folder: %s\n", DEPLOYMENT_PATH);
+
     bool ok = true;
 
 #ifndef Q_OS_ANDROID
@@ -1749,6 +1751,7 @@ QString Game::getApplicationFilename(const QString &name) const {
 #ifdef Q_OS_ANDROID
 void Game::exportFilenameToSDCard(const QString &src_fullfilename, const QString &filename) const {
     if( this->sdcard_ok ) {
+        qDebug("Game::exportFilenameToSDCard(%s, %s)", src_fullfilename.toStdString().c_str(), filename.toStdString().c_str());
         // also copy failed save game to sdcard on Android, so user can potentially access it to send it to me
         QFile dir_file(this->getFilename(sdcard_path, filename));
         dir_file.remove(); // in case already present

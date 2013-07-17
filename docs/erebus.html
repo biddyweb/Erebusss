@@ -46,7 +46,7 @@
 <li><a href="#leavingthedungeon">Leaving the dungeon</a></li>
 <li><a href="#enemies">Enemies</a></li>
 <li><a href="#magic">Magic</a></li>
-<li><a href="#additionalinfo">Additional info</a></li>
+<li><a href="#commandline">Command line options</a></li>
 <!--<li><a href="#credits">Credits etc</a></li>-->
 <li><a href="#contact">Contacting me (bugs etc)</a></li>
 <li><a href="#helpwanted">Help wanted!</a></li>
@@ -425,12 +425,16 @@ restoring 4D6 health points.</p>
 <p><b>Paralyse.</b> If the recipient fails a Mind test, then he or she is
 gripped with feelings of terror and dread, and unable to move, for 10 seconds.</p>
 
-<p><a name="additionalinfo"><h2>Additional info</h2></p>
+<p><a name="commandline"><h2>Command line options</h2></p>
 
 <p>On non-mobile platforms, Erebus can be run in windowed mode by running from the command line
 with the argument "-windowed". E.g., on Windows, run with:
 
 <pre>erebus.exe -windowed</pre></p>
+
+<p>You can also set the folder for where data will be loaded from, e.g., on Linux:
+
+<pre>./erebus -datafolder=/home/my_user/Documents/erebussrc/</pre></p>
 
 <p><a name="contact"><h2>Contacting me (bugs etc)</h2></p>
 
@@ -516,6 +520,7 @@ FIXED   Potential crash when using volume control keys on Android.
 ADDED   Option to export save game files to SD card on Android.
 ADDED   If save game fails to load on Android, save game file will be copied to
         SD card.
+ADDED   New command line option -datafolder to specify location of data folder.
 UPDATED Now using SFML 2 instead of Phonon for audio on Windows and Linux
         (allows gapless looping, and fixes audio problems on Linux).
 UPDATED Added footsteps sounds for Linux (now work properly with SFML).

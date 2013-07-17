@@ -17,11 +17,7 @@ const bool touchscreen_c = false;
 const bool lightdistribution_c = false;
 #endif
 
-#if defined(Q_OS_ANDROID)
-#define DEPLOYMENT_PATH "assets:/"
-#else
-#define DEPLOYMENT_PATH ""
-#endif
+extern char *DEPLOYMENT_PATH; // defined in main.cpp
 
 // remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;

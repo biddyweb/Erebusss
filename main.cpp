@@ -1,9 +1,16 @@
+#include "common.h"
 #include "mainwindow.h"
 #include "qt_screen.h"
 #include "game.h"
 #include "logiface.h"
 
 #include <QtGui/QApplication>
+
+#if defined(Q_OS_ANDROID)
+char *DEPLOYMENT_PATH = "assets:/";
+#else
+char *DEPLOYMENT_PATH = "";
+#endif
 
 class MyApplication : public QApplication {
 
@@ -139,6 +146,30 @@ int main(int argc, char *argv[])
             runtests = true;
         else if( strcmp(argv[i], "-help") == 0 )
             help = true;
+        else if( strncmp(argv[i], "-datafolder=", 12) == 0 ) {
+            printf("Setting data folder:\n");
+            DEPLOYMENT_PATH = &(argv[i])[12];
+            if( DEPLOYMENT_PATH[0] == '\"' ) {
+                DEPLOYMENT_PATH++;
+            }
+            if( strlen(DEPLOYMENT_PATH) >= 1 && DEPLOYMENT_PATH[strlen(DEPLOYMENT_PATH)-1] == '\"' ) {
+                DEPLOYMENT_PATH[strlen(DEPLOYMENT_PATH)-1] = '\0';
+            }
+
+#if defined(_WIN32)
+            char folder_sep = '\\';
+#else
+            char folder_sep = '/';
+#endif
+            if( strlen(DEPLOYMENT_PATH) >= 1 && DEPLOYMENT_PATH[strlen(DEPLOYMENT_PATH)-1] != folder_sep ) {
+                char *new_folder = new char[strlen(DEPLOYMENT_PATH)+2];
+                strcpy(new_folder, DEPLOYMENT_PATH);
+                new_folder[strlen(DEPLOYMENT_PATH)] = folder_sep;
+                new_folder[strlen(DEPLOYMENT_PATH)+1] = '\0';
+                DEPLOYMENT_PATH = new_folder;
+            }
+            printf("%s\n", DEPLOYMENT_PATH);
+        }
     }
 #endif
 
