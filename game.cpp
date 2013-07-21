@@ -2051,6 +2051,30 @@ void Game::activate(bool active) {
     this->getScreen()->enableUpdateTimer(active);
     if( !active ) {
         this->getScreen()->setPaused(true, false); // automatically pause when application goes inactive
+#ifndef Q_OS_ANDROID
+        if( this->current_stream_sound_effect.length() > 0 ) {
+            // pause current stream
+            qDebug("pause stream: %s", this->current_stream_sound_effect.c_str());
+            Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
+            ASSERT_LOGGER(current_sound != NULL);
+            if( current_sound != NULL ) {
+                current_sound->pause();
+            }
+        }
+#endif
+    }
+    else {
+#ifndef Q_OS_ANDROID
+        if( this->current_stream_sound_effect.length() > 0 ) {
+            // unpause current stream
+            qDebug("unpause stream: %s", this->current_stream_sound_effect.c_str());
+            Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
+            ASSERT_LOGGER(current_sound != NULL);
+            if( current_sound != NULL ) {
+                current_sound->unpause();
+            }
+        }
+#endif
     }
     if( this->gamestate != NULL ) {
         this->gamestate->activate(active);

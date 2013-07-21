@@ -144,6 +144,21 @@ public:
         }
 #endif
     }
+    void unpause() {
+        // plays without changing anything else
+#ifdef USING_PHONON
+        if( this->mediaObject != NULL ) {
+            this->mediaObject->play();
+        }
+#else
+        if( stream ) {
+            music.play();
+        }
+        else {
+            sound.play();
+        }
+#endif
+    }
     void stop() {
 #ifdef USING_PHONON
         if( this->mediaObject != NULL ) {
