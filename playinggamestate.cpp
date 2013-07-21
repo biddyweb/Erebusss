@@ -2846,62 +2846,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     }
 
     layout->addWidget(view);
-    /*{
-        QVBoxLayout *v_layout = new QVBoxLayout();
-        layout->addLayout(v_layout);
-
-        v_layout->addWidget(view);
-
-        {
-            QHBoxLayout *h_layout = new QHBoxLayout();
-            v_layout->addLayout(h_layout);
-
-            if( !this->permadeath ) {
-                quickSaveButton = new QPushButton("QS");
-                game_g->initButton(quickSaveButton);
-                quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
-#ifndef Q_OS_ANDROID
-                // for some reason, this sometimes shows on Android when it shouldn't?
-                quickSaveButton->setToolTip(tr("Quick-save"));
-#endif
-                quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-                connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
-                h_layout->addWidget(quickSaveButton);
-            }
-
-            QPushButton *zoomoutButton = new QPushButton("-");
-            game_g->initButton(zoomoutButton);
-            zoomoutButton->setShortcut(QKeySequence(Qt::Key_Less));
-#ifndef Q_OS_ANDROID
-            // for some reason, this sometimes shows on Android when it shouldn't?
-            zoomoutButton->setToolTip(tr("Zoom out"));
-#endif
-            connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
-            h_layout->addWidget(zoomoutButton);
-
-            QPushButton *zoominButton = new QPushButton("+");
-            game_g->initButton(zoominButton);
-            zoominButton->setShortcut(QKeySequence(Qt::Key_Greater));
-#ifndef Q_OS_ANDROID
-            // for some reason, this sometimes shows on Android when it shouldn't?
-            zoominButton->setToolTip(tr("Zoom in"));
-#endif
-            connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
-            h_layout->addWidget(zoominButton);
-
-            QPushButton *centreButton = new QPushButton("O");
-            game_g->initButton(centreButton);
-            centreButton->setShortcut(QKeySequence(Qt::Key_C));
-#ifndef Q_OS_ANDROID
-            // for some reason, this sometimes shows on Android when it shouldn't?
-            centreButton->setToolTip(tr("Centre view on your player's location"));
-#endif
-            centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-            connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
-            h_layout->addWidget(centreButton);
-        }
-    }*/
-
     view->showFullScreen();
 
     gui_overlay = new GUIOverlay(this, view);
@@ -2922,6 +2866,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         this->player = game_g->createPlayer(player_type, player_name);
     }
 
+    //throw string("Failed to open images xml file"); // test
     LOG("load images\n");
     {
         QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";
