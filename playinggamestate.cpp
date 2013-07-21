@@ -2868,6 +2868,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         }
 
         //throw string("Failed to open images xml file"); // test
+        //throw "unexpected error"; // test
         LOG("load images\n");
         {
             QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";

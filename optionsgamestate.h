@@ -39,6 +39,8 @@ class OptionsGamestate : public Gamestate {
     bool cheat_mode;
     int cheat_start_level;
 
+    void cleanup();
+
 /*#ifndef Q_OS_ANDROID
     Sound *music;
 #endif*/

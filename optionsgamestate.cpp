@@ -18,129 +18,135 @@ OptionsGamestate::OptionsGamestate() :
     load_list(NULL), /*soundCheck(NULL),*/ soundSlider(NULL), lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
-    //cheat_mode = true;
-    //cheat_start_level = 1;
-    LOG("OptionsGamestate::OptionsGamestate()\n");
-    optionsGamestate = this;
+    try {
+        //cheat_mode = true;
+        //cheat_start_level = 1;
+        LOG("OptionsGamestate::OptionsGamestate()\n");
+        optionsGamestate = this;
 
-//#ifndef Q_OS_ANDROID
-    //this->music = NULL;
-    if( !lightdistribution_c ) {
-        game_g->loadSound("music_intro", string(DEPLOYMENT_PATH) + "music/no_more_magic.ogg", true);
-        game_g->playSound("music_intro");
+    //#ifndef Q_OS_ANDROID
+        //this->music = NULL;
+        if( !lightdistribution_c ) {
+            game_g->loadSound("music_intro", string(DEPLOYMENT_PATH) + "music/no_more_magic.ogg", true);
+            game_g->playSound("music_intro");
+        }
+    //#endif
+
+        MainWindow *window = game_g->getScreen()->getMainWindow();
+        QFont font = game_g->getFontBig();
+        window->setFont(font);
+
+        this->main_stacked_widget = new QStackedWidget();
+        main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+        window->setCentralWidget(main_stacked_widget);
+
+        QWidget *centralWidget = new QWidget(window);
+        //centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+        //window->setCentralWidget(centralWidget);
+        main_stacked_widget->addWidget(centralWidget);
+
+        QVBoxLayout *layout = new QVBoxLayout();
+        centralWidget->setLayout(layout);
+
+        QPushButton *startButton = new QPushButton(tr("Start game"));
+        game_g->initButton(startButton);
+        startButton->setShortcut(QKeySequence(Qt::Key_Return));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        startButton->setToolTip(tr("Start playing a new game (Return)"));
+#endif
+        startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(startButton);
+        connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
+
+        QPushButton *loadButton = new QPushButton(tr("Load game"));
+        game_g->initButton(loadButton);
+        loadButton->setShortcut(QKeySequence(Qt::Key_L));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        loadButton->setToolTip(tr("Load a previously saved game (L)"));
+#endif
+        loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(loadButton);
+        connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
+
+        QPushButton *optionsButton = new QPushButton(tr("Options"));
+        game_g->initButton(optionsButton);
+        optionsButton->setShortcut(QKeySequence(Qt::Key_O));
+#ifndef Q_OS_ANDROID
+        // for some reason, this sometimes shows on Android when it shouldn't?
+        optionsButton->setToolTip(tr("Configure various game options (O)"));
+#endif
+        optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(optionsButton);
+        connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
+
+#ifndef Q_OS_ANDROID
+        // applications don't quit on Android.
+        QPushButton *quitButton = new QPushButton(tr("Quit game"));
+        game_g->initButton(quitButton);
+        quitButton->setShortcut(QKeySequence(Qt::Key_Escape));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            quitButton->setToolTip(tr("Exit the game (Escape)"));
+#endif
+        quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(quitButton);
+        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
+#endif
+
+        //throw string("error"); // test
+        //throw "unexpected error"; // test
+        {
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
+
+            QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
+            //titleLabel->setStyleSheet("QLabel { color : red; }");
+            titleLabel->setFont(game_g->getFontStd());
+            h_layout->addWidget(titleLabel);
+
+            QPushButton *offlineHelpButton = new QPushButton(tr("Offline help"));
+            game_g->initButton(offlineHelpButton);
+            offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            offlineHelpButton->setToolTip(tr("View the game instructions (H)"));
+#endif
+            //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            offlineHelpButton->setFont(game_g->getFontStd());
+            h_layout->addWidget(offlineHelpButton);
+            connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
+
+            QPushButton *onlineHelpButton = new QPushButton(tr("Online help"));
+            game_g->initButton(onlineHelpButton);
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            onlineHelpButton->setToolTip(tr("Visit the game's website"));
+#endif
+            //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            onlineHelpButton->setFont(game_g->getFontStd());
+            h_layout->addWidget(onlineHelpButton);
+            connect(onlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOnlineHelp()));
+        }
+
+        window->setEnabled(true); // ensure is enabled - may have been disabled if fail to load game, and return to OptionsGamestate
     }
-//#endif
-
-    MainWindow *window = game_g->getScreen()->getMainWindow();
-    QFont font = game_g->getFontBig();
-    window->setFont(font);
-
-    this->main_stacked_widget = new QStackedWidget();
-    main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(main_stacked_widget);
-
-    QWidget *centralWidget = new QWidget(window);
-    //centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    //window->setCentralWidget(centralWidget);
-    main_stacked_widget->addWidget(centralWidget);
-
-    QVBoxLayout *layout = new QVBoxLayout();
-    centralWidget->setLayout(layout);
-
-    QPushButton *startButton = new QPushButton(tr("Start game"));
-    game_g->initButton(startButton);
-    startButton->setShortcut(QKeySequence(Qt::Key_Return));
-#ifndef Q_OS_ANDROID
-    // for some reason, this sometimes shows on Android when it shouldn't?
-    startButton->setToolTip(tr("Start playing a new game (Return)"));
-#endif
-    startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(startButton);
-    connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStart()));
-
-    QPushButton *loadButton = new QPushButton(tr("Load game"));
-    game_g->initButton(loadButton);
-    loadButton->setShortcut(QKeySequence(Qt::Key_L));
-#ifndef Q_OS_ANDROID
-    // for some reason, this sometimes shows on Android when it shouldn't?
-    loadButton->setToolTip(tr("Load a previously saved game (L)"));
-#endif
-    loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(loadButton);
-    connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoad()));
-
-    QPushButton *optionsButton = new QPushButton(tr("Options"));
-    game_g->initButton(optionsButton);
-    optionsButton->setShortcut(QKeySequence(Qt::Key_O));
-#ifndef Q_OS_ANDROID
-    // for some reason, this sometimes shows on Android when it shouldn't?
-    optionsButton->setToolTip(tr("Configure various game options (O)"));
-#endif
-    optionsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(optionsButton);
-    connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
-
-#ifndef Q_OS_ANDROID
-    // applications don't quit on Android.
-    QPushButton *quitButton = new QPushButton(tr("Quit game"));
-    game_g->initButton(quitButton);
-    quitButton->setShortcut(QKeySequence(Qt::Key_Escape));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        quitButton->setToolTip(tr("Exit the game (Escape)"));
-#endif
-    quitButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    layout->addWidget(quitButton);
-    connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));
-#endif
-
-    {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
-
-        QLabel *titleLabel = new QLabel("erebus v" + QString::number(versionMajor) + "." + QString::number(versionMinor));
-        //titleLabel->setStyleSheet("QLabel { color : red; }");
-        titleLabel->setFont(game_g->getFontStd());
-        h_layout->addWidget(titleLabel);
-
-        QPushButton *offlineHelpButton = new QPushButton(tr("Offline help"));
-        game_g->initButton(offlineHelpButton);
-        offlineHelpButton->setShortcut(QKeySequence(Qt::Key_H));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        offlineHelpButton->setToolTip(tr("View the game instructions (H)"));
-#endif
-        //offlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        offlineHelpButton->setFont(game_g->getFontStd());
-        h_layout->addWidget(offlineHelpButton);
-        connect(offlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOfflineHelp()));
-
-        QPushButton *onlineHelpButton = new QPushButton(tr("Online help"));
-        game_g->initButton(onlineHelpButton);
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        onlineHelpButton->setToolTip(tr("Visit the game's website"));
-#endif
-        //onlineHelpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        onlineHelpButton->setFont(game_g->getFontStd());
-        h_layout->addWidget(onlineHelpButton);
-        connect(onlineHelpButton, SIGNAL(clicked()), this, SLOT(clickedOnlineHelp()));
+    catch(...) {
+        // clean up stuff created in the constructor
+        LOG("OptionsGamestate constructor throwing an exception");
+        this->cleanup();
+        throw;
     }
-
-    window->setEnabled(true); // ensure is enabled - may have been disabled if fail to load game, and return to OptionsGamestate
 }
 
 OptionsGamestate::~OptionsGamestate() {
     LOG("OptionsGamestate::~OptionsGamestate()\n");
-    /*VI_flush(0); // delete all the gamestate objects, but leave the game level objects (which should be set at persistence level -1)
-    VI_GraphicsEnvironment *genv = game_g->getGraphicsEnvironment();
-    game_g->getGraphicsEnvironment()->setPanel(NULL); // as the main panel is now destroyed
-    */
-/*#ifndef Q_OS_ANDROID
-    if( music != NULL ) {
-        delete music;
-    }
-#endif*/
+    this->cleanup();
+}
+
+void OptionsGamestate::cleanup() {
+    LOG("OptionsGamestate::cleanup()\n");
     game_g->freeSound("music_intro");
 
     MainWindow *window = game_g->getScreen()->getMainWindow();

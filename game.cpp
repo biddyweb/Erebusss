@@ -840,7 +840,29 @@ void Game::run(bool fullscreen) {
 
     this->init(fullscreen);
 
-    gamestate = new OptionsGamestate();
+    try {
+        gamestate = new OptionsGamestate();
+    }
+    catch(string &error) {
+        LOG("exception creating initial gamestate: %s\n", error.c_str());
+        this->getScreen()->getMainWindow()->unsetCursor();
+
+        stringstream str;
+        str << "Failed to start game:\n" << error;
+        game_g->showErrorDialog(str.str());
+        // can't use qApp->quit() here, as not yet in main event loop
+        return;
+    }
+    catch(...) {
+        LOG("unexpected exception creating initial gamestate\n");
+        this->getScreen()->getMainWindow()->unsetCursor();
+
+        stringstream str;
+        str << "Unexpected error starting game!\n";
+        game_g->showErrorDialog(str.str());
+        // can't use qApp->quit() here, as not yet in main event loop
+        return;
+    }
 
     screen->runMainLoop();
 
@@ -1699,11 +1721,27 @@ void Game::handleMessages() {
             LOG("exception creating new gamestate: %s\n", error.c_str());
             this->getScreen()->getMainWindow()->unsetCursor();
             if( gamestate != NULL ) {
+                LOG("deleting gamestate");
                 delete gamestate;
                 gamestate = NULL;
             }
+
             stringstream str;
             str << "Failed to load game data:\n" << error;
+            game_g->showErrorDialog(str.str());
+            qApp->quit();
+        }
+        catch(...) {
+            LOG("unexpected exception creating new gamestate\n");
+            this->getScreen()->getMainWindow()->unsetCursor();
+            if( gamestate != NULL ) {
+                LOG("deleting gamestate");
+                delete gamestate;
+                gamestate = NULL;
+            }
+
+            stringstream str;
+            str << "Unexpected error loading game data!\n";
             game_g->showErrorDialog(str.str());
             qApp->quit();
         }
