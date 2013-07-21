@@ -1020,11 +1020,11 @@ Thank you! Here, have 25 gold pieces as a reward.
 cdddddddddde
 </tilemap>
 
-<scenery name="Door" image_name="door_wood_n" x="26.0" y="9.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Entrance, Wentbridge Fort" exit_location_x="32.5" exit_location_y="59.0"/>
+<scenery name="Door" image_name="door_wood_n" x="26.0" y="9.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Ground Level, Wentbridge Fort" exit_location_x="32.5" exit_location_y="59.0"/>
 
 </location>
 
-<location name="Entrance, Wentbridge Fort" display_name="true">
+<location name="Ground Level, Wentbridge Fort" display_name="true">
 
 <floor image_name="floor_paved"/>
 <wall image_name="wall"/>
@@ -1073,6 +1073,28 @@ cdddddddddde
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+<floorregion shape="rect" rect_x="36.0" rect_y="39.0" rect_w="5.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="41.0" rect_y="38.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="43.0" y="40.0" size="2.0" blocking="true" exit_location="Upper Level, Wentbridge Fort" exit_location_x="32.5" exit_location_y="58.5"/>
+
+</location>
+
+<location name="Upper Level, Wentbridge Fort" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
+
+<scenery name="Torch" image_name="torch" x="31.0" y="49.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="34.0" y="49.55" w="0.75" h="0.75"/>
+
+<scenery name="Stairs" image_name="stairsdown_indoors" x="32.5" y="57.0" size="2.0" blocking="true" exit_location="Ground Level, Wentbridge Fort" exit_location_x="41.5" exit_location_y="40.0"/>
 
 </location>
 
