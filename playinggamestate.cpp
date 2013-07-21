@@ -3504,11 +3504,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         if( !lightdistribution_c ) {
 #ifndef USING_PHONON
             // only supported for SFML, as Phonon doesn't support looping
-            game_g->loadSound("ingame_music", "music/exploring_loop.ogg", true);
+            game_g->loadSound("ingame_music", string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
             game_g->setSoundVolume("ingame_music", 0.1f);
-            game_g->loadSound("trade", "music/traide.ogg", true);
+            game_g->loadSound("trade", string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
             game_g->setSoundVolume("trade", 0.1f);
-            game_g->loadSound("game_over", "music/your_fail.ogg", true);
+            game_g->loadSound("game_over", string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
             game_g->setSoundVolume("game_over", 1.0f);
 #endif
         }

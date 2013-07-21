@@ -26,16 +26,7 @@ OptionsGamestate::OptionsGamestate() :
 //#ifndef Q_OS_ANDROID
     //this->music = NULL;
     if( !lightdistribution_c ) {
-        /*music = new Phonon::MediaObject(qApp);
-        connect(music, SIGNAL(stateChanged(Phonon::State,Phonon::State)), this, SLOT(mediaStateChanged(Phonon::State,Phonon::State)));
-        music->setCurrentSource(Phonon::MediaSource("music/no_more_magic.ogg"));
-        Phonon::AudioOutput *audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
-        Phonon::Path audioPath = Phonon::createPath(music, audioOutput);*/
-        /*music = game_g->loadSound("music/no_more_magic.ogg");
-        if( game_g->isSoundEnabled() ) {
-            music->play();
-        }*/
-        game_g->loadSound("music_intro", "music/no_more_magic.ogg", true);
+        game_g->loadSound("music_intro", string(DEPLOYMENT_PATH) + "music/no_more_magic.ogg", true);
         game_g->playSound("music_intro");
     }
 //#endif
