@@ -2628,1084 +2628,1098 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
     cheat_mode(cheat_mode),
     need_visibility_update(false)
 {
-    LOG("PlayingGamestate::PlayingGamestate()\n");
-    playingGamestate = this;
+    try {
+        LOG("PlayingGamestate::PlayingGamestate()\n");
+        playingGamestate = this;
 
-    srand( clock() );
+        srand( clock() );
 
-    MainWindow *window = game_g->getScreen()->getMainWindow();
-    window->setEnabled(false);
-    game_g->getScreen()->setPaused(true, true);
+        MainWindow *window = game_g->getScreen()->getMainWindow();
+        window->setEnabled(false);
+        game_g->getScreen()->setPaused(true, true);
 
-    {
+        {
 #if defined(Q_OS_SYMBIAN)
-        const int res_c = 16;
+            const int res_c = 16;
 #else
-        const int res_c = 64;
+            const int res_c = 64;
 #endif
-        QPixmap pixmap(res_c, res_c);
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-        radialGrad.setColorAt(0.0, QColor(255, 255, 255, 63));
-        radialGrad.setColorAt(1.0, QColor(255, 255, 255, 0));
-        QPainter painter(&pixmap);
-        painter.setPen(Qt::NoPen);
-        painter.fillRect(0, 0, res_c, res_c, radialGrad);
-        painter.end();
-        this->smoke_pixmap = pixmap;
-    }
-    {
-#if defined(Q_OS_SYMBIAN)
-        const int res_c = 16;
-#else
-        const int res_c = 64;
-#endif
-        QPixmap pixmap(res_c, res_c);
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-        radialGrad.setColorAt(0.0, QColor(255, 127, 0, 255));
-        radialGrad.setColorAt(1.0, QColor(255, 127, 0, 0));
-        QPainter painter(&pixmap);
-        painter.setPen(Qt::NoPen);
-        painter.fillRect(0, 0, res_c, res_c, radialGrad);
-        painter.end();
-        this->fireball_pixmap = pixmap;
-    }
-    {
-#if defined(Q_OS_SYMBIAN)
-        const int res_c = 16;
-#else
-        const int res_c = 64;
-#endif
-        /*QPixmap pixmap(res_c, res_c);
-        pixmap.fill(Qt::transparent);
-        QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-        radialGrad.setColorAt(0.0, QColor(255, 0, 0, 0));
-        radialGrad.setColorAt(0.7, QColor(255, 0, 0, 0));
-        radialGrad.setColorAt(0.75, QColor(255, 0, 0, 160));
-        radialGrad.setColorAt(0.95, QColor(255, 0, 0, 160));
-        radialGrad.setColorAt(1.0, QColor(255, 0, 0, 0));
-        QPainter painter(&pixmap);
-        painter.setPen(Qt::NoPen);
-        painter.fillRect(0, 0, res_c, res_c, radialGrad);
-        painter.end();
-        this->target_pixmap = pixmap;*/
-        int n_frames = 4;
-        QPixmap full_pixmap(n_frames*res_c, res_c);
-        full_pixmap.fill(Qt::transparent);
-        QPainter painter(&full_pixmap);
-        for(int i=0;i<n_frames;i++) {
-            QRadialGradient radialGrad(i*res_c+(res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
-            float alpha = n_frames==1 ? 1.0f : i/(float)(n_frames-1);
-            float size = (1.0f-alpha)*0.6f + alpha*1.0f;
-            radialGrad.setColorAt(0.0*size, QColor(255, 0, 0, 0));
-            radialGrad.setColorAt(0.7*size, QColor(255, 0, 0, 0));
-            radialGrad.setColorAt(0.75*size, QColor(255, 0, 0, 160));
-            radialGrad.setColorAt(0.95*size, QColor(255, 0, 0, 160));
-            radialGrad.setColorAt(1.0*size, QColor(255, 0, 0, 0));
-            QBrush brush(radialGrad);
-            painter.fillRect(i*res_c, 0, res_c, res_c, brush);
+            QPixmap pixmap(res_c, res_c);
+            pixmap.fill(Qt::transparent);
+            QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+            radialGrad.setColorAt(0.0, QColor(255, 255, 255, 63));
+            radialGrad.setColorAt(1.0, QColor(255, 255, 255, 0));
+            QPainter painter(&pixmap);
+            painter.setPen(Qt::NoPen);
+            painter.fillRect(0, 0, res_c, res_c, radialGrad);
+            painter.end();
+            this->smoke_pixmap = pixmap;
         }
-        this->target_pixmap = full_pixmap;
-        vector<AnimationLayerDefinition> target_animation_layer_definition;
-        target_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, n_frames, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-        this->target_animation_layer = AnimationLayer::create(this->target_pixmap, target_animation_layer_definition, true, 0, 0, res_c, res_c, res_c, res_c, n_frames*res_c, 1);
-    }
-
-    // create UI
-    LOG("create UI\n");
-    QFont font = game_g->getFontStd();
-    window->setFont(font);
-
-    scene = new QGraphicsScene(window);
-    //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
-    //scene->setItemIndexMethod(QGraphicsScene::NoIndex); // doesn't seem to help
-    //view = new QGraphicsView(scene, window);
-    view = new MainGraphicsView(this, scene, window);
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setBackgroundBrush(QBrush(Qt::black));
-    view->setFrameStyle(QFrame::NoFrame);
-    view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
-    view->setCursor(Qt::OpenHandCursor);
-    //view->grabGesture(Qt::PinchGesture);
-    view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
-    view->setCacheMode(QGraphicsView::CacheBackground);
-    //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
-    //view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
-    view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time (better performance than FullViewportUpdate)
-    view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
-
-    /*QWidget *centralWidget = new QWidget(window);
-    this->mainwindow = centralWidget;
-    LOG("mainwindow: %d\n", mainwindow);
-    centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-    window->setCentralWidget(centralWidget);*/
-    /*if( mobile_c ) {
-        this->main_stacked_widget = new QStackedWidget();
-        main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
-        window->setCentralWidget(main_stacked_widget);
-    }*/
-
-    QWidget *centralWidget = new QWidget();
-    /*if( mobile_c ) {
-        main_stacked_widget->addWidget(centralWidget);
-    }
-    else*/ {
-        window->setCentralWidget(centralWidget);
-    }
-    this->widget_stack.push_back(centralWidget);
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    centralWidget->setLayout(layout);
-
-    {
-        QVBoxLayout *v_layout = new QVBoxLayout();
-        layout->addLayout(v_layout);
-
-        QPushButton *statsButton = new QPushButton(tr("Stats"));
-        game_g->initButton(statsButton);
-        statsButton->setShortcut(QKeySequence(Qt::Key_F1));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        statsButton->setToolTip(tr("Display statistics of your character (F1)"));
+        {
+#if defined(Q_OS_SYMBIAN)
+            const int res_c = 16;
+#else
+            const int res_c = 64;
 #endif
-        statsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
-        v_layout->addWidget(statsButton);
-
-        QPushButton *itemsButton = new QPushButton(tr("Items"));
-        game_g->initButton(itemsButton);
-        itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        itemsButton->setToolTip(tr("Display the items that you are carrying (F2)"));
-#endif
-        itemsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
-        v_layout->addWidget(itemsButton);
-
-        /*QPushButton *spellsButton = new QPushButton(tr("Spells"));
-        game_g->initButton(spellsButton);
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        spellsButton->setToolTip(tr("Not supported yet"));
-#endif
-        spellsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        v_layout->addWidget(spellsButton);*/
-
-        QPushButton *journalButton = new QPushButton(tr("Journal"));
-        game_g->initButton(journalButton);
-        journalButton->setShortcut(QKeySequence(Qt::Key_F3));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        journalButton->setToolTip(tr("Displays information about your quests (F3)"));
-#endif
-        journalButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
-        v_layout->addWidget(journalButton);
-
-        /*QPushButton *quitButton = new QPushButton(tr("Quit"));
-        game_g->initButton(quitButton);
-        quitButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        v_layout->addWidget(quitButton);
-        connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
-
-        QPushButton *pauseButton = new QPushButton(tr("Pause"));
-        game_g->initButton(pauseButton);
-        pauseButton->setShortcut(QKeySequence(Qt::Key_P));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        pauseButton->setToolTip(tr("Pause the game (P)"));
-#endif
-        pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(pauseButton, SIGNAL(clicked()), this, SLOT(clickedPause()));
-        v_layout->addWidget(pauseButton);
-
-        QPushButton *restButton = new QPushButton(tr("Rest"));
-        game_g->initButton(restButton);
-        restButton->setShortcut(QKeySequence(Qt::Key_R));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        restButton->setToolTip(tr("Rest until you are healed (R)"));
-#endif
-        restButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
-        v_layout->addWidget(restButton);
-
-        QPushButton *optionsButton = new QPushButton(tr("Options"));
-        game_g->initButton(optionsButton);
-        optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        optionsButton->setToolTip(tr("Options to save game or quit (Escape)"));
-#endif
-        optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-        connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
-        v_layout->addWidget(optionsButton);
-    }
-
-    layout->addWidget(view);
-    view->showFullScreen();
-
-    gui_overlay = new GUIOverlay(this, view);
-    gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    view->setGUIOverlay(gui_overlay);
-    gui_overlay->setFadeIn();
-
-    LOG("display UI\n");
-    gui_overlay->setProgress(0);
-    qApp->processEvents();
-    qApp->processEvents(); // need to call this twice to get window to update, on Windows at least, for some reason?
-
-    // create RPG data
-    LOG("create RPG data\n");
-
-    if( !is_savegame ) {
-        LOG("create player\n");
-        this->player = game_g->createPlayer(player_type, player_name);
-    }
-
-    //throw string("Failed to open images xml file"); // test
-    LOG("load images\n");
-    {
-        QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";
-        QFile file(filename);
-        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            qDebug("failed to open: %s", filename.toUtf8().data());
-            throw string("Failed to open images xml file");
+            QPixmap pixmap(res_c, res_c);
+            pixmap.fill(Qt::transparent);
+            QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+            radialGrad.setColorAt(0.0, QColor(255, 127, 0, 255));
+            radialGrad.setColorAt(1.0, QColor(255, 127, 0, 0));
+            QPainter painter(&pixmap);
+            painter.setPen(Qt::NoPen);
+            painter.fillRect(0, 0, res_c, res_c, radialGrad);
+            painter.end();
+            this->fireball_pixmap = pixmap;
         }
-        QXmlStreamReader reader(&file);
-        while( !reader.atEnd() && !reader.hasError() ) {
-            reader.readNext();
-            if( reader.isStartElement() )
-            {
-                if( reader.name() == "image" ) {
-                    QStringRef type_s = reader.attributes().value("type");
-                    if( type_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("image element has no type attribute or is zero length");
-                    }
-                    QString type = type_s.toString();
-                    QStringRef name_s = reader.attributes().value("name");
-                    if( name_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("image element has no name attribute or is zero length");
-                    }
-                    QString name = name_s.toString(); // need to take copy of string reference
-                    QStringRef imagetype_s = reader.attributes().value("imagetype");
-                    QString imagetype = imagetype_s.toString();
-                    qDebug("image element type: %s name: %s imagetype: %s", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
-                    QString filename;
-                    QPixmap pixmap;
-                    bool clip = false;
-                    int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
-                    int stride_x = 0, stride_y = 0;
-                    const int def_width_c = 128, def_height_c = 128;
-                    int n_dimensions = 0;
-                    QStringRef n_dimensions_s = reader.attributes().value("n_dimensions");
-                    if( n_dimensions_s.length() > 0 ) {
-                        n_dimensions = parseInt(n_dimensions_s.toString());
-                    }
-                    if( imagetype_s.length() == 0 ) {
-                        // load file
-                        QStringRef filename_s = reader.attributes().value("filename");
-                        if( filename_s.length() == 0 ) {
+        {
+#if defined(Q_OS_SYMBIAN)
+            const int res_c = 16;
+#else
+            const int res_c = 64;
+#endif
+            /*QPixmap pixmap(res_c, res_c);
+            pixmap.fill(Qt::transparent);
+            QRadialGradient radialGrad((res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+            radialGrad.setColorAt(0.0, QColor(255, 0, 0, 0));
+            radialGrad.setColorAt(0.7, QColor(255, 0, 0, 0));
+            radialGrad.setColorAt(0.75, QColor(255, 0, 0, 160));
+            radialGrad.setColorAt(0.95, QColor(255, 0, 0, 160));
+            radialGrad.setColorAt(1.0, QColor(255, 0, 0, 0));
+            QPainter painter(&pixmap);
+            painter.setPen(Qt::NoPen);
+            painter.fillRect(0, 0, res_c, res_c, radialGrad);
+            painter.end();
+            this->target_pixmap = pixmap;*/
+            int n_frames = 4;
+            QPixmap full_pixmap(n_frames*res_c, res_c);
+            full_pixmap.fill(Qt::transparent);
+            QPainter painter(&full_pixmap);
+            for(int i=0;i<n_frames;i++) {
+                QRadialGradient radialGrad(i*res_c+(res_c-1)/2, (res_c-1)/2, (res_c-1)/2);
+                float alpha = n_frames==1 ? 1.0f : i/(float)(n_frames-1);
+                float size = (1.0f-alpha)*0.6f + alpha*1.0f;
+                radialGrad.setColorAt(0.0*size, QColor(255, 0, 0, 0));
+                radialGrad.setColorAt(0.7*size, QColor(255, 0, 0, 0));
+                radialGrad.setColorAt(0.75*size, QColor(255, 0, 0, 160));
+                radialGrad.setColorAt(0.95*size, QColor(255, 0, 0, 160));
+                radialGrad.setColorAt(1.0*size, QColor(255, 0, 0, 0));
+                QBrush brush(radialGrad);
+                painter.fillRect(i*res_c, 0, res_c, res_c, brush);
+            }
+            this->target_pixmap = full_pixmap;
+            vector<AnimationLayerDefinition> target_animation_layer_definition;
+            target_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, n_frames, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+            this->target_animation_layer = AnimationLayer::create(this->target_pixmap, target_animation_layer_definition, true, 0, 0, res_c, res_c, res_c, res_c, n_frames*res_c, 1);
+        }
+
+        // create UI
+        LOG("create UI\n");
+        QFont font = game_g->getFontStd();
+        window->setFont(font);
+
+        scene = new QGraphicsScene(window);
+        //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
+        //scene->setItemIndexMethod(QGraphicsScene::NoIndex); // doesn't seem to help
+        //view = new QGraphicsView(scene, window);
+        view = new MainGraphicsView(this, scene, window);
+        view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        view->setBackgroundBrush(QBrush(Qt::black));
+        view->setFrameStyle(QFrame::NoFrame);
+        view->setFocusPolicy(Qt::NoFocus); // so clicking doesn't take focus away from the main window
+        view->setCursor(Qt::OpenHandCursor);
+        //view->grabGesture(Qt::PinchGesture);
+        view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
+        view->setCacheMode(QGraphicsView::CacheBackground);
+        //view->setOptimizationFlag(QGraphicsView::DontSavePainterState); // doesn't seem to help
+        //view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
+        view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time (better performance than FullViewportUpdate)
+        view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
+
+        /*QWidget *centralWidget = new QWidget(window);
+        this->mainwindow = centralWidget;
+        LOG("mainwindow: %d\n", mainwindow);
+        centralWidget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+        window->setCentralWidget(centralWidget);*/
+        /*if( mobile_c ) {
+            this->main_stacked_widget = new QStackedWidget();
+            main_stacked_widget->setContextMenuPolicy(Qt::NoContextMenu); // explicitly forbid usage of context menu so actions item is not shown menu
+            window->setCentralWidget(main_stacked_widget);
+        }*/
+
+        QWidget *centralWidget = new QWidget();
+        /*if( mobile_c ) {
+            main_stacked_widget->addWidget(centralWidget);
+        }
+        else*/ {
+            window->setCentralWidget(centralWidget);
+        }
+        this->widget_stack.push_back(centralWidget);
+
+        QHBoxLayout *layout = new QHBoxLayout();
+        centralWidget->setLayout(layout);
+
+        {
+            QVBoxLayout *v_layout = new QVBoxLayout();
+            layout->addLayout(v_layout);
+
+            QPushButton *statsButton = new QPushButton(tr("Stats"));
+            game_g->initButton(statsButton);
+            statsButton->setShortcut(QKeySequence(Qt::Key_F1));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            statsButton->setToolTip(tr("Display statistics of your character (F1)"));
+#endif
+            statsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(statsButton, SIGNAL(clicked()), this, SLOT(clickedStats()));
+            v_layout->addWidget(statsButton);
+
+            QPushButton *itemsButton = new QPushButton(tr("Items"));
+            game_g->initButton(itemsButton);
+            itemsButton->setShortcut(QKeySequence(Qt::Key_F2));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            itemsButton->setToolTip(tr("Display the items that you are carrying (F2)"));
+#endif
+            itemsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(itemsButton, SIGNAL(clicked()), this, SLOT(clickedItems()));
+            v_layout->addWidget(itemsButton);
+
+            /*QPushButton *spellsButton = new QPushButton(tr("Spells"));
+            game_g->initButton(spellsButton);
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            spellsButton->setToolTip(tr("Not supported yet"));
+#endif
+            spellsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            v_layout->addWidget(spellsButton);*/
+
+            QPushButton *journalButton = new QPushButton(tr("Journal"));
+            game_g->initButton(journalButton);
+            journalButton->setShortcut(QKeySequence(Qt::Key_F3));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            journalButton->setToolTip(tr("Displays information about your quests (F3)"));
+#endif
+            journalButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(journalButton, SIGNAL(clicked()), this, SLOT(clickedJournal()));
+            v_layout->addWidget(journalButton);
+
+            /*QPushButton *quitButton = new QPushButton(tr("Quit"));
+            game_g->initButton(quitButton);
+            quitButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            v_layout->addWidget(quitButton);
+            connect(quitButton, SIGNAL(clicked()), this, SLOT(clickedQuit()));*/
+
+            QPushButton *pauseButton = new QPushButton(tr("Pause"));
+            game_g->initButton(pauseButton);
+            pauseButton->setShortcut(QKeySequence(Qt::Key_P));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            pauseButton->setToolTip(tr("Pause the game (P)"));
+#endif
+            pauseButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(pauseButton, SIGNAL(clicked()), this, SLOT(clickedPause()));
+            v_layout->addWidget(pauseButton);
+
+            QPushButton *restButton = new QPushButton(tr("Rest"));
+            game_g->initButton(restButton);
+            restButton->setShortcut(QKeySequence(Qt::Key_R));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            restButton->setToolTip(tr("Rest until you are healed (R)"));
+#endif
+            restButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(restButton, SIGNAL(clicked()), this, SLOT(clickedRest()));
+            v_layout->addWidget(restButton);
+
+            QPushButton *optionsButton = new QPushButton(tr("Options"));
+            game_g->initButton(optionsButton);
+            optionsButton->setShortcut(QKeySequence(Qt::Key_Escape));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            optionsButton->setToolTip(tr("Options to save game or quit (Escape)"));
+#endif
+            optionsButton->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+            connect(optionsButton, SIGNAL(clicked()), this, SLOT(clickedOptions()));
+            v_layout->addWidget(optionsButton);
+        }
+
+        layout->addWidget(view);
+        view->showFullScreen();
+
+        gui_overlay = new GUIOverlay(this, view);
+        gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+        view->setGUIOverlay(gui_overlay);
+        gui_overlay->setFadeIn();
+
+        LOG("display UI\n");
+        gui_overlay->setProgress(0);
+        qApp->processEvents();
+        qApp->processEvents(); // need to call this twice to get window to update, on Windows at least, for some reason?
+
+        // create RPG data
+        LOG("create RPG data\n");
+
+        if( !is_savegame ) {
+            LOG("create player\n");
+            this->player = game_g->createPlayer(player_type, player_name);
+        }
+
+        //throw string("Failed to open images xml file"); // test
+        LOG("load images\n");
+        {
+            QString filename = QString(DEPLOYMENT_PATH) + "data/images.xml";
+            QFile file(filename);
+            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+                qDebug("failed to open: %s", filename.toUtf8().data());
+                throw string("Failed to open images xml file");
+            }
+            QXmlStreamReader reader(&file);
+            while( !reader.atEnd() && !reader.hasError() ) {
+                reader.readNext();
+                if( reader.isStartElement() )
+                {
+                    if( reader.name() == "image" ) {
+                        QStringRef type_s = reader.attributes().value("type");
+                        if( type_s.length() == 0 ) {
                             LOG("error at line %d\n", reader.lineNumber());
-                            throw string("image element has no filename attribute or is zero length");
+                            throw string("image element has no type attribute or is zero length");
                         }
-                        filename = filename_s.toString();
-                        qDebug("    filename: %s", filename.toStdString().c_str());
-                        QStringRef xpos_s = reader.attributes().value("xpos");
-                        QStringRef ypos_s = reader.attributes().value("ypos");
-                        QStringRef width_s = reader.attributes().value("width");
-                        QStringRef height_s = reader.attributes().value("height");
-                        QStringRef expected_width_s = reader.attributes().value("expected_width");
-                        if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
-                            clip = true;
-                            xpos = parseInt(xpos_s.toString(), true);
-                            ypos = parseInt(ypos_s.toString(), true);
-                            width = parseInt(width_s.toString());
-                            height = parseInt(height_s.toString());
-                            expected_width = parseInt(expected_width_s.toString());
-                            qDebug("    clip to: %d, %d, %d, %d (expected width %d)", xpos, ypos, width, height, expected_width);
+                        QString type = type_s.toString();
+                        QStringRef name_s = reader.attributes().value("name");
+                        if( name_s.length() == 0 ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("image element has no name attribute or is zero length");
+                        }
+                        QString name = name_s.toString(); // need to take copy of string reference
+                        QStringRef imagetype_s = reader.attributes().value("imagetype");
+                        QString imagetype = imagetype_s.toString();
+                        qDebug("image element type: %s name: %s imagetype: %s", type_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str(), imagetype_s.toString().toStdString().c_str());
+                        QString filename;
+                        QPixmap pixmap;
+                        bool clip = false;
+                        int xpos = 0, ypos = 0, width = 0, height = 0, expected_width = 0;
+                        int stride_x = 0, stride_y = 0;
+                        const int def_width_c = 128, def_height_c = 128;
+                        int n_dimensions = 0;
+                        QStringRef n_dimensions_s = reader.attributes().value("n_dimensions");
+                        if( n_dimensions_s.length() > 0 ) {
+                            n_dimensions = parseInt(n_dimensions_s.toString());
+                        }
+                        if( imagetype_s.length() == 0 ) {
+                            // load file
+                            QStringRef filename_s = reader.attributes().value("filename");
+                            if( filename_s.length() == 0 ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("image element has no filename attribute or is zero length");
+                            }
+                            filename = filename_s.toString();
+                            qDebug("    filename: %s", filename.toStdString().c_str());
+                            QStringRef xpos_s = reader.attributes().value("xpos");
+                            QStringRef ypos_s = reader.attributes().value("ypos");
+                            QStringRef width_s = reader.attributes().value("width");
+                            QStringRef height_s = reader.attributes().value("height");
+                            QStringRef expected_width_s = reader.attributes().value("expected_width");
+                            if( xpos_s.length() > 0 || ypos_s.length() > 0 || width_s.length() > 0 || height_s.length() > 0 ) {
+                                clip = true;
+                                xpos = parseInt(xpos_s.toString(), true);
+                                ypos = parseInt(ypos_s.toString(), true);
+                                width = parseInt(width_s.toString());
+                                height = parseInt(height_s.toString());
+                                expected_width = parseInt(expected_width_s.toString());
+                                qDebug("    clip to: %d, %d, %d, %d (expected width %d)", xpos, ypos, width, height, expected_width);
 
-                            QStringRef stride_x_s = reader.attributes().value("stride_x");
-                            if( stride_x_s.length() > 0 ) {
-                                stride_x = parseInt(stride_x_s.toString());
+                                QStringRef stride_x_s = reader.attributes().value("stride_x");
+                                if( stride_x_s.length() > 0 ) {
+                                    stride_x = parseInt(stride_x_s.toString());
+                                }
+                                else {
+                                    // set a default in case needed for animation
+                                    stride_x = def_width_c;
+                                }
+                                QStringRef stride_y_s = reader.attributes().value("stride_y");
+                                if( stride_y_s.length() > 0 ) {
+                                    stride_y = parseInt(stride_y_s.toString());
+                                }
+                                else {
+                                    // set a default in case needed for animation
+                                    stride_y = def_height_c;
+                                }
                             }
                             else {
-                                // set a default in case needed for animation
+                                // set up defaults in case needed for animation
+                                if( expected_width_s.length() > 0 ) {
+                                    expected_width = parseInt(expected_width_s.toString());
+                                }
+                                else {
+                                    expected_width = def_width_c;
+                                }
+
+                                width = def_width_c;
+                                height = def_height_c;
                                 stride_x = def_width_c;
-                            }
-                            QStringRef stride_y_s = reader.attributes().value("stride_y");
-                            if( stride_y_s.length() > 0 ) {
-                                stride_y = parseInt(stride_y_s.toString());
-                            }
-                            else {
-                                // set a default in case needed for animation
                                 stride_y = def_height_c;
                             }
+                            // image loaded later, lazily
+                        }
+                        else if( imagetype_s == "solid" ) {
+                            QStringRef red_s = reader.attributes().value("red");
+                            QStringRef green_s = reader.attributes().value("green");
+                            QStringRef blue_s = reader.attributes().value("blue");
+                            int red = parseInt(red_s.toString());
+                            int green = parseInt(green_s.toString());
+                            int blue = parseInt(blue_s.toString());
+                            pixmap = QPixmap(16, 16);
+                            pixmap.fill(QColor(red, green, blue));
+                        }
+                        else if( imagetype_s == "perlin" ) {
+                            QStringRef max_red_s = reader.attributes().value("max_red");
+                            QStringRef max_green_s = reader.attributes().value("max_green");
+                            QStringRef max_blue_s = reader.attributes().value("max_blue");
+                            QStringRef min_red_s = reader.attributes().value("min_red");
+                            QStringRef min_green_s = reader.attributes().value("min_green");
+                            QStringRef min_blue_s = reader.attributes().value("min_blue");
+                            unsigned char filter_max[3] = {255, 255, 255};
+                            unsigned char filter_min[3] = {255, 255, 255};
+                            filter_max[0] = parseInt(max_red_s.toString());
+                            filter_max[1] = parseInt(max_green_s.toString());
+                            filter_max[2] = parseInt(max_blue_s.toString());
+                            filter_min[0] = parseInt(min_red_s.toString());
+                            filter_min[1] = parseInt(min_green_s.toString());
+                            filter_min[2] = parseInt(min_blue_s.toString());
+                            pixmap = createNoise(64, 64, 4.0f, 4.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
                         }
                         else {
-                            // set up defaults in case needed for animation
-                            if( expected_width_s.length() > 0 ) {
-                                expected_width = parseInt(expected_width_s.toString());
-                            }
-                            else {
-                                expected_width = def_width_c;
-                            }
-
-                            width = def_width_c;
-                            height = def_height_c;
-                            stride_x = def_width_c;
-                            stride_y = def_height_c;
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("image element has unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
+                            throw string("image element has unknown imagetype");
                         }
-                        // image loaded later, lazily
-                    }
-                    else if( imagetype_s == "solid" ) {
-                        QStringRef red_s = reader.attributes().value("red");
-                        QStringRef green_s = reader.attributes().value("green");
-                        QStringRef blue_s = reader.attributes().value("blue");
-                        int red = parseInt(red_s.toString());
-                        int green = parseInt(green_s.toString());
-                        int blue = parseInt(blue_s.toString());
-                        pixmap = QPixmap(16, 16);
-                        pixmap.fill(QColor(red, green, blue));
-                    }
-                    else if( imagetype_s == "perlin" ) {
-                        QStringRef max_red_s = reader.attributes().value("max_red");
-                        QStringRef max_green_s = reader.attributes().value("max_green");
-                        QStringRef max_blue_s = reader.attributes().value("max_blue");
-                        QStringRef min_red_s = reader.attributes().value("min_red");
-                        QStringRef min_green_s = reader.attributes().value("min_green");
-                        QStringRef min_blue_s = reader.attributes().value("min_blue");
-                        unsigned char filter_max[3] = {255, 255, 255};
-                        unsigned char filter_min[3] = {255, 255, 255};
-                        filter_max[0] = parseInt(max_red_s.toString());
-                        filter_max[1] = parseInt(max_green_s.toString());
-                        filter_max[2] = parseInt(max_blue_s.toString());
-                        filter_min[0] = parseInt(min_red_s.toString());
-                        filter_min[1] = parseInt(min_green_s.toString());
-                        filter_min[2] = parseInt(min_blue_s.toString());
-                        pixmap = createNoise(64, 64, 4.0f, 4.0f, filter_max, filter_min, NOISEMODE_PERLIN, 4);
-                    }
-                    else {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        LOG("image element has unknown imagetype: %s\n", imagetype_s.string()->toStdString().c_str());
-                        throw string("image element has unknown imagetype");
-                    }
-                    // now read any animations (only relevant for some types)
-                    vector<AnimationLayerDefinition> animation_layer_definition;
-                    while( !reader.atEnd() && !reader.hasError() && !(reader.isEndElement() && reader.name() == "image") ) {
-                        reader.readNext();
-                        if( reader.isStartElement() )
-                        {
-                            if( reader.name() == "animation" ) {
-                                QStringRef sub_name_s = reader.attributes().value("name");
-                                QStringRef sub_start_s = reader.attributes().value("start");
-                                QStringRef sub_length_s = reader.attributes().value("length");
-                                QStringRef sub_type_s = reader.attributes().value("type");
-                                int sub_start = parseInt(sub_start_s.toString());
-                                int sub_length = parseInt(sub_length_s.toString());
-                                AnimationSet::AnimationType animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
-                                if( sub_type_s == "single" ) {
-                                    animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
-                                }
-                                else if( sub_type_s == "loop" ) {
-                                    animation_type = AnimationSet::ANIMATIONTYPE_LOOP;
-                                }
-                                else if( sub_type_s == "bounce" ) {
-                                    animation_type = AnimationSet::ANIMATIONTYPE_BOUNCE;
+                        // now read any animations (only relevant for some types)
+                        vector<AnimationLayerDefinition> animation_layer_definition;
+                        while( !reader.atEnd() && !reader.hasError() && !(reader.isEndElement() && reader.name() == "image") ) {
+                            reader.readNext();
+                            if( reader.isStartElement() )
+                            {
+                                if( reader.name() == "animation" ) {
+                                    QStringRef sub_name_s = reader.attributes().value("name");
+                                    QStringRef sub_start_s = reader.attributes().value("start");
+                                    QStringRef sub_length_s = reader.attributes().value("length");
+                                    QStringRef sub_type_s = reader.attributes().value("type");
+                                    int sub_start = parseInt(sub_start_s.toString());
+                                    int sub_length = parseInt(sub_length_s.toString());
+                                    AnimationSet::AnimationType animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
+                                    if( sub_type_s == "single" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
+                                    }
+                                    else if( sub_type_s == "loop" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_LOOP;
+                                    }
+                                    else if( sub_type_s == "bounce" ) {
+                                        animation_type = AnimationSet::ANIMATIONTYPE_BOUNCE;
+                                    }
+                                    else {
+                                        LOG("error at line %d\n", reader.lineNumber());
+                                        throw string("image has unknown animation type");
+                                    }
+                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
                                 }
                                 else {
                                     LOG("error at line %d\n", reader.lineNumber());
-                                    throw string("image has unknown animation type");
+                                    throw string("unknown xml tag within image section");
                                 }
-                                animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
                             }
-                            else {
+                        }
+
+                        if( animation_layer_definition.size() > 0 && filename.length() == 0 ) {
+                            throw string("animations can only load from filenames");
+                        }
+                        if( animation_layer_definition.size() > 0 && !clip ) {
+                            // animations must have clip data specified - we'll use the defaults set above
+                            clip = true;
+                        }
+
+                        if( filename.length() > 0 ) {
+                            filename = DEPLOYMENT_PATH + filename;
+                        }
+
+                        if( type == "generic") {
+                            if( animation_layer_definition.size() > 0 ) {
                                 LOG("error at line %d\n", reader.lineNumber());
-                                throw string("unknown xml tag within image section");
+                                throw string("animations not supported for this animation type");
                             }
+                            if( filename.length() > 0 )
+                                pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
+                            this->builtin_images[name.toStdString()] = pixmap;
                         }
-                    }
-
-                    if( animation_layer_definition.size() > 0 && filename.length() == 0 ) {
-                        throw string("animations can only load from filenames");
-                    }
-                    if( animation_layer_definition.size() > 0 && !clip ) {
-                        // animations must have clip data specified - we'll use the defaults set above
-                        clip = true;
-                    }
-
-                    if( filename.length() > 0 ) {
-                        filename = DEPLOYMENT_PATH + filename;
-                    }
-
-                    if( type == "generic") {
-                        if( animation_layer_definition.size() > 0 ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("animations not supported for this animation type");
+                        else if( type == "item") {
+                            if( animation_layer_definition.size() > 0 ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("animations not supported for this animation type");
+                            }
+                            if( filename.length() > 0 )
+                                pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
+                            this->item_images[name.toStdString()] = pixmap;
                         }
-                        if( filename.length() > 0 )
-                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
-                        this->builtin_images[name.toStdString()] = pixmap;
-                    }
-                    else if( type == "item") {
-                        if( animation_layer_definition.size() > 0 ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("animations not supported for this animation type");
-                        }
-                        if( filename.length() > 0 )
-                            pixmap = game_g->loadImage(filename.toStdString(), clip, xpos, ypos, width, height, expected_width);
-                        this->item_images[name.toStdString()] = pixmap;
-                    }
-                    else if( type == "projectile") {
-                        if( animation_layer_definition.size() > 0 ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("animations not supported for this animation type");
-                        }
-                        if( n_dimensions == 0 ) {
-                            n_dimensions = 8;
-                        }
-                        animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
-                        if( filename.length() > 0 )
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
-                        else
-                            this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
-                    }
-                    else if( type == "scenery" ) {
-                        if( animation_layer_definition.size() == 0 ) {
+                        else if( type == "projectile") {
+                            if( animation_layer_definition.size() > 0 ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("animations not supported for this animation type");
+                            }
+                            if( n_dimensions == 0 ) {
+                                n_dimensions = 8;
+                            }
                             animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                            if( filename.length() > 0 )
+                                this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
+                            else
+                                this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                         }
-                        if( filename.length() > 0 )
-                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
-                        else
-                            this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
-                    }
-                    else if( type == "npc" ) {
-                        unsigned int n_dimensions = animation_layer_definition.size() > 0 ? N_DIRECTIONS : 1;
-                        if( animation_layer_definition.size() == 0 ) {
-                            animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                        else if( type == "scenery" ) {
+                            if( animation_layer_definition.size() == 0 ) {
+                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                            }
+                            if( filename.length() > 0 )
+                                this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
+                            else
+                                this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
                         }
-                        if( filename.length() > 0 )
-                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
-                        else
-                            this->animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
-                    }
-                    else {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        LOG("unknown type attribute: %s\n", type.toStdString().c_str());
-                        throw string("image element has unknown type attribute");
+                        else if( type == "npc" ) {
+                            unsigned int n_dimensions = animation_layer_definition.size() > 0 ? N_DIRECTIONS : 1;
+                            if( animation_layer_definition.size() == 0 ) {
+                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                            }
+                            if( filename.length() > 0 )
+                                this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
+                            else
+                                this->animation_layers[name.toStdString()] = new LazyAnimationLayer(pixmap, animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
+                        }
+                        else {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("unknown type attribute: %s\n", type.toStdString().c_str());
+                            throw string("image element has unknown type attribute");
+                        }
                     }
                 }
             }
+            if( reader.hasError() ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                LOG("error reading images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+                throw string("error reading images xml file");
+            }
         }
-        if( reader.hasError() ) {
-            LOG("error at line %d\n", reader.lineNumber());
-            LOG("error reading images.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading images xml file");
-        }
-    }
 
-    this->portrait_images["portrait_barbarian"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/barbarian_m0.png");
-    this->portrait_images["portrait_elf"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/elf_f0.png");
-    this->portrait_images["portrait_halfling"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/halfling_f0.png");
-    this->portrait_images["portrait_ranger"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/ranger_m0.png");
-    this->portrait_images["portrait_warrior"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/warrior_m0.png");
+        this->portrait_images["portrait_barbarian"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/barbarian_m0.png");
+        this->portrait_images["portrait_elf"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/elf_f0.png");
+        this->portrait_images["portrait_halfling"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/halfling_f0.png");
+        this->portrait_images["portrait_ranger"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/ranger_m0.png");
+        this->portrait_images["portrait_warrior"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/warrior_m0.png");
 
-    /*{
-        // force all lazily loaded data to be loaded
-        for(map<string, LazyAnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
-            LazyAnimationLayer *animation_layer = (*iter).second;
-            animation_layer->getAnimationLayer();
-        }
-        for(map<string, LazyAnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
-            LazyAnimationLayer *animation_layer = (*iter).second;
-            animation_layer->getAnimationLayer();
-        }
-    }*/
+        /*{
+            // force all lazily loaded data to be loaded
+            for(map<string, LazyAnimationLayer *>::iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+                LazyAnimationLayer *animation_layer = (*iter).second;
+                animation_layer->getAnimationLayer();
+            }
+            for(map<string, LazyAnimationLayer *>::iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+                LazyAnimationLayer *animation_layer = (*iter).second;
+                animation_layer->getAnimationLayer();
+            }
+        }*/
 
-    gui_overlay->setProgress(20);
-    qApp->processEvents();
+        gui_overlay->setProgress(20);
+        qApp->processEvents();
 
-    LOG("load items\n");
-    {
-        QFile file(QString(DEPLOYMENT_PATH) + "data/items.xml");
-        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open items xml file");
-        }
-        enum ItemsXMLType {
-            ITEMS_XML_TYPE_NONE = 0,
-            ITEMS_XML_TYPE_SHOP = 1,
-            ITEMS_XML_TYPE_PLAYER_DEFAULT = 2
-        };
-        ItemsXMLType itemsXMLType = ITEMS_XML_TYPE_NONE;
-        Shop *shop = NULL;
-        string player_default_type;
-        QXmlStreamReader reader(&file);
-        while( !reader.atEnd() && !reader.hasError() ) {
-            reader.readNext();
-            if( reader.isStartElement() )
-            {
-                /*qDebug("read xml: %s", reader.name().toString().toStdString().c_str());
-                qDebug("    type: %d", reader.tokenType());
-                qDebug("    n attributes: %d", reader.attributes().size());*/
-                if( reader.name() == "shop" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: shop element wasn't expected here");
+        LOG("load items\n");
+        {
+            QFile file(QString(DEPLOYMENT_PATH) + "data/items.xml");
+            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+                throw string("Failed to open items xml file");
+            }
+            enum ItemsXMLType {
+                ITEMS_XML_TYPE_NONE = 0,
+                ITEMS_XML_TYPE_SHOP = 1,
+                ITEMS_XML_TYPE_PLAYER_DEFAULT = 2
+            };
+            ItemsXMLType itemsXMLType = ITEMS_XML_TYPE_NONE;
+            Shop *shop = NULL;
+            string player_default_type;
+            QXmlStreamReader reader(&file);
+            while( !reader.atEnd() && !reader.hasError() ) {
+                reader.readNext();
+                if( reader.isStartElement() )
+                {
+                    /*qDebug("read xml: %s", reader.name().toString().toStdString().c_str());
+                    qDebug("    type: %d", reader.tokenType());
+                    qDebug("    n attributes: %d", reader.attributes().size());*/
+                    if( reader.name() == "shop" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: shop element wasn't expected here");
+                        }
+                        QStringRef name_s = reader.attributes().value("name");
+                        shop = new Shop(name_s.toString().toStdString());
+                        shops.push_back(shop);
+                        itemsXMLType = ITEMS_XML_TYPE_SHOP;
                     }
-                    QStringRef name_s = reader.attributes().value("name");
-                    shop = new Shop(name_s.toString().toStdString());
-                    shops.push_back(shop);
-                    itemsXMLType = ITEMS_XML_TYPE_SHOP;
-                }
-                else if( reader.name() == "purchase" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: purchase element wasn't expected here");
-                    }
-                    QStringRef template_s = reader.attributes().value("template");
-                    QStringRef cost_s = reader.attributes().value("cost");
-                    if( template_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("purchase element has no template attribute");
-                    }
-                    int cost = parseInt(cost_s.toString());
-                    Item *item = this->cloneStandardItem(template_s.toString().toStdString());
-                    shop->addItem(item, cost);
-                }
-                else if( reader.name() == "player_default_items" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: player_default_items element wasn't expected here");
-                    }
-                    itemsXMLType = ITEMS_XML_TYPE_PLAYER_DEFAULT;
-                    QStringRef type_s = reader.attributes().value("type");
-                    player_default_type = type_s.toString().toStdString();
-                }
-                else if( reader.name() == "player_default_item" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: player_default_item element wasn't expected here");
-                    }
-                    if( !is_savegame && player_default_type == player_type ) {
+                    else if( reader.name() == "purchase" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: purchase element wasn't expected here");
+                        }
                         QStringRef template_s = reader.attributes().value("template");
+                        QStringRef cost_s = reader.attributes().value("cost");
                         if( template_s.length() == 0 ) {
                             LOG("error at line %d\n", reader.lineNumber());
-                            throw string("player_default_item element has no template attribute");
+                            throw string("purchase element has no template attribute");
                         }
+                        int cost = parseInt(cost_s.toString());
                         Item *item = this->cloneStandardItem(template_s.toString().toStdString());
-                        player->addItem(item);
+                        shop->addItem(item, cost);
+                    }
+                    else if( reader.name() == "player_default_items" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: player_default_items element wasn't expected here");
+                        }
+                        itemsXMLType = ITEMS_XML_TYPE_PLAYER_DEFAULT;
+                        QStringRef type_s = reader.attributes().value("type");
+                        player_default_type = type_s.toString().toStdString();
+                    }
+                    else if( reader.name() == "player_default_item" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: player_default_item element wasn't expected here");
+                        }
+                        if( !is_savegame && player_default_type == player_type ) {
+                            QStringRef template_s = reader.attributes().value("template");
+                            if( template_s.length() == 0 ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("player_default_item element has no template attribute");
+                            }
+                            Item *item = this->cloneStandardItem(template_s.toString().toStdString());
+                            player->addItem(item);
+                        }
+                    }
+                    else {
+                        if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: element wasn't expected here");
+                        }
+                        Item *item = parseXMLItem( reader );
+                        if( item != NULL ) {
+                            this->addStandardItem( item );
+                        }
+                        // else ignore unknown element
                     }
                 }
-                else {
-                    if( itemsXMLType != ITEMS_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: element wasn't expected here");
+                else if( reader.isEndElement() ) {
+                    if( reader.name() == "shop" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: shop end element wasn't expected here");
+                        }
+                        shop = NULL;
+                        itemsXMLType = ITEMS_XML_TYPE_NONE;
                     }
-                    Item *item = parseXMLItem( reader );
-                    if( item != NULL ) {
-                        this->addStandardItem( item );
+                    else if( reader.name() == "player_default_items" ) {
+                        if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected items xml: player_default_items end element wasn't expected here");
+                        }
+                        itemsXMLType = ITEMS_XML_TYPE_NONE;
                     }
-                    // else ignore unknown element
-                }
-            }
-            else if( reader.isEndElement() ) {
-                if( reader.name() == "shop" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_SHOP ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: shop end element wasn't expected here");
-                    }
-                    shop = NULL;
-                    itemsXMLType = ITEMS_XML_TYPE_NONE;
-                }
-                else if( reader.name() == "player_default_items" ) {
-                    if( itemsXMLType != ITEMS_XML_TYPE_PLAYER_DEFAULT ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected items xml: player_default_items end element wasn't expected here");
-                    }
-                    itemsXMLType = ITEMS_XML_TYPE_NONE;
-                }
-            }
-        }
-        if( reader.hasError() ) {
-            LOG("error at line %d\n", reader.lineNumber());
-            LOG("error reading items.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading items xml file");
-        }
-    }
-
-    gui_overlay->setProgress(30);
-    qApp->processEvents();
-
-    LOG("load NPCs\n");
-    {
-        QFile file(QString(DEPLOYMENT_PATH) + "data/npcs.xml");
-        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open npcs xml file");
-        }
-        QXmlStreamReader reader(&file);
-        while( !reader.atEnd() && !reader.hasError() ) {
-            reader.readNext();
-            if( reader.isStartElement() )
-            {
-                if( reader.name() == "npc" ) {
-                    QStringRef name_s = reader.attributes().value("name");
-                    qDebug("found npc template: %s", name_s.toString().toStdString().c_str());
-                    QStringRef animation_name_s = reader.attributes().value("animation_name");
-                    QStringRef static_image_s = reader.attributes().value("static_image");
-                    bool static_image = parseBool(static_image_s.toString(), true);
-                    QStringRef bounce_s = reader.attributes().value("bounce");
-                    bool bounce = parseBool(bounce_s.toString(), true);
-                    QStringRef FP_s = reader.attributes().value("FP");
-                    int FP = parseInt(FP_s.toString());
-                    QStringRef BS_s = reader.attributes().value("BS");
-                    int BS = parseInt(BS_s.toString());
-                    QStringRef S_s = reader.attributes().value("S");
-                    int S = parseInt(S_s.toString());
-                    QStringRef A_s = reader.attributes().value("A");
-                    int A = parseInt(A_s.toString());
-                    QStringRef M_s = reader.attributes().value("M");
-                    int M = parseInt(M_s.toString());
-                    QStringRef D_s = reader.attributes().value("D");
-                    int D = parseInt(D_s.toString());
-                    QStringRef B_s = reader.attributes().value("B");
-                    int B = parseInt(B_s.toString());
-                    QStringRef Sp_s = reader.attributes().value("Sp");
-                    float Sp = parseFloat(Sp_s.toString());
-                    QStringRef health_min_s = reader.attributes().value("health_min");
-                    int health_min = parseInt(health_min_s.toString());
-                    QStringRef health_max_s = reader.attributes().value("health_max");
-                    int health_max = parseInt(health_max_s.toString());
-                    QStringRef gold_min_s = reader.attributes().value("gold_min");
-                    int gold_min = parseInt(gold_min_s.toString());
-                    QStringRef gold_max_s = reader.attributes().value("gold_max");
-                    int gold_max = parseInt(gold_max_s.toString());
-                    QStringRef xp_worth_s = reader.attributes().value("xp_worth");
-                    int xp_worth = parseInt(xp_worth_s.toString());
-                    QStringRef causes_terror_s = reader.attributes().value("causes_terror");
-                    bool causes_terror = parseBool(causes_terror_s.toString(), true);
-                    QStringRef terror_effect_s = reader.attributes().value("terror_effect");
-                    int terror_effect = parseInt(terror_effect_s.toString(), true);
-                    QStringRef causes_disease_s = reader.attributes().value("causes_disease");
-                    int causes_disease = parseInt(causes_disease_s.toString(), true);
-                    QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
-                    int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
-                    QStringRef requires_magical_s = reader.attributes().value("requires_magical");
-                    bool requires_magical = parseBool(requires_magical_s.toString(), true);
-                    QStringRef unholy_s = reader.attributes().value("unholy");
-                    bool unholy = parseBool(unholy_s.toString(), true);
-
-                    CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max);
-
-                    character_template->setXPWorth(xp_worth);
-                    if( causes_terror ) {
-                        character_template->setCausesTerror(terror_effect);
-                    }
-                    character_template->setCausesDisease(causes_disease);
-                    character_template->setCausesParalysis(causes_paralysis);
-                    character_template->setStaticImage(static_image);
-                    character_template->setBounce(bounce);
-                    character_template->setRequiresMagical(requires_magical);
-                    character_template->setUnholy(unholy);
-
-                    QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
-                    QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
-                    QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
-                    if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
-                        int natural_damageX = parseInt(natural_damageX_s.toString());
-                        int natural_damageY = parseInt(natural_damageY_s.toString());
-                        int natural_damageZ = parseInt(natural_damageZ_s.toString());
-                        character_template->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
-                    }
-
-                    QStringRef can_fly_s = reader.attributes().value("can_fly");
-                    bool can_fly = parseBool(can_fly_s.toString(), true);
-                    character_template->setCanFly(can_fly);
-
-                    QStringRef weapon_resist_class_s = reader.attributes().value("weapon_resist_class");
-                    if( weapon_resist_class_s.length() > 0 ) {
-                        QStringRef weapon_resist_percentage_s = reader.attributes().value("weapon_resist_percentage");
-                        int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
-                        character_template->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
-                    }
-
-                    this->character_templates[ name_s.toString().toStdString() ] = character_template;
                 }
             }
-        }
-        if( reader.hasError() ) {
-            LOG("error at line %d\n", reader.lineNumber());
-            LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading npcs xml file");
-        }
-    }
-
-    gui_overlay->setProgress(40);
-    qApp->processEvents();
-
-    LOG("load Spells\n");
-    {
-        QFile file(QString(DEPLOYMENT_PATH) + "data/spells.xml");
-        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open spells xml file");
-        }
-        QXmlStreamReader reader(&file);
-        while( !reader.atEnd() && !reader.hasError() ) {
-            reader.readNext();
-            if( reader.isStartElement() )
-            {
-                if( reader.name() == "spell" ) {
-                    QStringRef name_s = reader.attributes().value("name");
-                    qDebug("found spell template: %s", name_s.toString().toStdString().c_str());
-                    QStringRef type_s = reader.attributes().value("type");
-                    QStringRef effect_s = reader.attributes().value("effect");
-                    QStringRef rollX_s = reader.attributes().value("rollX");
-                    QStringRef rollY_s = reader.attributes().value("rollY");
-                    QStringRef rollZ_s = reader.attributes().value("rollZ");
-                    QStringRef damage_armour_s = reader.attributes().value("damage_armour");
-                    QStringRef damage_shield_s = reader.attributes().value("damage_shield");
-                    QStringRef mind_test_s = reader.attributes().value("mind_test");
-                    int rollX = parseInt(rollX_s.toString(), true);
-                    int rollY = parseInt(rollY_s.toString(), true);
-                    int rollZ = parseInt(rollZ_s.toString(), true);
-                    bool damage_armour = parseBool(damage_armour_s.toString(), true);
-                    bool damage_shield = parseBool(damage_shield_s.toString(), true);
-                    bool mind_test = parseBool(mind_test_s.toString(), true);
-                    Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString(), effect_s.toString().toStdString());
-                    spell->setRoll(rollX, rollY, rollZ);
-                    spell->setDamage(damage_armour, damage_shield);
-                    spell->setMindTest(mind_test);
-                    this->spells[ name_s.toString().toStdString() ] = spell;
-                }
+            if( reader.hasError() ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                LOG("error reading items.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+                throw string("error reading items xml file");
             }
         }
-        if( reader.hasError() ) {
-            LOG("error at line %d\n", reader.lineNumber());
-            LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading npcs xml file");
+
+        gui_overlay->setProgress(30);
+        qApp->processEvents();
+
+        LOG("load NPCs\n");
+        {
+            QFile file(QString(DEPLOYMENT_PATH) + "data/npcs.xml");
+            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+                throw string("Failed to open npcs xml file");
+            }
+            QXmlStreamReader reader(&file);
+            while( !reader.atEnd() && !reader.hasError() ) {
+                reader.readNext();
+                if( reader.isStartElement() )
+                {
+                    if( reader.name() == "npc" ) {
+                        QStringRef name_s = reader.attributes().value("name");
+                        qDebug("found npc template: %s", name_s.toString().toStdString().c_str());
+                        QStringRef animation_name_s = reader.attributes().value("animation_name");
+                        QStringRef static_image_s = reader.attributes().value("static_image");
+                        bool static_image = parseBool(static_image_s.toString(), true);
+                        QStringRef bounce_s = reader.attributes().value("bounce");
+                        bool bounce = parseBool(bounce_s.toString(), true);
+                        QStringRef FP_s = reader.attributes().value("FP");
+                        int FP = parseInt(FP_s.toString());
+                        QStringRef BS_s = reader.attributes().value("BS");
+                        int BS = parseInt(BS_s.toString());
+                        QStringRef S_s = reader.attributes().value("S");
+                        int S = parseInt(S_s.toString());
+                        QStringRef A_s = reader.attributes().value("A");
+                        int A = parseInt(A_s.toString());
+                        QStringRef M_s = reader.attributes().value("M");
+                        int M = parseInt(M_s.toString());
+                        QStringRef D_s = reader.attributes().value("D");
+                        int D = parseInt(D_s.toString());
+                        QStringRef B_s = reader.attributes().value("B");
+                        int B = parseInt(B_s.toString());
+                        QStringRef Sp_s = reader.attributes().value("Sp");
+                        float Sp = parseFloat(Sp_s.toString());
+                        QStringRef health_min_s = reader.attributes().value("health_min");
+                        int health_min = parseInt(health_min_s.toString());
+                        QStringRef health_max_s = reader.attributes().value("health_max");
+                        int health_max = parseInt(health_max_s.toString());
+                        QStringRef gold_min_s = reader.attributes().value("gold_min");
+                        int gold_min = parseInt(gold_min_s.toString());
+                        QStringRef gold_max_s = reader.attributes().value("gold_max");
+                        int gold_max = parseInt(gold_max_s.toString());
+                        QStringRef xp_worth_s = reader.attributes().value("xp_worth");
+                        int xp_worth = parseInt(xp_worth_s.toString());
+                        QStringRef causes_terror_s = reader.attributes().value("causes_terror");
+                        bool causes_terror = parseBool(causes_terror_s.toString(), true);
+                        QStringRef terror_effect_s = reader.attributes().value("terror_effect");
+                        int terror_effect = parseInt(terror_effect_s.toString(), true);
+                        QStringRef causes_disease_s = reader.attributes().value("causes_disease");
+                        int causes_disease = parseInt(causes_disease_s.toString(), true);
+                        QStringRef causes_paralysis_s = reader.attributes().value("causes_paralysis");
+                        int causes_paralysis = parseInt(causes_paralysis_s.toString(), true);
+                        QStringRef requires_magical_s = reader.attributes().value("requires_magical");
+                        bool requires_magical = parseBool(requires_magical_s.toString(), true);
+                        QStringRef unholy_s = reader.attributes().value("unholy");
+                        bool unholy = parseBool(unholy_s.toString(), true);
+
+                        CharacterTemplate *character_template = new CharacterTemplate(animation_name_s.toString().toStdString(), FP, BS, S, A, M, D, B, Sp, health_min, health_max, gold_min, gold_max);
+
+                        character_template->setXPWorth(xp_worth);
+                        if( causes_terror ) {
+                            character_template->setCausesTerror(terror_effect);
+                        }
+                        character_template->setCausesDisease(causes_disease);
+                        character_template->setCausesParalysis(causes_paralysis);
+                        character_template->setStaticImage(static_image);
+                        character_template->setBounce(bounce);
+                        character_template->setRequiresMagical(requires_magical);
+                        character_template->setUnholy(unholy);
+
+                        QStringRef natural_damageX_s = reader.attributes().value("natural_damageX");
+                        QStringRef natural_damageY_s = reader.attributes().value("natural_damageY");
+                        QStringRef natural_damageZ_s = reader.attributes().value("natural_damageZ");
+                        if( natural_damageX_s.length() > 0 || natural_damageY_s.length() > 0 || natural_damageZ_s.length() > 0 ) {
+                            int natural_damageX = parseInt(natural_damageX_s.toString());
+                            int natural_damageY = parseInt(natural_damageY_s.toString());
+                            int natural_damageZ = parseInt(natural_damageZ_s.toString());
+                            character_template->setNaturalDamage(natural_damageX, natural_damageY, natural_damageZ);
+                        }
+
+                        QStringRef can_fly_s = reader.attributes().value("can_fly");
+                        bool can_fly = parseBool(can_fly_s.toString(), true);
+                        character_template->setCanFly(can_fly);
+
+                        QStringRef weapon_resist_class_s = reader.attributes().value("weapon_resist_class");
+                        if( weapon_resist_class_s.length() > 0 ) {
+                            QStringRef weapon_resist_percentage_s = reader.attributes().value("weapon_resist_percentage");
+                            int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
+                            character_template->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
+                        }
+
+                        this->character_templates[ name_s.toString().toStdString() ] = character_template;
+                    }
+                }
+            }
+            if( reader.hasError() ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+                throw string("error reading npcs xml file");
+            }
         }
-    }
 
-    gui_overlay->setProgress(60);
-    qApp->processEvents();
+        gui_overlay->setProgress(40);
+        qApp->processEvents();
 
-    LOG("create animation frames\n");
-    LOG("load player image\n");
-    vector<AnimationLayerDefinition> player_animation_layer_definition;
-    // if we change the offsets, remember to update the hotspot in PlayingGamestate::locationAddCharacter !
-    const int off_x = 32, off_y = 40, width = 64, height = 64;
-    //const int off_x = 0, off_y = 0, width = 128, height = 128;
-    const int expected_stride_x = 128, expected_stride_y = 128, expected_total_width = 4096;
-    //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
-    //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    //this->animation_layers["player"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    //this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-    this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-    this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+        LOG("load Spells\n");
+        {
+            QFile file(QString(DEPLOYMENT_PATH) + "data/spells.xml");
+            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+                throw string("Failed to open spells xml file");
+            }
+            QXmlStreamReader reader(&file);
+            while( !reader.atEnd() && !reader.hasError() ) {
+                reader.readNext();
+                if( reader.isStartElement() )
+                {
+                    if( reader.name() == "spell" ) {
+                        QStringRef name_s = reader.attributes().value("name");
+                        qDebug("found spell template: %s", name_s.toString().toStdString().c_str());
+                        QStringRef type_s = reader.attributes().value("type");
+                        QStringRef effect_s = reader.attributes().value("effect");
+                        QStringRef rollX_s = reader.attributes().value("rollX");
+                        QStringRef rollY_s = reader.attributes().value("rollY");
+                        QStringRef rollZ_s = reader.attributes().value("rollZ");
+                        QStringRef damage_armour_s = reader.attributes().value("damage_armour");
+                        QStringRef damage_shield_s = reader.attributes().value("damage_shield");
+                        QStringRef mind_test_s = reader.attributes().value("mind_test");
+                        int rollX = parseInt(rollX_s.toString(), true);
+                        int rollY = parseInt(rollY_s.toString(), true);
+                        int rollZ = parseInt(rollZ_s.toString(), true);
+                        bool damage_armour = parseBool(damage_armour_s.toString(), true);
+                        bool damage_shield = parseBool(damage_shield_s.toString(), true);
+                        bool mind_test = parseBool(mind_test_s.toString(), true);
+                        Spell *spell = new Spell(name_s.toString().toStdString(), type_s.toString().toStdString(), effect_s.toString().toStdString());
+                        spell->setRoll(rollX, rollY, rollZ);
+                        spell->setDamage(damage_armour, damage_shield);
+                        spell->setMindTest(mind_test);
+                        this->spells[ name_s.toString().toStdString() ] = spell;
+                    }
+                }
+            }
+            if( reader.hasError() ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                LOG("error reading npcs.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+                throw string("error reading npcs xml file");
+            }
+        }
 
-    gui_overlay->setProgress(70);
-    qApp->processEvents();
+        gui_overlay->setProgress(60);
+        qApp->processEvents();
 
-    //if( !mobile_c )
-    //if( game_g->isSoundEnabled() )
+        LOG("create animation frames\n");
+        LOG("load player image\n");
+        vector<AnimationLayerDefinition> player_animation_layer_definition;
+        // if we change the offsets, remember to update the hotspot in PlayingGamestate::locationAddCharacter !
+        const int off_x = 32, off_y = 40, width = 64, height = 64;
+        //const int off_x = 0, off_y = 0, width = 128, height = 128;
+        const int expected_stride_x = 128, expected_stride_y = 128, expected_total_width = 4096;
+        //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
+        //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
+        player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+        player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+        player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+        player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+        player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+        //this->animation_layers["player"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+        //this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+        //this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+        //this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
+        this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+        this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+        this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+        this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+
+        gui_overlay->setProgress(70);
+        qApp->processEvents();
+
+        //if( !mobile_c )
+        //if( game_g->isSoundEnabled() )
 #ifndef Q_OS_ANDROID
-    if( game_g->getGlobalSoundVolume() > 0 )
+        if( game_g->getGlobalSoundVolume() > 0 )
 #endif
-    {
-        LOG("load sound effects\n");
-        game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav", false);
-        game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav", false);
-        game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav", false);
-        game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav", false);
-        game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav", false);
-        game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav", false);
-        game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav", false);
-        game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav", false);
-        game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav", false);
+        {
+            LOG("load sound effects\n");
+            game_g->loadSound("click", string(DEPLOYMENT_PATH) + "sound/click_short.wav", false);
+            game_g->loadSound("coin", string(DEPLOYMENT_PATH) + "sound/coin.wav", false);
+            game_g->loadSound("container", string(DEPLOYMENT_PATH) + "sound/container.wav", false);
+            game_g->loadSound("door", string(DEPLOYMENT_PATH) + "sound/door.wav", false);
+            game_g->loadSound("drink", string(DEPLOYMENT_PATH) + "sound/bubble2.wav", false);
+            game_g->loadSound("lock", string(DEPLOYMENT_PATH) + "sound/lock.wav", false);
+            game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav", false);
+            game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav", false);
+            game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav", false);
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
-        game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav", false);  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
+            game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav", false);  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
 #endif
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID)
-        // strange pauses on Symbian?
-        // conflicts with other sounds on Android
-        game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav", false);
+            // strange pauses on Symbian?
+            // conflicts with other sounds on Android
+            game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav", false);
 #endif
-        // remember to call freeSound in the PlayingGamestate destructor!
-        LOG("done loading sound effects\n");
+            // remember to call freeSound in the PlayingGamestate destructor!
+            LOG("done loading sound effects\n");
 
-        if( !lightdistribution_c ) {
+            if( !lightdistribution_c ) {
 #ifndef USING_PHONON
-            // only supported for SFML, as Phonon doesn't support looping
-            game_g->loadSound("ingame_music", string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
-            game_g->setSoundVolume("ingame_music", 0.1f);
-            game_g->loadSound("trade", string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
-            game_g->setSoundVolume("trade", 0.1f);
-            game_g->loadSound("game_over", string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
-            game_g->setSoundVolume("game_over", 1.0f);
+                // only supported for SFML, as Phonon doesn't support looping
+                game_g->loadSound("ingame_music", string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
+                game_g->setSoundVolume("ingame_music", 0.1f);
+                game_g->loadSound("trade", string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
+                game_g->setSoundVolume("trade", 0.1f);
+                game_g->loadSound("game_over", string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
+                game_g->setSoundVolume("game_over", 1.0f);
 #endif
+            }
         }
-    }
 #ifndef Q_OS_ANDROID
-    else {
-        LOG("sound is disabled\n");
-    }
+        else {
+            LOG("sound is disabled\n");
+        }
 #endif
 
-    gui_overlay->setProgress(90);
-    qApp->processEvents();
+        gui_overlay->setProgress(90);
+        qApp->processEvents();
 
-    LOG("load quests\n");
+        LOG("load quests\n");
 
-    {
-        QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
-        if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-            throw string("Failed to open quests xml file");
-        }
-        QXmlStreamReader reader(&file);
-        while( !reader.atEnd() && !reader.hasError() ) {
-            reader.readNext();
-            if( reader.isStartElement() )
-            {
-                if( reader.name() == "quest" ) {
-                    QStringRef filename_s = reader.attributes().value("filename");
-                    qDebug("found quest: %s", filename_s.toString().toStdString().c_str());
-                    if( filename_s.length() == 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("quest doesn't have filename info");
+        {
+            QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
+            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+                throw string("Failed to open quests xml file");
+            }
+            QXmlStreamReader reader(&file);
+            while( !reader.atEnd() && !reader.hasError() ) {
+                reader.readNext();
+                if( reader.isStartElement() )
+                {
+                    if( reader.name() == "quest" ) {
+                        QStringRef filename_s = reader.attributes().value("filename");
+                        qDebug("found quest: %s", filename_s.toString().toStdString().c_str());
+                        if( filename_s.length() == 0 ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("quest doesn't have filename info");
+                        }
+                        QuestInfo quest_info(filename_s.toString().toStdString());
+                        this->quest_list.push_back(quest_info);
                     }
-                    QuestInfo quest_info(filename_s.toString().toStdString());
-                    this->quest_list.push_back(quest_info);
                 }
             }
+            if( reader.hasError() ) {
+                LOG("error at line %d\n", reader.lineNumber());
+                LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+                throw string("error reading quests xml file");
+            }
         }
-        if( reader.hasError() ) {
-            LOG("error at line %d\n", reader.lineNumber());
-            LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-            throw string("error reading quests xml file");
+        if( this->quest_list.size() == 0 ) {
+            throw string("failed to find any quests");
         }
-    }
-    if( this->quest_list.size() == 0 ) {
-        throw string("failed to find any quests");
-    }
-    gui_overlay->setProgress(100);
-    qApp->processEvents();
+        gui_overlay->setProgress(100);
+        qApp->processEvents();
 
-    {
-        QGridLayout *layout = new QGridLayout();
-        view->setLayout(layout);
+        {
+            QGridLayout *layout = new QGridLayout();
+            view->setLayout(layout);
 
-        layout->setColumnStretch(0, 1);
-        layout->setRowStretch(1, 1);
-        int col = 1;
-        MainWindow *window = game_g->getScreen()->getMainWindow();
-        const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
-        const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
-        const int icon_size = (icon_resolution_independent_size*window->width())/640;
-        const int button_size = (button_resolution_independent_size*window->width())/640;
-        LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
-        LOG("button_resolution_independent_size: %d\n", button_resolution_independent_size);
-        LOG("icon_size: %d\n", icon_size);
-        LOG("button_size: %d\n", button_size);
+            layout->setColumnStretch(0, 1);
+            layout->setRowStretch(1, 1);
+            int col = 1;
+            MainWindow *window = game_g->getScreen()->getMainWindow();
+            const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
+            const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
+            const int icon_size = (icon_resolution_independent_size*window->width())/640;
+            const int button_size = (button_resolution_independent_size*window->width())/640;
+            LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
+            LOG("button_resolution_independent_size: %d\n", button_resolution_independent_size);
+            LOG("icon_size: %d\n", icon_size);
+            LOG("button_size: %d\n", button_size);
 
-        QIcon turboIcon(this->builtin_images["gui_time"]);
-        turboButton = new QPushButton(turboIcon, "");
-        turboButton->setShortcut(QKeySequence(Qt::Key_T));
-        turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        turboButton->setIconSize(QSize(icon_size, icon_size));
-        turboButton->setMinimumSize(button_size, button_size);
-        turboButton->setMaximumSize(button_size, button_size);
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        turboButton->setToolTip(tr("Toggle turbo mode: make game time go faster (T)"));
-#endif
-        turboButton->setCheckable(true);
-        turboToggled(false); // initialise game speed to standard
-        connect(turboButton, SIGNAL(toggled(bool)), this, SLOT(turboToggled(bool)));
-        layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
-
-        if( !this->permadeath ) {
-            QIcon quickSaveIcon(this->builtin_images["gui_quicksave"]);
-            quickSaveButton = new QPushButton(quickSaveIcon, "");
-            quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
+            QIcon turboIcon(this->builtin_images["gui_time"]);
+            turboButton = new QPushButton(turboIcon, "");
+            turboButton->setShortcut(QKeySequence(Qt::Key_T));
+            turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            turboButton->setIconSize(QSize(icon_size, icon_size));
+            turboButton->setMinimumSize(button_size, button_size);
+            turboButton->setMaximumSize(button_size, button_size);
 #ifndef Q_OS_ANDROID
             // for some reason, this sometimes shows on Android when it shouldn't?
-            quickSaveButton->setToolTip(tr("Quick-save (F5)"));
+            turboButton->setToolTip(tr("Toggle turbo mode: make game time go faster (T)"));
 #endif
-            quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-            quickSaveButton->setIconSize(QSize(icon_size, icon_size));
-            quickSaveButton->setMinimumSize(button_size, button_size);
-            quickSaveButton->setMaximumSize(button_size, button_size);
-            connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
-            layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
+            turboButton->setCheckable(true);
+            turboToggled(false); // initialise game speed to standard
+            connect(turboButton, SIGNAL(toggled(bool)), this, SLOT(turboToggled(bool)));
+            layout->addWidget(turboButton, 0, col++, Qt::AlignCenter);
+
+            if( !this->permadeath ) {
+                QIcon quickSaveIcon(this->builtin_images["gui_quicksave"]);
+                quickSaveButton = new QPushButton(quickSaveIcon, "");
+                quickSaveButton->setShortcut(QKeySequence(Qt::Key_F5));
+#ifndef Q_OS_ANDROID
+                // for some reason, this sometimes shows on Android when it shouldn't?
+                quickSaveButton->setToolTip(tr("Quick-save (F5)"));
+#endif
+                quickSaveButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+                quickSaveButton->setIconSize(QSize(icon_size, icon_size));
+                quickSaveButton->setMinimumSize(button_size, button_size);
+                quickSaveButton->setMaximumSize(button_size, button_size);
+                connect(quickSaveButton, SIGNAL(clicked()), this, SLOT(quickSave()));
+                layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
+            }
+
+            QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
+            zoomoutButton = new QPushButton(zoomoutIcon, "");
+            zoomoutButton->setShortcut(QKeySequence(Qt::Key_Minus));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            zoomoutButton->setToolTip(tr("Zoom out (-)"));
+#endif
+            zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            zoomoutButton->setIconSize(QSize(icon_size, icon_size));
+            zoomoutButton->setMinimumSize(button_size, button_size);
+            zoomoutButton->setMaximumSize(button_size, button_size);
+            connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
+            layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
+
+            QIcon zoominIcon(this->builtin_images["gui_zoomin"]);
+            zoominButton = new QPushButton(zoominIcon, "");
+            zoominButton->setShortcut(QKeySequence(Qt::Key_Plus));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            zoominButton->setToolTip(tr("Zoom in (+)"));
+#endif
+            zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            zoominButton->setIconSize(QSize(icon_size, icon_size));
+            zoominButton->setMinimumSize(button_size, button_size);
+            zoominButton->setMaximumSize(button_size, button_size);
+            connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
+            layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
+
+            QIcon centreIcon(this->builtin_images["gui_centre"]);
+            centreButton = new QPushButton(centreIcon, "");
+            centreButton->setShortcut(QKeySequence(Qt::Key_C));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            centreButton->setToolTip(tr("Centre view on your player's location (C)"));
+#endif
+            centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            centreButton->setIconSize(QSize(icon_size, icon_size));
+            centreButton->setMinimumSize(button_size, button_size);
+            centreButton->setMaximumSize(button_size, button_size);
+            connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
+            layout->addWidget(centreButton, 0, col++, Qt::AlignCenter);
+
+            //v_layout->addStretch();
         }
 
-        QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
-        zoomoutButton = new QPushButton(zoomoutIcon, "");
-        zoomoutButton->setShortcut(QKeySequence(Qt::Key_Minus));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        zoomoutButton->setToolTip(tr("Zoom out (-)"));
-#endif
-        zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        zoomoutButton->setIconSize(QSize(icon_size, icon_size));
-        zoomoutButton->setMinimumSize(button_size, button_size);
-        zoomoutButton->setMaximumSize(button_size, button_size);
-        connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
-        layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
+        window->setEnabled(true);
+        game_g->getScreen()->setPaused(false, true);
 
-        QIcon zoominIcon(this->builtin_images["gui_zoomin"]);
-        zoominButton = new QPushButton(zoominIcon, "");
-        zoominButton->setShortcut(QKeySequence(Qt::Key_Plus));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        zoominButton->setToolTip(tr("Zoom in (+)"));
-#endif
-        zoominButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        zoominButton->setIconSize(QSize(icon_size, icon_size));
-        zoominButton->setMinimumSize(button_size, button_size);
-        zoominButton->setMaximumSize(button_size, button_size);
-        connect(zoominButton, SIGNAL(clicked()), view, SLOT(zoomIn()));
-        layout->addWidget(zoominButton, 0, col++, Qt::AlignCenter);
-
-        QIcon centreIcon(this->builtin_images["gui_centre"]);
-        centreButton = new QPushButton(centreIcon, "");
-        centreButton->setShortcut(QKeySequence(Qt::Key_C));
-#ifndef Q_OS_ANDROID
-        // for some reason, this sometimes shows on Android when it shouldn't?
-        centreButton->setToolTip(tr("Centre view on your player's location (C)"));
-#endif
-        centreButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        centreButton->setIconSize(QSize(icon_size, icon_size));
-        centreButton->setMinimumSize(button_size, button_size);
-        centreButton->setMaximumSize(button_size, button_size);
-        connect(centreButton, SIGNAL(clicked()), view, SLOT(centreOnPlayer()));
-        layout->addWidget(centreButton, 0, col++, Qt::AlignCenter);
-
-        //v_layout->addStretch();
+        if( !is_savegame ) {
+            //this->player->initialiseHealth(600); // CHEAT
+            //player->addGold( 1000 ); // CHEAT
+            //player->addXP(this, 96); // CHEAT
+        }
+        if( !is_savegame && this->cheat_mode ) {
+            this->c_quest_indx = cheat_start_level % this->quest_list.size();
+            if( this->c_quest_indx == 1 ) {
+                // CHEAT, simulate start of quest 2:
+                player->addGold( 166 );
+                player->deleteItem("Leather Armour");
+                player->addItem(this->cloneStandardItem("Long Sword"), true);
+                player->addItem(this->cloneStandardItem("Shield"), true);
+                player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
+                player->addItem(this->cloneStandardItem("Longbow"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->setXP(70);
+            }
+            else if( this->c_quest_indx == 2 ) {
+                // CHEAT, simulate start of quest 3:
+                for(int i=0;i<114;i++) {
+                    player->addXP(this, 10);
+                }
+                player->addGold( 1241 + 300 );
+                player->deleteItem("Leather Armour");
+                player->deleteItem("Long Sword");
+                player->armWeapon(NULL);
+                player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
+                player->addItem(this->cloneStandardItem("Plate Armour"), true);
+                player->addItem(this->cloneStandardItem("Longbow"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                {
+                    Item *item = this->cloneStandardItem("Long Sword");
+                    item->setName("Magical Long Sword");
+                    item->setMagical(true);
+                    item->setBaseTemplate("Long Sword");
+                    player->addItem(item, true);
+                }
+            }
+            else if( this->c_quest_indx == 3 ) {
+                // CHEAT, simulate start of quest 4:
+                for(int i=0;i<211;i++) {
+                    player->addXP(this, 10);
+                }
+                player->addGold( 1998 + 350 );
+                player->deleteItem("Leather Armour");
+                player->deleteItem("Long Sword");
+                player->armWeapon(NULL);
+                //player->addItem(this->cloneStandardItem("Two Handed Sword"), true); // lose this, as no better than the Long Sword 2D10+2
+                player->addItem(this->cloneStandardItem("Shield"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                player->addItem(this->cloneStandardItem("Arrows"), true);
+                {
+                    Item *item = this->cloneStandardItem("Long Sword");
+                    item->setBaseTemplate("Long Sword");
+                    Weapon *weapon = static_cast<Weapon *>(item);
+                    weapon->setDamage(2, 10, 2);
+                    player->addItem(item, true);
+                }
+                {
+                    Item *item = this->cloneStandardItem("Long Sword");
+                    item->setName("Magical Long Sword");
+                    item->setMagical(true);
+                    item->setBaseTemplate("Long Sword");
+                    player->addItem(item, true);
+                }
+                {
+                    Item *item = this->cloneStandardItem("Plate Armour");
+                    item->setName("Derrin's Armour");
+                    item->setRating(7);
+                    item->setMagical(true);
+                    item->setBaseTemplate("Plate Armour");
+                    player->addItem(item, true);
+                }
+                {
+                    Item *item = this->cloneStandardItem("Gold Ring");
+                    item->setName("Derrin's Ring");
+                    item->setProfileBonusIntProperty(profile_key_D_c, 1);
+                    item->setMagical(true);
+                    item->setBaseTemplate("Gold Ring");
+                    player->addItem(item, true);
+                }
+                {
+                    Item *item = this->cloneStandardItem("Arrows");
+                    item->setName("Arrows +1");
+                    item->setRating(2);
+                    item->setMagical(true);
+                    item->setBaseTemplate("Arrows");
+                    Ammo *ammo = static_cast<Ammo *>(item);
+                    ammo->setAmount(10);
+                    player->addItem(item, true);
+                }
+                player->addItem(this->cloneStandardItem("Longbow"), true);
+            }
+        }
     }
-
-    window->setEnabled(true);
-    game_g->getScreen()->setPaused(false, true);
-
-    if( !is_savegame ) {
-        //this->player->initialiseHealth(600); // CHEAT
-        //player->addGold( 1000 ); // CHEAT
-        //player->addXP(this, 96); // CHEAT
-    }
-    if( !is_savegame && this->cheat_mode ) {
-        this->c_quest_indx = cheat_start_level % this->quest_list.size();
-        if( this->c_quest_indx == 1 ) {
-            // CHEAT, simulate start of quest 2:
-            player->addGold( 166 );
-            player->deleteItem("Leather Armour");
-            player->addItem(this->cloneStandardItem("Long Sword"), true);
-            player->addItem(this->cloneStandardItem("Shield"), true);
-            player->addItem(this->cloneStandardItem("Chain Mail Armour"), true);
-            player->addItem(this->cloneStandardItem("Longbow"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->setXP(70);
-        }
-        else if( this->c_quest_indx == 2 ) {
-            // CHEAT, simulate start of quest 3:
-            for(int i=0;i<114;i++) {
-                player->addXP(this, 10);
-            }
-            player->addGold( 1241 + 300 );
-            player->deleteItem("Leather Armour");
-            player->deleteItem("Long Sword");
-            player->armWeapon(NULL);
-            player->addItem(this->cloneStandardItem("Two Handed Sword"), true);
-            player->addItem(this->cloneStandardItem("Plate Armour"), true);
-            player->addItem(this->cloneStandardItem("Longbow"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            {
-                Item *item = this->cloneStandardItem("Long Sword");
-                item->setName("Magical Long Sword");
-                item->setMagical(true);
-                item->setBaseTemplate("Long Sword");
-                player->addItem(item, true);
-            }
-        }
-        else if( this->c_quest_indx == 3 ) {
-            // CHEAT, simulate start of quest 4:
-            for(int i=0;i<211;i++) {
-                player->addXP(this, 10);
-            }
-            player->addGold( 1998 + 350 );
-            player->deleteItem("Leather Armour");
-            player->deleteItem("Long Sword");
-            player->armWeapon(NULL);
-            //player->addItem(this->cloneStandardItem("Two Handed Sword"), true); // lose this, as no better than the Long Sword 2D10+2
-            player->addItem(this->cloneStandardItem("Shield"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            player->addItem(this->cloneStandardItem("Arrows"), true);
-            {
-                Item *item = this->cloneStandardItem("Long Sword");
-                item->setBaseTemplate("Long Sword");
-                Weapon *weapon = static_cast<Weapon *>(item);
-                weapon->setDamage(2, 10, 2);
-                player->addItem(item, true);
-            }
-            {
-                Item *item = this->cloneStandardItem("Long Sword");
-                item->setName("Magical Long Sword");
-                item->setMagical(true);
-                item->setBaseTemplate("Long Sword");
-                player->addItem(item, true);
-            }
-            {
-                Item *item = this->cloneStandardItem("Plate Armour");
-                item->setName("Derrin's Armour");
-                item->setRating(7);
-                item->setMagical(true);
-                item->setBaseTemplate("Plate Armour");
-                player->addItem(item, true);
-            }
-            {
-                Item *item = this->cloneStandardItem("Gold Ring");
-                item->setName("Derrin's Ring");
-                item->setProfileBonusIntProperty(profile_key_D_c, 1);
-                item->setMagical(true);
-                item->setBaseTemplate("Gold Ring");
-                player->addItem(item, true);
-            }
-            {
-                Item *item = this->cloneStandardItem("Arrows");
-                item->setName("Arrows +1");
-                item->setRating(2);
-                item->setMagical(true);
-                item->setBaseTemplate("Arrows");
-                Ammo *ammo = static_cast<Ammo *>(item);
-                ammo->setAmount(10);
-                player->addItem(item, true);
-            }
-            player->addItem(this->cloneStandardItem("Longbow"), true);
-        }
+    catch(...) {
+        // clean up stuff created in the constructor
+        LOG("PlayingGamestate constructor throwing an exception");
+        this->cleanup();
+        throw;
     }
 }
 
 PlayingGamestate::~PlayingGamestate() {
     LOG("PlayingGamestate::~PlayingGamestate()\n");
+    this->cleanup();
+}
+
+void PlayingGamestate::cleanup() {
+    LOG("PlayingGamestate::cleanup()\n");
     //this->closeSubWindow();
     this->closeAllSubWindows();
+
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->centralWidget()->deleteLater();
     window->setCentralWidget(NULL);

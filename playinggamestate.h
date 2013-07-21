@@ -554,6 +554,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Character *loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const;
     Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const;
 
+    void cleanup();
+
 #ifdef _DEBUG
     vector<QGraphicsItem *> debug_items;
 
