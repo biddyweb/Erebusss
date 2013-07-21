@@ -948,7 +948,7 @@ Experiments.
 
 <floorregion shape="rect" rect_x="35.0" rect_y="27.0" rect_w="5.0" rect_h="5.0"/>
 
-<scenery name="Stairs" image_name="stairsdown_indoors" x="37.5" y="29.5" size="2.0" blocking="true" exit_location="level_6" exit_location_x="38.5" exit_location_y="14.0"/>
+<scenery name="Stairs" image_name="stairsdown_indoors" x="37.5" y="29.5" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="level_6" exit_location_x="38.5" exit_location_y="14.0"/>
 
 <scenery name="Skulls" image_name="skulls" x="39.5" y="27.5" size="0.3" draw_type="background"/>
 
@@ -1048,7 +1048,7 @@ cddddd2b
 
 <scenery name="Mage's Tent" image_name="tent" x="20.0" y="43.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.495" blocking="true" block_visibility="true" exit_location="mage_tent" exit_location_x="1.0" exit_location_y="1.5"/>
 
-<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="1.0" size="2.0" blocking="true" exit_location="cave" exit_location_x="6.3" exit_location_y="30.2"/>
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="17.0" y="1.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="cave" exit_location_x="6.3" exit_location_y="30.2"/>
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
@@ -1251,7 +1251,7 @@ I don't know that. We know of nothing of how such powerful magic works - just th
 <!--<player_start x="6.3" y="30.2"/>-->
 <!--<player_start x="16.0" y="23.0"/>-->
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="1.0"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="5.0" y="29.5" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="level_past" exit_location_x="19.0" exit_location_y="1.0"/>
 
 <scenery name="Bones" image_name="bones" x="5.5" y="27.5" size="0.5" draw_type="background"/>
 
@@ -1644,7 +1644,7 @@ Inside this casket are a collection of bones.
 
 <floorregion shape="rect" rect_x="34.5" rect_y="11.5" rect_w="5.0" rect_h="7.0"/>
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="37.0" y="14.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="level_5" exit_location_x="39.0" exit_location_y="29.5"/>
 
 <!--<player_start x="38.5" y="14.0"/>-->
 

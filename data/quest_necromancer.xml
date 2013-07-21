@@ -400,7 +400,7 @@ ce
 
 <!--<player_start x="30.0" y="3.5"/>-->
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="30.0" y="2.0" size="2.0" blocking="true" exit_location="Axbury" exit_location_x="37.5" exit_location_y="67.0"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="30.0" y="2.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Axbury" exit_location_x="37.5" exit_location_y="67.0"/>
 
 <!--west route-->
 
@@ -656,7 +656,7 @@ cdddddddde
 
 <!-- town, east side -->
 
-<scenery name="Stairs" image_name="stairsdown_outdoors" x="41.0" y="24.0" size="2.0" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="41.0" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
 
 <scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" locked="true"/>
 
@@ -867,7 +867,7 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <scenery name="Torch" image_name="torch" x="26.0" y="19.55" w="0.75" h="0.75"/>
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="24.0" y="24.0" size="2.0" blocking="true" exit_location="Middleham" exit_location_x="41.0" exit_location_y="25.5"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="24.0" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Middleham" exit_location_x="41.0" exit_location_y="25.5"/>
 
 <!--<player_start x="24.0" y="25.5"/>-->
 
@@ -1078,7 +1078,7 @@ cdddddddddde
 
 <floorregion shape="rect" rect_x="41.0" rect_y="38.0" rect_w="4.0" rect_h="4.0"/>
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="43.0" y="40.0" size="2.0" blocking="true" exit_location="Upper Level, Wentbridge Fort" exit_location_x="32.5" exit_location_y="58.5"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="43.0" y="40.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Upper Level, Wentbridge Fort" exit_location_x="32.5" exit_location_y="58.5"/>
 
 </location>
 
@@ -1094,7 +1094,7 @@ cdddddddddde
 
 <scenery name="Torch" image_name="torch" x="34.0" y="49.55" w="0.75" h="0.75"/>
 
-<scenery name="Stairs" image_name="stairsdown_indoors" x="32.5" y="57.0" size="2.0" blocking="true" exit_location="Ground Level, Wentbridge Fort" exit_location_x="41.5" exit_location_y="40.0"/>
+<scenery name="Stairs" image_name="stairsdown_indoors" x="32.5" y="57.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Ground Level, Wentbridge Fort" exit_location_x="41.5" exit_location_y="40.0"/>
 
 </location>
 
