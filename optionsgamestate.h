@@ -52,12 +52,14 @@ private slots:
     void clickedCancel();
     void clickedLoad();
     void clickedLoadGame();
+    void clickedImportButton(); // although this is only used on Android, shouldn't be under an Android #define, as then we can't find the slot for some reason
     void clickedExportButton(); // although this is only used on Android, shouldn't be under an Android #define, as then we can't find the slot for some reason
     void clickedOptions();
     void clickedOptionsOkay();
     void clickedQuit();
     void clickedOnlineHelp();
     void clickedOfflineHelp();
+    void closeSubWindow();
     void closeAllSubWindows();
 /*#ifndef Q_OS_ANDROID
     void mediaStateChanged(Phonon::State newstate, Phonon::State oldstate);

@@ -600,6 +600,7 @@ public:
     bool isSDCardOk() const {
         return this->sdcard_ok;
     }
+    int importFilesToSDCard() const;
     void exportFilenameToSDCard(const QString &src_fullfilename, const QString &filename) const;
 #endif
     QString getFilename(const QString &path, const QString &name) const;
@@ -646,8 +647,6 @@ public:
     void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);
-    void showInfoDialog(const string &title, const string &message);
-    //bool askQuestionDialog(const string &title, const string &message);
 };
 
 extern Game *game_g;

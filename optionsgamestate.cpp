@@ -4,10 +4,14 @@
 
 #include <QtWebKit/QWebView>
 
+#include <sstream>
+using std::stringstream;
+
 #include "optionsgamestate.h"
 #include "game.h"
 #include "qt_screen.h"
 #include "mainwindow.h"
+#include "infodialog.h"
 #include "logiface.h"
 
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
@@ -389,6 +393,25 @@ void OptionsGamestate::clickedLoad() {
     this->load_filenames.clear();
     game_g->fillSaveGameFiles(&load_list, &load_filenames);
 
+#ifdef Q_OS_ANDROID
+            if( game_g->isSDCardOk() ) {
+                QHBoxLayout *h_layout = new QHBoxLayout();
+                layout->addLayout(h_layout);
+
+                QPushButton *importButton = new QPushButton(tr("Import"));
+                game_g->initButton(importButton);
+                h_layout->addWidget(importButton);
+                connect(importButton, SIGNAL(clicked()), this, SLOT(clickedImportButton()));
+
+                if( load_list != NULL ) {
+                    QPushButton *exportButton = new QPushButton(tr("Export"));
+                    game_g->initButton(exportButton);
+                    h_layout->addWidget(exportButton);
+                    connect(exportButton, SIGNAL(clicked()), this, SLOT(clickedExportButton()));
+                }
+            }
+#endif
+
     // load_list only created if it has items
     if( load_list != NULL ) {
         ASSERT_LOGGER(load_list->count() > 0 );
@@ -396,26 +419,12 @@ void OptionsGamestate::clickedLoad() {
         layout->addWidget(load_list);
         load_list->setCurrentRow(0);
 
-        {
-            QHBoxLayout *h_layout = new QHBoxLayout();
-            layout->addLayout(h_layout);
-
-            QPushButton *loadButton = new QPushButton(tr("Load"));
-            game_g->initButton(loadButton);
-            loadButton->setShortcut(QKeySequence(Qt::Key_Return));
-            //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-            h_layout->addWidget(loadButton);
-            connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
-
-#ifdef Q_OS_ANDROID
-            if( game_g->isSDCardOk() ) {
-                QPushButton *exportButton = new QPushButton(tr("Export to SD Card"));
-                game_g->initButton(exportButton);
-                h_layout->addWidget(exportButton);
-                connect(exportButton, SIGNAL(clicked()), this, SLOT(clickedExportButton()));
-            }
-#endif
-        }
+        QPushButton *loadButton = new QPushButton(tr("Load"));
+        game_g->initButton(loadButton);
+        loadButton->setShortcut(QKeySequence(Qt::Key_Return));
+        //loadButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        layout->addWidget(loadButton);
+        connect(loadButton, SIGNAL(clicked()), this, SLOT(clickedLoadGame()));
     }
     else {
         QLabel *label = new QLabel(tr("No save game files\navailable"));
@@ -450,6 +459,35 @@ void OptionsGamestate::clickedLoadGame() {
     game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
 }
 
+void OptionsGamestate::clickedImportButton() {
+#ifdef Q_OS_ANDROID
+    LOG("OptionsGamestate::clickedImportButton()\n");
+    if( !game_g->isSDCardOk() ) {
+        qDebug("no SD Card access");
+        return;
+    }
+
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo("Do you want to import save game files from external storage (files with same name will be overwritten)?");
+    this->main_stacked_widget->addWidget(dialog);
+    this->main_stacked_widget->setCurrentWidget(dialog);
+    int result = dialog->exec();
+    LOG("dialog returns %d\n", result);
+    this->closeSubWindow();
+    if( result == 0 ) {
+        int count = game_g->importFilesToSDCard();
+        stringstream str;
+        str << "Successfully imported " << count << " save game files";
+        dialog = InfoDialog::createInfoDialogOkay(str.str());
+        this->main_stacked_widget->addWidget(dialog);
+        this->main_stacked_widget->setCurrentWidget(dialog);
+        dialog->exec();
+    }
+
+    this->closeAllSubWindows();
+    this->clickedLoad();
+#endif
+}
+
 void OptionsGamestate::clickedExportButton() {
 #ifdef Q_OS_ANDROID
     LOG("OptionsGamestate::clickedExportButton()\n");
@@ -465,12 +503,30 @@ void OptionsGamestate::clickedExportButton() {
         qDebug("no filenames");
         return;
     }
-    for(size_t i=0;i<load_filenames.size();i++) {
-        QString filename = load_filenames.at(i);
-        QString full_filename = game_g->getApplicationFilename(savegame_folder + filename);
-        game_g->exportFilenameToSDCard(full_filename, filename);
+
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo("Do you want to import save game files from external storage (files with same name will be overwritten)?");
+    this->main_stacked_widget->addWidget(dialog);
+    this->main_stacked_widget->setCurrentWidget(dialog);
+    int result = dialog->exec();
+    LOG("dialog returns %d\n", result);
+    this->closeSubWindow();
+    if( result == 0 ) {
+        for(size_t i=0;i<load_filenames.size();i++) {
+            QString filename = load_filenames.at(i);
+            QString full_filename = game_g->getApplicationFilename(savegame_folder + filename);
+            game_g->exportFilenameToSDCard(full_filename, filename);
+        }
+
+        stringstream str;
+        str << "Successfully exported " << load_filenames.size() << " save game files";
+        dialog = InfoDialog::createInfoDialogOkay(str.str());
+        this->main_stacked_widget->addWidget(dialog);
+        this->main_stacked_widget->setCurrentWidget(dialog);
+        dialog->exec();
+
+        this->closeAllSubWindows();
+        this->clickedLoad();
     }
-    game_g->showInfoDialog("", "Successfully saved files to SD card");
 #endif
 }
 
@@ -583,6 +639,16 @@ void OptionsGamestate::clickedOfflineHelp() {
     //closeButton->setFont(game_g->getFontSmall());
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
+}
+
+void OptionsGamestate::closeSubWindow() {
+    LOG("OptionsGamestate::closeSubWindow\n");
+    int n_stacked_widgets = this->main_stacked_widget->count();
+    if( n_stacked_widgets > 1 ) {
+        QWidget *subwindow = this->main_stacked_widget->widget(n_stacked_widgets-1);
+        this->main_stacked_widget->removeWidget(subwindow);
+        subwindow->deleteLater();
+    }
 }
 
 void OptionsGamestate::closeAllSubWindows() {

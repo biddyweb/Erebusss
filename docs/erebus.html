@@ -100,6 +100,16 @@ allows you to play the game while the instructions are open in the browser, as
 well as meaning you get the latest version of the webpage, but "Offline help" is
 useful if you are without an Internet connection).</p>
 
+<p>On Android, the Load menu also provides the option to Import and Export save game
+files. The Export option can be used to access the save game files, e.g., to send
+them to me for debugging purposes - see
+<a href="#contact">Contacting me</a> for details. It also allows you to backup save
+games, or transfer them to another Android device. To Import, copy the save game files
+into the folder net.sourceforge.erebusrpg/ (in sdcard/) (created automatically when
+you run Erebus for the first time), then use the Import option to be able to use them.
+Note that the Import and Export options will overwrite any existing files with the same
+name.</p>
+
 <p>When starting the game, you also have various choices:<ul>
 <li><b>Game type</b> - The following game types are available:<ul>
     <li><i>Begin Campaign</i> - Play through the series of quests that
@@ -471,7 +481,7 @@ with the argument "-windowed". E.g., on Windows, run with:
   <li>A description of what happened, and what steps you took that resulted in the bug.</li>
   <li>Does the bug happen every time?</li>
   <li>A save game file, if relevant. This is located in the savegames/ folder, in the same location as the log.txt file.
-  Note that on Android, you need to export the save game files by clicking "Export to SD Card"
+  Note that on Android, you need to export the save game files by clicking "Export"
   from the Load menu. This will copy the save game files to the folder net.sourceforge.erebusrpg/ (in sdcard/),
   which you can access the same way as the log.txt file (see above). Also note that if a save game file fails
   to load, that file will automatically be copied to the folder. (The reason for doing it this way is that
@@ -518,7 +528,8 @@ Version 0.11 (Work in progress)
 
 FIXED   Crash if game failed to find game data.
 FIXED   Potential crash when using volume control keys on Android.
-ADDED   Option to export save game files to SD card on Android.
+ADDED   Option to import/export save game files from/to external storage on
+        Android.
 ADDED   If save game fails to load on Android, save game file will be copied to
         SD card.
 ADDED   New command line option -datafolder to specify location of data folder.

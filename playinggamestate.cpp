@@ -6403,18 +6403,7 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
 }
 
 void PlayingGamestate::closeSubWindow() {
-    LOG("closeSubWindow\n");
-    /*int n_stacked_widgets = this->main_stacked_widget->count();
-    if( n_stacked_widgets > 1 ) {
-        QWidget *subwindow = this->main_stacked_widget->widget(n_stacked_widgets-1);
-        this->main_stacked_widget->removeWidget(subwindow);
-        subwindow->deleteLater();
-        if( n_stacked_widgets == 2 ) {
-            game_g->getScreen()->setPaused(false, true);
-            this->view->setEnabled(true);
-            this->view->grabKeyboard();
-        }
-    }*/
+    LOG("PlayingGamestate::closeSubWindow\n");
     int n_stacked_widgets = this->widget_stack.size();
     if( n_stacked_widgets > 1 ) {
         QWidget *subwindow = this->widget_stack.at(n_stacked_widgets-1);
@@ -6438,12 +6427,7 @@ void PlayingGamestate::closeSubWindow() {
 }
 
 void PlayingGamestate::closeAllSubWindows() {
-    LOG("closeAllSubWindows");
-    /*while( this->main_stacked_widget->count() > 1 ) {
-        QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
-        this->main_stacked_widget->removeWidget(subwindow);
-        subwindow->deleteLater();
-    }*/
+    LOG("PlayingGamestate::closeAllSubWindows");
     while( this->widget_stack.size() > 1 ) {
         QWidget *subwindow = this->widget_stack.at(this->widget_stack.size()-1);
         /*if( this->main_stacked_widget != NULL ) {

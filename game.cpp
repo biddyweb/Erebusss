@@ -1699,6 +1699,7 @@ void Game::handleMessages() {
                     stringstream str;
                     str << "Failed to load save game file:\n" << error;
 #ifdef Q_OS_ANDROID
+                    // also copy failed save game to sdcard on Android, so user can potentially access it to send it to me
                     this->exportFilenameToSDCard(full_filename, load_message->getFilename());
 #endif
                     game_g->showErrorDialog(str.str());
@@ -1787,10 +1788,29 @@ QString Game::getApplicationFilename(const QString &name) const {
 }
 
 #ifdef Q_OS_ANDROID
+int Game::importFilesToSDCard() const {
+    int count = 0;
+    if( this->sdcard_ok ) {
+        QDir dir( sdcard_path );
+        QStringList filter;
+        filter << "*" + savegame_ext;
+        QFileInfoList files = dir.entryInfoList(filter, QDir::Files, QDir::Time);
+        for(size_t i=0;i<files.size();i++) {
+            QFileInfo file_info = files.at(i);
+            QString full_filename = this->getApplicationFilename(savegame_folder + file_info.fileName());
+            QFile file(full_filename);
+            file.remove(); // in case already present
+            qDebug("copy from %s to %s", file_info.filePath().toStdString().c_str(), full_filename.toStdString().c_str());
+            QFile::copy(file_info.filePath(), full_filename);
+            count++;
+        }
+    }
+    return count;
+}
+
 void Game::exportFilenameToSDCard(const QString &src_fullfilename, const QString &filename) const {
     if( this->sdcard_ok ) {
         qDebug("Game::exportFilenameToSDCard(%s, %s)", src_fullfilename.toStdString().c_str(), filename.toStdString().c_str());
-        // also copy failed save game to sdcard on Android, so user can potentially access it to send it to me
         QFile dir_file(this->getFilename(sdcard_path, filename));
         dir_file.remove(); // in case already present
         QFile::copy(src_fullfilename, dir_file.fileName());
@@ -2068,22 +2088,6 @@ void Game::showErrorDialog(const string &message) {
     QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message.c_str());
     this->getScreen()->enableUpdateTimer(true);
 }
-
-void Game::showInfoDialog(const string &title, const string &message) {
-    LOG("Game::showInfoDialog: %s\n", message.c_str());
-    this->getScreen()->enableUpdateTimer(false);
-    QMessageBox::information(this->getScreen()->getMainWindow(), title.c_str(), message.c_str());
-    this->getScreen()->enableUpdateTimer(true);
-}
-
-/*bool Game::askQuestionDialog(const string &title, const string &message) {
-    LOG("Game::askQuestionWindow: %s\n", message.c_str());
-    this->getScreen()->enableUpdateTimer(false);
-    int res = QMessageBox::question(this->getScreen()->getMainWindow(), title.c_str(), message.c_str(), QMessageBox::Yes, QMessageBox::No);
-    this->getScreen()->enableUpdateTimer(true);
-    LOG("    answer is %d\n", res);
-    return res == QMessageBox::Yes;
-}*/
 
 void Game::activate(bool active) {
     this->getScreen()->enableUpdateTimer(active);
