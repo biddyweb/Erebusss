@@ -476,7 +476,7 @@ void OptionsGamestate::clickedImportButton() {
     if( result == 0 ) {
         int count = game_g->importFilesToSDCard();
         stringstream str;
-        str << "Successfully imported " << count << " save game files";
+        str << "Successfully imported " << count << " save game files.";
         dialog = InfoDialog::createInfoDialogOkay(str.str());
         this->main_stacked_widget->addWidget(dialog);
         this->main_stacked_widget->setCurrentWidget(dialog);
@@ -518,7 +518,7 @@ void OptionsGamestate::clickedExportButton() {
         }
 
         stringstream str;
-        str << "Successfully exported " << load_filenames.size() << " save game files";
+        str << "Successfully exported " << load_filenames.size() << " save game files.";
         dialog = InfoDialog::createInfoDialogOkay(str.str());
         this->main_stacked_widget->addWidget(dialog);
         this->main_stacked_widget->setCurrentWidget(dialog);
