@@ -1503,6 +1503,9 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
         try {
             Item *item = playing_gamestate->cloneStandardItem(this->interaction_reward_item);
             playing_gamestate->getPlayer()->addItem(item);
+            stringstream str;
+            str << "Received " << item->getName() << " as a reward";
+            playing_gamestate->addTextEffect(str.str(), 2000);
         }
         catch(const string &err) {
             // catch it, as better than crashing at runtime if the data isn't correct
@@ -1512,6 +1515,9 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
     }
     if( this->interaction_reward_gold > 0 ) {
         playing_gamestate->getPlayer()->addGold(this->interaction_reward_gold);
+        stringstream str;
+        str << "Received " << this->interaction_reward_gold << " gold pieces as a reward";
+        playing_gamestate->addTextEffect(str.str(), 2000);
     }
     if( this->interaction_set_flag.length() > 0 ) {
         LOG("add quest flag: %s\n", this->interaction_set_flag.c_str());
