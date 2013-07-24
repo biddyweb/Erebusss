@@ -1500,18 +1500,24 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
         playing_gamestate->getPlayer()->addXP(playing_gamestate, this->interaction_xp);
     }
     if( this->interaction_reward_item.length() > 0 ) {
-        try {
-            Item *item = playing_gamestate->cloneStandardItem(this->interaction_reward_item);
-            playing_gamestate->getPlayer()->addItem(item);
-            stringstream str;
-            str << "Received " << item->getName() << " as a reward";
-            playing_gamestate->addTextEffect(str.str(), 2000);
+        Item *item = this->findItem(this->interaction_reward_item);
+        if( item != NULL ) {
+            this->takeItem(item);
         }
-        catch(const string &err) {
-            // catch it, as better than crashing at runtime if the data isn't correct
-            LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
-            ASSERT_LOGGER(false);
+        else {
+            try {
+                item = playing_gamestate->cloneStandardItem(this->interaction_reward_item);
+            }
+            catch(const string &err) {
+                // catch it, as better than crashing at runtime if the data isn't correct
+                LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
+                ASSERT_LOGGER(false);
+            }
         }
+        playing_gamestate->getPlayer()->addItem(item);
+        stringstream str;
+        str << "Received " << item->getName() << " as a reward";
+        playing_gamestate->addTextEffect(str.str(), 2000);
     }
     if( this->interaction_reward_gold > 0 ) {
         playing_gamestate->getPlayer()->addGold(this->interaction_reward_gold);
