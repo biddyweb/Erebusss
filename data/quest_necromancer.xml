@@ -1030,7 +1030,7 @@ cdddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.5" y="59.0"/>
+<!--<player_start x="32.5" y="59.0"/>-->
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1088,6 +1088,8 @@ cdddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
+<player_start x="32.5" y="59.0"/>
+
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
 <scenery name="Torch" image_name="torch" x="31.0" y="49.55" w="0.75" h="0.75"/>
@@ -1095,6 +1097,44 @@ cdddddddddde
 <scenery name="Torch" image_name="torch" x="34.0" y="49.55" w="0.75" h="0.75"/>
 
 <scenery name="Stairs" image_name="stairsdown_indoors" x="32.5" y="57.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Ground Level, Wentbridge Fort" exit_location_x="41.5" exit_location_y="40.0"/>
+
+<floorregion shape="rect" rect_x="25.0" rect_y="54.0" rect_w="5.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="20.0" rect_y="52.5" rect_w="5.0" rect_h="5.0"/>
+
+<npc name="Hectar" animation_name="peasant_man" static_image="true" x="22.0" y="54.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="KILL_NPCS"
+    interaction_data="Hectar"
+    interaction_xp="100"
+    interaction_reward_gold="50"
+    interaction_reward_item="Hectar's Talisman"
+    interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Wentbridge Fort, also to the east, for more help."
+>
+<opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
+</opening_initial>
+<opening_later>Hello, again.
+</opening_later>
+<opening_interaction_complete>Hello, again. I'm afraid I have nothing more of help to tell you.
+</opening_interaction_complete>
+<talk question="I'm trying to find the source of this evil - do you have any information?" while_not_done="true" journal="Borin asked me to find a Scrying Orb, located in some dungeons to the south.">Unfortunately I don't yet know. But you could help me by finding one of my Scrying Orbs - I put them in a dungeon to the south for safe keeping. I can then use it to identify the source of this evil.
+</talk>
+<talk question="I have found the Scrying Orb for you" objective="true">
+Ah, thank you. Now let's see - it's been a while since I've used this old orb. Yes - ah, I see it now. There is indeed great evil, the dead walk across the land.
+
+A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
+
+They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Wentbridge Fort, also to the east.
+</talk>
+<item name="Hectar's Talisman" image_name="orb" icon_width="0.25" weight="2">
+blah blah
+</item>
+</npc>
 
 </location>
 
