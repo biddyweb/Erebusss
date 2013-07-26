@@ -2082,12 +2082,13 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         int row = 0;
         g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), row++, 0 );
         // mobile platforms may be too small to fit the labels (e.g., Symbian 640x360)
+        // also need to be careful not to make the labels too long, for low resolution non-mobiles (e.g., 1024x600 netbooks)
         if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("Hand-to-hand combat")), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), row++, 0 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel(tr("Ranged combat: bows and thrown weapons")), row++, 0 );
+            g_layout->addWidget( new QLabel(tr("Ranged combat")), row++, 0 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_S_c), row++, 0 );
         if( !smallscreen_c ) {
@@ -2097,16 +2098,16 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         row = 0;
         g_layout->addWidget( addProfileCheckBox(profile_key_M_c), row++, 1 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel(tr("Your mental and psychic abilities")), row++, 1 );
+            g_layout->addWidget( new QLabel(tr("Mental and psychic abilities")), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_D_c), row++, 1 );
         if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel(tr("Useful for avoiding traps")), row++, 1 );
+            g_layout->addWidget( new QLabel(tr("For avoiding traps")), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
-        if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel(tr("Courage against terrifying enemies")), row++, 1 );
-        }
+        /*if( !smallscreen_c ) {
+            g_layout->addWidget( new QLabel(tr("")), row++, 1 );
+        }*/
     }
 
     int initial_level = player->getInitialLevel();
