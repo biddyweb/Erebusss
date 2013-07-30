@@ -56,10 +56,10 @@ else {
         }
         else {
             CONFIG(debug, debug|release) {
-                QMAKE_POST_LINK = copy $${PWD_WIN}\libsndfile-1.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\openal32.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-audio-d-2.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-system-d-2.dll $${OUT_PWD_WIN}\
+                QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-d-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-d-2.dll $${OUT_PWD_WIN}\\
             }
             else {
-                QMAKE_POST_LINK = copy $${PWD_WIN}\libsndfile-1.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\openal32.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-audio-2.dll $${OUT_PWD_WIN}\ && copy $${PWD_WIN}\sfml-system-2.dll $${OUT_PWD_WIN}\
+                QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-2.dll $${OUT_PWD_WIN}\\
             }
         }
     }
