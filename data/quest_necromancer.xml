@@ -221,7 +221,7 @@ Ah, thank you. Now let's see - it's been a while since I've used this old orb. Y
 
 A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
 
-They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Wentbridge Fort, also to the east.
+They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Wentbridge Fort, also to the east. The soldiers there may be able to offer help.
 </talk>
 </npc>
 
@@ -1030,7 +1030,7 @@ cdddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.5" y="59.0"/>-->
+<player_start x="32.5" y="59.0"/>
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1080,6 +1080,14 @@ cdddddddddde
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="43.0" y="40.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Upper Level, Wentbridge Fort" exit_location_x="32.5" exit_location_y="58.5"/>
 
+<floorregion shape="rect" rect_x="42.5" rect_y="32.0" rect_w="1.0" rect_h="6.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="43.0" y="32.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true" locked="true" unlocked_by_template="Wentbridge Dungeon Key"/>
+
+<floorregion shape="rect" rect_x="41.0" rect_y="28.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Stairs" image_name="stairsdown_indoors" x="43.0" y="30.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="22.0" exit_location_y="4.5"/>
+
 </location>
 
 <location name="Upper Level, Wentbridge Fort" display_name="true">
@@ -1088,7 +1096,7 @@ cdddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.5" y="59.0"/>
+<!--<player_start x="32.5" y="59.0"/>-->
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1102,6 +1110,7 @@ cdddddddddde
 
 <floorregion shape="rect" rect_x="20.0" rect_y="52.5" rect_w="5.0" rect_h="5.0"/>
 
+-> They have now perfected a talisman to protect from this evil plague, but they require you to prove your worth, by killing the skeletons in the dungeon.
 <npc name="Hectar" animation_name="peasant_man" static_image="true" x="22.0" y="54.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -1114,27 +1123,45 @@ cdddddddddde
     interaction_xp="100"
     interaction_reward_gold="50"
     interaction_reward_item="Hectar's Talisman"
-    interaction_journal="I found Borin's Scrying Orb for him. He told me that a Skeleton Army had destroyed the village of Dunbridge to the east, led by a Skeleton Lord who I should kill. He suggested I go to Wentbridge Fort, also to the east, for more help."
+    interaction_journal="I killed the Skeletons in the dungeon beneath Wentbridge Fort. Hectar gave me a talisman, to protect me from the undead plague."
 >
-<opening_initial>Hello. A great evil plagues this land. You look like someone who could help us?
+<opening_initial>I am Hectar, the Captain of Wentbridge Fort.
 </opening_initial>
 <opening_later>Hello, again.
 </opening_later>
-<opening_interaction_complete>Hello, again. I'm afraid I have nothing more of help to tell you.
+<opening_interaction_complete>Hello, again. Good luck in your quest.
 </opening_interaction_complete>
-<talk question="I'm trying to find the source of this evil - do you have any information?" while_not_done="true" journal="Borin asked me to find a Scrying Orb, located in some dungeons to the south.">Unfortunately I don't yet know. But you could help me by finding one of my Scrying Orbs - I put them in a dungeon to the south for safe keeping. I can then use it to identify the source of this evil.
+<talk question="Can you help me destroy the Skeleton Army that has invaded this land?" while_not_done="true" journal="Hectar told me that he had created a talisman to protect against a plague carried by the skeleton army. In order to get it, I have to prove my worth by killing all the skeletons in the dungeon beneath Wentbridge Fort. The key to the dungeon is located in the chest in the same room as Hectar.">We have tried to engage the army in battle, but our soldiers ended up being infected with a mysterious plague, killing or severely weakening them.
+
+We returned to the safety of this fort, and set our scholars and wizards to work. They have now perfected a talisman to protect someone from this evil plague. But it won't protect an entire army - we need a hero to venture into the dungeons that have been constructed beneath the village of Dunbridge, and, protected by our talisman, find and slay the Skeleton Lord.
+
+However we can't give away this precious talisman to anyone. If you think you are worthy of this quest, you must prove yourself. Beneath this fort is a dungeon - we use it to lock up criminals, but now it is inhabited by skeletons. Kill them all, and I will give you the talisman. You will find a key to the dungeons in the chest in this room.
 </talk>
-<talk question="I have found the Scrying Orb for you" objective="true">
-Ah, thank you. Now let's see - it's been a while since I've used this old orb. Yes - ah, I see it now. There is indeed great evil, the dead walk across the land.
-
-A necromancer is certainly behind this evil, but unfortuntely I cannot see his location. But I do see a great concentration of power in the village of Dunbridge, to the east - or what remains of it. Now all I see is smouldering buildings and rotten corpses, slain by a skeleton army.
-
-They are led by a Skeleton Lord, who needs to be slain, but this vile creature is protected by powerful magic. Hmm, I'm afraid that's the extent of my vision. For more help, I suggest you check out Wentbridge Fort, also to the east.
+<talk question="I have slain all the skeletons, may I now have the talisman?" objective="true">
+You have proven yourself a worthy champion, though the quest that lies before you I fear will be far harder. Here is the talisman, and I hope you are able to succeed in destroying the undead evil.
 </talk>
 <item name="Hectar's Talisman" image_name="orb" icon_width="0.25" weight="2">
 blah blah
 </item>
 </npc>
+
+<scenery name="Chest" image_name="chest" x="20.5" y="53.0" size="0.8" blocking="true">
+    <item name="Wentbridge Dungeon Key" image_name="key" icon_width="0.5" weight="0"/>
+</scenery>
+
+</location>
+
+<location name="Dungeons, Wentbridge Fort" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<!--<player_start x="32.5" y="59.0"/>-->
+
+<floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="22.0" y="3.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Ground Level, Wentbridge Fort" exit_location_x="43.0" exit_location_y="34.5"/>
 
 </location>
 
