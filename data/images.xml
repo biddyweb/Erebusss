@@ -216,7 +216,14 @@
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
     <animation name="death" start="16" length="6" type="single"/>
-</image> <!-- original for zombie: expected_width 4096, death animation start 22 -->
+</image>
+<image type="npc" name="skeleton_archer" filename="gfx/textures/npcs/skeleton_archer.png" xpos="32" ypos="40" width="64" height="64" expected_width="3320">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <animation name="death" start="16" length="6" type="single"/>
+    <animation name="ranged" start="22" length="4" type="single"/>
+</image>
 <image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
 
 <image type="npc" name="spider" filename="gfx/textures/npcs/spider_giant.png" xpos="32" ypos="40" width="64" height="64" expected_width="4096">
