@@ -1187,7 +1187,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="36.0" rect_y="15.5" rect_w="1.0" rect_h="1.0"/>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="12.0">
+<!--<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="12.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
@@ -1215,7 +1215,35 @@ blah blah
 <npc name="Skeleton Archer" template="Skeleton Archer" x="36.5" y="16.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
-</npc>
+</npc>-->
+
+<floorregion shape="rect" rect_x="38.0" rect_y="13.5" rect_w="4.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="42.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
+
+<!-- south route to grate -->
+
+<floorregion shape="rect" rect_x="42.0" rect_y="14.5" rect_w="1.0" rect_h="6.0"/>
+
+<floorregion shape="rect" rect_x="41.0" rect_y="20.5" rect_w="3.0" rect_h="4.0"/>
+
+<!-- east route to locked cell with orcs -->
+
+<floorregion shape="rect" rect_x="43.0" rect_y="13.5" rect_w="3.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="46.0" rect_y="11.5" rect_w="4.0" rect_h="5.0"/>
+
+<!-- north route to guard room, and beyond -->
+
+<floorregion shape="rect" rect_x="42.0" rect_y="7.5" rect_w="1.0" rect_h="6.0"/>
+
+<floorregion shape="rect" rect_x="42.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="41.0" rect_y="2.5" rect_w="3.0" rect_h="4.0"/>
+
+<floorregion shape="rect" rect_x="43.0" rect_y="7.5" rect_w="6.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="48.0" rect_y="6.5" rect_w="6.0" rect_h="1.0"/>
 
 </location>
 
