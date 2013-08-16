@@ -36,6 +36,7 @@
     />
 
 <image type="item" name="beer" filename="gfx/textures/items/beer.png"/>
+<image type="item" name="book" filename="gfx/textures/items/book.png"/>
 <image type="item" name="bowl" filename="gfx/textures/items/bowl.png"/>
 <image type="item" name="bull_statuette" filename="gfx/textures/items/bull_statuette.png"/>
 <image type="item" name="casket" filename="gfx/textures/items/casket.png"/>
@@ -51,6 +52,7 @@
 <image type="item" name="key" filename="gfx/textures/items/key.png"/>
 <image type="item" name="leaf" filename="gfx/textures/items/leaf.png"/>
 <image type="item" name="leaf_dire" filename="gfx/textures/items/leaf_dire.png"/>
+<image type="item" name="mushroom" filename="gfx/textures/items/mushroom.png"/>
 <image type="item" name="orb" filename="gfx/textures/items/orb.png"/>
 <image type="item" name="orb_broken" filename="gfx/textures/items/orb_broken.png"/>
 <image type="item" name="plate" filename="gfx/textures/items/plate.png"/>
@@ -58,12 +60,11 @@
 <image type="item" name="potion_red" filename="gfx/textures/items/potion_red.png"/>
 <image type="item" name="potion_green" filename="gfx/textures/items/potion_green.png"/>
 <image type="item" name="potion_blue" filename="gfx/textures/items/potion_blue.png"/>
-<image type="item" name="skull" filename="gfx/textures/items/skull.png"/>
 <image type="item" name="ring_gold" filename="gfx/textures/items/ring_gold.png"/>
 <image type="item" name="ring_plain" filename="gfx/textures/items/ring_plain.png"/>
 <image type="item" name="ring_gem_red" filename="gfx/textures/items/ring_gem_red.png"/>
-<image type="item" name="mushroom" filename="gfx/textures/items/mushroom.png"/>
-<image type="item" name="book" filename="gfx/textures/items/book.png"/>
+<image type="item" name="skull" filename="gfx/textures/items/skull.png"/>
+<image type="item" name="talisman" filename="gfx/textures/items/talisman.png"/>
 <image type="item" name="vial" filename="gfx/textures/items/vial.png"/>
 <image type="item" name="vial_green" filename="gfx/textures/items/vial_green.png"/>
 
