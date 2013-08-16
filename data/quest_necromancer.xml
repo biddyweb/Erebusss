@@ -1096,7 +1096,7 @@ cdddddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.5" y="59.0"/>
+<!--<player_start x="32.5" y="59.0"/>-->
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1110,7 +1110,6 @@ cdddddddddde
 
 <floorregion shape="rect" rect_x="20.0" rect_y="52.5" rect_w="5.0" rect_h="5.0"/>
 
--> They have now perfected a talisman to protect from this evil plague, but they require you to prove your worth, by killing the skeletons in the dungeon.
 <npc name="Hectar" animation_name="peasant_man" static_image="true" x="22.0" y="54.5"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -1221,7 +1220,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="42.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
 
-<!--<player_start x="42.5" y="14.0"/>-->
+<player_start x="42.5" y="14.0"/>
 
 <!-- south route to grate -->
 
