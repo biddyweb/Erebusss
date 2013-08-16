@@ -605,7 +605,7 @@ public:
     virtual void update();
     virtual void updateInput();
     virtual void render();
-    virtual void activate(bool active);
+    virtual void activate(bool active, bool newly_paused);
     //virtual void mouseClick(int m_x, int m_y);
     void checkQuestComplete();
 

@@ -6901,13 +6901,13 @@ void PlayingGamestate::displayPausedMessage() {
     this->addTextEffect(paused_message, 0); // 0 time, so the message disappears as soon as the game is unpaused
 }
 
-void PlayingGamestate::activate(bool active) {
+void PlayingGamestate::activate(bool active, bool newly_paused) {
     // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
     /*if( !active ) {
         this->autoSave();
     }*/
     //this->addTextEffect(active ? "activated" : "deactivated", 10000);
-    if( !active ) {
+    if( newly_paused ) {
         this->displayPausedMessage();
     }
 }

@@ -2091,7 +2091,9 @@ void Game::showErrorDialog(const string &message) {
 
 void Game::activate(bool active) {
     this->getScreen()->enableUpdateTimer(active);
+    bool newly_paused = false;
     if( !active ) {
+        newly_paused = !this->getScreen()->isPaused();
         this->getScreen()->setPaused(true, false); // automatically pause when application goes inactive
 #ifndef Q_OS_ANDROID
         if( this->current_stream_sound_effect.length() > 0 ) {
@@ -2119,7 +2121,7 @@ void Game::activate(bool active) {
 #endif
     }
     if( this->gamestate != NULL ) {
-        this->gamestate->activate(active);
+        this->gamestate->activate(active, newly_paused);
     }
 }
 
