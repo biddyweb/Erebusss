@@ -1361,7 +1361,11 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <floorregion shape="rect" rect_x="41.0" rect_y="20.5" rect_w="3.0" rect_h="4.0"/>
 
-<scenery name="Door" image_name="door_wood_n" x="42.5" y="20.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+<scenery name="Door" image_name="door_wood_n" x="42.5" y="20.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"
+    locked="true" unlocked_by_template="Wentbridge Cell Key"
+    />
+
+<scenery name="Skeleton" image_name="skeleton" x="43.5" y="22.3" size="0.7" draw_type="background"/>
 
 </location>
 
