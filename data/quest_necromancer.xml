@@ -1156,6 +1156,8 @@ blah blah
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
+<wandering_monster template="Orc" time="300000" rest_chance="15"/>
+
 <!--<player_start x="22.0" y="4.5"/>-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="4.0" rect_h="4.0"/>
@@ -1220,7 +1222,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="42.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
 
-<player_start x="42.5" y="14.0"/>
+<!--<player_start x="42.5" y="14.0"/>-->
 
 <!-- south route to grate -->
 
@@ -1283,6 +1285,45 @@ blah blah
     <floorregion_point x="59.0" y="24.0"/>
     <floorregion_point x="61.0" y="19.5"/>
 </floorregion>
+
+<player_start x="56.5" y="16.0"/>
+
+<floorregion shape="rect" rect_x="58.0" rect_y="6.5" rect_w="8.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="65.0" rect_y="7.5" rect_w="1.0" rect_h="5.0"/>
+
+<!--room with orcs-->
+
+<floorregion shape="rect" rect_x="65.0" rect_y="12.5" rect_w="6.0" rect_h="5.5"/>
+
+<!--<npc name="Orc" template="Orc" x="69.5" y="13.0">
+    <item template="Chain Mail Armour"/>
+</npc>
+<npc name="Orc Shaman" template="Orc Shaman" x="70.5" y="13.0">
+    <spell name="Acid strike" count="2"/>
+    <spell name="Agony" count="2"/>
+    <spell name="Heal" count="2"/>
+</npc>
+<npc name="Orc Archer" template="Orc" x="70.5" y="16.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>-->
+<npc name="Orc Champion" template="Orc Champion" x="70.5" y="14.0">
+    <item template="Plate Armour"/>
+    <ring name="Hermes's Ring" image_name="ring_gold" weight="0" magical="true" bonus_Sp="0.1"
+        base_template="Gold Ring" worth_bonus="250"
+        />
+</npc>
+
+<floorregion shape="rect" rect_x="68.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
+
+<floorregion shape="rect" rect_x="63.0" rect_y="24.0" rect_w="6.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="63.0" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="58.0" rect_y="25.0" rect_w="5.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="58.0" rect_y="24.0" rect_w="1.0" rect_h="1.0"/>
 
 </location>
 
