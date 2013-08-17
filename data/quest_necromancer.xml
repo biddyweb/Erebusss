@@ -1222,7 +1222,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="42.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
 
-<!--<player_start x="42.5" y="14.0"/>-->
+<player_start x="42.5" y="14.0"/>
 
 <!-- south route to grate -->
 
@@ -1231,6 +1231,8 @@ blah blah
 <floorregion shape="rect" rect_x="41.0" rect_y="20.5" rect_w="3.0" rect_h="4.0"/>
 
 <scenery name="Door" image_name="door_wood_n" x="42.5" y="20.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Trapdoor" image_name="grate" x="42.5" y="22.5" w="0.5" h="0.5" exit_location="Dungeons Lower Level, Wentbridge Fort" exit_location_x="42.5" exit_location_y="22.5" confirm_text="There is a trapdoor in this room. Do you want to drop down into the room below?" draw_type="background"/>
 
 <!-- east route to locked cell with orcs -->
 
@@ -1252,17 +1254,25 @@ blah blah
 
 <!--<player_start x="46.5" y="15.5"/>-->
 
-<!-- north route to guard room, and beyond -->
+<!-- north route to stairs room, guard room, and beyond -->
 
 <floorregion shape="rect" rect_x="42.0" rect_y="7.5" rect_w="1.0" rect_h="6.0"/>
 
 <floorregion shape="rect" rect_x="42.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
 
-<floorregion shape="rect" rect_x="41.0" rect_y="2.5" rect_w="3.0" rect_h="4.0"/>
+<floorregion shape="rect" rect_x="40.0" rect_y="2.5" rect_w="3.0" rect_h="4.0"/>
 
 <scenery name="Door" image_name="door_wood_n" x="42.5" y="6.55" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
-<scenery name="Crate" image_name="crate" x="41.5" y="3.0" size="0.8" blocking="true">
+<scenery name="Stairs" image_name="stairsdown_indoors" x="41.5" y="4.5" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons Lower Level, Wentbridge Fort" exit_location_x="41.5" exit_location_y="6.0"/>
+
+<floorregion shape="rect" rect_x="46.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="45.0" rect_y="2.5" rect_w="3.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="46.5" y="6.55" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Crate" image_name="crate" x="45.5" y="3.0" size="0.8" blocking="true">
     <gold amount="5"/>
     <item template="Long Sword"/>
     <item template="Longbow"/>
@@ -1286,7 +1296,7 @@ blah blah
     <floorregion_point x="61.0" y="19.5"/>
 </floorregion>
 
-<player_start x="56.5" y="16.0"/>
+<!--<player_start x="56.5" y="16.0"/>-->
 
 <floorregion shape="rect" rect_x="58.0" rect_y="6.5" rect_w="8.0" rect_h="1.0"/>
 
@@ -1310,9 +1320,11 @@ blah blah
 </npc>-->
 <npc name="Orc Champion" template="Orc Champion" x="70.5" y="14.0">
     <item template="Plate Armour"/>
-    <ring name="Hermes's Ring" image_name="ring_gold" weight="0" magical="true" bonus_Sp="0.1"
+    <ring name="Hermes's Ring" image_name="ring_plain" weight="0" magical="true" bonus_Sp="0.2"
         base_template="Gold Ring" worth_bonus="250"
-        />
+        >
+The ring is plain, except for a symbol of a small pair of wings.
+    </ring>
 </npc>
 
 <floorregion shape="rect" rect_x="68.0" rect_y="18.0" rect_w="1.0" rect_h="6.0"/>
@@ -1324,6 +1336,32 @@ blah blah
 <floorregion shape="rect" rect_x="58.0" rect_y="25.0" rect_w="5.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="58.0" rect_y="24.0" rect_w="1.0" rect_h="1.0"/>
+
+</location>
+
+<location name="Dungeons Lower Level, Wentbridge Fort" display_name="true">
+
+<floor image_name="floor_rock"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<wandering_monster template="Orc" time="300000" rest_chance="20"/>
+
+<!--<player_start x="41.5" y="6.0"/>-->
+
+<floorregion shape="rect" rect_x="42.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="40.0" rect_y="2.5" rect_w="3.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="42.5" y="6.55" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="41.5" y="4.5" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="41.5" exit_location_y="6.0"/>
+
+<floorregion shape="rect" rect_x="42.0" rect_y="7.5" rect_w="1.0" rect_h="13.0"/>
+
+<floorregion shape="rect" rect_x="41.0" rect_y="20.5" rect_w="3.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="42.5" y="20.45" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 
 </location>
 
