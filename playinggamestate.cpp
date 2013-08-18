@@ -6967,7 +6967,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
         }*/
         QPointF dir = new_pos - old_pos;
         Vector2D vdir(dir.x(), dir.y());
-        if( !this->is_keyboard_moving ) {
+        if( !( character == this->player && this->is_keyboard_moving ) ) {
             // if using keyboard movement, then the direction is already set (and the UI works better if the direction comes from that requested by the player - e.g., consider walking against a diagonal scenery boundary)
             character->setDirection(vdir);
         }
