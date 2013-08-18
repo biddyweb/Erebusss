@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -1188,7 +1188,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="36.0" rect_y="15.5" rect_w="1.0" rect_h="1.0"/>
 
-<!--<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="12.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="12.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
@@ -1216,13 +1216,13 @@ blah blah
 <npc name="Skeleton Archer" template="Skeleton Archer" x="36.5" y="16.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
-</npc>-->
+</npc>
 
 <floorregion shape="rect" rect_x="38.0" rect_y="13.5" rect_w="4.0" rect_h="1.0"/>
 
 <floorregion shape="rect" rect_x="42.0" rect_y="13.5" rect_w="1.0" rect_h="1.0"/>
 
-<player_start x="42.5" y="14.0"/>
+<!--<player_start x="42.5" y="14.0"/>-->
 
 <!-- south route to grate -->
 
@@ -1306,7 +1306,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="65.0" rect_y="12.5" rect_w="6.0" rect_h="5.5"/>
 
-<!--<npc name="Orc" template="Orc" x="69.5" y="13.0">
+<npc name="Orc" template="Orc" x="69.5" y="13.0">
     <item template="Chain Mail Armour"/>
 </npc>
 <npc name="Orc Shaman" template="Orc Shaman" x="70.5" y="13.0">
@@ -1317,7 +1317,7 @@ blah blah
 <npc name="Orc Archer" template="Orc" x="70.5" y="16.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
-</npc>-->
+</npc>
 <npc name="Orc Champion" template="Orc Champion" x="70.5" y="14.0">
     <item template="Plate Armour"/>
     <ring name="Hermes's Ring" image_name="ring_plain" weight="0" magical="true" bonus_Sp="0.2"
