@@ -92,6 +92,12 @@ public:
     void setFloatProperty(const string &key, float value) {
         this->float_properties[key] = value;
     }
+    void addIntProperty(const string &key, int value) {
+        this->int_properties[key] += value;
+    }
+    void addFloatProperty(const string &key, float value) {
+        this->float_properties[key] += value;
+    }
     int getIntProperty(const string &key) const;
     float getFloatProperty(const string &key) const;
     bool hasIntProperty(const string &key) const;
@@ -109,7 +115,7 @@ public:
         return this->float_properties.end();
     }
 
-    // convenient wrapper to set all properties
+    // convenient wrappers to set all properties
     void set(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->setIntProperty(profile_key_FP_c, FP);
         this->setIntProperty(profile_key_BS_c, BS);
@@ -119,6 +125,16 @@ public:
         this->setIntProperty(profile_key_D_c, D);
         this->setIntProperty(profile_key_B_c, B);
         this->setFloatProperty(profile_key_Sp_c, Sp);
+    }
+    void add(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->addIntProperty(profile_key_FP_c, FP);
+        this->addIntProperty(profile_key_BS_c, BS);
+        this->addIntProperty(profile_key_S_c, S);
+        this->addIntProperty(profile_key_A_c, A);
+        this->addIntProperty(profile_key_M_c, M);
+        this->addIntProperty(profile_key_D_c, D);
+        this->addIntProperty(profile_key_B_c, B);
+        this->addFloatProperty(profile_key_Sp_c, Sp);
     }
 };
 
@@ -679,10 +695,18 @@ public:
     bool hasBaseProfileFloatProperty(const string &key) const {
         return this->profile.hasFloatProperty(key);
     }
-    void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+    void initialiseProfile(int level, int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        // sets the profile, and also records this as the "initial" level and profile
+        this->level = level;
         this->profile.set(FP, BS, S, A, M, D, B, Sp);
         this->initial_level = this->level;
         this->initial_profile = this->profile;
+    }
+    void setProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->profile.set(FP, BS, S, A, M, D, B, Sp);
+    }
+    void addProfile(int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
+        this->profile.add(FP, BS, S, A, M, D, B, Sp);
     }
     void setInitialProfile(int initial_level, int FP, int BS, int S, int A, int M, int D, int B, float Sp) {
         this->initial_level = initial_level;
@@ -708,6 +732,10 @@ public:
         }
         this->health = max_health;
         this->max_health = max_health;
+    }
+    void increaseMaxHealth(int health_bonus) {
+        this->max_health += health_bonus;
+        this->increaseHealth(health_bonus);
     }
     void setHealth(int health) {
         if( health > max_health ) {

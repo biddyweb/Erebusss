@@ -2040,31 +2040,31 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
     //Character *character = new Character(player_types.at(i), "", false);
     Character *character = new Character(player_name, "", false);
     if( player_type == "Barbarian" ) {
-        character->setProfile(8, 6, 8, 1, 5, 5, 8, 1.8f);
+        character->initialiseProfile(1, 8, 6, 8, 1, 5, 5, 8, 1.8f);
         character->initialiseHealth(75);
         character->setBiography("");
         character->setPortrait("portrait_barbarian");
     }
     else if( player_type == "Elf" ) {
-        character->setProfile(7, 8, 6, 1, 8, 7, 8, 2.25f);
+        character->initialiseProfile(1, 7, 8, 6, 1, 8, 7, 8, 2.25f);
         character->initialiseHealth(60);
         character->setBiography("");
         character->setPortrait("portrait_elf");
     }
     else if( player_type == "Halfling" ) {
-        character->setProfile(7, 7, 5, 1, 7, 9, 7, 1.8f);
+        character->initialiseProfile(1, 7, 7, 5, 1, 7, 9, 7, 1.8f);
         character->initialiseHealth(50);
         character->setBiography("");
         character->setPortrait("portrait_halfling");
     }
     else if( player_type == "Ranger" ) {
-        character->setProfile(7, 8, 7, 1, 7, 8, 6, 2.2f);
+        character->initialiseProfile(1, 7, 8, 7, 1, 7, 8, 6, 2.2f);
         character->initialiseHealth(60);
         character->setBiography("");
         character->setPortrait("portrait_ranger");
     }
     else if( player_type == "Warrior" ) {
-        character->setProfile(8, 7, 7, 1, 6, 7, 7, 2.0f);
+        character->initialiseProfile(1, 8, 7, 7, 1, 6, 7, 7, 2.0f);
         character->initialiseHealth(70);
         character->setBiography("");
         character->setPortrait("portrait_warrior");

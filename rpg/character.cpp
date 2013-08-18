@@ -172,7 +172,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
 {
     // ensure we always have default properties set
-    this->setProfile(0, 0, 0, 0, 0, 0, 0, 0.0f);
+    this->initialiseProfile(1, 0, 0, 0, 0, 0, 0, 0, 0.0f);
 }
 
 // this is not the only Character constructor!
@@ -1421,8 +1421,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
     }
     //qDebug("speed is now: %f", this->getBaseProfileFloatProperty(profile_key_Sp_c));
     int health_bonus = rollDice(1, 6, 0);
-    this->max_health += health_bonus;
-    this->increaseHealth(health_bonus);
+    this->increaseMaxHealth(health_bonus);
 
     this->level++;
     if( this == playing_gamestate->getPlayer() ) {

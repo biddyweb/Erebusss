@@ -3612,6 +3612,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             this->c_quest_indx = cheat_start_level % this->quest_list.size();
             if( this->c_quest_indx == 1 ) {
                 // CHEAT, simulate start of quest 2:
+                player->addXP(this, 70);
                 player->addGold( 166 );
                 player->deleteItem("Leather Armour");
                 player->addItem(this->cloneStandardItem("Long Sword"), true);
@@ -3621,13 +3622,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                 player->addItem(this->cloneStandardItem("Arrows"), true);
                 player->addItem(this->cloneStandardItem("Arrows"), true);
                 player->addItem(this->cloneStandardItem("Arrows"), true);
-                player->setXP(70);
             }
             else if( this->c_quest_indx == 2 ) {
                 // CHEAT, simulate start of quest 3:
-                for(int i=0;i<114;i++) {
-                    player->addXP(this, 10);
-                }
+                player->addXP(this, 1140);
                 player->addGold( 1241 + 300 );
                 player->deleteItem("Leather Armour");
                 player->deleteItem("Long Sword");
@@ -3648,8 +3646,15 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             }
             else if( this->c_quest_indx == 3 ) {
                 // CHEAT, simulate start of quest 4:
-                for(int i=0;i<211;i++) {
-                    player->addXP(this, 10);
+                //player->addXP(this, 2110);
+                {
+                    // set profile directly (simulated for Warrior)
+                    player->setXP(2110);
+                    player->setLevel(6);
+                    //player->setProfile(10, 9, 8, 1, 8, 8, 9, 2.5f);
+                    //player->initialiseHealth(94);
+                    player->addProfile(2, 2, 1, 0, 2, 1, 2, 0.5f);
+                    player->increaseMaxHealth(24);
                 }
                 player->addGold( 1998 + 350 );
                 player->deleteItem("Leather Armour");
@@ -3683,12 +3688,13 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                     player->addItem(item, true);
                 }
                 {
-                    Item *item = this->cloneStandardItem("Gold Ring");
+                    Ring *item = static_cast<Ring *>(this->cloneStandardItem("Gold Ring"));
                     item->setName("Derrin's Ring");
                     item->setProfileBonusIntProperty(profile_key_D_c, 1);
                     item->setMagical(true);
                     item->setBaseTemplate("Gold Ring");
                     player->addItem(item, true);
+                    player->wearRing(item);
                 }
                 {
                     Item *item = this->cloneStandardItem("Arrows");
@@ -4501,11 +4507,10 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
 
         QStringRef level_s = reader.attributes().value("level");
         int level = parseInt(level_s.toString(), true);
-        npc->setLevel(level);
         QStringRef xp_s = reader.attributes().value("xp");
         int xp = parseInt(xp_s.toString(), true);
         npc->setXP(xp);
-        npc->setProfile(FP, BS, S, A, M, D, B, Sp); // must be done after setting level, so that the initial level is set correctly
+        npc->initialiseProfile(level, FP, BS, S, A, M, D, B, Sp);
 
         QStringRef initial_level_s = reader.attributes().value("initial_level");
         if( initial_level_s.length() > 0 ) {
