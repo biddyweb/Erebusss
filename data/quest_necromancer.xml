@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -897,7 +897,7 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the town of Middleham?"
@@ -928,7 +928,15 @@ cdddde          9b
 
 <scenery name="Tree" image_name="deadtree2" x="20.0" y="15.0" size="3.0"/>
 
+<npc name="Zombie" template="Zombie" x="23.0" y="14.0"/>
+
+<npc name="Zombie" template="Zombie" x="23.2" y="10.0"/>
+
 <scenery name="Ruined Building" image_name="ruined_house" x="25.0" y="15.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.332" blocking="true" block_visibility="true" locked="true"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="28.1" y="15.0"/>
+
+<scenery name="Peasant's Hut" image_name="hut" x="24.5" y="26.0" size="2.5" boundary_iso="true" boundary_iso_ratio="0.589" blocking="true" block_visibility="true" exit_location="Peasant Hut, Stockton" exit_location_x="1.0" exit_location_y="2.5"/>
 
 <!-- n.b., no smoke -->
 <scenery name="Private Home" image_name="house_brick" x="29.0" y="25.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.545" blocking="true" block_visibility="true" locked="true"/>
@@ -936,9 +944,25 @@ cdddde          9b
 <!-- n.b., no smoke -->
 <scenery name="Private Home" image_name="house_brick2" x="36.0" y="15.0" size="3.0" boundary_iso="true" boundary_iso_ratio="0.387" blocking="true" block_visibility="true" locked="true"/>
 
+<npc name="Zombie" template="Zombie" x="27.0" y="27.0"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="27.0" y="28.0"/>
+
+<scenery name="Tree" image_name="deadtree2" x="41.0" y="17.0" size="3.0"/>
+
+<npc name="Zombie" template="Zombie" x="40.0" y="15.1"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="42.0" y="20.0"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="40.0" y="25.0"/>
+
+<scenery name="Tree" image_name="deadtree2" x="24.75" y="32.0" size="3.0"/>
+
+<scenery name="Tree" image_name="deadtree2" x="33.75" y="30.0" size="3.0"/>
+
 <scenery name="Ruined Building" image_name="ruined_house2" x="36.0" y="25.0" size="5.0" boundary_iso="true" boundary_iso_ratio="0.379" blocking="true" block_visibility="true" exit_location="Magnus's Home, Stockton" exit_location_x="3.5" exit_location_y="9.5"/>
 
-<npc name="Magnus" animation_name="peasant_man" static_image="true" x="40.0" y="26.0"
+<npc name="Magnus" animation_name="peasant_man" static_image="true" x="32.3" y="25.1"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"
@@ -971,6 +995,23 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 </location>
 
+<location name="Peasant Hut, Stockton">
+
+<floor image_name="floor_dirt"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="2.0"/>
+<floorregion shape="rect" rect_x="0.5" rect_y="3.0" rect_w="1.0" rect_h="1.0"/>
+
+<scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="Stockton" exit_location_x="23.5" exit_location_y="27.75"/>
+
+<npc name="Zombie" template="Zombie" x="2.5" y="1.5"/>
+
+</location>
+
 <location name="Magnus's Home, Stockton" display_name="true">
 
 <floor image_name="floor_paved"/>
@@ -987,6 +1028,12 @@ Thank you! Here, have 25 gold pieces as a reward.
     <item name="Magnus's Heirloom" image_name="ring_gem_red" weight="0"/>
     <gold amount="23"/>
 </scenery>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="2.5" y="1.5"/>
+
+<npc name="Zombie Champion" template="Zombie Champion" x="4.4" y="2.5"/>
+
+<npc name="Zombie" template="Zombie" x="2.7" y="5.0"/>
 
 </location>
 
