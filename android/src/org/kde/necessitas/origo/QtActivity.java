@@ -69,6 +69,13 @@ import android.view.WindowManager.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
 import dalvik.system.DexClassLoader;
 
+// modified from standard necessitas
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.WindowManager;
+//import android.widget.Toast;
+// end of modified code
+
 //@ANDROID-11
 //QtCreator import android.app.Fragment;
 //QtCreator import android.view.ActionMode;
@@ -80,7 +87,9 @@ public class QtActivity extends Activity
     // modified from standard necessitas
     public static native void AndroidOnPause();
     public static native void AndroidOnResume();
+    public static native void AndroidSetLargeScreen();
     private boolean loadLibrary_ok = false;
+    private boolean large_screen;
     // end of modified code
 
     private final static int MINISTRO_INSTALL_REQUEST_CODE = 0xf3ee; // request code used to know when Ministro instalation is finished
@@ -191,6 +200,10 @@ public class QtActivity extends Activity
                 System.loadLibrary(libName);
                 // modified from standard necessitas, to provide native methods
                 loadLibrary_ok = true;
+                //Toast.makeText(this, "loadLibrary_ok? " + loadLibrary_ok + " large_screen? " + large_screen, Toast.LENGTH_LONG).show();
+                if( large_screen ) {
+                    AndroidSetLargeScreen();
+                }
                 // end of modified code
             }
 
@@ -579,6 +592,37 @@ public class QtActivity extends Activity
         // modified from standard necessitas
         // keep screen active - see http://stackoverflow.com/questions/2131948/force-screen-on
         getWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // end of modified code
+
+        // modified from standard necessitas
+        {
+            Display display = getWindowManager().getDefaultDisplay();
+            DisplayMetrics outMetrics = new DisplayMetrics ();
+            display.getMetrics(outMetrics);
+
+            float density  = getResources().getDisplayMetrics().density;
+            float dpWidth  = outMetrics.widthPixels / density;
+            float dpHeight = outMetrics.heightPixels / density;
+            //Toast.makeText(this, "Screen size dp " + dpWidth + " x " + dpHeight, Toast.LENGTH_LONG).show();
+            large_screen = dpWidth >= 960;
+            // this code is called before we load the native library, so we don't call the native function yet
+        }
+        /*int screenSize = getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        switch(screenSize) {
+            case Configuration.SCREENLAYOUT_SIZE_LARGE:
+                Toast.makeText(this, "Large screen",Toast.LENGTH_LONG).show();
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_NORMAL:
+                Toast.makeText(this, "Normal screen",Toast.LENGTH_LONG).show();
+                break;
+            case Configuration.SCREENLAYOUT_SIZE_SMALL:
+                Toast.makeText(this, "Small screen",Toast.LENGTH_LONG).show();
+                break;
+            default:
+                Toast.makeText(this, "Screen size is neither large, normal or small" , Toast.LENGTH_LONG).show();
+        }*/
         // end of modified code
     }
     //---------------------------------------------------------------------------

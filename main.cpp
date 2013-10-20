@@ -6,6 +6,21 @@
 
 #include <QtGui/QApplication>
 
+/** Platform #defines:
+  * smallscreen_c: whether the platform has a smallscreen or not (phones, handhelds).
+  * touchscreen_c: whether to optimise the UI for a touchscreen rather than mouse/touchpad.
+  * lightdistribution_c: whether the distribution misses large non-essential files (currently this means the intro music)
+  */
+#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
+bool smallscreen_c = true; // on Android default to true, but set dynamically from Java
+bool touchscreen_c = true;
+bool lightdistribution_c = true;
+#else
+bool smallscreen_c = false;
+bool touchscreen_c = false;
+bool lightdistribution_c = false;
+#endif
+
 #if defined(Q_OS_ANDROID)
 char *DEPLOYMENT_PATH = "assets:/";
 #else
@@ -71,9 +86,16 @@ static void AndroidOnPause(JNIEnv * /*env*/, jobject /*thiz*/) {
     }
 }
 
+static void AndroidSetLargeScreen(JNIEnv * /*env*/, jobject /*thiz*/) {
+    qDebug("application set large screen\n");
+    //smallscreen_c = false;
+    // don't actually use this yet - windows still open fullscreen, and problems with fonts need fixing
+}
+
 static JNINativeMethod methods[] = {
     {"AndroidOnResume", "()V", (void *)AndroidOnResume},
-    {"AndroidOnPause", "()V", (void *)AndroidOnPause}
+    {"AndroidOnPause", "()V", (void *)AndroidOnPause},
+    {"AndroidSetLargeScreen", "()V", (void *)AndroidSetLargeScreen}
 };
 
 // this method is called immediately after the module is load
