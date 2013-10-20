@@ -1804,6 +1804,10 @@ void Location::calculatePathWayPoints() {
                 Vector2D path_way_point_pos = point + inwards * offset;
 
                 PathWayPoint path_way_point(point, path_way_point_pos, boundary->getSource());
+                float turn_sign = d0 % normal_from_wall1;
+                if( turn_sign < E_TOL_LINEAR ) {
+                    path_way_point.used_for_pathfinding = false;
+                }
                 this->testActivatePathWayPoint(&path_way_point);
                 path_way_points.push_back( path_way_point );
             }
@@ -1846,7 +1850,7 @@ void Location::calculateDistanceGraph() {
     //int n_hits = 0;
     for(size_t i=0;i<path_way_points.size();i++) {
         PathWayPoint path_way_point = path_way_points.at(i);
-        if( path_way_point.active ) {
+        if( path_way_point.active && path_way_point.used_for_pathfinding ) {
             Vector2D A = path_way_point.point;
             GraphVertex vertex(A, path_way_point.source);
             this->distance_graph->addVertex(vertex);

@@ -619,8 +619,9 @@ protected:
         Vector2D point;
         void *source;
         bool active;
+        bool used_for_pathfinding; // if false, we don't actually need the path way point for pathfinding, but still use it for things like flee-points and wandering monster spawn points
 
-        PathWayPoint(Vector2D origin_point, Vector2D point, void *source) : origin_point(origin_point), point(point), source(source), active(false) {
+        PathWayPoint(Vector2D origin_point, Vector2D point, void *source) : origin_point(origin_point), point(point), source(source), active(false), used_for_pathfinding(true) {
         }
     };
     vector<PathWayPoint> path_way_points;
