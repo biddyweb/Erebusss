@@ -738,6 +738,10 @@ void Game::init(bool fullscreen) {
     LOG("fullscreen? %d\n", fullscreen);
     screen = new Screen(fullscreen);
 
+    LOG("smallscreen? %d\n", smallscreen_c);
+    LOG("touchscreen? %d\n", touchscreen_c);
+    LOG("lightdistribution? %d\n", lightdistribution_c);
+
     // setup fonts
     MainWindow *window = game_g->getScreen()->getMainWindow();
     // palettes disabled for now - problems with differences between platforms, plus setting it for this window doesn't apply to the subwindows that we open up
@@ -758,10 +762,10 @@ void Game::init(bool fullscreen) {
     int screen_w = QApplication::desktop()->width();
     int screen_h = QApplication::desktop()->height();
     LOG("resolution %d x %d\n", screen_w, screen_h);
-    if( smallscreen_c ) {
-        QFont new_font = window->font();
 #if defined(Q_OS_ANDROID)
+    {
         qDebug("setting up fonts for Android");
+        QFont new_font = window->font();
         // n.b., need to set font size directly, as new_font.pointSize() returns -1 on Android!
         if( screen_w <= 480 ) {
             // optimise for smaller screens
@@ -786,7 +790,10 @@ void Game::init(bool fullscreen) {
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
+    }
 #else
+    if( smallscreen_c ) {
+        QFont new_font = window->font();
         qDebug("setting up fonts for non-Android smallscreen");
         if( screen_w == 640 && screen_h == 480 ) {
             // hackery for Nokia E6 - almost all Symbian^1 phones or later are 640x360, but things don't look right with the E6, which is 640x480
@@ -803,10 +810,9 @@ void Game::init(bool fullscreen) {
         this->font_big = new_font;
 
         // leave web font as default
-#endif
     }
     else {
-        qDebug("setting up fonts for non-mobile");
+        qDebug("setting up fonts for non-Android non-mobile");
         LOG("default font size: %d\n", window->font().pointSize());
         QString font_family = window->font().family();
         LOG("font family: %s\n", font_family.toStdString().c_str());
@@ -819,6 +825,7 @@ void Game::init(bool fullscreen) {
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize());
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize());
     }
+#endif
 
 /*#if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
     // crashes on Android?!
