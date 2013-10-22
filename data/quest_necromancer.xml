@@ -1095,7 +1095,17 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree3" x="49.0" y="37.0" size="3.0"/>
 
-<scenery name="Boulders" image_name="boulders2" x="45.7" y="41.1" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="45.7" y="41.1" size="1.5" blocking="true"/>
+
+<scenery name="Tree" image_name="tree2" x="51.0" y="37.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="53.0" y="38.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="55.0" y="37.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="57.0" y="37.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="59.0" y="37.5" size="3.0"/>
 
 <!-- west row of trees -->
 
@@ -1125,27 +1135,44 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree3" x="43.5" y="16.0" size="3.0"/>
 
-<scenery name="Boulders" image_name="boulders" x="43.5" y="33.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="43.5" y="33.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.0" y="32.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="44.5" y="31.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders2" x="44.5" y="31.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="44.5" y="29.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.0" y="30.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="44.0" y="27.5" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders2" x="44.5" y="29.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="44.5" y="26.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.0" y="27.5" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="44.0" y="24.5" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.5" y="26.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="44.5" y="23.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.0" y="24.5" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="44.0" y="21.5" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders2" x="44.5" y="23.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="44.5" y="20.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders2" x="44.0" y="21.5" size="1.0" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="44.5" y="20.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="46.0" y="31.5" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders2" x="47.5" y="32.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="49.0" y="31.5" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="50.5" y="31.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders2" x="52.0" y="31.5" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="53.5" y="31.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="55.0" y="31.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="56.5" y="30.5" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="58.0" y="30.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="59.5" y="29.5" size="1.5" blocking="true"/>
 
 <!-- top area -->
 
@@ -1163,6 +1190,17 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree3" x="53.0" y="12.0" size="3.0"/>
 
+<scenery name="Tree" image_name="tree3" x="55.0" y="12.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="57.0" y="13.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="59.0" y="14.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="60.5" y="17.0" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="61.0" y="21.0" size="3.0"/>
+
+
 <scenery name="Tree" image_name="tree3" x="45.5" y="16.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree3" x="47.5" y="16.5" size="3.0"/>
@@ -1173,13 +1211,58 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree2" x="53.5" y="18.0" size="3.0"/>
 
-<scenery name="Boulders" image_name="boulders" x="46.0" y="20.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="46.0" y="20.0" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders" x="47.5" y="20.5" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="47.5" y="20.5" size="1.5" blocking="true"/>
 
-<scenery name="Boulders" image_name="boulders2" x="49.0" y="20.0" size="1.0" blocking="true"/>
+<scenery name="Boulders" image_name="boulders2" x="49.0" y="20.0" size="1.5" blocking="true"/>
 
+<scenery name="Boulders" image_name="boulders2" x="50.5" y="20.5" size="1.5" blocking="true"/>
 
+<scenery name="Boulders" image_name="boulders" x="52.0" y="20.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders2" x="53.5" y="20.5" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="54.0" y="22.0" size="1.5" blocking="true"/>
+
+<scenery name="Boulders" image_name="boulders" x="54.5" y="23.5" size="1.5" blocking="true"/>
+
+<!-- camp area -->
+
+<scenery name="Campfire" image_name="campfire" x="52.0" y="25.0" size="0.8" blocking="true"/>
+
+<scenery name="Bones" image_name="bones" x="49.0" y="25.5" size="0.5" draw_type="background"/>
+
+<scenery name="Bones" image_name="bones" x="50.0" y="27.5" size="0.5" draw_type="background"/>
+
+<scenery name="Skulls" image_name="skulls" x="51.5" y="28.0" size="0.3" draw_type="background"/>
+
+<scenery name="Bones" image_name="bones" x="53.5" y="28.5" size="0.5" draw_type="background"/>
+
+<scenery name="Skulls" image_name="skulls" x="55.0" y="28.0" size="0.3" draw_type="background"/>
+
+<!--<scenery name="Bones" image_name="bones" x="50.0" y="25.0" size="0.5" draw_type="background"/>
+<scenery name="Bones" image_name="bones" x="47.0" y="25.5" size="0.5" draw_type="background"/>
+<scenery name="Bones" image_name="bones" x="52.0" y="27.0" size="0.5" draw_type="background"/>-->
+
+<npc name="Orc Shaman" template="Orc Shaman" x="50.0" y="25.0">
+    <spell name="Acid strike" count="2"/>
+    <spell name="Agony" count="2"/>
+    <spell name="Heal" count="2"/>
+</npc>
+<npc name="Orc Archer" template="Orc" x="47.0" y="25.5">
+    <item template="Chain Mail Armour"/>
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
+<npc name="Orc Champion" template="Orc Champion" x="52.0" y="27.0">
+    <item template="Chain Mail Armour"/>
+</npc>
+
+<scenery name="Crate" image_name="crate" x="49.0" y="25.0" size="0.8" blocking="true">
+    <item template="Skull" x="40.5" y="10.3"/>
+    <gold amount="24"/>
+</scenery>
 
 </location>
 
