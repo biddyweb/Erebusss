@@ -973,7 +973,7 @@ cdddde          9b
     interaction_data="Magnus's Heirloom"
     interaction_xp="30"
     interaction_reward_gold="25"
-    interaction_journal="I found Magnus's heirloom for him, who in return gave me 50 gold pieces as a reward."
+    interaction_journal="I found Magnus's heirloom for him, who in return gave me 25 gold pieces as a reward."
 >
 <opening_initial>Please ... will you help me?
 </opening_initial>
@@ -985,7 +985,7 @@ Thank you again for your help.
 <talk question="What happened here?">
 blah
 </talk>
-<talk question="What are you doing here?" while_not_done="true" journal="I met an alchemist named Anmareth who is looking for a leaf from the dire plant.">
+<talk question="What are you doing here?" while_not_done="true" journal="Magnus has asked me to retrive his heirloom from his home, that has been invaded by zombies.">
 My home still has those awful creatures in there. I wonder ... I know it's silly to worry about material goods when I am lucky to be alive, but there is a treasured heirloom of mine that has been in my family for generations. I would be grateful if someone were to retrieve it for me from my home.
 </talk>
 <talk question="I have recovered your heirloom" objective="true">
@@ -1045,7 +1045,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="30.0" rect_w="20.0" rect_h="20.0"/>
 
-<player_start x="16.0" y="42.0"/>
+<!--<player_start x="16.0" y="42.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="42.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="44.0" exit_location_y="20.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Stockton?"
@@ -1262,6 +1262,9 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 <scenery name="Crate" image_name="crate" x="49.0" y="25.0" size="0.8" blocking="true">
     <item template="Skull" x="40.5" y="10.3"/>
     <gold amount="24"/>
+    <item name="Gregory's Journal" image_name="book" weight="1">
+This is a tattered old journal, its pages worn from age, whilst spatters of blood on the cover look more recent. Inside are large numbers of diary entries of someone's life, going back many years.
+    </item>
 </scenery>
 
 </location>
@@ -1272,7 +1275,7 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.5" y="59.0"/>-->
+<player_start x="32.5" y="59.0"/>
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1282,7 +1285,7 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Carpet" image_name="carpet" x="32.5" y="54.0" w="1.0" h="1.5" draw_type="background"/>
 
-<scenery name="Door" image_name="door_wood_n" x="32.5" y="60.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="26.0" exit_location_y="11.0"/>
+<scenery name="Door" image_name="door_wood_n" x="32.5" y="60.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="26.0" exit_location_y="31.0"/>
 
 <floorregion shape="rect" rect_x="32.0" rect_y="45.0" rect_w="1.0" rect_h="5.0"/>
 
@@ -1315,6 +1318,36 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
     is_hostile="false"
     xp_worth="0"
     shop="Armourer"/>
+
+<npc name="Gregory" animation_name="peasant_man" static_image="true" x="34.0" y="37.1"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="WANT_OBJECT"
+    interaction_data="Gregory's Journal"
+    interaction_xp="40"
+    interaction_reward_gold="50"
+    interaction_journal="I found Gregory's Journal for him, and he gave me 50 gold pieces as a reward."
+>
+<opening_initial>Hello stranger - you look like a sort who might be able to help me?
+</opening_initial>
+<opening_later>Hello again.
+</opening_later>
+<opening_interaction_complete>
+Thank you for your help.
+</opening_interaction_complete>
+<talk question="How can I help you?" while_not_done="true" journal="Gregory asked me to find his journal, taken by some creatures. Their camp is located in the woods nearby Wentbridge Fort.">
+I was travelling here a few days ago, but on the way here I was attacked by some savages. Thankfully I managed to get away from them, but they snatched my bag. Most of the items are replaceable, but they took my journal, that I have kept for many years.
+
+I doubt the thugs can even read, it's no use to them. I don't suppose a brave warrior like yourself could find the item? There are 50 gold pieces in it for you. The people here tell me that they keep a camp in the woods nearby. And you'd be doing everyone a favour if you were to get rid of them.
+</talk>
+<talk question="I have recovered your journal" objective="true">
+Thank you! Here, have 50 gold pieces as a reward.
+</talk>
+</npc>
 
 <floorregion shape="rect" rect_x="36.0" rect_y="39.0" rect_w="5.0" rect_h="2.0"/>
 
