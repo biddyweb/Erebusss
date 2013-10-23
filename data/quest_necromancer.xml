@@ -1275,7 +1275,7 @@ This is a tattered old journal, its pages worn from age, whilst spatters of bloo
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.5" y="59.0"/>
+<!--<player_start x="32.5" y="59.0"/>-->
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
@@ -1433,7 +1433,7 @@ blah blah
 
 <wandering_monster template="Orc" time="300000" rest_chance="15"/>
 
-<!--<player_start x="22.0" y="4.5"/>-->
+<player_start x="22.0" y="4.5"/>
 
 <floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="4.0" rect_h="4.0"/>
 
@@ -1463,32 +1463,22 @@ blah blah
 
 <floorregion shape="rect" rect_x="36.0" rect_y="15.5" rect_w="1.0" rect_h="1.0"/>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="12.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" objective_id="Hectar" x="32.5" y="12.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="34.5" y="12.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" objective_id="Hectar" x="36.5" y="12.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="36.5" y="12.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" objective_id="Hectar" x="32.5" y="16.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="32.5" y="16.0">
-    <item template="Longbow"/>
-    <item template="Arrows"/>
-</npc>
-
-<npc name="Skeleton Archer" template="Skeleton Archer" x="34.5" y="16.0">
-    <item template="Longbow"/>
-    <item template="Arrows"/>
-</npc>
-
-<npc name="Skeleton Archer" template="Skeleton Archer" x="36.5" y="16.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" objective_id="Hectar" x="36.5" y="16.0">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
