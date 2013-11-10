@@ -1433,7 +1433,7 @@ blah blah
 
 <wandering_monster template="Orc" time="300000" rest_chance="15"/>
 
-<player_start x="22.0" y="4.5"/>
+<!--<player_start x="22.0" y="4.5"/>-->
 
 <floorregion shape="rect" rect_x="20.0" rect_y="1.0" rect_w="4.0" rect_h="4.0"/>
 
@@ -1561,7 +1561,14 @@ blah blah
     <floorregion_point x="61.0" y="19.5"/>
 </floorregion>
 
-<!--<player_start x="56.5" y="16.0"/>-->
+<player_start x="56.5" y="16.0"/>
+
+<npc name="Skeleton" template="Skeleton" objective_id="Hectar" x="53.0" y="18.5"/>
+
+<npc name="Skeleton Archer" template="Skeleton Archer" objective_id="Hectar" x="55.0" y="20.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
 
 <floorregion shape="rect" rect_x="58.0" rect_y="6.5" rect_w="8.0" rect_h="1.0"/>
 
@@ -1602,6 +1609,16 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <floorregion shape="rect" rect_x="58.0" rect_y="24.0" rect_w="1.0" rect_h="1.0"/>
 
+<!-- route to exit to lower level -->
+
+<floorregion shape="rect" rect_x="48.5" rect_y="24.0" rect_w="6.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="48.5" rect_y="25.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="47.0" rect_y="26.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Stairs" image_name="stairsdown_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons Lower Level, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
+
 </location>
 
 <location name="Dungeons Lower Level, Wentbridge Fort" display_name="true">
@@ -1631,6 +1648,12 @@ The ring is plain, except for a symbol of a small pair of wings.
     />
 
 <scenery name="Skeleton" image_name="skeleton" x="43.5" y="22.3" size="0.7" draw_type="background"/>
+
+<!-- main part -->
+
+<floorregion shape="rect" rect_x="47.0" rect_y="26.0" rect_w="4.0" rect_h="4.0"/>
+
+<scenery name="Stairs" image_name="stairsup_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
 
 </location>
 
