@@ -692,10 +692,7 @@ public:
     vector<Shop *>::const_iterator shopsEnd() const {
         return shops.end();
     }
-    Shop *getRandomShop() {
-        int r = rand() % shops.size();
-        return shops.at(r);
-    }
+    const Shop *getRandomShop(bool is_random_npc) const;
 
     AnimationLayer *getProjectileAnimationLayer(const string &name);
     QPixmap &getPortraitImage(const string &name);

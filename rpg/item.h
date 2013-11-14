@@ -399,6 +399,8 @@ class Shop {
     string name;
     vector<const Item *> items;
     vector<int> costs;
+    bool allow_random_npc; // whether to allow as an NPC seller in random dungeons
+    bool campaign; // whether to appear on campaign screens
 public:
     Shop(const string &name);
     ~Shop();
@@ -414,5 +416,17 @@ public:
     }
     const vector<int> &getCosts() const {
         return costs;
+    }
+    void setAllowRandomNPC(bool allow_random_npc) {
+        this->allow_random_npc = allow_random_npc;
+    }
+    bool isAllowRandomNPC() const{
+        return this->allow_random_npc;
+    }
+    void setCampaign(bool campaign) {
+        this->campaign = campaign;
+    }
+    bool isCampaign() const {
+        return this->campaign;
     }
 };

@@ -173,7 +173,7 @@ A small wooden chess piece, the Knight.
     <purchase template="Wyvern Egg" cost="30"/>
 </shop>
 
-<shop name="Inn">
+<shop name="Inn" allow_random_npc="false" campaign="false">
     <purchase template="Cheap Beer" cost="1"/>
     <purchase template="Fine Beer" cost="2"/>
 </shop>

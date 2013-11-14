@@ -386,7 +386,7 @@ string Currency::getName() const {
     return currency_name.str();
 }
 
-Shop::Shop(const string &name) : name(name) {
+Shop::Shop(const string &name) : name(name), allow_random_npc(true), campaign(true) {
 }
 
 Shop::~Shop() {

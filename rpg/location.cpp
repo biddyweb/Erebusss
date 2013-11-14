@@ -2290,7 +2290,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         float room_size_h = base_room_size;
         int roll = rollDice(1, 12, 0);
         /*if( rollDice(1, 2, 0) == 1 ) {
-            roll = 8;
+            roll = 8; // test
         }*/
         if( roll <= 6 ) {
             // normal room
@@ -2456,7 +2456,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             else if( room_type == ROOMTYPE_HAZARD ) {
                 // hazard
                 int r = rollDice(1, 7, 0);
-                //r = 7;
+                //r = 2; // test
                 if( r == 1 ) {
                     // wandering monster
                     enemy_table = "isolated";
@@ -2466,7 +2466,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     string npc_animation_name = (rollDice(1, 2, 0) == 1) ? "man" : "peasant_woman";
                     Character *npc = new Character("Trader", npc_animation_name, true);
                     npc->setHostile(false);
-                    Shop *shop = playing_gamestate->getRandomShop();
+                    const Shop *shop = playing_gamestate->getRandomShop(true);
                     npc->setShop(shop->getName());
                     location->addCharacter(npc, room_centre.x, room_centre.y);
                 }

@@ -2322,6 +2322,8 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 
         for(vector<Shop *>::const_iterator iter = playing_gamestate->shopsBegin(); iter != playing_gamestate->shopsEnd(); ++iter) {
             const Shop *shop = *iter;
+            if( !shop->isCampaign() )
+                continue;
             QPushButton *shopButton = new QPushButton(shop->getName().c_str());
             game_g->initButton(shopButton);
             shopButton->setShortcut(QKeySequence(shop->getName().at(0)));
@@ -2737,6 +2739,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         //view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
         view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time (better performance than FullViewportUpdate)
         view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
+        //view->setDragMode(QGraphicsView::ScrollHandDrag);
 
         /*QWidget *centralWidget = new QWidget(window);
         this->mainwindow = centralWidget;
@@ -3162,6 +3165,16 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                         }
                         QStringRef name_s = reader.attributes().value("name");
                         shop = new Shop(name_s.toString().toStdString());
+                        QStringRef allow_random_npc_s = reader.attributes().value("allow_random_npc");
+                        if( allow_random_npc_s.length() > 0 ) {
+                            bool allow_random_npc = parseBool(allow_random_npc_s.toString());
+                            shop->setAllowRandomNPC(allow_random_npc);
+                        }
+                        QStringRef campaign_s = reader.attributes().value("campaign");
+                        if( campaign_s.length() > 0 ) {
+                            bool campaign = parseBool(campaign_s.toString());
+                            shop->setCampaign(campaign);
+                        }
                         shops.push_back(shop);
                         itemsXMLType = ITEMS_XML_TYPE_SHOP;
                     }
@@ -3646,17 +3659,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             }
             else if( this->c_quest_indx == 3 ) {
                 // CHEAT, simulate start of quest 4:
-                //player->addXP(this, 2110);
-                {
-                    // set profile directly (simulated for Warrior)
+                /*{
+                    // set profile directly
                     player->setXP(2110);
                     player->setLevel(6);
-                    //player->setProfile(10, 9, 8, 1, 8, 8, 9, 2.5f);
-                    //player->initialiseHealth(94);
                     player->addProfile(2, 2, 1, 0, 2, 1, 2, 0.5f);
                     player->increaseMaxHealth(24);
-                }
-                player->addGold( 1998 + 350 );
+                }*/
+                player->setGold( 1998 + 350 );
                 player->deleteItem("Leather Armour");
                 player->deleteItem("Long Sword");
                 player->armWeapon(NULL);
@@ -3707,6 +3717,40 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
                     player->addItem(item, true);
                 }
                 player->addItem(this->cloneStandardItem("Longbow"), true);
+
+                // further test:
+                /*player->setXP(2945);
+                player->setGold( 1597 );
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);*/
+                /*{
+                    // set profile directly
+                    player->setXP(3290);
+                    player->setLevel(7);
+                    player->addProfile(3, 2, 1, 0, 2, 1, 3, 0.52f);
+                    player->increaseMaxHealth(26);
+                }
+                player->setGold( 1645 );
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);*/
+                {
+                    // set profile directly
+                    player->setXP(3405);
+                    player->setLevel(7);
+                    player->addProfile(3, 2, 1, 0, 2, 1, 3, 0.52f);
+                    player->increaseMaxHealth(26);
+                }
+                player->setGold( 1645 );
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Holy Water"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
+                player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
+                player->addItem(this->cloneStandardItem("Potion of Healing"), true);
             }
         }
     }
@@ -8534,6 +8578,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 }
 
 void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
+    LOG("PlayingGamestate::addWidget() fullscreen_hint? &d\n", fullscreen_hint);
     ASSERT_LOGGER( widget->isWindow() );
     this->widget_stack.push_back(widget);
     /*if( mobile_c ) {
@@ -8707,6 +8752,17 @@ Currency *PlayingGamestate::cloneGoldItem(int value) const {
     Currency *item = static_cast<Currency *>(this->cloneStandardItem("Gold"));
     item->setValue(value);
     return item;
+}
+
+const Shop *PlayingGamestate::getRandomShop(bool is_random_npc) const {
+    for(;;) {
+        int r = rand() % shops.size();
+        Shop *shop = shops.at(r);
+        if( is_random_npc && !shop->isAllowRandomNPC() ) {
+            continue;
+        }
+        return shops.at(r);
+    }
 }
 
 AnimationLayer *PlayingGamestate::getProjectileAnimationLayer(const string &name) {
