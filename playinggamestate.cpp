@@ -2624,18 +2624,19 @@ void SaveGameWindow::clickedSaveNew() {
     }
 }
 
-PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
+PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level) :
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     /*main_stacked_widget(NULL),*/
     turboButton(NULL), quickSaveButton(NULL), zoomoutButton(NULL), zoominButton(NULL), centreButton(NULL),
-    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL),
+    difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL), gameType(gameType),
     is_keyboard_moving(false),
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
     cheat_mode(cheat_mode),
     need_visibility_update(false)
 {
+    // n.b., if we're loading a game, gameType will default to GAMETYPE_CAMPAIGN and will be set to the actual type when we load the quest
     try {
         LOG("PlayingGamestate::PlayingGamestate()\n");
         playingGamestate = this;
@@ -3489,7 +3490,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
         qApp->processEvents();
 
         LOG("load quests\n");
-
         {
             QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
             if( !file.open(QFile::ReadOnly | QFile::Text) ) {
@@ -5121,6 +5121,19 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QStringRef permadeath_s = reader.attributes().value("permadeath");
                     qDebug("read permadeath: %s\n", permadeath_s.toString().toStdString().c_str());
                     this->permadeath = parseBool(permadeath_s.toString(), true);
+
+                    // if not defined, we keep to the default
+                    // this is for backwards compatibility - it will mean that old "random" games are actually loaded in campaign mode, but this shouldn't be a problem, as those random games can never be "completed"
+                    QStringRef game_type_s = reader.attributes().value("gametype");
+                    if( game_type_s.toString() == "gametype_campaign" ) {
+                        gameType = GAMETYPE_CAMPAIGN;
+                    }
+                    else if( game_type_s.toString() == "gametype_random" ) {
+                        gameType = GAMETYPE_RANDOM;
+                    }
+                    else if( game_type_s.length() > 0 ) {
+                        LOG("unknown gametype: %s\n", game_type_s.toString().toStdString().c_str());
+                    }
                 }
                 else if( reader.name() == "flag" ) {
                     if( location != NULL ) {
@@ -5790,6 +5803,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
 void PlayingGamestate::createRandomQuest() {
     LOG("PlayingGamestate::createRandomQuest()\n");
+    ASSERT_LOGGER(gameType == GAMETYPE_RANDOM);
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
@@ -5815,6 +5829,7 @@ void PlayingGamestate::createRandomQuest() {
     qDebug("create random quest\n");
     this->quest = new Quest();
     //this->quest->setCompleted(true); // test
+    this->c_quest_indx = 0; // ensure reset to 0
 
     this->quest->setName(tr("Random dungeon").toStdString());
 
@@ -8024,6 +8039,8 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 
     const int savegame_version = 2;
 
+    LOG("c_quest_indx: %d\n", c_quest_indx);
+
     //fprintf(file, "<?xml version=\"1.0\" ?>\n");
     //fprintf(file, "<savegame major=\"%d\" minor=\"%d\" savegame_version=\"%d\">\n", versionMajor, versionMinor, savegame_version);
     //fprintf(file, "\n");
@@ -8033,8 +8050,19 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
     stream << "<?xml version=\"1.0\" ?>\n";
     stream << "<savegame major=\"" << versionMajor << "\" minor=\"" << versionMinor << "\" savegame_version=\"" << savegame_version << "\">\n";
     stream << "\n";
-    stream << "<game difficulty=\"" << Game::getDifficultyString(difficulty).c_str() << "\" permadeath=\"" << (permadeath ? "true" : "false") << "\"/>";
-    stream << "<current_quest name=\"" << this->quest_list.at(this->c_quest_indx).getFilename().c_str() << "\"/>\n";
+    stream << "<game";
+    stream << " difficulty=\"" << Game::getDifficultyString(difficulty).c_str() << "\"";
+    stream << " permadeath=\"" << (permadeath ? "true" : "false") << "\"";
+    stream << " gametype=\"";
+    if( gameType == GAMETYPE_RANDOM )
+        stream << "gametype_random";
+    else
+        stream << "gametype_campaign";
+    stream << "\"";
+    stream << "/>\n";
+    if( gameType == GAMETYPE_CAMPAIGN ) {
+        stream << "<current_quest name=\"" << this->quest_list.at(this->c_quest_indx).getFilename().c_str() << "\"/>\n";
+    }
     stream << "\n";
 
     qDebug("save flags");

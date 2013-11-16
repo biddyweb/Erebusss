@@ -490,6 +490,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     size_t c_quest_indx;
     Location *c_location;
     Quest *quest;
+    GameType gameType;
 
     vector<CharacterAction *> character_actions;
 
@@ -576,7 +577,7 @@ private slots:
     void quickSave();
 
 public:
-    PlayingGamestate(bool is_savegame, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level);
+    PlayingGamestate(bool is_savegame, GameType gameType, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level);
     virtual ~PlayingGamestate();
 
     float getDifficultyModifier() const;
@@ -643,12 +644,9 @@ public:
     const Character *getPlayer() const {
         return this->player;
     }
-    /*Location *getLocation() {
-        return this->location;
+    GameType getGameType() const {
+        return this->gameType;
     }
-    const Location *getLocation() const {
-        return this->location;
-    }*/
     Quest *getQuest() {
         return this->quest;
     }

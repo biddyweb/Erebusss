@@ -1528,7 +1528,7 @@ void Game::runTest(const string &filename, int test_id) {
         else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 ) {
             QElapsedTimer timer;
             timer.start();
-            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
             gamestate = playing_gamestate;
 
             QString qt_filename;
@@ -1543,6 +1543,9 @@ void Game::runTest(const string &filename, int test_id) {
             }
 
             playing_gamestate->loadQuest(qt_filename, false);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
 
             QString filename = "EREBUSTEST_" + QString::number(test_id - (int)TEST_LOADSAVEQUEST_0) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
@@ -1555,9 +1558,12 @@ void Game::runTest(const string &filename, int test_id) {
 
             QString full_filename = this->getApplicationFilename(savegame_folder + filename);
             LOG("now try loading %s\n", full_filename.toStdString().c_str());
-            playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
+            playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
             gamestate = playing_gamestate;
             playing_gamestate->loadQuest(full_filename, true);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
 
             delete gamestate;
             gamestate = NULL;
@@ -1569,10 +1575,13 @@ void Game::runTest(const string &filename, int test_id) {
         else if( test_id == TEST_LOADSAVERANDOMQUEST_0 ) {
             QElapsedTimer timer;
             timer.start();
-            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, "Warrior", "name", false, false, 0);
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_RANDOM, "Warrior", "name", false, false, 0);
             gamestate = playing_gamestate;
 
             playing_gamestate->createRandomQuest();
+            if( playing_gamestate->getGameType() != GAMETYPE_RANDOM ) {
+                throw string("expected GAMETYPE_RANDOM");
+            }
 
             QString filename = "EREBUSTEST_RANDOM.xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
@@ -1585,9 +1594,13 @@ void Game::runTest(const string &filename, int test_id) {
 
             QString full_filename = this->getApplicationFilename(savegame_folder + filename);
             LOG("now try loading %s\n", full_filename.toStdString().c_str());
-            playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
+            playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
+            // n.b., use GAMETYPE_CAMPAIGN as we're loading a game
             gamestate = playing_gamestate;
             playing_gamestate->loadQuest(full_filename, true);
+            if( playing_gamestate->getGameType() != GAMETYPE_RANDOM ) {
+                throw string("expected GAMETYPE_RANDOM");
+            }
 
             delete gamestate;
             gamestate = NULL;
@@ -1670,7 +1683,7 @@ void Game::handleMessages() {
                 StartGameMessage *start_message = static_cast<StartGameMessage *>(message);
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getPlayerType(), start_message->getName(), start_message->getPermadeath(), start_message->getCheatMode(), start_message->getCheatStartLevel());
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(false, start_message->getGametype(), start_message->getPlayerType(), start_message->getName(), start_message->getPermadeath(), start_message->getCheatMode(), start_message->getCheatStartLevel());
                 gamestate = playing_gamestate;
                 playing_gamestate->setDifficulty(start_message->getDifficulty());
 
@@ -1692,7 +1705,7 @@ void Game::handleMessages() {
             {
                 delete gamestate;
                 gamestate = NULL;
-                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, "", "", false, false, 0);
+                PlayingGamestate *playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
                 gamestate = playing_gamestate;
                 LoadGameMessage *load_message = static_cast<LoadGameMessage *>(message);
                 QString full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
