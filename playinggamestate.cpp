@@ -29,6 +29,10 @@ const float z_value_gui = 4.0f*E_TOL_LINEAR; // so items appear above DRAWTYPE_B
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
+const string music_key_ingame_c = "ingame_music";
+const string music_key_trade_c = "trade";
+const string music_key_game_over_c = "game_over";
+
 PlayingGamestate *PlayingGamestate::playingGamestate = NULL;
 
 Direction directionFromVecDir(Vector2D dir) {
@@ -2295,7 +2299,7 @@ CampaignWindow::CampaignWindow(PlayingGamestate *playing_gamestate) :
 {
     playing_gamestate->addWidget(this, true);
 
-    game_g->playSound("trade", true);
+    game_g->playSound(music_key_trade_c, true);
 
     QFont font = game_g->getFontStd();
     this->setFont(font);
@@ -2373,7 +2377,7 @@ void CampaignWindow::clickedClose() {
     /*else {
         this->playing_gamestate->closeSubWindow();
     }*/
-    game_g->playSound("ingame_music", true);
+    //game_g->playSound(music_key_ingame_c, true);
 }
 
 void CampaignWindow::clickedShop() {
@@ -3465,12 +3469,12 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, const string &player_type, 
             if( !lightdistribution_c ) {
 #ifndef USING_PHONON
                 // only supported for SFML, as Phonon doesn't support looping
-                game_g->loadSound("ingame_music", string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
-                game_g->setSoundVolume("ingame_music", 0.1f);
-                game_g->loadSound("trade", string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
-                game_g->setSoundVolume("trade", 0.1f);
-                game_g->loadSound("game_over", string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
-                game_g->setSoundVolume("game_over", 1.0f);
+                //game_g->loadSound(music_key_ingame_c, string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
+                //game_g->setSoundVolume(music_key_ingame_c, 0.1f);
+                game_g->loadSound(music_key_trade_c, string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
+                game_g->setSoundVolume(music_key_trade_c, 0.1f);
+                game_g->loadSound(music_key_game_over_c, string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
+                game_g->setSoundVolume(music_key_game_over_c, 1.0f);
 #endif
             }
         }
@@ -3841,9 +3845,9 @@ void PlayingGamestate::cleanup() {
         game_g->freeSound("wear_armour");
         game_g->freeSound("swing");
         game_g->freeSound("footsteps");
-        game_g->freeSound("ingame_music");
-        game_g->freeSound("trade");
-        game_g->freeSound("game_over");
+        //game_g->freeSound(music_key_ingame_c);
+        game_g->freeSound(music_key_trade_c);
+        game_g->freeSound(music_key_game_over_c);
     }
     LOG("done\n");
 }
@@ -5777,7 +5781,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         this->journal_ss << "<p>" << quest_info << "</p>";
     }
 
-    game_g->playSound("ingame_music", true);
+    //game_g->playSound(music_key_ingame_c, true);
 
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
@@ -6846,7 +6850,7 @@ void PlayingGamestate::update() {
                 death_message << "<p><b>Game over</b></p><p>You are dead! Your time on this mortal plane is over, and your adventure ends here.</p>";
             }
             death_message << "<p><b>Achieved Level:</b> " << player->getLevel() << "<br/><b>Achieved XP:</b> " << player->getXP() << "</p>";
-            game_g->playSound("game_over", false);
+            game_g->playSound(music_key_game_over_c, false);
             this->showInfoDialog(death_message.str(), string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
 
             this->player = NULL;
