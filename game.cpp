@@ -1938,16 +1938,10 @@ void Game::playSound(const string &sound_effect, bool loop) {
     {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
-#ifndef Q_OS_ANDROID
-            if( sound->isStream() && this->current_stream_sound_effect.length() > 0 ) {
-                // cancel current stream
-                qDebug("cancel stream: %s", this->current_stream_sound_effect.c_str());
-                Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
-                ASSERT_LOGGER(current_sound != NULL);
-                if( current_sound != NULL ) {
-                    current_sound->stop();
-                }
+            if( sound->isStream() ) {
+                this->cancelCurrentStream();
             }
+#ifndef Q_OS_ANDROID
             sound->play(loop);
             if( sound->isStream() ) {
                 this->current_stream_sound_effect = sound_effect;
@@ -1967,6 +1961,22 @@ void Game::pauseSound(const string &sound_effect) {
     ASSERT_LOGGER(sound != NULL);
     if( sound != NULL ) {
         sound->pause();
+    }
+#endif
+    // not yet supported on Android
+}
+
+void Game::cancelCurrentStream() {
+#ifndef Q_OS_ANDROID
+    if( this->current_stream_sound_effect.length() > 0 ) {
+        // cancel current stream
+        qDebug("cancel stream: %s", this->current_stream_sound_effect.c_str());
+        Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
+        ASSERT_LOGGER(current_sound != NULL);
+        if( current_sound != NULL ) {
+            current_sound->stop();
+        }
+        this->current_stream_sound_effect = "";
     }
 #endif
     // not yet supported on Android

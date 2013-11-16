@@ -618,6 +618,7 @@ public:
     }
     void playSound(const string &sound_effect, bool loop);
     void pauseSound(const string &sound_effect);
+    void cancelCurrentStream();
     void freeSound(const string &sound_effect);
     void updateSoundVolume(const string &sound_effect);
     void setSoundVolume(const string &sound_effect, float volume);

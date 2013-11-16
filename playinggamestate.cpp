@@ -2377,6 +2377,7 @@ void CampaignWindow::clickedClose() {
     /*else {
         this->playing_gamestate->closeSubWindow();
     }*/
+    game_g->cancelCurrentStream();
     //game_g->playSound(music_key_ingame_c, true);
 }
 
