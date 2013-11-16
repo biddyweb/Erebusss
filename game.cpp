@@ -1951,10 +1951,10 @@ void Game::playSound(const string &sound_effect, bool loop) {
     {
         Sound *sound = this->sound_effects[sound_effect];
         if( sound != NULL ) {
+#ifndef Q_OS_ANDROID
             if( sound->isStream() ) {
                 this->cancelCurrentStream();
             }
-#ifndef Q_OS_ANDROID
             sound->play(loop);
             if( sound->isStream() ) {
                 this->current_stream_sound_effect = sound_effect;
