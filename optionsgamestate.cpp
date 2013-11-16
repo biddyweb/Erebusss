@@ -14,6 +14,21 @@ using std::stringstream;
 #include "infodialog.h"
 #include "logiface.h"
 
+void GameTypeHelp::changedGameType(int index) {
+    if( index == GAMETYPE_CAMPAIGN ) {
+        //this->setText("Play through the series of quests that have been written for Erebus.");
+        this->setHtml("Play through the series of quests that have been written for Erebus.");
+    }
+    else if( index == GAMETYPE_RANDOM ) {
+        //this->setText("Play a single one-off dungeon that is randomly generated. There is no objective to random dungeons, but you can see how much experience (XP) you can achieve, or perhaps how much gold you can find!");
+        this->setHtml("Play a single one-off dungeon that is randomly generated. There is no objective to random dungeons, but you can see how much experience (XP) you can achieve, or perhaps how much gold you can find!");
+    }
+    else {
+        //this->setText("");
+        this->setHtml("");
+    }
+}
+
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
@@ -215,6 +230,7 @@ void OptionsGamestate::clickedStart() {
             {
                 int n_row = 0;
                 QGridLayout *g_layout = new QGridLayout();
+                g_layout->setColumnStretch(1, 1);
                 layout->addLayout(g_layout);
 
                 QLabel *label = new QLabel(tr("Select a game type: "));
@@ -224,11 +240,24 @@ void OptionsGamestate::clickedStart() {
                 gametypeComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
 #endif
                 gametypeComboBox->setFont(game_g->getFontBig());
+                // should match order of GameType enum
                 gametypeComboBox->addItem(tr("Begin Campaign"));
                 gametypeComboBox->addItem(tr("Random Dungeon"));
-                gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                //gametypeComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                gametypeComboBox->setFocus(); // sometimes don't get focus (meaning we have to click twice to make the combo list popup)?
                 g_layout->addWidget(gametypeComboBox, n_row, 1);
                 n_row++;
+
+                // be careful if we change this code - need to ensure layout still works okay, including on Android
+                GameTypeHelp *helpLabel = new GameTypeHelp();
+                game_g->setWebView(helpLabel);
+                //helpLabel->setWordWrap(true);
+                helpLabel->setFont(game_g->getFontSmall());
+                connect(gametypeComboBox, SIGNAL(currentIndexChanged(int)), helpLabel, SLOT(changedGameType(int)));
+                g_layout->addWidget(helpLabel, n_row, 1, 1, 1, Qt::AlignLeft);
+                n_row++;
+
+                helpLabel->changedGameType( gametypeComboBox->currentIndex() ); // force initial update
             }
         }
     }

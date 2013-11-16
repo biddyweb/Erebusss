@@ -6,11 +6,22 @@
 using std::vector;
 
 #include <QtGui>
+#include <QtWebKit/QWebView>
 
 #include "gamestate.h"
 
 class ScrollingListWidget;
 //class Sound;
+
+class GameTypeHelp : public QWebView {
+    Q_OBJECT
+public:
+    GameTypeHelp() : QWebView() {
+    }
+
+public slots:
+    void changedGameType(int index);
+};
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
