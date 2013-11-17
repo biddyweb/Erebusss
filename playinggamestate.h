@@ -523,6 +523,13 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     bool need_visibility_update;
 
+    enum MusicMode {
+        MUSICMODE_SILENCE = 0,
+        MUSICMODE_COMBAT = 1
+    };
+    MusicMode music_mode;
+    int time_combat_ended;
+
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);

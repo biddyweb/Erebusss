@@ -29,7 +29,8 @@ const float z_value_gui = 4.0f*E_TOL_LINEAR; // so items appear above DRAWTYPE_B
 const float MainGraphicsView::min_zoom_c = 10.0f;
 const float MainGraphicsView::max_zoom_c = 200.0f;
 
-const string music_key_ingame_c = "ingame_music";
+//const string music_key_ingame_c = "ingame_music";
+const string music_key_combat_c = "combat_music";
 const string music_key_trade_c = "trade";
 const string music_key_game_over_c = "game_over";
 
@@ -2634,7 +2635,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
     cheat_mode(cheat_mode),
-    need_visibility_update(false)
+    need_visibility_update(false),
+    music_mode(MUSICMODE_SILENCE), time_combat_ended(-1)
 {
     // n.b., if we're loading a game, gameType will default to GAMETYPE_CAMPAIGN and will be set to the actual type when we load the quest
     try {
@@ -3473,6 +3475,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 // only supported for SFML, as Phonon doesn't support looping
                 //game_g->loadSound(music_key_ingame_c, string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
                 //game_g->setSoundVolume(music_key_ingame_c, 0.1f);
+                game_g->loadSound(music_key_combat_c, string(DEPLOYMENT_PATH) + "music/battle_scene.ogg", true);
                 game_g->loadSound(music_key_trade_c, string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
                 game_g->setSoundVolume(music_key_trade_c, 0.1f);
                 game_g->loadSound(music_key_game_over_c, string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
@@ -3847,6 +3850,7 @@ void PlayingGamestate::cleanup() {
         game_g->freeSound("swing");
         game_g->freeSound("footsteps");
         //game_g->freeSound(music_key_ingame_c);
+        game_g->freeSound(music_key_combat_c);
         game_g->freeSound(music_key_trade_c);
         game_g->freeSound(music_key_game_over_c);
     }
@@ -6384,6 +6388,8 @@ void PlayingGamestate::clickedRest() {
             }
         }
         if( rest_ok ) {
+            game_g->stopSound(music_key_combat_c);
+            music_mode = MUSICMODE_SILENCE;
             int time = this->getRestTime();
             this->player->restoreHealth();
             this->player->expireProfileEffects();
@@ -6570,7 +6576,7 @@ void PlayingGamestate::update() {
     }
 //#define TIMING_INFO
 
-    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+    const int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     //qDebug("PlayingGamestate::update()");
     bool do_complex_update = false;
@@ -6674,6 +6680,38 @@ void PlayingGamestate::update() {
                 else {
                     delete enemy;
 
+                }
+            }
+        }
+
+        // music
+        if( music_mode != MUSICMODE_COMBAT ) {
+            bool enemy_visible = false;
+            for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd() && !enemy_visible; ++iter) {
+                Character *character = *iter;
+                if( character != player && character->isVisible() && character->isHostile() ) {
+                    enemy_visible = true;
+                }
+            }
+            if( enemy_visible ) {
+                game_g->playSound(music_key_combat_c, true);
+                music_mode = MUSICMODE_COMBAT;
+                this->time_combat_ended = -1;
+            }
+        }
+        else {
+            if( c_location->hasEnemies(this) ) {
+                this->time_combat_ended = -1;
+            }
+            else {
+                if( this->time_combat_ended == -1 ) {
+                    this->time_combat_ended = elapsed_ms;
+                }
+                else {
+                    if( elapsed_ms - time_combat_ended > 5000 ) {
+                        game_g->stopSound(music_key_combat_c);
+                        music_mode = MUSICMODE_SILENCE;
+                    }
                 }
             }
         }
@@ -6872,6 +6910,15 @@ void PlayingGamestate::update() {
             this->player = NULL;
             GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
             game_g->pushMessage(game_message);
+        }
+        else {
+            if( music_mode == MUSICMODE_COMBAT ) {
+                if( !c_location->hasEnemies(this) ) {
+                    // immediately stop music after killing the last nearby enemy
+                    game_g->stopSound(music_key_combat_c);
+                    music_mode = MUSICMODE_SILENCE;
+                }
+            }
         }
         delete character; // also removes character from the QGraphicsScene, via the listeners
     }
@@ -7388,6 +7435,8 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
                         this->writeJournal(completed_text);
                         this->writeJournal("</p>");
                     }
+                    game_g->stopSound(music_key_combat_c);
+                    music_mode = MUSICMODE_SILENCE;
                     new CampaignWindow(this);
                     game_g->getScreen()->setPaused(true, true);
                     this->time_hours += 48 + this->getRestTime();
@@ -7407,6 +7456,8 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
 #if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
                         this->autoSave();
 #endif
+                        game_g->stopSound(music_key_combat_c);
+                        music_mode = MUSICMODE_SILENCE;
                         this->moveToLocation(new_location, scenery->getExitLocationPos());
                         *move = false;
                         if( scenery->getExitTravelTime() >= 24 ) {

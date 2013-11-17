@@ -1971,12 +1971,25 @@ void Game::pauseSound(const string &sound_effect) {
     qDebug("pause sound: %s\n", sound_effect.c_str());
     // n.b., need to allow pausing even if sound not enabled (so we can disable sound, then pause music)
     Sound *sound = this->sound_effects[sound_effect];
-    ASSERT_LOGGER(sound != NULL);
     if( sound != NULL ) {
         sound->pause();
     }
 #endif
     // not yet supported on Android
+}
+
+void Game::stopSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    qDebug("stop sound: %s\n", sound_effect.c_str());
+    Sound *sound = this->sound_effects[sound_effect];
+    if( sound != NULL ) {
+        sound->stop();
+    }
+#endif
+    // not yet supported on Android
+    if( current_stream_sound_effect == sound_effect ) {
+        this->current_stream_sound_effect = "";
+    }
 }
 
 void Game::cancelCurrentStream() {
