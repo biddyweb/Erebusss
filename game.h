@@ -77,6 +77,11 @@ class Sound : public QObject {
     sf::Sound sound;
     // if streaming:
     sf::Music music;
+
+    // only for streams, where we manually call update()
+    bool is_fading;
+    int fade_start_time;
+    int fade_end_time;
 #endif
 
 public:
@@ -171,9 +176,12 @@ public:
         else {
             sound.stop();
         }
+        this->is_fading = false;
 #endif
     }
 
+    void fadeOut(int delay);
+    bool update();
 #else
     AndroidSoundEffect *android_sound;
 
@@ -619,6 +627,7 @@ public:
     void playSound(const string &sound_effect, bool loop);
     void pauseSound(const string &sound_effect);
     void stopSound(const string &sound_effect);
+    void fadeSound(const string &sound_effect);
     void cancelCurrentStream();
     void freeSound(const string &sound_effect);
     void updateSoundVolume(const string &sound_effect);

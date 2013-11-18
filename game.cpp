@@ -51,6 +51,9 @@ Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream)
         }
     }
 #else
+    this->is_fading = false;
+    this->fade_start_time = -1;
+    this->fade_end_time = -1;
     if( this->stream ) {
         if( !music.openFromFile(filename.c_str()) ) {
             throw string("SFML failed to openFromFile");
@@ -73,6 +76,15 @@ void Sound::updateVolume() {
         this->audioOutput->setVolume(real_volume);
     }
 #else
+    if( is_fading ) {
+        int time = game_g->getScreen()->getGameTimeTotalMS();
+        if( time >= this->fade_end_time )
+            real_volume = 0.0f;
+        else {
+            float alpha = ((float)(time - this->fade_start_time))/(float)(this->fade_end_time - this->fade_start_time);
+            real_volume *= (1.0f - alpha);
+        }
+    }
     if( stream )
         music.setVolume(100.0f*real_volume);
     else
@@ -84,6 +96,31 @@ void Sound::setVolume(float volume) {
     this->volume = volume;
     this->updateVolume();
 }
+
+void Sound::fadeOut(int delay) {
+#ifndef USING_PHONON
+    this->is_fading = true;
+    this->fade_start_time = game_g->getScreen()->getGameTimeTotalMS();
+    this->fade_end_time = fade_start_time + delay;
+#endif
+}
+
+bool Sound::update() {
+#ifndef USING_PHONON
+    if( this->is_fading ) {
+        int time = game_g->getScreen()->getGameTimeTotalMS();
+        if( time >= fade_end_time ) {
+            this->stop();
+            return true;
+        }
+        else {
+            this->updateVolume();
+        }
+    }
+    return false;
+#endif
+}
+
 #endif
 
 void WebViewEventFilter::setWebView(QWebView *webView) {
@@ -1772,6 +1809,15 @@ void Game::handleMessages() {
 
 void Game::update() {
     this->handleMessages(); // needed to process any messages from earlier update call
+    if( this->current_stream_sound_effect.length() > 0 ) {
+#ifndef Q_OS_ANDROID
+        Sound *current_sound = this->sound_effects[this->current_stream_sound_effect];
+        ASSERT_LOGGER(current_sound != NULL);
+        if( current_sound != NULL ) {
+            current_sound->update();
+        }
+#endif
+    }
     if( gamestate != NULL ) {
         gamestate->update();
     }
@@ -1990,6 +2036,17 @@ void Game::stopSound(const string &sound_effect) {
     if( current_stream_sound_effect == sound_effect ) {
         this->current_stream_sound_effect = "";
     }
+}
+
+void Game::fadeSound(const string &sound_effect) {
+#ifndef Q_OS_ANDROID
+    qDebug("fade sound: %s\n", sound_effect.c_str());
+    Sound *sound = this->sound_effects[sound_effect];
+    if( sound != NULL ) {
+        sound->fadeOut(2000);
+    }
+#endif
+    // not yet supported on Android
 }
 
 void Game::cancelCurrentStream() {

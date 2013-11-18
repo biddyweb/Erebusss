@@ -3476,7 +3476,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 //game_g->loadSound(music_key_ingame_c, string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
                 //game_g->setSoundVolume(music_key_ingame_c, 0.1f);
                 game_g->loadSound(music_key_combat_c, string(DEPLOYMENT_PATH) + "music/battle_scene.ogg", true);
-                game_g->loadSound(music_key_trade_c, string(DEPLOYMENT_PATH) + "music/traide.ogg", true);
+                game_g->loadSound(music_key_trade_c, string(DEPLOYMENT_PATH) + "music/bazar_traide.ogg", true);
                 game_g->setSoundVolume(music_key_trade_c, 0.1f);
                 game_g->loadSound(music_key_game_over_c, string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
                 game_g->setSoundVolume(music_key_game_over_c, 1.0f);
@@ -6709,7 +6709,7 @@ void PlayingGamestate::update() {
                 }
                 else {
                     if( elapsed_ms - time_combat_ended > 5000 ) {
-                        game_g->stopSound(music_key_combat_c);
+                        game_g->fadeSound(music_key_combat_c);
                         music_mode = MUSICMODE_SILENCE;
                     }
                 }
@@ -6915,7 +6915,7 @@ void PlayingGamestate::update() {
             if( music_mode == MUSICMODE_COMBAT ) {
                 if( !c_location->hasEnemies(this) ) {
                     // immediately stop music after killing the last nearby enemy
-                    game_g->stopSound(music_key_combat_c);
+                    game_g->fadeSound(music_key_combat_c);
                     music_mode = MUSICMODE_SILENCE;
                 }
             }
