@@ -47,28 +47,27 @@ You also need SFML 2, which should be installed as follows:
 * Copy the sfml-audio.lib and sfml-system.lib files, and the "-d.lib" versions of those files, to the erebus/ folder (or add the SFML/ lib path the .pro file).
 * Copy the DLLs libsndfile-1.dll, openal32.dll, sfml-audio-2.dll, sfml-audio-d-2.dll, sfml-system-2.dll and sfml-system-d-2.dll to the erebus/ folder.
 
-Symbian
-=======
-
-Use Nokia Qt SDK with Qt Creator to compile for Symbian ( http://www.developer.nokia.com/Develop/Qt/Tools/ ). Note that for Symbian, lower resolution graphics are used for some of the images - these are supplied in gfx_lores/ and should be copied to overwrite the corresponding files in the gfx/ folder. This is to help on low memory older Symbian phones (e.g., Nokia 5800), and the higher resolutions are less important on smartphone devices.
-
 Android
 =======
 
 Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 8. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
 
+Symbian
+=======
+
+Versions 0.10 and earlier supported Symbian, but this has now been dropped for 0.11 onwards. Possibly the latest source may still compile, though this is untested.
+
 Other platforms
 ===============
 
-It should be possible to compile Erebus on any other platform that Qt supports, though this is untested. SFML 2.0 is also required for Audio, though you can configure to use Phonon (part of Qt) instead by adding:
-        CONFIG += USING_PHONON
-to the start of the erebus.pro file.
+It should be possible to compile Erebus on any other platform that Qt supports, though this is untested. SFML 2.0 is also required for audio.
 
 History
 =======
 
 Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
 
+0.11 - Symbian port dropped. Switched from using Phonon to SFML for audio.
 0.6 - Add "make install" support for Linux. Also ported to Pandora.
 0.2 - Switched to using Necessitas alpha 4 for Android.
 0.1 - First release.
@@ -90,4 +89,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 10 July 2013
+Mark Harman 19 November 2013
