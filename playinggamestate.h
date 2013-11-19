@@ -523,6 +523,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     bool need_visibility_update;
 
+    bool has_ingame_music;
     enum MusicMode {
         MUSICMODE_SILENCE = 0,
         MUSICMODE_COMBAT = 1

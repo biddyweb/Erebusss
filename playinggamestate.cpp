@@ -2636,6 +2636,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
     time_last_complex_update_ms(0),
     cheat_mode(cheat_mode),
     need_visibility_update(false),
+    has_ingame_music(false),
     music_mode(MUSICMODE_SILENCE), time_combat_ended(-1)
 {
     // n.b., if we're loading a game, gameType will default to GAMETYPE_CAMPAIGN and will be set to the actual type when we load the quest
@@ -3473,9 +3474,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             if( !lightdistribution_c ) {
 #ifndef USING_PHONON
                 // only supported for SFML, as Phonon doesn't support looping
+                this->has_ingame_music = true;
                 //game_g->loadSound(music_key_ingame_c, string(DEPLOYMENT_PATH) + "music/exploring_loop.ogg", true);
                 //game_g->setSoundVolume(music_key_ingame_c, 0.1f);
                 game_g->loadSound(music_key_combat_c, string(DEPLOYMENT_PATH) + "music/battle_scene.ogg", true);
+                game_g->setSoundVolume(music_key_combat_c, 0.1f);
                 game_g->loadSound(music_key_trade_c, string(DEPLOYMENT_PATH) + "music/bazar_traide.ogg", true);
                 game_g->setSoundVolume(music_key_trade_c, 0.1f);
                 game_g->loadSound(music_key_game_over_c, string(DEPLOYMENT_PATH) + "music/your_fail.ogg", true);
@@ -6685,32 +6688,34 @@ void PlayingGamestate::update() {
         }
 
         // music
-        if( music_mode != MUSICMODE_COMBAT ) {
-            bool enemy_visible = false;
-            for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd() && !enemy_visible; ++iter) {
-                Character *character = *iter;
-                if( character != player && character->isVisible() && character->isHostile() ) {
-                    enemy_visible = true;
+        if( has_ingame_music ) {
+            if( music_mode != MUSICMODE_COMBAT ) {
+                bool enemy_visible = false;
+                for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd() && !enemy_visible; ++iter) {
+                    Character *character = *iter;
+                    if( character != player && character->isVisible() && character->isHostile() ) {
+                        enemy_visible = true;
+                    }
                 }
-            }
-            if( enemy_visible ) {
-                game_g->playSound(music_key_combat_c, true);
-                music_mode = MUSICMODE_COMBAT;
-                this->time_combat_ended = -1;
-            }
-        }
-        else {
-            if( c_location->hasEnemies(this) ) {
-                this->time_combat_ended = -1;
+                if( enemy_visible ) {
+                    game_g->playSound(music_key_combat_c, true);
+                    music_mode = MUSICMODE_COMBAT;
+                    this->time_combat_ended = -1;
+                }
             }
             else {
-                if( this->time_combat_ended == -1 ) {
-                    this->time_combat_ended = elapsed_ms;
+                if( c_location->hasEnemies(this) ) {
+                    this->time_combat_ended = -1;
                 }
                 else {
-                    if( elapsed_ms - time_combat_ended > 5000 ) {
-                        game_g->fadeSound(music_key_combat_c);
-                        music_mode = MUSICMODE_SILENCE;
+                    if( this->time_combat_ended == -1 ) {
+                        this->time_combat_ended = elapsed_ms;
+                    }
+                    else {
+                        if( elapsed_ms - time_combat_ended > 5000 ) {
+                            game_g->fadeSound(music_key_combat_c);
+                            music_mode = MUSICMODE_SILENCE;
+                        }
                     }
                 }
             }
