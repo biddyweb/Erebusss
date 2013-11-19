@@ -540,9 +540,9 @@ protected:
 
 #ifndef Q_OS_ANDROID
     int sound_volume;
-#endif
     int sound_volume_music;
     int sound_volume_effects;
+#endif
     bool lighting_enabled;
 
     vector<string> player_types;
@@ -643,7 +643,6 @@ public:
         return this->sound_volume;
     }
     void setGlobalSoundVolume(int sound_volume);
-#endif
     int getGlobalSoundVolumeMusic() const {
         return this->sound_volume_music;
     }
@@ -652,6 +651,7 @@ public:
         return this->sound_volume_effects;
     }
     void setGlobalSoundVolumeEffects(int sound_volume_effects);
+#endif
     bool isLightingEnabled() const {
         return this->lighting_enabled;
     }

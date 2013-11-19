@@ -37,9 +37,9 @@ OptionsGamestate::OptionsGamestate() :
     load_list(NULL),
 #ifndef Q_OS_ANDROID
     soundSlider(NULL),
-#endif
     soundSliderMusic(NULL),
     soundSliderEffects(NULL),
+#endif
     lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
@@ -591,7 +591,7 @@ void OptionsGamestate::clickedOptions() {
         soundSlider->setValue(game_g->getGlobalSoundVolume());
         g_layout->addWidget(soundSlider, n_row, 1);
         n_row++;
-#endif
+
         label = new QLabel(tr("Music Volume: "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
         soundSliderMusic = new QSlider(Qt::Horizontal);
@@ -609,6 +609,7 @@ void OptionsGamestate::clickedOptions() {
         soundSliderEffects->setValue(game_g->getGlobalSoundVolumeEffects());
         g_layout->addWidget(soundSliderEffects, n_row, 1);
         n_row++;
+#endif
 
         label = new QLabel(tr("Lighting (uncheck if too slow): "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);

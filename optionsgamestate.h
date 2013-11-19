@@ -45,9 +45,9 @@ class OptionsGamestate : public Gamestate {
 
 #ifndef Q_OS_ANDROID
     QSlider *soundSlider;
-#endif
     QSlider *soundSliderMusic;
     QSlider *soundSliderEffects;
+#endif
     QCheckBox *lightingCheck;
 
     bool cheat_mode;

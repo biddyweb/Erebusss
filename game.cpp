@@ -21,11 +21,11 @@ const int default_sound_enabled_c = true;*/
 #ifndef Q_OS_ANDROID
 const QString sound_volume_key_c = "sound_volume";
 const int default_sound_volume_c = 100;
-#endif
 const QString sound_volume_music_key_c = "sound_volume_music";
 const int default_sound_volume_music_c = 100;
 const QString sound_volume_effects_key_c = "sound_volume_effects";
 const int default_sound_volume_effects_c = 100;
+#endif
 
 const QString lighting_enabled_key_c = "lighting_enabled";
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
@@ -733,7 +733,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     else {
         this->sound_volume = sound_volume_i;
     }
-#endif
+
     int sound_volume_music_i = settings->value(sound_volume_music_key_c, default_sound_volume_music_c).toInt(&ok);
     if( !ok ) {
         qDebug("settings sound_volume_music not ok, set to default");
@@ -742,6 +742,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     else {
         this->sound_volume_music = sound_volume_music_i;
     }
+
     int sound_volume_effects_i = settings->value(sound_volume_effects_key_c, default_sound_volume_effects_c).toInt(&ok);
     if( !ok ) {
         qDebug("settings sound_volume_effects not ok, set to default");
@@ -750,6 +751,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     else {
         this->sound_volume_effects = sound_volume_effects_i;
     }
+#endif
 
     int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
     if( !ok ) {
