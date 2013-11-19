@@ -22,6 +22,11 @@ const int default_sound_enabled_c = true;*/
 const QString sound_volume_key_c = "sound_volume";
 const int default_sound_volume_c = 100;
 #endif
+const QString sound_volume_music_key_c = "sound_volume_music";
+const int default_sound_volume_music_c = 100;
+const QString sound_volume_effects_key_c = "sound_volume_effects";
+const int default_sound_volume_effects_c = 100;
+
 const QString lighting_enabled_key_c = "lighting_enabled";
 #if defined(Q_OS_ANDROID) || defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR) || defined(Q_WS_MAEMO_5)
 const int default_lighting_enabled_c = false; // lighting effects can be a bit too slow on mobile platforms
@@ -71,6 +76,8 @@ Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream)
 void Sound::updateVolume() {
     // multiply with the global volume
     float real_volume = ((float)game_g->getGlobalSoundVolume())/100.0f * volume;
+    int scale = stream ? game_g->getGlobalSoundVolumeMusic() : game_g->getGlobalSoundVolumeEffects();
+    real_volume = ((float)scale)/100.0f * real_volume;
 #ifdef USING_PHONON
     if( this->audioOutput != NULL ) {
         this->audioOutput->setVolume(real_volume);
@@ -612,6 +619,8 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 #else
     sound_volume(default_sound_volume_c),
 #endif
+    sound_volume_music(default_sound_volume_music_c),
+    sound_volume_effects(default_sound_volume_effects_c),
     lighting_enabled(default_lighting_enabled_c) {
     game_g = this;
 
@@ -725,6 +734,22 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
         this->sound_volume = sound_volume_i;
     }
 #endif
+    int sound_volume_music_i = settings->value(sound_volume_music_key_c, default_sound_volume_music_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings sound_volume_music not ok, set to default");
+        this->sound_volume_music = default_sound_volume_music_c;
+    }
+    else {
+        this->sound_volume_music = sound_volume_music_i;
+    }
+    int sound_volume_effects_i = settings->value(sound_volume_effects_key_c, default_sound_volume_effects_c).toInt(&ok);
+    if( !ok ) {
+        qDebug("settings sound_volume_effects not ok, set to default");
+        this->sound_volume_effects = default_sound_volume_effects_c;
+    }
+    else {
+        this->sound_volume_effects = sound_volume_effects_i;
+    }
 
     int lighting_enabled_i = settings->value(lighting_enabled_key_c, default_lighting_enabled_c).toInt(&ok);
     if( !ok ) {
@@ -2107,6 +2132,16 @@ void Game::setGlobalSoundVolume(int sound_volume) {
     this->settings->setValue(sound_volume_key_c, sound_volume);
 }
 #endif
+
+void Game::setGlobalSoundVolumeMusic(int sound_volume_music) {
+    this->sound_volume_music = sound_volume_music;
+    this->settings->setValue(sound_volume_music_key_c, sound_volume_music);
+}
+
+void Game::setGlobalSoundVolumeEffects(int sound_volume_effects) {
+    this->sound_volume_effects = sound_volume_effects;
+    this->settings->setValue(sound_volume_effects_key_c, sound_volume_effects);
+}
 
 void Game::setLightingEnabled(bool lighting_enabled) {
     this->lighting_enabled = lighting_enabled;

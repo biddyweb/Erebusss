@@ -34,7 +34,13 @@ OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 OptionsGamestate::OptionsGamestate() :
     main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
     nameLineEdit(NULL),
-    load_list(NULL), /*soundCheck(NULL),*/ soundSlider(NULL), lightingCheck(NULL),
+    load_list(NULL),
+#ifndef Q_OS_ANDROID
+    soundSlider(NULL),
+#endif
+    soundSliderMusic(NULL),
+    soundSliderEffects(NULL),
+    lightingCheck(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
     try {
@@ -577,7 +583,7 @@ void OptionsGamestate::clickedOptions() {
 
 #ifndef Q_OS_ANDROID
         // on Android, volume is handled by the volume control keys
-        label = new QLabel(tr("Volume: "));
+        label = new QLabel(tr("Master Volume: "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
         soundSlider = new QSlider(Qt::Horizontal);
         soundSlider->setMinimum(0);
@@ -586,6 +592,23 @@ void OptionsGamestate::clickedOptions() {
         g_layout->addWidget(soundSlider, n_row, 1);
         n_row++;
 #endif
+        label = new QLabel(tr("Music Volume: "));
+        g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+        soundSliderMusic = new QSlider(Qt::Horizontal);
+        soundSliderMusic->setMinimum(0);
+        soundSliderMusic->setMaximum(100);
+        soundSliderMusic->setValue(game_g->getGlobalSoundVolumeMusic());
+        g_layout->addWidget(soundSliderMusic, n_row, 1);
+        n_row++;
+
+        label = new QLabel(tr("Effects Volume: "));
+        g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+        soundSliderEffects = new QSlider(Qt::Horizontal);
+        soundSliderEffects->setMinimum(0);
+        soundSliderEffects->setMaximum(100);
+        soundSliderEffects->setValue(game_g->getGlobalSoundVolumeEffects());
+        g_layout->addWidget(soundSliderEffects, n_row, 1);
+        n_row++;
 
         label = new QLabel(tr("Lighting (uncheck if too slow): "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
@@ -630,8 +653,10 @@ void OptionsGamestate::clickedOptionsOkay() {
     }*/
 #ifndef Q_OS_ANDROID
     game_g->setGlobalSoundVolume( soundSlider->value() );
-    game_g->updateSoundVolume("music_intro");
 #endif
+    game_g->setGlobalSoundVolumeMusic( soundSliderMusic->value() );
+    game_g->setGlobalSoundVolumeEffects( soundSliderEffects->value() );
+    game_g->updateSoundVolume("music_intro");
 
     bool new_lighting_enabled = lightingCheck->isChecked();
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {

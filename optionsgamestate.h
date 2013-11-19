@@ -43,8 +43,11 @@ class OptionsGamestate : public Gamestate {
     ScrollingListWidget *load_list;
     vector<QString> load_filenames;
 
-    //QCheckBox *soundCheck;
+#ifndef Q_OS_ANDROID
     QSlider *soundSlider;
+#endif
+    QSlider *soundSliderMusic;
+    QSlider *soundSliderEffects;
     QCheckBox *lightingCheck;
 
     bool cheat_mode;
