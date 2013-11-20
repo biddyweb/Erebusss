@@ -618,9 +618,9 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     sdcard_ok(false),
 #else
     sound_volume(default_sound_volume_c),
-#endif
     sound_volume_music(default_sound_volume_music_c),
     sound_volume_effects(default_sound_volume_effects_c),
+#endif
     lighting_enabled(default_lighting_enabled_c) {
     game_g = this;
 
@@ -2133,7 +2133,6 @@ void Game::setGlobalSoundVolume(int sound_volume) {
     this->sound_volume = sound_volume;
     this->settings->setValue(sound_volume_key_c, sound_volume);
 }
-#endif
 
 void Game::setGlobalSoundVolumeMusic(int sound_volume_music) {
     this->sound_volume_music = sound_volume_music;
@@ -2144,6 +2143,7 @@ void Game::setGlobalSoundVolumeEffects(int sound_volume_effects) {
     this->sound_volume_effects = sound_volume_effects;
     this->settings->setValue(sound_volume_effects_key_c, sound_volume_effects);
 }
+#endif
 
 void Game::setLightingEnabled(bool lighting_enabled) {
     this->lighting_enabled = lighting_enabled;

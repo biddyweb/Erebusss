@@ -654,10 +654,10 @@ void OptionsGamestate::clickedOptionsOkay() {
     }*/
 #ifndef Q_OS_ANDROID
     game_g->setGlobalSoundVolume( soundSlider->value() );
-#endif
     game_g->setGlobalSoundVolumeMusic( soundSliderMusic->value() );
     game_g->setGlobalSoundVolumeEffects( soundSliderEffects->value() );
     game_g->updateSoundVolume("music_intro");
+#endif
 
     bool new_lighting_enabled = lightingCheck->isChecked();
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {
