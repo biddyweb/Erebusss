@@ -4,7 +4,7 @@
 #include "gamestate.h"
 #include "logiface.h"
 
-#include <QtCore/QCoreApplication>
+#include <QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)/*, elapsed_time(0)*/
@@ -33,7 +33,6 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
             return;
         }
     }
-#endif // Q_OS_SYMBIAN
 
     Qt::WidgetAttribute attribute;
     switch (orientation) {
@@ -63,6 +62,7 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
 #endif // QT_VERSION < 0x040702
     };
     setAttribute(attribute, true);
+#endif // Q_OS_SYMBIAN
 }
 
 void MainWindow::showExpanded(bool fullscreen)

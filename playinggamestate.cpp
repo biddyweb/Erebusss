@@ -1,5 +1,18 @@
-#include <QtWebKit/QWebView>
-#include <QtWebKit/QWebFrame>
+#include <QApplication>
+#include <QTextBlockFormat>
+#include <QTextCursor>
+#include <QTextStream>
+#include <QMouseEvent>
+#include <QVBoxLayout>
+#include <QLineEdit>
+#include <QDesktopWidget>
+#include <QWebView>
+#include <QWebFrame>
+
+#if QT_VERSION < 0x050000
+#include <QFile>
+#include <qmath.h>
+#endif
 
 #include <ctime>
 #include <algorithm> // needed for stable_sort on Symbian at least
@@ -345,7 +358,11 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
             /*QPointF old_pos = this->mapToScene(this->last_mouse_x, this->last_mouse_y);
             QPointF new_pos = this->mapToScene(event->x(), event->y());*/
             QPointF old_pos(this->last_mouse_x, this->last_mouse_y);
+#if QT_VERSION >= 0x050000
+            QPointF new_pos = event->localPos();
+#else
             QPointF new_pos = event->posF();
+#endif
             QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
 
             // drag - we do this ourselves rather than using drag mode QGraphicsView::ScrollHandDrag, to avoid conflict with multitouch

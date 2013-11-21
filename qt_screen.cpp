@@ -1,5 +1,6 @@
-#include "qt_screen.h"
+#include <QApplication>
 
+#include "qt_screen.h"
 #include "game.h"
 #include "logiface.h"
 

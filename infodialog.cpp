@@ -3,6 +3,12 @@
 #include "qt_screen.h"
 #include "logiface.h"
 
+#include <QApplication>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QDesktopWidget>
+
 #include <cassert>
 #include <QWebFrame>
 

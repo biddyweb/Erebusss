@@ -7,8 +7,23 @@
 
 #include <ctime>
 
+#include <QApplication>
+#include <QDesktopWidget>
 #include <QWebFrame>
 #include <QXmlStreamReader>
+#include <QTextStream>
+#include <QImageReader>
+#include <QMessageBox>
+#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QStyleFactory>
+#include <QDir>
+#include <QDateTime>
+
+#if QT_VERSION < 0x050000
+#include <QWindowsStyle>
+#include <qmath.h>
+#endif
 
 #ifdef _DEBUG
 #include <cassert>
@@ -627,13 +642,21 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     QCoreApplication::setApplicationName("erebus");
     settings = new QSettings("Mark Harman", "erebus", this);
 
+#if QT_VERSION >= 0x050000
+    style = QStyleFactory::create("windows");
+#else
     style = new QWindowsStyle(); // needed to get the textured buttons (which doesn't work with Windows XP, Symbian or Android styles)
+#endif
 
     webViewEventFilter = new WebViewEventFilter(this);
 
     // initialise paths
     // n.b., not safe to use logging until after copied/removed old log files!
+#if QT_VERSION >= 0x050000
+    QString pathQt = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#else
     QString pathQt = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
     qDebug("user data location path: %s", pathQt.toStdString().c_str());
     if( !QDir(pathQt).exists() ) {
         QDir().mkpath(pathQt);

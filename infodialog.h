@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#include <QtGui>
+#include <QDialog>
 
 #include <string>
 using std::string;

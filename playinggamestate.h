@@ -2,8 +2,16 @@
 
 #include "common.h"
 
-#include <QtGui>
-#include <QtWebKit/QWebView>
+#include <QGraphicsTextItem>
+#include <QGraphicsView>
+#include <QElapsedTimer>
+#include <QPushButton>
+#include <QLabel>
+#include <QScrollBar>
+#include <QListWidget>
+#include <QCheckBox>
+#include <QXmlStreamReader>
+#include <QWebView>
 
 #include <sstream>
 using std::stringstream;

@@ -2,7 +2,14 @@
 #include <cassert>
 #endif
 
-#include <QtWebKit/QWebView>
+#include <QApplication>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
+#include <QDesktopServices>
+#include <QWebView>
 
 #include <sstream>
 using std::stringstream;

@@ -5,8 +5,10 @@
 #include <vector>
 using std::vector;
 
-#include <QtGui>
-#include <QtWebKit/QWebView>
+#include <QStackedWidget>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QWebView>
 
 #include "gamestate.h"
 

@@ -4,7 +4,9 @@
 #include "game.h"
 #include "logiface.h"
 
-#include <QtGui/QApplication>
+#include <QApplication>
+#include <QDir>
+#include <QTranslator>
 
 /** Platform #defines:
   * smallscreen_c: whether the platform has a smallscreen or not (phones, handhelds).

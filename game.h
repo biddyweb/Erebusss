@@ -2,8 +2,10 @@
 
 #include "common.h"
 
-#include <QtGui>
-#include <QtWebKit/QWebView>
+#include <QWebView>
+#include <QGraphicsItem>
+#include <QListWidget>
+#include <QSettings>
 
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID

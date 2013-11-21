@@ -1,10 +1,11 @@
 #pragma once
 
+#include <QTimer>
+#include <QElapsedTimer>
+
 #include "common.h"
 
 #include "mainwindow.h"
-
-#include <QtGui>
 
 class GameClock {
     bool paused;
