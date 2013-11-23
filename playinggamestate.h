@@ -11,7 +11,12 @@
 #include <QListWidget>
 #include <QCheckBox>
 #include <QXmlStreamReader>
+
+#ifdef USING_WEBKIT
 #include <QWebView>
+#else
+#include <QTextEdit>
+#endif
 
 #include <sstream>
 using std::stringstream;
@@ -649,7 +654,8 @@ public:
     void addTextEffect(const string &text, Vector2D pos, int duration_ms);
     void addTextEffect(const string &text, Vector2D pos, int duration_ms, int r, int g, int b);
     void playSound(const string &sound_effect);
-    QWebView *showInfoWindow(const string &html);
+    void showInfoWindow(const string &html);
+    void showInfoWindow(const string &html, bool scroll_to_end);
 
     bool isTransform3D() const {
         return this->view_transform_3d;

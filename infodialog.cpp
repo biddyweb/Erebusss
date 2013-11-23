@@ -9,8 +9,15 @@
 #include <QPushButton>
 #include <QDesktopWidget>
 
-#include <cassert>
+#ifdef USING_WEBKIT
+#include <QWebView>
 #include <QWebFrame>
+#else
+#include <QTextEdit>
+#include <QScrollBar>
+#endif
+
+#include <cassert>
 
 #include <sstream>
 using std::stringstream;
@@ -45,10 +52,21 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
 
     //QLabel *label = new QLabel(text.c_str());
     //label->setWordWrap(true);
-    //label = new QTextEdit(text.c_str());
+#ifdef USING_WEBKIT
     label = new QWebView();
     game_g->setWebView(label);
+#else
+    label = new QTextEdit();
+    game_g->setTextEdit(label);
+#endif
     label->setHtml(text.c_str());
+    /*string text2 = text;
+    //text2 += "<font color=\"red\">blah</font> <font color=\"black\">blah</font> blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ";
+    text2 += "blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ";
+    text2 += "blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ";
+    text2 += "blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ";
+    label->setHtml(text2.c_str());*/
+
     label->setFont(game_g->getFontSmall());
     //label->setReadOnly(true);
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -89,14 +107,15 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
                 button->setShortcut(QKeySequence(Qt::Key_Escape));
             }
             button->setFont(small_buttons ? game_g->getFontSmall() : game_g->getFontStd());
-            button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            //button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
             layout2->addWidget(button);
             connect(button, SIGNAL(clicked()), this, SLOT(clicked()));
             buttons_list.push_back(button);
         }
     }
 
-    this->setEnabled(true);
+    //this->setEnabled(true);
 }
 
 void InfoDialog::reject() {
@@ -125,8 +144,11 @@ void InfoDialog::clicked() {
 }
 
 void InfoDialog::scrollToBottom() {
-    //this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
+#ifdef USING_WEBKIT
     this->label->page()->mainFrame()->setScrollBarValue(Qt::Vertical, this->label->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
+#else
+    this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
+#endif
 }
 
 int InfoDialog::exec() {

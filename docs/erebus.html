@@ -535,12 +535,17 @@ FIXED   Fixed level up window for lower resolution non-mobile screens (e.g.,
         1024x600 netbooks).
 FIXED   Made it so that "Inn" shop doesn't appear in campaign window, nor as an
         NPC shopkeeper in random dungeons.
+FIXED   On Android, text windows were slightly misaligned if scrolling (due to
+        attempting to display a scrollbar).
 ADDED   New music by Alexander Timoshenko (on Windows and Linux).
 ADDED   Option to import/export save game files from/to external storage on
         Android.
 ADDED   If save game fails to load on Android, save game file will be copied to
         SD card.
 ADDED   New command line option -datafolder to specify location of data folder.
+UPDATED No longer using WebKit - on Android, this reduces the required library
+        downloads from ~25MB to ~10MB; on Windows, this reduces the required
+        install size by ~10MB.
 UPDATED Now using SFML 2 instead of Phonon for audio on Windows and Linux
         (allows gapless looping, and fixes audio problems on Linux).
 UPDATED Added footsteps sounds for Linux (now work properly with SFML).

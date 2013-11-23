@@ -9,7 +9,6 @@
 
 #include <QApplication>
 #include <QDesktopWidget>
-#include <QWebFrame>
 #include <QXmlStreamReader>
 #include <QTextStream>
 #include <QImageReader>
@@ -19,6 +18,13 @@
 #include <QStyleFactory>
 #include <QDir>
 #include <QDateTime>
+
+#ifdef USING_WEBKIT
+#include <QWebFrame>
+#else
+#include <QTextEdit>
+#include <QUrl>
+#endif
 
 #if QT_VERSION < 0x050000
 #include <QWindowsStyle>
@@ -145,21 +151,52 @@ bool Sound::update() {
 
 #endif
 
+#ifdef USING_WEBKIT
 void WebViewEventFilter::setWebView(QWebView *webView) {
     qDebug("setWebView");
     this->webView = webView;
     this->webView->installEventFilter(this);
+    //this->textEdit = NULL;
+    this->filterMouseMove = false;
+    this->orig_mouse_x = 0;
+    this->orig_mouse_y = 0;
+    this->saved_mouse_x = 0;
+    this->saved_mouse_y = 0;
+    this->last_scroll_y = -1;
 }
+#else
+void WebViewEventFilter::setTextEdit(QTextEdit *textEdit) {
+    qDebug("setTextEdit");
+    this->textEdit = textEdit;
+    this->textEdit->installEventFilter(this);
+    //this->webView = NULL;
+    this->filterMouseMove = false;
+    this->orig_mouse_x = 0;
+    this->orig_mouse_y = 0;
+    this->saved_mouse_x = 0;
+    this->saved_mouse_y = 0;
+    this->last_scroll_y = -1;
+}
+#endif
 
 // returns true to filter the event
 bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
+    //qDebug("eventFilter type: %d", event->type());
     switch( event->type() ) {
+        case QEvent::Timer:
+            {
+                // hack to fix problem where when drag-scrolling with mouse or touch, when mouse/pointer moves outside the textedit, it starts scrolling in the opposte direction
+                return true;
+                break;
+            }
         case QEvent::MouseButtonPress:
             {
+                //qDebug("MouseButtonPress");
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                 if( mouseEvent->button() == Qt::LeftButton ) {
                     //filterMouseMove = true;
                     // disallow selection - but we need to allow click and drag for the scroll bars!
+#ifdef USING_WEBKIT
                     if( webView != NULL ) {
                         QRect vertRect = webView->page()->mainFrame()->scrollBarGeometry(Qt::Vertical);
                         QRect horizRect = webView->page()->mainFrame()->scrollBarGeometry(Qt::Horizontal);
@@ -172,11 +209,25 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
                             orig_mouse_y = saved_mouse_y = mouseEvent->globalY();
                         }
                     }
+#else
+                    if( textEdit != NULL ) {
+                        filterMouseMove = true;
+                        orig_mouse_x = saved_mouse_x = mouseEvent->globalX();
+                        orig_mouse_y = saved_mouse_y = mouseEvent->globalY();
+                    }
+#endif
                 }
                 break;
             }
         case QEvent::MouseButtonRelease:
             {
+                //qDebug("MouseButtonRelease");
+#ifndef USING_WEBKIT
+                if( textEdit != NULL && last_scroll_y != -1 ) {
+                    // fix problem where when drag-scrolling with mouse or touch, if mouse/pointer has moved outside the textedit, it scrolls back to original position when we let go
+                    textEdit->verticalScrollBar()->setValue(last_scroll_y);
+                }
+#endif
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                 if( mouseEvent->button() == Qt::LeftButton ) {
                     filterMouseMove = false;
@@ -193,10 +244,38 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
                         return true;
                     }
                 }
-               break;
+#ifndef USING_WEBKIT
+                if( textEdit != NULL ) {
+                    // need to handle links manually!
+                    // problem that Qt::LinksAccessibleByMouse messes up the drag scrolling, so have to use Qt::NoTextInteraction
+                    QString url = textEdit->anchorAt(mouseEvent->pos());
+                    if( url.length() > 0 ) {
+                        LOG("textEdit: clicked on: %s\n", url.toStdString().c_str());
+                        if( url.at(0) == '#' ) {
+                            last_scroll_y = -1;
+                            textEdit->scrollToAnchor(url.mid(1));
+                        }
+                        else if( url.contains("://") ) {
+                            QDesktopServices::openUrl(url);
+                        }
+                        else {
+                            QFile file(QString(DEPLOYMENT_PATH) + "docs/" + url);
+                            if( file.open(QFile::ReadOnly | QFile::Text) ) {
+                                QTextStream in(&file);
+                                textEdit->setHtml(in.readAll());
+                            }
+                            else {
+                                LOG("failed to load: %s\n", url.toStdString().c_str());
+                            }
+                        }
+                    }
+                }
+#endif
+                break;
             }
         case QEvent::MouseMove:
             {
+                //qDebug("MouseMove");
                 /*if( filterMouseMove && webView != NULL ) {
                     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                     int scrollbar_x = webView->page()->mainFrame()->scrollBarGeometry(Qt::Vertical).left();
@@ -207,12 +286,44 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
                     }
                 }*/
                 if( filterMouseMove ) {
+                    //if( webView != NULL || textEdit != NULL ) {
+#ifdef USING_WEBKIT
                     if( webView != NULL ) {
+#else
+                    if( textEdit != NULL ) {
+#endif
                         // support for swipe scrolling
                         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                         int new_mouse_x = mouseEvent->globalX();
                         int new_mouse_y = mouseEvent->globalY();
-                        webView->page()->mainFrame()->scroll(saved_mouse_x - new_mouse_x, saved_mouse_y - new_mouse_y);
+                        //qDebug("mouse %d, %d", new_mouse_x, new_mouse_y);
+#ifdef USING_WEBKIT
+                        if( webView != NULL ) {
+                            webView->page()->mainFrame()->scroll(saved_mouse_x - new_mouse_x, saved_mouse_y - new_mouse_y);
+                        }
+#else
+                        if( textEdit != NULL ){
+                            qDebug("scroll %d, %d", saved_mouse_x - new_mouse_x, saved_mouse_y - new_mouse_y);
+                            int value = textEdit->verticalScrollBar()->value();
+                            value += saved_mouse_y - new_mouse_y;
+                            if( value < textEdit->verticalScrollBar()->minimum() )
+                                value = textEdit->verticalScrollBar()->minimum();
+                            if( value > textEdit->verticalScrollBar()->maximum() )
+                                value = textEdit->verticalScrollBar()->maximum();
+                            textEdit->verticalScrollBar()->setValue(value);
+                            //qDebug("    value is now %d", value);
+                            last_scroll_y = value;
+
+                            value = textEdit->horizontalScrollBar()->value();
+                            value += saved_mouse_x - new_mouse_x;
+                            if( value < textEdit->horizontalScrollBar()->minimum() )
+                                value = textEdit->horizontalScrollBar()->minimum();
+                            if( value > textEdit->horizontalScrollBar()->maximum() )
+                                value = textEdit->horizontalScrollBar()->maximum();
+                            textEdit->horizontalScrollBar()->setValue(value);
+                            //qDebug("    value is now %d", value);
+                        }
+#endif
                         saved_mouse_x = new_mouse_x;
                         saved_mouse_y = new_mouse_y;
                     }
@@ -222,6 +333,10 @@ bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
             break;
         case QEvent::MouseButtonDblClick:
             return true;
+            break;
+        case QEvent::KeyPress:
+        case QEvent::KeyRelease:
+            last_scroll_y = -1;
             break;
         default:
             break;
@@ -845,7 +960,9 @@ void Game::init(bool fullscreen) {
         palette.setColor(QPalette::Text, Qt::white);
         window->setPalette(palette);
     }*/
+#ifdef USING_WEBKIT
     QWebSettings *web_settings = QWebSettings::globalSettings();
+#endif
     int screen_w = QApplication::desktop()->width();
     int screen_h = QApplication::desktop()->height();
     LOG("resolution %d x %d\n", screen_w, screen_h);
@@ -874,9 +991,11 @@ void Game::init(bool fullscreen) {
             this->font_big.setPointSize(13);
         }
 
+#ifdef USING_WEBKIT
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize() + 20);
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize() + 20);
+#endif
     }
 #else
     if( smallscreen_c ) {
@@ -903,14 +1022,16 @@ void Game::init(bool fullscreen) {
         LOG("default font size: %d\n", window->font().pointSize());
         QString font_family = window->font().family();
         LOG("font family: %s\n", font_family.toStdString().c_str());
-        this->font_scene = QFont(font_family, 16);
-        this->font_small = QFont(font_family, 16);
-        this->font_std = QFont(font_family, 18);
+        this->font_scene = QFont(font_family, 16, QFont::Normal);
+        this->font_small = QFont(font_family, 16, QFont::Normal);
+        this->font_std = QFont(font_family, 18, QFont::Normal);
         this->font_big = QFont(font_family, 24, QFont::Bold);
 
+#ifdef USING_WEBKIT
         web_settings->setFontFamily(QWebSettings::StandardFont, font_std.family());
         web_settings->setFontSize(QWebSettings::DefaultFontSize, font_std.pointSize());
         web_settings->setFontSize(QWebSettings::DefaultFixedFontSize, font_std.pointSize());
+#endif
     }
 #endif
 
@@ -928,6 +1049,48 @@ void Game::init(bool fullscreen) {
     this->gui_palette.setBrush(QPalette::Button, gui_brush_buttons);
     this->gui_palette.setColor(QPalette::ButtonText, QColor(76, 0, 0));
 //#endif
+}
+
+#ifdef USING_WEBKIT
+void Game::setWebView(QWebView *webView) {
+#ifdef Q_OS_ANDROID
+    // scrollbars need to be explicitly disabled, as otherwise we get a space being left, even though scrollbars don't show
+    webView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    webView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#endif
+    this->webViewEventFilter->setWebView(webView);
+}
+#else
+void Game::setTextEdit(QTextEdit *textEdit) {
+    // need to set colours for Android at least
+    QPalette p = textEdit->palette();
+    p.setColor(QPalette::Base, Qt::white);
+    p.setColor(QPalette::Text, Qt::black);
+    textEdit->setPalette(p);
+    textEdit->setReadOnly(true);
+    textEdit->setTextInteractionFlags(Qt::NoTextInteraction);
+    //textEdit->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+    //textEdit->setFont(this->getFontSmall());
+    QFont font = this->getFontSmall();
+    if( !smallscreen_c ) {
+        // font seems slightly too large, at least for Windows
+        font.setPointSizeF(font.pointSizeF() - 4.5f);
+    }
+    textEdit->setFont(font);
+#ifdef Q_OS_ANDROID
+    // scrollbars need to be explicitly disabled, as otherwise we get a space being left, even though scrollbars don't show
+    textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#endif
+    this->webViewEventFilter->setTextEdit(textEdit);
+}
+#endif
+
+void Game::resizeTopLevelWidget(QWidget *widget) const {
+    int width = QApplication::desktop()->width();
+    int height = QApplication::desktop()->height();
+    widget->setMinimumWidth(width/2);
+    widget->setMinimumHeight(height/2);
 }
 
 void Game::run(bool fullscreen) {

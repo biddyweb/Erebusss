@@ -8,18 +8,26 @@ using std::vector;
 #include <QStackedWidget>
 #include <QComboBox>
 #include <QCheckBox>
+
+#ifdef USING_WEBKIT
 #include <QWebView>
+#else
+#include <QTextEdit>
+#endif
 
 #include "gamestate.h"
 
 class ScrollingListWidget;
 //class Sound;
 
+#ifdef USING_WEBKIT
 class GameTypeHelp : public QWebView {
+#else
+class GameTypeHelp : public QTextEdit {
+#endif
     Q_OBJECT
 public:
-    GameTypeHelp() : QWebView() {
-    }
+    GameTypeHelp();
 
 public slots:
     void changedGameType(int index);

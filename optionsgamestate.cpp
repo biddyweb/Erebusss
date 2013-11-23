@@ -9,7 +9,14 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDesktopServices>
+
+#ifdef USING_WEBKIT
 #include <QWebView>
+#else
+#include <QTextBrowser>
+#include <QFile>
+#include <QTextStream>
+#endif
 
 #include <sstream>
 using std::stringstream;
@@ -20,6 +27,16 @@ using std::stringstream;
 #include "mainwindow.h"
 #include "infodialog.h"
 #include "logiface.h"
+
+#ifdef USING_WEBKIT
+GameTypeHelp::GameTypeHelp() : QWebView() {
+    game_g->setWebView(this);
+}
+#else
+GameTypeHelp::GameTypeHelp() : QTextEdit() {
+    game_g->setTextEdit(this);
+}
+#endif
 
 void GameTypeHelp::changedGameType(int index) {
     if( index == GAMETYPE_CAMPAIGN ) {
@@ -261,17 +278,14 @@ void OptionsGamestate::clickedStart() {
                 g_layout->addWidget(gametypeComboBox, n_row, 1);
                 n_row++;
 
-                // be careful if we change this code - need to ensure layout still works okay, including on Android
-                GameTypeHelp *helpLabel = new GameTypeHelp();
-                game_g->setWebView(helpLabel);
-                //helpLabel->setWordWrap(true);
-                helpLabel->setFont(game_g->getFontSmall());
-                connect(gametypeComboBox, SIGNAL(currentIndexChanged(int)), helpLabel, SLOT(changedGameType(int)));
-                g_layout->addWidget(helpLabel, n_row, 1, 1, 1, Qt::AlignLeft);
-                n_row++;
-
-                helpLabel->changedGameType( gametypeComboBox->currentIndex() ); // force initial update
             }
+            // be careful if we change this code - need to ensure layout still works okay, including on Android
+            GameTypeHelp *helpLabel = new GameTypeHelp();
+            //helpLabel->setWordWrap(true);
+            //helpLabel->setFont(game_g->getFontSmall());
+            connect(gametypeComboBox, SIGNAL(currentIndexChanged(int)), helpLabel, SLOT(changedGameType(int)));
+            layout->addWidget(helpLabel);
+            helpLabel->changedGameType( gametypeComboBox->currentIndex() ); // force initial update
         }
     }
     else if( options_page_index == 1 ) {
@@ -689,10 +703,22 @@ void OptionsGamestate::clickedOfflineHelp() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
+#ifdef USING_WEBKIT
     QWebView *help = new QWebView();
     game_g->setWebView(help);
     help->setUrl(QUrl(QString(DEPLOYMENT_PATH) + "docs/erebus.html"));
-    help->show();
+#else
+    QTextBrowser *help = new QTextBrowser();
+    game_g->setTextEdit(help);
+    help->setOpenExternalLinks(true);
+    //help->setSearchPaths(QStringList(QString(DEPLOYMENT_PATH) + "docs/")); // not needed, as we have to handle links manually anyway
+
+    QFile file(QString(DEPLOYMENT_PATH) + "docs/erebus.html");
+    if( file.open(QFile::ReadOnly | QFile::Text) ) {
+        QTextStream in(&file);
+        help->setHtml(in.readAll());
+    }
+#endif
     layout->addWidget(help);
 
     QPushButton *closeButton = new QPushButton(tr("Close"));

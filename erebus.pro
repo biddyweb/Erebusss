@@ -9,9 +9,13 @@ else {
         #CONFIG += USING_PHONON
     }
 }
-
 USING_PHONON {
     DEFINES += USING_PHONON
+}
+
+#CONFIG += USING_WEBKIT
+USING_WEBKIT {
+    DEFINES += USING_WEBKIT
 }
 
 # Add files and directories to ship with the application
@@ -66,9 +70,16 @@ else {
 }
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += webkitwidgets
+    USING_WEBKIT {
+        QT += webkitwidgets
+    }
+    else {
+        QT += widgets
+    }
 }
-QT += webkit
+USING_WEBKIT {
+    QT += webkit
+}
 QT += xml
 
 # Test UID only:

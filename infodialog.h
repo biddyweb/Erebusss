@@ -10,12 +10,20 @@ using std::string;
 #include <vector>
 using std::vector;
 
+#ifdef USING_WEBKIT
 class QWebView;
+#else
+class QTextEdit;
+#endif
 
 class InfoDialog : public QDialog {
     Q_OBJECT
 
+#ifdef USING_WEBKIT
     QWebView *label;
+#else
+    QTextEdit *label;
+#endif
     vector<QPushButton *> buttons_list;
 
 private slots:

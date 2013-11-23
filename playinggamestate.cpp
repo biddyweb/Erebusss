@@ -6,8 +6,14 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 #include <QDesktopWidget>
+
+#ifdef USING_WEBKIT
 #include <QWebView>
 #include <QWebFrame>
+#else
+#include <QTextEdit>
+#include <QUrl>
+#endif
 
 #if QT_VERSION < 0x050000
 #include <QFile>
@@ -1015,8 +1021,13 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     html += "</body></html>";
 
+#ifdef USING_WEBKIT
     QWebView *label = new QWebView();
     game_g->setWebView(label);
+#else
+    QTextEdit *label = new QTextEdit();
+    game_g->setTextEdit(label);
+#endif
     label->setHtml(html);
     layout->addWidget(label);
 
@@ -6315,8 +6326,7 @@ void PlayingGamestate::clickedJournal() {
     str << this->journal_ss.str();
     str << "<hr/><p>" << this->getJournalDate() << "</p>";
     str << "</body></html>";
-    QWebView *web_view = this->showInfoWindow(str.str());
-    web_view->page()->mainFrame()->setScrollBarValue(Qt::Vertical, web_view->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
+    this->showInfoWindow(str.str(), true);
 }
 
 void PlayingGamestate::clickedPause() {
@@ -6471,7 +6481,11 @@ void PlayingGamestate::clickedQuit() {
     this->quitGame();
 }
 
-QWebView *PlayingGamestate::showInfoWindow(const string &html) {
+void PlayingGamestate::showInfoWindow(const string &html) {
+    this->showInfoWindow(html, false);
+}
+
+void PlayingGamestate::showInfoWindow(const string &html, bool scroll_to_end) {
     // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
     qDebug("showInfoWindow()\n");
 
@@ -6482,20 +6496,33 @@ QWebView *PlayingGamestate::showInfoWindow(const string &html) {
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
 
+#ifdef USING_WEBKIT
     QWebView *label = new QWebView();
     game_g->setWebView(label);
+#else
+    QTextEdit *label = new QTextEdit();
+    game_g->setTextEdit(label);
+#endif
     label->setHtml(html.c_str());
     layout->addWidget(label);
 
     QPushButton *closeButton = new QPushButton(tr("Continue"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Return));
-    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     layout->addWidget(closeButton);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeSubWindow()));
 
     this->addWidget(subwindow, false); // should be last, so resizing is already correct - needed for things like scrolling to bottom to work
-    return label;
+
+    if( scroll_to_end ) {
+#ifdef USING_WEBKIT
+        label->page()->mainFrame()->setScrollBarValue(Qt::Vertical, label->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
+#else
+        label->verticalScrollBar()->setValue( label->verticalScrollBar()->maximum() );
+#endif
+    }
 }
 
 void PlayingGamestate::closeSubWindow() {
@@ -8684,7 +8711,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
 }
 
 void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
-    LOG("PlayingGamestate::addWidget() fullscreen_hint? &d\n", fullscreen_hint);
+    LOG("PlayingGamestate::addWidget() fullscreen_hint? %d\n", fullscreen_hint);
     ASSERT_LOGGER( widget->isWindow() );
     this->widget_stack.push_back(widget);
     /*if( mobile_c ) {
@@ -8710,12 +8737,14 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
                 widget->resize( QApplication::desktop()->size() ); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
             }
             else {
+                game_g->resizeTopLevelWidget(widget);
                 widget->show();
             }
         }
         else {
             // always windowed
             widget->setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+            game_g->resizeTopLevelWidget(widget);
             widget->show();
         }
     }

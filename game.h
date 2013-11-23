@@ -2,10 +2,15 @@
 
 #include "common.h"
 
-#include <QWebView>
 #include <QGraphicsItem>
 #include <QListWidget>
 #include <QSettings>
+
+#ifdef USING_WEBKIT
+class QWebView;
+#else
+class QTextEdit;
+#endif
 
 // Phonon not supported on Qt Android
 #ifdef Q_OS_ANDROID
@@ -207,19 +212,34 @@ public:
 class WebViewEventFilter : public QObject {
     Q_OBJECT
 
+#ifdef USING_WEBKIT
     QWebView *webView;
+#else
+    QTextEdit *textEdit;
+#endif
     bool filterMouseMove;
     int orig_mouse_x, orig_mouse_y;
     int saved_mouse_x, saved_mouse_y;
+    int last_scroll_y;
 protected:
 
     bool eventFilter(QObject *obj, QEvent *event);
 
 public:
-    WebViewEventFilter(QObject *parent) : QObject(parent), webView(NULL), filterMouseMove(false), orig_mouse_x(0), orig_mouse_y(0), saved_mouse_x(0), saved_mouse_y(0) {
+    WebViewEventFilter(QObject *parent) : QObject(parent),
+#ifdef USING_WEBKIT
+        webView(NULL),
+#else
+        textEdit(NULL),
+#endif
+        filterMouseMove(false), orig_mouse_x(0), orig_mouse_y(0), saved_mouse_x(0), saved_mouse_y(0), last_scroll_y(-1) {
     }
 
+#ifdef USING_WEBKIT
     void setWebView(QWebView *webView);
+#else
+    void setTextEdit(QTextEdit *textEdit);
+#endif
 };
 
 class AnimationSet {
@@ -590,9 +610,12 @@ public:
         message_queue.push(message);
     }
 
-    void setWebView(QWebView *webView) {
-        this->webViewEventFilter->setWebView(webView);
-    }
+#ifdef USING_WEBKIT
+    void setWebView(QWebView *webView);
+#else
+    void setTextEdit(QTextEdit *textEdit);
+#endif
+    void resizeTopLevelWidget(QWidget *widget) const;
 
     void run(bool fullscreen);
     void handleMessages();
