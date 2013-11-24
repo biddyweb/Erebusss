@@ -913,27 +913,27 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
 }
 
 Game::~Game() {
-    qDebug("Game::~Game()");
+    LOG("Game::~Game()\n");
     if( screen != NULL ) {
-        qDebug("delete screen");
+        LOG("delete screen\n");
         // hack to prevent the MyApplication::event() from calling screen functions when deactivating
         Screen *local_screen = screen;
         screen = NULL;
         delete local_screen;
     }
 
-    qDebug("delete sounds");
+    LOG("delete sounds\n");
     for(map<string, Sound *>::iterator iter = this->sound_effects.begin(); iter != this->sound_effects.end(); ++iter) {
         Sound *sound = iter->second;
         delete sound;
     }
 
     if( style != NULL ) {
-        qDebug("delete style");
+        LOG("delete style\n");
         delete style;
     }
+    LOG("Game::~Game() done\n");
     game_g = NULL;
-    qDebug("Game::~Game() done");
 }
 
 void Game::init(bool fullscreen) {
@@ -1501,6 +1501,7 @@ void Game::runTest(const string &filename, int test_id) {
 
                 floor_region = FloorRegion::createRectangle(1.0f, 25.0f, 2.0f, 5.0f);
                 location.addFloorRegion(floor_region);
+
                 floor_region = FloorRegion::createRectangle(0.0f, 30.0f, 5.0f, 5.0f);
                 location.addFloorRegion(floor_region);
 
