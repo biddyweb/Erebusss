@@ -110,7 +110,11 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
     }
 
     // search for our class
+#if QT_VERSION >= 0x050000
+    jclass clazz=env->FindClass("org/qtproject/qt5/android/bindings/QtActivity");
+#else
     jclass clazz=env->FindClass("org/kde/necessitas/origo/QtActivity");
+#endif
     if (!clazz)
     {
         qDebug("JNI: can't find QtActivity class");
