@@ -38,7 +38,7 @@ Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to
 Windows
 =======
 
-Use the full Qt SDK with Qt Creator to compile for Windows. This has been tested on Windows 7 and Windows 8. This should also work for Linux.
+Use the full Qt SDK with Qt Creator to compile for Windows. This has been tested on Windows 7 and Windows 8. This should also work for Linux. The Windows version is compiled with Qt 4.8.5.
 
 You also need SFML 2, which should be installed as follows:
 
@@ -67,8 +67,8 @@ History
 
 Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
 
-0.11 - Symbian port dropped. Switched from using Phonon to SFML for audio.
-0.6 - Add "make install" support for Linux. Also ported to Pandora.
+0.11 - Symbian port dropped. Switched from using Phonon to SFML for audio. Dependency on QtWebKit removed. Windows version now compiled with Qt 4.8.5.
+0.6 - Added "make install" support for Linux. Also ported to Pandora.
 0.2 - Switched to using Necessitas alpha 4 for Android.
 0.1 - First release.
 
@@ -89,4 +89,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 19 November 2013
+Mark Harman 24 November 2013
