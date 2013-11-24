@@ -3,18 +3,20 @@ rd /S /Q c:\temp\erebus\
 mkdir c:\temp\erebus\
 
 set src="."
-set dllsrc="..\_windows_release_dlls_4_7_3_msvc2008\"
+REM set dllsrc="..\_windows_release_dlls_4_7_3_msvc2008\"
+set dllsrc="..\_windows_release_dlls_4_8_5_msvc2008\"
 set dst="c:\temp\erebus"
 
 copy ..\erebus-build-desktop\release\erebus.exe %dst%\erebus.exe
 
 copy %dllsrc%\QtCore4.dll %dst%
 copy %dllsrc%\QtGui4.dll %dst%
-copy %dllsrc%\QtNetwork4.dll %dst%
-copy %dllsrc%\QtWebKit4.dll %dst%
+REM No longer using QtWebKit
+REM copy %dllsrc%\QtWebKit4.dll %dst%
 copy %dllsrc%\QtXml4.dll %dst%
 REM N.B., we still need phonon4.dll even when using SFML, as it's still needed for QtWebKit
-copy %dllsrc%\phonon4.dll %dst%
+REM Though no longer using QtWebKit...
+REM copy %dllsrc%\phonon4.dll %dst%
 REM For SFML:
 copy libsndfile-1.dll %dst%
 copy openal32.dll %dst%
