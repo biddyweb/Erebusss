@@ -4,7 +4,8 @@
 #include "gamestate.h"
 #include "logiface.h"
 
-#include <QCoreApplication>
+#include <QApplication>
+#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)/*, elapsed_time(0)*/
@@ -76,6 +77,7 @@ void MainWindow::showExpanded(bool fullscreen)
 #endif*/
     if( smallscreen_c || fullscreen ) {
         // smallscreen platforms always fullscreen
+        this->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Android Qt 5 bug where windows open at 640x480?! See http://www.qtcentre.org/threads/55453-Android-screen-res-problem-(it-s-always-640x480-instead-of-maximized)-Qt-5-1-XP . No harm in having it for all platforms
         showFullScreen();
     }
     else {

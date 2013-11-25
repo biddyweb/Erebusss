@@ -924,7 +924,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     if( player->getPortrait().length() > 0 ) {
         QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
         QLabel *portrait_label = new QLabel();
-        int height = QApplication::desktop()->height();
+        int height = QApplication::desktop()->availableGeometry().height();
         int max_pic_height = height/3;
         qDebug("pixmap height %d , height %d , max_pic_height %d", pixmap.height(), height, max_pic_height);
         if( pixmap.height() > max_pic_height ) {
@@ -6994,8 +6994,8 @@ void PlayingGamestate::updateInput() {
         // scroll due to mouse at edge of screen
         int m_x = QCursor::pos().x();
         int m_y = QCursor::pos().y();
-        int screen_width = QApplication::desktop()->width();
-        int screen_height = QApplication::desktop()->height();
+        int screen_width = QApplication::desktop()->availableGeometry().width();
+        int screen_height = QApplication::desktop()->availableGeometry().height();
         //qDebug("mouse at %d, %d", m_x, m_y);
         //qDebug("screen size %d x %d", screen_width, screen_height);
         QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
@@ -8728,13 +8728,14 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
         if( smallscreen_c ) {
             // always fullscreen
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+            widget->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Android Qt 5 bug where windows open at 640x480?! See http://www.qtcentre.org/threads/55453-Android-screen-res-problem-(it-s-always-640x480-instead-of-maximized)-Qt-5-1-XP . No harm in having it for all platforms
             widget->showFullScreen();
         }
         else if( game_g->getScreen()->isFullscreen() ) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             if( fullscreen_hint ) {
                 widget->showFullScreen();
-                widget->resize( QApplication::desktop()->size() ); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
+                widget->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
             }
             else {
                 game_g->resizeTopLevelWidget(widget);

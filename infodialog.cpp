@@ -35,7 +35,7 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
             QPixmap pixmap = game_g->loadImage(picture);
             QLabel *picture_label = new QLabel();
             //picture_label->setPicture(pic);
-            int height = QApplication::desktop()->height();
+            int height = QApplication::desktop()->availableGeometry().height();
             int max_pic_height = height/3;
             if( pixmap.height() > max_pic_height ) {
                 pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);

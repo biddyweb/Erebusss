@@ -963,8 +963,8 @@ void Game::init(bool fullscreen) {
 #ifdef USING_WEBKIT
     QWebSettings *web_settings = QWebSettings::globalSettings();
 #endif
-    int screen_w = QApplication::desktop()->width();
-    int screen_h = QApplication::desktop()->height();
+    int screen_w = QApplication::desktop()->availableGeometry().width();
+    int screen_h = QApplication::desktop()->availableGeometry().height();
     LOG("resolution %d x %d\n", screen_w, screen_h);
 #if defined(Q_OS_ANDROID)
     {
@@ -1087,8 +1087,8 @@ void Game::setTextEdit(QTextEdit *textEdit) {
 #endif
 
 void Game::resizeTopLevelWidget(QWidget *widget) const {
-    int width = QApplication::desktop()->width();
-    int height = QApplication::desktop()->height();
+    int width = QApplication::desktop()->availableGeometry().width();
+    int height = QApplication::desktop()->availableGeometry().height();
     widget->setMinimumWidth(width/2);
     widget->setMinimumHeight(height/2);
 }
