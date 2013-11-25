@@ -8728,7 +8728,9 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
         if( smallscreen_c ) {
             // always fullscreen
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+#ifdef Q_OS_ANDROID
             widget->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Android Qt 5 bug where windows open at 640x480?! See http://www.qtcentre.org/threads/55453-Android-screen-res-problem-(it-s-always-640x480-instead-of-maximized)-Qt-5-1-XP . No harm in having it for all platforms
+#endif
             widget->showFullScreen();
         }
         else if( game_g->getScreen()->isFullscreen() ) {
