@@ -8735,7 +8735,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             if( fullscreen_hint ) {
                 widget->showFullScreen();
-                widget->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
+                widget->resize(QApplication::desktop()->width(), QApplication::desktop()->height()); // workaround for Ubuntu bug where windows sometimes aren't fullscreen?! No harm in having it for all platforms
             }
             else {
                 game_g->resizeTopLevelWidget(widget);
