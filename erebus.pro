@@ -141,7 +141,8 @@ SOURCES += main.cpp mainwindow.cpp \
     logiface.cpp \
     infodialog.cpp \
     androidaudio/androidsoundeffect.cpp \
-    androidaudio/androidaudio.cpp
+    androidaudio/androidaudio.cpp \
+    sound.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -157,7 +158,8 @@ HEADERS += mainwindow.h \
     infodialog.h \
     common.h \
     androidaudio/androidsoundeffect.h \
-    androidaudio/androidaudio.h
+    androidaudio/androidaudio.h \
+    sound.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
