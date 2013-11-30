@@ -56,30 +56,7 @@ const int default_lighting_enabled_c = true;
 #endif
 
 #ifndef Q_OS_ANDROID
-Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream) {
-#ifdef USING_PHONON
-    this->mediaObject = NULL;
-    this->audioOutput = NULL;
-    this->mediaObject = new Phonon::MediaObject(qApp);
-    if( mediaObject == NULL ) {
-        throw string("failed to create media object");
-    }
-    else {
-        connect(mediaObject, SIGNAL(stateChanged(Phonon::State,Phonon::State)), game_g, SLOT(stateChanged(Phonon::State, Phonon::State)));
-        mediaObject->setCurrentSource(Phonon::MediaSource(filename.c_str()));
-        this->audioOutput = new Phonon::AudioOutput(Phonon::GameCategory, qApp);
-        if( audioOutput == NULL ) {
-            delete mediaObject;
-            throw string("failed to create audio output");
-        }
-        else {
-            Phonon::createPath(mediaObject, audioOutput);
-        }
-    }
-#else
-    this->is_fading = false;
-    this->fade_start_time = -1;
-    this->fade_end_time = -1;
+Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream), is_fading(false), fade_start_time(-1), fade_end_time(-1) {
     if( this->stream ) {
         if( !music.openFromFile(filename.c_str()) ) {
             throw string("SFML failed to openFromFile");
@@ -91,7 +68,6 @@ Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream)
         }
         sound.setBuffer(buffer);
     }
-#endif
 }
 
 void Sound::updateVolume() {
@@ -99,11 +75,6 @@ void Sound::updateVolume() {
     float real_volume = ((float)game_g->getGlobalSoundVolume())/100.0f * volume;
     int scale = stream ? game_g->getGlobalSoundVolumeMusic() : game_g->getGlobalSoundVolumeEffects();
     real_volume = ((float)scale)/100.0f * real_volume;
-#ifdef USING_PHONON
-    if( this->audioOutput != NULL ) {
-        this->audioOutput->setVolume(real_volume);
-    }
-#else
     if( is_fading ) {
         int time = game_g->getScreen()->getGameTimeTotalMS();
         if( time >= this->fade_end_time )
@@ -117,7 +88,6 @@ void Sound::updateVolume() {
         music.setVolume(100.0f*real_volume);
     else
         sound.setVolume(100.0f*real_volume);
-#endif
 }
 
 void Sound::setVolume(float volume) {
@@ -126,15 +96,12 @@ void Sound::setVolume(float volume) {
 }
 
 void Sound::fadeOut(int delay) {
-#ifndef USING_PHONON
     this->is_fading = true;
     this->fade_start_time = game_g->getScreen()->getGameTimeTotalMS();
     this->fade_end_time = fade_start_time + delay;
-#endif
 }
 
 bool Sound::update() {
-#ifndef USING_PHONON
     if( this->is_fading ) {
         int time = game_g->getScreen()->getGameTimeTotalMS();
         if( time >= fade_end_time ) {
@@ -146,7 +113,6 @@ bool Sound::update() {
         }
     }
     return false;
-#endif
 }
 
 #endif
@@ -2161,17 +2127,6 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
     return pixmap;
 }
 
-#ifdef USING_PHONON
-void Game::stateChanged(Phonon::State newstate, Phonon::State oldstate) const {
-    if( newstate == Phonon::ErrorState ) {
-        LOG("Game::stateChanged received Phonon::ErrorState\n");
-        Phonon::MediaObject *mediaObject = static_cast<Phonon::MediaObject *>(this->sender());
-        LOG("    error code %d\n", mediaObject->errorType());
-        LOG("    error string: %s\n", mediaObject->errorString().toStdString().c_str());
-    }
-}
-#endif
-
 void Game::loadSound(const string &id, const string &filename, bool stream) {
     LOG("load sound: %s : %s , %d\n", id.c_str(), filename.c_str(), stream);
 #ifndef Q_OS_ANDROID
@@ -2190,20 +2145,6 @@ void Game::loadSound(const string &id, const string &filename, bool stream) {
 
 #endif
 }
-
-#ifndef Q_OS_ANDROID
-/*void Game::mediaStateChanged(Phonon::State newstate, Phonon::State oldstate) const {
-    qDebug("Game::mediaStateChanged(%d, %d)", newstate, oldstate);
-    if( newstate == Phonon::ErrorState ) {
-        Phonon::MediaObject *sound = static_cast<Phonon::MediaObject *>(this->sender());
-        qDebug("phonon reports error!");
-        if( sound != NULL ) {
-            qDebug("    error code: %d", sound->errorType());
-            qDebug("    error string: %s", sound->errorString().toStdString().c_str());
-        }
-    }
-}*/
-#endif
 
 void Game::playSound(const string &sound_effect, bool loop) {
     //qDebug("play sound: %s\n", sound_effect.c_str());

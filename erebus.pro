@@ -1,18 +1,3 @@
-android {
-}
-else {
-    # if set, use Phonon library for sound; if commented out, use SFML
-    symbian {
-        CONFIG += USING_PHONON
-    }
-    else {
-        #CONFIG += USING_PHONON
-    }
-}
-USING_PHONON {
-    DEFINES += USING_PHONON
-}
-
 #CONFIG += USING_WEBKIT
 USING_WEBKIT {
     DEFINES += USING_WEBKIT
@@ -56,15 +41,12 @@ else {
         PWD_WIN ~= s,/,\\,g
         OUT_PWD_WIN = $${OUT_PWD}
         OUT_PWD_WIN ~= s,/,\\,g
-        USING_PHONON {
+        # for SFML:
+        CONFIG(debug, debug|release) {
+            QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-d-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-d-2.dll $${OUT_PWD_WIN}\\
         }
         else {
-            CONFIG(debug, debug|release) {
-                QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-d-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-d-2.dll $${OUT_PWD_WIN}\\
-            }
-            else {
-                QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-2.dll $${OUT_PWD_WIN}\\
-            }
+            QMAKE_POST_LINK = copy $${PWD_WIN}\\libsndfile-1.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\openal32.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-audio-2.dll $${OUT_PWD_WIN}\\ && copy $${PWD_WIN}\\sfml-system-2.dll $${OUT_PWD_WIN}\\
         }
     }
 }
@@ -117,23 +99,18 @@ symbian {
 # MOBILITY +=
 
 android {
-    # phonon not supported on Android
     LIBS += -lOpenSLES
 }
 else {
-    USING_PHONON {
-        QT += phonon
+    # SFML:
+    win32 {
+        LIBS += -L$$PWD # add the source folder for libs
+    }
+    CONFIG(debug, debug|release) {
+        LIBS += -lsfml-audio-d -lsfml-system-d
     }
     else {
-        win32 {
-            LIBS += -L$$PWD # add the source folder for libs
-        }
-        CONFIG(debug, debug|release) {
-            LIBS += -lsfml-audio-d -lsfml-system-d
-        }
-        else {
-            LIBS += -lsfml-audio -lsfml-system
-        }
+        LIBS += -lsfml-audio -lsfml-system
     }
 }
 

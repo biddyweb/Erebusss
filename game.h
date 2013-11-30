@@ -12,29 +12,14 @@ class QWebView;
 class QTextEdit;
 #endif
 
-// Phonon not supported on Qt Android
+// SFML not supported on Qt Android
 #ifdef Q_OS_ANDROID
 
 #include "androidaudio/androidaudio.h"
 
-// hack for Android, as moc doesn't seem to recognise precompiler, so can't be made to ignore stateChanged().
-
-class Phonon {
- public:
-    enum State {
-    };
-};
-
-#else
-
-#ifdef USING_PHONON
-#include <phonon/MediaObject>
-#include <phonon/AudioOutput>
 #else
 
 #include <SFML/Audio.hpp>
-
-#endif
 
 #endif
 
@@ -75,10 +60,6 @@ class Sound : public QObject {
 
     float volume;
     bool stream;
-#ifdef USING_PHONON
-    Phonon::MediaObject *mediaObject;
-    Phonon::AudioOutput *audioOutput;
-#else
     // if not streaming:
     sf::SoundBuffer buffer;
     sf::Sound sound;
@@ -89,15 +70,10 @@ class Sound : public QObject {
     bool is_fading;
     int fade_start_time;
     int fade_end_time;
-#endif
 
 public:
     Sound(const string &filename, bool stream);
     ~Sound() {
-#ifdef USING_PHONON
-        delete mediaObject;
-        delete audioOutput;
-#endif
     }
 
     bool isStream() const {
@@ -108,18 +84,6 @@ public:
     void play(bool loop) {
         // if already playing, this function has no effect (doesn't restart)
         //qDebug("play");
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            if( this->mediaObject->state() == Phonon::PlayingState ) {
-                //qDebug("    already playing, pos %d", this->mediaObject->currentTime());
-            }
-            else {
-                this->updateVolume();
-                this->mediaObject->seek(0);
-                this->mediaObject->play();
-            }
-        }
-#else
         if( stream ) {
             if( music.getStatus() == sf::SoundSource::Playing ) {
                 //qDebug("    already playing");
@@ -140,43 +104,25 @@ public:
                 sound.play();
             }
         }
-#endif
     }
     void pause() {
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            this->mediaObject->pause();
-        }
-#else
         if( stream ) {
             music.pause();
         }
         else {
             sound.pause();
         }
-#endif
     }
     void unpause() {
         // plays without changing anything else
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            this->mediaObject->play();
-        }
-#else
         if( stream ) {
             music.play();
         }
         else {
             sound.play();
         }
-#endif
     }
     void stop() {
-#ifdef USING_PHONON
-        if( this->mediaObject != NULL ) {
-            this->mediaObject->stop();
-        }
-#else
         if( stream ) {
             music.stop();
         }
@@ -184,7 +130,6 @@ public:
             sound.stop();
         }
         this->is_fading = false;
-#endif
     }
 
     void fadeOut(int delay);
@@ -572,11 +517,6 @@ protected:
     void init(bool fullscreen);
     void createPlayerNames();
     void runTest(const string &filename, int test_id);
-
-private slots:
-#ifdef USING_PHONON
-    void stateChanged(Phonon::State newstate, Phonon::State oldstate) const;
-#endif
 
 public:
     Game();
