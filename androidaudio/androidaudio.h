@@ -1,17 +1,9 @@
-#ifndef ANDROIDAUDIO_H
-#define ANDROIDAUDIO_H
-
 // modified from https://groups.google.com/forum/?fromgroups=#!topic/android-qt/rpPa_W6PF1Y , by Adam Pigg
+#pragma once
 
 #include <QtGlobal> // need this to get Q_OS_ANDROID #define, which we need before we include anything else!
 
-// n.b., need to faff around with #includes here, so it compiles on both Android and other platforms, even though we only need this file for Android
-
-#include <QObject>
-
 #if defined(Q_OS_ANDROID)
-
-#include <QMap>
 
 #include "androidsoundeffect.h"
 
@@ -22,25 +14,7 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
-#endif
-
-class AndroidAudio : public QObject
-{
-    Q_OBJECT
-#if defined(Q_OS_ANDROID)
-public:
-    explicit AndroidAudio(QObject *parent = 0);
-    ~AndroidAudio();
-
-signals:
-
-public slots:
-
-    void setVolume(int volume);
-    void playSound(const AndroidSoundEffect *sound, bool loop);
-    AndroidSoundEffect *loadSound(const QString &filename);
-
-private:
+class AndroidAudio {
     bool createEngine();
     void destroyEngine();
     bool startSoundPlayer();
@@ -54,18 +28,25 @@ private:
     // output mix interfaces
     SLObjectItf mOutputMixObject;
 
-    // buffer queue player interfaces - Effects
+    // buffer queue player interfaces - should ultimately be per sample
     SLObjectItf mPlayerObject;
     SLPlayItf mPlayerPlay;
     SLBufferQueueItf mPlayerQueue;
 
-    // output volume interface
+    // output volume interface - should ultimately be per sample
     SLVolumeItf mPlayerVolume;
 
-    // output seek interface
+    // output seek interface - should ultimately be per sample
     //SLSeekItf mPlayerSeek;
 
-#endif
-};
+public:
+    explicit AndroidAudio();
+    ~AndroidAudio();
 
-#endif // ANDROIDAUDIO_H
+    void setVolume(int volume);
+    void playSound(const AndroidSoundEffect *sound, bool loop);
+    AndroidSoundEffect *loadSound(const QString &filename);
+
+
+};
+#endif

@@ -11,9 +11,7 @@
 
 #include <cmath>
 
-AndroidAudio::AndroidAudio(QObject *parent) :
-    QObject(parent), sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mPlayerObject(NULL)
-{
+AndroidAudio::AndroidAudio() : sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL), mPlayerObject(NULL) {
     if( createEngine() ) {
         if( startSoundPlayer() ) {
             sound_ok = true;
@@ -105,7 +103,7 @@ AndroidSoundEffect *AndroidAudio::loadSound(const QString &filename) {
         qDebug("sound engine not available");
         return NULL;
     }
-    AndroidSoundEffect *sound = new AndroidSoundEffect(filename, this);
+    AndroidSoundEffect *sound = new AndroidSoundEffect(filename);
     if( !sound->load() ) {
         qDebug() << "failed to load sound";
         delete sound;

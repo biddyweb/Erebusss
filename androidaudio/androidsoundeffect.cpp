@@ -7,9 +7,7 @@
 #include "androidsoundeffect.h"
 #include <QFile>
 
-AndroidSoundEffect::AndroidSoundEffect(const QString& path, QObject *parent) :
-    QObject(parent), mBuffer(NULL), mLength(0), mPath(path)
-{
+AndroidSoundEffect::AndroidSoundEffect(const QString& path) : mBuffer(NULL), mLength(0), mPath(path) {
 }
 
 AndroidSoundEffect::~AndroidSoundEffect()
