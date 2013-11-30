@@ -53,9 +53,7 @@ class Character;
 const QString savegame_ext = ".xml";
 const QString savegame_folder = "savegames/";
 
-class Sound : public QObject {
-    Q_OBJECT
-
+class Sound {
 #ifndef Q_OS_ANDROID
 
     float volume;
@@ -137,9 +135,6 @@ public:
 #else
     AndroidSoundEffect *android_sound;
 
-private slots:
-    void aboutToFinish() {
-    }
 public:
     Sound(AndroidSoundEffect *android_sound) : android_sound(android_sound) {
     }
