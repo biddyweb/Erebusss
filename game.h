@@ -166,7 +166,7 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
 public:
-    WebViewEventFilter(QObject *parent) : QObject(parent),
+    WebViewEventFilter() : QObject(),
 #ifdef USING_WEBKIT
         webView(NULL),
 #else
@@ -464,9 +464,7 @@ public:
     }
 };
 
-class Game : public QObject {
-    Q_OBJECT
-
+class Game {
 protected:
     map<string, Sound *> sound_effects;
     string current_stream_sound_effect;

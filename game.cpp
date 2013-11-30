@@ -721,7 +721,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     game_g = this;
 
     QCoreApplication::setApplicationName("erebus");
-    settings = new QSettings("Mark Harman", "erebus", this);
+    settings = new QSettings("Mark Harman", "erebus");
 
 #if QT_VERSION >= 0x050000
     style = QStyleFactory::create("windows");
@@ -729,7 +729,7 @@ Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(
     style = new QWindowsStyle(); // needed to get the textured buttons (which doesn't work with Windows XP, Symbian or Android styles)
 #endif
 
-    webViewEventFilter = new WebViewEventFilter(this);
+    webViewEventFilter = new WebViewEventFilter();
 
     // initialise paths
     // n.b., not safe to use logging until after copied/removed old log files!
@@ -894,10 +894,21 @@ Game::~Game() {
         delete sound;
     }
 
+    if( webViewEventFilter != NULL ) {
+        LOG("delete webViewEventFilter");
+        delete webViewEventFilter;
+    }
+
     if( style != NULL ) {
         LOG("delete style\n");
         delete style;
     }
+
+    if( settings != NULL ) {
+        LOG("delete settings");
+        delete settings;
+    }
+
     LOG("Game::~Game() done\n");
     game_g = NULL;
 }
