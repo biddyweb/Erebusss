@@ -3491,9 +3491,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
             game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav", false);  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
 #endif
-#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
             // strange pauses on Symbian?
-            // conflicts with other sounds on Android
             game_g->loadSound("footsteps", string(DEPLOYMENT_PATH) + "sound/stepdirt_1.wav", false);
 #endif
             // remember to call freeSound in the PlayingGamestate destructor!
