@@ -17,15 +17,18 @@ class AndroidSoundEffect {
     char* mBuffer;
     int mLength;
 
-    QString mPath;
-
-    friend class AndroidAudio;
 public:
-    explicit AndroidSoundEffect(const QString& pPath);
+    explicit AndroidSoundEffect();
     ~AndroidSoundEffect();
 
-    const char* getPath();
-    bool load();
+    bool load(const char *path);
     bool unload();
+
+    char *getBuffer() const {
+        return this->mBuffer;
+    }
+    int getLength() const {
+        return this->mLength;
+    }
 };
 #endif

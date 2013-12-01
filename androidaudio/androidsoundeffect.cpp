@@ -7,7 +7,7 @@
 #include "androidsoundeffect.h"
 #include <QFile>
 
-AndroidSoundEffect::AndroidSoundEffect(const QString& path) : mBuffer(NULL), mLength(0), mPath(path) {
+AndroidSoundEffect::AndroidSoundEffect() : mBuffer(NULL), mLength(0) {
 }
 
 AndroidSoundEffect::~AndroidSoundEffect()
@@ -16,14 +16,14 @@ AndroidSoundEffect::~AndroidSoundEffect()
     this->unload();
 }
 
-bool AndroidSoundEffect::load()
+bool AndroidSoundEffect::load(const char *path)
 {
-    QFile lSoundFile(mPath);
+    QFile lSoundFile(path);
 
-    qDebug() << "opening:" << mPath;
+    qDebug() << "opening:" << path;
 
     if (!lSoundFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "Could not open: " << mPath;
+        qDebug() << "Could not open: " << path;
         return false;
     }
 
@@ -115,7 +115,7 @@ bool AndroidSoundEffect::load()
 
     int dataRead = lSoundFile.read(mBuffer, mLength);
     if (dataRead != mLength) {
-        qDebug() << "didn't read correct amount of data' :" << mPath;
+        qDebug() << "didn't read correct amount of data' :" << path;
         lSoundFile.close();
         delete [] mBuffer;
         mBuffer = NULL;

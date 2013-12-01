@@ -45,7 +45,7 @@ public:
 
     void setVolume(int volume);
     void playSound(const AndroidSoundEffect *sound, bool loop);
-    AndroidSoundEffect *loadSound(const QString &filename);
+    AndroidSoundEffect *loadSound(const char *filename);
 
 
 };

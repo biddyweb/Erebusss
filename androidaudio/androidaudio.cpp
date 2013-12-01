@@ -98,13 +98,13 @@ void AndroidAudio::destroyEngine()
     qDebug("AndroidAudio::destroyEngine() done");
 }
 
-AndroidSoundEffect *AndroidAudio::loadSound(const QString &filename) {
+AndroidSoundEffect *AndroidAudio::loadSound(const char *filename) {
     if( !sound_ok ) {
         qDebug("sound engine not available");
         return NULL;
     }
-    AndroidSoundEffect *sound = new AndroidSoundEffect(filename);
-    if( !sound->load() ) {
+    AndroidSoundEffect *sound = new AndroidSoundEffect();
+    if( !sound->load(filename) ) {
         qDebug() << "failed to load sound";
         delete sound;
         sound = NULL;
@@ -255,8 +255,8 @@ void AndroidAudio::playSound(const AndroidSoundEffect *sound, bool loop) {
     //If the player is realised
     if (lPlayerState == SL_OBJECT_STATE_REALIZED) {
         //Get the buffer and length of the effect
-        int16_t* lBuffer = (int16_t *)sound->mBuffer;
-        off_t lLength = sound->mLength;
+        int16_t* lBuffer = (int16_t *)sound->getBuffer();
+        off_t lLength = sound->getLength();
 
         SLBufferQueueState queue_state;
         (*mPlayerQueue)->GetState(mPlayerQueue, &queue_state);
