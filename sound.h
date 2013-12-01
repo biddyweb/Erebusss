@@ -8,7 +8,9 @@ using std::string;
 // SFML not supported on Qt Android
 #ifdef Q_OS_ANDROID
 
-#include "androidaudio/androidaudio.h"
+// n.b., not safe to use forward declarations here - as need to call destructors
+#include "androidaudio/androidsound.h"
+#include "androidaudio/androidsoundeffect.h"
 
 #else
 
@@ -96,16 +98,15 @@ public:
     void fadeOut(int delay);
     bool update();
 #else
-    AndroidSoundEffect *android_sound;
+    AndroidSound *android_sound;
+    AndroidSoundEffect *android_sound_effect;
 
 public:
-    Sound(AndroidSoundEffect *android_sound) : android_sound(android_sound) {
+    Sound(AndroidSound *android_sound, AndroidSoundEffect *android_sound_effect) : android_sound(android_sound), android_sound_effect(android_sound_effect) {
     }
-    ~Sound() {
-        delete android_sound;
-    }
+    ~Sound();
 
-    AndroidSoundEffect *getAndroidSound() const {
+    AndroidSound *getAndroidSound() const {
         return android_sound;
     }
 #endif

@@ -62,4 +62,16 @@ bool Sound::update() {
     return false;
 }
 
+#else
+
+Sound::~Sound() {
+    qDebug("Sound::~Sound()");
+    if( android_sound != NULL ) {
+        delete android_sound;
+    }
+    if( android_sound_effect != NULL ) {
+        delete android_sound_effect;
+    }
+}
+
 #endif

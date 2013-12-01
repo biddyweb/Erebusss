@@ -58,6 +58,8 @@ mkdir %dst%\androidaudio\
 
 copy %src%\androidaudio\androidaudio.cpp %dst%\androidaudio
 copy %src%\androidaudio\androidaudio.h %dst%\androidaudio
+copy %src%\androidaudio\androidsound.cpp %dst%\androidaudio
+copy %src%\androidaudio\androidsound.h %dst%\androidaudio
 copy %src%\androidaudio\androidsoundeffect.cpp %dst%\androidaudio
 copy %src%\androidaudio\androidsoundeffect.h %dst%\androidaudio
 

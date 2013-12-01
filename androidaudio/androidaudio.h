@@ -5,7 +5,7 @@
 
 #if defined(Q_OS_ANDROID)
 
-#include "androidsoundeffect.h"
+class AndroidSoundEffect;
 
 // for native audio
 #include <jni.h>
@@ -13,6 +13,8 @@
 #include <SLES/OpenSLES_Android.h>
 
 class AndroidAudio {
+    friend class AndroidSound;
+
     bool createEngine();
     void destroyEngine();
     bool startSoundPlayer();
@@ -26,25 +28,12 @@ class AndroidAudio {
     // output mix interfaces
     SLObjectItf mOutputMixObject;
 
-    // buffer queue player interfaces - should ultimately be per sample
-    SLObjectItf mPlayerObject;
-    SLPlayItf mPlayerPlay;
-    SLBufferQueueItf mPlayerQueue;
-
-    // output volume interface - should ultimately be per sample
-    SLVolumeItf mPlayerVolume;
-
-    // output seek interface - should ultimately be per sample
-    //SLSeekItf mPlayerSeek;
-
 public:
     explicit AndroidAudio();
     ~AndroidAudio();
 
     void setVolume(int volume);
     void playSound(const AndroidSoundEffect *sound, bool loop);
-    AndroidSoundEffect *loadSound(const char *filename);
-
-
+    AndroidSoundEffect *loadSoundEffect(const char *filename);
 };
 #endif

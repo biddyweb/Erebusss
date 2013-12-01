@@ -80,7 +80,12 @@ Effects" (from the main menu, go to Options).</p>
 <p><a name="knownissues"><h2>Known issues</h2></p>
 
 <p>There are some known issues:<ul>
+<li>This does not work on Android 4.4! (Unless you have already downloaded the Ministro/Qt libraries.) I hope a fix for this will be out soon.</li>
 <li>On Android, when switching back from another app, the display sometimes takes a while to resume. Switching to the homescreen then back to the game may help.</li>
+<li>On Android, I have had some reports of failing to load save games, but unfortunately I have been unable to reproduce
+this. If you encounter this, please email me with details such as device model, Android version, which quest this was,
+which character you were playing, and if possible the log.txt file from net.sourceforge.erebusrpg/ (in sdcard/) after
+this problem occurs (see <a href="#contact">below</a> for details).</li>
 <li>On Windows XP, the game may crash on exit - <a href="https://github.com/LaurentGomila/SFML/issues/30">this seems to be due to a bug with SFML</a>. Windows Vista onwards should be fine.</li>
 </ul></p>
 
@@ -528,6 +533,11 @@ through Paypal below (Paypal account not required). Thanks!</p>
 <p><a name="history"><h2>History</h2></p>
 
 <pre>
+Version 0.12 (Work in progress)
+
+FIXED   Android version can now play multiple sounds at once.
+ADDED   Android version now plays footsteps sound.
+
 Version 0.11 (2013/11/26)
 
 FIXED   Crash if game failed to find game data.

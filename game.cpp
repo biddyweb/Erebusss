@@ -6,6 +6,10 @@
 #include "sound.h"
 #include "logiface.h"
 
+#ifdef Q_OS_ANDROID
+#include "androidaudio/androidsound.h"
+#endif
+
 #include <ctime>
 
 #include <QApplication>
@@ -2088,11 +2092,21 @@ void Game::loadSound(const string &id, const string &filename, bool stream) {
         LOG("%s\n", str.c_str());
     }
 #else
-    AndroidSoundEffect *android_sound = androidAudio.loadSound(filename.c_str());
-    Sound *sound = new Sound(android_sound);
-    qDebug("loadSound: %s : %s : %d : %d", id.c_str(), filename.c_str(), android_sound, sound);
-    this->sound_effects[id] = sound;
-
+    Sound *sound = NULL;
+    AndroidSoundEffect *android_sound_effect = androidAudio.loadSoundEffect(filename.c_str());
+    if( android_sound_effect != NULL ) {
+        AndroidSound *android_sound = new AndroidSound();
+        if( android_sound->setSoundEffect(&androidAudio, android_sound_effect) ) {
+            sound = new Sound(android_sound, android_sound_effect);
+        }
+        else {
+            delete android_sound;
+            delete android_sound_effect;
+        }
+    }
+    if( sound != NULL ) {
+        this->sound_effects[id] = sound;
+    }
 #endif
 }
 
@@ -2111,7 +2125,8 @@ void Game::playSound(const string &sound_effect, bool loop) {
                 this->current_stream_sound_effect = sound_effect;
             }
 #else
-            androidAudio.playSound(sound->getAndroidSound(), loop);
+            //androidAudio.playSound(sound->getAndroidSound(), loop);
+            sound->getAndroidSound()->playSound(loop);
 #endif
         }
     }
@@ -2171,6 +2186,7 @@ void Game::cancelCurrentStream() {
 }
 
 void Game::freeSound(const string &sound_effect) {
+    qDebug("Game::freeSound(%s)", sound_effect.c_str());
     Sound *sound = this->sound_effects[sound_effect];
     if( sound != NULL ) {
         this->sound_effects.erase( this->sound_effects.find(sound_effect) );
