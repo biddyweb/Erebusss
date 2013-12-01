@@ -5,14 +5,6 @@
 
 #if defined(Q_OS_ANDROID)
 
-#include <QDebug>
-#include <QString>
-
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-#include <android/asset_manager.h>
-#include <android/asset_manager_jni.h>
-
 class AndroidSoundEffect {
     char* mBuffer;
     int mLength;

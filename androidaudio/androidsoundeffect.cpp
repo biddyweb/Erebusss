@@ -5,7 +5,9 @@
 #if defined(Q_OS_ANDROID)
 
 #include "androidsoundeffect.h"
+
 #include <QFile>
+#include <QDebug>
 
 AndroidSoundEffect::AndroidSoundEffect() : mBuffer(NULL), mLength(0) {
 }

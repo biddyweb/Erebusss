@@ -11,8 +11,6 @@
 #include <jni.h>
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
-#include <android/asset_manager.h>
-#include <android/asset_manager_jni.h>
 
 class AndroidAudio {
     bool createEngine();
