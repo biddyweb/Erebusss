@@ -64,6 +64,18 @@ bool Sound::update() {
 
 #else
 
+Sound::Sound(const string &filename, bool stream) : android_sound(NULL), android_sound_effect(NULL) {
+    this->android_sound_effect = AndroidSoundEffect::create(filename.c_str());
+    if( android_sound_effect == NULL ) {
+        throw string("failed to create AndroidSoundEffect");
+    }
+    this->android_sound = AndroidSound::create(android_sound_effect);
+    if( android_sound == NULL ) {
+        delete android_sound_effect;
+        throw string("failed to create AndroidSound");
+    }
+}
+
 Sound::~Sound() {
     qDebug("Sound::~Sound()");
     if( android_sound != NULL ) {

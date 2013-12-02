@@ -5,8 +5,6 @@
 
 #if defined(Q_OS_ANDROID)
 
-class AndroidSoundEffect;
-
 // for native audio
 #include <jni.h>
 #include <SLES/OpenSLES.h>
@@ -31,9 +29,5 @@ class AndroidAudio {
 public:
     explicit AndroidAudio();
     ~AndroidAudio();
-
-    void setVolume(int volume);
-    void playSound(const AndroidSoundEffect *sound, bool loop);
-    AndroidSoundEffect *loadSoundEffect(const char *filename);
 };
 #endif

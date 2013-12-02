@@ -3,12 +3,12 @@
 #if defined(Q_OS_ANDROID)
 
 #include "androidsound.h"
-#include "androidaudio.h"
-#include "androidsoundeffect.h"
 
 #include <QDebug>
 
 #include <cmath>
+
+AndroidAudio AndroidSound::androidAudio;
 
 AndroidSound::AndroidSound() : mPlayerObject(NULL), mPlayerPlay(NULL), mPlayerQueue(NULL), mPlayerVolume(NULL), sound_effect(NULL) {
 }
@@ -17,21 +17,21 @@ AndroidSound::~AndroidSound() {
     // n.b., we don't delete sound_effect, as not owned by this class (so one AndroidSound can point to multiple AndroidSoundEffects)
     qDebug("AndroidSound::~AndroidSound()");
     if (mPlayerObject != NULL) {
-        qDebug("AndroidSound::~AndroidSound(): destroy player object %d", mPlayerObject);
+        qDebug("AndroidSound::~AndroidSound(): destroy player object");
         (*mPlayerObject)->Destroy(mPlayerObject);
     }
 }
 
-bool AndroidSound::setSoundEffect(const AndroidAudio *android_audio, const AndroidSoundEffect *sound_effect) {
+bool AndroidSound::setSoundEffect(const AndroidSoundEffect *sound_effect) {
     qDebug() << "Starting Sound Player";
 
     this->sound_effect = NULL;
     if (mPlayerObject != NULL) {
-        qDebug("destroy player object %d", mPlayerObject);
+        qDebug("destroy player object");
         (*mPlayerObject)->Destroy(mPlayerObject);
         mPlayerObject = NULL;
     }
-    if( !android_audio->sound_ok ) {
+    if( !androidAudio.sound_ok ) {
         return false;
     }
 
@@ -59,7 +59,7 @@ bool AndroidSound::setSoundEffect(const AndroidAudio *android_audio, const Andro
 
     SLDataLocator_OutputMix lDataLocatorOut;
     lDataLocatorOut.locatorType = SL_DATALOCATOR_OUTPUTMIX;
-    lDataLocatorOut.outputMix = android_audio->mOutputMixObject;
+    lDataLocatorOut.outputMix = androidAudio.mOutputMixObject;
 
     SLDataSink lDataSink;
     lDataSink.pLocator = &lDataLocatorOut;
@@ -75,7 +75,7 @@ bool AndroidSound::setSoundEffect(const AndroidAudio *android_audio, const Andro
 
     qDebug() << "Configured Sound Player";
 
-    lRes = (*android_audio->mEngineEngine)->CreateAudioPlayer(android_audio->mEngineEngine, &mPlayerObject, &lDataSource, &lDataSink, lSoundPlayerIIDCount, lSoundPlayerIIDs, lSoundPlayerReqs);
+    lRes = (*androidAudio.mEngineEngine)->CreateAudioPlayer(androidAudio.mEngineEngine, &mPlayerObject, &lDataSource, &lDataSink, lSoundPlayerIIDCount, lSoundPlayerIIDs, lSoundPlayerReqs);
     Q_ASSERT(SL_RESULT_SUCCESS == lRes);
     if( lRes != SL_RESULT_SUCCESS ) {
         qDebug("failed to create audio player");
@@ -152,7 +152,7 @@ void AndroidSound::setVolume(int volume) {
     }
 }
 
-void AndroidSound::playSound(bool loop) {
+void AndroidSound::play(bool loop) {
     SLresult lRes;
     SLuint32 lPlayerState;
 
@@ -189,6 +189,16 @@ void AndroidSound::playSound(bool loop) {
             Q_ASSERT(SL_RESULT_SUCCESS == lRes);
         }
     }
+}
+
+AndroidSound *AndroidSound::create(const AndroidSoundEffect *sound_effect) {
+    AndroidSound *sound = new AndroidSound();
+    if( !sound->setSoundEffect(sound_effect) ) {
+        qDebug() << "failed to create sound";
+        delete sound;
+        sound = NULL;
+    }
+    return sound;
 }
 
 #endif

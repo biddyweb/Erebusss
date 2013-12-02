@@ -6,15 +6,15 @@
 #if defined(Q_OS_ANDROID)
 
 class AndroidSoundEffect {
-    char* mBuffer;
+    char *mBuffer;
     int mLength;
-
-public:
-    explicit AndroidSoundEffect();
-    ~AndroidSoundEffect();
 
     bool load(const char *path);
     bool unload();
+
+    AndroidSoundEffect();
+public:
+    ~AndroidSoundEffect();
 
     char *getBuffer() const {
         return this->mBuffer;
@@ -22,5 +22,7 @@ public:
     int getLength() const {
         return this->mLength;
     }
+
+    static AndroidSoundEffect *create(const char *filename);
 };
 #endif

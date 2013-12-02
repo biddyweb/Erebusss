@@ -139,4 +139,14 @@ bool AndroidSoundEffect::unload()
     return true;
 }
 
+AndroidSoundEffect *AndroidSoundEffect::create(const char *filename) {
+    AndroidSoundEffect *sound_effect = new AndroidSoundEffect();
+    if( !sound_effect->load(filename) ) {
+        qDebug() << "failed to load sound_effect";
+        delete sound_effect;
+        sound_effect = NULL;
+    }
+    return sound_effect;
+}
+
 #endif

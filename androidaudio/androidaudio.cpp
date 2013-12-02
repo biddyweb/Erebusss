@@ -5,15 +5,11 @@
 #if defined(Q_OS_ANDROID)
 
 #include "androidaudio.h"
-#include "androidsoundeffect.h"
 
 #include <QDebug>
 
 AndroidAudio::AndroidAudio() : sound_ok(false), mEngineObject(NULL), mEngineEngine(NULL), mOutputMixObject(NULL) {
     if( createEngine() ) {
-        /*if( startSoundPlayer() ) {
-            sound_ok = true;
-        }*/
         sound_ok = true;
     }
 }
@@ -80,30 +76,16 @@ void AndroidAudio::destroyEngine()
     qDebug("AndroidAudio::destroyEngine()");
 
     if (mOutputMixObject != NULL) {
-        qDebug("destroy mix object %d", mOutputMixObject);
+        qDebug("destroy mix object");
         (*mOutputMixObject)->Destroy(mOutputMixObject);
     }
 
     if (mEngineObject != NULL) {
-        qDebug("destroy engine object %d", mEngineObject);
+        qDebug("destroy engine object");
         (*mEngineObject)->Destroy(mEngineObject);
     }
 
     qDebug("AndroidAudio::destroyEngine() done");
-}
-
-AndroidSoundEffect *AndroidAudio::loadSoundEffect(const char *filename) {
-    if( !sound_ok ) {
-        qDebug("sound engine not available");
-        return NULL;
-    }
-    AndroidSoundEffect *sound = new AndroidSoundEffect();
-    if( !sound->load(filename) ) {
-        qDebug() << "failed to load sound";
-        delete sound;
-        sound = NULL;
-    }
-    return sound;
 }
 
 #endif

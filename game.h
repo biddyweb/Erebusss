@@ -2,10 +2,6 @@
 
 #include "common.h"
 
-#ifdef Q_OS_ANDROID
-#include "androidaudio/androidaudio.h"
-#endif
-
 #include <QGraphicsItem>
 #include <QListWidget>
 #include <QSettings>
@@ -366,10 +362,6 @@ class Game {
 protected:
     map<string, Sound *> sound_effects;
     string current_stream_sound_effect;
-
-#ifdef Q_OS_ANDROID
-    AndroidAudio androidAudio;
-#endif
 
     QSettings *settings;
 

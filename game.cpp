@@ -6,10 +6,6 @@
 #include "sound.h"
 #include "logiface.h"
 
-#ifdef Q_OS_ANDROID
-#include "androidaudio/androidsound.h"
-#endif
-
 #include <ctime>
 
 #include <QApplication>
@@ -2083,7 +2079,6 @@ QPixmap Game::loadImage(const string &filename, bool clip, int xpos, int ypos, i
 
 void Game::loadSound(const string &id, const string &filename, bool stream) {
     LOG("load sound: %s : %s , %d\n", id.c_str(), filename.c_str(), stream);
-#ifndef Q_OS_ANDROID
     try {
         this->sound_effects[id] = new Sound(filename, stream);
     }
@@ -2091,23 +2086,6 @@ void Game::loadSound(const string &id, const string &filename, bool stream) {
         LOG("Error when loading %s\n", filename.c_str());
         LOG("%s\n", str.c_str());
     }
-#else
-    Sound *sound = NULL;
-    AndroidSoundEffect *android_sound_effect = androidAudio.loadSoundEffect(filename.c_str());
-    if( android_sound_effect != NULL ) {
-        AndroidSound *android_sound = new AndroidSound();
-        if( android_sound->setSoundEffect(&androidAudio, android_sound_effect) ) {
-            sound = new Sound(android_sound, android_sound_effect);
-        }
-        else {
-            delete android_sound;
-            delete android_sound_effect;
-        }
-    }
-    if( sound != NULL ) {
-        this->sound_effects[id] = sound;
-    }
-#endif
 }
 
 void Game::playSound(const string &sound_effect, bool loop) {
@@ -2125,8 +2103,7 @@ void Game::playSound(const string &sound_effect, bool loop) {
                 this->current_stream_sound_effect = sound_effect;
             }
 #else
-            //androidAudio.playSound(sound->getAndroidSound(), loop);
-            sound->getAndroidSound()->playSound(loop);
+            sound->play(loop);
 #endif
         }
     }

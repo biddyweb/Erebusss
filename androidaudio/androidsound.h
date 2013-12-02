@@ -4,8 +4,8 @@
 
 #if defined(Q_OS_ANDROID)
 
-class AndroidAudio;
-class AndroidSoundEffect;
+#include "androidaudio.h"
+#include "androidsoundeffect.h"
 
 // for native audio
 #include <jni.h>
@@ -24,15 +24,20 @@ class AndroidSound {
     // output seek interface
     //SLSeekItf mPlayerSeek;
 
+    static AndroidAudio androidAudio;
+
     const AndroidSoundEffect *sound_effect;
 
-public:
+    bool setSoundEffect(const AndroidSoundEffect *sound_effect);
+
     AndroidSound();
+public:
     ~AndroidSound();
 
-    bool setSoundEffect(const AndroidAudio *android_audio, const AndroidSoundEffect *sound_effect);
     void setVolume(int volume);
-    void playSound(bool loop);
+    void play(bool loop);
+
+    static AndroidSound *create(const AndroidSoundEffect *sound_effect);
 };
 
 #endif

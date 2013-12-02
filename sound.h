@@ -102,10 +102,14 @@ public:
     AndroidSoundEffect *android_sound_effect;
 
 public:
-    Sound(AndroidSound *android_sound, AndroidSoundEffect *android_sound_effect) : android_sound(android_sound), android_sound_effect(android_sound_effect) {
-    }
+    Sound(const string &filename, bool stream);
     ~Sound();
 
+    void play(bool loop) {
+        if( android_sound != NULL ) {
+            android_sound->play(loop);
+        }
+    }
     AndroidSound *getAndroidSound() const {
         return android_sound;
     }
