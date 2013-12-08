@@ -80,7 +80,7 @@ protected:
     Polygon2D boundary_visual;
 
     // actions are events which happen periodically
-    int action_last_time;
+    int action_last_time; // not saved
     int action_delay;
     string action_type;
     int action_value;

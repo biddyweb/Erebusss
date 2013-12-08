@@ -5637,10 +5637,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                             throw string("unrecognised draw_type for scenery");
                         }
                     }
-                    if( action_last_time_s.length() > 0 ) {
+                    // not saved:
+                    /*if( action_last_time_s.length() > 0 ) {
                         int action_last_time = parseInt(action_last_time_s.toString());
                         scenery->setActionLastTime(action_last_time);
-                    }
+                    }*/
                     if( action_delay_s.length() > 0 ) {
                         int action_delay = parseInt(action_delay_s.toString());
                         scenery->setActionDelay(action_delay);
@@ -8536,8 +8537,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             //fprintf(file, " action_value=\"%d\"", scenery->getActionValue());
             //fprintf(file, " interact_type=\"%s\"", scenery->getInteractType().c_str());
             //fprintf(file, " interact_state=\"%d\"", scenery->getInteractState());
-            if( scenery->getActionLastTime() != 0 )
-                stream << " action_last_time=\"" << scenery->getActionLastTime();
+            // not saved:
+            /*if( scenery->getActionLastTime() != 0 )
+                stream << " action_last_time=\"" << scenery->getActionLastTime() << "\"";*/
             if( scenery->getActionDelay() != 0 )
                 stream << " action_delay=\"" << scenery->getActionDelay() << "\"";
             if( scenery->getActionType().length() > 0 )

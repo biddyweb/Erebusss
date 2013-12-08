@@ -1091,7 +1091,8 @@ enum TestID {
     TEST_LOADSAVEQUEST_1 = 44,
     TEST_LOADSAVEQUEST_2 = 45,
     TEST_LOADSAVERANDOMQUEST_0 = 46,
-    N_TESTS = 47
+    TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 47,
+    N_TESTS = 48
 };
 
 /**
@@ -1140,6 +1141,7 @@ enum TestID {
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
+  TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/saveload cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   */
 
 void Game::runTest(const string &filename, int test_id) {
@@ -1714,7 +1716,7 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
-            QString filename = "EREBUSTEST_" + QString::number(test_id - (int)TEST_LOADSAVEQUEST_0) + ".xml";
+            QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
                 throw string("failed to save game");
@@ -1750,7 +1752,7 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_RANDOM");
             }
 
-            QString filename = "EREBUSTEST_RANDOM.xml";
+            QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
                 throw string("failed to save game");
@@ -1767,6 +1769,43 @@ void Game::runTest(const string &filename, int test_id) {
             playing_gamestate->loadQuest(full_filename, true);
             if( playing_gamestate->getGameType() != GAMETYPE_RANDOM ) {
                 throw string("expected GAMETYPE_RANDOM");
+            }
+
+            delete gamestate;
+            gamestate = NULL;
+
+            has_score = true;
+            score = ((double)timer.elapsed());
+            score /= 1000.0;
+        }
+        else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
+            QElapsedTimer timer;
+            timer.start();
+            QString load_filename = "../erebus/_test_savegames/action_last_time_bug.xml"; // hack to get local directory rather than deployed directory
+            LOG("try loading %s\n", load_filename.toStdString().c_str());
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
+            gamestate = playing_gamestate;
+            playing_gamestate->loadQuest(load_filename, true);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
+
+            QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
+            LOG("try saving as %s\n", filename.toStdString().c_str());
+            if( !playing_gamestate->saveGame(filename, false) ) {
+                throw string("failed to save game");
+            }
+
+            delete gamestate;
+            gamestate = NULL;
+
+            QString full_filename = this->getApplicationFilename(savegame_folder + filename);
+            LOG("now try loading %s\n", full_filename.toStdString().c_str());
+            playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
+            gamestate = playing_gamestate;
+            playing_gamestate->loadQuest(full_filename, true);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
             }
 
             delete gamestate;
@@ -1826,7 +1865,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVEQUEST_1);
+    //runTest(filename, ::TEST_LOADSAVE_ACTION_LAST_TIME_BUG);
 }
 
 void Game::initButton(QWidget *button) const {
