@@ -169,7 +169,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     is_diseased(false),
     initial_level(0),
     current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
-    can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
+    can_talk(false), has_talked(false), interaction_xp(0), interaction_reward_gold(0), interaction_completed(false)
 {
     // ensure we always have default properties set
     this->initialiseProfile(1, 0, 0, 0, 0, 0, 0, 0, 0.0f);
@@ -196,7 +196,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_diseased(false),
     initial_level(0),
     current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
-    can_talk(false), has_talked(false), interaction_xp(0), interaction_completed(false)
+    can_talk(false), has_talked(false), interaction_xp(0), interaction_reward_gold(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
     this->initialiseHealth( character_template.getTemplateHealth() );
