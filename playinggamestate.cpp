@@ -5006,7 +5006,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
             QUEST_XML_TYPE_FLOORREGION = 3
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
-        Polygon2D boundary;
         Scenery *scenery = NULL;
         FloorRegion *floor_region = NULL;
         QFile file(filename);
