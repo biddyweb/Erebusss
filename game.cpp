@@ -1144,6 +1144,49 @@ enum TestID {
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   */
 
+void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, Location *location, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const {
+    if( key_owned_by_scenery && key_owned_by_npc ) {
+        throw string("test error: key can't be owned by scenery and npc");
+    }
+    set<Scenery *> scenerys = location->getSceneryUnlockedBy(key_name);
+    if( scenerys.size() != n_doors ) {
+        throw string("unexpected number of locked scenerys");
+    }
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        if( !scenery->isLocked() ) {
+            throw string("didn't expect door to be unlocked");
+        }
+    }
+    vector<Scenery *> scenery_owners;
+    vector<Character *> character_owners;
+    vector<Item *> items = location->getItems(key_name, true, true, &scenery_owners, &character_owners);
+    if( items.size() != scenery_owners.size() || items.size() != character_owners.size() ) {
+        throw string("mismatched array lengths");
+    }
+    else if( items.size() != 1 ) {
+        throw string("unexpected number of items");
+    }
+    else if( key_owned_by_scenery ) {
+        if( scenery_owners[0] == NULL || character_owners[0] != NULL ) {
+            throw string("expected key to be owned by scenery");
+        }
+    }
+    else if( key_owned_by_npc ) {
+        if( scenery_owners[0] != NULL || character_owners[0] == NULL ) {
+            throw string("expected key to be owned by character");
+        }
+        else if( character_owners[0] == playing_gamestate->getPlayer() ) {
+            throw string("didn't expect key to be owned by player, should be an NPC");
+        }
+    }
+    else {
+        if( scenery_owners[0] != NULL || character_owners[0] != NULL ) {
+            throw string("expected key to be owned by nothing");
+        }
+    }
+}
+
 /** Optional checks on a loaded game.
   */
 void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const {
@@ -1154,28 +1197,8 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
             throw string("didn't expect quest to already be completed");
         }
         Location *location = playing_gamestate->getCLocation();
-        set<Scenery *> scenerys = location->getSceneryUnlockedBy("Goblin's Key");
-        if( scenerys.size() != 1 ) {
-            throw string("unexpected number of locked scenerys");
-        }
-        for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
-            Scenery *scenery = *iter;
-            if( !scenery->isLocked() ) {
-                throw string("didn't expect door to be unlocked");
-            }
-        }
-        vector<Scenery *> scenery_owners;
-        vector<Character *> character_owners;
-        vector<Item *> items = location->getItems("Goblin's Key", true, true, &scenery_owners, &character_owners);
-        if( items.size() != scenery_owners.size() || items.size() != character_owners.size() ) {
-            throw string("mismatched array lengths");
-        }
-        else if( items.size() != 1 ) {
-            throw string("unexpected number of items");
-        }
-        else if( scenery_owners[0] != NULL || character_owners[0] == NULL ) {
-            throw string("expected item to be owned by character");
-        }
+        string key_name = "Goblin's Key";
+        checkLockedDoors(playing_gamestate, location, key_name, 1, false, true);
     }
     else if( test_id == TEST_LOADSAVEQUEST_1 ) {
         // check quest not completed
