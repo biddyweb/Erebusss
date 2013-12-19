@@ -1141,8 +1141,61 @@ enum TestID {
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
-  TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/saveload cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
+  TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   */
+
+/** Optional checks on a loaded game.
+  */
+void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const {
+    LOG("checkSaveGame\n");
+    if( test_id == TEST_LOADSAVEQUEST_0 ) {
+        // check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+        Location *location = playing_gamestate->getCLocation();
+        set<Scenery *> scenerys = location->getSceneryUnlockedBy("Goblin's Key");
+        if( scenerys.size() != 1 ) {
+            throw string("unexpected number of locked scenerys");
+        }
+        for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+            Scenery *scenery = *iter;
+            if( !scenery->isLocked() ) {
+                throw string("didn't expect door to be unlocked");
+            }
+        }
+        vector<Scenery *> scenery_owners;
+        vector<Character *> character_owners;
+        vector<Item *> items = location->getItems("Goblin's Key", true, true, &scenery_owners, &character_owners);
+        if( items.size() != scenery_owners.size() || items.size() != character_owners.size() ) {
+            throw string("mismatched array lengths");
+        }
+        else if( items.size() != 1 ) {
+            throw string("unexpected number of items");
+        }
+        else if( scenery_owners[0] != NULL || character_owners[0] == NULL ) {
+            throw string("expected item to be owned by character");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEQUEST_1 ) {
+        // check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEQUEST_2 ) {
+        // check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+    }
+    else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
+        // check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+    }
+}
 
 void Game::runTest(const string &filename, int test_id) {
     LOG(">>> Run Test: %d\n", test_id);
@@ -1716,6 +1769,8 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            checkSaveGame(playing_gamestate, test_id);
+
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
@@ -1733,6 +1788,8 @@ void Game::runTest(const string &filename, int test_id) {
             if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
+
+            checkSaveGame(playing_gamestate, test_id);
 
             delete gamestate;
             gamestate = NULL;
@@ -1790,6 +1847,8 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            checkSaveGame(playing_gamestate, test_id);
+
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
@@ -1807,6 +1866,8 @@ void Game::runTest(const string &filename, int test_id) {
             if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
+
+            checkSaveGame(playing_gamestate, test_id);
 
             delete gamestate;
             gamestate = NULL;
@@ -1863,9 +1924,9 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        runTest(filename, i);
+        //runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVE_ACTION_LAST_TIME_BUG);
+    runTest(filename, ::TEST_LOADSAVEQUEST_0);
 }
 
 void Game::initButton(QWidget *button) const {

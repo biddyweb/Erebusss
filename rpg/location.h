@@ -836,6 +836,10 @@ public:
 #endif
     void clearVisibility();
     vector<FloorRegion *> updateVisibility(Vector2D pos);
+
+    // for testing:
+    set<Scenery *> getSceneryUnlockedBy(const string &unlocked_by_template);
+    vector<Item *> getItems(const string &name, bool include_scenery, bool include_characters, vector<Scenery *> *scenery_owners, vector<Character *> *character_owners);
 };
 
 class QuestObjective {

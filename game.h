@@ -31,6 +31,7 @@ using std::string;
 class Screen;
 class Sound;
 class Gamestate;
+class PlayingGamestate;
 class Quest;
 class Location;
 class Item;
@@ -399,6 +400,7 @@ protected:
 
     void init(bool fullscreen);
     void createPlayerNames();
+    void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const;
     void runTest(const string &filename, int test_id);
 
 public:

@@ -2047,6 +2047,62 @@ vector<FloorRegion *> Location::updateVisibility(Vector2D pos) {
     return update_floor_regions;
 }
 
+set<Scenery *> Location::getSceneryUnlockedBy(const string &unlocked_by_template) {
+    set<Scenery *> ret_scenery;
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        if( scenery->getUnlockItemName() == unlocked_by_template ) {
+           ret_scenery.insert(scenery);
+        }
+    }
+    return ret_scenery;
+}
+
+vector<Item *> Location::getItems(const string &name, bool include_scenery, bool include_characters, vector<Scenery *> *scenery_owners, vector<Character *> *character_owners) {
+    vector<Item *> ret_items;
+    for(set<Item *>::iterator iter = items.begin(); iter != items.end(); ++iter) {
+        Item *item = *iter;
+        if( item->getName() == name ) {
+            ret_items.push_back(item);
+            if( scenery_owners != NULL )
+                scenery_owners->push_back(NULL);
+            if( character_owners != NULL )
+                character_owners->push_back(NULL);
+        }
+    }
+    if( include_scenery ) {
+        for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+            Scenery *scenery = *iter;
+            for(set<Item *>::iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
+                Item *item = *iter2;
+                if( item->getName() == name ) {
+                    ret_items.push_back(item);
+                    if( scenery_owners != NULL )
+                        scenery_owners->push_back(scenery);
+                    if( character_owners != NULL )
+                        character_owners->push_back(NULL);
+                }
+            }
+        }
+    }
+    if( include_characters ) {
+        for(set<Character *>::iterator iter = characters.begin(); iter != characters.end(); ++iter) {
+            Character *character = *iter;
+            for(set<Item *>::iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
+                Item *item = *iter2;
+                if( item->getName() == name ) {
+                    ret_items.push_back(item);
+                    if( scenery_owners != NULL )
+                        scenery_owners->push_back(NULL);
+                    if( character_owners != NULL )
+                        character_owners->push_back(character);
+                }
+            }
+        }
+    }
+    return ret_items;
+}
+
 QuestObjective::QuestObjective(const string &type, const string &arg1, int gold) : type(type), arg1(arg1), gold(gold) {
 }
 
