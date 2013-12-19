@@ -1090,9 +1090,10 @@ enum TestID {
     TEST_LOADSAVEQUEST_0 = 43,
     TEST_LOADSAVEQUEST_1 = 44,
     TEST_LOADSAVEQUEST_2 = 45,
-    TEST_LOADSAVERANDOMQUEST_0 = 46,
-    TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 47,
-    N_TESTS = 48
+    TEST_LOADSAVEQUEST_3 = 46,
+    TEST_LOADSAVERANDOMQUEST_0 = 47,
+    TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
+    N_TESTS = 49
 };
 
 /**
@@ -1197,6 +1198,9 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
             throw string("didn't expect quest to already be completed");
         }
         Location *location = playing_gamestate->getCLocation();
+        if( location->getName() != "" ) {
+            throw string("unexpected start location");
+        }
         string key_name = "Goblin's Key";
         checkLockedDoors(playing_gamestate, location, key_name, 1, false, true);
     }
@@ -1205,12 +1209,30 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
         if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("didn't expect quest to already be completed");
         }
+        Location *location = playing_gamestate->getCLocation();
+        if( location->getName() != "entrance" ) {
+            throw string("unexpected start location");
+        }
     }
     else if( test_id == TEST_LOADSAVEQUEST_2 ) {
         // check quest not completed
         if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("didn't expect quest to already be completed");
         }
+        Location *location = playing_gamestate->getCLocation();
+        if( location->getName() != "entrance" ) {
+            throw string("unexpected start location");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEQUEST_3 ) {
+        // check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+        Location *location = playing_gamestate->getCLocation();
+        /*if( location->getName() != "Axbury" ) {
+            throw string("unexpected start location");
+        }*/
     }
     else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
         // check quest not completed
@@ -1770,7 +1792,7 @@ void Game::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed()) / ((double)n_times);
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 ) {
+        else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 || test_id == TEST_LOADSAVEQUEST_3 ) {
             QElapsedTimer timer;
             timer.start();
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
@@ -1785,6 +1807,9 @@ void Game::runTest(const string &filename, int test_id) {
             }
             else if( test_id == TEST_LOADSAVEQUEST_2 ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
+            }
+            else if( test_id == TEST_LOADSAVEQUEST_3 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_necromancer.xml");
             }
 
             playing_gamestate->loadQuest(qt_filename, false);
