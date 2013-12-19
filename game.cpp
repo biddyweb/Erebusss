@@ -1145,11 +1145,19 @@ enum TestID {
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   */
 
-void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, Location *location, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const {
+void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const {
     if( key_owned_by_scenery && key_owned_by_npc ) {
         throw string("test error: key can't be owned by scenery and npc");
     }
-    set<Scenery *> scenerys = location->getSceneryUnlockedBy(key_name);
+    Location *location_key = playing_gamestate->getQuest()->findLocation(location_key_name);
+    if( location_key == NULL ) {
+        throw string("can't find location for key");
+    }
+    Location *location_doors = playing_gamestate->getQuest()->findLocation(location_doors_name);
+    if( location_doors == NULL ) {
+        throw string("can't find location for doors");
+    }
+    set<Scenery *> scenerys = location_doors->getSceneryUnlockedBy(key_name);
     if( scenerys.size() != n_doors ) {
         throw string("unexpected number of locked scenerys");
     }
@@ -1161,7 +1169,7 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, Location *locat
     }
     vector<Scenery *> scenery_owners;
     vector<Character *> character_owners;
-    vector<Item *> items = location->getItems(key_name, true, true, &scenery_owners, &character_owners);
+    vector<Item *> items = location_key->getItems(key_name, true, true, &scenery_owners, &character_owners);
     if( items.size() != scenery_owners.size() || items.size() != character_owners.size() ) {
         throw string("mismatched array lengths");
     }
@@ -1201,8 +1209,7 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
         if( location->getName() != "" ) {
             throw string("unexpected start location");
         }
-        string key_name = "Goblin's Key";
-        checkLockedDoors(playing_gamestate, location, key_name, 1, false, true);
+        checkLockedDoors(playing_gamestate, "", "", "Goblin's Key", 1, false, true);
     }
     else if( test_id == TEST_LOADSAVEQUEST_1 ) {
         // check quest not completed
@@ -1213,6 +1220,13 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
         if( location->getName() != "entrance" ) {
             throw string("unexpected start location");
         }
+        checkLockedDoors(playing_gamestate, "level_1", "level_1", "Vespar's Cell Key", 5, false, true);
+        checkLockedDoors(playing_gamestate, "level_3", "level_3", "Hand Mirror", 1, false, false);
+        checkLockedDoors(playing_gamestate, "cave", "level_past", "Missing Teleporter Piece", 1, true, false);
+        checkLockedDoors(playing_gamestate, "cave", "cave", "Orc Warlord's Key", 2, false, true);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Maze Key", 1, true, false);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Bull Statuette", 1, true, false);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Minotaur's Key", 1, false, true);
     }
     else if( test_id == TEST_LOADSAVEQUEST_2 ) {
         // check quest not completed
@@ -1223,16 +1237,23 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
         if( location->getName() != "entrance" ) {
             throw string("unexpected start location");
         }
+        checkLockedDoors(playing_gamestate, "level_1", "level_2", "Dwarven Key", 1, true, false);
+        checkLockedDoors(playing_gamestate, "level_2", "level_3", "Derrin's Ring", 1, false, true);
+        checkLockedDoors(playing_gamestate, "level_2", "level_4", "Derrin's Ring", 1, false, true);
     }
     else if( test_id == TEST_LOADSAVEQUEST_3 ) {
         // check quest not completed
         if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("didn't expect quest to already be completed");
         }
-        Location *location = playing_gamestate->getCLocation();
-        /*if( location->getName() != "Axbury" ) {
+        /*Location *location = playing_gamestate->getCLocation();
+        if( location->getName() != "Axbury" ) {
             throw string("unexpected start location");
         }*/
+        checkLockedDoors(playing_gamestate, "Dungeons near Axbury", "Dungeons near Axbury", "Axbury Dungeon Key", 2, false, true);
+        checkLockedDoors(playing_gamestate, "Upper Level, Wentbridge Fort", "Ground Level, Wentbridge Fort", "Wentbridge Dungeon Key", 1, true, false);
+        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false);
+        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons Lower Level, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false);
     }
     else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
         // check quest not completed
@@ -1974,7 +1995,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         //runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEQUEST_0);
+    runTest(filename, ::TEST_LOADSAVEQUEST_3);
 }
 
 void Game::initButton(QWidget *button) const {
