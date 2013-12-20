@@ -1803,10 +1803,10 @@ This leather armour is blessed, offering greater protection.
 <opening_later>Woo!
 </opening_later>
 <opening_interaction_complete>
-. Thank you once again for helping me. Once I have finished researching from this book that you found for me, I will finally be able to leave this place.
+Thank you for your help.
 </opening_interaction_complete>
 <talk question="Are you ... a ghost?">
-I guess you could say that ... for some reason I have been trapped here as a spirit, wandering these passageways for many years, unable to pass onto the plane of death.
+I guess you could say that ... for some reason I was trapped here as a spirit, wandering these passageways for many years, unable to pass onto the plane of death.
 </talk>
 <talk question="How did you die?">
 I would rather not talk about that ... it is too terrible to mention.
