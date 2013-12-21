@@ -1093,7 +1093,9 @@ enum TestID {
     TEST_LOADSAVEQUEST_3 = 46,
     TEST_LOADSAVERANDOMQUEST_0 = 47,
     TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
-    N_TESTS = 49
+    TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 49,
+    TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 50,
+    N_TESTS = 51
 };
 
 /**
@@ -1143,6 +1145,8 @@ enum TestID {
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
+  TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
+  TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   */
 
 void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const {
@@ -1196,7 +1200,7 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
     }
 }
 
-/** Optional checks on a loaded game.
+/** Optional read-only checks on a loaded game.
   */
 void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const {
     LOG("checkSaveGame\n");
@@ -1260,6 +1264,69 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
         if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("didn't expect quest to already be completed");
         }
+    }
+    else {
+        throw string("unknown test_id");
+    }
+}
+
+void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) const {
+    LOG("checkSaveGameWrite");
+    if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ) {
+        // check quest not completed until all goblins completed
+        Location *location = playing_gamestate->getCLocation();
+        while( location->getNCharacters() > 0 ) {
+            Character *npc = NULL;
+            for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd() && npc==NULL; ++iter) {
+                Character *character = *iter;
+                if( character != playing_gamestate->getPlayer() ) {
+                    npc = character;
+                }
+            }
+            if( npc == NULL )
+                break;
+            if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+                throw string("didn't expect quest to already be completed");
+            }
+            location->removeCharacter(npc);
+            delete npc;
+        }
+        LOG("now check quest complete\n");
+        if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("expected quest to be completed now");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
+        // check quest completed iff item picked up
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+        Location *location = playing_gamestate->getQuest()->findLocation("level_6");
+        if( location == NULL ) {
+            throw string("can't find location");
+        }
+        vector<Scenery *> scenery_owners;
+        vector<Item *> items = location->getItems("Vespar's Skull", true, false, &scenery_owners, NULL);
+        if( items.size() != scenery_owners.size() ) {
+            throw string("mismatched array lengths");
+        }
+        else if( items.size() != 1 ) {
+            throw string("unexpected number of items");
+        }
+        Item *item = items[0];
+        Scenery *scenery = scenery_owners[0];
+        bool move = false;
+        void *ignore = NULL;
+        playing_gamestate->moveToLocation(location, Vector2D(0.0f, 0.0f));
+        playing_gamestate->interactWithScenery(&move, &ignore, scenery);
+        playing_gamestate->getPlayer()->pickupItem(item);
+        LOG("now check quest complete\n");
+        if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("expected quest to be completed now");
+        }
+    }
+    else {
+        throw string("unknown test_id");
     }
 }
 
@@ -1814,6 +1881,7 @@ void Game::runTest(const string &filename, int test_id) {
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 || test_id == TEST_LOADSAVEQUEST_3 ) {
+            // load, check, save, load, check
             QElapsedTimer timer;
             timer.start();
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
@@ -1833,13 +1901,16 @@ void Game::runTest(const string &filename, int test_id) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_necromancer.xml");
             }
 
+            // load
             playing_gamestate->loadQuest(qt_filename, false);
             if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            // check
             checkSaveGame(playing_gamestate, test_id);
 
+            // save
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
@@ -1848,7 +1919,9 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
 
+            // load
             QString full_filename = this->getApplicationFilename(savegame_folder + filename);
             LOG("now try loading %s\n", full_filename.toStdString().c_str());
             playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
@@ -1858,18 +1931,23 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            // check
             checkSaveGame(playing_gamestate, test_id);
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
 
             has_score = true;
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVERANDOMQUEST_0 ) {
+            // load, save, load
             QElapsedTimer timer;
             timer.start();
+
+            // load
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_RANDOM, "Warrior", "name", false, false, 0);
             gamestate = playing_gamestate;
 
@@ -1878,6 +1956,7 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_RANDOM");
             }
 
+            // save
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
@@ -1886,7 +1965,9 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
 
+            // load
             QString full_filename = this->getApplicationFilename(savegame_folder + filename);
             LOG("now try loading %s\n", full_filename.toStdString().c_str());
             playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
@@ -1899,14 +1980,18 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
 
             has_score = true;
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
+            // load, check, save, load, check
             QElapsedTimer timer;
             timer.start();
+
+            // load
             QString load_filename = "../erebus/_test_savegames/action_last_time_bug.xml"; // hack to get local directory rather than deployed directory
             LOG("try loading %s\n", load_filename.toStdString().c_str());
             PlayingGamestate *playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
@@ -1916,8 +2001,10 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            // check
             checkSaveGame(playing_gamestate, test_id);
 
+            // save
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
             if( !playing_gamestate->saveGame(filename, false) ) {
@@ -1926,7 +2013,9 @@ void Game::runTest(const string &filename, int test_id) {
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
 
+            // load
             QString full_filename = this->getApplicationFilename(savegame_folder + filename);
             LOG("now try loading %s\n", full_filename.toStdString().c_str());
             playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
@@ -1936,10 +2025,82 @@ void Game::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
 
+            // check
             checkSaveGame(playing_gamestate, test_id);
 
             delete gamestate;
             gamestate = NULL;
+            playing_gamestate = NULL;
+
+            has_score = true;
+            score = ((double)timer.elapsed());
+            score /= 1000.0;
+        }
+        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
+            // load, check, load, save, load, check
+            QElapsedTimer timer;
+            timer.start();
+
+            // load
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
+            gamestate = playing_gamestate;
+
+            QString qt_filename;
+            if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
+            }
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
+            }
+
+            playing_gamestate->loadQuest(qt_filename, false);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
+
+            // check
+            checkSaveGameWrite(playing_gamestate, test_id);
+
+            delete gamestate;
+            gamestate = NULL;
+            playing_gamestate = NULL;
+
+            // load
+            playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
+            gamestate = playing_gamestate;
+
+            playing_gamestate->loadQuest(qt_filename, false);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
+
+            // save
+            QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
+            LOG("try saving as %s\n", filename.toStdString().c_str());
+            if( !playing_gamestate->saveGame(filename, false) ) {
+                throw string("failed to save game");
+            }
+
+            delete gamestate;
+            gamestate = NULL;
+            playing_gamestate = NULL;
+
+            // load
+            QString full_filename = this->getApplicationFilename(savegame_folder + filename);
+            LOG("now try loading %s\n", full_filename.toStdString().c_str());
+            playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
+            gamestate = playing_gamestate;
+            playing_gamestate->loadQuest(full_filename, true);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
+
+            // check
+            checkSaveGameWrite(playing_gamestate, test_id);
+
+            delete gamestate;
+            gamestate = NULL;
+            playing_gamestate = NULL;
 
             has_score = true;
             score = ((double)timer.elapsed());
@@ -1995,7 +2156,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         //runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEQUEST_3);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_COMPLETE);
 }
 
 void Game::initButton(QWidget *button) const {

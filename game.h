@@ -402,6 +402,7 @@ protected:
     void createPlayerNames();
     void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
     void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const;
+    void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) const;
     void runTest(const string &filename, int test_id);
 
 public:
