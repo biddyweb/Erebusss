@@ -547,7 +547,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);
-    void moveToLocation(Location *location, Vector2D pos);
     void setupView();
     void autoSave() {
         if( !this->permadeath ) {
@@ -738,6 +737,8 @@ public:
     }
 
     void hitEnemy(Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage);
+    void moveToLocation(Location *location, Vector2D pos);
+    bool interactWithScenery(bool *move, void **ignore, Scenery *scenery);
 
 public slots:
     void closeSubWindow();

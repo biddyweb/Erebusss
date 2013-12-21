@@ -7333,6 +7333,207 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     return done;
 }
 
+bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *scenery) {
+    bool done = false;
+
+    if( scenery->getTrap() != NULL ) {
+        scenery->getTrap()->setOff(this, player);
+        scenery->setTrap(NULL);
+        if( player->isDead() ) {
+            done = true;
+            return done;
+        }
+    }
+
+    bool is_locked = false;
+    if( scenery->isLocked() ) {
+        // can we unlock it?
+        is_locked = true;
+        string unlock_item_name = scenery->getUnlockItemName();
+        Item *item = NULL;
+        if( unlock_item_name.length() > 0 ) {
+            qDebug("search for %s", unlock_item_name.c_str());
+            for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
+                item = *iter;
+                //LOG("    compare to: %s\n", item->getKey().c_str());
+                if( item->getType() == ITEMTYPE_WEAPON && player->getCurrentWeapon() != item )
+                    continue;
+                else if( item->getType() == ITEMTYPE_ARMOUR && player->getCurrentArmour() != item )
+                    continue;
+                else if( item->getType() == ITEMTYPE_SHIELD && player->getCurrentShield() != item )
+                    continue;
+                else if( item->getType() == ITEMTYPE_RING && player->getCurrentRing() != item )
+                    continue;
+                if( item->getKey() == unlock_item_name ) {
+                    is_locked = false;
+                }
+            }
+        }
+        if( is_locked ) {
+            done = true;
+            if( !scenery->isLockedSilent() ) {
+                this->playSound("lock");
+            }
+            if( scenery->getLockedText().length() == 0 ) {
+                stringstream str;
+                str << "The " << scenery->getName() << " is locked!";
+                this->addTextEffect(str.str(), player->getPos(), 2000);
+            }
+            else if( scenery->getLockedText() != "none" ) {
+                this->addTextEffect(scenery->getLockedText(), player->getPos(), 2000);
+            }
+        }
+        else {
+            ASSERT_LOGGER(item != NULL);
+            stringstream str;
+            if( scenery->getUnlockText().length() == 0 ) {
+                str << "You unlock the " << scenery->getName() << ".";
+            }
+            else {
+                str << scenery->getUnlockText();
+            }
+            this->addTextEffect(str.str(), player->getPos(), 2000);
+            qDebug("isKeyAlwaysNeeded? %d", scenery->isKeyAlwaysNeeded());
+            if( !scenery->isKeyAlwaysNeeded() ) {
+                scenery->setLocked(false);
+            }
+            qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
+            if( scenery->isLockedUsedUp() ) {
+                player->takeItem(item);
+                delete item;
+                item = NULL;
+            }
+            player->addXP(this, scenery->getUnlockXP());
+        }
+    }
+
+    if( !is_locked ) {
+        if( scenery->getNItems() > 0 ) {
+            done = true;
+            bool all_gold = true;
+            for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
+                Item *item = *iter;
+                if( item->getType() != ITEMTYPE_CURRENCY ) {
+                    all_gold = false;
+                }
+                c_location->addItem(item, player->getX(), player->getY());
+            }
+            scenery->eraseAllItems();
+            this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
+        }
+
+        if( scenery->canBeOpened() && !scenery->isOpened() ) {
+            done = true;
+            this->playSound("container");
+            scenery->setOpened(true);
+        }
+
+        if( scenery->isDoor() ) {
+            done = true;
+            qDebug("clicked on a door");
+            // open door
+            if( scenery->getName() == "Door" ) {
+                this->playSound("door");
+            }
+            this->addTextEffect(tr("Opening door...").toStdString(), scenery->getPos(), 1000);
+            qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
+            c_location->removeScenery(scenery);
+            delete scenery;
+            scenery = NULL;
+            *ignore = NULL;
+        }
+        else if( scenery->isExit() ) {
+            done = true;
+            LOG("clicked on an exit\n");
+            // exit
+            if( scenery->getName() == "Door" ) {
+                this->playSound("door");
+            }
+            this->closeSubWindow(); // just in case
+            if( this->quest->getQuestObjective() != NULL && this->quest->getQuestObjective()->getType() == "find_exit" && this->quest->getQuestObjective()->getArg1() == scenery->getName() ) {
+                this->quest->setCompleted(true);
+            }
+
+            this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
+            if( this->getQuest()->isCompleted() ) {
+                this->getQuest()->getQuestObjective()->completeQuest(this);
+                /*int gold = this->getQuest()->getQuestObjective()->getGold();
+                this->player->addGold(gold);*/
+                string completed_text = this->getQuest()->getCompletedText();
+                completed_text = convertToHTML(completed_text);
+                this->showInfoDialog(completed_text);
+                this->writeJournal("<hr/><p>");
+                this->writeJournalDate();
+                this->writeJournal(completed_text);
+                this->writeJournal("</p>");
+            }
+            game_g->stopSound(music_key_combat_c);
+            music_mode = MUSICMODE_SILENCE;
+            new CampaignWindow(this);
+            game_g->getScreen()->setPaused(true, true);
+            this->time_hours += 48 + this->getRestTime();
+            this->player->restoreHealth();
+            this->player->expireProfileEffects();
+        }
+        else if( scenery->getExitLocation().length() > 0 ) {
+            done = true;
+            if( scenery->getName() == "Door" ) {
+                this->playSound("door");
+            }
+            this->time_hours += scenery->getExitTravelTime();
+            LOG("clicked on an exit location: %s travel time %d\n", scenery->getExitLocation().c_str(), scenery->getExitTravelTime());
+            Location *new_location = quest->findLocation(scenery->getExitLocation());
+            ASSERT_LOGGER(new_location != NULL);
+            if( new_location != NULL ) {
+#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
+                this->autoSave();
+#endif
+                game_g->stopSound(music_key_combat_c);
+                music_mode = MUSICMODE_SILENCE;
+                this->moveToLocation(new_location, scenery->getExitLocationPos());
+                *move = false;
+                if( scenery->getExitTravelTime() >= 24 ) {
+                    int travel_time_days = scenery->getExitTravelTime() / 24;
+                    stringstream str;
+                    str << "Journey took " << travel_time_days << " day";
+                    if( travel_time_days > 1 )
+                        str << "s";
+                    this->addTextEffect(str.str(), player->getPos(), 2000);
+                }
+            }
+        }
+        else if( scenery->getInteractType().length() > 0 ) {
+            done = true;
+            LOG("interact_type: %s\n", scenery->getInteractType().c_str());
+            string dialog_text;
+            vector<string> options = scenery->getInteractionText(this, &dialog_text);
+            if( options.size() == 0 ) {
+                // auto-interact
+                scenery->interact(this, 0);
+            }
+            else {
+                //if( this->askQuestionDialog(dialog_text) ) {
+                //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
+                InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false, true);
+                this->addWidget(dialog, false);
+                int result = dialog->exec();
+                LOG("scenery iteraction dialog returns %d\n", result);
+                this->closeSubWindow();
+                if( result != options.size()-1 ) {
+                    scenery->interact(this, result);
+                }
+            }
+        }
+        else if( scenery->getDescription().length() > 0 ) {
+            done = true;
+            string description = scenery->getDescription();
+            description = convertToHTML(description);
+            this->showInfoDialog(description, string(DEPLOYMENT_PATH) + scenery->getBigImageName());
+        }
+    }
+    return done;
+}
+
 bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector<Scenery *> &clicked_scenerys) {
     bool done = false;
     for(vector<Scenery *>::const_iterator iter = clicked_scenerys.begin(); iter != clicked_scenerys.end() && !done; ++iter) {
@@ -7353,201 +7554,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
         }
 
         if( confirm_ok ) {
-            if( scenery->getTrap() != NULL ) {
-                scenery->getTrap()->setOff(this, player);
-                scenery->setTrap(NULL);
-                if( player->isDead() ) {
-                    done = true;
-                    break;
-                }
-            }
-
-            bool is_locked = false;
-            if( scenery->isLocked() ) {
-                // can we unlock it?
-                is_locked = true;
-                string unlock_item_name = scenery->getUnlockItemName();
-                Item *item = NULL;
-                if( unlock_item_name.length() > 0 ) {
-                    qDebug("search for %s", unlock_item_name.c_str());
-                    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd() && is_locked; ++iter) {
-                        item = *iter;
-                        //LOG("    compare to: %s\n", item->getKey().c_str());
-                        if( item->getType() == ITEMTYPE_WEAPON && player->getCurrentWeapon() != item )
-                            continue;
-                        else if( item->getType() == ITEMTYPE_ARMOUR && player->getCurrentArmour() != item )
-                            continue;
-                        else if( item->getType() == ITEMTYPE_SHIELD && player->getCurrentShield() != item )
-                            continue;
-                        else if( item->getType() == ITEMTYPE_RING && player->getCurrentRing() != item )
-                            continue;
-                        if( item->getKey() == unlock_item_name ) {
-                            is_locked = false;
-                        }
-                    }
-                }
-                if( is_locked ) {
-                    done = true;
-                    if( !scenery->isLockedSilent() ) {
-                        this->playSound("lock");
-                    }
-                    if( scenery->getLockedText().length() == 0 ) {
-                        stringstream str;
-                        str << "The " << scenery->getName() << " is locked!";
-                        this->addTextEffect(str.str(), player->getPos(), 2000);
-                    }
-                    else if( scenery->getLockedText() != "none" ) {
-                        this->addTextEffect(scenery->getLockedText(), player->getPos(), 2000);
-                    }
-                }
-                else {
-                    ASSERT_LOGGER(item != NULL);
-                    stringstream str;
-                    if( scenery->getUnlockText().length() == 0 ) {
-                        str << "You unlock the " << scenery->getName() << ".";
-                    }
-                    else {
-                        str << scenery->getUnlockText();
-                    }
-                    this->addTextEffect(str.str(), player->getPos(), 2000);
-                    qDebug("isKeyAlwaysNeeded? %d", scenery->isKeyAlwaysNeeded());
-                    if( !scenery->isKeyAlwaysNeeded() ) {
-                        scenery->setLocked(false);
-                    }
-                    qDebug("isLockedUsedUp? %d", scenery->isLockedUsedUp());
-                    if( scenery->isLockedUsedUp() ) {
-                        player->takeItem(item);
-                        delete item;
-                        item = NULL;
-                    }
-                    player->addXP(this, scenery->getUnlockXP());
-                }
-            }
-
-            if( !is_locked ) {
-                if( scenery->getNItems() > 0 ) {
-                    done = true;
-                    bool all_gold = true;
-                    for(set<Item *>::iterator iter = scenery->itemsBegin(); iter != scenery->itemsEnd(); ++iter) {
-                        Item *item = *iter;
-                        if( item->getType() != ITEMTYPE_CURRENCY ) {
-                            all_gold = false;
-                        }
-                        c_location->addItem(item, player->getX(), player->getY());
-                    }
-                    scenery->eraseAllItems();
-                    this->addTextEffect(all_gold ? "Found some gold!" : "Found some items!", player->getPos(), 2000);
-                }
-
-                if( scenery->canBeOpened() && !scenery->isOpened() ) {
-                    done = true;
-                    this->playSound("container");
-                    scenery->setOpened(true);
-                }
-
-                if( scenery->isDoor() ) {
-                    done = true;
-                    qDebug("clicked on a door");
-                    // open door
-                    if( scenery->getName() == "Door" ) {
-                        this->playSound("door");
-                    }
-                    this->addTextEffect(tr("Opening door...").toStdString(), scenery->getPos(), 1000);
-                    qApp->processEvents(); // so that the text effect gets displayed, whilst recalculating the location's distance graph
-                    c_location->removeScenery(scenery);
-                    delete scenery;
-                    scenery = NULL;
-                    *ignore = NULL;
-                }
-                else if( scenery->isExit() ) {
-                    done = true;
-                    LOG("clicked on an exit\n");
-                    // exit
-                    if( scenery->getName() == "Door" ) {
-                        this->playSound("door");
-                    }
-                    this->closeSubWindow(); // just in case
-                    if( this->quest->getQuestObjective() != NULL && this->quest->getQuestObjective()->getType() == "find_exit" && this->quest->getQuestObjective()->getArg1() == scenery->getName() ) {
-                        this->quest->setCompleted(true);
-                    }
-
-                    this->quest->testIfComplete(this); // recall, in case quest no longer completed (e.g., player has dropped an item that is needed)
-                    if( this->getQuest()->isCompleted() ) {
-                        this->getQuest()->getQuestObjective()->completeQuest(this);
-                        /*int gold = this->getQuest()->getQuestObjective()->getGold();
-                        this->player->addGold(gold);*/
-                        string completed_text = this->getQuest()->getCompletedText();
-                        completed_text = convertToHTML(completed_text);
-                        this->showInfoDialog(completed_text);
-                        this->writeJournal("<hr/><p>");
-                        this->writeJournalDate();
-                        this->writeJournal(completed_text);
-                        this->writeJournal("</p>");
-                    }
-                    game_g->stopSound(music_key_combat_c);
-                    music_mode = MUSICMODE_SILENCE;
-                    new CampaignWindow(this);
-                    game_g->getScreen()->setPaused(true, true);
-                    this->time_hours += 48 + this->getRestTime();
-                    this->player->restoreHealth();
-                    this->player->expireProfileEffects();
-                }
-                else if( scenery->getExitLocation().length() > 0 ) {
-                    done = true;
-                    if( scenery->getName() == "Door" ) {
-                        this->playSound("door");
-                    }
-                    this->time_hours += scenery->getExitTravelTime();
-                    LOG("clicked on an exit location: %s travel time %d\n", scenery->getExitLocation().c_str(), scenery->getExitTravelTime());
-                    Location *new_location = quest->findLocation(scenery->getExitLocation());
-                    ASSERT_LOGGER(new_location != NULL);
-                    if( new_location != NULL ) {
-#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
-                        this->autoSave();
-#endif
-                        game_g->stopSound(music_key_combat_c);
-                        music_mode = MUSICMODE_SILENCE;
-                        this->moveToLocation(new_location, scenery->getExitLocationPos());
-                        *move = false;
-                        if( scenery->getExitTravelTime() >= 24 ) {
-                            int travel_time_days = scenery->getExitTravelTime() / 24;
-                            stringstream str;
-                            str << "Journey took " << travel_time_days << " day";
-                            if( travel_time_days > 1 )
-                                str << "s";
-                            this->addTextEffect(str.str(), player->getPos(), 2000);
-                        }
-                    }
-                }
-                else if( scenery->getInteractType().length() > 0 ) {
-                    done = true;
-                    LOG("interact_type: %s\n", scenery->getInteractType().c_str());
-                    string dialog_text;
-                    vector<string> options = scenery->getInteractionText(this, &dialog_text);
-                    if( options.size() == 0 ) {
-                        // auto-interact
-                        scenery->interact(this, 0);
-                    }
-                    else {
-                        //if( this->askQuestionDialog(dialog_text) ) {
-                        //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
-                        InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false, true);
-                        this->addWidget(dialog, false);
-                        int result = dialog->exec();
-                        LOG("scenery iteraction dialog returns %d\n", result);
-                        this->closeSubWindow();
-                        if( result != options.size()-1 ) {
-                            scenery->interact(this, result);
-                        }
-                    }
-                }
-                else if( scenery->getDescription().length() > 0 ) {
-                    done = true;
-                    string description = scenery->getDescription();
-                    description = convertToHTML(description);
-                    this->showInfoDialog(description, string(DEPLOYMENT_PATH) + scenery->getBigImageName());
-                }
-            }
+            done = this->interactWithScenery(move, ignore, scenery);
         }
     }
     return done;
