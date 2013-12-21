@@ -705,6 +705,7 @@ bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
 }
 
 void Location::addItem(Item *item, float xpos, float ypos) {
+    qDebug("add item %s to %s at %f, %f", item->getName().c_str(), this->name.c_str(), xpos, ypos);
     item->setPos(xpos, ypos);
     this->items.insert(item);
 
@@ -2076,6 +2077,16 @@ Scenery *Location::findScenery(const string &scenery_name) {
         Scenery *scenery = *iter;
         if( scenery->getName() == scenery_name ) {
             return scenery;
+        }
+    }
+    return NULL;
+}
+
+Character *Location::findCharacter(const string &character_name) {
+    for(set<Character *>::iterator iter = characters.begin(); iter != characters.end(); ++iter) {
+        Character *character = *iter;
+        if( character->getName() == character_name ) {
+            return character;
         }
     }
     return NULL;

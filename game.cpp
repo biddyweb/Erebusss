@@ -1095,8 +1095,9 @@ enum TestID {
     TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
     TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 49,
     TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 50,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 51,
-    N_TESTS = 52
+    TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 51,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 52,
+    N_TESTS = 53
 };
 
 /**
@@ -1148,6 +1149,7 @@ enum TestID {
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
+  TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   */
 
@@ -1325,6 +1327,41 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         LOG("now check quest complete\n");
         if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("expected quest to be completed now");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ) {
+        // interact with Calbert
+        Location *location = playing_gamestate->getQuest()->findLocation("level_3");
+        if( location == NULL ) {
+            throw string("can't find location");
+        }
+        playing_gamestate->moveToLocation(location, Vector2D(7.5f, 14.0f));
+
+        Character *npc = location->findCharacter("Calbert");
+        if( npc == NULL ) {
+            throw string("can't find Calbert");
+        }
+        if( npc->canCompleteInteraction(playing_gamestate) ) {
+            throw string("didn't expect to have completed quest for Calbert");
+        }
+
+        vector<Scenery *> scenery_owners;
+        vector<Item *> items = location->getItems("Necromancy for Beginners", true, false, &scenery_owners, NULL);
+        if( items.size() != scenery_owners.size() ) {
+            throw string("mismatched array lengths");
+        }
+        else if( items.size() != 1 ) {
+            throw string("unexpected number of items");
+        }
+        Item *item = items[0];
+        Scenery *scenery = scenery_owners[0];
+        bool move = false;
+        void *ignore = NULL;
+        playing_gamestate->interactWithScenery(&move, &ignore, scenery);
+        playing_gamestate->getPlayer()->pickupItem(item);
+
+        if( !npc->canCompleteInteraction(playing_gamestate) ) {
+            throw string("expected to have completed quest for Calbert");
         }
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
@@ -2065,7 +2102,7 @@ void Game::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
+        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
             // load, check, load, save, load, check
             QElapsedTimer timer;
             timer.start();
@@ -2078,7 +2115,7 @@ void Game::runTest(const string &filename, int test_id) {
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
@@ -2191,9 +2228,9 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        runTest(filename, i);
+        //runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_COMPLETE);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT);
 }
 
 void Game::initButton(QWidget *button) const {

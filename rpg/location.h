@@ -841,6 +841,7 @@ public:
     // for testing:
     set<Scenery *> getSceneryUnlockedBy(const string &unlocked_by_template);
     Scenery *findScenery(const string &scenery_name);
+    Character *findCharacter(const string &character_name);
     vector<Item *> getItems(const string &item_name, bool include_scenery, bool include_characters, vector<Scenery *> *scenery_owners, vector<Character *> *character_owners);
 };
 
