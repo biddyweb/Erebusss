@@ -7357,6 +7357,7 @@ bool PlayingGamestate::clickedOnScenerys(bool *move, void **ignore, const vector
                 scenery->getTrap()->setOff(this, player);
                 scenery->setTrap(NULL);
                 if( player->isDead() ) {
+                    done = true;
                     break;
                 }
             }
