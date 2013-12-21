@@ -648,7 +648,7 @@ void ScrollingListWidget::mousePressEvent(QMouseEvent *event) {
     saved_y = event->y();
 }
 
-Game::Game() : settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
+Game::Game() : is_testing(false), test_n_info_dialog(0), test_expected_n_info_dialog(0), settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
 #ifdef Q_OS_ANDROID
     sdcard_ok(false),
 #else
@@ -1095,7 +1095,8 @@ enum TestID {
     TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
     TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 49,
     TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 50,
-    N_TESTS = 51
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 51,
+    N_TESTS = 52
 };
 
 /**
@@ -1147,6 +1148,7 @@ enum TestID {
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
+  TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   */
 
 void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const {
@@ -1202,7 +1204,7 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
 
 /** Optional read-only checks on a loaded game.
   */
-void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const {
+void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
     LOG("checkSaveGame\n");
     if( test_id == TEST_LOADSAVEQUEST_0 ) {
         // check quest not completed
@@ -1270,7 +1272,7 @@ void Game::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const
     }
 }
 
-void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) const {
+void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) {
     LOG("checkSaveGameWrite");
     if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ) {
         // check quest not completed until all goblins completed
@@ -1325,6 +1327,29 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("expected quest to be completed now");
         }
     }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
+        // check quest completed iff go through exit picked up
+        test_expected_n_info_dialog++;
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
+        Location *location = playing_gamestate->getQuest()->findLocation("level_5");
+        if( location == NULL ) {
+            throw string("can't find location");
+        }
+        Scenery *scenery = location->findScenery("North Exit");
+        if( scenery == NULL ) {
+            throw string("can't find north exit");
+        }
+        bool move = false;
+        void *ignore = NULL;
+        playing_gamestate->moveToLocation(location, Vector2D(0.0f, 0.0f));
+        playing_gamestate->interactWithScenery(&move, &ignore, scenery);
+        LOG("now check quest complete\n");
+        if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("expected quest to be completed now");
+        }
+    }
     else {
         throw string("unknown test_id");
     }
@@ -1334,6 +1359,10 @@ void Game::runTest(const string &filename, int test_id) {
     LOG(">>> Run Test: %d\n", test_id);
     ASSERT_LOGGER(test_id >= 0);
     ASSERT_LOGGER(test_id < N_TESTS);
+
+    this->is_testing = true;
+    this->test_n_info_dialog = 0;
+    this->test_expected_n_info_dialog = 0;
 
     FILE *testfile = fopen(filename.c_str(), "at+");
     if( testfile == NULL ) {
@@ -2036,7 +2065,7 @@ void Game::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
+        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
             // load, check, load, save, load, check
             QElapsedTimer timer;
             timer.start();
@@ -2051,6 +2080,9 @@ void Game::runTest(const string &filename, int test_id) {
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
+            }
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
             }
 
             playing_gamestate->loadQuest(qt_filename, false);
@@ -2110,6 +2142,11 @@ void Game::runTest(const string &filename, int test_id) {
             throw string("unknown test");
         }
 
+        // final checks
+        if( this->test_n_info_dialog != this->test_expected_n_info_dialog ) {
+            throw string("unexpected test_n_info_dialog; expected: ") + numberToString(test_expected_n_info_dialog) + string(" actual: ") + numberToString(test_n_info_dialog);
+        }
+
         fprintf(testfile, "PASSED,");
         if( has_score ) {
             if( score < 0.01 ) {
@@ -2154,9 +2191,9 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        //runTest(filename, i);
+        runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_COMPLETE);
+    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_COMPLETE);
 }
 
 void Game::initButton(QWidget *button) const {

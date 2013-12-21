@@ -7,6 +7,12 @@
 #include <vector>
 using std::vector;
 
+#include <sstream>
+using std::ostringstream;
+
+#include <string>
+using std::string;
+
 const float E_TOL_MACHINE = 1.0e-12f;
 const float E_TOL_ANGULAR = 1.0e-6f;
 const float E_TOL_LINEAR = 1.0e-4f;
@@ -361,3 +367,10 @@ int rollDice(int X, int Y, int Z);
 int poisson(int mean_ticks_per_event, int time_interval);
 
 float perlin_noise2(float vec[2]);
+
+template <typename T>
+string numberToString(T number) {
+    ostringstream ss;
+    ss << number;
+    return ss.str();
+}

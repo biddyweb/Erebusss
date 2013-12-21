@@ -361,6 +361,10 @@ public:
 
 class Game {
 protected:
+    bool is_testing;
+    int test_n_info_dialog;
+    int test_expected_n_info_dialog;
+
     map<string, Sound *> sound_effects;
     string current_stream_sound_effect;
 
@@ -401,8 +405,8 @@ protected:
     void init(bool fullscreen);
     void createPlayerNames();
     void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
-    void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) const;
-    void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) const;
+    void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id);
+    void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id);
     void runTest(const string &filename, int test_id);
 
 public:
@@ -520,6 +524,13 @@ public:
     void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);
+
+    bool isTesting() const {
+        return this->is_testing;
+    }
+    void recordTestInfoDialog() {
+        this->test_n_info_dialog++;
+    }
 };
 
 extern Game *game_g;

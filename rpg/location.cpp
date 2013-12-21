@@ -2071,11 +2071,21 @@ set<Scenery *> Location::getSceneryUnlockedBy(const string &unlocked_by_template
     return ret_scenery;
 }
 
-vector<Item *> Location::getItems(const string &name, bool include_scenery, bool include_characters, vector<Scenery *> *scenery_owners, vector<Character *> *character_owners) {
+Scenery *Location::findScenery(const string &scenery_name) {
+    for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
+        Scenery *scenery = *iter;
+        if( scenery->getName() == scenery_name ) {
+            return scenery;
+        }
+    }
+    return NULL;
+}
+
+vector<Item *> Location::getItems(const string &item_name, bool include_scenery, bool include_characters, vector<Scenery *> *scenery_owners, vector<Character *> *character_owners) {
     vector<Item *> ret_items;
     for(set<Item *>::iterator iter = items.begin(); iter != items.end(); ++iter) {
         Item *item = *iter;
-        if( item->getName() == name ) {
+        if( item->getName() == item_name ) {
             ret_items.push_back(item);
             if( scenery_owners != NULL )
                 scenery_owners->push_back(NULL);
@@ -2088,7 +2098,7 @@ vector<Item *> Location::getItems(const string &name, bool include_scenery, bool
             Scenery *scenery = *iter;
             for(set<Item *>::iterator iter2 = scenery->itemsBegin(); iter2 != scenery->itemsEnd(); ++iter2) {
                 Item *item = *iter2;
-                if( item->getName() == name ) {
+                if( item->getName() == item_name ) {
                     ret_items.push_back(item);
                     if( scenery_owners != NULL )
                         scenery_owners->push_back(scenery);
@@ -2103,7 +2113,7 @@ vector<Item *> Location::getItems(const string &name, bool include_scenery, bool
             Character *character = *iter;
             for(set<Item *>::iterator iter2 = character->itemsBegin(); iter2 != character->itemsEnd(); ++iter2) {
                 Item *item = *iter2;
-                if( item->getName() == name ) {
+                if( item->getName() == item_name ) {
                     ret_items.push_back(item);
                     if( scenery_owners != NULL )
                         scenery_owners->push_back(NULL);

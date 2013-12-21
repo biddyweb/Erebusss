@@ -152,6 +152,10 @@ void InfoDialog::scrollToBottom() {
 }
 
 int InfoDialog::exec() {
+    if( game_g->isTesting() ) {
+        game_g->recordTestInfoDialog();
+        return 0;
+    }
     game_g->getScreen()->setPaused(true, true);
     int result = QDialog::exec();
     game_g->getScreen()->setPaused(false, true);
