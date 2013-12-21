@@ -484,6 +484,14 @@ void FloorRegion::insertPoint(size_t indx, Vector2D point) {
     this->temp_marks.insert( this->temp_marks.begin() + indx, 0 );
 }
 
+void FloorRegion::removeItem(Item *item) {
+    if( this->items.find(item) == items.end() ) {
+        LOG("failed to find item %s in floor region\n", item->getName().c_str());
+        throw string("failed to find item in this floor region");
+    }
+    this->items.erase(item);
+}
+
 FloorRegion *FloorRegion::createRectangle(float x, float y, float w, float h) {
     FloorRegion *floor_regions = new FloorRegion();
     if( x < 0.0f ) {
@@ -713,11 +721,16 @@ void Location::addItem(Item *item, float xpos, float ypos) {
 }
 
 void Location::removeItem(Item *item) {
+    qDebug("remove item %s from %s", item->getName().c_str(), this->name.c_str());
+    if( this->items.find(item) == items.end() ) {
+        LOG("failed to find item %s in location %s\n", item->getName().c_str(), name.c_str());
+        throw string("failed to find item in this location");
+    }
     this->items.erase(item);
 
     FloorRegion *floor_region = this->findFloorRegionAt(item->getPos());
     if( floor_region == NULL ) {
-        LOG("failed to find floor region for item %s at %f, %f\n", item->getName().c_str(), item->getX(), item->getY());
+        LOG("failed to find floor region for item %s at %f, %f in location %s\n", item->getName().c_str(), item->getX(), item->getY(), this->name.c_str());
         throw string("failed to find floor region for item");
     }
     floor_region->removeItem(item);
@@ -2117,6 +2130,7 @@ bool QuestObjective::testIfComplete(const PlayingGamestate *playing_gamestate, c
                 for(set<Character *>::const_iterator iter2 = location->charactersBegin(); iter2 != location->charactersEnd() && complete; ++iter2) {
                     const Character *character = *iter2;
                     if( character->isHostile() && !character->isDead() ) {
+                        //qDebug("ping still character: %s", character->getName().c_str());
                         complete = false;
                     }
                 }

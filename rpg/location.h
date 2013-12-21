@@ -519,9 +519,7 @@ public:
     void addItem(Item *item) {
         this->items.insert(item);
     }
-    void removeItem(Item *item) {
-        this->items.erase(item);
-    }
+    void removeItem(Item *item);
     void setFloorImageName(const string &floor_image_name) {
         this->floor_image_name = floor_image_name;
     }
@@ -763,6 +761,9 @@ public:
     }
     set<Character *>::const_iterator charactersEnd() const {
         return this->characters.end();
+    }
+    size_t getNCharacters() const {
+        return this->characters.size();
     }
     bool hasEnemies(const PlayingGamestate *playing_gamstate) const;
 
