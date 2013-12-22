@@ -7334,6 +7334,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
 }
 
 bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *scenery) {
+    LOG("PlayingGamestate::interactWithScenery: %s\n", scenery->getName().c_str());
     bool done = false;
 
     if( scenery->getTrap() != NULL ) {
