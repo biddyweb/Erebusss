@@ -1216,7 +1216,7 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
     checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc);
 }
 
-void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &item_name, bool owned_by_scenery, bool owned_by_npc) {
+void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold) {
     Location *location = playing_gamestate->getQuest()->findLocation(location_npc_name);
     if( location == NULL ) {
         throw string("can't find location with npc");
@@ -1241,6 +1241,16 @@ void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
 
     if( !npc->canCompleteInteraction(playing_gamestate) ) {
         throw string("expected to have completed quest for ") + npc_name;
+    }
+    const Character *player = playing_gamestate->getPlayer();
+    int current_xp = player->getXP();
+    int current_gold = player->getGold();
+    npc->completeInteraction(playing_gamestate);
+    if( player->getXP() != current_xp + expected_xp ) {
+        throw string("unexpected xp reward");
+    }
+    if( player->getGold() != current_gold + expected_gold ) {
+        throw string("unexpected gold reward");
     }
 }
 
@@ -1372,11 +1382,11 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ) {
         // interact with Calbert
-        this->interactNPCItem(playing_gamestate, "level_3", Vector2D(7.5f, 14.0f), "Calbert", "Necromancy for Beginners", true, false);
+        this->interactNPCItem(playing_gamestate, "level_3", Vector2D(7.5f, 14.0f), "Calbert", "Necromancy for Beginners", true, false, 50, 0);
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
         // interact with Ghost
-        this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "Ghost's Bones", false, false);
+        this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "Ghost's Bones", false, false, 30, 0);
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
         // check quest completed iff go through exit picked up
@@ -2250,6 +2260,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
+    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT);
     //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST);
 }
 
