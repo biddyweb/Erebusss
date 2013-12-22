@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "rpg/utils.h" // for Vector2D
 
 #include <QGraphicsItem>
 #include <QListWidget>
@@ -39,6 +40,7 @@ class Currency;
 class Shop;
 class CharacterTemplate;
 class Character;
+class Scenery;
 
 //const QString savegame_root = "savegame_";
 const QString savegame_ext = ".xml";
@@ -404,7 +406,9 @@ protected:
 
     void init(bool fullscreen);
     void createPlayerNames();
+    Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) const;
     void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
+    void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &item_name, bool owned_by_scenery, bool owned_by_npc);
     void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id);
     void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id);
     void runTest(const string &filename, int test_id);
