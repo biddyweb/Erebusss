@@ -1098,7 +1098,9 @@ enum TestID {
     TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 51,
     TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 52,
     TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 53,
-    N_TESTS = 54
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 54,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 55,
+    N_TESTS = 56
 };
 
 /**
@@ -1153,6 +1155,8 @@ enum TestID {
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
+  TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
+  TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR - test for 3rd quest: interact with Glenthor
   */
 
 Item *Game::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) const {
@@ -1216,7 +1220,10 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
     checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc);
 }
 
-void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold) {
+#include "rpg/item.h"
+
+void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item) {
+    // first check that we can't yet complete the interaction with NPC
     Location *location = playing_gamestate->getQuest()->findLocation(location_npc_name);
     if( location == NULL ) {
         throw string("can't find location with npc");
@@ -1228,29 +1235,78 @@ void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
         throw string("can't find ") + npc_name;
     }
     if( npc->canCompleteInteraction(playing_gamestate) ) {
-        throw string("didn't expect to have completed quest for ") + npc_name;
+        throw string("didn't expect to have completed sub-quest for ") + npc_name;
     }
 
+    Location *location_item = playing_gamestate->getQuest()->findLocation(location_item_name);
+    if( location_item == NULL ) {
+        throw string("can't find location with item");
+    }
+    if( location != location_item ) {
+        playing_gamestate->moveToLocation(location_item, location_item_pos);
+    }
+
+    // now pick up item
     Scenery *scenery = NULL;
-    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location, item_name, owned_by_scenery, owned_by_npc);
+    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc);
     bool move = false;
     void *ignore = NULL;
     if( owned_by_scenery )
         playing_gamestate->interactWithScenery(&move, &ignore, scenery);
     playing_gamestate->getPlayer()->pickupItem(item);
 
+    // now return to NPC
+    if( location != location_item ) {
+        playing_gamestate->moveToLocation(location, location_npc_pos);
+    }
     if( !npc->canCompleteInteraction(playing_gamestate) ) {
         throw string("expected to have completed quest for ") + npc_name;
     }
     const Character *player = playing_gamestate->getPlayer();
+    int current_quest_item = player->findItemCount(item_name);
+    if( current_quest_item == 0 ) {
+        throw string("player didn't pick up quest item");
+    }
     int current_xp = player->getXP();
     int current_gold = player->getGold();
+    int current_item = expected_item.length() == 0 ? 0 : player->findItemCount(expected_item);
+    int current_total_items = player->getItemCount();
+    if( current_total_items < current_quest_item ) {
+        throw string("current_total_items less than current_quest_item !");
+    }
+    /*for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        const Item *item = *iter;
+        LOG("item: %s\n", item->getName().c_str());
+    }*/
+
     npc->completeInteraction(playing_gamestate);
+
+    if( player->findItemCount(item_name) != current_quest_item-1 ) {
+        throw string("player didn't give up quest item");
+    }
     if( player->getXP() != current_xp + expected_xp ) {
         throw string("unexpected xp reward");
     }
     if( player->getGold() != current_gold + expected_gold ) {
         throw string("unexpected gold reward");
+    }
+    if( expected_item.length() > 0 && player->findItemCount(expected_item) != current_item+1 ) {
+        throw string("didn't get item reward");
+    }
+    if( expected_item.length() > 0 && player->getItemCount() != current_total_items ) {
+        // check we didn't get any other items
+        // if we got a reward, then number of items should be the same, due to giving up the quest item
+        throw string("unexpected additional item reward");
+    }
+    /*LOG("expected_item: %s", expected_item.c_str());
+    LOG("count was %d now %d\n", current_total_items, player->getItemCount());
+    for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+        const Item *item = *iter;
+        LOG("item: %s\n", item->getName().c_str());
+    }*/
+    if( expected_item.length() == 0 && player->getItemCount() != current_total_items-1 ) {
+        // if no item reward, we should lose one, due to giving up the quest item
+        throw string("unexpected item reward");
     }
 }
 
@@ -1382,11 +1438,11 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ) {
         // interact with Calbert
-        this->interactNPCItem(playing_gamestate, "level_3", Vector2D(7.5f, 14.0f), "Calbert", "Necromancy for Beginners", true, false, 50, 0);
+        this->interactNPCItem(playing_gamestate, "level_3", Vector2D(7.5f, 14.0f), "Calbert", "level_3", Vector2D(7.5f, 14.0f), "Necromancy for Beginners", true, false, 50, 0, "");
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
         // interact with Ghost
-        this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "Ghost's Bones", false, false, 30, 0);
+        this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "level_6", Vector2D(5.9f, 28.0f), "Ghost's Bones", false, false, 30, 0, "");
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
         // check quest completed iff go through exit picked up
@@ -1410,6 +1466,12 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
             throw string("expected quest to be completed now");
         }
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ) {
+        // interact with Anmareth
+        this->interactNPCItem(playing_gamestate, "entrance", Vector2D(3.5f, 6.0f), "Anmareth", "level_1", Vector2D(21.0f, 39.0f), "Dire Leaf", true, false, 30, 0, "Potion of Healing");
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
     }
     else {
         throw string("unknown test_id");
@@ -2126,7 +2188,13 @@ void Game::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
+        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
             // load, check, load, save, load, check
             QElapsedTimer timer;
             timer.start();
@@ -2143,7 +2211,7 @@ void Game::runTest(const string &filename, int test_id) {
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
             }
 
@@ -2260,8 +2328,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT);
-    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST);
+    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH);
 }
 
 void Game::initButton(QWidget *button) const {

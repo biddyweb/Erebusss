@@ -408,7 +408,7 @@ protected:
     void createPlayerNames();
     Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) const;
     void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
-    void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold);
+    void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item);
     void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id);
     void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id);
     void runTest(const string &filename, int test_id);
