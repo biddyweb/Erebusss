@@ -1315,7 +1315,41 @@ void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
 }
 
 void Game::interactNPCKill(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &objective_id, const string &check_kill_location, const string &check_kill_name, int expected_xp, int expected_gold, const string &expected_item) {
+    // first check that we can't yet complete the interaction with NPC
+    checkCanCompleteNPC(playing_gamestate, location_npc_name, location_npc_pos, npc_name, expected_xp, expected_gold, expected_item, false, false);
 
+    const Quest *quest = playing_gamestate->getQuest();
+    for(vector<Location *>::const_iterator iter = quest->locationsBegin(); iter != quest->locationsEnd(); ++iter) {
+        Location *location = *iter;
+        while( location->getNCharacters() > 0 ) {
+            Character *npc = NULL;
+            for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd() && npc==NULL; ++iter) {
+                Character *character = *iter;
+                if( character->getObjectiveId() == objective_id ) {
+                    if( character == playing_gamestate->getPlayer() ) {
+                        throw string("player has objective_id!");
+                    }
+                    if( !character->isHostile() ) {
+                        throw string("npc with objective_id isn't hostile");
+                    }
+                    if( check_kill_location.length() > 0 && check_kill_location != location->getName() ) {
+                        throw string("enemies with objective_id in unexpected location");
+                    }
+                    if( check_kill_name.length() > 0 && check_kill_name != character->getName() ) {
+                        throw string("enemy with objective_id has unexpected name");
+                    }
+                    npc = character;
+                }
+            }
+            if( npc == NULL )
+                break;
+            location->removeCharacter(npc);
+            delete npc;
+        }
+    }
+
+    // now return to NPC
+    checkCanCompleteNPC(playing_gamestate, location_npc_name, location_npc_pos, npc_name, expected_xp, expected_gold, expected_item, true, false);
 }
 
 
@@ -1400,6 +1434,9 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             for(set<Character *>::iterator iter = location->charactersBegin(); iter != location->charactersEnd() && npc==NULL; ++iter) {
                 Character *character = *iter;
                 if( character != playing_gamestate->getPlayer() ) {
+                    if( !character->isHostile() ) {
+                        throw string("npc isn't hostile");
+                    }
                     npc = character;
                 }
             }
@@ -2336,9 +2373,10 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        runTest(filename, i);
+        //runTest(filename, i);
     }
     //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR);
 }
 
 void Game::initButton(QWidget *button) const {
