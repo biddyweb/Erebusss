@@ -2373,10 +2373,10 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        //runTest(filename, i);
+        runTest(filename, i);
     }
     //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH);
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR);
+    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR);
 }
 
 void Game::initButton(QWidget *button) const {
