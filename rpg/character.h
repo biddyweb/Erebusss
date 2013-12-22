@@ -810,8 +810,10 @@ public:
     set<Item *>::const_iterator itemsBegin() const;
     set<Item *>::iterator itemsEnd();
     set<Item *>::const_iterator itemsEnd() const;
+    int getItemCount() const;
     Item *findItem(const string &key);
     const Item *findItem(const string &key) const;
+    int findItemCount(const string &key) const;
     Ammo *findAmmo(const string &key);
     int getGold() const {
         return this->gold;

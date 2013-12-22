@@ -271,6 +271,17 @@ const Item *Character::findItem(const string &key) const {
     return NULL;
 }
 
+int Character::findItemCount(const string &key) const {
+    int count = 0;
+    for(set<Item *>::const_iterator iter = this->items.begin(); iter != this->items.end(); ++iter) {
+        const Item *item = *iter;
+        if( item->getKey() == key )
+            count++;
+    }
+    return count;
+}
+
+
 Ammo *Character::findAmmo(const string &key) {
     if( this->current_ammo != NULL ) {
         if( this->current_ammo->getAmmoType() == key ) {
@@ -1259,6 +1270,10 @@ set<Item *>::iterator Character::itemsEnd() {
 
 set<Item *>::const_iterator Character::itemsEnd() const {
     return this->items.end();
+}
+
+int Character::getItemCount() const {
+    return this->items.size();
 }
 
 void Character::setGold(int gold) {

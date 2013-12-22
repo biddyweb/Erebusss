@@ -1220,33 +1220,78 @@ void Game::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
     checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc);
 }
 
-#include "rpg/item.h"
-
-void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item) {
-    // first check that we can't yet complete the interaction with NPC
+void Game::checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item) {
     Location *location = playing_gamestate->getQuest()->findLocation(location_npc_name);
     if( location == NULL ) {
         throw string("can't find location with npc");
     }
-    playing_gamestate->moveToLocation(location, location_npc_pos);
+    if( location != playing_gamestate->getCLocation() ) {
+        playing_gamestate->moveToLocation(location, location_npc_pos);
+    }
 
     Character *npc = location->findCharacter(npc_name);
     if( npc == NULL ) {
         throw string("can't find ") + npc_name;
     }
-    if( npc->canCompleteInteraction(playing_gamestate) ) {
-        throw string("didn't expect to have completed sub-quest for ") + npc_name;
+    if( npc->canCompleteInteraction(playing_gamestate) != can_complete ) {
+        if( can_complete )
+            throw string("didn't expect to have completed sub-quest for ") + npc_name;
+        else
+            throw string("expected to have completed quest for ") + npc_name;
     }
+    if( can_complete ) {
+        const Character *player = playing_gamestate->getPlayer();
+        int current_xp = player->getXP();
+        int current_gold = player->getGold();
+        int current_item = expected_item.length() == 0 ? 0 : player->findItemCount(expected_item);
+        int current_total_items = player->getItemCount();
+        /*for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+            const Item *item = *iter;
+            LOG("item: %s\n", item->getName().c_str());
+        }*/
 
+        npc->completeInteraction(playing_gamestate);
+
+        if( player->getXP() != current_xp + expected_xp ) {
+            throw string("unexpected xp reward");
+        }
+        if( player->getGold() != current_gold + expected_gold ) {
+            throw string("unexpected gold reward");
+        }
+        if( expected_item.length() > 0 && player->findItemCount(expected_item) != current_item+1 ) {
+            throw string("didn't get item reward");
+        }
+        if( expected_item.length() > 0 && player->getItemCount() != (quest_was_item ? current_total_items : current_total_items+1) ) {
+            // check we didn't get any other items
+            // if quest_was_item: if we got a reward, then number of items should be the same, due to giving up the quest item
+            throw string("unexpected additional item reward");
+        }
+        /*LOG("expected_item: %s", expected_item.c_str());
+        LOG("count was %d now %d\n", current_total_items, player->getItemCount());
+        for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+            const Item *item = *iter;
+            LOG("item: %s\n", item->getName().c_str());
+        }*/
+        if( expected_item.length() == 0 && player->getItemCount() != (quest_was_item ? current_total_items-1 : current_total_items)) {
+            // if quest_was_item: if no item reward, we should lose one, due to giving up the quest item
+            throw string("unexpected item reward");
+        }
+    }
+}
+
+void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item) {
+    // first check that we can't yet complete the interaction with NPC
+    checkCanCompleteNPC(playing_gamestate, location_npc_name, location_npc_pos, npc_name, expected_xp, expected_gold, expected_item, false, true);
+
+    // now pick up item
     Location *location_item = playing_gamestate->getQuest()->findLocation(location_item_name);
     if( location_item == NULL ) {
         throw string("can't find location with item");
     }
-    if( location != location_item ) {
+    if( location_item != playing_gamestate->getCLocation() ) {
         playing_gamestate->moveToLocation(location_item, location_item_pos);
     }
 
-    // now pick up item
     Scenery *scenery = NULL;
     Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc);
     bool move = false;
@@ -1255,60 +1300,24 @@ void Game::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
         playing_gamestate->interactWithScenery(&move, &ignore, scenery);
     playing_gamestate->getPlayer()->pickupItem(item);
 
-    // now return to NPC
-    if( location != location_item ) {
-        playing_gamestate->moveToLocation(location, location_npc_pos);
-    }
-    if( !npc->canCompleteInteraction(playing_gamestate) ) {
-        throw string("expected to have completed quest for ") + npc_name;
-    }
     const Character *player = playing_gamestate->getPlayer();
     int current_quest_item = player->findItemCount(item_name);
     if( current_quest_item == 0 ) {
         throw string("player didn't pick up quest item");
     }
-    int current_xp = player->getXP();
-    int current_gold = player->getGold();
-    int current_item = expected_item.length() == 0 ? 0 : player->findItemCount(expected_item);
-    int current_total_items = player->getItemCount();
-    if( current_total_items < current_quest_item ) {
-        throw string("current_total_items less than current_quest_item !");
-    }
-    /*for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        const Item *item = *iter;
-        LOG("item: %s\n", item->getName().c_str());
-    }*/
 
-    npc->completeInteraction(playing_gamestate);
+    // now return to NPC
+    checkCanCompleteNPC(playing_gamestate, location_npc_name, location_npc_pos, npc_name, expected_xp, expected_gold, expected_item, true, true);
 
     if( player->findItemCount(item_name) != current_quest_item-1 ) {
         throw string("player didn't give up quest item");
     }
-    if( player->getXP() != current_xp + expected_xp ) {
-        throw string("unexpected xp reward");
-    }
-    if( player->getGold() != current_gold + expected_gold ) {
-        throw string("unexpected gold reward");
-    }
-    if( expected_item.length() > 0 && player->findItemCount(expected_item) != current_item+1 ) {
-        throw string("didn't get item reward");
-    }
-    if( expected_item.length() > 0 && player->getItemCount() != current_total_items ) {
-        // check we didn't get any other items
-        // if we got a reward, then number of items should be the same, due to giving up the quest item
-        throw string("unexpected additional item reward");
-    }
-    /*LOG("expected_item: %s", expected_item.c_str());
-    LOG("count was %d now %d\n", current_total_items, player->getItemCount());
-    for(set<Item *>::const_iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
-        const Item *item = *iter;
-        LOG("item: %s\n", item->getName().c_str());
-    }*/
-    if( expected_item.length() == 0 && player->getItemCount() != current_total_items-1 ) {
-        // if no item reward, we should lose one, due to giving up the quest item
-        throw string("unexpected item reward");
-    }
 }
+
+void Game::interactNPCKill(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &objective_id, const string &check_kill_location, const string &check_kill_name, int expected_xp, int expected_gold, const string &expected_item) {
+
+}
+
 
 
 /** Optional read-only checks on a loaded game.
@@ -1472,6 +1481,7 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         this->interactNPCItem(playing_gamestate, "entrance", Vector2D(3.5f, 6.0f), "Anmareth", "level_1", Vector2D(21.0f, 39.0f), "Dire Leaf", true, false, 30, 0, "Potion of Healing");
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
+        this->interactNPCKill(playing_gamestate, "level_1", Vector2D(39.0f, 29.0f), "Glenthor", "Glenthor", "level_1", "Wyvern", 75, 0, "");
     }
     else {
         throw string("unknown test_id");
