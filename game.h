@@ -227,23 +227,34 @@ public:
 
 class Particle {
     float xpos, ypos; // floats to allow for movement
+    float xspeed, yspeed;
     int birth_time;
     bool flag;
 public:
     Particle();
 
     float getX() const {
-            return this->xpos;
+        return this->xpos;
     }
     float getY() const {
-            return this->ypos;
+        return this->ypos;
     }
     void setPos(float xpos, float ypos) {
-            this->xpos = xpos;
-            this->ypos = ypos;
+        this->xpos = xpos;
+        this->ypos = ypos;
+    }
+    float getXSpeed() const {
+        return this->xspeed;
+    }
+    float getYSpeed() const {
+        return this->yspeed;
+    }
+    void setSpeed(float xspeed, float yspeed) {
+        this->xspeed = xspeed;
+        this->yspeed = yspeed;
     }
     int getBirthTime() const {
-            return this->birth_time;
+        return this->birth_time;
     }
     void setFlag(bool flag) {
         this->flag = flag;
@@ -251,6 +262,7 @@ public:
     bool isFlag() const {
         return this->flag;
     }
+    void move(int loop_time);
 };
 
 class ParticleSystem : public QGraphicsItem {
@@ -258,6 +270,7 @@ protected:
     vector<Particle> particles;
     QPixmap pixmap;
 
+    void moveParticles();
 public:
     ParticleSystem(const QPixmap &pixmap) : pixmap(pixmap) {
     }
@@ -269,11 +282,21 @@ public:
 };
 
 class SmokeParticleSystem : public ParticleSystem {
+public:
+    enum Type {
+        TYPE_RISE = 0,
+        TYPE_RADIAL = 1
+    };
+protected:
+    Type type;
     float birth_rate;
     int life_exp;
     int last_emit_time;
 public:
     SmokeParticleSystem(const QPixmap &pixmap);
+    void setType(Type type) {
+        this->type =  type;
+    }
     void setBirthRate(float birth_rate);
 
     virtual void updatePS();

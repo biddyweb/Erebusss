@@ -525,14 +525,27 @@ AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
     return this->animation_layer;
 }
 
-Particle::Particle() : xpos(0.0f), ypos(0.0f), birth_time(0), flag(false) {
+Particle::Particle() : xpos(0.0f), ypos(0.0f), xspeed(0.0f), yspeed(0.0f), birth_time(0), flag(false) {
     this->birth_time = game_g->getScreen()->getGameTimeTotalMS();
 }
+
+void Particle::move(int loop_time) {
+    this->xpos += loop_time * this->xspeed;
+    this->ypos += loop_time * this->yspeed;
+}
+
 
 void ParticleSystem::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
         this->updatePS();
+    }
+}
+
+void ParticleSystem::moveParticles() {
+    int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
+    for(int i=0;i<particles.size();i++) {
+        particles.at(i).move(real_loop_time);
     }
 }
 
@@ -553,7 +566,7 @@ QRectF ParticleSystem::boundingRect() const {
 }
 
 SmokeParticleSystem::SmokeParticleSystem(const QPixmap &pixmap) : ParticleSystem(pixmap),
-    birth_rate(0.0f), life_exp(1500), last_emit_time(0) {
+    type(TYPE_RISE), birth_rate(0.0f), life_exp(1500), last_emit_time(0) {
     this->last_emit_time = game_g->getScreen()->getGameTimeTotalMS();
 }
 
@@ -566,45 +579,29 @@ void SmokeParticleSystem::updatePS() {
     // expire old particles
     int time_now = game_g->getScreen()->getGameTimeTotalMS();
     for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
-            if( time_now >= particles.at(i).getBirthTime() + life_exp ) {
-                    // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
-                    particles[i] = particles[particles.size()-1];
-                    particles.resize(particles.size()-1);
-            }
+        if( time_now >= particles.at(i).getBirthTime() + life_exp ) {
+            // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
+            particles[i] = particles[particles.size()-1];
+            particles.resize(particles.size()-1);
+        }
     }
 
-    int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
-    const float xspeed = 0.03f;
-    const float yspeed = 0.06f;
-    // update particles
-    for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
-            float xpos = particles.at(i).getX();
-            float ypos = particles.at(i).getY();
-            float xdiff = real_loop_time * xspeed;
-            float ydiff = real_loop_time * yspeed;
-            ypos -= ydiff;
-            /*if( rand() % 2 == 0 ) {
-                    xdiff = - xdiff;
-            }*/
+    if( type == TYPE_RISE ) {
+        int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
+        // update particle speed
+        for(int i=0;i<particles.size();i++) {
             int prob = poisson(100, real_loop_time);
             if( rand() % RAND_MAX <= prob ) {
-                particles.at(i).setFlag( !particles.at(i).isFlag() );
+                float xspeed = particles.at(i).getXSpeed();
+                float yspeed = particles.at(i).getYSpeed();
+                xspeed = - xspeed;
+                particles.at(i).setSpeed(xspeed, yspeed);
             }
-            if( !particles.at(i).isFlag() ) {
-                xdiff = - xdiff;
-            }
-            xpos += xdiff;
-            /*if( ypos < 0 ) {
-                    // kill
-                    // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
-                    particles[i] = particles[particles.size()-1];
-                    particles.resize(particles.size()-1);
-                    //LOG("resize to %d\n", particles.size());
-            }
-            else*/ {
-                    particles.at(i).setPos(xpos, ypos);
-            }
+        }
     }
+
+    // now move the particles
+    this->moveParticles();
 
     // emit new particles
     int accumulated_time = game_g->getScreen()->getGameTimeTotalMS() - this->last_emit_time;
@@ -612,12 +609,21 @@ void SmokeParticleSystem::updatePS() {
     int new_particles = (int)(this->birth_rate/1000.0f * accumulated_time);
     this->last_emit_time += (int)(1000.0f/birth_rate * new_particles);
     if( new_particles > 0 ) {
-            //qDebug("%d new particles (total will be %d)", new_particles, particles.size() + new_particles);
-            for(int i=0;i<new_particles;i++) {
-                    Particle particle;
-                    particle.setFlag( rand() % 2 == 0 );
-                    particles.push_back(particle);
+        //qDebug("%d new particles (total will be %d)", new_particles, particles.size() + new_particles);
+        for(int i=0;i<new_particles;i++) {
+            Particle particle;
+            if( type == TYPE_RISE ) {
+                int dir = rand() % 2 == 0 ? 1 : -1;
+                particle.setSpeed(dir*0.03f, -0.06f);
             }
+            else if( type == TYPE_RADIAL ) {
+                int deg = rand() % 360;
+                float rad = (deg*M_PI)/180.0f;
+                float speed = 0.2f;
+                particle.setSpeed(speed*cos(rad), speed*sin(rad));
+            }
+            particles.push_back(particle);
+        }
     }
 
     this->update();

@@ -8852,7 +8852,16 @@ QGraphicsItem *PlayingGamestate::addPixmapGraphic(const QPixmap &pixmap, Vector2
 
 QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
     qDebug("PlayingGamestate::addSpellGraphic(%f, %f)", pos.x, pos.y);
-    return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.25f, true, false);
+    //return this->addPixmapGraphic(this->fireball_pixmap, pos, 0.25f, true, false);
+    SmokeParticleSystem *ps = new SmokeParticleSystem(fireball_pixmap);
+    ps->setType(SmokeParticleSystem::TYPE_RADIAL);
+    ps->setBirthRate(50.0f);
+    ps->setPos(pos.x, pos.y);
+    ps->setZValue(pos.y + 2000.0f);
+    float item_scale = 1.0f / smoke_pixmap.width();
+    ps->setScale(item_scale);
+    scene->addItem(ps);
+    return ps;
 }
 
 void PlayingGamestate::addStandardItem(Item *item) {
