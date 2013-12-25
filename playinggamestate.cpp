@@ -1019,6 +1019,8 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     }
     html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/>";
 
+    html += writeSkills(player);
+
     html += "</body></html>";
 
 #ifdef USING_WEBKIT
@@ -1039,7 +1041,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 }
 
 QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
-    QString html = ::writeStat(playing_gamestate->getPlayer(), stat_key, is_float);
+    QString html = ::writeStat(playing_gamestate->getPlayer(), stat_key, is_float, false);
     return html;
 }
 
@@ -2215,7 +2217,7 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
 }
 
 QCheckBox *LevelUpWindow::addProfileCheckBox(const string &key) {
-    string long_string = getLongString(key);
+    string long_string = getProfileLongString(key);
     QCheckBox * check_box = new QCheckBox(long_string.c_str());
     check_boxes[key] = check_box;
     return check_box;
@@ -4685,19 +4687,23 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
         reader.readNext();
         //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
         if( reader.isStartElement() ) {
-            if( reader.name() == "opening_initial") {
+            if( reader.name() == "skill" ) {
+                QStringRef name_s = reader.attributes().value("name");
+                npc->addSkill(name_s.toString().toStdString());
+            }
+            else if( reader.name() == "opening_initial" ) {
                 QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->setTalkOpeningInitial(text.toStdString());
             }
-            else if( reader.name() == "opening_later") {
+            else if( reader.name() == "opening_later ") {
                 QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->setTalkOpeningLater(text.toStdString());
             }
-            else if( reader.name() == "opening_interaction_complete") {
+            else if( reader.name() == "opening_interaction_complete" ) {
                 QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->setTalkOpeningInteractionComplete(text.toStdString());
             }
-            else if( reader.name() == "talk") {
+            else if( reader.name() == "talk" ) {
                 QStringRef question_s = reader.attributes().value("question");
                 QString question = question_s.toString();
                 QStringRef action_s = reader.attributes().value("action");
@@ -4711,7 +4717,7 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
                 QString answer = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->addTalkItem(question.toStdString(), answer.toStdString(), action.toStdString(), journal.toStdString(), while_not_done, objective);
             }
-            else if( reader.name() == "spell") {
+            else if( reader.name() == "spell" ) {
                 QStringRef name_s = reader.attributes().value("name");
                 QStringRef count_s = reader.attributes().value("count");
                 int count = parseInt(count_s.toString());
@@ -8303,6 +8309,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             stream << " natural_damageX=\"" << natural_damageX << "\"";
             stream << " natural_damageY=\"" << natural_damageY << "\"";
             stream << " natural_damageZ=\"" << natural_damageZ << "\"";
+
             if( character->canFly() ) {
                 //fprintf(file, " can_fly=\"true\"");
                 stream << " can_fly=\"true\"";
@@ -8402,6 +8409,12 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             }
             //fprintf(file, ">\n");
             stream << ">\n";
+
+            for(set<string>::const_iterator iter2 = character->skillsBegin(); iter2 != character->skillsEnd(); ++iter2) {
+                const string skill = *iter2;
+                stream << "<skill name=\"" << skill.c_str() << "\"/>";
+            }
+
             if( character->getTalkOpeningInitial().length() > 0 ) {
                 //fprintf(file, "<opening_initial>%s</opening_initial>", character->getTalkOpeningInitial().c_str());
                 stream << "<opening_initial>" << character->getTalkOpeningInitial().c_str() << "</opening_initial>";

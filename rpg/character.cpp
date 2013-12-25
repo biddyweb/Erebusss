@@ -16,7 +16,7 @@ const int default_natural_damageX = 1;
 const int default_natural_damageY = 3;
 const int default_natural_damageZ = -1;
 
-string getLongString(const string &key) {
+string getProfileLongString(const string &key) {
     if( key == profile_key_FP_c )
         return "Fighting Prowess";
     else if( key == profile_key_BS_c )
@@ -37,14 +37,16 @@ string getLongString(const string &key) {
     throw string("unknown key");
 }
 
-QString writeStat(Character *character, const string &stat_key, bool is_float) {
-    string visual_name = getLongString(stat_key);
+QString writeStat(const Character *character, const string &stat_key, bool is_float, bool want_base) {
+    string visual_name = getProfileLongString(stat_key);
     QString html = "<b>";
     html += visual_name.c_str();
     html += ":</b> ";
     if( is_float ) {
         float stat = character->getProfileFloatProperty(stat_key);
         float base_stat = character->getBaseProfileFloatProperty(stat_key);
+        if( want_base )
+            stat = base_stat;
         if( stat > base_stat ) {
             html += "<font color=\"#00ff00\">";
         }
@@ -59,6 +61,8 @@ QString writeStat(Character *character, const string &stat_key, bool is_float) {
     else {
         int stat = character->getProfileIntProperty(stat_key);
         int base_stat = character->getBaseProfileIntProperty(stat_key);
+        if( want_base )
+            stat = base_stat;
         if( stat > base_stat ) {
             html += "<font color=\"#00ff00\">";
         }
@@ -72,6 +76,41 @@ QString writeStat(Character *character, const string &stat_key, bool is_float) {
     }
     html += "<br/>";
     return html;
+}
+
+QString writeSkills(const Character *character) {
+    QString html = "";
+    bool any_skills = false;
+    for(set<string>::const_iterator iter = character->skillsBegin(); iter != character->skillsEnd(); ++iter) {
+        const string skill = *iter;
+        if( !any_skills ) {
+            any_skills = true;
+            html += "<b>Skills:</b><br/><br/>";
+        }
+        html += "<i>";
+        html += getSkillLongString(skill).c_str();
+        html += "</i>: ";
+        html += getSkillDescription(skill).c_str();
+        html += "<br/>";
+    }
+    if( any_skills ) {
+        html += "<br/>";
+    }
+    return html;
+}
+
+string getSkillLongString(const string &key) {
+    if( key == skill_unarmed_combat_c )
+        return "Unarmed Combat";
+    LOG("getSkillLongString: unknown key: %s\n", key.c_str());
+    throw string("unknown key");
+}
+
+string getSkillDescription(const string &key) {
+    if( key == skill_unarmed_combat_c )
+        return "You do not suffer any penalty to Fighting Prowess when fighting without weapons.";
+    LOG("getSkillDescription: unknown key: %s\n", key.c_str());
+    throw string("unknown key");
 }
 
 int Profile::getIntProperty(const string &key) const {
@@ -378,7 +417,7 @@ int Character::getProfileIntProperty(const string &key) const {
             value--;
         }
     }
-    if( key == profile_key_FP_c && this->current_weapon == NULL && !this->is_hostile ) {
+    if( key == profile_key_FP_c && this->current_weapon == NULL && !this->is_hostile && !this->hasSkill(skill_unarmed_combat_c) ) {
         // modifier for player being unarmed
         value -= 2;
     }
@@ -1413,6 +1452,7 @@ bool Character::tooWeakForArmour() const {
         return true;
     }
     return false;
+
 }
 
 bool Character::tooWeakForWeapon() const {

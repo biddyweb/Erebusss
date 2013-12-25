@@ -74,8 +74,14 @@ const string profile_key_D_c = "D";
 const string profile_key_B_c = "B";
 const string profile_key_Sp_c = "Sp";
 
-string getLongString(const string &key);
-QString writeStat(Character *character, const string &stat_key, bool is_float);
+string getProfileLongString(const string &key);
+QString writeStat(const Character *character, const string &stat_key, bool is_float, bool want_base);
+
+const string skill_unarmed_combat_c = "unarmed_combat";
+
+string getSkillLongString(const string &key);
+string getSkillDescription(const string &key);
+QString writeSkills(const Character *character);
 
 class Profile {
     map<string, int> int_properties;
@@ -398,6 +404,8 @@ class Character {
     // used for levelling:
     Profile initial_profile;
     int initial_level;
+
+    set<string> skills;
 
     set<Item *> items;
     Weapon *current_weapon;
@@ -764,7 +772,20 @@ public:
     void restoreHealth() {
         this->health = this->max_health;
     }
-    int getArmourRating(bool armour, bool shield) const;
+    void addSkill(const string &skill) {
+        this->skills.insert(skill);
+    }
+    bool hasSkill(const string &skill) const {
+        if( this->skills.find(skill) == this->skills.end() )
+            return false;
+        return true;
+    }
+    set<string>::const_iterator skillsBegin() const {
+        return this->skills.begin();
+    }
+    set<string>::const_iterator skillsEnd() const {
+        return this->skills.end();
+    }
 
     const Weapon *getCurrentWeapon() const {
         return this->current_weapon;
@@ -780,6 +801,7 @@ public:
         return this->current_ammo;
     }
     void selectAmmo(Ammo *item);
+    int getArmourRating(bool armour, bool shield) const;
     const Shield *getCurrentShield() const {
         return this->current_shield;
     }

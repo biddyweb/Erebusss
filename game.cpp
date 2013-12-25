@@ -2409,9 +2409,9 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        //runTest(filename, i);
+        runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED);
+    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED);
 }
 
 void Game::initButton(QWidget *button) const {
@@ -2854,6 +2854,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
     if( player_type == "Barbarian" ) {
         character->initialiseProfile(1, 8, 6, 8, 1, 5, 5, 8, 1.8f);
         character->initialiseHealth(75);
+        character->addSkill(skill_unarmed_combat_c);
         character->setBiography("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.");
         character->setPortrait("portrait_barbarian");
     }

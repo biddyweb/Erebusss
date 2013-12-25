@@ -64,17 +64,20 @@ void CharacterHelp::changedGameType(int index) {
     string player = options_gamestate->characterComboBox->currentText().toStdString();
     Character *character = game_g->createPlayer(player, "");
     QString html = "";
-    html += writeStat(character, profile_key_FP_c, false);
-    html += writeStat(character, profile_key_BS_c, false);
-    html += writeStat(character, profile_key_S_c, false);
-    html += writeStat(character, profile_key_A_c, false);
-    html += writeStat(character, profile_key_M_c, false);
-    html += writeStat(character, profile_key_D_c, false);
-    html += writeStat(character, profile_key_B_c, false);
-    html += writeStat(character, profile_key_Sp_c, true);
+    html += writeStat(character, profile_key_FP_c, false, true);
+    html += writeStat(character, profile_key_BS_c, false, true);
+    html += writeStat(character, profile_key_S_c, false, true);
+    html += writeStat(character, profile_key_A_c, false, true);
+    html += writeStat(character, profile_key_M_c, false, true);
+    html += writeStat(character, profile_key_D_c, false, true);
+    html += writeStat(character, profile_key_B_c, false, true);
+    html += writeStat(character, profile_key_Sp_c, true, true);
     html += "<b>Health:</b> ";
     html += QString::number(character->getMaxHealth());
     html += "<br/><br/>";
+
+    html += writeSkills(character);
+
     html += character->getBiography().c_str();
     html += "<br/>";
 
