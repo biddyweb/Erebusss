@@ -43,6 +43,7 @@ GameTypeHelp::GameTypeHelp(OptionsGamestate *options_gamestate) : Help(options_g
 }
 
 void GameTypeHelp::changedGameType(int index) {
+    LOG("GameTypeHelp::changedGameType(%d)\n", index);
     if( index == GAMETYPE_CAMPAIGN ) {
         //this->setText("Play through the series of quests that have been written for Erebus.");
         this->setHtml("Play through the series of quests that have been written for Erebus.");
@@ -61,6 +62,7 @@ CharacterHelp::CharacterHelp(OptionsGamestate *options_gamestate) : Help(options
 }
 
 void CharacterHelp::changedGameType(int index) {
+    LOG("CharacterHelp::changedGameType(%d)\n", index);
     string player = options_gamestate->characterComboBox->currentText().toStdString();
     Character *character = game_g->createPlayer(player, "");
     QString html = "";
