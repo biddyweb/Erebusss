@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     //runtests = true;
 
 #if !defined(Q_OS_ANDROID)
-        // n.b., crashes when run on Galaxy Nexus (even though fine in the emulator)
+    // n.b., crashes when run on Galaxy Nexus (even though fine in the emulator)
     for(int i=0;i<argc;i++) {
         if( strcmp(argv[i], "-windowed") == 0 )
             fullscreen = false;
