@@ -378,6 +378,10 @@ int Character::getProfileIntProperty(const string &key) const {
             value--;
         }
     }
+    if( key == profile_key_FP_c && this->current_weapon == NULL && !this->is_hostile ) {
+        // modifier for player being unarmed
+        value -= 2;
+    }
     return value;
 }
 
