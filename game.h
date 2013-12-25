@@ -426,9 +426,11 @@ protected:
     bool lighting_enabled;
 
     vector<string> player_types;
+    map<string, QPixmap> portrait_images;
 
     void init(bool fullscreen);
     void createPlayerNames();
+    void loadPortraits();
     Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) const;
     void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
     void checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item);
@@ -463,6 +465,7 @@ public:
     /*const QBrush &getGuiBrushButtons() const {
         return this->gui_brush_buttons;
     }*/
+    QPixmap &getPortraitImage(const string &name);
 
     void initButton(QWidget *button) const;
 

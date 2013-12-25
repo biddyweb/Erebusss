@@ -8,6 +8,7 @@ using std::vector;
 #include <QStackedWidget>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QLabel>
 
 #ifdef USING_WEBKIT
 #include <QWebView>
@@ -18,23 +19,47 @@ using std::vector;
 #include "gamestate.h"
 
 class ScrollingListWidget;
-//class Sound;
+class OptionsGamestate;
 
 #ifdef USING_WEBKIT
-class GameTypeHelp : public QWebView {
+class Help : public QWebView {
 #else
-class GameTypeHelp : public QTextEdit {
+class Help : public QTextEdit {
 #endif
     Q_OBJECT
+
+protected:
+    OptionsGamestate *options_gamestate;
+
 public:
-    GameTypeHelp();
+    Help(OptionsGamestate *options_gamestate);
 
 public slots:
-    void changedGameType(int index);
+    virtual void changedGameType(int index)=0;
+};
+
+class GameTypeHelp : public Help {
+    Q_OBJECT
+public:
+    GameTypeHelp(OptionsGamestate *options_gamestate);
+
+public slots:
+    virtual void changedGameType(int index);
+};
+
+class CharacterHelp : public Help {
+    Q_OBJECT
+public:
+    CharacterHelp(OptionsGamestate *options_gamestate);
+
+public slots:
+    virtual void changedGameType(int index);
 };
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
+
+    friend class CharacterHelp;
 
     static OptionsGamestate *optionsGamestate; // singleton pointer, needed for static member functions
 
@@ -44,6 +69,7 @@ class OptionsGamestate : public Gamestate {
 
     QComboBox *gametypeComboBox;
     QComboBox *characterComboBox;
+    QLabel *portraitLabel;
     QComboBox *difficultyComboBox;
     //QButtonGroup *difficultyButtonGroup;
     QCheckBox *permadeathCheckBox;

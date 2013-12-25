@@ -37,6 +37,43 @@ string getLongString(const string &key) {
     throw string("unknown key");
 }
 
+QString writeStat(Character *character, const string &stat_key, bool is_float) {
+    string visual_name = getLongString(stat_key);
+    QString html = "<b>";
+    html += visual_name.c_str();
+    html += ":</b> ";
+    if( is_float ) {
+        float stat = character->getProfileFloatProperty(stat_key);
+        float base_stat = character->getBaseProfileFloatProperty(stat_key);
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
+    }
+    else {
+        int stat = character->getProfileIntProperty(stat_key);
+        int base_stat = character->getBaseProfileIntProperty(stat_key);
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
+    }
+    html += "<br/>";
+    return html;
+}
+
 int Profile::getIntProperty(const string &key) const {
     map<string, int>::const_iterator iter = this->int_properties.find(key);
     if( iter == this->int_properties.end() ) {

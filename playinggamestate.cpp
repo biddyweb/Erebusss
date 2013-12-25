@@ -786,7 +786,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
     if( playing_gamestate->getPlayer() != NULL ) {
         const Character *player = playing_gamestate->getPlayer();
         if( player->getPortrait().length() > 0 ) {
-            QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
+            QPixmap pixmap = game_g->getPortraitImage(player->getPortrait());
             painter.drawPixmap(bar_x*width(), (bar_y - portrait_size)*height(), portrait_size*height(), portrait_size*height(), pixmap);
         }
         else {
@@ -922,7 +922,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     this->setLayout(layout);
 
     if( player->getPortrait().length() > 0 ) {
-        QPixmap pixmap = playing_gamestate->getPortraitImage(player->getPortrait());
+        QPixmap pixmap = game_g->getPortraitImage(player->getPortrait());
         QLabel *portrait_label = new QLabel();
         int height = QApplication::desktop()->availableGeometry().height();
         int max_pic_height = height/3;
@@ -1039,40 +1039,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 }
 
 QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
-    string visual_name = getLongString(stat_key);
-    const Character *player = playing_gamestate->getPlayer();
-    QString html = "<b>";
-    html += visual_name.c_str();
-    html += ":</b> ";
-    if( is_float ) {
-        float stat = player->getProfileFloatProperty(stat_key);
-        float base_stat = player->getBaseProfileFloatProperty(stat_key);
-        if( stat > base_stat ) {
-            html += "<font color=\"#00ff00\">";
-        }
-        else if( stat < base_stat ) {
-            html += "<font color=\"#ff0000\">";
-        }
-        html += QString::number(stat);
-        if( stat != base_stat ) {
-            html += "</font>";
-        }
-    }
-    else {
-        int stat = player->getProfileIntProperty(stat_key);
-        int base_stat = player->getBaseProfileIntProperty(stat_key);
-        if( stat > base_stat ) {
-            html += "<font color=\"#00ff00\">";
-        }
-        else if( stat < base_stat ) {
-            html += "<font color=\"#ff0000\">";
-        }
-        html += QString::number(stat);
-        if( stat != base_stat ) {
-            html += "</font>";
-        }
-    }
-    html += "<br/>";
+    QString html = ::writeStat(playing_gamestate->getPlayer(), stat_key, is_float);
     return html;
 }
 
@@ -3151,12 +3118,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 throw string("error reading images xml file");
             }
         }
-
-        this->portrait_images["portrait_barbarian"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/barbarian_m0.png");
-        this->portrait_images["portrait_elf"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/elf_f0.png");
-        this->portrait_images["portrait_halfling"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/halfling_f0.png");
-        this->portrait_images["portrait_ranger"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/ranger_m0.png");
-        this->portrait_images["portrait_warrior"] = game_g->loadImage(string(DEPLOYMENT_PATH) + "gfx/portraits/warrior_m0.png");
 
         /*{
             // force all lazily loaded data to be loaded
@@ -8927,16 +8888,6 @@ AnimationLayer *PlayingGamestate::getProjectileAnimationLayer(const string &name
         LOG("failed to find image for projectile: %s\n", name.c_str());
         LOG("    image name: %s\n", name.c_str());
         throw string("Failed to find projectile's image");
-    }
-    return image_iter->second;
-}
-
-QPixmap &PlayingGamestate::getPortraitImage(const string &name) {
-    map<string, QPixmap>::iterator image_iter = this->portrait_images.find(name);
-    if( image_iter == this->portrait_images.end() ) {
-        LOG("failed to find image for portrait_images: %s\n", name.c_str());
-        LOG("    image name: %s\n", name.c_str());
-        throw string("Failed to find portrait_images's image");
     }
     return image_iter->second;
 }

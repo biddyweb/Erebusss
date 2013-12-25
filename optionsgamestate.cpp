@@ -23,20 +23,24 @@ using std::stringstream;
 
 #include "optionsgamestate.h"
 #include "game.h"
+#include "rpg/character.h"
 #include "qt_screen.h"
 #include "mainwindow.h"
 #include "infodialog.h"
 #include "logiface.h"
 
 #ifdef USING_WEBKIT
-GameTypeHelp::GameTypeHelp() : QWebView() {
+Help::Help(OptionsGamestate *options_gamestate) : QWebView(), options_gamestate(options_gamestate) {
     game_g->setWebView(this);
 }
 #else
-GameTypeHelp::GameTypeHelp() : QTextEdit() {
+Help::Help(OptionsGamestate *options_gamestate) : QTextEdit(), options_gamestate(options_gamestate) {
     game_g->setTextEdit(this);
 }
 #endif
+
+GameTypeHelp::GameTypeHelp(OptionsGamestate *options_gamestate) : Help(options_gamestate) {
+}
 
 void GameTypeHelp::changedGameType(int index) {
     if( index == GAMETYPE_CAMPAIGN ) {
@@ -53,10 +57,40 @@ void GameTypeHelp::changedGameType(int index) {
     }
 }
 
+CharacterHelp::CharacterHelp(OptionsGamestate *options_gamestate) : Help(options_gamestate) {
+}
+
+void CharacterHelp::changedGameType(int index) {
+    string player = options_gamestate->characterComboBox->currentText().toStdString();
+    Character *character = game_g->createPlayer(player, "");
+    QString html = "";
+    html += writeStat(character, profile_key_FP_c, false);
+    html += writeStat(character, profile_key_BS_c, false);
+    html += writeStat(character, profile_key_S_c, false);
+    html += writeStat(character, profile_key_A_c, false);
+    html += writeStat(character, profile_key_M_c, false);
+    html += writeStat(character, profile_key_D_c, false);
+    html += writeStat(character, profile_key_B_c, false);
+    html += writeStat(character, profile_key_Sp_c, true);
+    html += "<b>Health:</b> ";
+    html += QString::number(character->getMaxHealth());
+    html += "<br/><br/>";
+    html += character->getBiography().c_str();
+    html += "<br/>";
+
+    this->setHtml(html);
+
+    // also update portrait
+    QPixmap pixmap = game_g->getPortraitImage(character->getPortrait());
+    options_gamestate->portraitLabel->setPixmap(pixmap);
+
+    delete character;
+}
+
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
+    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), portraitLabel(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
     nameLineEdit(NULL),
     load_list(NULL),
 #ifndef Q_OS_ANDROID
@@ -280,7 +314,7 @@ void OptionsGamestate::clickedStart() {
 
             }
             // be careful if we change this code - need to ensure layout still works okay, including on Android
-            GameTypeHelp *helpLabel = new GameTypeHelp();
+            GameTypeHelp *helpLabel = new GameTypeHelp(this);
             //helpLabel->setWordWrap(true);
             //helpLabel->setFont(game_g->getFontSmall());
             connect(gametypeComboBox, SIGNAL(currentIndexChanged(int)), helpLabel, SLOT(changedGameType(int)));
@@ -293,7 +327,8 @@ void OptionsGamestate::clickedStart() {
         {
             QLabel *label = new QLabel(tr("Choose game settings: "));
             label->setAlignment(Qt::AlignCenter);
-            label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            //label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
             layout->addWidget(label);
         }
 
@@ -346,6 +381,19 @@ void OptionsGamestate::clickedStart() {
             n_row++;
         }
 
+        {
+            // be careful if we change this code - need to ensure layout still works okay, including on Android
+            QHBoxLayout *h_layout = new QHBoxLayout();
+            layout->addLayout(h_layout);
+
+            this->portraitLabel = new QLabel();
+            h_layout->addWidget(portraitLabel);
+
+            CharacterHelp *helpLabel = new CharacterHelp(this);
+            connect(characterComboBox, SIGNAL(currentIndexChanged(int)), helpLabel, SLOT(changedGameType(int)));
+            h_layout->addWidget(helpLabel);
+            helpLabel->changedGameType( characterComboBox->currentIndex() ); // force initial update
+        }
     }
     else if( options_page_index == 2 ) {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -379,7 +427,7 @@ void OptionsGamestate::clickedStart() {
         // for some reason, this sometimes shows on Android when it shouldn't?
         startButton->setToolTip(tr("Accept the options and proceed to next step (Return)"));
 #endif
-        startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        startButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         h_layout->addWidget(startButton);
         if( options_page_index == n_options_pages-1 ) {
             connect(startButton, SIGNAL(clicked()), this, SLOT(clickedStartGame()));
@@ -395,7 +443,7 @@ void OptionsGamestate::clickedStart() {
         // for some reason, this sometimes shows on Android when it shouldn't?
         closeButton->setToolTip(tr("Return to main menu (Escape)"));
 #endif
-        closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        closeButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         h_layout->addWidget(closeButton);
         //connect(closeButton, SIGNAL(clicked()), this, SLOT(closeAllSubWindows()));
         connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedCancel()));

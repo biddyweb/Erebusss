@@ -519,7 +519,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     map<string, Item *> standard_items;
     map<string, QPixmap> item_images;
     map<string, QPixmap> builtin_images;
-    map<string, QPixmap> portrait_images;
     map<string, CharacterTemplate *> character_templates;
     map<string, Spell *> spells;
     vector<Shop *> shops;
@@ -714,7 +713,6 @@ public:
     const Shop *getRandomShop(bool is_random_npc) const;
 
     AnimationLayer *getProjectileAnimationLayer(const string &name);
-    QPixmap &getPortraitImage(const string &name);
     QPixmap &getItemImage(const string &name);
     QString getItemString(const Item *item, bool want_weight) const;
 

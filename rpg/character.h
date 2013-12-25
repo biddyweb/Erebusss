@@ -14,6 +14,8 @@ using std::map;
 
 #include "utils.h"
 
+#include <QString>
+
 class Character;
 class CharacterTemplate;
 class PlayingGamestate;
@@ -73,6 +75,7 @@ const string profile_key_B_c = "B";
 const string profile_key_Sp_c = "Sp";
 
 string getLongString(const string &key);
+QString writeStat(Character *character, const string &stat_key, bool is_float);
 
 class Profile {
     map<string, int> int_properties;
@@ -345,9 +348,9 @@ class Character {
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
 
-    //   basic info
+    // basic info
     string name;
-    string biography;
+    string biography; // not saved - we currently don't use it during the game, only when choosing a character
     bool is_ai; // not saved
     bool is_hostile;
     bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
