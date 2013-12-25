@@ -3985,7 +3985,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         item = weapon;
         weapon->setTwoHanded(two_handed);
         if( ranged && thrown ) {
-            throw string("Weapons can be ranged and thrown");
+            throw string("Weapons can't' be ranged and thrown");
         }
         else if( ranged ) {
             weapon->setWeaponType(Weapon::WEAPONTYPE_RANGED);
