@@ -3,6 +3,7 @@
 
 <weapon name="Dagger" image_name="longsword" weight="5"
     damageX="1" damageY="6" damageZ="0"
+    bonus_FP="-1"
     animation_name="longsword"/>
 
 <weapon name="Short Sword" image_name="longsword" weight="10"
@@ -24,6 +25,7 @@
     damageX="2" damageY="8" damageZ="-2"
     animation_name="longbow"
     weapon_class="bow"
+    bonus_BS="-1"
     two_handed="true" ranged="true" ammo="Arrows"/>
 
 <weapon name="Longbow" image_name="longbow" weight="5"
