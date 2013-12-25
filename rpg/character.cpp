@@ -102,6 +102,8 @@ QString writeSkills(const Character *character) {
 string getSkillLongString(const string &key) {
     if( key == skill_unarmed_combat_c )
         return "Unarmed Combat";
+    else if( key == skill_sprint_c )
+        return "Sprint";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -109,6 +111,8 @@ string getSkillLongString(const string &key) {
 string getSkillDescription(const string &key) {
     if( key == skill_unarmed_combat_c )
         return "You do not suffer any penalty to Fighting Prowess when fighting without weapons.";
+    else if( key == skill_sprint_c )
+        return "Your speed is 0.2 greater when outdoors.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -435,6 +439,9 @@ float Character::getProfileFloatProperty(const string &key) const {
         const Item *item = *iter;
         float item_bonus = item->getProfileBonusFloatProperty(this, key);
         value += item_bonus;
+    }
+    if( key == profile_key_Sp_c && this->hasSkill(skill_sprint_c) && this->location != NULL && this->location->getGeoType() == Location::GEOTYPE_OUTDOORS ) {
+        value += 0.2f;
     }
     return value;
 }

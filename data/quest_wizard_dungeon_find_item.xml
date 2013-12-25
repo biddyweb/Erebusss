@@ -975,7 +975,7 @@ The journal claims that each of the nearby teleporters is linked to a different 
 
 </location>
 
-<location name="level_past" lighting_min="160">
+<location name="level_past" lighting_min="160" geo_type="outdoors">
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>

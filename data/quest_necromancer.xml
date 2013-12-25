@@ -19,7 +19,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="500"/>
 
-<location name="Axbury" display_name="true" lighting_min="160">
+<location name="Axbury" display_name="true" lighting_min="160" geo_type="outdoors">
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -278,7 +278,7 @@ Thank you for helping me!
 
 </location>
 
-<location name="Graveyard, Axbury" display_name="true" lighting_min="90">
+<location name="Graveyard, Axbury" display_name="true" lighting_min="90" geo_type="outdoors">
 
 <!--<player_start x="6.0" y="12.0"/>-->
 
@@ -594,7 +594,7 @@ When you stare into this Orb, you see swirling lights of many different colours.
 
 </location>
 
-<location name="Middleham" display_name="true" lighting_min="160">
+<location name="Middleham" display_name="true" lighting_min="160" geo_type="outdoors">
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -889,7 +889,7 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 </location>
 
-<location name="Stockton" display_name="true" lighting_min="160">
+<location name="Stockton" display_name="true" lighting_min="160" geo_type="outdoors">
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -1655,7 +1655,7 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
 
-<player_start x="49.0" y="29.5"/>
+<!--<player_start x="49.0" y="29.5"/>-->
 
 <!-- north route, past human prisoners -->
 

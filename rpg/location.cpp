@@ -536,7 +536,7 @@ char Tilemap::getTileAt(int x, int y) const {
 }
 
 Location::Location(const string &name) :
-    name(name), display_name(false), type(TYPE_INDOORS), listener(NULL), listener_data(NULL),
+    name(name), display_name(false), type(TYPE_INDOORS), geo_type(GEOTYPE_DUNGEON), listener(NULL), listener_data(NULL),
     distance_graph(NULL), wall_x_scale(3.0f), lighting_min(55), wandering_monster_time_ms(0), wandering_monster_rest_chance(0)
 {
 }

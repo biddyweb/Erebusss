@@ -1017,7 +1017,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
         }
         html += str.str().c_str();
     }
-    html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/>";
+    html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/><br/>";
 
     html += writeSkills(player);
 
@@ -3056,6 +3056,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         }
 
                         if( type == "generic") {
+
                             if( animation_layer_definition.size() > 0 ) {
                                 LOG("error at line %d\n", reader.lineNumber());
                                 throw string("animations not supported for this animation type");
@@ -5162,6 +5163,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         throw string("unexpected quest xml: duplicate location name");
                     }
                     QStringRef type_s = reader.attributes().value("type");
+                    QStringRef geo_type_s = reader.attributes().value("geo_type");
                     QStringRef lighting_min_s = reader.attributes().value("lighting_min");
                     QStringRef display_name_s = reader.attributes().value("display_name");
                     location = new Location(name_s.toString().toStdString());
@@ -5178,10 +5180,22 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                             throw string("unexpected quest xml: location has unknown type");
                         }
                     }
+                    if( geo_type_s.length() > 0 ) {
+                        if( geo_type_s.toString() == "dungeon" ) {
+                            location->setGeoType(Location::GEOTYPE_DUNGEON);
+                        }
+                        else if( geo_type_s.toString() == "outdoors" ) {
+                            location->setGeoType(Location::GEOTYPE_OUTDOORS);
+                        }
+                        else {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            LOG("unknown geo_type: %s\n", geo_type_s.toString().toStdString().c_str());
+                            throw string("unexpected quest xml: location has unknown geo_type");
+                        }
+                    }
                     if( lighting_min_s.length() > 0 ) {
                         int lighting_min = parseInt(lighting_min_s.toString());
                         if( lighting_min < 0 || lighting_min > 255 ) {
-                            LOG("unknown type: %s\n", type_s.toString().toStdString().c_str());
                             LOG("invalid lighting_min: %f\n", lighting_min);
                             throw string("unexpected quest xml: location has invalid lighting_min");
                         }
@@ -8162,8 +8176,20 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             ASSERT_LOGGER(false);
             break;
         }
+        string geo_type_str;
+        switch( location->getGeoType() ) {
+        case Location::GEOTYPE_DUNGEON:
+            geo_type_str = "dungeon";
+            break;
+        case Location::GEOTYPE_OUTDOORS:
+            geo_type_str = "outdoors";
+            break;
+        default:
+            ASSERT_LOGGER(false);
+            break;
+        }
         //fprintf(file, "<location name=\"%s\" type=\"%s\" lighting_min=\"%d\">\n\n", location->getName().c_str(), type_str.c_str(), location->getLightingMin());
-        stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\"";
+        stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" geo_type=\"" << geo_type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\"";
         if( location->isDisplayName() ) {
             stream << " display_name=\"true\"";
         }

@@ -77,6 +77,7 @@ const string profile_key_Sp_c = "Sp";
 string getProfileLongString(const string &key);
 QString writeStat(const Character *character, const string &stat_key, bool is_float, bool want_base);
 
+const string skill_sprint_c = "sprint";
 const string skill_unarmed_combat_c = "unarmed_combat";
 
 string getSkillLongString(const string &key);

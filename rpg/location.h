@@ -574,14 +574,20 @@ public:
         INTERSECTTYPE_VISIBILITY = 1 // include scenery that blocks visibility
     };
     enum Type {
+        // note, this represents how walls are drawn, so in practice non-dungeon outdoor locations often still have TYPE_INDOORS
         TYPE_INDOORS = 0,
         TYPE_OUTDOORS = 1
+    };
+    enum GeoType {
+        GEOTYPE_DUNGEON = 0,
+        GEOTYPE_OUTDOORS = 1
     };
 
 protected:
     string name;
     bool display_name; // whether to display the name of the location?
     Type type;
+    GeoType geo_type;
     LocationListener *listener;
     void *listener_data;
 
@@ -656,6 +662,12 @@ public:
     }
     Type getType() const {
         return this->type;
+    }
+    void setGeoType(GeoType geo_type) {
+        this->geo_type = geo_type;
+    }
+    GeoType getGeoType() const {
+        return this->geo_type;
     }
     void setWallImageName(const string &wall_image_name) {
         this->wall_image_name = wall_image_name;
