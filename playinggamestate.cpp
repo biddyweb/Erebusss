@@ -3906,7 +3906,7 @@ void PlayingGamestate::quickSave() {
 void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, const QXmlStreamReader &reader, const string &key) const {
     string attribute = "bonus_" + key;
     QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
-    if( attribute_sr.length() > 0 ) {
+    if( attribute_sr.length() != 0 ) {
         int value = parseInt(attribute_sr.toString());
         item->setProfileBonusIntProperty(key, value);
     }
@@ -3915,7 +3915,7 @@ void PlayingGamestate::parseXMLItemProfileAttributeInt(Item *item, const QXmlStr
 void PlayingGamestate::parseXMLItemProfileAttributeFloat(Item *item, const QXmlStreamReader &reader, const string &key) const {
     string attribute = "bonus_" + key;
     QStringRef attribute_sr = reader.attributes().value(attribute.c_str());
-    if( attribute_sr.length() > 0 ) {
+    if( attribute_sr.length() != 0 ) {
         float value = parseFloat(attribute_sr.toString());
         item->setProfileBonusFloatProperty(key, value);
     }
@@ -7830,7 +7830,7 @@ void PlayingGamestate::updateVisibility(Vector2D pos) {
 
 void PlayingGamestate::saveItemProfileBonusInt(QTextStream &stream, const Item *item, const string &key) const {
     int value = item->getRawProfileBonusIntProperty(key);
-    if( value > 0 ) {
+    if( value != 0 ) {
         //fprintf(file, " bonus_%s=\"%d\"", key.c_str(), value);
         stream << " bonus_" << key.c_str() << "=\"" << value << "\"";
     }
@@ -7838,7 +7838,7 @@ void PlayingGamestate::saveItemProfileBonusInt(QTextStream &stream, const Item *
 
 void PlayingGamestate::saveItemProfileBonusFloat(QTextStream &stream, const Item *item, const string &key) const {
     float value = item->getRawProfileBonusFloatProperty(key);
-    if( value > 0 ) {
+    if( value != 0 ) {
         //fprintf(file, " bonus_%s=\"%f\"", key.c_str(), value);
         stream << " bonus_" << key.c_str() << "=\"" << value << "\"";
     }
