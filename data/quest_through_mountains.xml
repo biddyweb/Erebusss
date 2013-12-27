@@ -508,7 +508,7 @@ This painting is titled, "Derrin", and dated the year 1006.
 <gold amount="7" x="5.5" y="15.5"/>
 
 <scenery name="Chest" image_name="chest" x="8.0" y="19.5" size="0.8" blocking="true">
-    <item template="Potion of Combat"/>
+    <item template="Potion of Rage"/>
     <item name="Book" image_name="book" icon_width="0.25" weight="1">
 This book is a journal, kept by the Dwarves who once lived here. The dates are of almost one hundred years earlier. An army of invading Orcs and Goblins descended into the dungeons beneath the mountains. Many brave dwarves lost their lives in the fight.
 
