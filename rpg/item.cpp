@@ -101,10 +101,13 @@ bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
         }
         else {
             // harms
-            int amount = rollDice(1, 6, 0);
-            LOG("    harm %d\n", amount);
-            character->decreaseHealth(playing_gamestate, amount, false, false);
-            LOG("    health is now: %d\n", character->getHealth());
+            if( !character->hasSkill(skill_disease_resistance_c) ) {
+                int amount = rollDice(1, 6, 0);
+                LOG("    harm %d\n", amount);
+                character->decreaseHealth(playing_gamestate, amount, false, false);
+                LOG("    health is now: %d\n", character->getHealth());
+            }
+            // still print out "Yuck" even for disease resistant characters
             playing_gamestate->addTextEffect(PlayingGamestate::tr("Yuck!").toStdString(), character->getPos(), 1000);
         }
         return true;

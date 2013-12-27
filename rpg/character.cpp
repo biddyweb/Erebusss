@@ -120,7 +120,7 @@ string getSkillDescription(const string &key) {
     else if( key == skill_sprint_c )
         return "Your speed is 0.2 greater when outdoors.";
     else if( key == skill_disease_resistance_c )
-        return "You are immune to many common diseases, including disease from zombies.";
+        return "You are immune to many common diseases, including disease from zombies, as well as mushrooms.";
     else if( key == skill_hideaway_c )
         return "You are skilled at building secretive hideaways. Your chance of being disturbed by wandering monsters when resting is reduced by 50%.";
     else if( key == skill_shield_combat_c )
