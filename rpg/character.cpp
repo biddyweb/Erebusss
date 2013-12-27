@@ -89,7 +89,7 @@ QString writeSkills(const Character *character) {
         }
         html += "<i>";
         html += getSkillLongString(skill).c_str();
-        html += "</i>: ";
+        html += ":</i> ";
         html += getSkillDescription(skill).c_str();
         html += "<br/>";
     }
@@ -104,6 +104,12 @@ string getSkillLongString(const string &key) {
         return "Unarmed Combat";
     else if( key == skill_sprint_c )
         return "Sprint";
+    else if( key == skill_disease_resistance_c )
+        return "Disease Resistance";
+    else if( key == skill_hideaway_c )
+        return "Hideaway";
+    else if( key == skill_shield_combat_c )
+        return "Shield Combat";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -113,6 +119,12 @@ string getSkillDescription(const string &key) {
         return "You do not suffer any penalty to Fighting Prowess when fighting without weapons.";
     else if( key == skill_sprint_c )
         return "Your speed is 0.2 greater when outdoors.";
+    else if( key == skill_disease_resistance_c )
+        return "You are immune to many common diseases, including disease from zombies.";
+    else if( key == skill_hideaway_c )
+        return "You are skilled at building secretive hideaways. Your chance of being disturbed by wandering monsters when resting is reduced by 50%.";
+    else if( key == skill_shield_combat_c )
+        return "You are skilled at using a weapon and shield in combat. When using a shield, your Fighting Prowess is increased by 1.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -425,6 +437,9 @@ int Character::getProfileIntProperty(const string &key) const {
         // modifier for player being unarmed
         value -= 2;
     }
+    if( key == profile_key_FP_c && this->current_shield != NULL && this->hasSkill(skill_shield_combat_c) ) {
+        value++;
+    }
     return value;
 }
 
@@ -731,7 +746,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         playing_gamestate->hitEnemy(this, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
                                         // note that special effects are currently only supported as non-ranged attacks
                                         if( !target_npc->isDead() ) {
-                                            if( this->causes_disease && !target_npc->isDiseased() ) {
+                                            if( this->causes_disease > 0 && !target_npc->isDiseased() && !target_npc->hasSkill(skill_disease_resistance_c) ) {
                                                 int roll = rollDice(1, 100, 0);
                                                 qDebug("roll for causing disease: %d vs %d", roll, this->causes_disease);
                                                 if( roll < this->causes_disease ) {

@@ -571,6 +571,13 @@ Location::~Location() {
     }
 }
 
+int Location::getWanderingMonsterRestChance(const Character *player) const {
+    int chance = this->wandering_monster_rest_chance;
+    if( player->hasSkill(skill_hideaway_c) )
+        chance /= 2;
+    return chance;
+}
+
 void Location::addFloorRegion(FloorRegion *floorRegion) {
     this->floor_regions.push_back(floorRegion);
 }

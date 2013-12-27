@@ -3057,6 +3057,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
 
                         if( type == "generic") {
 
+
                             if( animation_layer_definition.size() > 0 ) {
                                 LOG("error at line %d\n", reader.lineNumber());
                                 throw string("animations not supported for this animation type");
@@ -6382,8 +6383,9 @@ void PlayingGamestate::clickedRest() {
     }
     if( this->askQuestionDialog(tr("Rest until fully healed?").toStdString()) ) {
         bool rest_ok = true;
-        if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance() > 0 ) {
-            if( rand() % 100 < c_location->getWanderingMonsterRestChance() ) {
+        if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance(player) > 0 ) {
+            int chance = c_location->getWanderingMonsterRestChance(player);
+            if( rand() % 100 < chance ) {
                 Vector2D free_pvec;
                 Character *enemy = this->createCharacter(c_location->getWanderingMonsterTemplate(), c_location->getWanderingMonsterTemplate());
                 if( c_location->findFreeWayPoint(&free_pvec, this->player->getPos(), true, enemy->canFly()) ) {
@@ -8210,7 +8212,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
         }
         if( location->getWanderingMonsterTemplate().length() > 0 ) {
             //fprintf(file, "<wandering_monster template=\"%s\" time=\"%d\" rest_chance=\"%d\"/>\n", location->getWanderingMonsterTemplate().c_str(), location->getWanderingMonsterTimeMS(), location->getWanderingMonsterRestChance());
-            stream << "<wandering_monster template=\"" << location->getWanderingMonsterTemplate().c_str() << "\" time=\"" << location->getWanderingMonsterTimeMS() << "\" rest_chance=\"" << location->getWanderingMonsterRestChance() << "\"/>\n";
+            stream << "<wandering_monster template=\"" << location->getWanderingMonsterTemplate().c_str() << "\" time=\"" << location->getWanderingMonsterTimeMS() << "\" rest_chance=\"" << location->getBaseWanderingMonsterRestChance() << "\"/>\n";
         }
         //fprintf(file, "\n");
         stream << "\n";

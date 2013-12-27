@@ -716,9 +716,10 @@ public:
     int getWanderingMonsterTimeMS() const {
         return this->wandering_monster_time_ms;
     }
-    int getWanderingMonsterRestChance() const {
+    int getBaseWanderingMonsterRestChance() const {
         return this->wandering_monster_rest_chance;
     }
+    int getWanderingMonsterRestChance(const Character *player) const;
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
         return this->floor_regions.at(i);
