@@ -2877,6 +2877,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 7, 8, 7, 1, 7, 8, 6, 2.2f);
         character->initialiseHealth(60);
         character->addSkill(skill_hideaway_c);
+        character->addSkill(skill_fast_shooter_c);
         character->setBiography("You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.");
         character->setPortrait("portrait_ranger");
     }

@@ -118,6 +118,8 @@ string getSkillLongString(const string &key) {
         return "Shield Combat";
     else if( key == skill_luck_c )
         return "Luck";
+    else if( key == skill_fast_shooter_c )
+        return "Fast Shooter";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -135,6 +137,8 @@ string getSkillDescription(const string &key) {
         return "You are skilled at using a weapon and shield in combat. When using a shield, your Fighting Prowess is increased by 1.";
     else if( key == skill_luck_c )
         return "You are luckier than most. If something causes you enough injury to kill you, there is a 50% chance you are not harmed.";
+    else if( key == skill_fast_shooter_c )
+        return "You can fire a bow more quickly than most. You have +1 Attacks when using a bow.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -446,6 +450,9 @@ int Character::getProfileIntProperty(const string &key) const {
     if( key == profile_key_FP_c && this->current_weapon == NULL && !this->is_hostile && !this->hasSkill(skill_unarmed_combat_c) ) {
         // modifier for player being unarmed
         value -= 2;
+    }
+    if( key == profile_key_A_c && this->current_weapon != NULL && this->current_weapon->getWeaponClass() == "bow" && this->hasSkill(skill_fast_shooter_c) ) {
+        value++;
     }
     if( key == profile_key_FP_c && this->current_shield != NULL && this->hasSkill(skill_shield_combat_c) ) {
         value++;
