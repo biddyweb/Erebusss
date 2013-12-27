@@ -675,6 +675,7 @@ public:
     }
     Vector2D getDestination() const;
     bool update(PlayingGamestate *playing_gamestate);
+    int getTimeTurn(bool is_casting, bool is_ranged);
     void setTargetNPC(Character *target_npc);
     Character *getTargetNPC() const {
         return this->target_npc;

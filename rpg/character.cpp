@@ -16,6 +16,12 @@ const int default_natural_damageX = 1;
 const int default_natural_damageY = 3;
 const int default_natural_damageZ = -1;
 
+const int base_time_turn_c = 1000;
+const int time_to_die_c = 400;
+const int time_to_hit_c = 400;
+const int time_to_fire_c = 400;
+const int time_to_cast_c = 2000;
+
 string getProfileLongString(const string &key) {
     if( key == profile_key_FP_c )
         return "Fighting Prowess";
@@ -484,11 +490,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         qDebug("Character::update() for the player");
     }*/
 
-    const int time_to_die_c = 400;
-    const int time_to_hit_c = 400;
-    const int time_to_fire_c = 400;
-    const int time_to_cast_c = 2000;
-
     int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
 
     // expire profile effects
@@ -804,7 +805,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 else if( hit_state == HITSTATE_IS_NOT_HITTING ) {
                     if( can_hit ) {
                         ai_try_moving = false; // even if we can't hit yet, we should just wait until we can
-                        if( elapsed_ms > time_last_action_ms + 1000 ) {
+                        int time_turn = getTimeTurn(spell != NULL, is_ranged);
+                        if( elapsed_ms > time_last_action_ms + time_turn ) {
                             if( spell != NULL ) {
                                 // cast spell!
                                 action = ACTION_CASTING;
@@ -1034,6 +1036,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
     //qDebug("Character::update() done: %s", this->name.c_str());
     return false;
+}
+
+int Character::getTimeTurn(bool is_casting, bool is_ranged) {
+    int time_turn = base_time_turn_c;
+    if( !is_casting ) {
+        int action_time = is_ranged ? time_to_fire_c : time_to_hit_c;
+        // note, increase attacks only speed up the delay between actions, not counting the action_time required to carry out the action
+        if( time_turn > action_time ) { // should always be true, but just to be safe
+            time_turn -= action_time;
+            time_turn /= this->getProfileIntProperty(profile_key_A_c);
+            time_turn += action_time;
+        }
+    }
+    return time_turn;
 }
 
 void Character::setTargetNPC(Character *target_npc) {
