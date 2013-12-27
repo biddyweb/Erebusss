@@ -110,6 +110,8 @@ string getSkillLongString(const string &key) {
         return "Hideaway";
     else if( key == skill_shield_combat_c )
         return "Shield Combat";
+    else if( key == skill_luck_c )
+        return "Luck";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -125,6 +127,8 @@ string getSkillDescription(const string &key) {
         return "You are skilled at building secretive hideaways. Your chance of being disturbed by wandering monsters when resting is reduced by 50%.";
     else if( key == skill_shield_combat_c )
         return "You are skilled at using a weapon and shield in combat. When using a shield, your Fighting Prowess is increased by 1.";
+    else if( key == skill_luck_c )
+        return "You are luckier than most. If something causes you enough injury to kill you, there is a 50% chance you are not harmed.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -1149,6 +1153,12 @@ bool Character::decreaseHealth(PlayingGamestate *playing_gamestate, int decrease
     int armour_value = this->getArmourRating(armour, shield);
     decrease -= armour_value;
     decrease = std::max(decrease, 0);
+    if( this->health - decrease <= 0 && this->hasSkill(skill_luck_c) ) {
+        if( rand() % 2 == 0 ) {
+            decrease = 0;
+            playing_gamestate->addTextEffect("Saved by luck", this->getPos(), 500);
+        }
+    }
     this->health -= decrease;
     if( health <= 0 ) {
         this->kill(playing_gamestate);

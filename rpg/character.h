@@ -82,6 +82,7 @@ const string skill_unarmed_combat_c = "unarmed_combat";
 const string skill_disease_resistance_c = "disease_resistance";
 const string skill_hideaway_c = "hideaway";
 const string skill_shield_combat_c = "shield_combat";
+const string skill_luck_c = "luck";
 
 string getSkillLongString(const string &key);
 string getSkillDescription(const string &key);

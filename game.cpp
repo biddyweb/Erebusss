@@ -2869,6 +2869,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 7, 7, 5, 1, 7, 9, 7, 1.8f);
         character->initialiseHealth(50);
         character->addSkill(skill_disease_resistance_c);
+        character->addSkill(skill_luck_c);
         character->setBiography("Halflings do not make great warriors and make unlikely adventurers, but their special skills can help them succeed where others might fail.");
         character->setPortrait("portrait_halfling");
     }
