@@ -28,6 +28,7 @@
 #endif
 
 #include "rpg/item.h"
+#include "rpg/locationgenerator.h"
 
 #include "playinggamestate.h"
 #include "game.h"
