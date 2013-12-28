@@ -125,6 +125,95 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
     }
 }
 
+Item *LocationGenerator::getRandomItem(const PlayingGamestate *playing_gamestate, int level) {
+    int r = rollDice(1, 10, 0);
+    Item *item = NULL;
+    if( r <= 2 ) {
+        item = playing_gamestate->cloneStandardItem("Arrows");
+    }
+    else if( r == 3 ) {
+        item = playing_gamestate->cloneStandardItem("Leather Armour");
+    }
+    else if( r == 4 ) {
+        item = playing_gamestate->cloneStandardItem("Shield");
+    }
+    else if( r == 5 || r == 6 ) {
+        item = playing_gamestate->cloneStandardItem("Dagger");
+    }
+    else if( r == 7 ) {
+        item = playing_gamestate->cloneStandardItem("Short Sword");
+    }
+    else if( r == 8 ) {
+        item = playing_gamestate->cloneStandardItem("Gold Ring");
+    }
+    else if( r == 9 ) {
+        item = playing_gamestate->cloneStandardItem("Wyvern Egg");
+    }
+    else {
+        item = playing_gamestate->cloneStandardItem("Red Gem");
+    }
+    return item;
+}
+
+Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_gamestate, int level) {
+    int r = rollDice(1, 14, 0);
+    //r = 13;
+    Item *item = NULL;
+    if( r == 1 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Healing");
+    }
+    else if( r == 2 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Combat");
+    }
+    else if( r == 3 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Archery");
+    }
+    else if( r == 4 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Strength");
+    }
+    else if( r == 5 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Speed");
+    }
+    else if( r == 6 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Cure Disease");
+    }
+    else if( r == 7 ) {
+        item = playing_gamestate->cloneStandardItem("Holy Water");
+    }
+    else if( r == 8 ) {
+        item = playing_gamestate->cloneStandardItem("Acid");
+    }
+    else if( r == 9 ) {
+        item = playing_gamestate->cloneStandardItem("Green Gem");
+    }
+    else if( r == 10 ) {
+        item = playing_gamestate->cloneStandardItem("Blue Gem");
+    }
+    else if( r == 11 ) {
+        item = playing_gamestate->cloneStandardItem("Gold Gem");
+    }
+    else if( r == 12 ) {
+        item = playing_gamestate->cloneStandardItem("White Gem");
+    }
+    else if( r == 13 || r == 14 ) {
+        if( r == 13 ) {
+            item = playing_gamestate->cloneStandardItem("Dagger");
+            item->setName("Magic Dagger");
+        }
+        else {
+            item = playing_gamestate->cloneStandardItem("Short Sword");
+            item->setName("Magic Short Sword");
+        }
+        item->setMagical(true);
+        int damageX = 0, damageY = 0, damageZ = 0;
+        Weapon *weapon = static_cast<Weapon *>(item);
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        damageZ += level;
+        weapon->setDamage(damageX, damageY, damageZ);
+    }
+    return item;
+}
+
 void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
     Vector2D room_dir_vec = directionFromEnum(seed.dir);
     Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
@@ -280,32 +369,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
                     if( rollDice(1, 4, 0) == 1 ) {
                         // also add an item
-                        int r = rollDice(1, 10, 0);
-                        Item *item = NULL;
-                        if( r <= 2 ) {
-                            item = playing_gamestate->cloneStandardItem("Arrows");
-                        }
-                        else if( r == 3 ) {
-                            item = playing_gamestate->cloneStandardItem("Leather Armour");
-                        }
-                        else if( r == 4 ) {
-                            item = playing_gamestate->cloneStandardItem("Shield");
-                        }
-                        else if( r == 5 || r == 6 ) {
-                            item = playing_gamestate->cloneStandardItem("Dagger");
-                        }
-                        else if( r == 7 ) {
-                            item = playing_gamestate->cloneStandardItem("Short Sword");
-                        }
-                        else if( r == 8 ) {
-                            item = playing_gamestate->cloneStandardItem("Gold Ring");
-                        }
-                        else if( r == 9 ) {
-                            item = playing_gamestate->cloneStandardItem("Wyvern Egg");
-                        }
-                        else {
-                            item = playing_gamestate->cloneStandardItem("Red Gem");
-                        }
+                        Item *item = getRandomItem(playing_gamestate, level);
                         scenery_corner->addItem(item);
                     }
                 }
@@ -416,61 +480,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 if( rollDice(1, 2, 0) == 1 )
                 {
                     // also add an item
-                    int r = rollDice(1, 14, 0);
-                    //r = 13;
-                    Item *item = NULL;
-                    if( r == 1 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Healing");
-                    }
-                    else if( r == 2 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Combat");
-                    }
-                    else if( r == 3 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Archery");
-                    }
-                    else if( r == 4 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Strength");
-                    }
-                    else if( r == 5 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Speed");
-                    }
-                    else if( r == 6 ) {
-                        item = playing_gamestate->cloneStandardItem("Potion of Cure Disease");
-                    }
-                    else if( r == 7 ) {
-                        item = playing_gamestate->cloneStandardItem("Holy Water");
-                    }
-                    else if( r == 8 ) {
-                        item = playing_gamestate->cloneStandardItem("Acid");
-                    }
-                    else if( r == 9 ) {
-                        item = playing_gamestate->cloneStandardItem("Green Gem");
-                    }
-                    else if( r == 10 ) {
-                        item = playing_gamestate->cloneStandardItem("Blue Gem");
-                    }
-                    else if( r == 11 ) {
-                        item = playing_gamestate->cloneStandardItem("Gold Gem");
-                    }
-                    else if( r == 12 ) {
-                        item = playing_gamestate->cloneStandardItem("White Gem");
-                    }
-                    else if( r == 13 || r == 14 ) {
-                        if( r == 13 ) {
-                            item = playing_gamestate->cloneStandardItem("Dagger");
-                            item->setName("Magic Dagger");
-                        }
-                        else {
-                            item = playing_gamestate->cloneStandardItem("Short Sword");
-                            item->setName("Magic Short Sword");
-                        }
-                        item->setMagical(true);
-                        int damageX = 0, damageY = 0, damageZ = 0;
-                        Weapon *weapon = static_cast<Weapon *>(item);
-                        weapon->getDamage(&damageX, &damageY, &damageZ);
-                        damageZ += level;
-                        weapon->setDamage(damageX, damageY, damageZ);
-                    }
+                    Item *item = getRandomTreasure(playing_gamestate, level);
                     scenery_corner->addItem(item);
                 }
 

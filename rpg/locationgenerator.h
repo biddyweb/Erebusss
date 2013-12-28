@@ -10,6 +10,7 @@ using std::map;
 class Character;
 class Location;
 class Scenery;
+class Item;
 class PlayingGamestate;
 
 enum Direction4 {
@@ -147,6 +148,9 @@ public:
 };
 
 class LocationGenerator {
+    static Item *getRandomItem(const PlayingGamestate *playing_gamestate, int level);
+    static Item *getRandomTreasure(const PlayingGamestate *playing_gamestate, int level);
+
     static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap);
     static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects);
     static void exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info);
