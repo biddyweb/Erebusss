@@ -746,6 +746,9 @@ public:
     vector<ProfileEffect>::const_iterator profileEffectsEnd() const {
         return this->profile_effects.end();
     }
+    bool hasProfileEffects() const {
+        return this->profile_effects.size() > 0;
+    }
     void expireProfileEffects() {
         this->profile_effects.clear();
     }

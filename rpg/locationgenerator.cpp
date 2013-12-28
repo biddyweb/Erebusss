@@ -448,7 +448,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             else if( room_type == ROOMTYPE_HAZARD ) {
                 // hazard
                 int r = rollDice(1, 7, 0);
-                //r = 2; // test
+                //r = 7; // test
                 if( r == 1 ) {
                     // wandering monster
                     enemy_table = "isolated";
@@ -491,27 +491,38 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         location->addItem(item, item_pos.x, item_pos.y);
                     }
                 }
-                else if( r == 5 || r == 6 ) {
-                    // shrine or bell
+                else if( r == 5 || r == 6 || r == 7 ) {
+                    // shrine, bell or pool
                     string scenery_name, scenery_image_name, interact_type;
+                    int interact_state;
                     if( r == 5 ) {
                         scenery_name = "Shrine";
                         scenery_image_name = "shrine";
                         interact_type ="INTERACT_TYPE_SHRINE";
                     }
-                    else {
+                    else if( r == 6 ) {
                         scenery_name = "Bell";
                         scenery_image_name = "church_bell";
                         interact_type = "INTERACT_TYPE_BELL";
+                    }
+                    else {
+                        interact_state = rollDice(1, 8, 0);
+                        scenery_name = "Pool";
+                        if( interact_state <= 4 )
+                            scenery_image_name = "pool_pink";
+                        else
+                            scenery_image_name = "pool_blue";
+                        interact_type = "INTERACT_TYPE_POOL";
                     }
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
                     Scenery *scenery = new Scenery(scenery_name, scenery_image_name, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setInteractType(interact_type);
+                    scenery->setInteractState(interact_state);
                     scenery->setBlocking(true, false);
                     location->addScenery(scenery, room_centre.x, room_centre.y);
                 }
-                else if( r == 7 ) {
+                else if( r == 8 ) {
                     // tomb
                     string scenery_image_name = "tomb";
                     float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;

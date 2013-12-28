@@ -195,6 +195,11 @@ vector<string> Scenery::getInteractionText(PlayingGamestate *playing_gamestate, 
     else if( this->interact_type == "INTERACT_TYPE_PAINTING_SHATTER" ) {
         // no options - go straight to interaction
     }
+    else if( this->interact_type == "INTERACT_TYPE_POOL" ) {
+        *dialog_text = PlayingGamestate::tr("A large pool of murky liquid is here. Do you wish to drink from it?").toStdString();
+        options.push_back(PlayingGamestate::tr("Yes, drink.").toStdString());
+        options.push_back(PlayingGamestate::tr("No.").toStdString());
+    }
     else {
         ASSERT_LOGGER(false);
     }
@@ -374,6 +379,43 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
             result_text = PlayingGamestate::tr("You look at the interesting painting.").toStdString();
         }
         picture = this->big_image_name;
+    }
+    else if( this->interact_type == "INTERACT_TYPE_POOL" ) {
+        if( !playing_gamestate->getPlayer()->hasProfileEffects() ) {
+            Profile pool_profile;
+            switch( interact_state ) {
+            case 1:
+                pool_profile.setIntProperty(profile_key_FP_c, 1);
+                break;
+            case 2:
+                pool_profile.setIntProperty(profile_key_BS_c, 1);
+                break;
+            case 3:
+                pool_profile.setIntProperty(profile_key_S_c, 1);
+                break;
+            case 4:
+                pool_profile.setIntProperty(profile_key_A_c, 1);
+                break;
+            case 5:
+                pool_profile.setIntProperty(profile_key_M_c, 1);
+                break;
+            case 6:
+                pool_profile.setIntProperty(profile_key_D_c, 1);
+                break;
+            case 7:
+                pool_profile.setIntProperty(profile_key_B_c, 1);
+                break;
+            case 8:
+                pool_profile.setFloatProperty(profile_key_Sp_c, 0.2f);
+                break;
+            }
+            ProfileEffect profile_effect(pool_profile, 30000);
+            playing_gamestate->getPlayer()->addProfileEffect(profile_effect);
+            result_text = PlayingGamestate::tr("You drink from the pool and feel a boost of energy.").toStdString();
+        }
+        else {
+            result_text = PlayingGamestate::tr("You drink from the pool but feel no effects.").toStdString();
+        }
     }
     else {
         ASSERT_LOGGER(false);
