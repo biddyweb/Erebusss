@@ -95,7 +95,7 @@ public:
     string getDescription() const {
         return this->description;
     }
-    string getDetailedDescription() const;
+    string getDetailedDescription(const Character *player) const;
     string getImageName() const {
         return this->image_name;
     }

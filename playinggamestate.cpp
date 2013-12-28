@@ -1570,7 +1570,7 @@ void ItemsWindow::clickedInfo() {
         return;
     }
     const Item *item = list_items.at(index);
-    string info = item->getDetailedDescription();
+    string info = item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
 }
@@ -1837,7 +1837,7 @@ void TradeWindow::clickedInfo() {
     ASSERT_LOGGER(index >= 0 && index < items.size() );
 
     const Item *selected_item = items.at(index);
-    string info = selected_item->getDetailedDescription();
+    string info = selected_item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
 }
@@ -2043,7 +2043,7 @@ void ItemsPickerWindow::clickedInfo() {
     ASSERT_LOGGER(index >= 0 && index < items.size() );
 
     const Item *selected_item = items.at(index);
-    string info = selected_item->getDetailedDescription();
+    string info = selected_item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
     playing_gamestate->showInfoWindow(info);
 }

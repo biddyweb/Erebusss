@@ -140,7 +140,7 @@ string Item::getProfileBonusDescriptionFloat(const string &key) const {
     return str.str();
 }
 
-string Item::getDetailedDescription() const {
+string Item::getDetailedDescription(const Character *player) const {
     stringstream str;
     str << "<html><body>";
     str << "<h2>" << this->getName() << "</h2>";
@@ -159,7 +159,11 @@ string Item::getDetailedDescription() const {
         }
         str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
         if( weapon->getMinStrength() > 0 ) {
-            str << "<b>Min Strength:</b> " << weapon->getMinStrength() << "<br/>";
+            str << "<b>Min Strength:</b> " << weapon->getMinStrength();
+            if( weapon->getMinStrength() > player->getProfileIntProperty(profile_key_S_c) ) {
+                str << "<font color=\"#ff0000\"> (You are too weak to use this weapon)</font>";
+            }
+            str << "<br/>";
         }
         if( weapon->getWeaponType() == Weapon::WEAPONTYPE_HAND ) {
             str << "<b>Weapon Type:</b> Hand to Hand<br/>";
@@ -180,7 +184,11 @@ string Item::getDetailedDescription() const {
         str << "<b>Type:</b> Armour<br/>";
         const Armour *armour = static_cast<const Armour *>(this);
         if( armour->getMinStrength() > 0 ) {
-            str << "<b>Min Strength:</b> " << armour->getMinStrength() << "<br/>";
+            str << "<b>Min Strength:</b> " << armour->getMinStrength();
+            if( armour->getMinStrength() > player->getProfileIntProperty(profile_key_S_c) ) {
+                str << "<font color=\"#ff0000\"> (You are too weak to wear this armour)</font>";
+            }
+            str << "<br/>";
         }
     }
     else if( this->getType() == ITEMTYPE_RING ) {
