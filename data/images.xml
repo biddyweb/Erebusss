@@ -26,6 +26,7 @@
 
 <image type="generic" name="dirt_extended" filename="gfx/textures/dirt_extended.png"/>
 
+<image type="item" name="dagger" filename="gfx/textures/items/dagger.png"/>
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
 <image type="item" name="shield" filename="gfx/textures/items/shield.png"/>

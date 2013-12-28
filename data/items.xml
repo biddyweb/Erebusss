@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <items>
 
-<weapon name="Dagger" image_name="longsword" weight="5"
+<weapon name="Dagger" image_name="dagger" weight="5"
     damageX="1" damageY="6" damageZ="0"
     bonus_FP="-1"
-    animation_name="longsword"/>
+    animation_name="dagger"/>
 
 <weapon name="Short Sword" image_name="longsword" weight="10"
     damageX="2" damageY="6" damageZ="0"
