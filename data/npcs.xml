@@ -148,7 +148,7 @@
     weapon_resist_percentage="50"
 />
 
-<!--Separate NPC due to separate animatio name; weapon hardcoded as natural damage: Club-->
+<!--Separate NPC due to separate animation name; weapon hardcoded as natural damage: Club-->
 <npc name="Skeleton Archer" animation_name="skeleton_archer"
     FP="10" BS="9" S="8" A="1" M="2" D="8" B="12" Sp="2.8"
     natural_damageX="2" natural_damageY="4" natural_damageZ="0"
