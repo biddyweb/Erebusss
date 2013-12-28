@@ -126,77 +126,110 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
 }
 
 Item *LocationGenerator::getRandomItem(const PlayingGamestate *playing_gamestate, int level) {
-    int r = rollDice(1, 10, 0);
+    int r = rollDice(1, 25, 0);
     Item *item = NULL;
-    if( r <= 2 ) {
+    if( r <= 3 ) {
         item = playing_gamestate->cloneStandardItem("Arrows");
     }
-    else if( r == 3 ) {
+    else if( r <= 4 ) {
         item = playing_gamestate->cloneStandardItem("Leather Armour");
     }
-    else if( r == 4 ) {
+    else if( r <= 5 ) {
+        item = playing_gamestate->cloneStandardItem(level == 0 ? "Leather Armour" : "Chain Mail Armour");
+    }
+    else if( r <= 6 ) {
+        item = playing_gamestate->cloneStandardItem(level == 0 ? "Chain Mail Armour" : "Plate Armour");
+    }
+    else if( r <= 8 ) {
         item = playing_gamestate->cloneStandardItem("Shield");
     }
-    else if( r == 5 || r == 6 ) {
+    else if( r <= 10 ) {
         item = playing_gamestate->cloneStandardItem("Dagger");
     }
-    else if( r == 7 ) {
+    else if( r <= 12 ) {
         item = playing_gamestate->cloneStandardItem("Short Sword");
     }
-    else if( r == 8 ) {
+    else if( r <= 13 ) {
+        item = playing_gamestate->cloneStandardItem("Long Sword");
+    }
+    else if( r <= 14 ) {
+        item = playing_gamestate->cloneStandardItem(level == 0 ? "Long Sword" : "Two Handed Sword");
+    }
+    else if( r <= 16 ) {
+        item = playing_gamestate->cloneStandardItem("Shortbow");
+    }
+    else if( r <= 17 ) {
+        item = playing_gamestate->cloneStandardItem(level == 0 ? "Shortbow" : "Longbow");
+    }
+    else if( r <= 18 ) {
+        item = playing_gamestate->cloneStandardItem("Plain Ring");
+    }
+    else if( r <= 19 ) {
         item = playing_gamestate->cloneStandardItem("Gold Ring");
     }
-    else if( r == 9 ) {
+    else if( r <= 20 ) {
         item = playing_gamestate->cloneStandardItem("Wyvern Egg");
     }
-    else {
+    else if( r <= 21 ) {
+        item = playing_gamestate->cloneStandardItem("Bowl");
+    }
+    else if( r <= 22 ) {
+        item = playing_gamestate->cloneStandardItem("Plate");
+    }
+    else if( r <= 23 ) {
+        item = playing_gamestate->cloneStandardItem("Pitcher");
+    }
+    else { // 24, 25
         item = playing_gamestate->cloneStandardItem("Red Gem");
     }
     return item;
 }
 
 Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_gamestate, int level) {
-    int r = rollDice(1, 14, 0);
+    int r = rollDice(1, 15, 0);
     //r = 13;
     Item *item = NULL;
-    if( r == 1 ) {
+    if( r <= 1 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Healing");
     }
-    else if( r == 2 ) {
+    else if( r <= 2 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Combat");
     }
-    else if( r == 3 ) {
+    else if( r <= 3 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Archery");
     }
-    else if( r == 4 ) {
+    else if( r <= 4 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Strength");
     }
-    else if( r == 5 ) {
+    else if( r <= 5 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Speed");
     }
-    else if( r == 6 ) {
+    else if( r <= 6 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Cure Disease");
     }
-    else if( r == 7 ) {
+    else if( r <= 7 ) {
+        item = playing_gamestate->cloneStandardItem("Potion of Rage");
+    }
+    else if( r <= 8 ) {
         item = playing_gamestate->cloneStandardItem("Holy Water");
     }
-    else if( r == 8 ) {
+    else if( r <= 9 ) {
         item = playing_gamestate->cloneStandardItem("Acid");
     }
-    else if( r == 9 ) {
+    else if( r <= 10 ) {
         item = playing_gamestate->cloneStandardItem("Green Gem");
     }
-    else if( r == 10 ) {
+    else if( r <= 11 ) {
         item = playing_gamestate->cloneStandardItem("Blue Gem");
     }
-    else if( r == 11 ) {
+    else if( r <= 12 ) {
         item = playing_gamestate->cloneStandardItem("Gold Gem");
     }
-    else if( r == 12 ) {
+    else if( r <= 13 ) {
         item = playing_gamestate->cloneStandardItem("White Gem");
     }
-    else if( r == 13 || r == 14 ) {
-        if( r == 13 ) {
+    else { // 14, 15
+        if( r == 14 ) {
             item = playing_gamestate->cloneStandardItem("Dagger");
             item->setName("Magic Dagger");
         }
