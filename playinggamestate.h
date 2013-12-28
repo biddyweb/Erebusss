@@ -543,6 +543,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MusicMode music_mode;
     int time_combat_ended;
 
+    void loadPlayerAnimation();
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
     void updateVisibility(Vector2D pos);

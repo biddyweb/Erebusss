@@ -367,6 +367,7 @@ class Character {
     bool is_hostile;
     bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
     string portrait;
+    string animation_folder; // for player only
 
     // game data
     Location *location; // not saved
@@ -557,6 +558,12 @@ public:
     }
     string getPortrait() const {
         return this->portrait;
+    }
+    void setAnimationFolder(const string &animation_folder) {
+        this->animation_folder = animation_folder;
+    }
+    string getAnimationFolder() const {
+        return this->animation_folder;
     }
     void setBiography(const string &biography) {
         this->biography = biography;

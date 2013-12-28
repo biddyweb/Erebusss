@@ -2411,7 +2411,8 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED);
+    //runTest(filename, ::TEST_LOADSAVEQUEST_0);
+    //runTest(filename, ::TEST_LOADSAVE_ACTION_LAST_TIME_BUG);
 }
 
 void Game::initButton(QWidget *button) const {
@@ -2857,6 +2858,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->addSkill(skill_unarmed_combat_c);
         character->setBiography("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.");
         character->setPortrait("portrait_barbarian");
+        character->setAnimationFolder("isometric_hero");
     }
     else if( player_type == "Elf" ) {
         character->initialiseProfile(1, 7, 8, 6, 1, 8, 7, 8, 2.25f);
@@ -2864,6 +2866,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->addSkill(skill_sprint_c);
         character->setBiography("You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.");
         character->setPortrait("portrait_elf");
+        character->setAnimationFolder("isometric_heroine");
     }
     else if( player_type == "Halfling" ) {
         character->initialiseProfile(1, 7, 7, 5, 1, 7, 9, 7, 1.8f);
@@ -2872,6 +2875,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->addSkill(skill_luck_c);
         character->setBiography("Halflings do not make great warriors and make unlikely adventurers, but their special skills can help them succeed where others might fail.");
         character->setPortrait("portrait_halfling");
+        character->setAnimationFolder("isometric_heroine");
     }
     else if( player_type == "Ranger" ) {
         character->initialiseProfile(1, 7, 8, 7, 1, 7, 8, 6, 2.2f);
@@ -2880,6 +2884,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->addSkill(skill_fast_shooter_c);
         character->setBiography("You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.");
         character->setPortrait("portrait_ranger");
+        character->setAnimationFolder("isometric_hero");
     }
     else if( player_type == "Warrior" ) {
         character->initialiseProfile(1, 8, 7, 7, 1, 6, 7, 7, 2.0f);
@@ -2887,6 +2892,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->addSkill(skill_shield_combat_c);
         character->setBiography("You come from the great city of Eastport. At a young age, you joined the army where you were trained how to fight, and saw combat in wars with Orcs to the north. After completing your service of seven years, you now work independently, hoping to find riches in return for your services.");
         character->setPortrait("portrait_warrior");
+        character->setAnimationFolder("isometric_hero");
     }
     else {
         ASSERT_LOGGER(false);

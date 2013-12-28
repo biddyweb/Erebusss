@@ -3411,29 +3411,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         gui_overlay->setProgress(60);
         qApp->processEvents();
 
-        LOG("create animation frames\n");
-        LOG("load player image\n");
-        vector<AnimationLayerDefinition> player_animation_layer_definition;
-        // if we change the offsets, remember to update the hotspot in PlayingGamestate::locationAddCharacter !
-        const int off_x = 32, off_y = 40, width = 64, height = 64;
-        //const int off_x = 0, off_y = 0, width = 128, height = 128;
-        const int expected_stride_x = 128, expected_stride_y = 128, expected_total_width = 4096;
-        //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
-        //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
-        player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-        player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-        player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-        player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-        player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
-        //this->animation_layers["player"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-        //this->animation_layers["longsword"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-        //this->animation_layers["longbow"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-        //this->animation_layers["shield"] = AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS);
-        this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/player.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-        this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longsword.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-        this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/longbow.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-        this->animation_layers["dagger"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/dagger.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
-        this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + "gfx/textures/isometric_hero/shield.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+        if( !is_savegame ) {
+            this->loadPlayerAnimation();
+        }
 
         gui_overlay->setProgress(70);
         qApp->processEvents();
@@ -3851,6 +3831,36 @@ void PlayingGamestate::cleanup() {
         game_g->freeSound(music_key_game_over_c);
     }
     LOG("done\n");
+}
+
+void PlayingGamestate::loadPlayerAnimation() {
+    LOG("PlayingGamestate::loadPlayerAnimation()\n");
+
+    vector<AnimationLayerDefinition> player_animation_layer_definition;
+    // if we change the offsets, remember to update the hotspot in PlayingGamestate::locationAddCharacter !
+    const int off_x = 32, off_y = 40, width = 64, height = 64;
+    //const int off_x = 0, off_y = 0, width = 128, height = 128;
+    const int expected_stride_x = 128, expected_stride_y = 128, expected_total_width = 4096;
+    //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
+    //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+
+    string animation_folder = player->getAnimationFolder();
+    if( animation_folder.length() == 0 ) {
+        // needed for backwards compatibility with save games where we didn't store animation_folder!
+        animation_folder = "isometric_hero";
+    }
+    string player_folder = "gfx/textures/" + animation_folder + "/";
+    LOG("player_folder: %s\n", player_folder.c_str());
+    this->animation_layers["player"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + player_folder + "player.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longsword"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + player_folder + "longsword.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["longbow"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + player_folder + "longbow.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["dagger"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + player_folder + "dagger.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
+    this->animation_layers["shield"] = new LazyAnimationLayer(AnimationLayer::create(string(DEPLOYMENT_PATH) + player_folder + "shield.png", player_animation_layer_definition, true, off_x, off_y, width, height, expected_stride_x, expected_stride_y, expected_total_width, N_DIRECTIONS));
 }
 
 float PlayingGamestate::getDifficultyModifier() const {
@@ -4529,6 +4539,10 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
         QStringRef portrait_s = reader.attributes().value("portrait");
         if( portrait_s.length() > 0 ) {
             npc->setPortrait(portrait_s.toString().toStdString());
+        }
+        QStringRef animation_folder_s = reader.attributes().value("animation_folder");
+        if( animation_folder_s.length() > 0 ) {
+            npc->setAnimationFolder(animation_folder_s.toString().toStdString());
         }
         QStringRef is_dead_s = reader.attributes().value("is_dead");
         npc->setDead( parseBool(is_dead_s.toString(), true) );
@@ -5442,7 +5456,12 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     Vector2D pos;
                     Character *npc = this->loadNPC(&is_player, &pos, reader);
                     if( is_player ) {
+                        if( !is_savegame ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected quest xml: player element not expected in non-save games");
+                        }
                         this->player = npc;
+                        this->loadPlayerAnimation();
                     }
 
                     // if an NPC doesn't have a default position defined in the file, we set it to the position
@@ -8276,6 +8295,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->getPortrait().length() > 0 ) {
                 //fprintf(file, " portrait=\"%s\"", character->getPortrait().c_str());
                 stream << " portrait=\"" << character->getPortrait().c_str() << "\"";
+            }
+            if( character->getAnimationFolder().length() > 0 ) {
+                stream << " animation_folder=\"" << character->getAnimationFolder().c_str() << "\"";
             }
             if( character->isBounce() ) {
                 stream << " bounce=\"true\"";
