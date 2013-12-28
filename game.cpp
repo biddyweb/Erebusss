@@ -2856,7 +2856,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 8, 6, 8, 1, 5, 5, 8, 1.8f);
         character->initialiseHealth(75);
         character->addSkill(skill_unarmed_combat_c);
-        character->setBiography("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.");
+        character->setBiography(PlayingGamestate::tr("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.").toStdString());
         character->setPortrait("portrait_barbarian");
         character->setAnimationFolder("isometric_hero");
     }
@@ -2864,7 +2864,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 7, 8, 6, 1, 8, 7, 8, 2.25f);
         character->initialiseHealth(60);
         character->addSkill(skill_sprint_c);
-        character->setBiography("You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.");
+        character->setBiography(PlayingGamestate::tr("You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.").toStdString());
         character->setPortrait("portrait_elf");
         character->setAnimationFolder("isometric_heroine");
     }
@@ -2873,7 +2873,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseHealth(50);
         character->addSkill(skill_disease_resistance_c);
         character->addSkill(skill_luck_c);
-        character->setBiography("Halflings do not make great warriors and make unlikely adventurers, but their special skills can help them succeed where others might fail.");
+        character->setBiography(PlayingGamestate::tr("Halflings do not make great warriors and make unlikely adventurers, but their special skills can help them succeed where others might fail.").toStdString());
         character->setPortrait("portrait_halfling");
         character->setAnimationFolder("isometric_heroine");
     }
@@ -2882,7 +2882,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseHealth(60);
         character->addSkill(skill_hideaway_c);
         character->addSkill(skill_fast_shooter_c);
-        character->setBiography("You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.");
+        character->setBiography(PlayingGamestate::tr("You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.").toStdString());
         character->setPortrait("portrait_ranger");
         character->setAnimationFolder("isometric_hero");
     }
@@ -2890,7 +2890,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 8, 7, 7, 1, 6, 7, 7, 2.0f);
         character->initialiseHealth(70);
         character->addSkill(skill_shield_combat_c);
-        character->setBiography("You come from the great city of Eastport. At a young age, you joined the army where you were trained how to fight, and saw combat in wars with Orcs to the north. After completing your service of seven years, you now work independently, hoping to find riches in return for your services.");
+        character->setBiography(PlayingGamestate::tr("You come from the great city of Eastport. At a young age, you joined the army where you were trained how to fight, and saw combat in wars with Orcs to the north. After completing your service of seven years, you now work independently, hoping to find riches in return for your services.").toStdString());
         character->setPortrait("portrait_warrior");
         character->setAnimationFolder("isometric_hero");
     }
