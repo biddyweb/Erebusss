@@ -186,8 +186,8 @@ Item *LocationGenerator::getRandomItem(const PlayingGamestate *playing_gamestate
 }
 
 Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_gamestate, int level) {
-    int r = rollDice(1, 15, 0);
-    //r = 13;
+    int r = rollDice(1, 17, 0);
+    //r = 15;
     Item *item = NULL;
     if( r <= 1 ) {
         item = playing_gamestate->cloneStandardItem("Potion of Healing");
@@ -228,13 +228,50 @@ Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_games
     else if( r <= 13 ) {
         item = playing_gamestate->cloneStandardItem("White Gem");
     }
-    else { // 14, 15
-        if( r == 14 ) {
+    else if( r <= 15 ) {
+        item = playing_gamestate->cloneStandardItem("Gold Ring");
+        item->setBaseTemplate(item->getName());
+        item->setName("Magic Ring");
+        item->setMagical(true);
+        int r2 = rollDice(1, 7, 0);
+        if( r2 == 1 ) {
+            item->setProfileBonusIntProperty(profile_key_FP_c, 1);
+            item->setWorthBonus(300);
+        }
+        else if( r2 == 2 ) {
+            item->setProfileBonusIntProperty(profile_key_BS_c, 1);
+            item->setWorthBonus(250);
+        }
+        else if( r2 == 3 ) {
+            item->setProfileBonusIntProperty(profile_key_S_c, 1);
+            item->setWorthBonus(200);
+        }
+        else if( r2 == 4 ) {
+            item->setProfileBonusIntProperty(profile_key_M_c, 1);
+            item->setWorthBonus(200);
+        }
+        else if( r2 == 5 ) {
+            item->setProfileBonusIntProperty(profile_key_D_c, 1);
+            item->setWorthBonus(150);
+        }
+        else if( r2 == 6 ) {
+            item->setProfileBonusIntProperty(profile_key_B_c, 1);
+            item->setWorthBonus(150);
+        }
+        else {
+            item->setProfileBonusFloatProperty(profile_key_Sp_c, 0.2f);
+            item->setWorthBonus(200);
+        }
+    }
+    else { // 16, 17
+        if( r == 16 ) {
             item = playing_gamestate->cloneStandardItem("Dagger");
+            item->setBaseTemplate(item->getName());
             item->setName("Magic Dagger");
         }
         else {
             item = playing_gamestate->cloneStandardItem("Short Sword");
+            item->setBaseTemplate(item->getName());
             item->setName("Magic Short Sword");
         }
         item->setMagical(true);
@@ -243,6 +280,7 @@ Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_games
         weapon->getDamage(&damageX, &damageY, &damageZ);
         damageZ += level;
         weapon->setDamage(damageX, damageY, damageZ);
+        item->setWorthBonus(100*level);
     }
     return item;
 }
@@ -510,7 +548,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     gold += 300;
                 }
                 scenery_corner->addItem( playing_gamestate->cloneGoldItem(gold) );
-                if( rollDice(1, 2, 0) == 1 )
+                if( room_type == ROOMTYPE_QUEST || rollDice(1, 2, 0) == 1 )
                 {
                     // also add an item
                     Item *item = getRandomTreasure(playing_gamestate, level);
