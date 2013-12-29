@@ -47,8 +47,6 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <!--<item template="Potion of Combat" x="32.0" y="3.0"/>
 <item template="Potion of Archery" x="32.0" y="4.0"/>-->
-<!--<ring name="Ring of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1" x="32.0" y="5.0"/>
-<item name="Amulet of Bravery" image_name="ring_gold" weight="0" magical="true" bonus_B="1" x="33.0" y="5.0"/>-->
 <!--<weapon name="Short Sword +1" image_name="longsword" weight="10"
     damageX="2" damageY="6" damageZ="1"
     bonus_FP="1"
