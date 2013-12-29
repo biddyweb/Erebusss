@@ -593,7 +593,12 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         scenery_centre_image_name = "fire";
                         scenery_centre_size = 1.0;
                     }
-                    else if( roll <= 50 ) {
+                    else if( roll <= 40 ) {
+                        scenery_centre_name = "Campfire";
+                        scenery_centre_image_name = "campfire";
+                        scenery_centre_size = 1.0;
+                    }
+                    else if( roll <= 55 ) {
                         scenery_centre_name = "Trapdoor";
                         scenery_centre_image_name = "grate";
                         scenery_centre_size = 0.5;
@@ -690,12 +695,20 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     scenery_size = 0.7f;
                     size_flat = true;
                 }
-                else if( r <= 40 ) {
+                else if( r <= 35 ) {
                     scenery_name = "bones";
                 }
-                else if( r <= 70 ) {
+                else if( r <= 65 ) {
                     scenery_name = "rock1";
                     scenery_size = 0.2f;
+                }
+                else if( r <= 70 ) {
+                    scenery_name = "grass";
+                    scenery_size = 1.0f;
+                }
+                else if( r <= 75 ) {
+                    scenery_name = "plant";
+                    scenery_size = 0.5f;
                 }
                 else {
                     scenery_name = "skulls";
@@ -731,14 +744,54 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
-            if( enemy_table.length() > 0 ) {
-                const int n_slots_w = base_room_size, n_slots_h = base_room_size;
-                bool slot_filled[n_slots_w*n_slots_h];
-                for(int i=0;i<n_slots_w*n_slots_h;i++) {
-                    slot_filled[i] = false;
+
+            const int n_slots_w = base_room_size, n_slots_h = base_room_size;
+            bool slot_filled[n_slots_w*n_slots_h];
+            for(int i=0;i<n_slots_w*n_slots_h;i++) {
+                slot_filled[i] = false;
+            }
+            // fill corners and centre, as may use for scenery, or have a rounded room
+            slot_filled[0*n_slots_w + 0] = true;
+            slot_filled[0*n_slots_w + (n_slots_w-1)] = true;
+            slot_filled[(n_slots_h-1)*n_slots_w + 0] = true;
+            slot_filled[(n_slots_h-1)*n_slots_w + (n_slots_w-1)] = true;
+            slot_filled[((n_slots_h-1)/2)*n_slots_w + ((n_slots_w-1)/2)] = true;
+            float slot_scale_x = room_size_w/(float)base_room_size;
+            float slot_scale_y = room_size_h/(float)base_room_size;
+            if( rollDice(1, 2, 0) == 1 ) {
+                // place some random blocking scenery
+                Vector2D scenery_pos;
+                while(true) {
+                    int slot_x = rand() % n_slots_w;
+                    int slot_y = rand() % n_slots_h;
+                    if( !slot_filled[slot_y*n_slots_w + slot_x] ) {
+                        slot_filled[slot_y*n_slots_w + slot_x] = true;
+                        scenery_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(slot_x+0.5f)*slot_scale_x + Vector2D(0.0f, 1.0f)*(slot_y+0.5f)*slot_scale_y;
+                        break;
+                    }
                 }
-                float slot_scale_x = room_size_w/(float)base_room_size;
-                float slot_scale_y = room_size_h/(float)base_room_size;
+                string scenery_name;
+                float scenery_size = 0.5f;
+                int r = rollDice(1, 100, 0);
+                if( r <= 20 ) {
+                    scenery_name = "bigboulder";
+                    scenery_size = 0.58f;
+                }
+                else if( r <= 60 ) {
+                    scenery_name = "boulders";
+                    scenery_size = 0.56f;
+                }
+                else {
+                    scenery_name = "boulders2";
+                    scenery_size = 0.56f;
+                }
+                float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_name, true, scenery_size, 0.0f, 0.0f, false, 0.0f);
+                Scenery *scenery = new Scenery(scenery_name, scenery_name, size_w, size_h, visual_h, false, 0.0f);
+                scenery->setBlocking(true, false);
+                location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
+            }
+            if( enemy_table.length() > 0 ) {
                 map<string, NPCTable *>::const_iterator iter = npc_tables.find(enemy_table);
                 if( iter != npc_tables.end() ) {
                     const NPCTable *npc_table = iter->second;
@@ -749,14 +802,6 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         while(true) {
                             int slot_x = rand() % n_slots_w;
                             int slot_y = rand() % n_slots_h;
-                            if( (slot_x == 0 || slot_x == n_slots_w-1) && (slot_x == 0 || slot_x == n_slots_w-1) ) {
-                                // don't put in corners, as we may use them for scenery
-                                continue;
-                            }
-                            if( slot_x == (n_slots_w-1)/2 && slot_y == (n_slots_h-1)/2 ) {
-                                // don't put in centre, as we may use it for scenery
-                                continue;
-                            }
                             if( !slot_filled[slot_y*n_slots_w + slot_x] ) {
                                 slot_filled[slot_y*n_slots_w + slot_x] = true;
                                 npc_pos = room_rect.getTopLeft() + Vector2D(1.0f, 0.0f)*(slot_x+0.5f)*slot_scale_x + Vector2D(0.0f, 1.0f)*(slot_y+0.5f)*slot_scale_y;
