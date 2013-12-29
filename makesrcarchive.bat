@@ -24,6 +24,7 @@ copy %src%\gamestate.cpp %dst%
 copy %src%\infodialog.cpp %dst%
 copy %src%\logiface.cpp %dst%
 copy %src%\main.cpp %dst%
+copy %src%\maingraphicsview.cpp %dst%
 copy %src%\mainwindow.cpp %dst%
 copy %src%\optionsgamestate.cpp %dst%
 copy %src%\particlesystem.cpp %dst%
@@ -39,6 +40,7 @@ copy %src%\game.h %dst%
 copy %src%\gamestate.h %dst%
 copy %src%\infodialog.h %dst%
 copy %src%\logiface.h %dst%
+copy %src%\maingraphicsview.h %dst%
 copy %src%\mainwindow.h %dst%
 copy %src%\optionsgamestate.h %dst%
 copy %src%\particlesystem.h %dst%
