@@ -28,13 +28,11 @@ using std::map;
 #include "gamestate.h"
 #include "rpg/character.h"
 #include "rpg/location.h"
+#include "rpg/item.h"
 
 class MainGraphicsView;
 class LazyAnimationLayer;
 class AnimationLayer;
-class Shop;
-class Currency;
-class Spell;
 class ScrollingListWidget;
 
 enum Direction {

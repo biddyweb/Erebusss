@@ -1,9 +1,8 @@
 #pragma once
 
-#include "common.h"
-
-
 #include <QMainWindow>
+
+#include "common.h"
 
 class MainWindow : public QMainWindow
 {

@@ -19,42 +19,6 @@ using std::vector;
 #include "gamestate.h"
 
 class ScrollingListWidget;
-class OptionsGamestate;
-
-#ifdef USING_WEBKIT
-class Help : public QWebView {
-#else
-class Help : public QTextEdit {
-#endif
-    Q_OBJECT
-
-protected:
-    OptionsGamestate *options_gamestate;
-
-public:
-    Help(OptionsGamestate *options_gamestate);
-
-public slots:
-    virtual void changedGameType(int index)=0;
-};
-
-class GameTypeHelp : public Help {
-    Q_OBJECT
-public:
-    GameTypeHelp(OptionsGamestate *options_gamestate);
-
-public slots:
-    virtual void changedGameType(int index);
-};
-
-class CharacterHelp : public Help {
-    Q_OBJECT
-public:
-    CharacterHelp(OptionsGamestate *options_gamestate);
-
-public slots:
-    virtual void changedGameType(int index);
-};
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
@@ -123,4 +87,39 @@ public:
     virtual void update() {
     }
     virtual void keyPress(QKeyEvent *key_event);
+};
+
+#ifdef USING_WEBKIT
+class Help : public QWebView {
+#else
+class Help : public QTextEdit {
+#endif
+    Q_OBJECT
+
+protected:
+    OptionsGamestate *options_gamestate;
+
+public:
+    Help(OptionsGamestate *options_gamestate);
+
+public slots:
+    virtual void changedGameType(int index)=0;
+};
+
+class GameTypeHelp : public Help {
+    Q_OBJECT
+public:
+    GameTypeHelp(OptionsGamestate *options_gamestate);
+
+public slots:
+    virtual void changedGameType(int index);
+};
+
+class CharacterHelp : public Help {
+    Q_OBJECT
+public:
+    CharacterHelp(OptionsGamestate *options_gamestate);
+
+public slots:
+    virtual void changedGameType(int index);
 };
