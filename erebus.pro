@@ -144,7 +144,8 @@ SOURCES += main.cpp mainwindow.cpp \
     scrollinglistwidget.cpp \
     animatedobject.cpp \
     particlesystem.cpp \
-    maingraphicsview.cpp
+    maingraphicsview.cpp \
+    webvieweventfilter.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -168,7 +169,8 @@ HEADERS += mainwindow.h \
     scrollinglistwidget.h \
     animatedobject.h \
     particlesystem.h \
-    maingraphicsview.h
+    maingraphicsview.h \
+    webvieweventfilter.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.
