@@ -50,10 +50,14 @@ MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphic
     /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0)
 {
     this->fps_timer.invalidate();
+    this->resetKeyboard();
+    this->grabKeyboard();
+}
+
+void MainGraphicsView::resetKeyboard() {
     for(int i=0;i<N_KEYS;i++) {
         this->key_down[i] = false;
     }
-    this->grabKeyboard();
 }
 
 void MainGraphicsView::zoomOut() {

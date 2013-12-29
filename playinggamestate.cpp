@@ -5796,6 +5796,7 @@ void PlayingGamestate::closeSubWindow() {
             game_g->setPaused(false, true);
             this->view->setEnabled(true);
             this->view->grabKeyboard();
+            this->view->resetKeyboard();
         }
         else {
             QWidget *subwindow2 = this->widget_stack.at(this->widget_stack.size()-1);
@@ -5817,6 +5818,7 @@ void PlayingGamestate::closeAllSubWindows() {
     game_g->setPaused(false, true);
     this->view->setEnabled(true);
     this->view->grabKeyboard();
+    this->view->resetKeyboard();
 }
 
 void PlayingGamestate::quitGame() {

@@ -99,6 +99,7 @@ public:
     }
     void createLightingMap(unsigned char lighting_min);
     void updateInput();
+    void resetKeyboard();
     void setScale(float c_scale);
     void setScale(QPointF centre, float c_scale);
     float getScale() const {
