@@ -101,7 +101,7 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
         return;
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
-        Vector2D passageway_centre = door_centre + dir_vec * ( 0.5f*door_depth + passage_hwidth );
+        //Vector2D passageway_centre = door_centre + dir_vec * ( 0.5f*door_depth + passage_hwidth );
         FloorRegion *floor_region = FloorRegion::createRectangle(door_rect);
         location->addFloorRegion(floor_region);
         floor_regions_rects->push_back(door_rect);
@@ -374,6 +374,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             floor_regions_rects->push_back(door_rect);
 
             bool rounded_rectangle = false;
+            //rounded_rectangle = true;
             if( (room_type == ROOMTYPE_NORMAL || room_type == ROOMTYPE_HAZARD) && rollDice(1, 2, 0) == 1 ) {
                 rounded_rectangle = true;
             }
@@ -550,8 +551,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 0.5f, 0.0f, 0.0f, false, 0.0f);
                     Scenery *scenery = new Scenery("Map", scenery_image_name, size_w, size_h, visual_h, false, 0.0f);
                     scenery->setInteractType("INTERACT_TYPE_DUNGEON_MAP");
-                    float x_pos = rollDice(1, 2, 0)==0 ? room_rect.getX() + 1.0f : room_rect.getX() + room_rect.getWidth() - 1.0f;
-                    location->addScenery(scenery, x_pos, room_rect.getY() - 0.5f*scenery->getHeight());
+                    float x_pos = rollDice(1, 2, 0)==0 ? room_rect.getX() + 1.5f : room_rect.getX() + room_rect.getWidth() - 1.5f;
+                    location->addScenery(scenery, x_pos, room_rect.getY() - 0.5f*scenery->getHeight() - 0.05f);
                 }
             }
             else if( room_type == ROOMTYPE_LAIR || room_type == ROOMTYPE_QUEST ) {
@@ -640,6 +641,19 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         location->addScenery(scenery_stairs_down, room_centre.x, room_centre.y);
                         *exit_down = scenery_stairs_down;
                     }
+                }
+
+                int n_torches = rollDice(1, 2, 0);
+                for(int i=0;i<n_torches;i++) {
+                    float xpos = room_rect.getX();
+                    if( (n_torches == 1 && rollDice(1, 2, 0)==1) || (n_torches==2 && i==0) ) {
+                        xpos += 0.25f*room_rect.getWidth();
+                    }
+                    else {
+                        xpos += 0.75f*room_rect.getWidth();
+                    }
+                    Scenery *scenery = new Scenery("Torch", "torch", 0.75f, 0.75f, 0.75f, false, 0.0f);
+                    location->addScenery(scenery, xpos, room_rect.getY() - 0.45f);
                 }
             }
 
@@ -989,6 +1003,17 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
                         }
                     }
                 }
+            }
+        }
+        if( seed.dir == DIRECTION4_WEST || seed.dir == DIRECTION4_EAST )
+        {
+            // torches
+            int n_torches = rollDice(1, 3, -1);
+            for(int i=0;i<n_torches;i++) {
+                float alpha = ((float)(i+1.0f))/(float)(n_torches+1.0f);
+                float xpos = rect_pos.x + alpha*rect_size.x;
+                Scenery *scenery = new Scenery("Torch", "torch", 0.75f, 0.75f, 0.75f, false, 0.0f);
+                location->addScenery(scenery, xpos, rect_pos.y - 0.45f);
             }
         }
     }
