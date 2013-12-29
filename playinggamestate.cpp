@@ -98,6 +98,15 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     this->setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 }
 
+void TextEffect::advance(int phase) {
+    if( phase == 0 ) {
+        if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
+            this->view->removeTextEffect(this);
+            this->deleteLater();
+        }
+    }
+}
+
 CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), hits(false), weapon_no_effect_magical(false), weapon_no_effect_holy(false), weapon_damage(0), spell(NULL), object(NULL) {
     this->source_pos = source->getPos();
     this->dest_pos = target_npc->getPos();
@@ -198,15 +207,6 @@ void CloseSubWindowWidget::closeEvent(QCloseEvent *event) {
 void CloseAllSubWindowsWidget::closeEvent(QCloseEvent *event) {
     event->ignore();
     playing_gamestate->closeAllSubWindows();
-}
-
-void TextEffect::advance(int phase) {
-    if( phase == 0 ) {
-        if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
-            this->view->removeTextEffect(this);
-            this->deleteLater();
-        }
-    }
 }
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :

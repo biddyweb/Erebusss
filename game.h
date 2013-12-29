@@ -151,6 +151,36 @@ public:
     static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
 };
 
+class LazyAnimationLayer {
+    AnimationLayer *animation_layer;
+    // if animation_layer == NULL, then we also store the information to load it when required:
+    string filename;
+    vector<AnimationLayerDefinition> animation_layer_definitions;
+    bool clip; // must be true for animations
+    int off_x;
+    int off_y;
+    int width;
+    int height;
+    int stride_x;
+    int stride_y;
+    int expected_total_width;
+    unsigned int n_dimensions;
+public:
+    LazyAnimationLayer(AnimationLayer *animation_layer) :
+        animation_layer(animation_layer), clip(false), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
+    {
+    }
+    LazyAnimationLayer(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
+        animation_layer(NULL), filename(filename), animation_layer_definitions(animation_layer_definitions), clip(clip), off_x(off_x), off_y(off_y), width(width), height(height), stride_x(stride_x), stride_y(stride_y), expected_total_width(expected_total_width), n_dimensions(n_dimensions)
+    {
+    }
+    LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
+
+    ~LazyAnimationLayer();
+
+    AnimationLayer *getAnimationLayer();
+};
+
 class AnimatedObject : public QGraphicsItem {
     int ms_per_frame;
     vector<AnimationLayer *> animation_layers;
@@ -189,36 +219,6 @@ public:
         this->clip_sw = sw;
         this->clip_sh = sh;
     }
-};
-
-class LazyAnimationLayer {
-    AnimationLayer *animation_layer;
-    // if animation_layer == NULL, then we also store the information to load it when required:
-    string filename;
-    vector<AnimationLayerDefinition> animation_layer_definitions;
-    bool clip; // must be true for animations
-    int off_x;
-    int off_y;
-    int width;
-    int height;
-    int stride_x;
-    int stride_y;
-    int expected_total_width;
-    unsigned int n_dimensions;
-public:
-    LazyAnimationLayer(AnimationLayer *animation_layer) :
-        animation_layer(animation_layer), clip(false), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
-    {
-    }
-    LazyAnimationLayer(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
-        animation_layer(NULL), filename(filename), animation_layer_definitions(animation_layer_definitions), clip(clip), off_x(off_x), off_y(off_y), width(width), height(height), stride_x(stride_x), stride_y(stride_y), expected_total_width(expected_total_width), n_dimensions(n_dimensions)
-    {
-    }
-    LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
-
-    ~LazyAnimationLayer();
-
-    AnimationLayer *getAnimationLayer();
 };
 
 class Particle {
