@@ -26,6 +26,7 @@ copy %src%\logiface.cpp %dst%
 copy %src%\main.cpp %dst%
 copy %src%\mainwindow.cpp %dst%
 copy %src%\optionsgamestate.cpp %dst%
+copy %src%\particlesystem.cpp %dst%
 copy %src%\playinggamestate.cpp %dst%
 copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
@@ -40,6 +41,7 @@ copy %src%\infodialog.h %dst%
 copy %src%\logiface.h %dst%
 copy %src%\mainwindow.h %dst%
 copy %src%\optionsgamestate.h %dst%
+copy %src%\particlesystem.h %dst%
 copy %src%\playinggamestate.h %dst%
 copy %src%\qt_screen.h %dst%
 copy %src%\qt_utils.h %dst%

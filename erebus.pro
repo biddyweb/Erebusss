@@ -147,7 +147,8 @@ SOURCES += main.cpp mainwindow.cpp \
     rpg/locationgenerator.cpp \
     rpg/profile.cpp \
     scrollinglistwidget.cpp \
-    animatedobject.cpp
+    animatedobject.cpp \
+    particlesystem.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -169,7 +170,8 @@ HEADERS += mainwindow.h \
     rpg/locationgenerator.h \
     rpg/profile.h \
     scrollinglistwidget.h \
-    animatedobject.h
+    animatedobject.h \
+    particlesystem.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

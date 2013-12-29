@@ -32,6 +32,7 @@
 #include "playinggamestate.h"
 #include "game.h"
 #include "animatedobject.h"
+#include "particlesystem.h"
 #include "infodialog.h"
 #include "qt_screen.h"
 #include "qt_utils.h"
