@@ -145,7 +145,8 @@ SOURCES += main.cpp mainwindow.cpp \
     sound.cpp \
     androidaudio/androidsound.cpp \
     rpg/locationgenerator.cpp \
-    rpg/profile.cpp
+    rpg/profile.cpp \
+    scrollinglistwidget.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -165,7 +166,8 @@ HEADERS += mainwindow.h \
     sound.h \
     androidaudio/androidsound.h \
     rpg/locationgenerator.h \
-    rpg/profile.h
+    rpg/profile.h \
+    scrollinglistwidget.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

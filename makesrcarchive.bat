@@ -28,6 +28,7 @@ copy %src%\optionsgamestate.cpp %dst%
 copy %src%\playinggamestate.cpp %dst%
 copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
+copy %src%\scrollinglistwidget.cpp %dst%
 copy %src%\sound.cpp %dst%
 
 copy %src%\common.h %dst%
@@ -40,6 +41,7 @@ copy %src%\optionsgamestate.h %dst%
 copy %src%\playinggamestate.h %dst%
 copy %src%\qt_screen.h %dst%
 copy %src%\qt_utils.h %dst%
+copy %src%\scrollinglistwidget.h %dst%
 copy %src%\sound.h %dst%
 
 mkdir %dst%\rpg\

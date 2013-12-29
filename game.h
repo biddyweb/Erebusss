@@ -1,11 +1,11 @@
 #pragma once
 
+#include <QGraphicsItem>
+#include <QSettings>
+
 #include "common.h"
 #include "rpg/utils.h" // for Vector2D
-
-#include <QGraphicsItem>
-#include <QListWidget>
-#include <QSettings>
+#include "scrollinglistwidget.h"
 
 #ifdef USING_WEBKIT
 class QWebView;
@@ -296,20 +296,6 @@ public:
     void setBirthRate(float birth_rate);
 
     virtual void updatePS();
-};
-
-class ScrollingListWidget : public QListWidget {
-    Q_OBJECT
-
-    int saved_x;
-    int saved_y;
-
-    virtual void mouseMoveEvent(QMouseEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
-public:
-    ScrollingListWidget();
-    virtual ~ScrollingListWidget() {
-    }
 };
 
 // used for passing messages

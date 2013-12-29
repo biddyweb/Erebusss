@@ -26,6 +26,7 @@ using std::map;
 
 #include "common.h"
 #include "gamestate.h"
+#include "scrollinglistwidget.h"
 #include "rpg/character.h"
 #include "rpg/location.h"
 #include "rpg/item.h"
@@ -33,7 +34,6 @@ using std::map;
 class MainGraphicsView;
 class LazyAnimationLayer;
 class AnimationLayer;
-class ScrollingListWidget;
 
 enum Direction {
     DIRECTION_W = 0,

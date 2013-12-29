@@ -17,8 +17,7 @@ using std::vector;
 #endif
 
 #include "gamestate.h"
-
-class ScrollingListWidget;
+#include "scrollinglistwidget.h"
 
 class OptionsGamestate : public Gamestate {
     Q_OBJECT
