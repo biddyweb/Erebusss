@@ -1020,7 +1020,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     }
     html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/><br/>";
 
-    html += writeSkills(player);
+    html += player->writeSkills();
 
     html += "</body></html>";
 
@@ -1042,7 +1042,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 }
 
 QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
-    QString html = ::writeStat(playing_gamestate->getPlayer(), stat_key, is_float, false);
+    QString html = playing_gamestate->getPlayer()->writeStat(stat_key, is_float, false);
     return html;
 }
 

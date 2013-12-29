@@ -12,13 +12,12 @@ using std::set;
 #include <map>
 using std::map;
 
-#include "utils.h"
-
 #include <QString>
 
-class Character;
-class CharacterTemplate;
+#include "utils.h"
+
 class PlayingGamestate;
+class Character;
 class Item;
 class Weapon;
 class Shield;
@@ -26,7 +25,6 @@ class Armour;
 class Ring;
 class Ammo;
 class Location;
-class Scenery;
 
 /*class Value {
     enum Type {
@@ -75,7 +73,6 @@ const string profile_key_B_c = "B";
 const string profile_key_Sp_c = "Sp";
 
 string getProfileLongString(const string &key);
-QString writeStat(const Character *character, const string &stat_key, bool is_float, bool want_base);
 
 const string skill_sprint_c = "sprint";
 const string skill_unarmed_combat_c = "unarmed_combat";
@@ -87,7 +84,6 @@ const string skill_fast_shooter_c = "fast_shooter";
 
 string getSkillLongString(const string &key);
 string getSkillDescription(const string &key);
-QString writeSkills(const Character *character);
 
 class Profile {
     map<string, int> int_properties;
@@ -1038,4 +1034,6 @@ public:
     void setObjectiveId(const string &objective_id) {
         this->objective_id = objective_id;
     }
+    QString writeStat(const string &stat_key, bool is_float, bool want_base) const;
+    QString writeSkills() const;
 };

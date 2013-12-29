@@ -43,68 +43,6 @@ string getProfileLongString(const string &key) {
     throw string("unknown key");
 }
 
-QString writeStat(const Character *character, const string &stat_key, bool is_float, bool want_base) {
-    string visual_name = getProfileLongString(stat_key);
-    QString html = "<b>";
-    html += visual_name.c_str();
-    html += ":</b> ";
-    if( is_float ) {
-        float stat = character->getProfileFloatProperty(stat_key);
-        float base_stat = character->getBaseProfileFloatProperty(stat_key);
-        if( want_base )
-            stat = base_stat;
-        if( stat > base_stat ) {
-            html += "<font color=\"#00ff00\">";
-        }
-        else if( stat < base_stat ) {
-            html += "<font color=\"#ff0000\">";
-        }
-        html += QString::number(stat);
-        if( stat != base_stat ) {
-            html += "</font>";
-        }
-    }
-    else {
-        int stat = character->getProfileIntProperty(stat_key);
-        int base_stat = character->getBaseProfileIntProperty(stat_key);
-        if( want_base )
-            stat = base_stat;
-        if( stat > base_stat ) {
-            html += "<font color=\"#00ff00\">";
-        }
-        else if( stat < base_stat ) {
-            html += "<font color=\"#ff0000\">";
-        }
-        html += QString::number(stat);
-        if( stat != base_stat ) {
-            html += "</font>";
-        }
-    }
-    html += "<br/>";
-    return html;
-}
-
-QString writeSkills(const Character *character) {
-    QString html = "";
-    bool any_skills = false;
-    for(set<string>::const_iterator iter = character->skillsBegin(); iter != character->skillsEnd(); ++iter) {
-        const string skill = *iter;
-        if( !any_skills ) {
-            any_skills = true;
-            html += "<b>Skills:</b><br/><br/>";
-        }
-        html += "<i>";
-        html += getSkillLongString(skill).c_str();
-        html += ":</i> ";
-        html += getSkillDescription(skill).c_str();
-        html += "<br/>";
-    }
-    if( any_skills ) {
-        html += "<br/>";
-    }
-    return html;
-}
-
 string getSkillLongString(const string &key) {
     if( key == skill_unarmed_combat_c )
         return "Unarmed Combat";
@@ -1696,3 +1634,65 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
     }
     return iter->second;
 }*/
+
+QString Character::writeStat(const string &stat_key, bool is_float, bool want_base) const {
+    string visual_name = getProfileLongString(stat_key);
+    QString html = "<b>";
+    html += visual_name.c_str();
+    html += ":</b> ";
+    if( is_float ) {
+        float stat = this->getProfileFloatProperty(stat_key);
+        float base_stat = this->getBaseProfileFloatProperty(stat_key);
+        if( want_base )
+            stat = base_stat;
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
+    }
+    else {
+        int stat = this->getProfileIntProperty(stat_key);
+        int base_stat = this->getBaseProfileIntProperty(stat_key);
+        if( want_base )
+            stat = base_stat;
+        if( stat > base_stat ) {
+            html += "<font color=\"#00ff00\">";
+        }
+        else if( stat < base_stat ) {
+            html += "<font color=\"#ff0000\">";
+        }
+        html += QString::number(stat);
+        if( stat != base_stat ) {
+            html += "</font>";
+        }
+    }
+    html += "<br/>";
+    return html;
+}
+
+QString Character::writeSkills() const {
+    QString html = "";
+    bool any_skills = false;
+    for(set<string>::const_iterator iter = this->skillsBegin(); iter != this->skillsEnd(); ++iter) {
+        const string skill = *iter;
+        if( !any_skills ) {
+            any_skills = true;
+            html += "<b>Skills:</b><br/><br/>";
+        }
+        html += "<i>";
+        html += getSkillLongString(skill).c_str();
+        html += ":</i> ";
+        html += getSkillDescription(skill).c_str();
+        html += "<br/>";
+    }
+    if( any_skills ) {
+        html += "<br/>";
+    }
+    return html;
+}
