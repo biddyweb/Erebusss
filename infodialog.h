@@ -34,20 +34,9 @@ public:
     virtual ~InfoDialog() {
     }
 
-    static InfoDialog *createInfoDialogOkay(const string &text, const string &picture) {
-        vector<string> buttons;
-        buttons.push_back("Okay");
-        return new InfoDialog(text, picture, buttons, true, false, false);
-    }
-    static InfoDialog *createInfoDialogOkay(const string &text) {
-        return createInfoDialogOkay(text, "");
-    }
-    static InfoDialog *createInfoDialogYesNo(const string &text) {
-        vector<string> buttons;
-        buttons.push_back("Yes");
-        buttons.push_back("No");
-        return new InfoDialog(text, "", buttons, true, false, false);
-    }
+    static InfoDialog *createInfoDialogOkay(const string &text, const string &picture);
+    static InfoDialog *createInfoDialogOkay(const string &text);
+    static InfoDialog *createInfoDialogYesNo(const string &text);
 
     void scrollToBottom();
     virtual int exec();

@@ -216,11 +216,7 @@ public:
     }
     LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
 
-    ~LazyAnimationLayer() {
-        if( this->animation_layer != NULL ) {
-            delete animation_layer;
-        }
-    }
+    ~LazyAnimationLayer();
 
     AnimationLayer *getAnimationLayer();
 };

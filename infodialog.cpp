@@ -118,6 +118,23 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
     //this->setEnabled(true);
 }
 
+InfoDialog *InfoDialog::createInfoDialogOkay(const string &text, const string &picture) {
+    vector<string> buttons;
+    buttons.push_back("Okay");
+    return new InfoDialog(text, picture, buttons, true, false, false);
+}
+
+InfoDialog *InfoDialog::createInfoDialogOkay(const string &text) {
+    return createInfoDialogOkay(text, "");
+}
+
+InfoDialog *InfoDialog::createInfoDialogYesNo(const string &text) {
+    vector<string> buttons;
+    buttons.push_back("Yes");
+    buttons.push_back("No");
+    return new InfoDialog(text, "", buttons, true, false, false);
+}
+
 void InfoDialog::reject() {
     // called when pressing Alt+F4 on Windows, Android back button, etc
     if( this->buttons_list.size() > 0 ) {
