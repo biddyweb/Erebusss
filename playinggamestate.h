@@ -27,13 +27,12 @@ using std::map;
 #include "common.h"
 #include "gamestate.h"
 #include "scrollinglistwidget.h"
+#include "animatedobject.h"
 #include "rpg/character.h"
 #include "rpg/location.h"
 #include "rpg/item.h"
 
 class MainGraphicsView;
-class LazyAnimationLayer;
-class AnimationLayer;
 
 enum Direction {
     DIRECTION_W = 0,
