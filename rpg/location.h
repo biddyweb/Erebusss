@@ -14,8 +14,8 @@ class Item;
 class Scenery;
 class Trap;
 class Location;
-class PlayingGamestate;
 class Quest;
+class PlayingGamestate;
 
 // source types for boundaries
 const int SOURCETYPE_FLOOR = 0;
@@ -378,7 +378,6 @@ public:
 
 class Trap {
 protected:
-    //Location *location;
     string type;
     bool has_position;
     Vector2D pos; // pos in Location (for top-left)
@@ -390,9 +389,6 @@ public:
     Trap(const string &type);
     Trap(const string &type, float width, float height);
 
-    /*void setLocation(Location *location) {
-        this->location = location;
-    }*/
     const string &getType() const {
         return this->type;
     }
