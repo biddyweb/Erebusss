@@ -6,14 +6,8 @@
 #include <QVBoxLayout>
 #include <QLineEdit>
 #include <QDesktopWidget>
-
-#ifdef USING_WEBKIT
-#include <QWebView>
-#include <QWebFrame>
-#else
 #include <QTextEdit>
 #include <QUrl>
-#endif
 
 #if QT_VERSION < 0x050000
 #include <QFile>
@@ -296,13 +290,8 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     html += "</body></html>";
 
-#ifdef USING_WEBKIT
-    QWebView *label = new QWebView();
-    game_g->setWebView(label);
-#else
     QTextEdit *label = new QTextEdit();
     game_g->setTextEdit(label);
-#endif
     label->setHtml(html);
     layout->addWidget(label);
 
@@ -5771,13 +5760,8 @@ void PlayingGamestate::showInfoWindow(const string &html, bool scroll_to_end) {
     QVBoxLayout *layout = new QVBoxLayout();
     subwindow->setLayout(layout);
 
-#ifdef USING_WEBKIT
-    QWebView *label = new QWebView();
-    game_g->setWebView(label);
-#else
     QTextEdit *label = new QTextEdit();
     game_g->setTextEdit(label);
-#endif
     label->setHtml(html.c_str());
     layout->addWidget(label);
 
@@ -5792,11 +5776,7 @@ void PlayingGamestate::showInfoWindow(const string &html, bool scroll_to_end) {
     this->addWidget(subwindow, false); // should be last, so resizing is already correct - needed for things like scrolling to bottom to work
 
     if( scroll_to_end ) {
-#ifdef USING_WEBKIT
-        label->page()->mainFrame()->setScrollBarValue(Qt::Vertical, label->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
-#else
         label->verticalScrollBar()->setValue( label->verticalScrollBar()->maximum() );
-#endif
     }
 }
 

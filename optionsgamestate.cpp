@@ -12,14 +12,9 @@ using std::stringstream;
 #include <QLabel>
 #include <QLineEdit>
 #include <QDesktopServices>
-
-#ifdef USING_WEBKIT
-#include <QWebView>
-#else
 #include <QTextBrowser>
 #include <QFile>
 #include <QTextStream>
-#endif
 
 #include "rpg/character.h"
 
@@ -29,15 +24,9 @@ using std::stringstream;
 #include "infodialog.h"
 #include "logiface.h"
 
-#ifdef USING_WEBKIT
-Help::Help(OptionsGamestate *options_gamestate) : QWebView(), options_gamestate(options_gamestate) {
-    game_g->setWebView(this);
-}
-#else
 Help::Help(OptionsGamestate *options_gamestate) : QTextEdit(), options_gamestate(options_gamestate) {
     game_g->setTextEdit(this);
 }
-#endif
 
 GameTypeHelp::GameTypeHelp(OptionsGamestate *options_gamestate) : Help(options_gamestate) {
 }
@@ -756,11 +745,6 @@ void OptionsGamestate::clickedOfflineHelp() {
     QVBoxLayout *layout = new QVBoxLayout();
     widget->setLayout(layout);
 
-#ifdef USING_WEBKIT
-    QWebView *help = new QWebView();
-    game_g->setWebView(help);
-    help->setUrl(QUrl(QString(DEPLOYMENT_PATH) + "docs/erebus.html"));
-#else
     QTextBrowser *help = new QTextBrowser();
     game_g->setTextEdit(help);
     help->setOpenExternalLinks(true);
@@ -771,7 +755,6 @@ void OptionsGamestate::clickedOfflineHelp() {
         QTextStream in(&file);
         help->setHtml(in.readAll());
     }
-#endif
     layout->addWidget(help);
 
     QPushButton *closeButton = new QPushButton(tr("Close"));

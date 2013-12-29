@@ -16,12 +16,6 @@ using std::map;
 #include <QCheckBox>
 #include <QXmlStreamReader>
 
-#ifdef USING_WEBKIT
-#include <QWebView>
-#else
-#include <QTextEdit>
-#endif
-
 #include "common.h"
 
 #include "rpg/character.h"

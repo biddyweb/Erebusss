@@ -8,14 +8,7 @@ using std::stringstream;
 #include <QLabel>
 #include <QPushButton>
 #include <QDesktopWidget>
-
-#ifdef USING_WEBKIT
-#include <QWebView>
-#include <QWebFrame>
-#else
-#include <QTextEdit>
 #include <QScrollBar>
-#endif
 
 #include "infodialog.h"
 #include "game.h"
@@ -51,13 +44,8 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
 
     //QLabel *label = new QLabel(text.c_str());
     //label->setWordWrap(true);
-#ifdef USING_WEBKIT
-    label = new QWebView();
-    game_g->setWebView(label);
-#else
     label = new QTextEdit();
     game_g->setTextEdit(label);
-#endif
     label->setHtml(text.c_str());
     /*string text2 = text;
     //text2 += "<font color=\"red\">blah</font> <font color=\"black\">blah</font> blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah ";
@@ -160,11 +148,7 @@ void InfoDialog::clicked() {
 }
 
 void InfoDialog::scrollToBottom() {
-#ifdef USING_WEBKIT
-    this->label->page()->mainFrame()->setScrollBarValue(Qt::Vertical, this->label->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
-#else
     this->label->verticalScrollBar()->setValue( this->label->verticalScrollBar()->maximum() );
-#endif
 }
 
 int InfoDialog::exec() {

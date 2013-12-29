@@ -1,8 +1,3 @@
-#CONFIG += USING_WEBKIT
-USING_WEBKIT {
-    DEFINES += USING_WEBKIT
-}
-
 # Add files and directories to ship with the application
 # by adapting the examples below.
 # file1.source = myfile

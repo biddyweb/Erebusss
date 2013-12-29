@@ -17,12 +17,7 @@ using std::pair;
 using std::string;
 
 #include <QSettings>
-
-#ifdef USING_WEBKIT
-#include <QWebView>
-#else
 #include <QTextEdit>
-#endif
 
 #include "common.h"
 
@@ -51,11 +46,7 @@ const QString savegame_folder = "savegames/";
 class WebViewEventFilter : public QObject {
     Q_OBJECT
 
-#ifdef USING_WEBKIT
-    QWebView *webView;
-#else
     QTextEdit *textEdit;
-#endif
     bool filterMouseMove;
     int orig_mouse_x, orig_mouse_y;
     int saved_mouse_x, saved_mouse_y;
@@ -66,19 +57,11 @@ protected:
 
 public:
     WebViewEventFilter() : QObject(),
-#ifdef USING_WEBKIT
-        webView(NULL),
-#else
         textEdit(NULL),
-#endif
         filterMouseMove(false), orig_mouse_x(0), orig_mouse_y(0), saved_mouse_x(0), saved_mouse_y(0), last_scroll_y(-1) {
     }
 
-#ifdef USING_WEBKIT
-    void setWebView(QWebView *webView);
-#else
     void setTextEdit(QTextEdit *textEdit);
-#endif
 };
 
 // used for passing messages
@@ -250,11 +233,7 @@ public:
         message_queue.push(message);
     }
 
-#ifdef USING_WEBKIT
-    void setWebView(QWebView *webView);
-#else
     void setTextEdit(QTextEdit *textEdit);
-#endif
     void resizeTopLevelWidget(QWidget *widget) const;
 
     void run(bool fullscreen);

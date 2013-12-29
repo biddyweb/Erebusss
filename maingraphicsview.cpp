@@ -1,3 +1,7 @@
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 #include <QApplication>
 
 #include "maingraphicsview.h"

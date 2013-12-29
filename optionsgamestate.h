@@ -7,12 +7,7 @@ using std::vector;
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLabel>
-
-#ifdef USING_WEBKIT
-#include <QWebView>
-#else
 #include <QTextEdit>
-#endif
 
 #include "common.h"
 
@@ -88,11 +83,7 @@ public:
     virtual void keyPress(QKeyEvent *key_event);
 };
 
-#ifdef USING_WEBKIT
-class Help : public QWebView {
-#else
 class Help : public QTextEdit {
-#endif
     Q_OBJECT
 
 protected:
