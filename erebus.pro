@@ -144,7 +144,8 @@ SOURCES += main.cpp mainwindow.cpp \
     androidaudio/androidaudio.cpp \
     sound.cpp \
     androidaudio/androidsound.cpp \
-    rpg/locationgenerator.cpp
+    rpg/locationgenerator.cpp \
+    rpg/profile.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -163,7 +164,8 @@ HEADERS += mainwindow.h \
     androidaudio/androidaudio.h \
     sound.h \
     androidaudio/androidsound.h \
-    rpg/locationgenerator.h
+    rpg/locationgenerator.h \
+    rpg/profile.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

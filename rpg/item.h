@@ -4,8 +4,9 @@
 using std::string;
 
 #include "utils.h"
-#include "character.h" // for Profile
+#include "profile.h"
 
+class Character;
 class PlayingGamestate;
 
 enum ItemType {

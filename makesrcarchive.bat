@@ -48,12 +48,14 @@ copy %src%\rpg\character.cpp %dst%\rpg
 copy %src%\rpg\item.cpp %dst%\rpg
 copy %src%\rpg\location.cpp %dst%\rpg
 copy %src%\rpg\locationgenerator.cpp %dst%\rpg
+copy %src%\rpg\profile.cpp %dst%\rpg
 copy %src%\rpg\utils.cpp %dst%\rpg
 
 copy %src%\rpg\character.h %dst%\rpg
 copy %src%\rpg\item.h %dst%\rpg
 copy %src%\rpg\location.h %dst%\rpg
 copy %src%\rpg\locationgenerator.h %dst%\rpg
+copy %src%\rpg\profile.h %dst%\rpg
 copy %src%\rpg\utils.h %dst%\rpg
 
 mkdir %dst%\androidaudio\
