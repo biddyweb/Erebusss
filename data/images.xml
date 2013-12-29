@@ -113,6 +113,7 @@
 <image type="scenery" name="hut" filename="gfx/textures/scenery/hut.png"/>
 <image type="scenery" name="knight_statue" filename="gfx/textures/scenery/knight_statue.png"/>
 <image type="scenery" name="painting_fortress" filename="gfx/textures/scenery/scenery_painting_fortress.png"/>
+<image type="scenery" name="map_dungeon" filename="gfx/textures/scenery/map_dungeon.png"/>
 <image type="scenery" name="painting_gate" filename="gfx/textures/scenery/scenery_painting_gate.png"/>
 <image type="scenery" name="painting_sword" filename="gfx/textures/scenery/scenery_painting_sword.png"/>
 <image type="scenery" name="painting_dwarf" filename="gfx/textures/scenery/scenery_painting_dwarf.png"/>

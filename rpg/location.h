@@ -847,6 +847,7 @@ public:
     void initVisibility(Vector2D pos);
 #endif
     void clearVisibility();
+    void revealMap(PlayingGamestate *playing_gamestate);
     vector<FloorRegion *> updateVisibility(Vector2D pos);
 
     // for testing:

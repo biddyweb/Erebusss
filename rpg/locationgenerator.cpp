@@ -447,8 +447,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
             else if( room_type == ROOMTYPE_HAZARD ) {
                 // hazard
-                int r = rollDice(1, 7, 0);
-                //r = 7; // test
+                int r = rollDice(1, 9, 0);
+                //r = 9; // test
                 if( r == 1 ) {
                     // wandering monster
                     enemy_table = "isolated";
@@ -542,6 +542,16 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                         scenery->setTrap(trap);
                     }
                     location->addScenery(scenery, room_centre.x, room_centre.y);
+                }
+                else if( r == 9 ) {
+                    // dungeon map
+                    string scenery_image_name = "map_dungeon";
+                    float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+                    playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, scenery_image_name, true, 0.5f, 0.0f, 0.0f, false, 0.0f);
+                    Scenery *scenery = new Scenery("Map", scenery_image_name, size_w, size_h, visual_h, false, 0.0f);
+                    scenery->setInteractType("INTERACT_TYPE_DUNGEON_MAP");
+                    float x_pos = rollDice(1, 2, 0)==0 ? room_rect.getX() + 1.0f : room_rect.getX() + room_rect.getWidth() - 1.0f;
+                    location->addScenery(scenery, x_pos, room_rect.getY() - 0.5f*scenery->getHeight());
                 }
             }
             else if( room_type == ROOMTYPE_LAIR || room_type == ROOMTYPE_QUEST ) {

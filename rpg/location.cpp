@@ -200,6 +200,9 @@ vector<string> Scenery::getInteractionText(PlayingGamestate *playing_gamestate, 
         options.push_back(PlayingGamestate::tr("Yes, drink.").toStdString());
         options.push_back(PlayingGamestate::tr("No.").toStdString());
     }
+    else if( this->interact_type == "INTERACT_TYPE_DUNGEON_MAP" ) {
+        // no options - go straight to interaction
+    }
     else {
         ASSERT_LOGGER(false);
     }
@@ -416,6 +419,10 @@ void Scenery::interact(PlayingGamestate *playing_gamestate, int option) {
         else {
             result_text = PlayingGamestate::tr("You drink from the pool but feel no effects.").toStdString();
         }
+    }
+    else if( this->interact_type == "INTERACT_TYPE_DUNGEON_MAP" ) {
+        result_text = PlayingGamestate::tr("The painting shows a map of the current dungeon level!").toStdString();
+        playing_gamestate->getCLocation()->revealMap(playing_gamestate);
     }
     else {
         ASSERT_LOGGER(false);
@@ -2039,6 +2046,17 @@ void Location::clearVisibility() {
     for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         floor_region->setVisible(false);
+    }
+}
+
+void Location::revealMap(PlayingGamestate *playing_gamestate) {
+    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+        FloorRegion *floor_region = *iter;
+        if( floor_region->isVisible() ) {
+            continue;
+        }
+        floor_region->setVisible(true);
+        playing_gamestate->updateVisibilityForFloorRegion(floor_region);
     }
 }
 
