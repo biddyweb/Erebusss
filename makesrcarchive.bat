@@ -18,6 +18,7 @@ copy %src%\erebus.svg %dst%
 copy %src%\erebus64.png %dst%
 copy %src%\erebus.desktop %dst%
 
+copy %src%\animatedobject.cpp %dst%
 copy %src%\game.cpp %dst%
 copy %src%\gamestate.cpp %dst%
 copy %src%\infodialog.cpp %dst%
@@ -31,6 +32,7 @@ copy %src%\qt_utils.cpp %dst%
 copy %src%\scrollinglistwidget.cpp %dst%
 copy %src%\sound.cpp %dst%
 
+copy %src%\animatedobject.h %dst%
 copy %src%\common.h %dst%
 copy %src%\game.h %dst%
 copy %src%\gamestate.h %dst%
