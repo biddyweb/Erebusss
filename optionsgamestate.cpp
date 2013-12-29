@@ -21,10 +21,10 @@
 #include <sstream>
 using std::stringstream;
 
+#include "rpg/character.h"
+
 #include "optionsgamestate.h"
 #include "game.h"
-#include "rpg/character.h"
-#include "qt_screen.h"
 #include "mainwindow.h"
 #include "infodialog.h"
 #include "logiface.h"
@@ -120,7 +120,7 @@ OptionsGamestate::OptionsGamestate() :
         }
     //#endif
 
-        MainWindow *window = game_g->getScreen()->getMainWindow();
+        MainWindow *window = game_g->getMainWindow();
         QFont font = game_g->getFontBig();
         window->setFont(font);
 
@@ -237,7 +237,7 @@ void OptionsGamestate::cleanup() {
     LOG("OptionsGamestate::cleanup()\n");
     game_g->freeSound("music_intro");
 
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    MainWindow *window = game_g->getMainWindow();
     window->centralWidget()->deleteLater();
     window->setCentralWidget(NULL);
 
@@ -467,7 +467,7 @@ void OptionsGamestate::clickedCancel() {
 
 void OptionsGamestate::clickedStartGame() {
     LOG("OptionsGamestate::clickedStartGame()\n");
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    game_g->getMainWindow()->setCursor(Qt::WaitCursor);
     int gametype_id = this->gametypeComboBox->currentIndex();
     LOG("gametype_id: %d\n", gametype_id);
     ASSERT_LOGGER(gametype_id >= 0 && gametype_id <= 1);
@@ -565,7 +565,7 @@ void OptionsGamestate::clickedLoadGame() {
     QString filename = this->load_filenames.at(index);
     LoadGameMessage *game_message = new LoadGameMessage(filename);
     game_g->pushMessage(game_message);
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    game_g->getMainWindow()->setCursor(Qt::WaitCursor);
 }
 
 void OptionsGamestate::clickedImportButton() {

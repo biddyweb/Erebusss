@@ -34,7 +34,7 @@
 #include "animatedobject.h"
 #include "particlesystem.h"
 #include "infodialog.h"
-#include "qt_screen.h"
+#include "mainwindow.h"
 #include "qt_utils.h"
 #include "logiface.h"
 
@@ -1916,7 +1916,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
 
         srand( clock() );
 
-        MainWindow *window = game_g->getScreen()->getMainWindow();
+        MainWindow *window = game_g->getMainWindow();
         window->setEnabled(false);
         game_g->setPaused(true, true);
 
@@ -2783,7 +2783,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             layout->setColumnStretch(0, 1);
             layout->setRowStretch(1, 1);
             int col = 1;
-            MainWindow *window = game_g->getScreen()->getMainWindow();
+            MainWindow *window = game_g->getMainWindow();
             const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
             const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
             const int icon_size = (icon_resolution_independent_size*window->width())/640;
@@ -3029,7 +3029,7 @@ void PlayingGamestate::cleanup() {
     //this->closeSubWindow();
     this->closeAllSubWindows();
 
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    MainWindow *window = game_g->getMainWindow();
     window->centralWidget()->deleteLater();
     window->setCentralWidget(NULL);
 
@@ -3169,7 +3169,7 @@ void PlayingGamestate::playBackgroundMusic() {
 void PlayingGamestate::turboToggled(bool checked) {
     LOG("PlayingGamestate::turboToggled(%d)\n", checked);
     turboButton->clearFocus(); // workaround for Android still showing selection
-    game_g->getScreen()->setGameTimeMultiplier(checked ? 2 : 1);
+    game_g->setGameTimeMultiplier(checked ? 2 : 1);
 }
 
 void PlayingGamestate::quickSave() {
@@ -3415,7 +3415,7 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
 void PlayingGamestate::setupView() {
     qDebug("PlayingGamestate::setupView()");
     // set up the view on the RPG world
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    MainWindow *window = game_g->getMainWindow();
 
     view->createLightingMap(this->c_location->getLightingMin());
     //view->centerOn(player->getPos().x, player->getPos().y);
@@ -4211,7 +4211,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.toUtf8().data());
     // filename should be full path
 
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    MainWindow *window = game_g->getMainWindow();
     window->setEnabled(false);
     game_g->setPaused(true, true);
 
@@ -5086,7 +5086,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
     window->setEnabled(true);
     game_g->setPaused(false, true);
-    game_g->getScreen()->restartElapsedTimer();
+    game_g->restartElapsedTimer();
 
     //qApp->processEvents();
 
@@ -5114,7 +5114,7 @@ void PlayingGamestate::createRandomQuest() {
     LOG("PlayingGamestate::createRandomQuest()\n");
     ASSERT_LOGGER(gameType == GAMETYPE_RANDOM);
 
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    MainWindow *window = game_g->getMainWindow();
     window->setEnabled(false);
     game_g->setPaused(true, true);
 
@@ -5308,7 +5308,7 @@ void PlayingGamestate::createRandomQuest() {
 
     window->setEnabled(true);
     game_g->setPaused(false, true);
-    game_g->getScreen()->restartElapsedTimer();
+    game_g->restartElapsedTimer();
 
     //qApp->processEvents();
 
@@ -5812,7 +5812,7 @@ void PlayingGamestate::closeSubWindow() {
         subwindow->deleteLater();
         this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1 );
         if( n_stacked_widgets == 2 ) {
-            game_g->getScreen()->getMainWindow()->activateWindow(); // needed for Symbian at least
+            game_g->getMainWindow()->activateWindow(); // needed for Symbian at least
             game_g->setPaused(false, true);
             this->view->setEnabled(true);
             this->view->grabKeyboard();
@@ -7419,7 +7419,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
     }
     QTextStream stream(&file);
 
-    game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
+    game_g->getMainWindow()->setCursor(Qt::WaitCursor);
 
     const int savegame_version = 2;
 
@@ -8013,7 +8013,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
         this->permadeath_savefilename = full_path;
     }
 
-    game_g->getScreen()->getMainWindow()->unsetCursor();
+    game_g->getMainWindow()->unsetCursor();
     return true;
 }
 
@@ -8026,7 +8026,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
         this->main_stacked_widget->setCurrentWidget(widget);
     }
     else*/ {
-        MainWindow *window = game_g->getScreen()->getMainWindow();
+        MainWindow *window = game_g->getMainWindow();
         //widget->setParent(window);
         widget->setParent(window->centralWidget());
         widget->setWindowModality(Qt::ApplicationModal);
@@ -8040,7 +8040,7 @@ void PlayingGamestate::addWidget(QWidget *widget, bool fullscreen_hint) {
 #endif
             widget->showFullScreen();
         }
-        else if( game_g->getScreen()->isFullscreen() ) {
+        else if( game_g->isFullscreen() ) {
             widget->setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
             if( fullscreen_hint ) {
                 widget->showFullScreen();

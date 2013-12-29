@@ -29,6 +29,7 @@ using std::string;
 #include "scrollinglistwidget.h"
 
 class Screen;
+class MainWindow;
 class Sound;
 class Gamestate;
 class PlayingGamestate;
@@ -212,12 +213,17 @@ public:
     const Screen *getScreen() const {
         return this->screen;
     }
+    bool isFullscreen() const;
+    MainWindow *getMainWindow();
+    const MainWindow *getMainWindow() const;
     bool isPaused() const;
     void setPaused(bool paused, bool also_input);
     void togglePaused();
+    void restartElapsedTimer();
     int getGameTimeFrameMS() const;
     int getGameTimeTotalMS() const;
     int getInputTimeFrameMS() const;
+    void setGameTimeMultiplier(int multiplier);
 
     QFont getFontScene() const {
         return this->font_scene;

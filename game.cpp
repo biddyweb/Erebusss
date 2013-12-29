@@ -569,6 +569,18 @@ void Game::init(bool fullscreen) {
     loadPortraits();
 }
 
+bool Game::isFullscreen() const {
+    return this->screen->isFullscreen();
+}
+
+MainWindow *Game::getMainWindow() {
+    return this->screen->getMainWindow();
+}
+
+const MainWindow *Game::getMainWindow() const {
+    return this->screen->getMainWindow();
+}
+
 bool Game::isPaused() const {
     return this->screen->isPaused();
 }
@@ -581,6 +593,10 @@ void Game::togglePaused() {
     this->screen->togglePaused();
 }
 
+void Game::restartElapsedTimer() {
+    this->screen->restartElapsedTimer();
+}
+
 int Game::getGameTimeFrameMS() const {
     return this->screen->getGameTimeFrameMS();
 }
@@ -591,6 +607,10 @@ int Game::getGameTimeTotalMS() const {
 
 int Game::getInputTimeFrameMS() const {
     return this->screen->getInputTimeFrameMS();
+}
+
+void Game::setGameTimeMultiplier(int multiplier) {
+    this->screen->setGameTimeMultiplier(multiplier);
 }
 
 #ifdef USING_WEBKIT
