@@ -12,7 +12,6 @@ using std::string;
 class Character;
 class Item;
 class Scenery;
-class Trap;
 class Location;
 class Quest;
 class PlayingGamestate;
@@ -32,6 +31,57 @@ public:
     virtual void locationUpdateScenery(Scenery *scenery)=0;
 
     virtual void locationAddCharacter(const Location *location, Character *character)=0;
+};
+
+class Trap {
+protected:
+    string type;
+    bool has_position;
+    Vector2D pos; // pos in Location (for top-left)
+    float width, height;
+    int rating;
+    int difficulty;
+
+public:
+    Trap(const string &type);
+    Trap(const string &type, float width, float height);
+
+    const string &getType() const {
+        return this->type;
+    }
+    void setPos(float xpos, float ypos) {
+        this->pos.set(xpos, ypos);
+    }
+    float getX() const {
+        return this->pos.x;
+    }
+    float getY() const {
+        return this->pos.y;
+    }
+    Vector2D getPos() const {
+        return this->pos;
+    }
+    float getWidth() const {
+        return this->width;
+    }
+    float getHeight() const {
+        return this->height;
+    }
+    void setRating(int rating) {
+        this->rating = rating;
+    }
+    int getRating() const {
+        return this->rating;
+    }
+    void setDifficulty(int diffculty) {
+        this->difficulty = difficulty;
+    }
+    int getDifficulty() const {
+        return this->difficulty;
+    }
+
+    bool isSetOff(const Character *character) const;
+    void setOff(PlayingGamestate *playing_gamestate, Character *character) const;
 };
 
 class Scenery {
@@ -374,57 +424,6 @@ public:
     Trap *getTrap() const {
         return this->trap;
     }
-};
-
-class Trap {
-protected:
-    string type;
-    bool has_position;
-    Vector2D pos; // pos in Location (for top-left)
-    float width, height;
-    int rating;
-    int difficulty;
-
-public:
-    Trap(const string &type);
-    Trap(const string &type, float width, float height);
-
-    const string &getType() const {
-        return this->type;
-    }
-    void setPos(float xpos, float ypos) {
-        this->pos.set(xpos, ypos);
-    }
-    float getX() const {
-        return this->pos.x;
-    }
-    float getY() const {
-        return this->pos.y;
-    }
-    Vector2D getPos() const {
-        return this->pos;
-    }
-    float getWidth() const {
-        return this->width;
-    }
-    float getHeight() const {
-        return this->height;
-    }
-    void setRating(int rating) {
-        this->rating = rating;
-    }
-    int getRating() const {
-        return this->rating;
-    }
-    void setDifficulty(int diffculty) {
-        this->difficulty = difficulty;
-    }
-    int getDifficulty() const {
-        return this->difficulty;
-    }
-
-    bool isSetOff(const Character *character) const;
-    void setOff(PlayingGamestate *playing_gamestate, Character *character) const;
 };
 
 class FloorRegion : public Polygon2D {
