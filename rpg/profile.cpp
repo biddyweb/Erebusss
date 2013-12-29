@@ -1,4 +1,5 @@
 #include "profile.h"
+
 #include "../logiface.h"
 
 string getProfileLongString(const string &key) {

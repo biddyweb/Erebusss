@@ -1,14 +1,15 @@
-#include "item.h"
-#include "character.h"
-#include "../playinggamestate.h"
-#include "../logiface.h"
-
 #include <sstream>
 using std::stringstream;
 
 #ifdef _DEBUG
 #include <cassert>
 #endif
+
+#include "item.h"
+#include "character.h"
+
+#include "../playinggamestate.h"
+#include "../logiface.h"
 
 Item::Item(const string &name, const string &image_name, int weight) :
     name(name), image_name(image_name), user_data_gfx(NULL), icon_width(0.5f), weight(weight),

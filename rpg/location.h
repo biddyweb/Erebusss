@@ -7,6 +7,8 @@ using std::set;
 #include <string>
 using std::string;
 
+#include "../common.h"
+
 #include "utils.h"
 
 class Character;

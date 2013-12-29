@@ -13,6 +13,8 @@ using std::ostringstream;
 #include <string>
 using std::string;
 
+#include "../common.h"
+
 const float E_TOL_MACHINE = 1.0e-12f;
 const float E_TOL_ANGULAR = 1.0e-6f;
 const float E_TOL_LINEAR = 1.0e-4f;

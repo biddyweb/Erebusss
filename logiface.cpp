@@ -1,7 +1,7 @@
+#include <cstdio>
+
 #include "logiface.h"
 #include "game.h"
-
-#include <cstdio>
 
 void log(const char *text, ...) {
     va_list vlist;

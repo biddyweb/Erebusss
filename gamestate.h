@@ -1,9 +1,9 @@
 #pragma once
 
-#include "common.h"
-
 #include <QObject>
 #include <QKeyEvent>
+
+#include "common.h"
 
 class Gamestate : public QObject {
 public:

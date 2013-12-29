@@ -1,12 +1,12 @@
 #pragma once
 
-#include "common.h"
+#include <string>
+using std::string;
 
 #include <QString>
 #include <QPixmap>
 
-#include <string>
-using std::string;
+#include "common.h"
 
 int parseInt(const QString &str, bool allow_empty = false);
 float parseFloat(const QString &str, bool allow_empty = false);

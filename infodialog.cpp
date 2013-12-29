@@ -1,6 +1,7 @@
-#include "infodialog.h"
-#include "game.h"
-#include "logiface.h"
+#include <cassert>
+
+#include <sstream>
+using std::stringstream;
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -16,10 +17,9 @@
 #include <QScrollBar>
 #endif
 
-#include <cassert>
-
-#include <sstream>
-using std::stringstream;
+#include "infodialog.h"
+#include "game.h"
+#include "logiface.h"
 
 InfoDialog::InfoDialog(const string &text, const string &picture, const vector<string> &buttons, bool horiz, bool small_buttons, bool numbered_shortcuts) {
     QVBoxLayout *layout = new QVBoxLayout();

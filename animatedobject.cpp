@@ -1,12 +1,16 @@
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
+#if QT_VERSION < 0x050000
+#include <qmath.h>
+#endif
+
 #include <QPainter>
 
 #include "animatedobject.h"
 #include "logiface.h"
 #include "game.h"
-
-#if QT_VERSION < 0x050000
-#include <qmath.h>
-#endif
 
 AnimationSet::AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_dimensions(n_dimensions), n_frames(n_frames), pixmaps(pixmaps) {
     if( pixmaps.size() != n_dimensions * n_frames ) {

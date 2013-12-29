@@ -1,6 +1,7 @@
 #include "locationgenerator.h"
 #include "location.h"
 #include "item.h"
+
 #include "../playinggamestate.h"
 #include "../logiface.h"
 

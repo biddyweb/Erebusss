@@ -1,3 +1,6 @@
+#include <sstream>
+using std::stringstream;
+
 #ifdef _DEBUG
 #include <cassert>
 #endif
@@ -17,9 +20,6 @@
 #include <QFile>
 #include <QTextStream>
 #endif
-
-#include <sstream>
-using std::stringstream;
 
 #include "rpg/character.h"
 

@@ -1,15 +1,16 @@
-#include "character.h"
-#include "location.h"
-#include "item.h"
-#include "../game.h"
-#include "../playinggamestate.h"
-#include "../logiface.h"
-
 #include <cmath>
 
 #ifdef _DEBUG
 #include <cassert>
 #endif
+
+#include "character.h"
+#include "location.h"
+#include "item.h"
+
+#include "../game.h"
+#include "../playinggamestate.h"
+#include "../logiface.h"
 
 const int default_natural_damageX = 1;
 const int default_natural_damageY = 3;

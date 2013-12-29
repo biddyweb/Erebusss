@@ -8,6 +8,7 @@ using std::set;
 #include <QElapsedTimer>
 
 #include "common.h"
+
 #include "rpg/utils.h" // for Vector2D
 
 class PlayingGamestate;

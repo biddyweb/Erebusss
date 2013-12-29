@@ -1,6 +1,3 @@
-#include "utils.h"
-#include "../logiface.h"
-
 #include <string>
 using std::string;
 
@@ -10,6 +7,10 @@ using std::priority_queue;
 #ifdef _DEBUG
 #include <cassert>
 #endif
+
+#include "utils.h"
+
+#include "../logiface.h"
 
 /* Drops the vector onto a line of direction 'n' that passes through 'o'.
 * 'n' must be normalised.

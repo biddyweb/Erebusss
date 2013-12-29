@@ -3,6 +3,8 @@
 #include <string>
 using std::string;
 
+#include "../common.h"
+
 #include "utils.h"
 #include "profile.h"
 

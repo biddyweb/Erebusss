@@ -6,6 +6,8 @@ using std::string;
 #include <map>
 using std::map;
 
+#include "../common.h"
+
 const string profile_key_FP_c = "FP";
 const string profile_key_BS_c = "BS";
 const string profile_key_S_c = "S";

@@ -1,12 +1,8 @@
-#include "game.h"
-#include "optionsgamestate.h"
-#include "playinggamestate.h"
-#include "qt_screen.h"
-#include "qt_utils.h"
-#include "sound.h"
-#include "logiface.h"
-
 #include <ctime>
+
+#ifdef _DEBUG
+#include <cassert>
+#endif
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -31,9 +27,13 @@
 #include <QWindowsStyle>
 #endif
 
-#ifdef _DEBUG
-#include <cassert>
-#endif
+#include "game.h"
+#include "optionsgamestate.h"
+#include "playinggamestate.h"
+#include "qt_screen.h"
+#include "qt_utils.h"
+#include "sound.h"
+#include "logiface.h"
 
 Game *game_g = NULL;
 

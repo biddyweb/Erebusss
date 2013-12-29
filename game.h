@@ -25,7 +25,9 @@ using std::string;
 #endif
 
 #include "common.h"
+
 #include "rpg/utils.h" // for Vector2D
+
 #include "scrollinglistwidget.h"
 
 class Screen;

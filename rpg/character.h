@@ -14,6 +14,8 @@ using std::map;
 
 #include <QString>
 
+#include "../common.h"
+
 #include "utils.h"
 #include "profile.h"
 

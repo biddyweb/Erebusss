@@ -1,9 +1,3 @@
-#include "location.h"
-#include "character.h"
-#include "item.h"
-#include "../playinggamestate.h"
-#include "../logiface.h"
-
 #include <qdebug.h>
 
 #include <algorithm>
@@ -14,6 +8,13 @@ using std::swap;
 #ifdef _DEBUG
 #include <cassert>
 #endif
+
+#include "location.h"
+#include "character.h"
+#include "item.h"
+
+#include "../playinggamestate.h"
+#include "../logiface.h"
 
 Scenery::Scenery(const string &name, const string &image_name, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio) :
     location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),

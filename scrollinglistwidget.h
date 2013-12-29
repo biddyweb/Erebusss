@@ -2,7 +2,7 @@
 
 #include <QListWidget>
 
-#include "common.h" // just to be safe for consistency, and ensure we get platform #defines...
+#include "common.h"
 
 class ScrollingListWidget : public QListWidget {
     Q_OBJECT

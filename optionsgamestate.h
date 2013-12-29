@@ -1,7 +1,5 @@
 #pragma once
 
-#include "common.h"
-
 #include <vector>
 using std::vector;
 
@@ -15,6 +13,8 @@ using std::vector;
 #else
 #include <QTextEdit>
 #endif
+
+#include "common.h"
 
 #include "gamestate.h"
 #include "scrollinglistwidget.h"

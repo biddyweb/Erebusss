@@ -1,12 +1,12 @@
+#include <QApplication>
+#include <QDir>
+#include <QTranslator>
+
 #include "common.h"
 #include "mainwindow.h"
 #include "qt_screen.h"
 #include "game.h"
 #include "logiface.h"
-
-#include <QApplication>
-#include <QDir>
-#include <QTranslator>
 
 /** Platform #defines:
   * smallscreen_c: whether the platform has a smallscreen or not (phones, handhelds).

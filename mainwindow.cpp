@@ -1,11 +1,11 @@
+#include <QApplication>
+#include <QDesktopWidget>
+
 #include "mainwindow.h"
 #include "qt_screen.h"
 #include "game.h"
 #include "gamestate.h"
 #include "logiface.h"
-
-#include <QApplication>
-#include <QDesktopWidget>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)/*, elapsed_time(0)*/

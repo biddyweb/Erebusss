@@ -1,7 +1,3 @@
-#include "qt_utils.h"
-#include "logiface.h"
-#include "rpg/utils.h"
-
 #include <string>
 using std::string;
 
@@ -10,6 +6,11 @@ using std::string;
 #ifdef _DEBUG
 #include <cassert>
 #endif
+
+#include "rpg/utils.h"
+
+#include "qt_utils.h"
+#include "logiface.h"
 
 int parseInt(const QString &str, bool allow_empty) {
     if( str.length() == 0 && allow_empty ) {

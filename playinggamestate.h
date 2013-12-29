@@ -1,6 +1,10 @@
 #pragma once
 
-#include "common.h"
+#include <sstream>
+using std::stringstream;
+
+#include <map>
+using std::map;
 
 #include <QGraphicsTextItem>
 #include <QGraphicsView>
@@ -18,20 +22,16 @@
 #include <QTextEdit>
 #endif
 
-#include <sstream>
-using std::stringstream;
-
-#include <map>
-using std::map;
-
 #include "common.h"
+
+#include "rpg/character.h"
+#include "rpg/location.h"
+#include "rpg/item.h"
+
 #include "gamestate.h"
 #include "scrollinglistwidget.h"
 #include "animatedobject.h"
 #include "maingraphicsview.h"
-#include "rpg/character.h"
-#include "rpg/location.h"
-#include "rpg/item.h"
 
 class MainGraphicsView;
 

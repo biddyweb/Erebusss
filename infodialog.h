@@ -1,14 +1,14 @@
 #pragma once
 
-#include "common.h"
-
-#include <QDialog>
-
 #include <string>
 using std::string;
 
 #include <vector>
 using std::vector;
+
+#include <QDialog>
+
+#include "common.h"
 
 #ifdef USING_WEBKIT
 class QWebView;

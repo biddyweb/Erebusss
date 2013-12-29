@@ -5,6 +5,8 @@ using std::vector;
 #include <map>
 using std::map;
 
+#include "../common.h"
+
 #include "utils.h"
 
 class Character;
