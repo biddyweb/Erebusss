@@ -73,6 +73,9 @@ public:
         return this->game_clock.isPaused();
     }
     void setPaused(bool paused, bool also_input);
+    void togglePaused() {
+        this->setPaused( !this->isPaused(), false );
+    }
     void restartElapsedTimer();
     void enableUpdateTimer(bool enabled);
     int getGameTimeFrameMS() const {
@@ -86,10 +89,5 @@ public:
     }
     void setGameTimeMultiplier(int multiplier) {
         this->game_clock.setMultiplier(multiplier);
-    }
-
-public slots:
-    void togglePaused() {
-        this->setPaused( !this->isPaused(), false );
     }
 };

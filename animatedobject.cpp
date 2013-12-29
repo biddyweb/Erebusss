@@ -3,7 +3,6 @@
 #include "animatedobject.h"
 #include "logiface.h"
 #include "game.h"
-#include "qt_screen.h"
 
 #if QT_VERSION < 0x050000
 #include <qmath.h>
@@ -165,7 +164,7 @@ void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
     if( phase == 1 ) {
         //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
-        int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
+        int time_elapsed_ms = game_g->getGameTimeTotalMS() - animation_time_start_ms;
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );
         if( n_frame != c_frame ) {
             c_frame = n_frame;
@@ -194,7 +193,7 @@ void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     int off_y = 0;
     if( this->bounce ) {
         const int scale = 4;
-        int time_elapsed_ms = game_g->getScreen()->getGameTimeTotalMS() - animation_time_start_ms;
+        int time_elapsed_ms = game_g->getGameTimeTotalMS() - animation_time_start_ms;
         off_y = (int)(sin( (((float)time_elapsed_ms)*2.0*M_PI)/1000.0f ) * scale);
         off_y -= scale/2;
     }
@@ -261,7 +260,7 @@ void AnimatedObject::setAnimationSet(const string &name, bool force_restart) {
     }*/
 
     if( is_new || force_restart ) {
-        animation_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
+        animation_time_start_ms = game_g->getGameTimeTotalMS();
         //this->setFrame(0);
         this->c_frame = 0;
         this->update();

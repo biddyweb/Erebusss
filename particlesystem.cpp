@@ -6,10 +6,9 @@
 
 #include "particlesystem.h"
 #include "game.h"
-#include "qt_screen.h"
 
 Particle::Particle() : xpos(0.0f), ypos(0.0f), xspeed(0.0f), yspeed(0.0f), birth_time(0), flag(false) {
-    this->birth_time = game_g->getScreen()->getGameTimeTotalMS();
+    this->birth_time = game_g->getGameTimeTotalMS();
 }
 
 void Particle::move(int loop_time) {
@@ -26,7 +25,7 @@ void ParticleSystem::advance(int phase) {
 }
 
 void ParticleSystem::moveParticles() {
-    int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
+    int real_loop_time = game_g->getGameTimeFrameMS();
     for(int i=0;i<particles.size();i++) {
         particles.at(i).move(real_loop_time);
     }
@@ -50,7 +49,7 @@ QRectF ParticleSystem::boundingRect() const {
 
 SmokeParticleSystem::SmokeParticleSystem(const QPixmap &pixmap, QGraphicsItem *parent) : ParticleSystem(pixmap, parent),
     type(TYPE_RISE), birth_rate(0.0f), life_exp(1500), last_emit_time(0) {
-    this->last_emit_time = game_g->getScreen()->getGameTimeTotalMS();
+    this->last_emit_time = game_g->getGameTimeTotalMS();
 }
 
 void SmokeParticleSystem::setBirthRate(float birth_rate) {
@@ -60,7 +59,7 @@ void SmokeParticleSystem::setBirthRate(float birth_rate) {
 void SmokeParticleSystem::updatePS() {
     //qDebug("smoke update");
     // expire old particles
-    int time_now = game_g->getScreen()->getGameTimeTotalMS();
+    int time_now = game_g->getGameTimeTotalMS();
     for(int i=particles.size()-1;i>=0;i--) { // count backwards in case of deletion
         if( time_now >= particles.at(i).getBirthTime() + life_exp ) {
             // for performance, we reorder and reduce the length by 1 (as the order of the particles shouldn't matter)
@@ -70,7 +69,7 @@ void SmokeParticleSystem::updatePS() {
     }
 
     if( type == TYPE_RISE ) {
-        int real_loop_time = game_g->getScreen()->getGameTimeFrameMS();
+        int real_loop_time = game_g->getGameTimeFrameMS();
         // update particle speed
         for(int i=0;i<particles.size();i++) {
             int prob = poisson(100, real_loop_time);
@@ -87,7 +86,7 @@ void SmokeParticleSystem::updatePS() {
     this->moveParticles();
 
     // emit new particles
-    int accumulated_time = game_g->getScreen()->getGameTimeTotalMS() - this->last_emit_time;
+    int accumulated_time = game_g->getGameTimeTotalMS() - this->last_emit_time;
     //qDebug("accumulated_time = %d - %d = %d", game_g->getScreen()->getGameTimeTotalMS(), this->last_emit_time, accumulated_time);
     int new_particles = (int)(this->birth_rate/1000.0f * accumulated_time);
     this->last_emit_time += (int)(1000.0f/birth_rate * new_particles);

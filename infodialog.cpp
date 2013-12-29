@@ -1,6 +1,5 @@
 #include "infodialog.h"
 #include "game.h"
-#include "qt_screen.h"
 #include "logiface.h"
 
 #include <QApplication>
@@ -173,8 +172,8 @@ int InfoDialog::exec() {
         game_g->recordTestInfoDialog();
         return 0;
     }
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
     int result = QDialog::exec();
-    game_g->getScreen()->setPaused(false, true);
+    game_g->setPaused(false, true);
     return result;
 }

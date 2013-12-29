@@ -76,7 +76,7 @@ Direction directionFromVecDir(Vector2D dir) {
 CharacterAction::CharacterAction(Type type, Character *source, Character *target_npc, float offset_y) : type(type), source(source), target_npc(target_npc), time_ms(0), duration_ms(0), offset_y(offset_y), hits(false), weapon_no_effect_magical(false), weapon_no_effect_holy(false), weapon_damage(0), spell(NULL), object(NULL) {
     this->source_pos = source->getPos();
     this->dest_pos = target_npc->getPos();
-    this->time_ms = game_g->getScreen()->getGameTimeTotalMS();
+    this->time_ms = game_g->getGameTimeTotalMS();
 }
 
 CharacterAction::~CharacterAction() {
@@ -107,7 +107,7 @@ void CharacterAction::update() {
         this->dest_pos = this->target_npc->getPos();
     }
     if( this->object != NULL ) {
-        int diff_ms = game_g->getScreen()->getGameTimeTotalMS() - this->time_ms;
+        int diff_ms = game_g->getGameTimeTotalMS() - this->time_ms;
         float alpha = ((float)diff_ms) / (float)duration_ms;
         alpha = std::max(alpha, 0.0f);
         alpha = std::min(alpha, 1.0f);
@@ -126,7 +126,7 @@ void CharacterAction::notifyDead(const Character *character) {
 }
 
 bool CharacterAction::isExpired() const {
-    if( game_g->getScreen()->getGameTimeTotalMS() >= time_ms + duration_ms ) {
+    if( game_g->getGameTimeTotalMS() >= time_ms + duration_ms ) {
         return true;
     }
     return false;
@@ -1918,7 +1918,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
 
         MainWindow *window = game_g->getScreen()->getMainWindow();
         window->setEnabled(false);
-        game_g->getScreen()->setPaused(true, true);
+        game_g->setPaused(true, true);
 
         {
 #if defined(Q_OS_SYMBIAN)
@@ -2871,7 +2871,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         }
 
         window->setEnabled(true);
-        game_g->getScreen()->setPaused(false, true);
+        game_g->setPaused(false, true);
 
         if( !is_savegame ) {
             //this->player->initialiseHealth(600); // CHEAT
@@ -4213,7 +4213,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -5085,7 +5085,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     this->setupView();
 
     window->setEnabled(true);
-    game_g->getScreen()->setPaused(false, true);
+    game_g->setPaused(false, true);
     game_g->getScreen()->restartElapsedTimer();
 
     //qApp->processEvents();
@@ -5116,7 +5116,7 @@ void PlayingGamestate::createRandomQuest() {
 
     MainWindow *window = game_g->getScreen()->getMainWindow();
     window->setEnabled(false);
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 
     gui_overlay->setProgress(0);
     qApp->processEvents();
@@ -5307,7 +5307,7 @@ void PlayingGamestate::createRandomQuest() {
     this->setupView();
 
     window->setEnabled(true);
-    game_g->getScreen()->setPaused(false, true);
+    game_g->setPaused(false, true);
     game_g->getScreen()->restartElapsedTimer();
 
     //qApp->processEvents();
@@ -5576,7 +5576,7 @@ void PlayingGamestate::clickedStats() {
     this->closeSubWindow();
 
     new StatsWindow(this);
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 }
 
 void PlayingGamestate::clickedItems() {
@@ -5584,7 +5584,7 @@ void PlayingGamestate::clickedItems() {
     this->closeSubWindow();
 
     new ItemsWindow(this);
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 }
 
 void PlayingGamestate::clickedJournal() {
@@ -5605,8 +5605,8 @@ void PlayingGamestate::clickedJournal() {
 
 void PlayingGamestate::clickedPause() {
     LOG("clickedPause()\n");
-    game_g->getScreen()->togglePaused();
-    if( game_g->getScreen()->isPaused() ) {
+    game_g->togglePaused();
+    if( game_g->isPaused() ) {
         this->displayPausedMessage();
     }
 }
@@ -5615,7 +5615,7 @@ void PlayingGamestate::clickedOptions() {
     LOG("clickedOptions()\n");
     this->closeSubWindow();
 
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 
     QWidget *subwindow = new CloseSubWindowWidget(this);
     this->addWidget(subwindow, false);
@@ -5764,7 +5764,7 @@ void PlayingGamestate::showInfoWindow(const string &html, bool scroll_to_end) {
     // n.b., different to showInfoDialog, as this doesn't block and wait for an answer
     qDebug("showInfoWindow()\n");
 
-    game_g->getScreen()->setPaused(true, true);
+    game_g->setPaused(true, true);
 
     QWidget *subwindow = new CloseSubWindowWidget(this);
 
@@ -5813,7 +5813,7 @@ void PlayingGamestate::closeSubWindow() {
         this->widget_stack.erase( this->widget_stack.begin() + n_stacked_widgets-1 );
         if( n_stacked_widgets == 2 ) {
             game_g->getScreen()->getMainWindow()->activateWindow(); // needed for Symbian at least
-            game_g->getScreen()->setPaused(false, true);
+            game_g->setPaused(false, true);
             this->view->setEnabled(true);
             this->view->grabKeyboard();
         }
@@ -5834,7 +5834,7 @@ void PlayingGamestate::closeAllSubWindows() {
         subwindow->deleteLater();
         this->widget_stack.erase(this->widget_stack.begin()+this->widget_stack.size()-1);
     }
-    game_g->getScreen()->setPaused(false, true);
+    game_g->setPaused(false, true);
     this->view->setEnabled(true);
     this->view->grabKeyboard();
 }
@@ -5898,7 +5898,7 @@ void PlayingGamestate::update() {
     }
 //#define TIMING_INFO
 
-    const int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+    const int elapsed_ms = game_g->getGameTimeTotalMS();
 
     //qDebug("PlayingGamestate::update()");
     bool do_complex_update = false;
@@ -5912,7 +5912,7 @@ void PlayingGamestate::update() {
 #endif
     if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
         if( time_last_complex_update_ms == 0 ) {
-            complex_time_ms = game_g->getScreen()->getGameTimeFrameMS();
+            complex_time_ms = game_g->getGameTimeFrameMS();
         }
         else {
             complex_time_ms = elapsed_ms - time_last_complex_update_ms;
@@ -6263,7 +6263,7 @@ void PlayingGamestate::updateInput() {
 
     // scroll
     bool scrolled = false;
-    int real_time_ms = game_g->getScreen()->getInputTimeFrameMS();
+    int real_time_ms = game_g->getInputTimeFrameMS();
     float speed = (4.0f * real_time_ms)/1000.0f;
     if( !touchscreen_c ) {
         // scroll due to mouse at edge of screen
@@ -6604,7 +6604,7 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     }
     else if( pickup_items.size() > 1 ) {
         new ItemsPickerWindow(this, pickup_items);
-        game_g->getScreen()->setPaused(true, true);
+        game_g->setPaused(true, true);
     }
     return done;
 }
@@ -6747,7 +6747,7 @@ bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *s
             game_g->stopSound(music_key_combat_c);
             music_mode = MUSICMODE_SILENCE;
             new CampaignWindow(this);
-            game_g->getScreen()->setPaused(true, true);
+            game_g->setPaused(true, true);
             this->time_hours += 48 + this->getRestTime();
             this->player->restoreHealth();
             this->player->expireProfileEffects();
@@ -6991,8 +6991,8 @@ void PlayingGamestate::cycleTargetNPC() {
 }
 
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
-    if( game_g->getScreen()->isPaused() ) {
-        game_g->getScreen()->setPaused(false, false);
+    if( game_g->isPaused() ) {
+        game_g->setPaused(false, false);
     }
 
     if( player != NULL && !player->isDead() && !player->isParalysed() ) {
@@ -7642,7 +7642,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
                 //fprintf(file, " is_paralysed=\"true\"");
                 stream << " is_paralysed=\"true\"";
                 //fprintf(file, " paralysed_time=\"%d\"", character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS());
-                stream << " paralysed_time=\"" << (character->getParalysedUntil() - game_g->getScreen()->getGameTimeTotalMS()) << "\"";
+                stream << " paralysed_time=\"" << (character->getParalysedUntil() - game_g->getGameTimeTotalMS()) << "\"";
             }
             if( character->isDiseased() ) {
                 //fprintf(file, " is_diseased=\"true\"");

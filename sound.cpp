@@ -1,6 +1,5 @@
 #include "sound.h"
 #include "game.h"
-#include "qt_screen.h"
 
 #ifndef Q_OS_ANDROID
 Sound::Sound(const string &filename, bool stream) : volume(1.0f), stream(stream), is_fading(false), fade_start_time(-1), fade_end_time(-1) {
@@ -23,7 +22,7 @@ void Sound::updateVolume() {
     int scale = stream ? game_g->getGlobalSoundVolumeMusic() : game_g->getGlobalSoundVolumeEffects();
     real_volume = ((float)scale)/100.0f * real_volume;
     if( is_fading ) {
-        int time = game_g->getScreen()->getGameTimeTotalMS();
+        int time = game_g->getGameTimeTotalMS();
         if( time >= this->fade_end_time )
             real_volume = 0.0f;
         else {
@@ -44,13 +43,13 @@ void Sound::setVolume(float volume) {
 
 void Sound::fadeOut(int delay) {
     this->is_fading = true;
-    this->fade_start_time = game_g->getScreen()->getGameTimeTotalMS();
+    this->fade_start_time = game_g->getGameTimeTotalMS();
     this->fade_end_time = fade_start_time + delay;
 }
 
 bool Sound::update() {
     if( this->is_fading ) {
-        int time = game_g->getScreen()->getGameTimeTotalMS();
+        int time = game_g->getGameTimeTotalMS();
         if( time >= fade_end_time ) {
             this->stop();
             return true;

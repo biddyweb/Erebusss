@@ -212,6 +212,13 @@ public:
     const Screen *getScreen() const {
         return this->screen;
     }
+    bool isPaused() const;
+    void setPaused(bool paused, bool also_input);
+    void togglePaused();
+    int getGameTimeFrameMS() const;
+    int getGameTimeTotalMS() const;
+    int getInputTimeFrameMS() const;
+
     QFont getFontScene() const {
         return this->font_scene;
     }

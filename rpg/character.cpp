@@ -3,7 +3,6 @@
 #include "item.h"
 #include "../game.h"
 #include "../playinggamestate.h"
-#include "../qt_screen.h"
 #include "../logiface.h"
 
 #include <cmath>
@@ -138,7 +137,7 @@ int CharacterTemplate::getTemplateGold() const {
 }
 
 ProfileEffect::ProfileEffect(const Profile &profile, int duration_ms) : profile(profile), expires_ms(0) {
-    this->expires_ms = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
+    this->expires_ms = game_g->getGameTimeTotalMS() + duration_ms;
 }
 
 // this is not the only Character constructor!
@@ -382,7 +381,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         qDebug("Character::update() for the player");
     }*/
 
-    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+    int elapsed_ms = game_g->getGameTimeTotalMS();
 
     // expire profile effects
     // count backwards, so we can delete
@@ -840,7 +839,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
         else if( this->path.size() > 0 ) {
             Vector2D dest = this->path.at(0);
             Vector2D diff = dest - this->pos;
-            int time_ms = game_g->getScreen()->getGameTimeFrameMS();
+            int time_ms = game_g->getGameTimeFrameMS();
             //float step = 0.002f * time_ms;
             //float step = (this->getSpeed() * time_ms)/1000.0f;
             float step = (this->getProfileFloatProperty(profile_key_Sp_c) * time_ms)/1000.0f;
@@ -1094,7 +1093,7 @@ void Character::setDirection(Vector2D dir) {
 void Character::kill(PlayingGamestate *playing_gamestate) {
     this->health = 0;
     LOG("%s has died\n", this->getName().c_str());
-    int elapsed_ms = game_g->getScreen()->getGameTimeTotalMS();
+    int elapsed_ms = game_g->getGameTimeTotalMS();
     this->is_dead = true;
     this->time_of_death_ms = elapsed_ms;
     if( this->listener != NULL ) {
@@ -1321,7 +1320,7 @@ int Character::calculateItemsWeight() const {
 void Character::paralyse(int time_ms) {
     this->setStateIdle();
     this->is_paralysed = true;
-    this->paralysed_until = game_g->getScreen()->getGameTimeTotalMS() + time_ms;
+    this->paralysed_until = game_g->getGameTimeTotalMS() + time_ms;
     //qDebug("%d, %d", paralysed_until, time_ms);
 }
 
@@ -1463,7 +1462,7 @@ void Character::advanceLevel(PlayingGamestate *playing_gamestate) {
     if( this == playing_gamestate->getPlayer() ) {
         LOG("player advances to level %d (xp %d)\n", level, xp);
         new LevelUpWindow(playing_gamestate);
-        game_g->getScreen()->setPaused(true, true);
+        game_g->setPaused(true, true);
     }
 }
 

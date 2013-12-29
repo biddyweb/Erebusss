@@ -3,7 +3,6 @@
 #include "maingraphicsview.h"
 #include "playinggamestate.h"
 #include "game.h"
-#include "qt_screen.h"
 #include "logiface.h"
 
 const float MainGraphicsView::min_zoom_c = 10.0f;
@@ -13,7 +12,7 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
     QGraphicsTextItem(text), time_expire(0), view(view) {
 
     this->setDefaultTextColor(color);
-    this->time_expire = game_g->getScreen()->getGameTimeTotalMS() + duration_ms;
+    this->time_expire = game_g->getGameTimeTotalMS() + duration_ms;
     //this->setFont(game_g->getFontStd());
     //this->setFont(game_g->getFontSmall());
     this->setFont(game_g->getFontScene());
@@ -35,7 +34,7 @@ TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration
 
 void TextEffect::advance(int phase) {
     if( phase == 0 ) {
-        if( game_g->getScreen()->getGameTimeTotalMS() >= time_expire ) {
+        if( game_g->getGameTimeTotalMS() >= time_expire ) {
             this->view->removeTextEffect(this);
             this->deleteLater();
         }
@@ -214,7 +213,7 @@ void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
 
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
-                int time_ms = game_g->getScreen()->getInputTimeFrameMS();
+                int time_ms = game_g->getInputTimeFrameMS();
                 if( time_ms > 0 ) {
                     diff /= (float)time_ms;
                     this->has_kinetic_scroll = true;
@@ -328,10 +327,10 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
 
 void MainGraphicsView::keyPressEvent(QKeyEvent *event) {
     //qDebug("MainGraphicsView::keyPressEvent: %d", event->key());
-    if( game_g->getScreen()->isPaused() && event->key() != Qt::Key_Control && event->key() != Qt::Key_Alt ) {
+    if( game_g->isPaused() && event->key() != Qt::Key_Control && event->key() != Qt::Key_Alt ) {
         // Qt::Key_Control, Qt::Key_Alt produced when doing multitouch zoom in/out for some reason?!
         //qDebug("unpause");
-        game_g->getScreen()->setPaused(false, false);
+        game_g->setPaused(false, false);
     }
 
     bool done = handleKey(event, true);
@@ -403,8 +402,8 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
 #ifndef Q_OS_SYMBIAN
         // Symbian (at least Nokia 5800) fails to create large pixmap, when zoomed in (larger than the screen).
         // This is only a minor performance improvement anyway.
-        if( !this->calculated_lighting_pixmap_scaled && game_g->getScreen()->getGameTimeTotalMS() > lasttime_calculated_lighting_pixmap_scaled_ms + 1000 ) {
-            this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS();
+        if( !this->calculated_lighting_pixmap_scaled && game_g->getGameTimeTotalMS() > lasttime_calculated_lighting_pixmap_scaled_ms + 1000 ) {
+            this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getGameTimeTotalMS();
             //qDebug("scale pixmap from %d to %d", lighting_pixmap.width(), 2*radius);
             this->lighting_pixmap_scaled = lighting_pixmap.scaledToWidth(2*radius);
             //qDebug("    done");
@@ -468,7 +467,7 @@ void MainGraphicsView::updateInput() {
         float speed = (4.0f * time_ms)/1000.0f;*/
         //if( fabs(this->kinetic_scroll_x) >= 0.0f && fabs(this->kinetic_scroll_y) >= 0.0f ) {
         if( this->has_kinetic_scroll ) {
-            int time_ms = game_g->getScreen()->getInputTimeFrameMS();
+            int time_ms = game_g->getInputTimeFrameMS();
             //qDebug("centre was: %f, %f", centre.x(), centre.y());
             float step = time_ms*this->kinetic_scroll_speed;
             float move_x = step * this->kinetic_scroll_dir.x;
@@ -500,7 +499,7 @@ void MainGraphicsView::updateInput() {
 void MainGraphicsView::setScale(float c_scale) {
     LOG("MainGraphicsView::setScale(%f)\n", c_scale);
     this->calculated_lighting_pixmap_scaled = false;
-    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
+    this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     this->c_scale = c_scale;
     this->c_scale = std::min(this->c_scale, max_zoom_c);
     this->c_scale = std::max(this->c_scale, min_zoom_c);
@@ -642,7 +641,7 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
 
     if( this->has_fade ) {
         const int duration_ms = 1000;
-        int time_diff_ms = game_g->getScreen()->getGameTimeTotalMS() - this->fade_time_start_ms;
+        int time_diff_ms = game_g->getGameTimeTotalMS() - this->fade_time_start_ms;
         if( time_diff_ms >= duration_ms ) {
             if( this->fade_in ) {
                 this->has_fade = false;
@@ -722,13 +721,13 @@ void GUIOverlay::setProgress(int progress_percent) {
 void GUIOverlay::setFadeIn() {
     this->has_fade = true;
     this->fade_in = true;
-    this->fade_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
+    this->fade_time_start_ms = game_g->getGameTimeTotalMS();
 }
 
 void GUIOverlay::setFadeOut() {
     this->has_fade = true;
     this->fade_in = false;
-    this->fade_time_start_ms = game_g->getScreen()->getGameTimeTotalMS();
+    this->fade_time_start_ms = game_g->getGameTimeTotalMS();
 }
 
 /*void GUIOverlayItem::advance(int phase) {

@@ -461,7 +461,7 @@ void Game::init(bool fullscreen) {
     LOG("lightdistribution? %d\n", lightdistribution_c);
 
     // setup fonts
-    MainWindow *window = game_g->getScreen()->getMainWindow();
+    const MainWindow *window = this->screen->getMainWindow();
     // palettes disabled for now - problems with differences between platforms, plus setting it for this window doesn't apply to the subwindows that we open up
     /*{
         QPalette palette = window->palette();
@@ -569,6 +569,30 @@ void Game::init(bool fullscreen) {
     loadPortraits();
 }
 
+bool Game::isPaused() const {
+    return this->screen->isPaused();
+}
+
+void Game::setPaused(bool paused, bool also_input) {
+    this->screen->setPaused(paused, also_input);
+}
+
+void Game::togglePaused() {
+    this->screen->togglePaused();
+}
+
+int Game::getGameTimeFrameMS() const {
+    return this->screen->getGameTimeFrameMS();
+}
+
+int Game::getGameTimeTotalMS() const {
+    return this->screen->getGameTimeTotalMS();
+}
+
+int Game::getInputTimeFrameMS() const {
+    return this->screen->getInputTimeFrameMS();
+}
+
 #ifdef USING_WEBKIT
 void Game::setWebView(QWebView *webView) {
 #ifdef Q_OS_ANDROID
@@ -620,7 +644,7 @@ void Game::run(bool fullscreen) {
     }
     catch(string &error) {
         LOG("exception creating initial gamestate: %s\n", error.c_str());
-        this->getScreen()->getMainWindow()->unsetCursor();
+        this->screen->getMainWindow()->unsetCursor();
 
         stringstream str;
         str << "Failed to start game:\n" << error;
@@ -630,7 +654,7 @@ void Game::run(bool fullscreen) {
     }
     catch(...) {
         LOG("unexpected exception creating initial gamestate\n");
-        this->getScreen()->getMainWindow()->unsetCursor();
+        this->screen->getMainWindow()->unsetCursor();
 
         stringstream str;
         str << "Unexpected error starting game!\n";
@@ -2045,7 +2069,7 @@ void Game::handleMessages() {
                 else {
                     ASSERT_LOGGER(false);
                 }
-                this->getScreen()->getMainWindow()->unsetCursor();
+                this->screen->getMainWindow()->unsetCursor();
                 break;
             }
             case GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD:
@@ -2058,11 +2082,11 @@ void Game::handleMessages() {
                 QString full_filename = this->getApplicationFilename(savegame_folder + load_message->getFilename());
                 try {
                     playing_gamestate->loadQuest(full_filename, true);
-                    this->getScreen()->getMainWindow()->unsetCursor();
+                    this->screen->getMainWindow()->unsetCursor();
                 }
                 catch(string &error) {
                     LOG("exception creating new gamestate when loading: %s\n", error.c_str());
-                    this->getScreen()->getMainWindow()->unsetCursor();
+                    this->screen->getMainWindow()->unsetCursor();
                     stringstream str;
                     str << "Failed to load save game file:\n" << error;
 #ifdef Q_OS_ANDROID
@@ -2087,7 +2111,7 @@ void Game::handleMessages() {
         }
         catch(string &error) {
             LOG("exception creating new gamestate: %s\n", error.c_str());
-            this->getScreen()->getMainWindow()->unsetCursor();
+            this->screen->getMainWindow()->unsetCursor();
             if( gamestate != NULL ) {
                 LOG("deleting gamestate");
                 delete gamestate;
@@ -2101,7 +2125,7 @@ void Game::handleMessages() {
         }
         catch(...) {
             LOG("unexpected exception creating new gamestate\n");
-            this->getScreen()->getMainWindow()->unsetCursor();
+            this->screen->getMainWindow()->unsetCursor();
             if( gamestate != NULL ) {
                 LOG("deleting gamestate");
                 delete gamestate;
@@ -2503,17 +2527,17 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
 
 void Game::showErrorDialog(const string &message) {
     LOG("Game::showErrorDialog: %s\n", message.c_str());
-    this->getScreen()->enableUpdateTimer(false);
-    QMessageBox::critical(this->getScreen()->getMainWindow(), "Error", message.c_str());
-    this->getScreen()->enableUpdateTimer(true);
+    this->screen->enableUpdateTimer(false);
+    QMessageBox::critical(this->screen->getMainWindow(), "Error", message.c_str());
+    this->screen->enableUpdateTimer(true);
 }
 
 void Game::activate(bool active) {
-    this->getScreen()->enableUpdateTimer(active);
+    this->screen->enableUpdateTimer(active);
     bool newly_paused = false;
     if( !active ) {
-        newly_paused = !this->getScreen()->isPaused();
-        this->getScreen()->setPaused(true, false); // automatically pause when application goes inactive
+        newly_paused = !this->screen->isPaused();
+        this->screen->setPaused(true, false); // automatically pause when application goes inactive
 #ifndef Q_OS_ANDROID
         if( this->current_stream_sound_effect.length() > 0 ) {
             // pause current stream
