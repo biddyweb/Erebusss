@@ -576,8 +576,8 @@ enum TestID {
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
-  TEST_LOADSAVEWRITEQUEST_0_UNARMED - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed
-  TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN - as TEST_LOADSAVEWRITEQUEST_0_UNARMED, but checks that Barbarian doesn't have FP penalty for being unarmed
+  TEST_LOADSAVEWRITEQUEST_0_UNARMED - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed; also test that Warrior gets FP bonus when armed with shield
+  TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN - as TEST_LOADSAVEWRITEQUEST_0_UNARMED, but checks that Barbarian doesn't have FP penalty for being unarmed, and doesn't get FP bonus when armed with shield
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
@@ -883,7 +883,10 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     else if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ) {
         Character *player = playing_gamestate->getPlayer();
         // check skill is as expected
-        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN && !player->hasSkill(::skill_unarmed_combat_c) ) {
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED && !player->hasSkill(skill_shield_combat_c) ) {
+            throw string("player doesn't have unarmed combat skill");
+        }
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN && !player->hasSkill(skill_unarmed_combat_c) ) {
             throw string("player doesn't have unarmed combat skill");
         }
         int base_fp = player->getBaseProfileIntProperty(profile_key_FP_c);
@@ -897,6 +900,20 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         int exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED) ? base_fp-2 : base_fp;
         if( fp != exp_fp ) {
             throw string("player unarmed fp " + numberToString(fp) + " is not " + numberToString(exp_fp) + " as expected, base fp was " + numberToString(base_fp));
+        }
+        // now rearm, and add a shield, and check we get a bonus (except for barbarian)
+        player->addItem(playing_gamestate->cloneStandardItem("Long Sword"), true);
+        player->addItem(playing_gamestate->cloneStandardItem("Shield"), true);
+        if( player->getCurrentWeapon() == NULL ) {
+            throw string("failed to arm player with weapon");
+        }
+        if( player->getCurrentShield() == NULL ) {
+            throw string("failed to arm player with shield");
+        }
+        fp = player->getProfileIntProperty(profile_key_FP_c);
+        exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED) ? base_fp+1 : base_fp;
+        if( fp != exp_fp ) {
+            throw string("player with shield fp " + numberToString(fp) + " is not " + numberToString(exp_fp) + " as expected, base fp was " + numberToString(base_fp));
         }
 
         Location *location = playing_gamestate->getCLocation();
@@ -1837,7 +1854,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         //runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN);
 }
 
 void Game::initButton(QWidget *button) const {
