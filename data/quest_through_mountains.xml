@@ -142,6 +142,7 @@ That's the one! Here, have one of my potions as a reward.
 
 <scenery name="Barrel" image_name="barrel" x="25.5" y="24.5" size="0.8" blocking="true">
     <gold amount="2"/>
+    <item template="Mushroom"/>
 </scenery>
 <scenery name="Crate" image_name="crate" x="25.5" y="25.5" size="0.8" blocking="true">
     <item template="Plate"/>
@@ -151,6 +152,7 @@ That's the one! Here, have one of my potions as a reward.
 </scenery>
 <scenery name="Barrel" image_name="barrel" x="24.5" y="26.5" size="0.8" blocking="true">
     <gold amount="3"/>
+    <item template="Mushroom"/>
 </scenery>
 <scenery name="Crate" image_name="crate" x="23.5" y="26.5" size="0.8" blocking="true">
     <gold amount="12"/>
@@ -284,6 +286,8 @@ Thank you for helping me!
 
 <floorregion shape="rect" rect_x="33.0" rect_y="22.0" rect_w="3.0" rect_h="4.0"/>
 
+<item template="Mushroom" x="34.0" y="23.0"/>
+
 <floorregion shape="polygon">
     <floorregion_point x="37.0" y="20.0" />
     <floorregion_point x="39.0" y="20.0" />
@@ -348,6 +352,10 @@ Thank you for helping me!
 <scenery name="Door" image_name="door_wood" x="13.95" y="26.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="9.0" rect_y="24.0" rect_w="4.0" rect_h="4.0"/>
+
+<item template="Mushroom" x="9.3" y="27.5"/>
+
+<item template="Mushroom" x="9.5" y="26.5"/>
 
 <scenery name="Crate" image_name="crate" x="9.5" y="25.0" size="0.8" blocking="true">
     <gold amount="11"/>
