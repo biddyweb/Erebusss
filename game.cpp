@@ -2275,6 +2275,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setBiography(PlayingGamestate::tr("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.").toStdString());
         character->setPortrait("portrait_barbarian");
         character->setAnimationFolder("isometric_hero");
+        character->addGold( rollDice(2, 6, 10) );
     }
     else if( player_type == "Elf" ) {
         character->initialiseProfile(1, 7, 8, 6, 1, 8, 7, 8, 2.25f);
@@ -2283,6 +2284,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setBiography(PlayingGamestate::tr("You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.").toStdString());
         character->setPortrait("portrait_elf");
         character->setAnimationFolder("isometric_heroine");
+        character->addGold( rollDice(2, 6, 10) );
     }
     else if( player_type == "Halfling" ) {
         character->initialiseProfile(1, 6, 7, 5, 1, 7, 10, 7, 1.8f);
@@ -2292,6 +2294,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setBiography(PlayingGamestate::tr("Halflings do not make great warriors and make unlikely adventurers, but they are suprisingly hardy, and their special skills can help them succeed where others might fail.").toStdString());
         character->setPortrait("portrait_halfling");
         character->setAnimationFolder("isometric_heroine");
+        character->addGold( rollDice(2, 6, 20) );
     }
     else if( player_type == "Ranger" ) {
         character->initialiseProfile(1, 7, 8, 7, 1, 7, 8, 6, 2.2f);
@@ -2301,6 +2304,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setBiography(PlayingGamestate::tr("You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.").toStdString());
         character->setPortrait("portrait_ranger");
         character->setAnimationFolder("isometric_hero");
+        character->addGold( rollDice(2, 6, 10) );
     }
     else if( player_type == "Warrior" ) {
         character->initialiseProfile(1, 8, 7, 7, 1, 6, 7, 7, 2.0f);
@@ -2309,13 +2313,13 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setBiography(PlayingGamestate::tr("You come from the great city of Eastport. At a young age, you joined the army where you were trained how to fight, and saw combat in wars with Orcs to the north. After completing your service of seven years, you now work independently, hoping to find riches in return for your services.").toStdString());
         character->setPortrait("portrait_warrior");
         character->setAnimationFolder("isometric_hero");
+        character->addGold( rollDice(2, 6, 10) );
     }
     else {
         ASSERT_LOGGER(false);
     }
 
     //character->initialiseHealth(600); // CHEAT
-    character->addGold( rollDice(2, 6, 10) );
     //character->addGold( 333 ); // CHEAT, simulate start of quest 2
     //character->setXP(68); // CHEAT, simulate start of quest 2
     //character->addGold( 1000 ); // CHEAT
