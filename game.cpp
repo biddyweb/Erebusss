@@ -518,13 +518,14 @@ enum TestID {
     TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
     TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 49,
     TEST_LOADSAVEWRITEQUEST_0_UNARMED = 50,
-    TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 51,
-    TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 52,
-    TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 53,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 54,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 55,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 56,
-    N_TESTS = 57
+    TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN = 51,
+    TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 52,
+    TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 53,
+    TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 54,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 55,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 56,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 57,
+    N_TESTS = 58
 };
 
 /**
@@ -576,6 +577,7 @@ enum TestID {
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
   TEST_LOADSAVEWRITEQUEST_0_UNARMED - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed
+  TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN - as TEST_LOADSAVEWRITEQUEST_0_UNARMED, but checks that Barbarian doesn't have FP penalty for being unarmed
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
@@ -878,18 +880,23 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("expected quest to be completed now");
         }
     }
-    else if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED ) {
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ) {
         Character *player = playing_gamestate->getPlayer();
+        // check skill is as expected
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN && !player->hasSkill(::skill_unarmed_combat_c) ) {
+            throw string("player doesn't have unarmed combat skill");
+        }
         int base_fp = player->getBaseProfileIntProperty(profile_key_FP_c);
         int fp = player->getProfileIntProperty(profile_key_FP_c);
         if( fp != base_fp ) {
             throw string("player fp " + numberToString(fp) + " is different to base fp " + numberToString(base_fp));
         }
-        // now disarm, and check we get a penalty
+        // now disarm, and check we get a penalty (except for barbarian)
         player->armWeapon(NULL);
         fp = player->getProfileIntProperty(profile_key_FP_c);
-        if( fp != base_fp-2 ) {
-            throw string("player unarmed fp " + numberToString(fp) + " is not as expected");
+        int exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED) ? base_fp-2 : base_fp;
+        if( fp != exp_fp ) {
+            throw string("player unarmed fp " + numberToString(fp) + " is not " + numberToString(exp_fp) + " as expected, base fp was " + numberToString(base_fp));
         }
 
         Location *location = playing_gamestate->getCLocation();
@@ -1687,6 +1694,7 @@ void Game::runTest(const string &filename, int test_id) {
         }
         else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
@@ -1699,11 +1707,14 @@ void Game::runTest(const string &filename, int test_id) {
 
             // load
             LOG("1 load\n");
-            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
+            string player = "Warrior";
+            if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN )
+                player = "Barbarian";
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             gamestate = playing_gamestate;
 
             QString qt_filename;
-            if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED ) {
+            if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
@@ -1728,7 +1739,7 @@ void Game::runTest(const string &filename, int test_id) {
 
             // load
             LOG("3 load\n");
-            playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
+            playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             gamestate = playing_gamestate;
 
             playing_gamestate->loadQuest(qt_filename, false);
@@ -1824,10 +1835,9 @@ void Game::runTests() {
 
     this->init(true); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
-        runTest(filename, i);
+        //runTest(filename, i);
     }
-    //runTest(filename, ::TEST_LOADSAVEQUEST_0);
-    //runTest(filename, ::TEST_LOADSAVE_ACTION_LAST_TIME_BUG);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED);
 }
 
 void Game::initButton(QWidget *button) const {
