@@ -551,6 +551,7 @@ public:
 
     void showInfoDialog(const string &message);
     void showInfoDialog(const string &message, const string &picture);
+    void showInfoDialog(const string &message, const QPixmap *pixmap);
     bool askQuestionDialog(const string &message);
 
     void writeJournal(const string &text) {

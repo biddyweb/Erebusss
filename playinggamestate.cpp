@@ -834,7 +834,7 @@ void ItemsWindow::clickedInfo() {
     const Item *item = list_items.at(index);
     string info = item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
-    playing_gamestate->showInfoWindow(info);
+    playing_gamestate->showInfoDialog(info, &playing_gamestate->getItemImage(item->getImageName()));
 }
 
 void ItemsWindow::itemIsDeleted(size_t index) {
@@ -1101,7 +1101,7 @@ void TradeWindow::clickedInfo() {
     const Item *selected_item = items.at(index);
     string info = selected_item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
-    playing_gamestate->showInfoWindow(info);
+    playing_gamestate->showInfoDialog(info, &playing_gamestate->getItemImage(selected_item->getImageName()));
 }
 
 ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector<Item *> items) :
@@ -1307,7 +1307,7 @@ void ItemsPickerWindow::clickedInfo() {
     const Item *selected_item = items.at(index);
     string info = selected_item->getDetailedDescription(playing_gamestate->getPlayer());
     info = convertToHTML(info);
-    playing_gamestate->showInfoWindow(info);
+    playing_gamestate->showInfoDialog(info, &playing_gamestate->getItemImage(selected_item->getImageName()));
 }
 
 void ItemsPickerWindow::setWeightLabel() {
@@ -6506,7 +6506,7 @@ void PlayingGamestate::clickedOnNPC(Character *character) {
                         }
                     }
                     buttons.push_back(tr("Goodbye").toStdString());
-                    InfoDialog *dialog = new InfoDialog(message.str(), "", buttons, false, true, true);
+                    InfoDialog *dialog = new InfoDialog(message.str(), "", NULL, buttons, false, true, true);
                     this->addWidget(dialog, false);
                     dialog->scrollToBottom();
                     int result = dialog->exec();
@@ -6787,7 +6787,7 @@ bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *s
             else {
                 //if( this->askQuestionDialog(dialog_text) ) {
                 //InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(dialog_text);
-                InfoDialog *dialog = new InfoDialog(dialog_text, "", options, false, false, true);
+                InfoDialog *dialog = new InfoDialog(dialog_text, "", NULL, options, false, false, true);
                 this->addWidget(dialog, false);
                 int result = dialog->exec();
                 LOG("scenery iteraction dialog returns %d\n", result);
@@ -8265,6 +8265,14 @@ void PlayingGamestate::showInfoDialog(const string &message) {
 void PlayingGamestate::showInfoDialog(const string &message, const string &picture) {
     LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
     InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message, picture);
+    this->addWidget(dialog, false);
+    dialog->exec();
+    this->closeSubWindow();
+}
+
+void PlayingGamestate::showInfoDialog(const string &message, const QPixmap *pixmap) {
+    LOG("PlayingGamestate::showInfoDialog(%s)\n", message.c_str());
+    InfoDialog *dialog = InfoDialog::createInfoDialogOkay(message, pixmap);
     this->addWidget(dialog, false);
     dialog->exec();
     this->closeSubWindow();

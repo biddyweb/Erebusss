@@ -14,23 +14,27 @@ using std::stringstream;
 #include "game.h"
 #include "logiface.h"
 
-InfoDialog::InfoDialog(const string &text, const string &picture, const vector<string> &buttons, bool horiz, bool small_buttons, bool numbered_shortcuts) {
+InfoDialog::InfoDialog(const string &text, const string &picture, const QPixmap *pixmap_ptr, const vector<string> &buttons, bool horiz, bool small_buttons, bool numbered_shortcuts) {
     QVBoxLayout *layout = new QVBoxLayout();
     this->setLayout(layout);
 
-    if( picture.length() > 0 ) {
+    if( picture.length() > 0 || pixmap_ptr != NULL ) {
         /*QPicture pic;
         if( !pic.load(picture.c_str()) ) {
             throw string("failed to load image");
         }*/
         try {
-            QPixmap pixmap = game_g->loadImage(picture);
+            QPixmap pixmap = pixmap_ptr != NULL ? *pixmap_ptr : game_g->loadImage(picture);
             QLabel *picture_label = new QLabel();
             //picture_label->setPicture(pic);
             int height = QApplication::desktop()->availableGeometry().height();
+            int min_pic_height = height/10;
             int max_pic_height = height/3;
             if( pixmap.height() > max_pic_height ) {
                 pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+            }
+            else if( pixmap.height() < min_pic_height ) {
+                pixmap = pixmap.scaledToHeight(min_pic_height, Qt::SmoothTransformation);
             }
             picture_label->setPixmap(pixmap);
             layout->addWidget(picture_label);
@@ -108,18 +112,24 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const vector<s
 InfoDialog *InfoDialog::createInfoDialogOkay(const string &text, const string &picture) {
     vector<string> buttons;
     buttons.push_back("Okay");
-    return new InfoDialog(text, picture, buttons, true, false, false);
+    return new InfoDialog(text, picture, NULL, buttons, true, false, false);
 }
 
 InfoDialog *InfoDialog::createInfoDialogOkay(const string &text) {
     return createInfoDialogOkay(text, "");
 }
 
+InfoDialog *InfoDialog::createInfoDialogOkay(const string &text, const QPixmap *pixmap) {
+    vector<string> buttons;
+    buttons.push_back("Okay");
+    return new InfoDialog(text, "", pixmap, buttons, true, false, false);
+}
+
 InfoDialog *InfoDialog::createInfoDialogYesNo(const string &text) {
     vector<string> buttons;
     buttons.push_back("Yes");
     buttons.push_back("No");
-    return new InfoDialog(text, "", buttons, true, false, false);
+    return new InfoDialog(text, "", NULL, buttons, true, false, false);
 }
 
 void InfoDialog::reject() {
