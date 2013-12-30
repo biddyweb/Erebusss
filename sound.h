@@ -3,6 +3,8 @@
 #include <string>
 using std::string;
 
+#include "common.h"
+
 // SFML not supported on Qt Android
 #ifdef Q_OS_ANDROID
 
@@ -15,8 +17,6 @@ using std::string;
 #include <SFML/Audio.hpp>
 
 #endif
-
-#include "common.h"
 
 class Sound {
 #ifndef Q_OS_ANDROID
