@@ -37,6 +37,8 @@ string getSkillLongString(const string &key) {
         return "Luck";
     else if( key == skill_fast_shooter_c )
         return "Fast Shooter";
+    else if( key == skill_charge_c )
+        return "Charge";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -56,6 +58,8 @@ string getSkillDescription(const string &key) {
         return "You are luckier than most. If something causes you enough injury to kill you, there is a 50% chance you are not harmed.";
     else if( key == skill_fast_shooter_c )
         return "You can fire a bow more quickly than most. You have +1 Attacks when using a bow.";
+    else if( key == skill_charge_c )
+        return "You get +1 damage if you hit on your first strike in a battle.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -148,10 +152,10 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     is_fixed(false),
     animation_name(animation_name), static_image(false), bounce(false), weapon_resist_percentage(50),
     location(NULL), listener(NULL), listener_data(NULL),
-    is_dead(false), time_of_death_ms(0), direction(Vector2D(-1.0f, 1.0f)), is_visible(false),
+    is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -174,10 +178,10 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     static_image(character_template.isStaticImage()),
     bounce(character_template.isBounce()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()),
     location(NULL), listener(NULL), listener_data(NULL),
-    is_dead(false), time_of_death_ms(0), is_visible(false),
+    is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
     profile(*character_template.getProfile()),
     health(0), max_health(0),
     //natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -412,6 +416,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     }
 
     if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
+        //qDebug("complex update for: %s", this->name.c_str());
         this->time_last_complex_update_ms = elapsed_ms;
 
         bool ai_try_moving = true;
@@ -453,6 +458,8 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     hit_state = HITSTATE_HAS_HIT;
                 }
             }
+            //qDebug("action: %d", action);
+            //qDebug("hit_state: %d", hit_state);
 
             if( hit_state == HITSTATE_HAS_HIT || ( hit_state == HITSTATE_IS_NOT_HITTING && !is_fleeing ) ) {
                 float dist = ( target->getPos() - this->getPos() ).magnitude();
@@ -588,6 +595,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     if( !weapon_is_magical && ammo != NULL && ammo->isMagical() ) {
                                         weapon_is_magical = true;
                                     }
+
                                     if( !weapon_is_magical && target_npc->requiresMagical() ) {
                                         // weapon has no effect!
                                         weapon_no_effect_magical = true;
@@ -602,6 +610,11 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                                 qDebug("    extra strong hit!");
                                                 int extra_damage = rollDice(1, 3, 0);
                                                 weapon_damage += extra_damage;
+                                            }
+                                            if( !is_ranged && has_charged ) {
+                                                weapon_damage++;
+                                                qDebug("    extra damage from charge");
+                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("ping").toStdString(), this->getPos(), 1000);
                                             }
                                             if( ammo != NULL ) {
                                                 // -1 from rating, as default rating is 1, but this should mean no modification
@@ -740,6 +753,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
                                 if( can_hit ) {
                                     action = is_ranged ? ACTION_FIRING : ACTION_HITTING;
+                                    qDebug("action is now: %d", action);
                                     has_path = false;
                                     time_last_action_ms = elapsed_ms;
                                     if( this->listener != NULL ) {
@@ -749,6 +763,20 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                         this->setDirection(dir);
                                     }
                                     playing_gamestate->playSound("swing");
+                                    if( !is_ranged && has_charge_pos && (charge_pos - pos).magnitude() > 1.0f && this->hasSkill(skill_charge_c) ) {
+                                        playing_gamestate->addTextEffect(PlayingGamestate::tr("Charge!").toStdString(), this->getPos(), 1000);
+                                        // weapon damage increased if/when we actually hit
+                                        has_charged = true;
+                                        qDebug("has_charged");
+                                        charge_pos = pos;
+                                    }
+                                    /*else {
+                                        qDebug("is_ranged? %d", is_ranged);
+                                        qDebug("has_charge_pos? %d", has_charge_pos);
+                                        qDebug("charge_pos? %f, %f", charge_pos.x, charge_pos.y);
+                                        qDebug("pos? %f, %f", pos.x, pos.y);
+                                        qDebug("dist %f", (charge_pos - pos).magnitude());
+                                    }*/
                                 }
                             }
                         }
@@ -949,6 +977,8 @@ void Character::setTargetNPC(Character *target_npc) {
         this->target_npc = target_npc;
         if( this->action != ACTION_NONE ) {
             this->action = ACTION_NONE;
+            this->has_charged = false;
+            qDebug("%s: setTargetNPC to different target: %d", this->name.c_str(), target_npc);
             if( this->listener != NULL ) {
                 this->listener->characterSetAnimation(this, this->listener_data, "", true);
             }
@@ -979,11 +1009,12 @@ void Character::addPainTextEffect(PlayingGamestate *playing_gamestate) const {
 }
 
 void Character::setStateIdle() {
-    //qDebug("set idle");
+    qDebug("Character::setStateIdle() for %s", this->getName().c_str());
     //has_destination = false;
     has_path = false;
     //is_hitting = false;
     action = ACTION_NONE;
+    this->has_charged = false;
     if( this->listener != NULL ) {
         this->listener->characterSetAnimation(this, this->listener_data, "", false);
     }
@@ -1326,11 +1357,12 @@ void Character::paralyse(int time_ms) {
 }
 
 void Character::setPath(vector<Vector2D> &path) {
-    //LOG("Character::setPath() for %s\n", this->getName().c_str());
+    //qDebug("Character::setPath() for %s", this->getName().c_str());
     this->has_path = true;
     this->path = path;
     //this->is_hitting = false;
     this->action = ACTION_NONE;
+    this->has_charged = false;
     if( this->listener != NULL ) {
         this->listener->characterSetAnimation(this, this->listener_data, "run", false);
     }

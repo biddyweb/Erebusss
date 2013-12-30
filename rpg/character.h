@@ -73,6 +73,7 @@ const string skill_hideaway_c = "hideaway";
 const string skill_shield_combat_c = "shield_combat";
 const string skill_luck_c = "luck";
 const string skill_fast_shooter_c = "fast_shooter";
+const string skill_charge_c = "charge";
 
 string getSkillLongString(const string &key);
 string getSkillDescription(const string &key);
@@ -301,6 +302,8 @@ class Character {
     int time_of_death_ms; // not saved
     Vector2D pos;
     Vector2D direction; // not saved
+    bool has_charge_pos; // not saved
+    Vector2D charge_pos; // not saved
     bool is_visible; // not saved // for NPCs: whether player and NPC can see each other
     bool has_path; // not saved
     vector<Vector2D> path; // not saved
@@ -313,7 +316,8 @@ class Character {
         ACTION_FIRING = 2,
         ACTION_CASTING = 3
     };
-    Action action;
+    Action action; // not saved
+    bool has_charged; // not saved // for ACTION_HITTING
     const Spell *casting_spell;
     Character *casting_spell_target;
     int time_last_complex_update_ms; // not saved
@@ -496,6 +500,9 @@ public:
         return this->biography;
     }
     void setStateIdle();
+    bool isDoingAction() const {
+        return action != ACTION_NONE;
+    }
     void setDefaultPosition(float xpos, float ypos) {
         this->has_default_position = true;
         this->default_position.set(xpos, ypos);
@@ -511,6 +518,10 @@ public:
     }
     void setPos(float xpos, float ypos) {
         this->pos.set(xpos, ypos);
+        if( !has_charge_pos ) {
+            this->has_charge_pos = true;
+            this->charge_pos = pos;
+        }
         if( this->listener != NULL ) {
             this->listener->characterMoved(this, this->listener_data);
         }
