@@ -4,36 +4,48 @@
 <weapon name="Dagger" image_name="dagger" weight="5"
     damageX="1" damageY="6" damageZ="0"
     bonus_FP="-1"
-    animation_name="dagger"/>
+    animation_name="dagger">
+Small and cheap, daggers are useful against an unarmed foe, but poor weapons otherwise.
+</weapon>
 
 <weapon name="Short Sword" image_name="longsword" weight="10"
     damageX="2" damageY="6" damageZ="0"
-    animation_name="longsword"/>
+    animation_name="longsword">
+Swords are one of the most commonly used weapons. This version is the shorter, lighter variety.
+</weapon>
 
 <weapon name="Long Sword" image_name="longsword" weight="14"
     damageX="2" damageY="10" damageZ="0"
     min_strength="7"
-    animation_name="longsword"/>
+    animation_name="longsword">
+Swords are one of the most commonly used weapons. This version is the longer, heavier variety, and requires greater strength to wield.
+</weapon>
 
 <weapon name="Two Handed Sword" image_name="longsword" weight="30"
     damageX="2" damageY="12" damageZ="0"
     min_strength="8"
     animation_name="longsword"
-    two_handed="true"/>
+    two_handed="true">
+Two handed swords are one of the most feared weapons.
+</weapon>
 
 <weapon name="Shortbow" image_name="longbow" weight="4"
     damageX="2" damageY="8" damageZ="-2"
     animation_name="longbow"
     weapon_class="bow"
     bonus_BS="-1"
-    two_handed="true" ranged="true" ammo="Arrows"/>
+    two_handed="true" ranged="true" ammo="Arrows">
+A simple bow.
+</weapon>
 
 <weapon name="Longbow" image_name="longbow" weight="5"
     damageX="2" damageY="12" damageZ="-1"
     min_strength="6"
     animation_name="longbow"
     weapon_class="bow"
-    two_handed="true" ranged="true" ammo="Arrows"/>
+    two_handed="true" ranged="true" ammo="Arrows">
+Longbows are a deadly weapon when used by an experienced archer.
+</weapon>
 
 <weapon name="Acid" image_name="vial_green" icon_width="0.15" weight="2"
     damageX="2" damageY="6" damageZ="0"
@@ -72,11 +84,17 @@ Plate armour provides excellent protection, but it is also heavy to carry and we
 </armour>
 
 <ammo name="Arrows" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
-    amount="20"/>
+    amount="20">
+Arrows are require for use with bows.
+</ammo>
 
-<ring name="Plain Ring" image_name="ring_plain" weight="0"/>
+<ring name="Plain Ring" image_name="ring_plain" weight="0">
+A simple, cheap ring.
+</ring>
 
-<ring name="Gold Ring" image_name="ring_gold" weight="0"/>
+<ring name="Gold Ring" image_name="ring_gold" weight="0">
+An exquisite ring.
+</ring>
 
 <item name="Potion of Healing" image_name="potion_green" weight="2"
     rating="4" magical="true" use="ITEMUSE_POTION_HEALING" use_verb="Drink">
