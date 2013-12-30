@@ -575,8 +575,9 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
 
                             if( can_hit ) {
-                                int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : profile_key_FP_c);
-                                int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : profile_key_FP_c);
+                                bool is_magical = this->requiresMagical() || target_npc->requiresMagical();
+                                int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : is_magical ? profile_key_M_c : profile_key_FP_c);
+                                int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : is_magical ? profile_key_M_c: profile_key_FP_c);
                                 int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
                                 int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
                                 int a_str = this->getProfileIntProperty(profile_key_S_c);
