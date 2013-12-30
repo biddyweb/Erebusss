@@ -522,10 +522,11 @@ enum TestID {
     TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 52,
     TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 53,
     TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 54,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 55,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 56,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 57,
-    N_TESTS = 58
+    TEST_LOADSAVEWRITEQUEST_1_ELF = 55,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 56,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 57,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 58,
+    N_TESTS = 59
 };
 
 /**
@@ -581,6 +582,7 @@ enum TestID {
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
+  TEST_LOADSAVEWRITEQUEST_1_ELF - test for 2nd quest: player has sprint bonus iff outdoors
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
   TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR - test for 3rd quest: interact with Glenthor
@@ -963,6 +965,24 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
         // interact with Ghost
         this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "level_6", Vector2D(5.9f, 28.0f), "Ghost's Bones", false, false, 30, 0, "");
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ) {
+        Character *player = playing_gamestate->getPlayer();
+        // check skill is as expected
+        if( !player->hasSkill(skill_sprint_c) ) {
+            throw string("player doesn't have sprint skill");
+        }
+        float base_sp = player->getBaseProfileFloatProperty(profile_key_Sp_c);
+        float sp = player->getProfileFloatProperty(profile_key_Sp_c);
+        if( fabs(base_sp - sp) > E_TOL_LINEAR ) {
+            throw string("player sp " + numberToString(sp) + " is different to base sp " + numberToString(base_sp));
+        }
+        Location *location = playing_gamestate->getQuest()->findLocation("level_past");
+        playing_gamestate->moveToLocation(location, Vector2D(25.0f, 24.0));
+        sp = player->getProfileFloatProperty(profile_key_Sp_c);
+        if( fabs(base_sp + 0.2f - sp) > E_TOL_LINEAR ) {
+            throw string("player sp " + numberToString(sp) + " does not have bonus over base sp " + numberToString(base_sp));
+        }
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
         // check quest completed iff go through exit picked up
@@ -1715,6 +1735,7 @@ void Game::runTest(const string &filename, int test_id) {
                  test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
@@ -1727,6 +1748,8 @@ void Game::runTest(const string &filename, int test_id) {
             string player = "Warrior";
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN )
                 player = "Barbarian";
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF )
+                player = "Elf";
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             gamestate = playing_gamestate;
 
@@ -1734,7 +1757,7 @@ void Game::runTest(const string &filename, int test_id) {
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
@@ -1854,7 +1877,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         //runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_ELF);
 }
 
 void Game::initButton(QWidget *button) const {
