@@ -6076,7 +6076,20 @@ void PlayingGamestate::update() {
             dest.x += step;
             dest.y += step;
         }
+        if( moved && player->isDoingAction() ) {
+            // moving will cancel the current action - only do this if changing direction
+            Vector2D old_dir = player->getDirection();
+            Vector2D new_dir = dest - player->getPos();
+            new_dir.normalise();
+            if( new_dir % old_dir > E_TOL_LINEAR ) {
+                // don't cancel action
+                moved = false;
+                this->is_keyboard_moving = false;
+                qDebug("cancel keyboard move, to avoid cancelling action");
+            }
+        }
         if( moved ) {
+            //qDebug("keyboard move");
             this->is_keyboard_moving = true;
             this->player->setDirection(dest - player->getPos());
             this->view->centreOnPlayer();
@@ -6103,6 +6116,7 @@ void PlayingGamestate::update() {
             }
         }
         else if( this->is_keyboard_moving ) {
+            qDebug("stopping keyboard movement");
             this->is_keyboard_moving = false;
             this->player->setStateIdle(); // needed, as for keyboard movement this may not have been done by the Character::update()
         }

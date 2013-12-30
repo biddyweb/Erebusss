@@ -2271,6 +2271,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 8, 6, 8, 1, 5, 5, 8, 1.8f);
         character->initialiseHealth(75);
         character->addSkill(skill_unarmed_combat_c);
+        character->addSkill(skill_charge_c);
         character->setBiography(PlayingGamestate::tr("You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.").toStdString());
         character->setPortrait("portrait_barbarian");
         character->setAnimationFolder("isometric_hero");
