@@ -198,6 +198,9 @@ She also warned me of a great beast lurking in the lower levels - perhaps one cr
 
 <floorregion shape="rect" rect_x="35.0" rect_y="1.0" rect_w="5.0" rect_h="12.0" />
 
+<item template="Mushroom" x="39.5" y="1.5"/>
+<item template="Mushroom" x="39.1" y="2.3"/>
+
 <floorregion shape="rect" rect_x="40.0" rect_y="2.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.05" y="2.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
@@ -562,6 +565,12 @@ This painting is titled, "The Fortress".
 <item template="Wyvern Egg" x="32.25" y="17.25"/>
 
 <item template="Wyvern Egg" x="33.75" y="16.75"/>
+
+<item template="Mushroom" x="30.25" y="15.1"/>
+
+<item template="Mushroom" x="33.9" y="16.1"/>
+
+<item template="Mushroom" x="31.1" y="17.1"/>
 
 <item name="Hand Mirror" image_name="hand_mirror" icon_width="0.25" weight="2" x="30.2" y="17.0"/>
 
@@ -1779,6 +1788,10 @@ This leather armour is blessed, offering greater protection.
 <scenery name="Tomb" image_name="tomb" x="14.0" y="29.0" size="1.0" blocking="true">
     <gold amount="20"/>
 </scenery>
+
+<item template="Mushroom" x="11.1" y="29.5"/>
+
+<item template="Mushroom" x="13.1" y="28.5"/>
 
 <floorregion shape="rect" rect_x="7.0" rect_y="28.5" rect_w="1.0" rect_h="1.0"/>
 
