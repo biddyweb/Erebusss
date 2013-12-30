@@ -74,6 +74,7 @@ const string skill_shield_combat_c = "shield_combat";
 const string skill_luck_c = "luck";
 const string skill_fast_shooter_c = "fast_shooter";
 const string skill_charge_c = "charge";
+const string skill_hatred_orcs_c = "hatred_orcs";
 
 string getSkillLongString(const string &key);
 string getSkillDescription(const string &key);
@@ -155,6 +156,7 @@ protected:
     bool bounce;
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
+    string type; // monster type, e.g., goblinoid (may be empty)
 
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
@@ -251,6 +253,12 @@ public:
     int getWeaponResistPercentage() const {
         return this->weapon_resist_percentage;
     }
+    void setType(const string &type) {
+        this->type = type;
+    }
+    string getType() const {
+        return this->type;
+    }
 };
 
 class ProfileEffect {
@@ -288,6 +296,7 @@ class Character {
     // basic info
     string name;
     string biography; // not saved - we currently don't use it during the game, only when choosing a character
+    string type; // monster type, e.g., goblinoid (may be empty)
     bool is_ai; // not saved
     bool is_hostile;
     bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
@@ -492,6 +501,12 @@ public:
     }
     string getAnimationFolder() const {
         return this->animation_folder;
+    }
+    void setType(const string &type) {
+        this->type = type;
+    }
+    string getType() const {
+        return this->type;
     }
     void setBiography(const string &biography) {
         this->biography = biography;

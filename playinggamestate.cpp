@@ -2535,6 +2535,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                     if( reader.name() == "npc" ) {
                         QStringRef name_s = reader.attributes().value("name");
                         qDebug("found npc template: %s", name_s.toString().toStdString().c_str());
+                        QStringRef type_s = reader.attributes().value("type");
                         QStringRef animation_name_s = reader.attributes().value("animation_name");
                         QStringRef static_image_s = reader.attributes().value("static_image");
                         bool static_image = parseBool(static_image_s.toString(), true);
@@ -2611,6 +2612,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                             QStringRef weapon_resist_percentage_s = reader.attributes().value("weapon_resist_percentage");
                             int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
                             character_template->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
+                        }
+
+                        if( type_s.length() > 0 ) {
+                            character_template->setType(type_s.toString().toStdString());
                         }
 
                         this->character_templates[ name_s.toString().toStdString() ] = character_template;
@@ -3797,6 +3802,10 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
                 int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
                 npc->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
             }
+        }
+        QStringRef type_s = reader.attributes().value("type");
+        if( type_s.length() > 0 ) {
+            npc->setType(type_s.toString().toStdString());
         }
         QStringRef portrait_s = reader.attributes().value("portrait");
         if( portrait_s.length() > 0 ) {
@@ -7560,6 +7569,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->isStaticImage() ) {
                 //fprintf(file, " static_image=\"%s\"", character->isStaticImage() ? "true": "false");
                 stream << " static_image=\"" << (character->isStaticImage() ? "true": "false") << "\"";
+            }
+            if( character->getType().length() > 0 ) {
+                stream << " type=\"" << character->getType().c_str() << "\"";
             }
             if( character->getPortrait().length() > 0 ) {
                 //fprintf(file, " portrait=\"%s\"", character->getPortrait().c_str());

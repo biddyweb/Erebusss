@@ -39,6 +39,8 @@ string getSkillLongString(const string &key) {
         return "Fast Shooter";
     else if( key == skill_charge_c )
         return "Charge";
+    else if( key == skill_hatred_orcs_c )
+        return "Hatred of Orcs";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -59,7 +61,9 @@ string getSkillDescription(const string &key) {
     else if( key == skill_fast_shooter_c )
         return "You can fire a bow more quickly than most. You have +1 Attacks when using a bow.";
     else if( key == skill_charge_c )
-        return "You get +1 damage if you hit on your first strike in a battle.";
+        return "You get +1 damage in hand-to-hand combat if you hit on your first strike in a battle.";
+    else if( key == skill_hatred_orcs_c )
+        return "You get +1 damage against goblinoids (Goblins, Orcs, etc) in hand-to-hand combat.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -194,6 +198,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     can_talk(false), has_talked(false), interaction_xp(0), interaction_reward_gold(0), interaction_completed(false)
 {
     this->animation_name = character_template.getAnimationName();
+    this->type = character_template.getType();
     this->initialiseHealth( character_template.getTemplateHealth() );
     /*if( character_template.hasNaturalDamage() ) {
         character_template.getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
@@ -615,7 +620,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                             if( !is_ranged && has_charged ) {
                                                 weapon_damage++;
                                                 qDebug("    extra damage from charge");
-                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("ping").toStdString(), this->getPos(), 1000);
+                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("ping charge").toStdString(), this->getPos(), 1000);
+                                            }
+                                            if( !is_ranged && this->hasSkill(skill_hatred_orcs_c) && target_npc->getType() == "goblinoid" ) {
+                                                weapon_damage++;
+                                                qDebug("    extra damage from hatred of orcs");
+                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("hatred of orcs").toStdString(), this->getPos(), 1000);
                                             }
                                             if( ammo != NULL ) {
                                                 // -1 from rating, as default rating is 1, but this should mean no modification

@@ -2375,6 +2375,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseProfile(1, 7, 8, 6, 1, 8, 7, 8, 2.25f);
         character->initialiseHealth(60);
         character->addSkill(skill_sprint_c);
+        character->addSkill(skill_hatred_orcs_c);
         character->setBiography(PlayingGamestate::tr("You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.").toStdString());
         character->setPortrait("portrait_elf");
         character->setAnimationFolder("isometric_heroine");
