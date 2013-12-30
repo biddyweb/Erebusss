@@ -523,10 +523,12 @@ enum TestID {
     TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 53,
     TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 54,
     TEST_LOADSAVEWRITEQUEST_1_ELF = 55,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 56,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 57,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 58,
-    N_TESTS = 59
+    TEST_LOADSAVEWRITEQUEST_1_RANGER = 56,
+    TEST_LOADSAVEWRITEQUEST_1_REVEAL = 57,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 58,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 59,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 60,
+    N_TESTS = 61
 };
 
 /**
@@ -582,7 +584,9 @@ enum TestID {
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
-  TEST_LOADSAVEWRITEQUEST_1_ELF - test for 2nd quest: player has sprint bonus iff outdoors
+  TEST_LOADSAVEWRITEQUEST_1_ELF - test for 2nd quest: Elf has sprint bonus iff outdoors; also check wandering monster rest chance is as expected
+  TEST_LOADSAVEWRITEQUEST_1_RANGER - test for 2nd quest: check wandering monster rest chance is as expected, and that doesn't have sprint bonus
+  TEST_LOADSAVEWRITEQUEST_1_REVEAL - test for 2nd quest: check Location::revealMap() works as expected
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
   TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR - test for 3rd quest: interact with Glenthor
@@ -966,22 +970,58 @@ void Game::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         // interact with Ghost
         this->interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "level_6", Vector2D(5.9f, 28.0f), "Ghost's Bones", false, false, 30, 0, "");
     }
-    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ) {
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ) {
         Character *player = playing_gamestate->getPlayer();
         // check skill is as expected
-        if( !player->hasSkill(skill_sprint_c) ) {
+        if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF && !player->hasSkill(skill_sprint_c) ) {
             throw string("player doesn't have sprint skill");
         }
+        if( test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER && !player->hasSkill(skill_hideaway_c) ) {
+            throw string("player doesn't have hideaway skill");
+        }
+        // check hideaway skill
+        Location *location = playing_gamestate->getCLocation();
+        int exp_rest_chance = test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ? 10 : 5;
+        int rest_chance = location->getWanderingMonsterRestChance(player);
+        if( rest_chance != exp_rest_chance ) {
+            throw string("wandering monster rest chance " + numberToString(rest_chance) + " is not as expected " + numberToString(exp_rest_chance));
+        }
+        // check sprint skill
         float base_sp = player->getBaseProfileFloatProperty(profile_key_Sp_c);
         float sp = player->getProfileFloatProperty(profile_key_Sp_c);
         if( fabs(base_sp - sp) > E_TOL_LINEAR ) {
             throw string("player sp " + numberToString(sp) + " is different to base sp " + numberToString(base_sp));
         }
-        Location *location = playing_gamestate->getQuest()->findLocation("level_past");
+        location = playing_gamestate->getQuest()->findLocation("level_past");
         playing_gamestate->moveToLocation(location, Vector2D(25.0f, 24.0));
         sp = player->getProfileFloatProperty(profile_key_Sp_c);
-        if( fabs(base_sp + 0.2f - sp) > E_TOL_LINEAR ) {
-            throw string("player sp " + numberToString(sp) + " does not have bonus over base sp " + numberToString(base_sp));
+        float exp_sp = test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ? base_sp + 0.2f : base_sp;
+        if( fabs(exp_sp - sp) > E_TOL_LINEAR ) {
+            throw string("player sp " + numberToString(sp) + " does not have expected sp " + numberToString(exp_sp) + " base sp was " + numberToString(base_sp));
+        }
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
+        Location *location = playing_gamestate->getCLocation();
+        int n_visible = 0;
+        QList<QGraphicsItem *> list = playing_gamestate->getView()->scene()->items();
+        foreach(QGraphicsItem *item, list) {
+            if( item->isVisible() ) {
+                n_visible++;
+            }
+        }
+        if( n_visible == 0 ) {
+            throw string("no floor_regions initially visible");
+        }
+        location->revealMap(playing_gamestate);
+        int new_n_visible = 0;
+        list = playing_gamestate->getView()->scene()->items();
+        foreach(QGraphicsItem *item, list) {
+            if( item->isVisible() ) {
+                new_n_visible++;
+            }
+        }
+        if( new_n_visible <= n_visible ) {
+            throw string("new_n_visible " + numberToString(new_n_visible) + " should be greater than n_visible " + numberToString(n_visible));
         }
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
@@ -1736,6 +1776,8 @@ void Game::runTest(const string &filename, int test_id) {
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
@@ -1750,6 +1792,8 @@ void Game::runTest(const string &filename, int test_id) {
                 player = "Barbarian";
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF )
                 player = "Elf";
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER )
+                player = "Ranger";
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             gamestate = playing_gamestate;
 
@@ -1757,7 +1801,7 @@ void Game::runTest(const string &filename, int test_id) {
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
@@ -1877,7 +1921,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         //runTest(filename, i);
     }
-    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_ELF);
+    runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_REVEAL);
 }
 
 void Game::initButton(QWidget *button) const {
