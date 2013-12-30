@@ -79,7 +79,7 @@
     <spell name="Heal" count="1"/>
 </npc>
 
-<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.58" blocking="true"/>
+<scenery name="Boulders" image_name="boulders" x="12.0" y="2.0" size="0.56" blocking="true"/>
 <scenery name="Boulders" image_name="boulders2" x="14.0" y="1.5" size="0.56" blocking="true"/>
 <scenery name="Big Boulder" image_name="bigboulder" x="13.0" y="1.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
