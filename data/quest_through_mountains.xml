@@ -633,7 +633,10 @@ This grate seems stuck or locked, and you are unable to budge it. Peering down, 
     <floorregion_point x="23.0" y="22.0" />
 </floorregion>
 
-<npc name="Skeleton" template="Skeleton" x="20.0" y="21.0"/>
+<npc name="Skeleton Archer" template="Skeleton Archer" x="20.0" y="21.0">
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+</npc>
 
 <scenery name="Teleport" image_name="teleport" x="19.5" y="22.5" size="1.0" blocking="true" exit_location="level_4" exit_location_x="30.0" exit_location_y="39.0"
     locked="true" unlocked_by_template="Derrin's Ring" locked_silent="true" locked_text="The teleporter does not seem to function!" key_always_needed="true"/>
