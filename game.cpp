@@ -2285,11 +2285,11 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->setAnimationFolder("isometric_heroine");
     }
     else if( player_type == "Halfling" ) {
-        character->initialiseProfile(1, 7, 7, 5, 1, 7, 9, 7, 1.8f);
-        character->initialiseHealth(50);
+        character->initialiseProfile(1, 6, 7, 5, 1, 7, 10, 7, 1.8f);
+        character->initialiseHealth(75);
         character->addSkill(skill_disease_resistance_c);
         character->addSkill(skill_luck_c);
-        character->setBiography(PlayingGamestate::tr("Halflings do not make great warriors and make unlikely adventurers, but their special skills can help them succeed where others might fail.").toStdString());
+        character->setBiography(PlayingGamestate::tr("Halflings do not make great warriors and make unlikely adventurers, but they are suprisingly hardy, and their special skills can help them succeed where others might fail.").toStdString());
         character->setPortrait("portrait_halfling");
         character->setAnimationFolder("isometric_heroine");
     }
