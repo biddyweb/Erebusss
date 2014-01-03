@@ -232,36 +232,42 @@ Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_games
     else if( r <= 15 ) {
         item = playing_gamestate->cloneStandardItem("Gold Ring");
         item->setBaseTemplate(item->getName());
-        item->setName("Magic Ring");
         item->setMagical(true);
         int r2 = rollDice(1, 7, 0);
         if( r2 == 1 ) {
             item->setProfileBonusIntProperty(profile_key_FP_c, 1);
             item->setWorthBonus(300);
+            item->setName("Ring of Combat");
         }
         else if( r2 == 2 ) {
             item->setProfileBonusIntProperty(profile_key_BS_c, 1);
             item->setWorthBonus(250);
+            item->setName("Ring of Accuracy");
         }
         else if( r2 == 3 ) {
             item->setProfileBonusIntProperty(profile_key_S_c, 1);
             item->setWorthBonus(200);
+            item->setName("Ring of Strength");
         }
         else if( r2 == 4 ) {
             item->setProfileBonusIntProperty(profile_key_M_c, 1);
             item->setWorthBonus(200);
+            item->setName("Ring of Wisdom");
         }
         else if( r2 == 5 ) {
             item->setProfileBonusIntProperty(profile_key_D_c, 1);
             item->setWorthBonus(150);
+            item->setName("Ring of Skill");
         }
         else if( r2 == 6 ) {
             item->setProfileBonusIntProperty(profile_key_B_c, 1);
             item->setWorthBonus(150);
+            item->setName("Ring of Bravery");
         }
         else {
             item->setProfileBonusFloatProperty(profile_key_Sp_c, 0.2f);
             item->setWorthBonus(200);
+            item->setName("Ring of Speed");
         }
     }
     else { // 16, 17
