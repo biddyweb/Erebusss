@@ -7,6 +7,7 @@
 #include "character.h"
 #include "location.h"
 #include "item.h"
+#include "rpgengine.h"
 
 #include "../game.h"
 #include "../playinggamestate.h"
@@ -580,68 +581,10 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                             }
 
                             if( can_hit ) {
-                                bool is_magical = this->requiresMagical() || target_npc->requiresMagical();
-                                int a_stat = this->getProfileIntProperty(is_ranged ? profile_key_BS_c : is_magical ? profile_key_M_c : profile_key_FP_c);
-                                int d_stat = target_npc->getProfileIntProperty(is_ranged ? profile_key_D_c : is_magical ? profile_key_M_c: profile_key_FP_c);
-                                int mod_a_stat = this->modifyStatForDifficulty(playing_gamestate, a_stat);
-                                int mod_d_stat = target_npc->modifyStatForDifficulty(playing_gamestate, d_stat);
-                                int a_str = this->getProfileIntProperty(profile_key_S_c);
-
-                                bool hits = false;
                                 bool weapon_no_effect_magical = false;
                                 bool weapon_no_effect_holy = false;
                                 int weapon_damage = 0;
-
-                                int hit_roll = rollDice(2, 6, -7);
-                                qDebug("character %s rolled %d; %d vs %d to hit %s (ranged? %d)", this->getName().c_str(), hit_roll, mod_a_stat, mod_d_stat, target_npc->getName().c_str(), is_ranged);
-                                if( hit_roll + mod_a_stat > mod_d_stat ) {
-                                    qDebug("    hit");
-                                    hits = true;
-                                    bool weapon_is_magical = this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isMagical();
-                                    if( !weapon_is_magical && ammo != NULL && ammo->isMagical() ) {
-                                        weapon_is_magical = true;
-                                    }
-
-                                    if( !weapon_is_magical && target_npc->requiresMagical() ) {
-                                        // weapon has no effect!
-                                        weapon_no_effect_magical = true;
-                                    }
-                                    else {
-                                        if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isUnholyOnly() && !target_npc->isUnholy() ) {
-                                            weapon_no_effect_holy = true;
-                                        }
-                                        else {
-                                            weapon_damage = this->getCurrentWeapon() != NULL ? this->getCurrentWeapon()->getDamage() : this->getNaturalDamage();
-                                            if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
-                                                qDebug("    extra strong hit!");
-                                                int extra_damage = rollDice(1, 3, 0);
-                                                weapon_damage += extra_damage;
-                                            }
-                                            if( !is_ranged && has_charged ) {
-                                                weapon_damage++;
-                                                qDebug("    extra damage from charge");
-                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("ping charge").toStdString(), this->getPos(), 1000);
-                                            }
-                                            if( !is_ranged && this->hasSkill(skill_hatred_orcs_c) && target_npc->getType() == "goblinoid" ) {
-                                                weapon_damage++;
-                                                qDebug("    extra damage from hatred of orcs");
-                                                //playing_gamestate->addTextEffect(PlayingGamestate::tr("hatred of orcs").toStdString(), this->getPos(), 1000);
-                                            }
-                                            if( ammo != NULL ) {
-                                                // -1 from rating, as default rating is 1, but this should mean no modification
-                                                weapon_damage += (ammo->getRating()-1);
-                                            }
-                                            if( this->getCurrentWeapon() != NULL && target_npc->getWeaponResistClass().length() > 0 && target_npc->getWeaponResistClass() == this->getCurrentWeapon()->getWeaponClass() ) {
-                                                qDebug("weapon resist percentage %d, scale from %d", target_npc->getWeaponResistPercentage(), weapon_damage);
-                                                weapon_damage = (weapon_damage * target_npc->getWeaponResistPercentage() )/100;
-                                            }
-                                            qDebug("weapon_damage %d", weapon_damage);
-                                        }
-                                    }
-                                }
-                                else{
-                                    //LOG("character %s rolled %d, missed %s (ranged? %d)\n", this->getName().c_str(), hit_roll, target_npc->getName().c_str(), is_ranged);
-                                }
+                                bool hits = RPGEngine::combat(weapon_damage, weapon_no_effect_magical, weapon_no_effect_holy, playing_gamestate, this, target_npc, is_ranged, ammo, has_charged);
 
                                 if( is_ranged ) {
                                     // fire off an action

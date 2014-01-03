@@ -145,7 +145,8 @@ SOURCES += main.cpp mainwindow.cpp \
     animatedobject.cpp \
     particlesystem.cpp \
     maingraphicsview.cpp \
-    webvieweventfilter.cpp
+    webvieweventfilter.cpp \
+    rpg/rpgengine.cpp
 HEADERS += mainwindow.h \
     game.h \
     qt_screen.h \
@@ -170,7 +171,8 @@ HEADERS += mainwindow.h \
     animatedobject.h \
     particlesystem.h \
     maingraphicsview.h \
-    webvieweventfilter.h
+    webvieweventfilter.h \
+    rpg/rpgengine.h
 FORMS +=
 
 # Please do not modify the following two lines. Required for deployment.

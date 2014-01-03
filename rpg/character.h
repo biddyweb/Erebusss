@@ -388,7 +388,6 @@ class Character {
     string objective_id;
 
     bool useAmmo(Ammo *ammo);
-    int getNaturalDamage() const;
 
     // rule of three
     /*Character& operator=(const Character &character) {
@@ -754,6 +753,7 @@ public:
         return this->skills.end();
     }
 
+    int getNaturalDamage() const;
     const Weapon *getCurrentWeapon() const {
         return this->current_weapon;
     }
