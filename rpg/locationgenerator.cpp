@@ -1060,10 +1060,11 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
         if( seed.dir == DIRECTION4_WEST || seed.dir == DIRECTION4_EAST )
         {
             // torches
-            int n_torches = rollDice(1, 3, -1);
-            for(int i=0;i<n_torches;i++) {
-                float alpha = ((float)(i+1.0f))/(float)(n_torches+1.0f);
-                float xpos = rect_pos.x + alpha*rect_size.x;
+            for(int i=0;i<passage_length_i;i++) {
+                if( rollDice(1, 2, 0) == 1 )
+                    continue;
+                float pos = (i+0.5f)*base_passage_length + 1.0f;
+                float xpos = rect_pos.x + pos;
                 Scenery *scenery = new Scenery("Torch", "torch", 0.75f, 0.75f, 0.75f, false, 0.0f);
                 location->addScenery(scenery, xpos, rect_pos.y - 0.45f);
             }
