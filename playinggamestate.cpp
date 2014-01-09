@@ -2701,6 +2701,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             game_g->loadSound("turn_page", string(DEPLOYMENT_PATH) + "sound/turn_page.wav", false);
             game_g->loadSound("weapon_unsheath", string(DEPLOYMENT_PATH) + "sound/sword-unsheathe5.wav", false);
             game_g->loadSound("wear_armour", string(DEPLOYMENT_PATH) + "sound/chainmail1.wav", false);
+            game_g->loadSound("spell_attack", string(DEPLOYMENT_PATH) + "sound/spell.wav", false);
 #if !defined(Q_OS_SYMBIAN) && !defined(Q_WS_SIMULATOR)
             game_g->loadSound("swing", string(DEPLOYMENT_PATH) + "sound/swing2.wav", false);  // playing this sample causes strange pauses on Symbian?? (Nokia 5800)
 #endif
@@ -3090,6 +3091,7 @@ void PlayingGamestate::cleanup() {
         game_g->freeSound("turn_page");
         game_g->freeSound("weapon_unsheath");
         game_g->freeSound("wear_armour");
+        game_g->freeSound("spell_attack");
         game_g->freeSound("swing");
         game_g->freeSound("footsteps");
         //game_g->freeSound(music_key_ingame_c);

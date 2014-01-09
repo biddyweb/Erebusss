@@ -555,6 +555,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     // fire off an action
                                     CharacterAction *action = CharacterAction::createSpellAction(playing_gamestate, this, casting_spell_target, casting_spell);
                                     playing_gamestate->addCharacterAction(action);
+                                    playing_gamestate->playSound("spell_attack");
                                 }
                             }
                         }
