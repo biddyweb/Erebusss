@@ -55,6 +55,7 @@ void CharacterHelp::changedGameType(int index) {
     string player = options_gamestate->characterComboBox->currentText().toStdString();
     Character *character = game_g->createPlayer(player, "");
     QString html = "";
+    html += "<table>";
     html += character->writeStat(profile_key_FP_c, false, true);
     html += character->writeStat(profile_key_BS_c, false, true);
     html += character->writeStat(profile_key_S_c, false, true);
@@ -63,10 +64,20 @@ void CharacterHelp::changedGameType(int index) {
     html += character->writeStat(profile_key_D_c, false, true);
     html += character->writeStat(profile_key_B_c, false, true);
     html += character->writeStat(profile_key_Sp_c, true, true);
+    html += "<tr>";
+    html += "<td>";
     html += "<b>Health:</b> ";
+    html += "</td>";
+    html += "<td>";
     html += QString::number(character->getMaxHealth());
-    html += "<br/><br/>";
+    //html += "<br/><br/>";
+    html += " ";
 
+    html += "</td>";
+    html += "</tr>";
+    html += "</table>";
+
+    html += "<hr/>";
     html += character->writeSkills();
 
     html += character->getBiography().c_str();

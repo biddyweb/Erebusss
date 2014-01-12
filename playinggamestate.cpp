@@ -204,31 +204,21 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
 
     QString html ="<html><body>";
 
+    html += "<table>";
+    html += "<tr>";
+    html += "<td>";
+
     html += "<b>Name:</b> ";
     html += player->getName().c_str();
     html += "<br/>";
 
     html += "<b>Difficulty:</b> ";
     html += Game::getDifficultyString(this->playing_gamestate->getDifficulty()).c_str();
-    html += "<br/>";
+    //html += "<br/>";
+    html += " ";
+    html += "<hr/>";
 
-    /*html += "<b>Fighting Prowess:</b> " + QString::number(player->getFP()) + "<br/>";
-    html += "<b>Bow Skill:</b> " + QString::number(player->getBS()) + "<br/>";
-    html += "<b>Strength:</b> " + QString::number(player->getStrength()) + "<br/>";
-    html += "<b>Attacks:</b> " + QString::number(player->getAttacks()) + "<br/>";
-    html += "<b>Mind:</b> " + QString::number(player->getMind()) + "<br/>";
-    html += "<b>Dexterity:</b> " + QString::number(player->getDexterity()) + "<br/>";
-    html += "<b>Bravery:</b> " + QString::number(player->getBravery()) + "<br/>";
-    html += "<b>Speed:</b> " + QString::number(player->getSpeed()) + "<br/>";*/
-
-    /*html += "<b>Fighting Prowess:</b> " + QString::number(player->getProfileIntProperty(profile_key_FP_c)) + "<br/>";
-    html += "<b>Bow Skill:</b> " + QString::number(player->getProfileIntProperty(profile_key_BS_c)) + "<br/>";
-    html += "<b>Strength:</b> " + QString::number(player->getProfileIntProperty(profile_key_S_c)) + "<br/>";
-    html += "<b>Attacks:</b> " + QString::number(player->getProfileIntProperty(profile_key_A_c)) + "<br/>";
-    html += "<b>Mind:</b> " + QString::number(player->getProfileIntProperty(profile_key_M_c)) + "<br/>";
-    html += "<b>Dexterity:</b> " + QString::number(player->getProfileIntProperty(profile_key_D_c)) + "<br/>";
-    html += "<b>Bravery:</b> " + QString::number(player->getProfileIntProperty(profile_key_B_c)) + "<br/>";
-    html += "<b>Speed:</b> " + QString::number(player->getProfileFloatProperty(profile_key_Sp_c)) + "<br/>";*/
+    html += "<table>";
     html += this->writeStat(profile_key_FP_c, false);
     html += this->writeStat(profile_key_BS_c, false);
     html += this->writeStat(profile_key_S_c, false);
@@ -238,7 +228,11 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     html += this->writeStat(profile_key_B_c, false);
     html += this->writeStat(profile_key_Sp_c, true);
 
+    html += "<tr>";
+    html += "<td>";
     html += "<b>Health:</b> ";
+    html += "</td>";
+    html += "<td>";
     if( player->getHealth() < player->getMaxHealth() ) {
         html += "<font color=\"#ff0000\">";
         html += QString::number(player->getHealth());
@@ -249,10 +243,34 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
     }
     html += " / ";
     html += QString::number(player->getMaxHealth());
-    html += "<br/>";
+    html += " ";
+    html += "</td>";
+    html += "</tr>";
 
-    html += "<b>Level:</b> " + QString::number(player->getLevel()) + "<br/>";
-    html += "<b>XP:</b> " + QString::number(player->getXP()) + " (" + QString::number(player->getXPForNextLevel()) + " required for next level.)<br/>";
+    html += "<tr>";
+    html += "<td>";
+    html += "<b>Level:</b> ";
+    html += "</td>";
+    html += "<td>";
+    html += QString::number(player->getLevel());
+    //html += "<br/>";
+    html += " ";
+    html += "</td>";
+    html += "</tr>";
+    html += "<tr>";
+    html += "<td>";
+    html += "<b>XP:</b> ";
+    html += "</td>";
+    html += "<td>";
+    html += QString::number(player->getXP()) + " (" + QString::number(player->getXPForNextLevel()) + " required for next level.)";
+    //html += "<br/>";
+    html += " ";
+    html += "</td>";
+    html += "</tr>";
+
+    html += "</table>";
+    //html += "<br/>";
+
     if( player->isParalysed() ) {
         html += "<font color=\"#ff0000\">PARALYSED</font><br/>";
     }
@@ -260,34 +278,79 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
         html += "<font color=\"#ff0000\">DISEASED</font><br/>";
     }
 
+    html += "</td>";
+    html += "<td>";
+
+    html += player->writeSkills();
+
+    html += "<hr/>";
+    html += "<table>";
     {
         stringstream str;
+        str << "<tr>";
+        str << "<td>";
+        str << "<b>Weapon: </b>";
+        str << "</td>";
+        str << "<td>";
         int damageX = 0, damageY = 0, damageZ = 0;
         if( player->getCurrentWeapon() == NULL ) {
             //player->getNaturalDamage(&damageX, &damageY, &damageZ);
             damageX = player->getNaturalDamageX();
             damageY = player->getNaturalDamageY();
             damageZ = player->getNaturalDamageZ();
-            str << "<b>Current Weapon:</b> None ";
+            str << "None ";
         }
         else {
             const Weapon *weapon = player->getCurrentWeapon();
             weapon->getDamage(&damageX, &damageY, &damageZ);
-            str << "<b>Current Weapon:</b> " << weapon->getName() << " ";
+            str << weapon->getName() << " ";
         }
+        str << "</td>";
+        str << "<td>";
+        str << "<b>Damage: </b>";
+        str << "</td>";
+        str << "<td>";
         if( damageZ != 0 ) {
             char sign = damageZ > 0 ? '+' : '-';
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << sign << abs(damageZ) << "<br/>";
+            str << damageX << "D" << damageY << sign << abs(damageZ);;
         }
         else {
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
+            str << damageX << "D" << damageY;
         }
+        //str << "<br/>";
+        str << " ";
+        str << "</td>";
+        str << "</tr>";
         html += str.str().c_str();
     }
-    html += "<b>Armour Rating:</b> " + QString::number(player->getArmourRating(true, true)) + "<br/><br/>";
 
-    html += player->writeSkills();
+    html += "<tr>";
+    html += "<td>";
+    html += "<b>Armour:</b> ";
+    html += "</td>";
+    html += "<td>";
+    if( player->getCurrentArmour() == NULL ) {
+        html += "None ";
+    }
+    else {
+        html += player->getCurrentArmour()->getName().c_str();
+        html += " ";
+    }
+    html += "</td>";
+    html += "<td>";
+    html += " <b>Rating:</b> ";
+    html += "</td>";
+    html += "<td>";
+    html += QString::number(player->getArmourRating(true, true));
+    //html += "<br/><br/>";
+    html += " ";
+    html += "</td>";
+    html += "</tr>";
+    html += "</table>";
 
+    html += "</td>";
+    html += "</tr>";
+    html += "</table>";
     html += "</body></html>";
 
     QTextEdit *label = new QTextEdit();

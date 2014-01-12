@@ -1571,9 +1571,14 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
 
 QString Character::writeStat(const string &stat_key, bool is_float, bool want_base) const {
     string visual_name = getProfileLongString(stat_key);
-    QString html = "<b>";
+    QString html;
+    html += "<tr>";
+    html += "<td>";
+    html += "<b>";
     html += visual_name.c_str();
     html += ":</b> ";
+    html += "</td>";
+    html += "<td>";
     if( is_float ) {
         float stat = this->getProfileFloatProperty(stat_key);
         float base_stat = this->getBaseProfileFloatProperty(stat_key);
@@ -1606,7 +1611,10 @@ QString Character::writeStat(const string &stat_key, bool is_float, bool want_ba
             html += "</font>";
         }
     }
-    html += "<br/>";
+    //html += "<br/>";
+    html += " ";
+    html += "</td>";
+    html += "</tr>";
     return html;
 }
 
