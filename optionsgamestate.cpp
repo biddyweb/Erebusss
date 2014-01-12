@@ -6,6 +6,7 @@ using std::stringstream;
 #endif
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -87,6 +88,13 @@ void CharacterHelp::changedGameType(int index) {
 
     // also update portrait
     QPixmap pixmap = game_g->getPortraitImage(character->getPortrait());
+    int height = QApplication::desktop()->availableGeometry().height();
+    int max_pic_height = height/3;
+    qDebug("pixmap height %d , height %d , max_pic_height %d", pixmap.height(), height, max_pic_height);
+    if( pixmap.height() > max_pic_height ) {
+        qDebug("    scale...");
+        pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+    }
     options_gamestate->portraitLabel->setPixmap(pixmap);
 
     delete character;
@@ -356,34 +364,6 @@ void OptionsGamestate::clickedStart() {
             characterComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
             g_layout->addWidget(characterComboBox, n_row, 1);
             n_row++;
-
-            label = new QLabel(tr("Difficulty: "));
-            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
-            difficultyComboBox = new QComboBox();
-#ifdef Q_OS_ANDROID
-            difficultyComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
-#endif
-            difficultyComboBox->setFont(game_g->getFontBig());
-            for(int i=0;i<N_DIFFICULTIES;i++) {
-                Difficulty test_difficulty = (Difficulty)i;
-                difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
-            }
-            difficultyComboBox->setCurrentIndex(1);
-            difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-            g_layout->addWidget(difficultyComboBox, n_row, 1);
-            n_row++;
-
-            label = new QLabel(tr("Permadeath: "));
-            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
-#ifdef Q_OS_ANDROID
-            permadeathCheckBox = new QCheckBox("        "); // needed for workaround due to Android bug
-            permadeathCheckBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
-#else
-            permadeathCheckBox = new QCheckBox("");
-#endif
-            permadeathCheckBox->setToolTip(tr("If checked, then once your player dies,\nyou won't be able to restore from a save game!"));
-            g_layout->addWidget(permadeathCheckBox, n_row, 1);
-            n_row++;
         }
 
         {
@@ -401,23 +381,55 @@ void OptionsGamestate::clickedStart() {
         }
     }
     else if( options_page_index == 2 ) {
-        QHBoxLayout *h_layout = new QHBoxLayout();
-        layout->addLayout(h_layout);
+        {
+            int n_row = 0;
+            QGridLayout *g_layout = new QGridLayout();
+            layout->addLayout(g_layout);
 
-        QLabel *label = new QLabel(tr("Your name:"));
-        h_layout->addWidget(label);
+            QLabel *label = new QLabel(tr("Your name:"));
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
 
-        int character_id = this->characterComboBox->currentIndex();
-        nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
-        h_layout->addWidget(nameLineEdit);
-        nameLineEdit->setFocus();
-        nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
-        nameLineEdit->selectAll();
-        if( options_page_index == n_options_pages-1 ) {
-            connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
-        }
-        else {
-            connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedNext()));
+            int character_id = this->characterComboBox->currentIndex();
+            nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
+            g_layout->addWidget(nameLineEdit, n_row, 1);
+            n_row++;
+            nameLineEdit->setFocus();
+            nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
+            nameLineEdit->selectAll();
+            /*if( options_page_index == n_options_pages-1 ) {
+                connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
+            }
+            else {
+                connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedNext()));
+            }*/
+
+            label = new QLabel(tr("Difficulty: "));
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+            difficultyComboBox = new QComboBox();
+    #ifdef Q_OS_ANDROID
+            difficultyComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+    #endif
+            difficultyComboBox->setFont(game_g->getFontBig());
+            for(int i=0;i<N_DIFFICULTIES;i++) {
+                Difficulty test_difficulty = (Difficulty)i;
+                difficultyComboBox->addItem(game_g->getDifficultyString(test_difficulty).c_str());
+            }
+            difficultyComboBox->setCurrentIndex(1);
+            difficultyComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            g_layout->addWidget(difficultyComboBox, n_row, 1);
+            n_row++;
+
+            label = new QLabel(tr("Permadeath: "));
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+    #ifdef Q_OS_ANDROID
+            permadeathCheckBox = new QCheckBox("        "); // needed for workaround due to Android bug
+            permadeathCheckBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
+    #else
+            permadeathCheckBox = new QCheckBox("");
+    #endif
+            permadeathCheckBox->setToolTip(tr("If checked, then once your player dies,\nyou won't be able to restore from a save game!"));
+            g_layout->addWidget(permadeathCheckBox, n_row, 1);
+            n_row++;
         }
     }
 
