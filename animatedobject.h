@@ -25,21 +25,25 @@ protected:
     AnimationType animation_type;
     unsigned int n_dimensions;
     size_t n_frames;
+    int ms_per_frame;
     vector<QPixmap> pixmaps; // vector of length n_dimensions * n_frames
     /*QRectF bounding_rect;
 
     virtual QRectF boundingRect() const;
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);*/
 public:
-    AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length n_dimensions * n_frames
+    AnimationSet(AnimationType animation_type, int ms_per_frame, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps); // pixmaps array of length n_dimensions * n_frames
     virtual ~AnimationSet();
 
-    size_t getNFrames() const {
+    /*size_t getNFrames() const {
         return this->n_frames;
-    }
+    }*/
     const QPixmap &getFrame(unsigned int c_dimension, size_t c_frame) const;
+    int getMSPerFrame() const {
+        return this->ms_per_frame;
+    }
 
-    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
+    static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int ms_per_frame, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -51,9 +55,10 @@ class AnimationLayerDefinition {
     int position;
     size_t n_frames;
     AnimationSet::AnimationType animation_type;
+    int ms_per_frame;
 public:
-    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type) :
-        name(name), position(position), n_frames(n_frames), animation_type(animation_type) {
+    AnimationLayerDefinition(string name, int position, size_t n_frames, AnimationSet::AnimationType animation_type, int ms_per_frame) :
+        name(name), position(position), n_frames(n_frames), animation_type(animation_type), ms_per_frame(ms_per_frame) {
     }
 };
 
@@ -116,7 +121,6 @@ public:
 };
 
 class AnimatedObject : public QGraphicsItem {
-    int ms_per_frame;
     vector<AnimationLayer *> animation_layers;
     bool set_c_animation_name;
     string c_animation_name;
@@ -132,7 +136,7 @@ class AnimatedObject : public QGraphicsItem {
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 public:
-    explicit AnimatedObject(int ms_per_frame, QGraphicsItem *parent = 0);
+    explicit AnimatedObject(QGraphicsItem *parent = 0);
     virtual ~AnimatedObject();
 
     virtual QRectF boundingRect() const;

@@ -12,7 +12,7 @@
 #include "logiface.h"
 #include "game.h"
 
-AnimationSet::AnimationSet(AnimationType animation_type, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_dimensions(n_dimensions), n_frames(n_frames), pixmaps(pixmaps) {
+AnimationSet::AnimationSet(AnimationType animation_type, int ms_per_frame, unsigned int n_dimensions, size_t n_frames, vector<QPixmap> pixmaps) : animation_type(animation_type), n_dimensions(n_dimensions), n_frames(n_frames), ms_per_frame(ms_per_frame), pixmaps(pixmaps) {
     if( pixmaps.size() != n_dimensions * n_frames ) {
         LOG("AnimationSet error: pixmaps size %d, n_frames %d, n_dimensions %d\n", pixmaps.size(), n_frames, n_dimensions);
         throw string("AnimationSet has incorrect pixmaps size");
@@ -53,7 +53,7 @@ const QPixmap &AnimationSet::getFrame(unsigned int c_dimension, size_t c_frame) 
     return this->pixmaps[c_dimension*n_frames + c_frame];
 }
 
-AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
+AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation_type, int ms_per_frame, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height) {
     //qDebug("### %d x %d\n", icon_width, icon_height);
     vector<QPixmap> frames;
     for(unsigned int i=0;i<n_dimensions;i++) {
@@ -63,7 +63,7 @@ AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation
             frames.push_back( image.copy(xpos, ypos, icon_width, icon_height));
         }
     }
-    AnimationSet *animation_set = new AnimationSet(animation_type, n_dimensions, n_frames, frames);
+    AnimationSet *animation_set = new AnimationSet(animation_type, ms_per_frame, n_dimensions, n_frames, frames);
     return animation_set;
 }
 
@@ -121,7 +121,7 @@ AnimationLayer *AnimationLayer::create(const QPixmap &image, const vector<Animat
     qDebug("    loaded image");
     for(vector<AnimationLayerDefinition>::const_iterator iter = animation_layer_definitions.begin(); iter != animation_layer_definitions.end(); ++iter) {
         const AnimationLayerDefinition animation_layer_definition = *iter;
-        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, stride_x, stride_y, animation_layer_definition.position, n_dimensions, animation_layer_definition.n_frames, off_x, off_y, width, height);
+        AnimationSet *animation_set = AnimationSet::create(image, animation_layer_definition.animation_type, animation_layer_definition.ms_per_frame, stride_x, stride_y, animation_layer_definition.position, n_dimensions, animation_layer_definition.n_frames, off_x, off_y, width, height);
         layer->addAnimationSet(animation_layer_definition.name, animation_set);
     }
     qDebug("    done");
@@ -155,8 +155,8 @@ AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
     return this->animation_layer;
 }
 
-AnimatedObject::AnimatedObject(int ms_per_frame, QGraphicsItem *parent) : /*animation_layer(NULL), c_animation_set(NULL),*/
-    QGraphicsItem(parent), ms_per_frame(ms_per_frame), set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false),
+AnimatedObject::AnimatedObject(QGraphicsItem *parent) : /*animation_layer(NULL), c_animation_set(NULL),*/
+    QGraphicsItem(parent), set_c_animation_name(false), c_dimension(0), c_frame(0), animation_time_start_ms(0), bounce(false),
     clip(false), clip_sx(0), clip_sy(0), clip_sw(0), clip_sh(0)
 {
 }
@@ -166,7 +166,11 @@ AnimatedObject::~AnimatedObject() {
 
 void AnimatedObject::advance(int phase) {
     //qDebug("AnimatedObject::advance() phase %d", phase);
+    if( c_animation_sets.size() == 0 )
+        return;
     if( phase == 1 ) {
+        const AnimationSet *animation_set = c_animation_sets.at(0);
+        int ms_per_frame = animation_set->getMSPerFrame();
         //int time_elapsed_ms = game_g->getScreen()->getElapsedMS() - animation_time_start_ms;
         int time_elapsed_ms = game_g->getGameTimeTotalMS() - animation_time_start_ms;
         size_t n_frame = ( time_elapsed_ms / ms_per_frame );

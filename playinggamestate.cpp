@@ -146,7 +146,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     character_action->weapon_no_effect_holy = weapon_no_effect_holy;
     character_action->weapon_damage = weapon_damage;
 
-    AnimatedObject *object = new AnimatedObject(100);
+    AnimatedObject *object = new AnimatedObject();
     character_action->object = object;
     object->addAnimationLayer( playing_gamestate->getProjectileAnimationLayer(projectile_key) );
     playing_gamestate->addGraphicsItem(object, icon_width, true);
@@ -2043,7 +2043,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             }
             this->target_pixmap = full_pixmap;
             vector<AnimationLayerDefinition> target_animation_layer_definition;
-            target_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, n_frames, AnimationSet::ANIMATIONTYPE_BOUNCE) );
+            target_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, n_frames, AnimationSet::ANIMATIONTYPE_BOUNCE, 100) );
             this->target_animation_layer = AnimationLayer::create(this->target_pixmap, target_animation_layer_definition, true, 0, 0, res_c, res_c, res_c, res_c, n_frames*res_c, 1);
         }
 
@@ -2343,6 +2343,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                                     QStringRef sub_start_s = reader.attributes().value("start");
                                     QStringRef sub_length_s = reader.attributes().value("length");
                                     QStringRef sub_type_s = reader.attributes().value("type");
+                                    QStringRef ms_per_frame_s = reader.attributes().value("ms_per_frame");
                                     int sub_start = parseInt(sub_start_s.toString());
                                     int sub_length = parseInt(sub_length_s.toString());
                                     AnimationSet::AnimationType animation_type = AnimationSet::ANIMATIONTYPE_SINGLE;
@@ -2359,7 +2360,11 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                                         LOG("error at line %d\n", reader.lineNumber());
                                         throw string("image has unknown animation type");
                                     }
-                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type) );
+                                    int ms_per_frame = 100;
+                                    if( ms_per_frame_s.length() > 0 ) {
+                                        ms_per_frame = parseInt(ms_per_frame_s.toString());
+                                    }
+                                    animation_layer_definition.push_back( AnimationLayerDefinition(sub_name_s.toString().toStdString(), sub_start, sub_length, animation_type, ms_per_frame) );
                                 }
                                 else {
                                     LOG("error at line %d\n", reader.lineNumber());
@@ -2408,7 +2413,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                             if( n_dimensions == 0 ) {
                                 n_dimensions = 8;
                             }
-                            animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                            animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
                             if( filename.length() > 0 )
                                 this->projectile_animation_layers[name.toStdString()] = AnimationLayer::create(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
                             else
@@ -2416,7 +2421,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         }
                         else if( type == "scenery" ) {
                             if( animation_layer_definition.size() == 0 ) {
-                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
                             }
                             if( filename.length() > 0 )
                                 this->scenery_animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, 1);
@@ -2426,7 +2431,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         else if( type == "npc" ) {
                             unsigned int n_dimensions = animation_layer_definition.size() > 0 ? N_DIRECTIONS : 1;
                             if( animation_layer_definition.size() == 0 ) {
-                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE) );
+                                animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 1, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
                             }
                             if( filename.length() > 0 )
                                 this->animation_layers[name.toStdString()] = new LazyAnimationLayer(filename.toStdString(), animation_layer_definition, clip, xpos, ypos, width, height, stride_x, stride_y, expected_width, n_dimensions);
@@ -3175,11 +3180,11 @@ void PlayingGamestate::loadPlayerAnimation() {
     const int expected_stride_x = 128, expected_stride_y = 128, expected_total_width = 4096;
     //float off_x = 32.0f/128.0f, off_y = 40.0f/128.0f, width = 64.0f/128.0f, height = 64.0f/128.0f;
     //float off_x = 0.0f/128.0f, off_y = 0.0f/128.0f, width = 128.0f/128.0f, height = 128.0f/128.0f;
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE) );
-    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("", 0, 4, AnimationSet::ANIMATIONTYPE_BOUNCE, 100) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("run", 4, 8, AnimationSet::ANIMATIONTYPE_LOOP, 100) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("attack", 12, 4, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("ranged", 28, 4, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
+    player_animation_layer_definition.push_back( AnimationLayerDefinition("death", 18, 6, AnimationSet::ANIMATIONTYPE_SINGLE, 100) );
 
     string animation_folder = player->getAnimationFolder();
     if( animation_folder.length() == 0 ) {
@@ -5492,7 +5497,7 @@ void PlayingGamestate::locationAddScenery(const Location *location, Scenery *sce
         float scenery_scale_w = 0.0f, scenery_scale_h = 0.0f;
         QTransform transform;
         for(int stripe=0;stripe<n_stripes;stripe++) {
-            AnimatedObject *object = new AnimatedObject(100);
+            AnimatedObject *object = new AnimatedObject();
             //scenery->setUserGfxData(object);
             scenery->addUserGfxData(object);
             if( n_stripes > 1 ) {
@@ -5593,7 +5598,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
 }
 
 void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
-    AnimatedObject *object = new AnimatedObject(100);
+    AnimatedObject *object = new AnimatedObject();
     object->setBounce( character->isBounce() );
     this->characterUpdateGraphics(character, object);
     this->characterTurn(character, object);
@@ -5924,7 +5929,7 @@ void PlayingGamestate::update() {
             Vector2D target_pos = this->player->getTargetNPC()->getPos();
             if( this->target_item == NULL ) {
                 //this->target_item = this->addPixmapGraphic(this->target_pixmap, target_pos, 0.5f, false, true);
-                AnimatedObject *object = new AnimatedObject(100);
+                AnimatedObject *object = new AnimatedObject();
                 this->target_item = object;
                 object->addAnimationLayer( target_animation_layer );
                 object->setZValue(z_value_gui);

@@ -103,7 +103,7 @@
 </image>
 <image type="scenery" name="gallows" filename="gfx/textures/scenery/gallows.png"/>
 <image type="scenery" name="grandfather_clock" filename="gfx/textures/scenery/grandfather_clock.png" width="32" height="96" stride_x="32" expected_width="96">
-    <animation name="" start="0" length="3" type="bounce"/>
+    <animation name="" start="0" length="3" type="bounce" ms_per_frame="500"/>
 </image>
 <image type="scenery" name="grass" filename="gfx/textures/scenery/grass.png"/>
 <image type="scenery" name="grate" filename="gfx/textures/scenery/grate.png"/>
