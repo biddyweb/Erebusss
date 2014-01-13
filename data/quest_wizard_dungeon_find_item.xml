@@ -1522,6 +1522,8 @@ You can also see large strange iron contraptions around the place, that appear t
 Further away, the landscape is formed by fields and trees, with occasional buildings, most of them damaged, some of them reduced to rubble. The trees look burned black, with no leaves. There is no sign of life that you see.
 </scenery>
 
+<scenery name="Grandfather Clock" image_name="grandfather_clock" x="24.0" y="21.75" size="1.5" blocking="true"/>
+
 <scenery name="Cabinet" image_name="cabinet" x="21.0" y="21.5" size="0.8" blocking="true">
     <item name="Rise of the Steam Age" image_name="book" icon_width="0.25" weight="2">
 This seems to be a kind of history book, detailing the progress that has been made in recent years. It talks of a thing called "science", which seems to be a means to develop amazing devices that seem magical to you. Together with harnessing the use of steam, great machines have been constructed, far more powerful than anything that can be done by a man on his own.
@@ -1726,6 +1728,7 @@ A small bronze statuette of a humanoid bull-like creature.
     />
 <floorregion shape="rect" rect_x="16.5" rect_y="11.5" rect_w="5.5" rect_h="7.0"/>
 
+<!--<player_start x="19.0" y="18.5"/>-->
 <!--<player_start x="19.0" y="20.5"/>-->
 <!--<player_start x="19.0" y="22.5"/>-->
 
