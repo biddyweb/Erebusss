@@ -401,6 +401,9 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         if( goblin == NULL ) {
             throw string("can't find goblin");
         }
+        if( goblin->skillsBegin() != goblin->skillsEnd() ) {
+            throw string("goblin shouldn't have any skills");
+        }
         base_fp = goblin->getBaseProfileIntProperty(profile_key_FP_c);
         fp = goblin->getProfileIntProperty(profile_key_FP_c);
         if( fp != base_fp ) {
