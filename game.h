@@ -116,7 +116,6 @@ class Game {
 protected:
     bool is_testing;
     int test_n_info_dialog;
-    int test_expected_n_info_dialog;
 
     map<string, Sound *> sound_effects;
     string current_stream_sound_effect;
@@ -159,14 +158,6 @@ protected:
     void init(bool fullscreen);
     void createPlayerNames();
     void loadPortraits();
-    Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) const;
-    void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) const;
-    void checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item);
-    void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item);
-    void interactNPCKill(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &objective_id, const string &check_kill_location, const string &check_kill_name, int expected_xp, int expected_gold, const string &expected_item);
-    void checkSaveGame(PlayingGamestate *playing_gamestate, int test_id);
-    void checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id);
-    void runTest(const string &filename, int test_id);
 
 public:
     Game();
@@ -227,6 +218,9 @@ public:
     void keyPress(QKeyEvent *key_event);
     Gamestate *getGamestate() const {
         return this->gamestate;
+    }
+    void setGamestate(Gamestate *gamestate) {
+        this->gamestate = gamestate;
     }
     //void mouseClick(int m_x, int m_y);
 
@@ -293,11 +287,21 @@ public:
 
     void showErrorDialog(const string &message);
 
+    void startTesting() {
+        this->is_testing = true;
+        this->test_n_info_dialog = 0;
+    }
+    void stopTesting() {
+        this->is_testing = false;
+    }
     bool isTesting() const {
         return this->is_testing;
     }
     void recordTestInfoDialog() {
         this->test_n_info_dialog++;
+    }
+    int getTestNInfoDialog() const {
+        return this->test_n_info_dialog;
     }
 };
 

@@ -33,6 +33,7 @@ copy %src%\qt_screen.cpp %dst%
 copy %src%\qt_utils.cpp %dst%
 copy %src%\scrollinglistwidget.cpp %dst%
 copy %src%\sound.cpp %dst%
+copy %src%\test.cpp %dst%
 copy %src%\webvieweventfilter.cpp %dst%
 
 copy %src%\animatedobject.h %dst%
@@ -50,6 +51,7 @@ copy %src%\qt_screen.h %dst%
 copy %src%\qt_utils.h %dst%
 copy %src%\scrollinglistwidget.h %dst%
 copy %src%\sound.h %dst%
+copy %src%\test.h %dst%
 copy %src%\webvieweventfilter.h %dst%
 
 mkdir %dst%\rpg\
