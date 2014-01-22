@@ -54,9 +54,10 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
-  TEST_LOADSAVEWRITEQUEST_0_UNARMED - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed; also test that Warrior gets FP bonus when armed with shield; also test that Warrior doesn't get +1 damage bonus against Goblin
-  TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN - as TEST_LOADSAVEWRITEQUEST_0_UNARMED, but checks that Barbarian doesn't have FP penalty for being unarmed, and doesn't get FP bonus when armed with shield
-  TEST_LOADSAVEWRITEQUEST_0_HATRED - test for 1st quest: check that Elf gets +1 damage bonus against Goblin and Orc, but not against Wyvern
+  TEST_LOADSAVEWRITEQUEST_0_WARRIOR - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed; also test that Warrior gets FP bonus when armed with shield; also test that Warrior doesn't get +1 damage bonus against Goblin; also tests for getTimeTurn()
+  TEST_LOADSAVEWRITEQUEST_0_BARBARIAN - as TEST_LOADSAVEWRITEQUEST_0_WARRIOR, but checks that Barbarian doesn't have FP penalty for being unarmed, and doesn't get FP bonus when armed with shield
+  TEST_LOADSAVEWRITEQUEST_0_ELF - test for 1st quest: check that Elf gets +1 damage bonus against Goblin and Orc, but not against Wyvern
+  TEST_LOADSAVEWRITEQUEST_0_RANGER - as TEST_LOADSAVEWRITEQUEST_0_WARRIOR, but checks that Ranger has faster ranged attacks
   TEST_LOADSAVEWRITEQUEST_1_COMPLETE - test for 2nd quest: pick up item, check quest then complete
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
@@ -362,13 +363,13 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("expected quest to be completed now");
         }
     }
-    else if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_HATRED ) {
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR || test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_ELF || test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER ) {
         Character *player = playing_gamestate->getPlayer();
         // check skill is as expected
-        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED && !player->hasSkill(skill_shield_combat_c) ) {
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR && !player->hasSkill(skill_shield_combat_c) ) {
             throw string("player doesn't have unarmed combat skill");
         }
-        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN && !player->hasSkill(skill_unarmed_combat_c) ) {
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN && !player->hasSkill(skill_unarmed_combat_c) ) {
             throw string("player doesn't have unarmed combat skill");
         }
         int base_fp = player->getBaseProfileIntProperty(profile_key_FP_c);
@@ -379,7 +380,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         // now disarm, and check we get a penalty (except for barbarian)
         player->armWeapon(NULL);
         fp = player->getProfileIntProperty(profile_key_FP_c);
-        int exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN) ? base_fp : base_fp-2;
+        int exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN) ? base_fp : base_fp-2;
         if( fp != exp_fp ) {
             throw string("player unarmed fp " + numberToString(fp) + " is not " + numberToString(exp_fp) + " as expected, base fp was " + numberToString(base_fp));
         }
@@ -393,7 +394,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             }
         }
         else {
-            if( player->getCurrentWeapon() == NULL ) {
+            if( player->getCurrentWeapon() != weapon ) {
                 throw string("failed to arm player with weapon");
             }
         }
@@ -401,7 +402,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("failed to arm player with shield");
         }
         fp = player->getProfileIntProperty(profile_key_FP_c);
-        exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED) ? base_fp+1 : base_fp;
+        exp_fp = (test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR) ? base_fp+1 : base_fp;
         if( player->getCurrentWeapon() == NULL )
             exp_fp -= 2;
         if( fp != exp_fp ) {
@@ -422,13 +423,13 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("goblin fp " + numberToString(fp) + " is different to base fp " + numberToString(base_fp));
         }
 
-        if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED ) {
+        if( test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR ) {
             // test no damage bonus against goblin
             if( RPGEngine::getDamageBonusFromHatred(player, goblin, false) != 0 ) {
                 throw string("shouldn't get damage bonus from hatred");
             }
         }
-        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_HATRED ) {
+        else if( test_id == TEST_LOADSAVEWRITEQUEST_0_ELF ) {
             if( RPGEngine::getDamageBonusFromHatred(player, goblin, false) != 1 ) {
                 throw string("should get damage bonus from hatred");
             }
@@ -442,6 +443,24 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             if( RPGEngine::getDamageBonusFromHatred(player, wyvern, false) != 0 ) {
                 throw string("shouldn't get damage bonus from hatred for wyvern");
             }
+        }
+
+        const int base_time_turn_c = 1000;
+        if( player->getTimeTurn(false, false) != base_time_turn_c ) {
+            throw string("unexpected time turn");
+        }
+        // arm with a bow
+        Weapon *bow = static_cast<Weapon *>(playing_gamestate->cloneStandardItem("Shortbow"));
+        player->addItem(bow, true);
+        player->armWeapon(bow);
+        if( player->getCurrentWeapon() != bow ) {
+            throw string("failed to arm player with bow");
+        }
+        if( player->getTimeTurn(false, true) != (test_id==TEST_LOADSAVEWRITEQUEST_0_RANGER ? 700 : base_time_turn_c) ) {
+            throw string("unexpected time turn for ranged");
+        }
+        else if( player->getTimeTurn(true, false) != base_time_turn_c ) {
+            throw string("unexpected time turn for spellcasting");
         }
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ) {
@@ -1280,9 +1299,10 @@ void Test::runTest(const string &filename, int test_id) {
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE ||
-                 test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED ||
-                 test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN ||
-                 test_id == TEST_LOADSAVEWRITEQUEST_0_HATRED ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_0_ELF ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
@@ -1299,17 +1319,17 @@ void Test::runTest(const string &filename, int test_id) {
             // load
             LOG("1 load\n");
             string player = "Warrior";
-            if( test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN )
+            if( test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN )
                 player = "Barbarian";
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_0_HATRED || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF )
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_0_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF )
                 player = "Elf";
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER )
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER )
                 player = "Ranger";
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             game_g->setGamestate(playing_gamestate);
 
             QString qt_filename;
-            if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED || test_id == TEST_LOADSAVEWRITEQUEST_0_UNARMED_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_HATRED ) {
+            if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR || test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_ELF || test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
