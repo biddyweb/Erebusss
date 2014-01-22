@@ -10,6 +10,16 @@ string RPGEngine::getDefenderProfileKey(bool is_ranged, bool is_magical) {
     return is_ranged ? profile_key_D_c : is_magical ? profile_key_M_c: profile_key_FP_c;
 }
 
+int RPGEngine::getDamageBonusFromHatred(const Character *attacker, const Character *defender, bool is_ranged) {
+    int bonus = 0;
+    if( !is_ranged && attacker->hasSkill(skill_hatred_orcs_c) && defender->getType() == "goblinoid" ) {
+        bonus++;
+        qDebug("    extra damage from hatred of orcs");
+        //playing_gamestate->addTextEffect(PlayingGamestate::tr("hatred of orcs").toStdString(), attacker->getPos(), 1000);
+    }
+    return bonus;
+}
+
 bool RPGEngine::combat(int &weapon_damage, bool &weapon_no_effect_magical, bool &weapon_no_effect_holy, PlayingGamestate *playing_gamestate, const Character *attacker, const Character *defender, bool is_ranged, const Ammo *ammo, bool has_charged) {
     bool is_magical = attacker->requiresMagical() || defender->requiresMagical();
     int a_stat = attacker->getProfileIntProperty( RPGEngine::getAttackerProfileKey(is_ranged, is_magical) );
@@ -53,11 +63,7 @@ bool RPGEngine::combat(int &weapon_damage, bool &weapon_no_effect_magical, bool 
                     qDebug("    extra damage from charge");
                     //playing_gamestate->addTextEffect(PlayingGamestate::tr("ping charge").toStdString(), attacker->getPos(), 1000);
                 }
-                if( !is_ranged && attacker->hasSkill(skill_hatred_orcs_c) && defender->getType() == "goblinoid" ) {
-                    weapon_damage++;
-                    qDebug("    extra damage from hatred of orcs");
-                    //playing_gamestate->addTextEffect(PlayingGamestate::tr("hatred of orcs").toStdString(), attacker->getPos(), 1000);
-                }
+                weapon_damage += getDamageBonusFromHatred(attacker, defender, is_ranged);
                 if( ammo != NULL ) {
                     // -1 from rating, as default rating is 1, but this should mean no modification
                     weapon_damage += (ammo->getRating()-1);
