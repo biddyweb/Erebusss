@@ -632,6 +632,7 @@ public:
     }
     Vector2D getDestination() const;
     bool update(PlayingGamestate *playing_gamestate);
+    void handleSpecialHitEffects(PlayingGamestate *playing_gamestate, Character *target) const;
     int getTimeTurn(bool is_casting, bool is_ranged);
     void setTargetNPC(Character *target_npc);
     Character *getTargetNPC() const {

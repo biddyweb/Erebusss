@@ -887,6 +887,33 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
     return false;
 }
 
+void Character::handleSpecialHitEffects(PlayingGamestate *playing_gamestate, Character *target) const {
+    // called when this character has hit the target character
+    if( this->getCausesDisease() > 0 && !target->isDiseased() && !target->hasSkill(skill_disease_resistance_c) ) {
+        int roll = rollDice(1, 100, 0);
+        qDebug("roll for causing disease: %d vs %d", roll, this->getCausesDisease());
+        if( roll < this->getCausesDisease() ) {
+            // infect!
+            target->setDiseased(true);
+            if( target == playing_gamestate->getPlayer() ) {
+                playing_gamestate->addTextEffect(PlayingGamestate::tr("You have been infected with a disease!").toStdString(), playing_gamestate->getPlayer()->getPos(), 5000);
+            }
+        }
+    }
+    if( this->getCausesParalysis() > 0 && !target->isParalysed() ) {
+        // note, although we could paralyse someone who's already paralysed (the effect being to extend the length of paralysis), it seems fairer to the player to not do this, to avoid the risk of a player being unable to ever do anything!
+        int roll = rollDice(1, 100, 0);
+        qDebug("roll for causing paralysis: %d vs %d", roll, this->getCausesParalysis());
+        if( roll < this->getCausesParalysis() ) {
+            // paralyse!
+            target->paralyse(5000);
+            if( target == playing_gamestate->getPlayer() ) {
+                playing_gamestate->addTextEffect(PlayingGamestate::tr("You are paralysed by the enemy!").toStdString(), playing_gamestate->getPlayer()->getPos(), 5000);
+            }
+        }
+    }
+}
+
 int Character::getTimeTurn(bool is_casting, bool is_ranged) {
     int time_turn = base_time_turn_c;
     if( !is_casting ) {
