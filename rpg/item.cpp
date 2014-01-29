@@ -33,7 +33,7 @@ string Item::getUseVerb() const {
 }
 
 bool Item::useItem(PlayingGamestate *playing_gamestate, Character *character) {
-    // returns true if item used up
+    // returns true if item used up - in which case, the item should be removed from the character with takeItem(), then the item deleted
     // n.b., must be an item owned by Character!
     if( !this->canUse() ) {
         LOG("tried to use item that can't be used %s\n", this->getName().c_str());
