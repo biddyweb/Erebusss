@@ -86,7 +86,7 @@ void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
     }
     if( type == CHARACTERACTION_RANGED_WEAPON ) {
         if( hits ) {
-            playing_gamestate->hitEnemy(source, target_npc, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
+            playing_gamestate->hitEnemy(source, target_npc, true, weapon_no_effect_magical, weapon_no_effect_holy, weapon_damage);
         }
     }
     else if( type == CHARACTERACTION_SPELL ) {
@@ -7151,7 +7151,7 @@ void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
     }
 }
 
-void PlayingGamestate::hitEnemy(Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage) {
+void PlayingGamestate::hitEnemy(Character *source, Character *target, bool is_ranged, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage) {
     // source may be NULL, if attacker is no longer alive (for ranged attacks)
     if( weapon_no_effect_magical ) {
         if( source == this->getPlayer() ) {
@@ -7171,6 +7171,32 @@ void PlayingGamestate::hitEnemy(Character *source, Character *target, bool weapo
             }
         }
         //qDebug("    damage %d remaining %d", weapon_damage, target->getHealth());
+    }
+
+    if( !target->isDead() && !is_ranged ) {
+        if( source->getCausesDisease() > 0 && !target->isDiseased() && !target->hasSkill(skill_disease_resistance_c) ) {
+            int roll = rollDice(1, 100, 0);
+            qDebug("roll for causing disease: %d vs %d", roll, source->getCausesDisease());
+            if( roll < source->getCausesDisease() ) {
+                // infect!
+                target->setDiseased(true);
+                if( target == this->getPlayer() ) {
+                    this->addTextEffect(PlayingGamestate::tr("You have been infected with a disease!").toStdString(), this->getPlayer()->getPos(), 5000);
+                }
+            }
+        }
+        if( source->getCausesParalysis() > 0 && !target->isParalysed() ) {
+            // note, although we could paralyse someone who's already paralysed (the effect being to extend the length of paralysis), it seems fairer to the player to not do this, to avoid the risk of a player being unable to ever do anything!
+            int roll = rollDice(1, 100, 0);
+            qDebug("roll for causing paralysis: %d vs %d", roll, source->getCausesParalysis());
+            if( roll < source->getCausesParalysis() ) {
+                // paralyse!
+                target->paralyse(5000);
+                if( target == this->getPlayer() ) {
+                    this->addTextEffect(PlayingGamestate::tr("You are paralysed by the enemy!").toStdString(), this->getPlayer()->getPos(), 5000);
+                }
+            }
+        }
     }
 }
 

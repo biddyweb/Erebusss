@@ -568,7 +568,7 @@ public:
         journal_ss << getJournalDate();
     }
 
-    void hitEnemy(Character *source, Character *target, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage);
+    void hitEnemy(Character *source, Character *target, bool is_ranged, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage);
     void moveToLocation(Location *location, Vector2D pos);
     bool interactWithScenery(bool *move, void **ignore, Scenery *scenery);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
