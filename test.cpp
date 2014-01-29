@@ -62,7 +62,8 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT - test for 2nd quest: interact with Calbert
   TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST - test for 2nd quest: interact with Ghost
   TEST_LOADSAVEWRITEQUEST_1_ELF - test for 2nd quest: Elf has sprint bonus iff outdoors; also check wandering monster rest chance is as expected
-  TEST_LOADSAVEWRITEQUEST_1_RANGER - test for 2nd quest: check wandering monster rest chance is as expected, and that doesn't have sprint bonus
+  TEST_LOADSAVEWRITEQUEST_1_RANGER - test for 2nd quest: check wandering monster rest chance is as expected, and that doesn't have sprint bonus; also check that ranger can get disease
+  TEST_LOADSAVEWRITEQUEST_1_HALFLING - test for 2nd quest: check that halfling can get disease
   TEST_LOADSAVEWRITEQUEST_1_REVEAL - test for 2nd quest: check Location::revealMap() works as expected
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
@@ -500,7 +501,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         // interact with Ghost
         interactNPCItem(playing_gamestate, "level_6", Vector2D(5.9f, 28.0f), "Ghost", "level_6", Vector2D(5.9f, 28.0f), "Ghost's Bones", false, false, 30, 0, "");
     }
-    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ) {
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING ) {
         Character *player = playing_gamestate->getPlayer();
         // check skill is as expected
         if( test_id == TEST_LOADSAVEWRITEQUEST_1_ELF && !player->hasSkill(skill_sprint_c) ) {
@@ -511,7 +512,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         }
         // check hideaway skill
         Location *location = playing_gamestate->getCLocation();
-        int exp_rest_chance = test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ? 10 : 5;
+        int exp_rest_chance = test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ? 5 : 10;
         int rest_chance = location->getWanderingMonsterRestChance(player);
         if( rest_chance != exp_rest_chance ) {
             throw string("wandering monster rest chance " + numberToString(rest_chance) + " is not as expected " + numberToString(exp_rest_chance));
@@ -523,11 +524,45 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("player sp " + numberToString(sp) + " is different to base sp " + numberToString(base_sp));
         }
         location = playing_gamestate->getQuest()->findLocation("level_past");
-        playing_gamestate->moveToLocation(location, Vector2D(25.0f, 24.0));
+        playing_gamestate->moveToLocation(location, Vector2D(25.0f, 24.0f));
         sp = player->getProfileFloatProperty(profile_key_Sp_c);
         float exp_sp = test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ? base_sp + 0.2f : base_sp;
         if( fabs(exp_sp - sp) > E_TOL_LINEAR ) {
             throw string("player sp " + numberToString(sp) + " does not have expected sp " + numberToString(exp_sp) + " base sp was " + numberToString(base_sp));
+        }
+        // check effects of disease
+        bool can_get_disease = test_id != TEST_LOADSAVEWRITEQUEST_1_HALFLING;
+        location = playing_gamestate->getQuest()->findLocation("level_5");
+        playing_gamestate->moveToLocation(location, Vector2D(21.0f, 2.5f));
+        Character *character = location->findCharacter("Zombie");
+        if( character == NULL ) {
+            throw string("can't find zombie");
+        }
+        for(int i=0;i<1000;i++) {
+            character->handleSpecialHitEffects(playing_gamestate, playing_gamestate->getPlayer());
+            if( character->isDiseased() )
+                break;
+        }
+        // n.b., very small chance that non-Halfling characters won't have got a disease! If this ever happens, need to rerun the test.
+        if( playing_gamestate->getPlayer()->isDiseased() != can_get_disease ) {
+            throw string("unexpected disease status");
+        }
+        // check effects of mushroom
+        for(int i=0;i<100;i++) {
+            Item *item = playing_gamestate->cloneStandardItem("Mushroom");
+            int old_health = playing_gamestate->getPlayer()->getHealth();
+            playing_gamestate->getPlayer()->addItem(item);
+            if( !item->useItem(playing_gamestate, playing_gamestate->getPlayer()) ) {
+                throw string("Failed to use up mushroom");
+            }
+            playing_gamestate->getPlayer()->takeItem(item);
+            delete item;
+            if( playing_gamestate->getPlayer()->getHealth() < old_health ) {
+                if( test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING ) {
+                    throw string("Halfling shouldn't have been harmed by mushroom");
+                }
+                break;
+            }
         }
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
@@ -1308,6 +1343,7 @@ void Test::runTest(const string &filename, int test_id) {
                  test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_ELF ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
@@ -1325,6 +1361,8 @@ void Test::runTest(const string &filename, int test_id) {
                 player = "Elf";
             else if( test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER )
                 player = "Ranger";
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING )
+                player = "Halfling";
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, player, "name", false, false, 0);
             game_g->setGamestate(playing_gamestate);
 
@@ -1332,7 +1370,7 @@ void Test::runTest(const string &filename, int test_id) {
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR || test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_ELF || test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
             else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
