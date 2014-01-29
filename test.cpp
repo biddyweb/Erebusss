@@ -65,12 +65,14 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_LOADSAVEWRITEQUEST_1_RANGER - test for 2nd quest: check wandering monster rest chance is as expected, and that doesn't have sprint bonus; also check that ranger can get disease
   TEST_LOADSAVEWRITEQUEST_1_HALFLING - test for 2nd quest: check that halfling can get disease
   TEST_LOADSAVEWRITEQUEST_1_REVEAL - test for 2nd quest: check Location::revealMap() works as expected
+  TEST_LOADSAVEWRITEQUEST_1_ITEMS - test for 2nd quest: check attributes for various items
   TEST_LOADSAVEWRITEQUEST_2_COMPLETE - test for 3rd quest: go through the exit, check quest then complete
   TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
   TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR - test for 3rd quest: interact with Glenthor
+  TEST_LOADSAVEWRITEQUEST_2_ITEMS - test for 3rd quest: check attributes for various items
   */
 
-Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc) {
+Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool allow_multiple) {
     LOG("checkFindSingleItem for %s\n", item_name.c_str());
     vector<Scenery *> scenery_owners;
     vector<Character *> character_owners;
@@ -78,8 +80,11 @@ Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_o
     if( items.size() != scenery_owners.size() || items.size() != character_owners.size() ) {
         throw string("mismatched array lengths");
     }
-    else if( items.size() != 1 ) {
-        throw string("unexpected number of items");
+    else if( items.size() == 0 ) {
+        throw string("couldn't find any items");
+    }
+    else if( !allow_multiple && items.size() > 1 ) {
+        throw string("too many items");
     }
     else if( owned_by_scenery ) {
         if( scenery_owners[0] == NULL || character_owners[0] != NULL ) {
@@ -128,7 +133,7 @@ void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
             throw string("didn't expect door to be unlocked");
         }
     }
-    checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc);
+    checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc, false);
 }
 
 void Test::checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item) {
@@ -204,7 +209,7 @@ void Test::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
     }
 
     Scenery *scenery = NULL;
-    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc);
+    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc, false);
     bool move = false;
     void *ignore = NULL;
     if( owned_by_scenery )
@@ -589,6 +594,107 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("new_n_visible " + numberToString(new_n_visible) + " should be greater than n_visible " + numberToString(n_visible));
         }
     }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ITEMS ) {
+        Location *location = playing_gamestate->getQuest()->findLocation("level_2");
+        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Shortbow", false, true, true);
+        if( item->getType() != ITEMTYPE_WEAPON ) {
+            throw string("expected a weapon");
+        }
+        if( item->getImageName() != "longbow" ) {
+            throw string("item image name is not as expected");
+        }
+        if( item->getWeight() != 4 ) {
+            throw string("item weight is not as expected");
+        }
+        if( item->isMagical() ) {
+            throw string("item magicalness is not as expected");
+        }
+        Weapon *weapon = static_cast<Weapon *>(item);
+        int damageX = 0, damageY = 0, damageZ = 0;
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        if( damageX != 2 || damageY != 8 || damageZ != -2 ) {
+            throw string("weapon damage is not as expected");
+        }
+        if( weapon->getMinStrength() != 0 ) {
+            throw string("weapon min strength is not as expected");
+        }
+        if( weapon->getAnimationName() != "longbow" ) {
+            throw string("weapon animation name is not as expected");
+        }
+        if( weapon->getWeaponClass() != "bow" ) {
+            throw string("weapon class is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_FP_c) != 0 ) {
+            throw string("weapon bonus FP is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_BS_c) != -1 ) {
+            throw string("weapon bonus BS is not as expected");
+        }
+        if( !weapon->isTwoHanded() ) {
+            throw string("weapon two-handedness is not as expected");
+        }
+        if( !weapon->isRangedOrThrown() ) {
+            throw string("weapon ranged/thrown status is not as expected");
+        }
+        if( weapon->getAmmoKey() != "Arrows") {
+            throw string("weapon ammo key is not as expected");
+        }
+        if( weapon->getBaseTemplate() != "" ) {
+            throw string("weapon base template is not as expected");
+        }
+        if( weapon->getWorthBonus() != 0 ) {
+            throw string("weapon worth bonus is not as expected");
+        }
+
+        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Magic Dagger", true, false, false);
+        if( item->getType() != ITEMTYPE_WEAPON ) {
+            throw string("expected a weapon");
+        }
+        if( item->getImageName() != "dagger" ) {
+            throw string("item image name is not as expected");
+        }
+        if( item->getWeight() != 5 ) {
+            throw string("item weight is not as expected");
+        }
+        if( !item->isMagical() ) {
+            throw string("item magicalness is not as expected");
+        }
+        weapon = static_cast<Weapon *>(item);
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        if( damageX != 1 || damageY != 6 || damageZ != 1 ) {
+            throw string("weapon damage is not as expected");
+        }
+        if( weapon->getMinStrength() != 0 ) {
+            throw string("weapon min strength is not as expected");
+        }
+        if( weapon->getAnimationName() != "dagger" ) {
+            throw string("weapon animation name is not as expected");
+        }
+        if( weapon->getWeaponClass() != "" ) {
+            throw string("weapon class is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_FP_c) != -1 ) {
+            throw string("weapon bonus FP is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_BS_c) != 0 ) {
+            throw string("weapon bonus BS is not as expected");
+        }
+        if( weapon->isTwoHanded() ) {
+            throw string("weapon two-handedness is not as expected");
+        }
+        if( weapon->isRangedOrThrown() ) {
+            throw string("weapon ranged/thrown status is not as expected");
+        }
+        if( weapon->getAmmoKey() != "") {
+            throw string("weapon ammo key is not as expected");
+        }
+        if( weapon->getBaseTemplate() != "Dagger" ) {
+            throw string("weapon base template is not as expected");
+        }
+        if( weapon->getWorthBonus() != 200 ) {
+            throw string("weapon worth bonus is not as expected");
+        }
+    }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ) {
         // check quest completed iff go through exit picked up
         test_expected_n_info_dialog++;
@@ -618,6 +724,79 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
         interactNPCKill(playing_gamestate, "level_1", Vector2D(39.0f, 29.0f), "Glenthor", "Glenthor", "level_1", "Wyvern", 75, 0, "");
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
+        Location *location = playing_gamestate->getQuest()->findLocation("level_1");
+        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Long Sword", true, false, false);
+        if( item->getType() != ITEMTYPE_WEAPON ) {
+            throw string("expected a weapon");
+        }
+        if( item->getImageName() != "longsword" ) {
+            throw string("item image name is not as expected");
+        }
+        if( item->getWeight() != 10 ) {
+            throw string("item weight is not as expected");
+        }
+        if( item->isMagical() ) {
+            throw string("item magicalness is not as expected");
+        }
+        Weapon *weapon = static_cast<Weapon *>(item);
+        int damageX = 0, damageY = 0, damageZ = 0;
+        weapon->getDamage(&damageX, &damageY, &damageZ);
+        if( damageX != 2 || damageY != 10 || damageZ != 2 ) {
+            throw string("weapon damage is not as expected");
+        }
+        if( weapon->getMinStrength() != 7 ) {
+            throw string("weapon min strength is not as expected");
+        }
+        if( weapon->getAnimationName() != "longsword" ) {
+            throw string("weapon animation name is not as expected");
+        }
+        if( weapon->getWeaponClass() != "" ) {
+            throw string("weapon class is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_FP_c) != 0 ) {
+            throw string("weapon bonus FP is not as expected");
+        }
+        if( weapon->getRawProfileBonusIntProperty(profile_key_BS_c) != 0 ) {
+            throw string("weapon bonus BS is not as expected");
+        }
+        if( weapon->isTwoHanded() ) {
+            throw string("weapon two-handedness is not as expected");
+        }
+        if( weapon->isRangedOrThrown() ) {
+            throw string("weapon ranged/thrown status is not as expected");
+        }
+        if( weapon->getAmmoKey() != "") {
+            throw string("weapon ammo key is not as expected");
+        }
+        if( weapon->getBaseTemplate() != "Long Sword" ) {
+            throw string("weapon base template is not as expected");
+        }
+        if( weapon->getWorthBonus() != 150 ) {
+            throw string("weapon worth bonus is not as expected");
+        }
+
+        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Chain Mail Armour", false, true, true);
+        if( item->getType() != ITEMTYPE_ARMOUR ) {
+            throw string("expected an armour");
+        }
+        if( item->getImageName() != "metal_armour" ) {
+            throw string("item image name is not as expected");
+        }
+        if( item->getWeight() != 150 ) {
+            throw string("item weight is not as expected");
+        }
+        if( item->isMagical() ) {
+            throw string("item magicalness is not as expected");
+        }
+        Armour *armour = static_cast<Armour *>(item);
+        if( armour->getMinStrength() != 7 ) {
+            throw string("armour min strength is not as expected");
+        }
+        if( armour->getRating() != 4 ) {
+            throw string("armour rating is not as expected");
+        }
     }
     else {
         throw string("unknown test_id");
@@ -1345,9 +1524,11 @@ void Test::runTest(const string &filename, int test_id) {
                  test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING ||
                  test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_1_ITEMS ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
-                 test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
             // load, check, load, save, load, check
             QElapsedTimer timer;
             timer.start();
@@ -1370,10 +1551,10 @@ void Test::runTest(const string &filename, int test_id) {
             if( test_id == TEST_LOADSAVEWRITEQUEST_0_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_0_WARRIOR || test_id == TEST_LOADSAVEWRITEQUEST_0_BARBARIAN || test_id == TEST_LOADSAVEWRITEQUEST_0_ELF || test_id == TEST_LOADSAVEWRITEQUEST_0_RANGER ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL || test_id == TEST_LOADSAVEWRITEQUEST_1_ITEMS ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR || test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
             }
 

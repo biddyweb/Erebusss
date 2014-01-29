@@ -74,16 +74,18 @@ enum TestID {
     TEST_LOADSAVEWRITEQUEST_1_RANGER = 58,
     TEST_LOADSAVEWRITEQUEST_1_HALFLING = 59,
     TEST_LOADSAVEWRITEQUEST_1_REVEAL = 60,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 61,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 62,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 63,
-    N_TESTS = 64
+    TEST_LOADSAVEWRITEQUEST_1_ITEMS = 61,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 62,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 63,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 64,
+    TEST_LOADSAVEWRITEQUEST_2_ITEMS = 65,
+    N_TESTS = 66
 };
 
 class Test {
     static int test_expected_n_info_dialog;
 
-    static Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc);
+    static Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool allow_multiple);
     static void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc);
     static void checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item);
     static void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item);
