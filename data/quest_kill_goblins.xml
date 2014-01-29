@@ -177,15 +177,6 @@
 <gold amount="60" x="1.0" y="10.5"/>
 -->
 
-<!--
-<weapon name="Magic Dagger" image_name="longsword" weight="5"
-    damageX="1" damageY="6" damageZ="1"
-    animation_name="longsword"
-    magical="true"
-    base_template="Dagger" worth_bonus="200"
-    x="2.0" y="10.5"/>
--->
-
 <!--<item template="Potion of Healing" x="2.0" y="10.5"/>-->
 
 <!--<item template="Gold Ring" x="4.0" y="10.5"/>-->
