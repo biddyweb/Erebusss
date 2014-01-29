@@ -47,13 +47,6 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <!--<item template="Potion of Combat" x="32.0" y="3.0"/>
 <item template="Potion of Archery" x="32.0" y="4.0"/>-->
-<!--<weapon name="Short Sword +1" image_name="longsword" weight="10"
-    damageX="2" damageY="6" damageZ="1"
-    bonus_FP="1"
-    animation_name="longsword"
-    base_template="Short Sword" worth_bonus="100"
-    x="34.0" y="5.0"
-    />-->
 
 <scenery name="Door" image_name="door_wood_n" x="32.5" y="0.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit="true"/>
 
@@ -366,9 +359,10 @@ This journal seems to be a record of grisly torture that took place in this room
 </npc>
 
 <scenery name="Chest" image_name="chest" x="24.5" y="20.5" size="0.8" blocking="true">
-    <weapon name="Magic Dagger" image_name="longsword" weight="5"
+    <weapon name="Magic Dagger" image_name="dagger" weight="5"
         damageX="1" damageY="6" damageZ="1"
-        animation_name="longsword"
+        bonus_FP="-1"
+        animation_name="dagger"
         magical="true"
         base_template="Dagger" worth_bonus="200"
         />
