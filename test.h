@@ -61,32 +61,33 @@ enum TestID {
     TEST_LOADSAVEQUEST_2 = 45,
     TEST_LOADSAVEQUEST_3 = 46,
     TEST_LOADSAVERANDOMQUEST_0 = 47,
-    TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 48,
-    TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 49,
-    TEST_LOADSAVEWRITEQUEST_0_WARRIOR = 50,
-    TEST_LOADSAVEWRITEQUEST_0_BARBARIAN = 51,
-    TEST_LOADSAVEWRITEQUEST_0_ELF = 52,
-    TEST_LOADSAVEWRITEQUEST_0_RANGER = 53,
-    TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 54,
-    TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 55,
-    TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 56,
-    TEST_LOADSAVEWRITEQUEST_1_ELF = 57,
-    TEST_LOADSAVEWRITEQUEST_1_RANGER = 58,
-    TEST_LOADSAVEWRITEQUEST_1_HALFLING = 59,
-    TEST_LOADSAVEWRITEQUEST_1_REVEAL = 60,
-    TEST_LOADSAVEWRITEQUEST_1_ITEMS = 61,
-    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 62,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 63,
-    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 64,
-    TEST_LOADSAVEWRITEQUEST_2_ITEMS = 65,
-    N_TESTS = 66
+    TEST_LOADSAVE_QUEST_1_COMPLETED = 48,
+    TEST_LOADSAVE_ACTION_LAST_TIME_BUG = 49,
+    TEST_LOADSAVEWRITEQUEST_0_COMPLETE = 50,
+    TEST_LOADSAVEWRITEQUEST_0_WARRIOR = 51,
+    TEST_LOADSAVEWRITEQUEST_0_BARBARIAN = 52,
+    TEST_LOADSAVEWRITEQUEST_0_ELF = 53,
+    TEST_LOADSAVEWRITEQUEST_0_RANGER = 54,
+    TEST_LOADSAVEWRITEQUEST_1_COMPLETE = 55,
+    TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT = 56,
+    TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST = 57,
+    TEST_LOADSAVEWRITEQUEST_1_ELF = 58,
+    TEST_LOADSAVEWRITEQUEST_1_RANGER = 59,
+    TEST_LOADSAVEWRITEQUEST_1_HALFLING = 60,
+    TEST_LOADSAVEWRITEQUEST_1_REVEAL = 61,
+    TEST_LOADSAVEWRITEQUEST_1_ITEMS = 62,
+    TEST_LOADSAVEWRITEQUEST_2_COMPLETE = 63,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH = 64,
+    TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR = 65,
+    TEST_LOADSAVEWRITEQUEST_2_ITEMS = 66,
+    N_TESTS = 67
 };
 
 class Test {
     static int test_expected_n_info_dialog;
 
-    static Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool allow_multiple);
-    static void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc);
+    static Item *checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool owned_by_player, bool allow_multiple);
+    static void checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc, bool key_owned_by_player);
     static void checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item);
     static void interactNPCItem(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &location_item_name, const Vector2D &location_item_pos, const string &item_name, bool owned_by_scenery, bool owned_by_npc, int expected_xp, int expected_gold, const string &expected_item);
     static void interactNPCKill(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, const string &objective_id, const string &check_kill_location, const string &check_kill_name, int expected_xp, int expected_gold, const string &expected_item);

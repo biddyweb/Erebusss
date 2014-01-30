@@ -52,6 +52,7 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
+  TEST_LOADSAVE_QUEST_1_COMPLETED - test for when 1st quest is completed, and door unlocked
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
   TEST_LOADSAVEWRITEQUEST_0_WARRIOR - test for 1st quest: check FP of player and goblin is as expected, then check again when they are unarmed; also test that Warrior gets FP bonus when armed with shield; also test that Warrior doesn't get +1 damage bonus against Goblin; also tests for getTimeTurn()
@@ -72,8 +73,11 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_LOADSAVEWRITEQUEST_2_ITEMS - test for 3rd quest: check attributes for various items
   */
 
-Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool allow_multiple) {
+Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool owned_by_player, bool allow_multiple) {
     LOG("checkFindSingleItem for %s\n", item_name.c_str());
+    if( owned_by_npc && owned_by_player ) {
+        throw string("test error: item can't be owned by npc and player");
+    }
     vector<Scenery *> scenery_owners;
     vector<Character *> character_owners;
     vector<Item *> items = location->getItems(item_name, true, true, &scenery_owners, &character_owners);
@@ -91,12 +95,15 @@ Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_o
             throw string("expected item to be owned by scenery");
         }
     }
-    else if( owned_by_npc ) {
+    else if( owned_by_npc || owned_by_player ) {
         if( scenery_owners[0] != NULL || character_owners[0] == NULL ) {
             throw string("expected item to be owned by character");
         }
-        else if( character_owners[0] == playing_gamestate->getPlayer() ) {
+        else if( owned_by_npc && character_owners[0] == playing_gamestate->getPlayer() ) {
             throw string("didn't expect item to be owned by player, should be an NPC");
+        }
+        else if( owned_by_player && character_owners[0] != playing_gamestate->getPlayer() ) {
+            throw string("expected item to be owned by player");
         }
     }
     else {
@@ -111,9 +118,12 @@ Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_o
     return items[0];
 }
 
-void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc) {
-    if( key_owned_by_scenery && key_owned_by_npc ) {
-        throw string("test error: key can't be owned by scenery and npc");
+void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc, bool key_owned_by_player) {
+    if( key_owned_by_scenery && ( key_owned_by_npc || key_owned_by_player ) ) {
+        throw string("test error: key can't be owned by scenery and npc/player");
+    }
+    if( key_owned_by_npc && key_owned_by_player ) {
+        throw string("test error: key can't be owned by npc and player");
     }
     Location *location_key = playing_gamestate->getQuest()->findLocation(location_key_name);
     if( location_key == NULL ) {
@@ -133,7 +143,7 @@ void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
             throw string("didn't expect door to be unlocked");
         }
     }
-    checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc, false);
+    checkFindSingleItem(NULL, NULL, playing_gamestate, location_key, key_name, key_owned_by_scenery, key_owned_by_npc, key_owned_by_player, false);
 }
 
 void Test::checkCanCompleteNPC(PlayingGamestate *playing_gamestate, const string &location_npc_name, const Vector2D &location_npc_pos, const string &npc_name, int expected_xp, int expected_gold, const string &expected_item, bool can_complete, bool quest_was_item) {
@@ -209,7 +219,7 @@ void Test::interactNPCItem(PlayingGamestate *playing_gamestate, const string &lo
     }
 
     Scenery *scenery = NULL;
-    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc, false);
+    Item *item = checkFindSingleItem(&scenery, NULL, playing_gamestate, location_item, item_name, owned_by_scenery, owned_by_npc, false, false);
     bool move = false;
     void *ignore = NULL;
     if( owned_by_scenery )
@@ -283,7 +293,7 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         if( location->getName() != "" ) {
             throw string("unexpected start location");
         }
-        checkLockedDoors(playing_gamestate, "", "", "Goblin's Key", 1, false, true);
+        checkLockedDoors(playing_gamestate, "", "", "Goblin's Key", 1, false, true, false);
     }
     else if( test_id == TEST_LOADSAVEQUEST_1 ) {
         // check quest not completed
@@ -294,13 +304,13 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         if( location->getName() != "entrance" ) {
             throw string("unexpected start location");
         }
-        checkLockedDoors(playing_gamestate, "level_1", "level_1", "Vespar's Cell Key", 5, false, true);
-        checkLockedDoors(playing_gamestate, "level_3", "level_3", "Hand Mirror", 1, false, false);
-        checkLockedDoors(playing_gamestate, "cave", "level_past", "Missing Teleporter Piece", 1, true, false);
-        checkLockedDoors(playing_gamestate, "cave", "cave", "Orc Warlord's Key", 2, false, true);
-        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Maze Key", 1, true, false);
-        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Bull Statuette", 1, true, false);
-        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Minotaur's Key", 1, false, true);
+        checkLockedDoors(playing_gamestate, "level_1", "level_1", "Vespar's Cell Key", 5, false, true, false);
+        checkLockedDoors(playing_gamestate, "level_3", "level_3", "Hand Mirror", 1, false, false, false);
+        checkLockedDoors(playing_gamestate, "cave", "level_past", "Missing Teleporter Piece", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "cave", "cave", "Orc Warlord's Key", 2, false, true, false);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Maze Key", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Bull Statuette", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "level_6", "level_6", "Minotaur's Key", 1, false, true, false);
     }
     else if( test_id == TEST_LOADSAVEQUEST_2 ) {
         // check quest not completed
@@ -311,9 +321,9 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         if( location->getName() != "entrance" ) {
             throw string("unexpected start location");
         }
-        checkLockedDoors(playing_gamestate, "level_1", "level_2", "Dwarven Key", 1, true, false);
-        checkLockedDoors(playing_gamestate, "level_2", "level_3", "Derrin's Ring", 1, false, true);
-        checkLockedDoors(playing_gamestate, "level_2", "level_4", "Derrin's Ring", 1, false, true);
+        checkLockedDoors(playing_gamestate, "level_1", "level_2", "Dwarven Key", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "level_2", "level_3", "Derrin's Ring", 1, false, true, false);
+        checkLockedDoors(playing_gamestate, "level_2", "level_4", "Derrin's Ring", 1, false, true, false);
     }
     else if( test_id == TEST_LOADSAVEQUEST_3 ) {
         // check quest not completed
@@ -324,10 +334,17 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         if( location->getName() != "Axbury" ) {
             throw string("unexpected start location");
         }*/
-        checkLockedDoors(playing_gamestate, "Dungeons near Axbury", "Dungeons near Axbury", "Axbury Dungeon Key", 2, false, true);
-        checkLockedDoors(playing_gamestate, "Upper Level, Wentbridge Fort", "Ground Level, Wentbridge Fort", "Wentbridge Dungeon Key", 1, true, false);
-        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false);
-        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons Lower Level, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false);
+        checkLockedDoors(playing_gamestate, "Dungeons near Axbury", "Dungeons near Axbury", "Axbury Dungeon Key", 2, false, true, false);
+        checkLockedDoors(playing_gamestate, "Upper Level, Wentbridge Fort", "Ground Level, Wentbridge Fort", "Wentbridge Dungeon Key", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons Lower Level, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false, false);
+    }
+    else if( test_id == TEST_LOADSAVE_QUEST_1_COMPLETED ) {
+        // check quest is completed
+        if( !playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("expected quest to be completed");
+        }
+        checkLockedDoors(playing_gamestate, "", "", "Goblin's Key", 0, false, false, true); // key now owned by player, and door should be unlocked
     }
     else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
         // check quest not completed
@@ -596,7 +613,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_1_ITEMS ) {
         Location *location = playing_gamestate->getQuest()->findLocation("level_2");
-        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Shortbow", false, true, true);
+        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Shortbow", false, true, false, true);
         if( item->getType() != ITEMTYPE_WEAPON ) {
             throw string("expected a weapon");
         }
@@ -646,7 +663,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("weapon worth bonus is not as expected");
         }
 
-        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Magic Dagger", true, false, false);
+        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Magic Dagger", true, false, false, false);
         if( item->getType() != ITEMTYPE_WEAPON ) {
             throw string("expected a weapon");
         }
@@ -727,7 +744,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
     }
     else if( test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
         Location *location = playing_gamestate->getQuest()->findLocation("level_1");
-        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Long Sword", true, false, false);
+        Item *item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Long Sword", true, false, false, false);
         if( item->getType() != ITEMTYPE_WEAPON ) {
             throw string("expected a weapon");
         }
@@ -777,7 +794,7 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
             throw string("weapon worth bonus is not as expected");
         }
 
-        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Chain Mail Armour", false, true, true);
+        item = checkFindSingleItem(NULL, NULL, playing_gamestate, location, "Chain Mail Armour", false, true, false, true);
         if( item->getType() != ITEMTYPE_ARMOUR ) {
             throw string("expected an armour");
         }
@@ -1462,17 +1479,22 @@ void Test::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
+        else if( test_id == TEST_LOADSAVE_QUEST_1_COMPLETED || test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
             // load, check, save, load, check
             QElapsedTimer timer;
             timer.start();
 
             // load
-            QString load_filename = "../erebus/_test_savegames/action_last_time_bug.xml"; // hack to get local directory rather than deployed directory
-            LOG("try loading %s\n", load_filename.toStdString().c_str());
+            QString load_filename = "";
+            if( test_id == TEST_LOADSAVE_QUEST_1_COMPLETED )
+                load_filename = "quest_1_completed.xml";
+            else if( test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG )
+                load_filename = "action_last_time_bug.xml";
+            QString full_load_filename = "../erebus/_test_savegames/" + load_filename; // hack to get local directory rather than deployed directory
+            LOG("try loading %s\n", full_load_filename.toStdString().c_str());
             PlayingGamestate *playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
             game_g->setGamestate(playing_gamestate);
-            playing_gamestate->loadQuest(load_filename, true);
+            playing_gamestate->loadQuest(full_load_filename, true);
             if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }
@@ -1481,9 +1503,9 @@ void Test::runTest(const string &filename, int test_id) {
             checkSaveGame(playing_gamestate, test_id);
 
             // save
-            QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
-            LOG("try saving as %s\n", filename.toStdString().c_str());
-            if( !playing_gamestate->saveGame(filename, false) ) {
+            QString save_filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
+            LOG("try saving as %s\n", save_filename.toStdString().c_str());
+            if( !playing_gamestate->saveGame(save_filename, false) ) {
                 throw string("failed to save game");
             }
 
@@ -1492,11 +1514,11 @@ void Test::runTest(const string &filename, int test_id) {
             playing_gamestate = NULL;
 
             // load
-            QString full_filename = game_g->getApplicationFilename(savegame_folder + filename);
-            LOG("now try loading %s\n", full_filename.toStdString().c_str());
+            QString full_save_filename = game_g->getApplicationFilename(savegame_folder + save_filename);
+            LOG("now try loading %s\n", full_save_filename.toStdString().c_str());
             playing_gamestate = new PlayingGamestate(true, GAMETYPE_CAMPAIGN, "", "", false, false, 0);
             game_g->setGamestate(playing_gamestate);
-            playing_gamestate->loadQuest(full_filename, true);
+            playing_gamestate->loadQuest(full_save_filename, true);
             if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
                 throw string("expected GAMETYPE_CAMPAIGN");
             }

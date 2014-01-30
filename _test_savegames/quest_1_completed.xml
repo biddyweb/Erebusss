@@ -1,0 +1,358 @@
+<?xml version="1.0" ?>
+<savegame major="0" minor="12" savegame_version="2">
+
+<game difficulty="Medium" permadeath="false" gametype="gametype_campaign"/>
+<current_quest name="data/quest_kill_goblins.xml"/>
+
+<location name="" type="indoors" geo_type="dungeon" lighting_min="55">
+
+<background image_name="background_brown"/>
+<floor image_name="floor_rock"/>
+<wall image_name="wall" image_x_scale="3"/>
+
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="0" y="8"/>
+    <floorregion_point x="0" y="10"/>
+    <floorregion_point x="1" y="10"/>
+    <floorregion_point x="1" y="8"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="0" y="10"/>
+    <floorregion_point x="0" y="11"/>
+    <floorregion_point x="5" y="11"/>
+    <floorregion_point x="6" y="11"/>
+    <floorregion_point x="11" y="11"/>
+    <floorregion_point x="12" y="11"/>
+    <floorregion_point x="12" y="10.9"/>
+    <floorregion_point x="12" y="10.1"/>
+    <floorregion_point x="12" y="10"/>
+    <floorregion_point x="6" y="10"/>
+    <floorregion_point x="4.5" y="10"/>
+    <floorregion_point x="1" y="10"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="5" y="5"/>
+    <floorregion_point x="4.5" y="10"/>
+    <floorregion_point x="6" y="10"/>
+    <floorregion_point x="6" y="8.4"/>
+    <floorregion_point x="6" y="7.6"/>
+    <floorregion_point x="6" y="5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="5" y="4"/>
+    <floorregion_point x="5" y="5"/>
+    <floorregion_point x="6" y="5"/>
+    <floorregion_point x="6" y="4"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="6" y="4"/>
+    <floorregion_point x="6" y="5"/>
+    <floorregion_point x="11" y="5"/>
+    <floorregion_point x="11" y="4"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="11" y="1"/>
+    <floorregion_point x="10.5" y="2.5"/>
+    <floorregion_point x="11" y="4"/>
+    <floorregion_point x="11" y="5"/>
+    <floorregion_point x="11.5" y="6"/>
+    <floorregion_point x="13.5" y="6.5"/>
+    <floorregion_point x="15.5" y="6"/>
+    <floorregion_point x="16" y="5"/>
+    <floorregion_point x="16" y="4"/>
+    <floorregion_point x="16" y="3"/>
+    <floorregion_point x="15.5" y="2.5"/>
+    <floorregion_point x="15" y="1"/>
+    <floorregion_point x="14.5" y="0.5"/>
+    <floorregion_point x="13.5" y="0"/>
+    <floorregion_point x="12" y="0.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="16" y="3"/>
+    <floorregion_point x="16" y="4"/>
+    <floorregion_point x="21" y="4"/>
+    <floorregion_point x="21" y="3"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="21" y="3"/>
+    <floorregion_point x="21" y="4"/>
+    <floorregion_point x="22" y="4"/>
+    <floorregion_point x="22" y="3"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="21" y="4"/>
+    <floorregion_point x="21" y="17"/>
+    <floorregion_point x="22.5" y="17"/>
+    <floorregion_point x="22" y="4"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="5" y="11"/>
+    <floorregion_point x="5" y="17"/>
+    <floorregion_point x="6" y="17"/>
+    <floorregion_point x="6" y="11"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="11" y="11"/>
+    <floorregion_point x="11" y="13.6"/>
+    <floorregion_point x="11" y="14.4"/>
+    <floorregion_point x="11" y="17"/>
+    <floorregion_point x="12" y="17"/>
+    <floorregion_point x="12" y="14.4"/>
+    <floorregion_point x="12" y="13.6"/>
+    <floorregion_point x="12" y="11"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="5" y="17"/>
+    <floorregion_point x="5" y="18"/>
+    <floorregion_point x="6" y="18"/>
+    <floorregion_point x="6" y="17"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="6" y="17"/>
+    <floorregion_point x="6" y="18"/>
+    <floorregion_point x="7" y="18"/>
+    <floorregion_point x="11" y="18"/>
+    <floorregion_point x="11" y="17"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="11" y="17"/>
+    <floorregion_point x="11" y="18"/>
+    <floorregion_point x="21" y="18"/>
+    <floorregion_point x="21" y="17"/>
+    <floorregion_point x="20.4" y="17"/>
+    <floorregion_point x="19.6" y="17"/>
+    <floorregion_point x="12" y="17"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="21" y="17"/>
+    <floorregion_point x="21" y="18"/>
+    <floorregion_point x="21.5" y="18"/>
+    <floorregion_point x="22.5" y="18"/>
+    <floorregion_point x="22.5" y="17"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="6" y="7.6"/>
+    <floorregion_point x="6" y="8.4"/>
+    <floorregion_point x="6.5" y="8.4"/>
+    <floorregion_point x="6.5" y="7.6"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="7" y="6.5"/>
+    <floorregion_point x="6.5" y="7"/>
+    <floorregion_point x="6.5" y="7.6"/>
+    <floorregion_point x="6.5" y="8.4"/>
+    <floorregion_point x="6.5" y="8.75"/>
+    <floorregion_point x="9.5" y="8.5"/>
+    <floorregion_point x="9.3" y="7"/>
+    <floorregion_point x="9" y="6.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="12" y="13.6"/>
+    <floorregion_point x="12" y="14.4"/>
+    <floorregion_point x="12.5" y="14.4"/>
+    <floorregion_point x="12.5" y="13.6"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="12.5" y="12.5"/>
+    <floorregion_point x="12.5" y="13.6"/>
+    <floorregion_point x="12.5" y="14.4"/>
+    <floorregion_point x="12.5" y="15.5"/>
+    <floorregion_point x="14.5" y="15.5"/>
+    <floorregion_point x="14.5" y="14.4"/>
+    <floorregion_point x="14.5" y="13.6"/>
+    <floorregion_point x="14.5" y="12.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="14.5" y="13.6"/>
+    <floorregion_point x="14.5" y="14.4"/>
+    <floorregion_point x="15" y="14.4"/>
+    <floorregion_point x="15" y="13.6"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="15" y="12.5"/>
+    <floorregion_point x="15" y="13.6"/>
+    <floorregion_point x="15" y="14.4"/>
+    <floorregion_point x="15" y="15.5"/>
+    <floorregion_point x="17.5" y="15.5"/>
+    <floorregion_point x="17.5" y="14.4"/>
+    <floorregion_point x="17.5" y="13.6"/>
+    <floorregion_point x="17.5" y="12.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="17.5" y="13.6"/>
+    <floorregion_point x="17.5" y="14.4"/>
+    <floorregion_point x="18" y="14.4"/>
+    <floorregion_point x="18" y="13.6"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="18" y="12.5"/>
+    <floorregion_point x="18" y="13.6"/>
+    <floorregion_point x="18" y="14.4"/>
+    <floorregion_point x="18" y="15.5"/>
+    <floorregion_point x="19.6" y="15.5"/>
+    <floorregion_point x="20.4" y="15.5"/>
+    <floorregion_point x="20.5" y="15.5"/>
+    <floorregion_point x="20.5" y="12.5"/>
+    <floorregion_point x="20.4" y="12.5"/>
+    <floorregion_point x="19.6" y="12.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="19.6" y="15.5"/>
+    <floorregion_point x="19.6" y="17"/>
+    <floorregion_point x="20.4" y="17"/>
+    <floorregion_point x="20.4" y="15.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="12" y="10.1"/>
+    <floorregion_point x="12" y="10.9"/>
+    <floorregion_point x="12.5" y="10.9"/>
+    <floorregion_point x="12.5" y="10.1"/>
+</floorregion>
+<floorregion shape="polygon">
+    <floorregion_point x="12.5" y="7.5"/>
+    <floorregion_point x="12.5" y="10.1"/>
+    <floorregion_point x="12.5" y="10.9"/>
+    <floorregion_point x="12.5" y="11"/>
+    <floorregion_point x="14.5" y="11"/>
+    <floorregion_point x="14.5" y="7.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="10.5" y="13.6"/>
+    <floorregion_point x="10.5" y="14.4"/>
+    <floorregion_point x="11" y="14.4"/>
+    <floorregion_point x="11" y="13.6"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="7.5" y="12.5"/>
+    <floorregion_point x="7.5" y="15.5"/>
+    <floorregion_point x="10.5" y="15.5"/>
+    <floorregion_point x="10.5" y="14.4"/>
+    <floorregion_point x="10.5" y="13.6"/>
+    <floorregion_point x="10.5" y="12.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="6" y="18"/>
+    <floorregion_point x="6" y="23"/>
+    <floorregion_point x="7" y="23"/>
+    <floorregion_point x="7" y="18"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="6" y="23"/>
+    <floorregion_point x="6" y="24"/>
+    <floorregion_point x="11" y="24"/>
+    <floorregion_point x="11" y="23"/>
+    <floorregion_point x="7" y="23"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="11" y="23"/>
+    <floorregion_point x="11" y="24"/>
+    <floorregion_point x="11" y="27"/>
+    <floorregion_point x="15" y="27"/>
+    <floorregion_point x="15" y="26"/>
+    <floorregion_point x="15" y="23"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="15" y="26"/>
+    <floorregion_point x="15" y="27"/>
+    <floorregion_point x="21.5" y="27"/>
+    <floorregion_point x="21.5" y="26"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="21.5" y="18"/>
+    <floorregion_point x="21.5" y="26"/>
+    <floorregion_point x="21.5" y="27"/>
+    <floorregion_point x="22.5" y="27"/>
+    <floorregion_point x="22.5" y="18"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="19.6" y="10.5"/>
+    <floorregion_point x="19.6" y="12.5"/>
+    <floorregion_point x="20.4" y="12.5"/>
+    <floorregion_point x="20.4" y="10.5"/>
+</floorregion>
+<floorregion shape="polygon" visible="true">
+    <floorregion_point x="15" y="7.25"/>
+    <floorregion_point x="15" y="10.5"/>
+    <floorregion_point x="19.6" y="10.5"/>
+    <floorregion_point x="20.4" y="10.5"/>
+    <floorregion_point x="20.5" y="10.5"/>
+    <floorregion_point x="20.5" y="7.25"/>
+</floorregion>
+
+
+<player portrait="portrait_warrior" animation_folder="isometric_hero" name="Warrior" x="8.90474" y="23.2679" health="68" max_health="70" A="1" B="7" BS="7" D="7" FP="8" M="6" S="7" Sp="2" initial_level="1" initial_A="1" initial_B="7" initial_BS="7" initial_D="7" initial_FP="8" initial_M="6" initial_S="7" initial_Sp="2" natural_damageX="1" natural_damageY="3" natural_damageZ="-1" level="1" xp="70" xp_worth="0" gold="237">
+<skill name="shield_combat"/><armour name="Leather Armour" image_name="leather_armour" x="0" y="0" icon_width="0.5" weight="100" rating="2" current_armour="true">
+Simple lightweight armour, that provides basic protection.
+</armour>
+<armour name="Leather Armour" image_name="leather_armour" x="6.28354" y="8.05023" icon_width="0.5" weight="100" rating="2">
+Simple lightweight armour, that provides basic protection.
+</armour>
+<weapon name="Long Sword" image_name="longsword" x="0" y="0" icon_width="0.5" weight="14" rating="1" animation_name="longsword" damageX="2" damageY="10" damageZ="0" min_strength="7" current_weapon="true">
+Swords are one of the most commonly used weapons. This version is the longer, heavier variety, and requires greater strength to wield.
+</weapon>
+<item name="Goblin's Key" image_name="key" x="18.118" y="9.23116" icon_width="0.5" weight="0" rating="1"></item>
+<item name="Potion of Healing" image_name="potion_green" x="18.3499" y="7.97215" icon_width="0.5" weight="2" use="ITEMUSE_POTION_HEALING" use_verb="Drink" rating="4" magical="true">
+This potion will heal some or all of your injuries.
+</item>
+<ring name="Gold Ring" image_name="ring_gold" x="18.3499" y="7.97215" icon_width="0.5" weight="0" rating="1">
+An exquisite ring.
+</ring>
+<item name="Red Gem" image_name="gem_red" x="6.28354" y="8.05023" icon_width="0.25" weight="1" rating="1"></item>
+<ammo name="Arrows" image_name="arrow" x="14.7441" y="3.85573" icon_width="0.5" weight="1" rating="1" ammo_type="Arrows" projectile_image_name="arrow" amount="20">
+Arrows are require for use with bows.
+</ammo>
+<armour name="Leather Armour" image_name="leather_armour" x="18.118" y="9.23116" icon_width="0.5" weight="100" rating="2">
+Simple lightweight armour, that provides basic protection.
+</armour>
+</player>
+
+<player_start x="8.90474" y="23.2679"/>
+
+<scenery name="Door" image_name="door_wood_n" x="0.5" y="7.55" w="1" h="0.9" visual_h="0.9" opacity="1" exit="true" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="2" y="9.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="9" y="9.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="8" y="3.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Boulders" image_name="boulders" x="12" y="2" w="0.56" h="0.56" visual_h="0.733793" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Fire" image_name="fire" x="14" y="3" w="0.888889" h="0.888889" visual_h="2" opacity="1" blocking="true" has_smoke="true" smoke_x="0.5" smoke_y="0.4167" unlock_xp="20"></scenery>
+<scenery name="Rock" image_name="rock1" x="14.5" y="5.7" w="0.2" h="0.2" visual_h="0.4" opacity="1" draw_type="background" unlock_xp="20"></scenery>
+<scenery name="Crate" image_name="crate" x="15" y="5" w="0.8" h="0.8" visual_h="1.6" opacity="1" blocking="true" is_opened="true" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="19" y="2.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="8.5" y="16.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="16" y="16.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Rock" image_name="rock1" x="8.5" y="7.1" w="0.2" h="0.2" visual_h="0.4" opacity="1" draw_type="background" unlock_xp="20"></scenery>
+<scenery name="Skulls" image_name="skulls" x="7.75" y="8" w="0.3" h="0.3" visual_h="0.4" opacity="1" draw_type="background" unlock_xp="20"></scenery>
+<scenery name="Boulders" image_name="boulders2" x="14" y="1.5" w="0.56" h="0.56" visual_h="0.68" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Big Boulder" image_name="bigboulder" x="13" y="1" w="0.431282" h="0.431282" visual_h="1.16" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Big Boulder" image_name="bigboulder" x="16" y="8.25" w="0.431282" h="0.431282" visual_h="1.16" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Rock" image_name="rock1" x="2" y="10.7" w="0.2" h="0.2" visual_h="0.4" opacity="1" draw_type="background" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="17" y="6.8" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Chest" image_name="chest" x="19" y="8.25" w="0.8" h="0.8" visual_h="1.6" opacity="1" blocking="true" is_opened="true" unlock_xp="20"></scenery>
+<scenery name="Barrel" image_name="barrel" x="15.5" y="15" w="0.8" h="0.8" visual_h="1.6" opacity="1" blocking="true" is_opened="true" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="18" y="25.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Chest" image_name="chest" x="8" y="13" w="0.8" h="0.8" visual_h="1.6" opacity="1" blocking="true" is_opened="true" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="19" y="12.05" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Campfire" image_name="campfire" x="14" y="8.5" w="0.8" h="0.8" visual_h="1.6" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Boulders" image_name="boulders" x="14" y="23.8" w="0.56" h="0.56" visual_h="0.733793" opacity="1" blocking="true" unlock_xp="20"></scenery>
+<scenery name="Bones" image_name="bones" x="13.5" y="9.5" w="0.5" h="0.5" visual_h="0.5" opacity="1" draw_type="background" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="8" y="22.55" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="13.5" y="12.05" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+<scenery name="Torch" image_name="torch" x="17" y="12.05" w="0.75" h="0.75" visual_h="0.75" opacity="1" unlock_xp="20"></scenery>
+
+<item name="Mushroom" image_name="mushroom" x="12" y="5" icon_width="0.25" weight="0" use="ITEMUSE_MUSHROOM" use_verb="Eat" rating="1"></item>
+<item name="Bowl" image_name="bowl" x="15.2501" y="14.3499" icon_width="0.25" weight="5" rating="1"></item>
+
+<trap type="mantrap" x="13" y="17" w="1" h="1" difficulty="0" rating="0"/>
+<trap type="mantrap" x="16" y="17" w="1" h="1" difficulty="0" rating="0"/>
+
+</location>
+
+<quest_objective type="kill" arg1="all_hostile" gold="100" />
+<completed_text>The villagers are grateful for you cleansing the caves of the infestion of goblins, and hope that now they will be safe from attacks from goblin raiders. They present you with the reward of one hundred gold pieces.
+</completed_text>
+
+<quest_info complete="true"/>
+
+<journal>
+%3Chr%2F%3E%3Cp%3E%3Cb%3EQuest%20Details%3A%20Goblin%20caves%3C%2Fb%3E%3C%2Fp%3E%3Cp%3EThe%20nearby%20caves%20to%20your%20village%20have%20become%20infested%20with%20Goblins%2C%20who%20have%20been%20responsible%20for%20taking%20part%20in%20raids%20on%20your%20village%2C%20killing%20innocent%20people%20and%20burning%20down%20their%20homes.%20Kill%20these%20vermin%2C%20and%20you%20will%20be%20rewarded%20with%20one%20hundred%20gold%20pieces%21%3Cbr%2F%3E%3C%2Fp%3E</journal>
+
+<time_hours value="9"/></savegame>
