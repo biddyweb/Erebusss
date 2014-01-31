@@ -28,10 +28,12 @@
 
 <image type="item" name="dagger" filename="gfx/textures/items/dagger.png"/>
 <image type="item" name="longsword" filename="gfx/textures/items/longsword.png"/>
+<image type="item" name="sling" filename="gfx/textures/items/sling.png"/>
 <image type="item" name="longbow" filename="gfx/textures/items/longbow.png"/>
 <image type="item" name="shield" filename="gfx/textures/items/shield.png"/>
 <image type="item" name="leather_armour" filename="gfx/textures/items/leather_armor.png"/>
 <image type="item" name="metal_armour" filename="gfx/textures/items/metal_armor.png"/>
+<image type="item" name="bullet" filename="gfx/textures/items/bullet.png"/>
 <image type="item" name="arrow" filename="gfx/textures/items/arrow.png"
     xpos="0" ypos="16" width="64" height="32" expected_width="64"
     />
@@ -71,6 +73,7 @@
 
 <image type="item" name="gold" filename="gfx/textures/items/gold.png"/>
 
+<image type="projectile" name="Bullets" filename="gfx/textures/items/bullet.png" width="64" height="64" stride_x="64" stride_y="64" expected_width="64" n_dimensions="1"/>
 <image type="projectile" name="Arrows" filename="gfx/textures/items/arrow.png" width="64" height="64" stride_x="64" stride_y="64" expected_width="64"/>
 <image type="projectile" name="Holy Water" filename="gfx/textures/items/vial.png" width="32" height="52" stride_x="32" stride_y="52" expected_width="32" n_dimensions="1"/>
 <image type="projectile" name="Acid" filename="gfx/textures/items/vial_green.png" width="32" height="52" stride_x="32" stride_y="52" expected_width="32" n_dimensions="1"/>
