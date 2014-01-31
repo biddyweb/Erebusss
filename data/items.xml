@@ -32,6 +32,7 @@ Two handed swords are one of the most feared weapons.
 <weapon name="Sling" image_name="sling" weight="4"
     damageX="2" damageY="4" damageZ="0"
     animation_name="sling"
+    weapon_class="sling"
     bonus_BS="-2"
     two_handed="true" ranged="true" ammo="Bullets">
 Slings are the simplest of ranged weapons, allowing you to shoot bullets fashioned from stone at your enemies.
@@ -91,7 +92,7 @@ Chain mail armour provides decent protection, whilst not being too heavy.
 Plate armour provides excellent protection, but it is also heavy to carry and wear.
 </armour>
 
-<ammo name="Bullets" ammo_type="Bullets" image_name="bullet" projectile_image_name="bullet" weight="2"
+<ammo name="Bullets" ammo_type="Bullets" image_name="bullet" projectile_image_name="bullet" weight="5"
     amount="20">
 Bullets are required for use with slings.
 </ammo>
@@ -230,6 +231,7 @@ A small wooden chess piece, the Knight.
 <player_default_items type="Halfling">
     <player_default_item template="Short Sword"/>
     <player_default_item template="Sling"/>
+    <player_default_item template="Bullets"/>
     <player_default_item template="Bullets"/>
 </player_default_items>
 <player_default_items type="Ranger">

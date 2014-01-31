@@ -486,7 +486,7 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_1_REVEAL);
+    //Test::runTest(filename, ::TEST_LOADSAVE_QUEST_1_COMPLETED);
 }
 
 void Game::initButton(QWidget *button) const {
@@ -951,6 +951,7 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
         character->initialiseHealth(75);
         character->addSkill(skill_disease_resistance_c);
         character->addSkill(skill_luck_c);
+        character->addSkill(skill_slingshot_c);
         character->setBiography(PlayingGamestate::tr("Halflings do not make great warriors and make unlikely adventurers, but they are suprisingly hardy, and their special skills can help them succeed where others might fail.").toStdString());
         character->setPortrait("portrait_halfling");
         character->setAnimationFolder("isometric_heroine");

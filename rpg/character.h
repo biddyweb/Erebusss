@@ -75,6 +75,7 @@ const string skill_luck_c = "luck";
 const string skill_fast_shooter_c = "fast_shooter";
 const string skill_charge_c = "charge";
 const string skill_hatred_orcs_c = "hatred_orcs";
+const string skill_slingshot_c = "slingshot";
 
 string getSkillLongString(const string &key);
 string getSkillDescription(const string &key);

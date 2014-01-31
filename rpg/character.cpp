@@ -42,6 +42,8 @@ string getSkillLongString(const string &key) {
         return "Charge";
     else if( key == skill_hatred_orcs_c )
         return "Hatred of Orcs";
+    else if( key == skill_slingshot_c )
+        return "Slingshot";
     LOG("getSkillLongString: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -65,6 +67,8 @@ string getSkillDescription(const string &key) {
         return "You get +1 damage in hand-to-hand combat if you hit on your first strike in a battle.";
     else if( key == skill_hatred_orcs_c )
         return "You get +1 damage against goblinoids (Goblins, Orcs, etc) in hand-to-hand combat.";
+    else if( key == skill_slingshot_c )
+        return "You can use a sling more quickly than most. You have +1 Attacks when using a sling.";
     LOG("getSkillDescription: unknown key: %s\n", key.c_str());
     throw string("unknown key");
 }
@@ -347,6 +351,9 @@ int Character::getProfileIntProperty(const string &key) const {
         value -= 2;
     }
     if( key == profile_key_A_c && this->current_weapon != NULL && this->current_weapon->getWeaponClass() == "bow" && this->hasSkill(skill_fast_shooter_c) ) {
+        value++;
+    }
+    if( key == profile_key_A_c && this->current_weapon != NULL && this->current_weapon->getWeaponClass() == "sling" && this->hasSkill(skill_slingshot_c) ) {
         value++;
     }
     if( key == profile_key_FP_c && this->current_shield != NULL && this->hasSkill(skill_shield_combat_c) ) {
