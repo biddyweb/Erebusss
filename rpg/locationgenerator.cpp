@@ -127,60 +127,66 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
 }
 
 Item *LocationGenerator::getRandomItem(const PlayingGamestate *playing_gamestate, int level) {
-    int r = rollDice(1, 25, 0);
+    int r = rollDice(1, 27, 0);
     Item *item = NULL;
     if( r <= 3 ) {
         item = playing_gamestate->cloneStandardItem("Arrows");
     }
     else if( r <= 4 ) {
-        item = playing_gamestate->cloneStandardItem("Leather Armour");
+        item = playing_gamestate->cloneStandardItem("Bullets");
     }
     else if( r <= 5 ) {
-        item = playing_gamestate->cloneStandardItem(level == 0 ? "Leather Armour" : "Chain Mail Armour");
+        item = playing_gamestate->cloneStandardItem("Leather Armour");
     }
     else if( r <= 6 ) {
+        item = playing_gamestate->cloneStandardItem(level == 0 ? "Leather Armour" : "Chain Mail Armour");
+    }
+    else if( r <= 7 ) {
         item = playing_gamestate->cloneStandardItem(level == 0 ? "Chain Mail Armour" : "Plate Armour");
     }
-    else if( r <= 8 ) {
+    else if( r <= 9 ) {
         item = playing_gamestate->cloneStandardItem("Shield");
     }
-    else if( r <= 10 ) {
+    else if( r <= 11 ) {
         item = playing_gamestate->cloneStandardItem("Dagger");
     }
-    else if( r <= 12 ) {
+    else if( r <= 13 ) {
         item = playing_gamestate->cloneStandardItem("Short Sword");
     }
-    else if( r <= 13 ) {
+    else if( r <= 14 ) {
         item = playing_gamestate->cloneStandardItem("Long Sword");
     }
-    else if( r <= 14 ) {
+    else if( r <= 15 ) {
         item = playing_gamestate->cloneStandardItem(level == 0 ? "Long Sword" : "Two Handed Sword");
     }
-    else if( r <= 16 ) {
+    else if( r <= 17 ) {
         item = playing_gamestate->cloneStandardItem("Shortbow");
     }
-    else if( r <= 17 ) {
+    else if( r <= 18 ) {
         item = playing_gamestate->cloneStandardItem(level == 0 ? "Shortbow" : "Longbow");
     }
-    else if( r <= 18 ) {
-        item = playing_gamestate->cloneStandardItem("Plain Ring");
-    }
     else if( r <= 19 ) {
-        item = playing_gamestate->cloneStandardItem("Gold Ring");
+        item = playing_gamestate->cloneStandardItem("Sling");
     }
     else if( r <= 20 ) {
-        item = playing_gamestate->cloneStandardItem("Wyvern Egg");
+        item = playing_gamestate->cloneStandardItem("Plain Ring");
     }
     else if( r <= 21 ) {
-        item = playing_gamestate->cloneStandardItem("Bowl");
+        item = playing_gamestate->cloneStandardItem("Gold Ring");
     }
     else if( r <= 22 ) {
-        item = playing_gamestate->cloneStandardItem("Plate");
+        item = playing_gamestate->cloneStandardItem("Wyvern Egg");
     }
     else if( r <= 23 ) {
+        item = playing_gamestate->cloneStandardItem("Bowl");
+    }
+    else if( r <= 24 ) {
+        item = playing_gamestate->cloneStandardItem("Plate");
+    }
+    else if( r <= 25 ) {
         item = playing_gamestate->cloneStandardItem("Pitcher");
     }
-    else { // 24, 25
+    else { // 26, 27
         item = playing_gamestate->cloneStandardItem("Red Gem");
     }
     return item;
