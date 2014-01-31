@@ -29,7 +29,7 @@ Swords are one of the most commonly used weapons. This version is the longer, he
 Two handed swords are one of the most feared weapons.
 </weapon>
 
-<weapon name="Sling" image_name="sling" weight="4"
+<weapon name="Sling" image_name="sling" icon_width="0.25" weight="4"
     damageX="2" damageY="4" damageZ="0"
     animation_name="sling"
     weapon_class="sling"
