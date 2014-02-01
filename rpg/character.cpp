@@ -299,6 +299,7 @@ Ammo *Character::findAmmo(const string &key) {
         if( item->getType() == ITEMTYPE_AMMO ) {
             Ammo *ammo = static_cast<Ammo *>(item);
             if( ammo->getAmmoType() == key ) {
+                this->current_ammo = ammo;
                 return ammo;
             }
         }
