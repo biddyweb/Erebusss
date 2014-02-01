@@ -1543,7 +1543,13 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
 
 QCheckBox *LevelUpWindow::addProfileCheckBox(const string &key) {
     string long_string = getProfileLongString(key);
-    QCheckBox * check_box = new QCheckBox(long_string.c_str());
+#ifdef Q_OS_ANDROID
+    // problem on Android that text overlaps with checkbox
+    QString android_hack = "            ";
+#else
+    QString android_hack = "";
+#endif
+    QCheckBox * check_box = new QCheckBox(android_hack + long_string.c_str());
     check_boxes[key] = check_box;
     return check_box;
 }
