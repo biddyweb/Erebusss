@@ -62,6 +62,7 @@ You will receive three hundred gold pieces for completing the quest.
 </floorregion>
 <scenery name="Crate" image_name="crate" x="14.5" y="22.5" size="0.8" blocking="true">
     <gold amount="7"/>
+    <item template="Bullets"/>
 </scenery>
 
 <npc name="Wyvern" template="Wyvern" x="14.5" y="21.5"/>
