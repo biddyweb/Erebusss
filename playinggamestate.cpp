@@ -2904,6 +2904,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             zoomoutButton->setIconSize(QSize(icon_size, icon_size));
             zoomoutButton->setMinimumSize(button_size, button_size);
+
+
             zoomoutButton->setMaximumSize(button_size, button_size);
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
@@ -5908,9 +5910,11 @@ void PlayingGamestate::closeAllSubWindows() {
 }
 
 void PlayingGamestate::quitGame() {
+    qDebug("PlayingGamestate::quitGame()");
     //qApp->quit();
-
+    qDebug("ask player to quit");
     if( this->askQuestionDialog(tr("Are you sure you wish to quit?").toStdString()) ) {
+        qDebug("player requests quit");
         GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS);
         game_g->pushMessage(game_message);
     }
