@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -477,7 +477,7 @@ When you stare into this Orb, it shows nothing but blackness.
 <scenery name="Crate" image_name="crate" x="27.5" y="35.5" size="0.8" blocking="true">
     <gold amount="3"/>
     <item template="Short Sword"/>
-    <item template="Arrows"/>
+    <item template="Bullets"/>
 </scenery>
 
 <!--south route/right-->
@@ -1542,6 +1542,7 @@ blah blah
     <item template="Long Sword"/>
     <item template="Longbow"/>
     <item template="Arrows"/>
+    <item template="Bullets"/>
     <item name="Wentbridge Cell Key" image_name="key" icon_width="0.5" weight="0"/>
 </scenery>
 
@@ -1655,7 +1656,7 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
 
-<!--<player_start x="49.0" y="29.5"/>-->
+<player_start x="49.0" y="29.5"/>
 
 <!-- north route, past human prisoners -->
 
