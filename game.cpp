@@ -561,6 +561,11 @@ void Game::handleMessages() {
                 gamestate = NULL;
                 gamestate = new OptionsGamestate();
                 break;
+            case GameMessage::GAMEMESSAGETYPE_QUIT:
+                if( gamestate != NULL )
+                    gamestate->quitGame();
+                // else ignore
+                break;
             default:
                 ASSERT_LOGGER(false);
             }

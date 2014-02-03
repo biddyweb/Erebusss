@@ -119,8 +119,10 @@ void MainWindow::updateScene() {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     LOG("MainWindow received close event\n");
-    if( game_g != NULL && game_g->getGamestate() != NULL ) {
-        game_g->getGamestate()->quitGame();
+    if( game_g != NULL ) {
+        // if there are already messages, either the user has already requested a quit (so don't want to pile up lots of quit dialogs), or we are changing gamestate and so may not be safe to quit now
+        if( !game_g->hasMessages() )
+            game_g->pushMessage(new GameMessage(GameMessage::GAMEMESSAGETYPE_QUIT));
         event->ignore();
     }
     else {

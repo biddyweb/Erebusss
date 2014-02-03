@@ -50,7 +50,8 @@ public:
     enum GameMessageType {
         GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING = 0,
         GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING_LOAD = 1,
-        GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS = 2
+        GAMEMESSAGETYPE_NEWGAMESTATE_OPTIONS = 2,
+        GAMEMESSAGETYPE_QUIT = 3
     };
 
 protected:
@@ -202,6 +203,9 @@ public:
 
     void pushMessage(GameMessage *message) {
         message_queue.push(message);
+    }
+    bool hasMessages() const {
+        return !message_queue.empty();
     }
 
     void setTextEdit(QTextEdit *textEdit);
