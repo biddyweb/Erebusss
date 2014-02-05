@@ -2906,6 +2906,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             zoomoutButton->setMinimumSize(button_size, button_size);
 
 
+
             zoomoutButton->setMaximumSize(button_size, button_size);
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
             layout->addWidget(zoomoutButton, 0, col++, Qt::AlignCenter);
@@ -8383,4 +8384,52 @@ bool PlayingGamestate::askQuestionDialog(const string &message) {
     LOG("askQuestionDialog returns %d\n", result);
     this->closeSubWindow();
     return result == 0;
+}
+
+int PlayingGamestate::getImageMemorySize() const {
+    LOG("PlayingGamestate::getImageMemorySize()\n");
+    int memory_size = 0;
+
+    int animation_layers_memory_size = 0;
+    for(map<string, LazyAnimationLayer *>::const_iterator iter = this->animation_layers.begin(); iter != this->animation_layers.end(); ++iter) {
+        const LazyAnimationLayer *lazy_animation_layer = (*iter).second;
+        animation_layers_memory_size += lazy_animation_layer->getMemorySize();
+    }
+    memory_size += animation_layers_memory_size;
+    LOG("NPCs: %d\n", animation_layers_memory_size);
+
+    int scenery_animation_layers_memory_size = 0;
+    for(map<string, LazyAnimationLayer *>::const_iterator iter = this->scenery_animation_layers.begin(); iter != this->scenery_animation_layers.end(); ++iter) {
+        const LazyAnimationLayer *lazy_animation_layer = (*iter).second;
+        scenery_animation_layers_memory_size += lazy_animation_layer->getMemorySize();
+    }
+    memory_size += scenery_animation_layers_memory_size;
+    LOG("Scenery: %d\n", scenery_animation_layers_memory_size);
+
+    int projectile_animation_layers_memory_size = 0;
+    for(map<string, AnimationLayer *>::const_iterator iter = this->projectile_animation_layers.begin(); iter != this->projectile_animation_layers.end(); ++iter) {
+        const AnimationLayer *animation_layer = (*iter).second;
+        projectile_animation_layers_memory_size += animation_layer->getMemorySize();
+    }
+    memory_size += projectile_animation_layers_memory_size;
+    LOG("Projectiles: %d\n", projectile_animation_layers_memory_size);
+
+    int item_images_memory_size = 0;
+    for(map<string, QPixmap>::const_iterator iter = this->item_images.begin(); iter != this->item_images.end(); ++iter) {
+        const QPixmap &pixmap = (*iter).second;
+        item_images_memory_size += pixmap.width() * pixmap.height() * 4;
+    }
+    memory_size += item_images_memory_size;
+    LOG("Items: %d\n", item_images_memory_size);
+
+    int builtin_images_memory_size = 0;
+    for(map<string, QPixmap>::const_iterator iter = this->builtin_images.begin(); iter != this->builtin_images.end(); ++iter) {
+        const QPixmap &pixmap = (*iter).second;
+        builtin_images_memory_size += pixmap.width() * pixmap.height() * 4;
+    }
+    memory_size += builtin_images_memory_size;
+    LOG("Built-in: %d\n", builtin_images_memory_size);
+
+    LOG("Total: %d\n", memory_size);
+    return memory_size;
 }

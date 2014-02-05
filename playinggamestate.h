@@ -573,6 +573,9 @@ public:
     bool interactWithScenery(bool *move, void **ignore, Scenery *scenery);
     void updateVisibilityForFloorRegion(FloorRegion *floor_region);
 
+    // for testing
+    int getImageMemorySize() const;
+
 public slots:
     void closeSubWindow();
     void closeAllSubWindows();

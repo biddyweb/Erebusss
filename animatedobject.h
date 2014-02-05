@@ -44,6 +44,9 @@ public:
     }
 
     static AnimationSet *create(const QPixmap &image, AnimationType animation_type, int ms_per_frame, int stride_x, int stride_y, int x_offset, unsigned int n_dimensions, size_t n_frames, int icon_off_x, int icon_off_y, int icon_width, int icon_height);
+
+    // for testing:
+    int getMemorySize() const;
 };
 
 /* Helper class used to define animation image formats, when loading in the
@@ -88,6 +91,9 @@ public:
 
     static AnimationLayer *create(const QPixmap &image, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
     static AnimationLayer *create(const string &filename, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions);
+
+    // for testing:
+    int getMemorySize() const;
 };
 
 class LazyAnimationLayer {
@@ -118,6 +124,9 @@ public:
     ~LazyAnimationLayer();
 
     AnimationLayer *getAnimationLayer();
+
+    // for testing:
+    int getMemorySize() const;
 };
 
 class AnimatedObject : public QGraphicsItem {

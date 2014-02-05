@@ -67,6 +67,15 @@ AnimationSet *AnimationSet::create(const QPixmap &image, AnimationType animation
     return animation_set;
 }
 
+int AnimationSet::getMemorySize() const {
+    int memory_size = 0;
+    foreach(const QPixmap &pixmap, pixmaps) {
+        int pixmap_size = pixmap.width() * pixmap.height() * 4;
+        memory_size += pixmap_size;
+    }
+    return memory_size;
+}
+
 AnimationLayer::~AnimationLayer() {
     for(map<string, const AnimationSet *>::iterator iter = this->animation_sets.begin(); iter != this->animation_sets.end(); ++iter) {
         const AnimationSet *animation_set = iter->second;
@@ -133,6 +142,15 @@ AnimationLayer *AnimationLayer::create(const string &filename, const vector<Anim
     return create(image, animation_layer_definitions, clip, off_x, off_y, width, height,stride_x, stride_y, expected_total_width, n_dimensions);
 }
 
+int AnimationLayer::getMemorySize() const {
+    int memory_size = 0;
+    for(map<string, const AnimationSet *>::const_iterator iter = this->animation_sets.begin(); iter != this->animation_sets.end(); ++iter) {
+        const AnimationSet *animation_set = iter->second;
+        memory_size += animation_set->getMemorySize();
+    }
+    return memory_size;
+}
+
 LazyAnimationLayer::LazyAnimationLayer(const QPixmap &pixmap, const vector<AnimationLayerDefinition> &animation_layer_definitions, bool clip, int off_x, int off_y, int width, int height, int stride_x, int stride_y, int expected_total_width, unsigned int n_dimensions) :
     animation_layer(NULL), clip(false), off_x(0), off_y(0), width(0), height(0), stride_x(0), stride_y(0), expected_total_width(0), n_dimensions(0)
 {
@@ -153,6 +171,13 @@ AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
         LOG("    done\n");
     }
     return this->animation_layer;
+}
+
+int LazyAnimationLayer::getMemorySize() const {
+    int memory_size = 0;
+    if( this->animation_layer != NULL )
+        memory_size = this->animation_layer->getMemorySize();
+    return memory_size;
 }
 
 AnimatedObject::AnimatedObject(QGraphicsItem *parent) : /*animation_layer(NULL), c_animation_set(NULL),*/

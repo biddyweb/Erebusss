@@ -52,6 +52,7 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
+  TEST_MEMORYQUEST_n - loads the nth quest, forces all NPCs and scenery to be instantiated, and checks the memory usage (we do this as a separate test, due to forcing all images to be loaded)
   TEST_LOADSAVE_QUEST_1_COMPLETED - test for when 1st quest is completed, and door unlocked
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
   TEST_LOADSAVEWRITEQUEST_0_COMPLETE - test for 1st quest: kill all goblins, check quest then complete
@@ -277,8 +278,6 @@ void Test::interactNPCKill(PlayingGamestate *playing_gamestate, const string &lo
     // now return to NPC
     checkCanCompleteNPC(playing_gamestate, location_npc_name, location_npc_pos, npc_name, expected_xp, expected_gold, expected_item, true, false);
 }
-
-
 
 /** Optional read-only checks on a loaded game.
   */
@@ -1478,6 +1477,40 @@ void Test::runTest(const string &filename, int test_id) {
             has_score = true;
             score = ((double)timer.elapsed());
             score /= 1000.0;
+        }
+        else if( test_id == TEST_MEMORYQUEST_0 || test_id == TEST_MEMORYQUEST_1 || test_id == TEST_MEMORYQUEST_2 || test_id == TEST_MEMORYQUEST_3 ) {
+            // load
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Warrior", "name", false, false, 0);
+            game_g->setGamestate(playing_gamestate);
+
+            QString qt_filename;
+            if( test_id == TEST_MEMORYQUEST_0 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml");
+            }
+            else if( test_id == TEST_MEMORYQUEST_1 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
+            }
+            else if( test_id == TEST_MEMORYQUEST_2 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
+            }
+            else if( test_id == TEST_MEMORYQUEST_3 ) {
+                qt_filename = DEPLOYMENT_PATH + QString("data/quest_necromancer.xml");
+            }
+
+            // load
+            playing_gamestate->loadQuest(qt_filename, false);
+            if( playing_gamestate->getGameType() != GAMETYPE_CAMPAIGN ) {
+                throw string("expected GAMETYPE_CAMPAIGN");
+            }
+
+            // check
+            const int max_memory_c = 70000000;
+            // if this check fails, retest the amount of memory usage on Windows and Android for this quest, to see if the new memory usage is acceptable
+            // ideally we should be less than 128MB
+            int memory_size = playing_gamestate->getImageMemorySize();
+            if( memory_size > max_memory_c ) {
+                throw string("image memory size too large: ") + numberToString(memory_size);
+            }
         }
         else if( test_id == TEST_LOADSAVE_QUEST_1_COMPLETED || test_id == TEST_LOADSAVE_ACTION_LAST_TIME_BUG ) {
             // load, check, save, load, check
