@@ -202,6 +202,13 @@
     <animation name="ranged" start="28" length="4" type="single"/>
     <animation name="death" start="20" length="4" type="single"/>
 </image>
+<image type="npc" name="orc_champion" filename="gfx/textures/npcs/orc_elite_0.png" xpos="32" ypos="40" width="64" height="64" expected_width="4096">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <animation name="ranged" start="28" length="4" type="single"/>
+    <animation name="death" start="20" length="4" type="single"/>
+</image>
 
 <image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="4096">
     <animation name="" start="0" length="8" type="loop"/>

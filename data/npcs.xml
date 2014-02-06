@@ -65,7 +65,7 @@
 />
 
 <!--Weapon hardcoded as natural damage: Battle Axe-->
-<npc name="Orc Champion" animation_name="orc"
+<npc name="Orc Champion" animation_name="orc_champion"
     type="goblinoid"
     FP="9" BS="8" S="7" A="1" M="7" D="7" B="8" Sp="2.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
