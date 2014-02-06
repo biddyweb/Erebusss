@@ -235,7 +235,13 @@
     <animation name="death" start="16" length="6" type="single"/>
     <animation name="ranged" start="22" length="4" type="single"/>
 </image>
-<image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/>
+<image type="npc" name="wraith" filename="gfx/textures/npcs/wraith.png"/> <!-- unused atm, kept for old save games -->
+<image type="npc" name="shadow" filename="gfx/textures/npcs/shadow.png" xpos="32" ypos="40" width="64" height="64" expected_width="3072">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <animation name="death" start="16" length="8" type="single"/>
+</image>
 
 <image type="npc" name="spider" filename="gfx/textures/npcs/spider_giant.png" xpos="32" ypos="40" width="64" height="64" expected_width="4096">
     <animation name="" start="0" length="4" type="bounce"/>

@@ -1504,7 +1504,7 @@ void Test::runTest(const string &filename, int test_id) {
             }
 
             // check
-            const int max_memory_c = 70000000;
+            const int max_memory_c = 75000000;
             // if this check fails, retest the amount of memory usage on Windows and Android for this quest, to see if the new memory usage is acceptable
             // ideally we should be less than 128MB
             int memory_size = playing_gamestate->getImageMemorySize();

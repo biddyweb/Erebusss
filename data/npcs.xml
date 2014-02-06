@@ -102,7 +102,7 @@
 />
 
 <!--Natural damage-->
-<npc name="Shadow" animation_name="wraith" static_image="true" bounce="true"
+<npc name="Shadow" animation_name="shadow"
     type="undead"
     FP="8" BS="0" S="5" A="1" M="8" D="0" B="12" Sp="1.5"
     natural_damageX="2" natural_damageY="10" natural_damageZ="1"
