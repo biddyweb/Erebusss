@@ -477,7 +477,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
             //qDebug("action: %d", action);
             //qDebug("hit_state: %d", hit_state);
 
-            if( hit_state == HITSTATE_HAS_HIT || ( hit_state == HITSTATE_IS_NOT_HITTING && !is_fleeing ) ) {
+            if( hit_state == HITSTATE_HAS_HIT || ( hit_state == HITSTATE_IS_NOT_HITTING && !is_fleeing && !playing_gamestate->isKeyboardMoving() ) ) {
                 float dist = ( target->getPos() - this->getPos() ).magnitude();
                 bool is_ranged = false; // also includes thrown weapons, and spell attacks
                 const Spell *spell = NULL;
