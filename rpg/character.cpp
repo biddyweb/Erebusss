@@ -490,35 +490,37 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                     }
                 }
                 else {
-                    if( this->health < 0.5f*this->max_health ) {
-                        // try casting a healing spell
-                        for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
-                            if( iter->second > 0 ) {
-                                string spell_name = iter->first;
-                                const Spell *this_spell = playing_gamestate->findSpell(spell_name);
-                                if( this_spell->getType() == "heal") {
-                                    spell = this_spell;
-                                    spell_target = this;
+                    if( is_ai ) {
+                        if( this->health < 0.5f*this->max_health ) {
+                            // try casting a healing spell
+                            for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
+                                if( iter->second > 0 ) {
+                                    string spell_name = iter->first;
+                                    const Spell *this_spell = playing_gamestate->findSpell(spell_name);
+                                    if( this_spell->getType() == "heal") {
+                                        spell = this_spell;
+                                        spell_target = this;
+                                    }
                                 }
                             }
                         }
-                    }
-                    if( spell == NULL ) {
-                        // try casting an attack spell
-                        vector<const Spell *> candidate_spells;
-                        for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
-                            if( iter->second > 0 ) {
-                                string spell_name = iter->first;
-                                const Spell *this_spell = playing_gamestate->findSpell(spell_name);
-                                if( this_spell->getType() == "attack") {
-                                    candidate_spells.push_back(this_spell);
+                        if( spell == NULL ) {
+                            // try casting an attack spell
+                            vector<const Spell *> candidate_spells;
+                            for(map<string, int>::const_iterator iter = this->spells.begin(); iter != this->spells.end() && spell == NULL; ++iter) {
+                                if( iter->second > 0 ) {
+                                    string spell_name = iter->first;
+                                    const Spell *this_spell = playing_gamestate->findSpell(spell_name);
+                                    if( this_spell->getType() == "attack") {
+                                        candidate_spells.push_back(this_spell);
+                                    }
                                 }
                             }
-                        }
-                        if( candidate_spells.size() > 0 ) {
-                            int r = rand() % candidate_spells.size();
-                            spell = candidate_spells.at(r);
-                            spell_target = target_npc;
+                            if( candidate_spells.size() > 0 ) {
+                                int r = rand() % candidate_spells.size();
+                                spell = candidate_spells.at(r);
+                                spell_target = target_npc;
+                            }
                         }
                     }
                     is_ranged = spell != NULL || ( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->isRangedOrThrown() );
