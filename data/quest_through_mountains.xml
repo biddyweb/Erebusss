@@ -302,7 +302,10 @@ Thank you for helping me!
 <scenery name="Door" image_name="door_wood" x="44.05" y="14.0" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"/>
 
 <floorregion shape="rect" rect_x="45.0" rect_y="12.0" rect_w="4.0" rect_h="4.0"/>
-<npc name="Orc" template="Orc" x="48.5" y="13.0">
+<!--<npc name="Orc" template="Orc" x="48.5" y="13.0">
+    <item template="Chain Mail Armour"/>
+</npc>-->
+<npc name="Hobgoblin" template="Hobgoblin" x="48.5" y="13.0">
     <item template="Chain Mail Armour"/>
 </npc>
 
@@ -343,7 +346,7 @@ Thank you for helping me!
 <npc name="Orc" template="Orc" x="15.0" y="24.5">
     <item template="Leather Armour"/>
 </npc>
-<npc name="Orc" template="Orc" x="15.0" y="27.5">
+<npc name="Hobgoblin" template="Hobgoblin" x="15.0" y="27.5">
     <item template="Leather Armour"/>
 </npc>
 
@@ -372,9 +375,10 @@ Thank you for helping me!
 
 <floorregion shape="rect" rect_x="14.0" rect_y="18.0" rect_w="12.0" rect_h="2.0"/>
 
-<npc name="Orc" template="Orc" x="17.0" y="19.0">
+<!--<npc name="Orc" template="Orc" x="17.0" y="19.0">
     <item template="Chain Mail Armour"/>
-</npc>
+</npc>-->
+<npc name="Troll" template="Troll" x="17.0" y="19.0"/>
 
 <scenery name="Big Boulder" image_name="bigboulder" x="14.5" y="19.1" size="0.58" blocking="true"/>
 <scenery name="Boulders" image_name="boulders" x="15.0" y="18.6" size="0.58" blocking="true"/>
@@ -544,8 +548,6 @@ The last few entries documents how many of the surviving dwarves decided to flee
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
-
-<npc name="Goblin" template="Goblin" x="33.5" y="16.0"/>
 
 <scenery name="Door" image_name="door_wood_n" x="34.0" y="13.55" w="1.0" h="0.9" blocking="false" block_visibility="false" exit_location="level_3" exit_location_x="21.0" exit_location_y="39.0"/>
 

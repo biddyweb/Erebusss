@@ -82,6 +82,15 @@
     causes_terror="true" terror_effect="0"
 />
 
+<!--Weapon hardcoded as natural damage: Massive Club-->
+<npc name="Troll" animation_name="troll"
+    FP="9" BS="4" S="10" A="2" M="7" D="7" B="10" Sp="2"
+    natural_damageX="2" natural_damageY="10" natural_damageZ="0"
+    health_min="50" health_max="60" gold_min="3" gold_max="12"
+    xp_worth="30"
+    image_size="1.5"
+/>
+
 <!--Natural damage-->
 <npc name="Baby Wyvern" animation_name="wyvern"
     type="animal"
@@ -167,7 +176,7 @@
 <npc name="Skeleton Archer" animation_name="skeleton_archer"
     type="undead"
     FP="10" BS="9" S="8" A="1" M="2" D="8" B="12" Sp="2.8"
-    natural_damageX="2" natural_damageY="4" natural_damageZ="0"
+    natural_damageX="1" natural_damageY="6" natural_damageZ="0"
     health_min="50" health_max="60" gold_min="0" gold_max="0"
     xp_worth="60"
     unholy="true"

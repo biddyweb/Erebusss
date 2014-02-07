@@ -155,6 +155,7 @@ protected:
     string animation_name;
     bool static_image;
     bool bounce;
+    float image_size;
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
     string type; // monster type, e.g., goblinoid (may be empty)
@@ -244,6 +245,12 @@ public:
     bool isBounce() const {
         return this->bounce;
     }
+    void setImageSize(float image_size) {
+        this->image_size = image_size;
+    }
+    float getImageSize() const {
+        return this->image_size;
+    }
     void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
         this->weapon_resist_class = weapon_resist_class;
         this->weapon_resist_percentage = weapon_resist_percentage;
@@ -291,6 +298,7 @@ class Character {
     string animation_name; // for NPCs (player is handled separately)
     bool static_image; // for NPCs
     bool bounce;
+    float image_size;
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
 
@@ -477,6 +485,12 @@ public:
     }
     bool isBounce() const {
         return this->bounce;
+    }
+    void setImageSize(float image_size) {
+        this->image_size = image_size;
+    }
+    float getImageSize() const {
+        return this->image_size;
     }
     void setWeaponResist(const string &weapon_resist_class, int weapon_resist_percentage) {
         this->weapon_resist_class = weapon_resist_class;

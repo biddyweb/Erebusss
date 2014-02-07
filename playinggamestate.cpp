@@ -2615,6 +2615,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         bool static_image = parseBool(static_image_s.toString(), true);
                         QStringRef bounce_s = reader.attributes().value("bounce");
                         bool bounce = parseBool(bounce_s.toString(), true);
+                        QStringRef image_size_s = reader.attributes().value("image_size");
                         QStringRef FP_s = reader.attributes().value("FP");
                         int FP = parseInt(FP_s.toString());
                         QStringRef BS_s = reader.attributes().value("BS");
@@ -2664,6 +2665,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         character_template->setCausesParalysis(causes_paralysis);
                         character_template->setStaticImage(static_image);
                         character_template->setBounce(bounce);
+                        if( image_size_s.length() > 0 ) {
+                            float image_size = parseFloat(image_size_s.toString());
+                            character_template->setImageSize(image_size);
+                        }
                         character_template->setRequiresMagical(requires_magical);
                         character_template->setUnholy(unholy);
 
@@ -2904,6 +2909,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             zoomoutButton->setIconSize(QSize(icon_size, icon_size));
             zoomoutButton->setMinimumSize(button_size, button_size);
+
 
 
 
@@ -3882,6 +3888,11 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
                 int weapon_resist_percentage = parseInt(weapon_resist_percentage_s.toString());
                 npc->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
             }
+        }
+        QStringRef image_size_s = reader.attributes().value("image_size");
+        if( image_size_s.length() > 0 ) {
+            float image_size = parseFloat(image_size_s.toString());
+            npc->setImageSize(image_size);
         }
         QStringRef type_s = reader.attributes().value("type");
         if( type_s.length() > 0 ) {
@@ -5625,7 +5636,8 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
     const int off_x = 64 - 32;
     const int off_y = 94 - 40;
     if( this->view_transform_3d ) {
-        const float desired_size = 0.75f;
+        //const float desired_size = 0.75f;
+        const float desired_size = 1.5f * character->getImageSize();
         float character_scale = desired_size / (float)character_size;
         qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
         {
@@ -5638,7 +5650,8 @@ void PlayingGamestate::locationAddCharacter(const Location *location, Character 
         }
     }
     else {
-        const float desired_size = 1.0f;
+        //const float desired_size = 1.0f;
+        const float desired_size = 2.0f * character->getImageSize();
         float character_scale = desired_size / (float)character_size;
         qDebug("character %s size %d scale %f", character->getName().c_str(), character_size, character_scale);
         object->setTransformOriginPoint(-desired_size*ratio_w*off_x/64.0f, -desired_size*ratio_h*off_y/64.0f);
@@ -5946,7 +5959,7 @@ void PlayingGamestate::update() {
                 object->addAnimationLayer( target_animation_layer );
                 object->setZValue(z_value_gui);
                 object->setPos(target_pos.x, target_pos.y);
-                this->addGraphicsItem(object, 0.5f, false);
+                this->addGraphicsItem(object, this->player->getTargetNPC()->getImageSize(), false);
             }
             else {
                 this->target_item->setPos(target_pos.x, target_pos.y);
@@ -7669,6 +7682,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->isBounce() ) {
                 stream << " bounce=\"true\"";
             }
+            stream << " image_size=\"" << character->getImageSize() << "\"";
             if( character->getWeaponResistClass().length() > 0 ) {
                 stream << " weapon_resist_class=\"" << character->getWeaponResistClass().c_str() << "\"";
                 stream << " weapon_resist_percentage=\"" << character->getWeaponResistPercentage() << "\"";

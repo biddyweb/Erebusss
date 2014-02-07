@@ -216,6 +216,12 @@
     <animation name="death" start="20" length="4" type="single"/>
 </image>
 
+<image type="npc" name="troll" filename="gfx/textures/npcs/troll.png" width="256" height="208" expected_width="6144" stride_x="256" stride_y="256">
+    <animation name="" start="0" length="4" type="bounce"/>
+    <animation name="run" start="4" length="8" type="loop"/>
+    <animation name="attack" start="12" length="4" type="single"/>
+    <animation name="death" start="19" length="5" type="single"/>
+</image> <!-- original for troll: expected_width 8192, death animation start 19 -->
 <image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="4096">
     <animation name="" start="0" length="8" type="loop"/>
     <animation name="run" start="8" length="8" type="loop"/>
