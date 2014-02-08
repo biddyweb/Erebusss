@@ -341,6 +341,18 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         checkLockedDoors(playing_gamestate, "level_1", "level_2", "Dwarven Key", 1, true, false, false);
         checkLockedDoors(playing_gamestate, "level_2", "level_3", "Derrin's Ring", 1, false, true, false);
         checkLockedDoors(playing_gamestate, "level_2", "level_4", "Derrin's Ring", 1, false, true, false);
+
+        location = playing_gamestate->getQuest()->findLocation("level_1");
+        if( location == NULL ) {
+            throw string("can't find level_1");
+        }
+        Character *npc = location->findCharacter("Troll");
+        if( npc == NULL ) {
+            throw string("can't find Troll");
+        }
+        if( npc->getRegeneration() == 0 ) {
+            throw string("Troll doesn't have regeneration");
+        }
     }
     else if( test_id == TEST_LOADSAVEQUEST_3 ) {
         // check quest not completed
