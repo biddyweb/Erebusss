@@ -2693,6 +2693,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                             character_template->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
                         }
 
+                        QStringRef regeneration_s = reader.attributes().value("regeneration");
+                        int regeneration = parseInt(regeneration_s.toString(), true);
+                        character_template->setRegeneration(regeneration);
+
                         if( type_s.length() > 0 ) {
                             character_template->setType(type_s.toString().toStdString());
                         }
@@ -3889,6 +3893,9 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
                 npc->setWeaponResist(weapon_resist_class_s.toString().toStdString(), weapon_resist_percentage);
             }
         }
+        QStringRef regeneration_s = reader.attributes().value("regeneration");
+        int regeneration = parseInt(regeneration_s.toString(), true);
+        npc->setRegeneration(regeneration);
         QStringRef image_size_s = reader.attributes().value("image_size");
         if( image_size_s.length() > 0 ) {
             float image_size = parseFloat(image_size_s.toString());
@@ -7686,6 +7693,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->getWeaponResistClass().length() > 0 ) {
                 stream << " weapon_resist_class=\"" << character->getWeaponResistClass().c_str() << "\"";
                 stream << " weapon_resist_percentage=\"" << character->getWeaponResistPercentage() << "\"";
+            }
+            if( character->getRegeneration() != 0 ) {
+                stream << " regeneration=\"" << character->getRegeneration() << "\"";
             }
             //fprintf(file, " name=\"%s\"", character->getName().c_str());
             stream << " name=\"" << character->getName().c_str() << "\"";

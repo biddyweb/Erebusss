@@ -159,6 +159,7 @@ protected:
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
     string type; // monster type, e.g., goblinoid (may be empty)
+    int regeneration; // if non-zero, the character will heal 1 health per regeneration ms
 
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
@@ -261,6 +262,12 @@ public:
     int getWeaponResistPercentage() const {
         return this->weapon_resist_percentage;
     }
+    void setRegeneration(int regeneration) {
+        this->regeneration = regeneration;
+    }
+    int getRegeneration() const {
+        return this->regeneration;
+    }
     void setType(const string &type) {
         this->type = type;
     }
@@ -301,11 +308,12 @@ class Character {
     float image_size;
     string weapon_resist_class; // resistance to this weapon class
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
+    string type; // monster type, e.g., goblinoid (may be empty)
+    int regeneration; // if non-zero, the character will heal 1 health per regeneration ms
 
     // basic info
     string name;
     string biography; // not saved - we currently don't use it during the game, only when choosing a character
-    string type; // monster type, e.g., goblinoid (may be empty)
     bool is_ai; // not saved
     bool is_hostile;
     bool is_fixed; // whether character can move or not (for now used for non-hostile NPCs)
@@ -339,6 +347,7 @@ class Character {
     const Spell *casting_spell;
     Character *casting_spell_target;
     int time_last_complex_update_ms; // not saved
+    int time_last_regenerated_ms; // not saved
     // default positions only relevant for NPCs that don't change locations
     bool has_default_position;
     Vector2D default_position;
@@ -502,6 +511,18 @@ public:
     int getWeaponResistPercentage() const {
         return this->weapon_resist_percentage;
     }
+    void setType(const string &type) {
+        this->type = type;
+    }
+    string getType() const {
+        return this->type;
+    }
+    void setRegeneration(int regeneration) {
+        this->regeneration = regeneration;
+    }
+    int getRegeneration() const {
+        return this->regeneration;
+    }
     //
 
     void setPortrait(const string &portrait) {
@@ -515,12 +536,6 @@ public:
     }
     string getAnimationFolder() const {
         return this->animation_folder;
-    }
-    void setType(const string &type) {
-        this->type = type;
-    }
-    string getType() const {
-        return this->type;
     }
     void setBiography(const string &biography) {
         this->biography = biography;

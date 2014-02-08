@@ -132,7 +132,7 @@ CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int B
     profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max),
     //has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50)
+    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0)
 {
 }
 
@@ -159,12 +159,12 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
-    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50),
+    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), time_last_complex_update_ms(0), time_last_regenerated_ms(0), has_default_position(false), has_last_known_player_position(false),
     //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
     health(0), max_health(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -185,12 +185,12 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
     static_image(character_template.isStaticImage()),
-    bounce(character_template.isBounce()), image_size(character_template.getImageSize()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()),
+    bounce(character_template.isBounce()), image_size(character_template.getImageSize()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()), regeneration(character_template.getRegeneration()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), has_default_position(false), has_last_known_player_position(false), time_last_complex_update_ms(0),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), time_last_complex_update_ms(0), time_last_regenerated_ms(0), has_default_position(false), has_last_known_player_position(false),
     profile(*character_template.getProfile()),
     health(0), max_health(0),
     //natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
@@ -893,6 +893,12 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                 }
             }
         }
+    }
+
+    if( this->regeneration > 0 && elapsed_ms >= this->time_last_regenerated_ms + this->regeneration ) {
+        // regenerate!
+        this->increaseHealth(1);
+        this->time_last_regenerated_ms = elapsed_ms;
     }
 
     //qDebug("Character::update() done: %s", this->name.c_str());

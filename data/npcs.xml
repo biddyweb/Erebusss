@@ -90,6 +90,7 @@
     health_min="50" health_max="60" gold_min="3" gold_max="12"
     xp_worth="30"
     image_size="1.5"
+    regeneration="500"
 />
 
 <!--Natural damage-->
