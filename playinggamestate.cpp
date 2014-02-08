@@ -4081,7 +4081,7 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
                 QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->setTalkOpeningInitial(text.toStdString());
             }
-            else if( reader.name() == "opening_later ") {
+            else if( reader.name() == "opening_later") {
                 QString text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                 npc->setTalkOpeningLater(text.toStdString());
             }
