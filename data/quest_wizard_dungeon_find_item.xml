@@ -232,7 +232,7 @@ Food is no longer given to me. I note that I no longer hear any noises - whether
 <floorregion shape="rect" rect_x="40.0" rect_y="10.0" rect_w="1.0" rect_h="1.0" />
 <scenery name="Door" image_name="door_metal" x="40.05" y="10.5" w="0.1" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Vespar's Cell Key" unlock_xp="10"/>
-<item template="Skull" x="40.5" y="10.3"/>
+<scenery name="Skulls" image_name="skulls" x="40.5" y="10.3" size="0.3" draw_type="background"/>
 <gold amount="4" x="40.6" y="10.5"/>
 
 <!--passage next to cells-->
@@ -1462,6 +1462,8 @@ Every so often, one of the prisoners was taken away, never to be returned.
 <!--route to Orc Warlord-->
 
 <floorregion shape="rect" rect_x="33.0" rect_y="17.0" rect_w="5.0" rect_h="1.0"/>
+
+<!--<player_start x="34.9" y="17.5"/>-->
 
 <floorregion shape="polygon">
     <floorregion_point x="39.0" y="14.0" />
