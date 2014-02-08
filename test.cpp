@@ -50,7 +50,7 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_PERF_NUDGE_12 - performance test for nudging: clicking on east side of scenery, src is on east side
   TEST_PERF_NUDGE_13 - performance test for nudging: clicking on west side of scenery, src is on east side
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
-  TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game
+  TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game; also some additional checks specific to each quest
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
   TEST_MEMORYQUEST_n - loads the nth quest, forces all NPCs and scenery to be instantiated, and checks the memory usage (we do this as a separate test, due to forcing all images to be loaded)
   TEST_LOADSAVE_QUEST_1_COMPLETED - test for when 1st quest is completed, and door unlocked
@@ -310,6 +310,24 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         checkLockedDoors(playing_gamestate, "level_6", "level_6", "Maze Key", 1, true, false, false);
         checkLockedDoors(playing_gamestate, "level_6", "level_6", "Bull Statuette", 1, true, false, false);
         checkLockedDoors(playing_gamestate, "level_6", "level_6", "Minotaur's Key", 1, false, true, false);
+
+        location = playing_gamestate->getQuest()->findLocation("level_3");
+        if( location == NULL ) {
+            throw string("can't find level_3");
+        }
+        Character *npc = location->findCharacter("Calbert");
+        if( npc == NULL ) {
+            throw string("can't find Calbert");
+        }
+        if( npc->getTalkOpeningInitial().length() == 0 ) {
+            throw string("Calbert has no talk opening initial");
+        }
+        if( npc->getTalkOpeningLater().length() == 0 ) {
+            throw string("Calbert has no talk opening later");
+        }
+        if( npc->getTalkOpeningInteractionComplete().length() == 0 ) {
+            throw string("Calbert has no talk opening interaction complete");
+        }
     }
     else if( test_id == TEST_LOADSAVEQUEST_2 ) {
         // check quest not completed
