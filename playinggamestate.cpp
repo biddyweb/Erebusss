@@ -7075,6 +7075,9 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
 
 void PlayingGamestate::cycleTargetNPC() {
     qDebug("PlayingGamestate::cycleTargetNPC()");
+    if( targetButton != NULL ) {
+        targetButton->clearFocus(); // workaround for Android still showing selection
+    }
     if( this->player != NULL ) {
         Character *current_target = this->player->getTargetNPC();
         this->player->setTargetNPC(NULL);
