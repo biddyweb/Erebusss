@@ -319,6 +319,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     QPushButton *turboButton;
     QPushButton *quickSaveButton;
+    QPushButton *targetButton;
     QPushButton *zoomoutButton;
     QPushButton *zoominButton;
     QPushButton *centreButton;
@@ -427,6 +428,7 @@ private slots:
     void playBackgroundMusic();
     void turboToggled(bool checked);
     void quickSave();
+    void cycleTargetNPC();
 
 public:
     PlayingGamestate(bool is_savegame, GameType gameType, const string &player_type, const string &player_name, bool permadeath, bool cheat_mode, int cheat_start_level);
@@ -478,7 +480,6 @@ public:
     virtual void locationAddCharacter(const Location *location, Character *character);
 
     void actionCommand(bool pickup_only);
-    void cycleTargetNPC();
     void clickedMainView(float scene_x, float scene_y);
     void addWidget(QWidget *widget, bool fullscreen_hint);
     void addTextEffect(const string &text, int duration_ms);

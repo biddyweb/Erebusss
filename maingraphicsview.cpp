@@ -318,11 +318,6 @@ bool MainGraphicsView::handleKey(const QKeyEvent *event, bool down) {
             this->playing_gamestate->actionCommand(true);
         }
         break;
-    case Qt::Key_N:
-        done = true;
-        if( down ) {
-            this->playing_gamestate->cycleTargetNPC();
-        }
     case Qt::Key_PageDown:
     case Qt::Key_PageUp:
         // we don't need to record these keys, but we set done to true, so that it isn't processed by the QGraphicsView

@@ -3,6 +3,7 @@
 
 <image type="generic" name="gui_centre" filename="gfx/textures/gui/centre.png"/>
 <image type="generic" name="gui_quicksave" filename="gfx/textures/gui/quicksave.png"/>
+<image type="generic" name="gui_target" filename="gfx/textures/gui/target.png"/>
 <image type="generic" name="gui_time" filename="gfx/textures/gui/time.png"/>
 <image type="generic" name="gui_zoomin" filename="gfx/textures/gui/zoomin.png"/>
 <image type="generic" name="gui_zoomout" filename="gfx/textures/gui/zoomout.png"/>

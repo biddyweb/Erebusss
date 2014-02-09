@@ -231,6 +231,9 @@ progresses twice as fast. This can be useful when travelling along long passagew
 that you've already explored.</li>
 <li><b>Quicksave (shortut 'F5')</b> - Quick-saves the current game under the name
 "quicksave.xml". This option is not available in "Permadeath" mode.</li>
+<li><b>Target/Next enemy</b> - Targets an enemy (so you will attack, moving towards the
+enemy if necessary), or cycles through the enemies if one is already targetted. Can be
+useful on touchscreens if you are having difficulty picking which enemy to attack.
 <li><b>Zoom out (shortcut '<')</b> - Zooms the display out.</li>
 <li><b>Zoom in (shortcut '>')</b> - Zooms the display in.</li>
 <li><b>Centre (shortcut 'C')</b> - Centres the display on the player.</li>
@@ -570,6 +573,10 @@ ADDED   Implemented multiple Attacks; new Potion of Rage (+1 Attacks); Minotaur
 ADDED   Sound effect for attack spells.
 ADDED   New weapon: sling.
 ADDED   New enemy Troll, added to 3rd quest.
+ADDED   New GUI button to target an enemy (so you will attack, moving towards
+        the enemy if necessary), or cycles through the enemies if one is
+        already targetted. Can be useful on touchscreens if you are having
+        difficulty picking which enemy to attack.
 UPDATED Character choice screen now displays picture, stats, skills and details
         for the currently selected choice.
 UPDATED Improved layout of stats window.
@@ -598,6 +605,8 @@ UPDATED Android devices with low resolutions (specifically, "normal" screen
         practice, this rules out devices with resolution 480x320 or less, which
         Erebus does not support. Please let me know if this has blocked your
         device, and it has a resolution of 800x480 or higher!
+UPDATED Pressing 'N' to target/switch an enemy now moves the player towards the
+        enemy to attack, if necessary.
 
 Version 0.12 (2013/12/08)
 
@@ -949,6 +958,7 @@ following files:<ul>
 <li>grass.png - from http://opengameart.org/content/grass-001 , by Lamoot, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>wall_redbricks.png - from http://opengameart.org/content/dims-enviromental-and-architectural-textures , by Dim, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>gui/centre.png, gui/quicksave.png, gui/time.png, gui/zoomin.png, gui/zoomout.png - from http://opengameart.org/content/dungeon-tbs / https://code.google.com/p/dungeon-dobrochan-game/ , by Ashiroxzer, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> or later.
+<li>gui/target.png - from http://opengameart.org/content/cursors-arrows-map-markers-for-ardentryst-by-jordan-trudgett , by Jordan Trudgett, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>items/arrow.png - from projectiles.png - from http://opengameart.org/content/projectiles , by Clint Bellanger , under GPL 2, GPL 3 or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
 <li>items/beer.png - from http://opengameart.org/content/misc-dark-fantasy-scenery-sprites , by Gwes, under CC0 (Public Domain).</li>
 <li>items/book.png - from http://openclipart.org/detail/4151/generic-book-by-dniezby , by dniezby, under CC0 (Public Domain).</li>

@@ -1957,7 +1957,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
     scene(NULL), view(NULL), gui_overlay(NULL),
     view_transform_3d(false), view_walls_3d(false),
     /*main_stacked_widget(NULL),*/
-    turboButton(NULL), quickSaveButton(NULL), zoomoutButton(NULL), zoominButton(NULL), centreButton(NULL),
+    turboButton(NULL), quickSaveButton(NULL), targetButton(NULL), zoomoutButton(NULL), zoominButton(NULL), centreButton(NULL),
     difficulty(DIFFICULTY_MEDIUM), permadeath(permadeath), permadeath_has_savefilename(false), player(NULL), time_hours(1), c_quest_indx(0), c_location(NULL), quest(NULL), gameType(gameType),
     is_keyboard_moving(false),
     target_animation_layer(NULL), target_item(NULL),
@@ -2903,6 +2903,19 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
             }
 
+            QIcon targetIcon(this->builtin_images["gui_target"]);
+            targetButton = new QPushButton(targetIcon, "");
+            targetButton->setShortcut(QKeySequence(Qt::Key_N));
+#ifndef Q_OS_ANDROID
+            // for some reason, this sometimes shows on Android when it shouldn't?
+            targetButton->setToolTip(tr("Target/cycle through available enemies (N)"));
+#endif
+            targetButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            targetButton->setIconSize(QSize(icon_size, icon_size));
+            targetButton->setMinimumSize(button_size, button_size);
+            targetButton->setMaximumSize(button_size, button_size);
+            connect(targetButton, SIGNAL(clicked()), this, SLOT(cycleTargetNPC()));
+            layout->addWidget(targetButton, 0, col++, Qt::AlignCenter);
 
             QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
             zoomoutButton = new QPushButton(zoomoutIcon, "");
@@ -2914,9 +2927,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             zoomoutButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             zoomoutButton->setIconSize(QSize(icon_size, icon_size));
             zoomoutButton->setMinimumSize(button_size, button_size);
-
-
-
 
             zoomoutButton->setMaximumSize(button_size, button_size);
             connect(zoomoutButton, SIGNAL(clicked()), view, SLOT(zoomOut()));
@@ -7064,6 +7074,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
 }
 
 void PlayingGamestate::cycleTargetNPC() {
+    qDebug("PlayingGamestate::cycleTargetNPC()");
     if( this->player != NULL ) {
         Character *current_target = this->player->getTargetNPC();
         this->player->setTargetNPC(NULL);
@@ -7095,6 +7106,10 @@ void PlayingGamestate::cycleTargetNPC() {
         if( this->player->getTargetNPC() == NULL && first_npc != NULL ) {
             // reset to first NPC
             this->player->setTargetNPC(first_npc);
+        }
+        if( this->player->getTargetNPC() != NULL && this->player->getTargetNPC() != current_target ) {
+            const Character *npc = this->player->getTargetNPC();
+            this->requestPlayerMove(npc->getPos(), npc);
         }
     }
 
