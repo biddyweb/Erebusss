@@ -85,12 +85,12 @@
 
 <!--Weapon hardcoded as natural damage: Massive Club-->
 <npc name="Troll" animation_name="troll"
-    FP="9" BS="4" S="10" A="2" M="7" D="7" B="10" Sp="2"
+    FP="10" BS="4" S="12" A="2" M="5" D="7" B="7" Sp="2"
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="50" health_max="60" gold_min="3" gold_max="12"
-    xp_worth="30"
+    xp_worth="50"
     image_size="1.5"
-    regeneration="500"
+    regeneration="1000"
 />
 
 <!--Natural damage-->
