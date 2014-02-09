@@ -486,7 +486,11 @@ void Game::runTests() {
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LOADSAVE_QUEST_1_COMPLETED);
+    //Test::runTest(filename, ::TEST_LOADSAVEQUEST_2);
+    //Test::runTest(filename, ::TEST_MEMORYQUEST_0);
+    //Test::runTest(filename, ::TEST_MEMORYQUEST_1);
+    //Test::runTest(filename, ::TEST_MEMORYQUEST_2);
+    //Test::runTest(filename, ::TEST_MEMORYQUEST_3);
 }
 
 void Game::initButton(QWidget *button) const {
