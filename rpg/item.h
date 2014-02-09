@@ -11,6 +11,8 @@ using std::string;
 class Character;
 class PlayingGamestate;
 
+const float default_icon_width_c = 0.5f;
+
 enum ItemType {
     ITEMTYPE_GENERAL = 0,
     ITEMTYPE_WEAPON = 1,

@@ -12,7 +12,7 @@ using std::stringstream;
 #include "../logiface.h"
 
 Item::Item(const string &name, const string &image_name, int weight) :
-    name(name), image_name(image_name), user_data_gfx(NULL), icon_width(0.5f), weight(weight),
+    name(name), image_name(image_name), user_data_gfx(NULL), icon_width(default_icon_width_c), weight(weight),
     arg1(0), arg2(0), rating(1), is_magical(false), worth_bonus(0)
 {
 }

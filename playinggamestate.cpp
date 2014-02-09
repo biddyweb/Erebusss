@@ -2903,6 +2903,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 layout->addWidget(quickSaveButton, 0, col++, Qt::AlignCenter);
             }
 
+
             QIcon zoomoutIcon(this->builtin_images["gui_zoomout"]);
             zoomoutButton = new QPushButton(zoomoutIcon, "");
             zoomoutButton->setShortcut(QKeySequence(Qt::Key_Minus));
@@ -6692,6 +6693,8 @@ bool PlayingGamestate::handleClickForItems(Vector2D dest) {
     for(set<Item *>::iterator iter = c_location->itemsBegin(); iter != c_location->itemsEnd(); ++iter) {
         Item *item = *iter;
         float icon_width = item->getIconWidth();
+        if( icon_width < default_icon_width_c )
+            icon_width = default_icon_width_c; // this avoids the problem where it's hard to pick up a small item - also avoids problem with multiple items dropped at same location, of different size (e.g., Red Gem problem with Goblin in 1st quest)
         float dist_from_click = (dest - item->getPos()).magnitude();
         float dist_from_player = (player->getPos() - item->getPos()).magnitude();
         if( dist_from_click <= sqrt(0.5f) * icon_width + click_tol_items_c && dist_from_player <= npc_radius_c + sqrt(0.5f)*icon_width ) {
