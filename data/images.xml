@@ -217,12 +217,12 @@
     <animation name="death" start="20" length="4" type="single"/>
 </image>  <!-- original for orc: expected_width 4096, ranged animation start 28 -->
 
-<image type="npc" name="troll" filename="gfx/textures/npcs/troll.png" width="256" height="208" expected_width="5376" stride_x="256" stride_y="256">
+<image type="npc" name="troll" filename="gfx/textures/npcs/troll.png" xpos="13" ypos="13" width="91" height="91" expected_width="2688">
     <animation name="" start="0" length="4" type="bounce"/>
     <animation name="run" start="4" length="8" type="loop"/>
     <animation name="attack" start="12" length="4" type="single"/>
     <animation name="death" start="16" length="5" type="single"/>
-</image> <!-- original for troll: expected_width 8192, death animation start 19 -->
+</image> <!-- original for troll: expected_width 8192, death animation start 19; also scaled by 50% -->
 <image type="npc" name="minotaur" filename="gfx/textures/npcs/minotaur.png" xpos="32" ypos="0" width="64" height="104" expected_width="4096">
     <animation name="" start="0" length="8" type="loop"/>
     <animation name="run" start="8" length="8" type="loop"/>

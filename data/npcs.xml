@@ -89,7 +89,7 @@
     natural_damageX="2" natural_damageY="10" natural_damageZ="0"
     health_min="50" health_max="60" gold_min="3" gold_max="12"
     xp_worth="50"
-    image_size="1.5"
+    image_size="1.0"
     regeneration="1000"
 />
 
