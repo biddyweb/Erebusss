@@ -74,6 +74,9 @@ private:
     const static float max_zoom_c;
 
     void zoom(QPointF zoom_centre, bool in);
+    void mousePress(int m_x, int m_y);
+    void mouseRelease(int m_x, int m_y);
+    void mouseMove(int m_x, int m_y);
 
     virtual bool viewportEvent(QEvent *event);
     virtual void mousePressEvent(QMouseEvent *event);

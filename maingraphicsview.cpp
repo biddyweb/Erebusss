@@ -92,23 +92,114 @@ void MainGraphicsView::zoom(QPointF zoom_centre, bool in) {
     }
 }
 
+void MainGraphicsView::mousePress(int m_x, int m_y) {
+    this->single_left_mouse_down = true;
+    this->mouse_down_x = m_x;
+    this->mouse_down_y = m_y;
+    this->has_kinetic_scroll = false;
+}
+
+// On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
+// Needs to be higher on Symbian, at least for Nokia 5800, as touching the display seems to cause it to move so much more easily.
+#if defined(Q_OS_SYMBIAN)
+const int drag_tol_c = 24;
+#else
+const int drag_tol_c = 16;
+#endif
+
+void MainGraphicsView::mouseRelease(int m_x, int m_y) {
+    this->single_left_mouse_down = false;
+    this->has_last_mouse = false;
+    int xdist = abs(this->mouse_down_x - m_x);
+    int ydist = abs(this->mouse_down_y - m_y);
+    //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
+    if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
+        this->has_kinetic_scroll = false;
+        QPointF m_scene = this->mapToScene(m_x, m_y);
+        LOG("clicked: %f, %f\n", m_scene.x(), m_scene.y());
+        playing_gamestate->clickedMainView(m_scene.x(), m_scene.y());
+    }
+    // else, this was a drag operation
+}
+
+void MainGraphicsView::mouseMove(int m_x, int m_y) {
+    if( this->single_left_mouse_down ) {
+        // only if the left mouse is down, and this isn't a multitouch event (otherwise single_left_mouse_down should be set to false)
+        //qDebug("    lmb");
+        if( this->has_last_mouse ) {
+            //qDebug("    has last mouse");
+            /*QPointF old_pos = this->mapToScene(this->last_mouse_x, this->last_mouse_y);
+            QPointF new_pos = this->mapToScene(event->x(), event->y());*/
+            QPointF old_pos(this->last_mouse_x, this->last_mouse_y);
+            QPointF new_pos(m_x, m_y);
+            QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
+
+            // drag - we do this ourselves rather than using drag mode QGraphicsView::ScrollHandDrag, to avoid conflict with multitouch
+            QPointF centre = this->mapToScene( this->rect() ).boundingRect().center();
+            QPoint centre_pixels = this->mapFromScene(centre);
+            centre_pixels.setX( centre_pixels.x() + diff.x() );
+            centre_pixels.setY( centre_pixels.y() + diff.y() );
+            centre = this->mapToScene(centre_pixels);
+            this->centerOn(centre);
+
+            // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
+            if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
+                int time_ms = game_g->getInputTimeFrameMS();
+                if( time_ms > 0 ) {
+                    diff /= (float)time_ms;
+                    this->has_kinetic_scroll = true;
+                    this->kinetic_scroll_dir.set(diff.x(), diff.y());
+                    this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
+                    this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
+                    this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
+                    //qDebug("    speed: %f", this->kinetic_scroll_speed);
+                }
+            }
+            else {
+                this->has_kinetic_scroll = false;
+            }
+        }
+        else {
+            this->has_kinetic_scroll = false;
+        }
+        this->has_last_mouse = true;
+        this->last_mouse_x = m_x;
+        this->last_mouse_y = m_y;
+    }
+}
+
 bool MainGraphicsView::viewportEvent(QEvent *event) {
     //qDebug("MainGraphicsView::viewportEvent() type %d\n", event->type());
     // multitouch done by touch events manually - gestures don't seem to work properly on my Android phone?
-    if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd || event->type() == QEvent::TouchUpdate ) {
+    if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
         QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
         QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+        //qDebug("touch event %d count %d", event->type(), touchPoints.count());
         if( touchPoints.count() > 1 ) {
             this->has_kinetic_scroll = false;
             this->single_left_mouse_down = false;
             // can't trust last mouse position if more that one touch!
             this->has_last_mouse = false;
         }
-    }
-    if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
-        QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
-        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
-        //qDebug("touch event %d count %d", event->type(), touchPoints.count());
+#if QT_VERSION >= 0x050000
+#ifdef Q_OS_ANDROID
+        // on Android with Qt 5, mouse events are never received, instead it's done purely via touch events
+        if( touchPoints.count() == 1 ) {
+            QTouchEvent::TouchPoint touchPoint = touchPoints.at(0);
+            int m_x = touchPoint.pos().x();
+            int m_y = touchPoint.pos().y();
+            if( event->type() == QEvent::TouchBegin ) {
+                this->mousePress(m_x, m_y);
+            }
+            else if( event->type() == QEvent::TouchEnd ) {
+                this->mouseRelease(m_x, m_y);
+            }
+            else if( event->type() == QEvent::TouchUpdate ) {
+                this->mouseMove(m_x, m_y);
+            }
+        }
+#endif
+#endif
         if( touchPoints.count() == 2 ) {
             // determine scale factor
             const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
@@ -155,40 +246,16 @@ bool MainGraphicsView::viewportEvent(QEvent *event) {
 void MainGraphicsView::mousePressEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mousePressEvent");
     if( event->button() & Qt::LeftButton ) {
-        this->single_left_mouse_down = true;
-        this->mouse_down_x = event->x();
-        this->mouse_down_y = event->y();
-        this->has_kinetic_scroll = false;
+        this->mousePress(event->x(), event->y());
     }
 
     QGraphicsView::mousePressEvent(event);
 }
 
-// On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
-// Needs to be higher on Symbian, at least for Nokia 5800, as touching the display seems to cause it to move so much more easily.
-#if defined(Q_OS_SYMBIAN)
-const int drag_tol_c = 24;
-#else
-const int drag_tol_c = 16;
-#endif
-
 void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mouseReleaseEvent");
     if( event->button() & Qt::LeftButton ) {
-        this->single_left_mouse_down = false;
-        this->has_last_mouse = false;
-        int m_x = event->x();
-        int m_y = event->y();
-        int xdist = abs(this->mouse_down_x - m_x);
-        int ydist = abs(this->mouse_down_y - m_y);
-        //if( m_x == this->mouse_down_x && m_y == this->mouse_down_y ) {
-        if( xdist <= drag_tol_c && ydist <= drag_tol_c ) {
-            this->has_kinetic_scroll = false;
-            QPointF m_scene = this->mapToScene(m_x, m_y);
-            LOG("clicked: %f, %f\n", m_scene.x(), m_scene.y());
-            playing_gamestate->clickedMainView(m_scene.x(), m_scene.y());
-        }
-        // else, this was a drag operation
+        mouseRelease(event->x(), event->y());
     }
 
     QGraphicsView::mouseReleaseEvent(event);
@@ -196,53 +263,12 @@ void MainGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 
 void MainGraphicsView::mouseMoveEvent(QMouseEvent *event) {
     //qDebug("MainGraphicsView::mouseMoveEvent");
-    if( this->single_left_mouse_down ) {
-        // only if the left mouse is down, and this isn't a multitouch event (otherwise single_left_mouse_down should be set to false)
-        //qDebug("    lmb");
-        if( this->has_last_mouse ) {
-            //qDebug("    has last mouse");
-            /*QPointF old_pos = this->mapToScene(this->last_mouse_x, this->last_mouse_y);
-            QPointF new_pos = this->mapToScene(event->x(), event->y());*/
-            QPointF old_pos(this->last_mouse_x, this->last_mouse_y);
 #if QT_VERSION >= 0x050000
-            QPointF new_pos = event->localPos();
+    QPointF new_pos = event->localPos();
 #else
-            QPointF new_pos = event->posF();
+    QPointF new_pos = event->posF();
 #endif
-            QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
-
-            // drag - we do this ourselves rather than using drag mode QGraphicsView::ScrollHandDrag, to avoid conflict with multitouch
-            QPointF centre = this->mapToScene( this->rect() ).boundingRect().center();
-            QPoint centre_pixels = this->mapFromScene(centre);
-            centre_pixels.setX( centre_pixels.x() + diff.x() );
-            centre_pixels.setY( centre_pixels.y() + diff.y() );
-            centre = this->mapToScene(centre_pixels);
-            this->centerOn(centre);
-
-            // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
-            if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
-                int time_ms = game_g->getInputTimeFrameMS();
-                if( time_ms > 0 ) {
-                    diff /= (float)time_ms;
-                    this->has_kinetic_scroll = true;
-                    this->kinetic_scroll_dir.set(diff.x(), diff.y());
-                    this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
-                    this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
-                    this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
-                    //qDebug("    speed: %f", this->kinetic_scroll_speed);
-                }
-            }
-            else {
-                this->has_kinetic_scroll = false;
-            }
-        }
-        else {
-            this->has_kinetic_scroll = false;
-        }
-        this->has_last_mouse = true;
-        this->last_mouse_x = event->x();
-        this->last_mouse_y = event->y();
-    }
+    this->mouseMove(new_pos.x(), new_pos.y());
 
     QGraphicsView::mouseMoveEvent(event);
 }
