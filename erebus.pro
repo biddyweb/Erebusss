@@ -59,6 +59,10 @@ USING_WEBKIT {
 }
 QT += xml
 
+greaterThan(QT_MAJOR_VERSION, 4) {
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+}
+
 # Test UID only:
 #symbian:TARGET.UID3 = 0xE11B6032
 # For use with Nokia Ovi Store only:
