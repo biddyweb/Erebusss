@@ -2975,8 +2975,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             this->c_quest_indx = cheat_start_level % this->quest_list.size();
             if( this->c_quest_indx == 1 ) {
                 // CHEAT, simulate start of quest 2:
-                player->addXP(this, 70);
-                player->addGold( 166 );
+                player->setXP(70);
+                player->setGold( 166 );
                 player->deleteItem("Leather Armour");
                 player->addItem(this->cloneStandardItem("Long Sword"), true);
                 player->addItem(this->cloneStandardItem("Shield"), true);
@@ -2988,8 +2988,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             }
             else if( this->c_quest_indx == 2 ) {
                 // CHEAT, simulate start of quest 3:
-                player->addXP(this, 1140);
-                player->addGold( 1241 + 300 );
+                {
+                    // set profile directly
+                    player->setXP(1140);
+                    player->setLevel(5);
+                    player->addProfile(2, 1, 1, 0, 2, 1, 1, 0.4f);
+                    player->increaseMaxHealth(24);
+                }
+                player->setGold( 1241 + 300 );
                 player->deleteItem("Leather Armour");
                 player->deleteItem("Long Sword");
                 player->armWeapon(NULL);
@@ -3068,7 +3074,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 }
                 player->addItem(this->cloneStandardItem("Longbow"), true);
 
-                // further test:
+                // further test for Middleham, after Vaults:
                 /*player->setXP(2945);
                 player->setGold( 1597 );
                 player->addItem(this->cloneStandardItem("Holy Water"), true);
@@ -3076,6 +3082,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
                 player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
                 player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);*/
+                // further test for Stockton, after killing all zombies and returning heirloom:
                 /*{
                     // set profile directly
                     player->setXP(3290);
@@ -3087,6 +3094,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 player->addItem(this->cloneStandardItem("Holy Water"), true);
                 player->addItem(this->cloneStandardItem("Holy Water"), true);
                 player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);*/
+                // further test for Wentbridge Fort, start of Dungeons:
                 {
                     // set profile directly
                     player->setXP(3405);
