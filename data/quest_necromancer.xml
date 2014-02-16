@@ -839,17 +839,48 @@ cdddddddde
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="2.5" y="5.5"/>-->
+<player_start x="2.5" y="5.5"/>
 
-<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="5.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="6.0" rect_h="5.0"/>
 
 <scenery name="Door" image_name="door_wood_n" x="2.5" y="6.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="39.5" exit_location_y="53.0"/>
 
-<scenery name="Torch" image_name="torch" x="4.0" y="0.55" w="0.75" h="0.75"/>
+<scenery name="Torch" image_name="torch" x="5.0" y="0.55" w="0.75" h="0.75"/>
 
 <scenery name="Door" image_name="door_metal_n" x="1.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false">
-Peering through a small hole in the cell door, you see a small dark room. After a few moments, you can make out the shape of someone sitting on the stone floor, chained to the wall.
+Peering through the small hole in the cell door, you see a small dark room. After a few moments, you can make out the shape of someone crouching on the stone floor, chained to the wall.
 </scenery>
+
+<scenery name="Door" image_name="door_metal_n" x="2.5" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false">
+Peering through the small hole in the cell door, you see the face of a woman. She pleads you to let her out, though the door is locked shut.
+</scenery>
+
+<floorregion shape="rect" rect_x="3.5" rect_y="0.0" rect_w="1.0" rect_h="1.0"/>
+<scenery name="Blood Stain" image_name="bloodstain" x="4.0" y="0.5" w="0.7" h="0.7" opacity="0.8" draw_type="background"/>
+
+<scenery name="Door" image_name="door_metal_n" x="4.0" y="0.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Table" image_name="table" x="4.0" y="3.0" size="1.2" blocking="true"/>
+
+<npc name="Jailer" animation_name="peasant_man" static_image="true" x="5.0" y="2.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello, how can I help you?
+</opening_initial>
+<opening_later>How can I help you?
+</opening_later>
+<talk question="What are these prisoners here for?">
+blah
+</talk>
+<talk question="Can't you let them go?">
+blah blah
+</talk>
+</npc>
 
 </location>
 
@@ -871,19 +902,45 @@ Peering through a small hole in the cell door, you see a small dark room. After 
 
 <!--<player_start x="24.0" y="25.5"/>-->
 
-<npc name="Skeleton" template="Skeleton" x="21.0" y="21.0"/>
-
-<npc name="Skeleton" template="Skeleton" x="27.0" y="21.0"/>
-
-<npc name="Skeleton" template="Skeleton" x="21.0" y="27.0"/>
-
-<npc name="Skeleton" template="Skeleton" x="27.0" y="27.0"/>
-
 <floorregion shape="rect" rect_x="23.0" rect_y="28.0" rect_w="2.0" rect_h="8.0"/>
+
+<floorregion shape="rect" rect_x="25.0" rect_y="34.0" rect_w="6.0" rect_h="2.0"/>
 
 <floorregion shape="rect" rect_x="17.0" rect_y="34.0" rect_w="6.0" rect_h="2.0"/>
 
-<scenery name="Chest" image_name="chest" x="17.5" y="35.0" size="0.8" blocking="true">
+<floorregion shape="rect" rect_x="11.0" rect_y="32.0" rect_w="6.0" rect_h="6.0"/>
+
+<scenery name="Torch" image_name="torch" x="12.25" y="31.55" w="0.75" h="0.75"/>
+
+<scenery name="Torch" image_name="torch" x="15.75" y="31.55" w="0.75" h="0.75"/>
+
+<floorregion shape="rect" rect_x="13.5" rect_y="31.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="13.5" rect_y="38.0" rect_w="1.0" rect_h="1.0"/>
+
+<floorregion shape="rect" rect_x="5.0" rect_y="34.0" rect_w="6.0" rect_h="2.0"/>
+
+<npc name="Skeleton" template="Skeleton" x="16.5" y="37.5"/>
+
+<npc name="Skeleton" template="Skeleton" x="14.0" y="31.5"/>
+
+<npc name="Skeleton" template="Skeleton" x="14.0" y="38.5"/>
+
+<npc name="Skeleton" template="Skeleton" x="7.6" y="35.0"/>
+
+<scenery name="Tomb" image_name="tomb" x="12.0" y="35.0" size="1.0" blocking="true">
+    <gold amount="7"/>
+</scenery>
+
+<scenery name="Tomb" image_name="tomb" x="14.0" y="35.0" size="1.0" blocking="true">
+    <gold amount="3"/>
+</scenery>
+
+<scenery name="Tomb" image_name="tomb" x="16.0" y="35.0" size="1.0" blocking="true">
+    <trap type="acid" rating="16"/>
+</scenery>
+
+<scenery name="Chest" image_name="chest" x="5.5" y="35.0" size="0.8" blocking="true">
     <gold amount="100"/>
 </scenery>
 
@@ -1656,7 +1713,7 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
 
-<player_start x="49.0" y="29.5"/>
+<!--<player_start x="49.0" y="29.5"/>-->
 
 <!-- north route, past human prisoners -->
 
