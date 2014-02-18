@@ -168,6 +168,9 @@ AnimationLayer *LazyAnimationLayer::getAnimationLayer() {
     if( this->animation_layer == NULL ) {
         LOG("lazily load animation layer from: %s\n", this->filename.c_str());
         this->animation_layer = AnimationLayer::create(filename, animation_layer_definitions, clip, off_x, off_y, width, height, stride_x, stride_y, expected_total_width, n_dimensions);
+        if( this->animation_layer == NULL ) {
+            throw string("failed to load animation layer from: " + this->filename);
+        }
         LOG("    done\n");
     }
     return this->animation_layer;

@@ -6494,7 +6494,12 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
     }
     object->clearAnimationLayers();
     if( character == player ) {
-        object->addAnimationLayer( this->animation_layers["player"]->getAnimationLayer() );
+        LazyAnimationLayer *lazy_animation_layer = this->animation_layers["player"];
+        if( lazy_animation_layer == NULL ) {
+            throw string("can't find lazy_animation_layer for player");
+        }
+        AnimationLayer *animation_layer = lazy_animation_layer->getAnimationLayer();
+        object->addAnimationLayer( animation_layer );
         if( character->getCurrentWeapon() != NULL && character->getCurrentWeapon()->getAnimationName().length() > 0 ) {
             object->addAnimationLayer( this->animation_layers[ character->getCurrentWeapon()->getAnimationName() ]->getAnimationLayer() );
         }
@@ -6503,7 +6508,12 @@ void PlayingGamestate::characterUpdateGraphics(const Character *character, void 
         }
     }
     else {
-        object->addAnimationLayer( this->animation_layers[ character->getAnimationName() ]->getAnimationLayer() );
+        LazyAnimationLayer *lazy_animation_layer = this->animation_layers[character->getAnimationName()];
+        if( lazy_animation_layer == NULL ) {
+            throw string("can't find lazy_animation_layer for: " + character->getAnimationName());
+        }
+        AnimationLayer *animation_layer = lazy_animation_layer->getAnimationLayer();
+        object->addAnimationLayer( animation_layer );
     }
 }
 
