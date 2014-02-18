@@ -280,7 +280,7 @@ Thank you for helping me!
 
 <location name="Graveyard, Axbury" display_name="true" lighting_min="90" geo_type="outdoors">
 
-<!--<player_start x="6.0" y="12.0"/>-->
+<player_start x="6.0" y="12.0"/>
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -302,39 +302,67 @@ ce
 </tilemap>
 
 <scenery name="Tomb" image_name="tomb" x="8.0" y="3.1" size="1.0" blocking="true">
+The text on this tomb is faded and unreadable.
     <gold amount="2"/>
 </scenery>
 
-<scenery name="Tomb" image_name="tomb" x="10.0" y="3.0" size="1.0" blocking="true"/>
+<scenery name="Tomb" image_name="tomb" x="10.0" y="3.0" size="1.0" blocking="true">
+Orin, 1132-1211.
+</scenery>
 
 <scenery name="Plant" image_name="plant" x="9.0" y="3.5" size="0.5" draw_type="background"/>
 
-<scenery name="Grave" image_name="grave2" x="8.6" y="5.0" size="0.5" blocking="true"/>
+<scenery name="Grave" image_name="grave2" x="8.6" y="5.0" size="0.5" blocking="true">
+Galain, 1208-1248.
+</scenery>
 
-<scenery name="Grave" image_name="grave0" x="6.0" y="3.0" size="1.0" blocking="true"/>
+<scenery name="Grave" image_name="grave0" x="6.0" y="3.0" size="1.0" blocking="true">
+Rogar, 1196-1231.
+</scenery>
 
-<scenery name="Grave" image_name="grave1" x="9.0" y="9.0" size="0.75" blocking="true"/>
+<scenery name="Grave" image_name="grave1" x="9.0" y="9.0" size="0.75" blocking="true">
+The text on this grave is faded and unreadable.
+</scenery>
 
-<scenery name="Grave" image_name="grave3" x="7.5" y="9.0" size="0.5" blocking="true"/>
+<scenery name="Grave" image_name="grave3" x="7.5" y="9.0" size="0.5" blocking="true">
+The text on this grave is faded and unreadable.
+</scenery>
 
-<scenery name="Grave" image_name="grave2" x="7.56" y="11.0" size="0.5" blocking="true"/>
+<scenery name="Grave" image_name="grave2" x="7.56" y="11.0" size="0.5" blocking="true">
+Selena, 1115-1249.
+</scenery>
 
-<scenery name="Grave" image_name="grave2" x="9.1" y="10.9" size="0.5" blocking="true"/>
+<scenery name="Grave" image_name="grave2" x="9.1" y="10.9" size="0.5" blocking="true">
+Eli, 1204-1231.
+</scenery>
 
 <scenery name="Tree" image_name="tree2" x="2.5" y="2.0" size="3.0"/>
 
-<scenery name="Grave" image_name="grave2" x="3.0" y="2.8" size="0.5" blocking="true"/>
+<scenery name="Grave" image_name="grave2" x="3.0" y="2.8" size="0.5" blocking="true">
+Keran, 1188-1241.
+</scenery>
 
-<scenery name="Grave" image_name="grave3" x="2.0" y="5.0" size="0.5" blocking="true"/>
-<scenery name="Grass" image_name="grass" x="2.1" y="5.5" size="0.5"/>
+<scenery name="Grave" image_name="grave3" x="2.0" y="5.0" size="0.5" blocking="true">
+The text on this grave is faded and unreadable.
+</scenery>
 
-<scenery name="Grave" image_name="grave2" x="3.7" y="7.0" size="0.5" blocking="true"/>
+<scenery name="Grass" image_name="grass" x="2.1" y="5.5" size="0.5">
+Sama, 1223-1238.
+</scenery>
+
+<scenery name="Grave" image_name="grave2" x="3.7" y="7.0" size="0.5" blocking="true">
+The text on this grave is faded and unreadable.
+</scenery>
 
 <scenery name="Grass" image_name="grass" x="3.1" y="7.1" size="0.5"/>
 
-<scenery name="Grave" image_name="grave1" x="2.0" y="10.0" size="0.75" blocking="true"/>
+<scenery name="Grave" image_name="grave1" x="2.0" y="10.0" size="0.75" blocking="true">
+The text on this grave is faded and unreadable.
+</scenery>
 
-<scenery name="Grave" image_name="grave1" x="4.0" y="10.1" size="0.75" blocking="true"/>
+<scenery name="Grave" image_name="grave1" x="4.0" y="10.1" size="0.75" blocking="true">
+Luna, 1222-1245.
+</scenery>
 
 <npc name="Zombie" objective_id="Axbury_Priest" template="Zombie" x="2.0" y="3.5"/>
 
@@ -1428,7 +1456,7 @@ Thank you! Here, have 50 gold pieces as a reward.
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<player_start x="32.5" y="59.0"/>
+<!--<player_start x="32.5" y="59.0"/>-->
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
 
