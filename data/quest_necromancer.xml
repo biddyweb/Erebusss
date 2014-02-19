@@ -280,7 +280,7 @@ Thank you for helping me!
 
 <location name="Graveyard, Axbury" display_name="true" lighting_min="90" geo_type="outdoors">
 
-<player_start x="6.0" y="12.0"/>
+<!--<player_start x="6.0" y="12.0"/>-->
 
 <floor image_name="grass"/>
 <wall image_name="wall"/>
@@ -1360,9 +1360,23 @@ This is a tattered old journal, its pages worn from age, whilst spatters of bloo
 <wall image_name="wall"/>
 <background image_name="background_dark"/>
 
-<!--<player_start x="32.5" y="59.0"/>-->
+<player_start x="32.5" y="59.0"/>
 
 <floorregion shape="rect" rect_x="30.0" rect_y="50.0" rect_w="5.0" rect_h="10.0"/>
+
+<npc name="Soldier" animation_name="spearman" static_image="true" x="31.0" y="51.1"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>Hello stranger - welcome to Wentbridge Fort.
+</opening_initial>
+<opening_later>Hello again, stranger.
+</opening_later>
+</npc>
 
 <scenery name="Torch" image_name="torch" x="31.0" y="49.55" w="0.75" h="0.75"/>
 
@@ -1396,7 +1410,7 @@ This is a tattered old journal, its pages worn from age, whilst spatters of bloo
     xp_worth="0"
     shop="General Stores"/>
 
-<npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="31.5" y="37.0"
+<npc name="Shopkeeper" animation_name="spearman" static_image="true" x="31.5" y="37.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
     health="10" max_health="10"

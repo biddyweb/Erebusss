@@ -275,6 +275,7 @@
 <image type="npc" name="peasant_man" filename="gfx/textures/npcs/peasant_man.png"/>
 <image type="npc" name="peasant_woman" filename="gfx/textures/npcs/peasant_woman.png"/>
 <image type="npc" name="soldier" filename="gfx/textures/npcs/soldier.png"/>
+<image type="npc" name="spearman" filename="gfx/textures/npcs/spearman.png"/>
 <image type="npc" name="wizard" filename="gfx/textures/npcs/wizard.png"/>
 
 </images>
