@@ -793,9 +793,7 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="35.0" y="24.0" />
 </floorregion>
 
-<npc name="Orc Champion" template="Orc Champion" x="30.5" y="18.5">
-    <item template="Chain Mail Armour"/>
-</npc>
+<npc name="Fire Ant" template="Fire Ant" x="23.5" y="27.5"/>
 
 <floorregion shape="polygon">
     <floorregion_point x="28.0" y="31.0" />
@@ -803,10 +801,6 @@ This plate armour is blessed with ancient Dwarven magic, offering greater protec
     <floorregion_point x="11.0" y="16.0" />
     <floorregion_point x="27.0" y="32.0" />
 </floorregion>
-
-<npc name="Orc Champion" template="Orc Champion" x="23.5" y="27.5">
-    <item template="Chain Mail Armour"/>
-</npc>
 
 <trap x="19.5" y="23.5" w="2.0" h="2.0" type="darts" rating="3"/>
 
