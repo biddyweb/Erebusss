@@ -201,6 +201,16 @@
 />
 
 <!--Natural damage-->
+<npc name="Fire Ant" animation_name="fire_ant"
+    type="animal"
+    FP="9" BS="0" S="5" A="1" M="4" D="0" B="6" Sp="4.5"
+    natural_damageX="2" natural_damageY="10" natural_damageZ="0"
+    health_min="20" health_max="30" gold_min="0" gold_max="0"
+    xp_worth="40"
+    causes_terror="true" terror_effect="2"
+/>
+
+<!--Natural damage-->
 <npc name="Giant Spider" animation_name="spider"
     type="animal"
     FP="8" BS="0" S="5" A="1" M="4" D="0" B="8" Sp="4.0"
