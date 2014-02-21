@@ -80,9 +80,9 @@ cdddddddddddd21dddddddddddddde
 
 <scenery name="Tree" image_name="tree2" x="20.0" y="30.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="27.0" y="33.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="27.0" y="33.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="30.0" y="15.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="30.0" y="15.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree3" x="22.5" y="32.0" size="3.0"/>
 
@@ -139,7 +139,7 @@ This worn and battered old scarecrow watches over the fields. As you examine it,
 
 <scenery name="Tree" image_name="tree3" x="31.7" y="58.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="31.6" y="66.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="31.6" y="66.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree2" x="34.4" y="60.0" size="3.0"/>
 
@@ -589,7 +589,7 @@ This magical plate armour is as strong as regular plate, but much lighter.
 
 <floorregion shape="rect" rect_x="41.0" rect_y="24.0" rect_w="5.0" rect_h="1.0"/>
 
-<player_start x="42.0" y="24.5"/>
+<!--<player_start x="42.0" y="24.5"/>-->
 
 <floorregion shape="rect" rect_x="43.0" rect_y="25.0" rect_w="1.0" rect_h="4.0"/>
 
@@ -1128,7 +1128,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="30.0" rect_w="20.0" rect_h="20.0"/>
 
-<!--<player_start x="16.0" y="42.0"/>-->
+<player_start x="16.0" y="42.0"/>
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="42.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="44.0" exit_location_y="20.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Stockton?"
@@ -1164,15 +1164,15 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree2" x="37.0" y="36.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="37.0" y="44.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="37.0" y="44.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree2" x="39.0" y="37.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree3" x="41.0" y="38.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="43.0" y="39.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="43.0" y="39.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="45.0" y="39.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="45.0" y="39.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree2" x="47.0" y="38.0" size="3.0"/>
 
@@ -1182,7 +1182,7 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree2" x="51.0" y="37.5" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="53.0" y="38.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="53.0" y="38.0" size="3.0"/>
 
 <scenery name="Tree" image_name="tree3" x="55.0" y="37.5" size="3.0"/>
 
@@ -1202,7 +1202,7 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree3" x="38.5" y="18.0" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="39.5" y="14.0" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="39.5" y="14.0" size="3.0"/>
 
 <!-- east row of trees -->
 
@@ -1269,7 +1269,7 @@ The sign, which is spattered with blood, bears the warning: "Beware the Krulls"
 
 <scenery name="Tree" image_name="tree3" x="49.0" y="10.5" size="3.0"/>
 
-<scenery name="Tree" image_name="tree2" x="51.0" y="11.5" size="3.0"/>
+<scenery name="Tree" image_name="tree5" x="51.0" y="11.5" size="3.0"/>
 
 <scenery name="Tree" image_name="tree3" x="53.0" y="12.0" size="3.0"/>
 

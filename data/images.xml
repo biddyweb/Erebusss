@@ -153,6 +153,9 @@
 <image type="scenery" name="tree3" filename="gfx/textures/scenery/tree3.png" width="72" height="65" stride_x="72" expected_width="288">
     <animation name="" start="0" length="4" type="loop"/>
 </image>
+<image type="scenery" name="tree5" filename="gfx/textures/scenery/tree5.png" width="72" height="65" stride_x="72" expected_width="288">
+    <animation name="" start="0" length="4" type="loop"/>
+</image>
 <image type="scenery" name="well" filename="gfx/textures/scenery/well.png"/>
 
 <image type="scenery" name="barrel" filename="gfx/textures/scenery/barrel.png" width="64" height="64" stride_x="64" expected_width="128">
