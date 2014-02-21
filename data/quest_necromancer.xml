@@ -980,7 +980,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the town of Middleham?"
@@ -1031,7 +1031,9 @@ cdddde          9b
 
 <npc name="Zombie Champion" template="Zombie Champion" x="27.0" y="28.0"/>
 
-<scenery name="Tree" image_name="deadtree2" x="41.0" y="17.0" size="3.0"/>
+<scenery name="Tree" image_name="deadtree3" x="41.0" y="17.0" size="3.0"/>
+
+<scenery name="Tree" image_name="deadtree4" x="43.0" y="14.0" size="3.0"/>
 
 <npc name="Zombie" template="Zombie" x="40.0" y="15.1"/>
 
@@ -1039,7 +1041,9 @@ cdddde          9b
 
 <npc name="Zombie Champion" template="Zombie Champion" x="40.0" y="25.0"/>
 
-<scenery name="Tree" image_name="deadtree2" x="24.75" y="32.0" size="3.0"/>
+<scenery name="Tree" image_name="deadtree4" x="24.75" y="32.0" size="3.0"/>
+
+<scenery name="Tree" image_name="deadtree2" x="26.75" y="34.0" size="3.0"/>
 
 <scenery name="Tree" image_name="deadtree2" x="33.75" y="30.0" size="3.0"/>
 
@@ -1128,7 +1132,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 <floorregion shape="rect" rect_x="15.0" rect_y="30.0" rect_w="20.0" rect_h="20.0"/>
 
-<player_start x="16.0" y="42.0"/>
+<!--<player_start x="16.0" y="42.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="42.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="44.0" exit_location_y="20.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the village of Stockton?"
