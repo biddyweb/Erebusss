@@ -2697,6 +2697,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         int regeneration = parseInt(regeneration_s.toString(), true);
                         character_template->setRegeneration(regeneration);
 
+                        QStringRef death_explodes_s = reader.attributes().value("death_explodes");
+                        bool death_explodes = parseBool(death_explodes_s.toString(), true);
+                        if( death_explodes ) {
+                            QStringRef death_explodes_damage_s = reader.attributes().value("death_explodes_damage");
+                            int death_explodes_damage = parseInt(death_explodes_damage_s.toString());
+                            character_template->setDeathExplodes(death_explodes_damage);
+                        }
+
                         if( type_s.length() > 0 ) {
                             character_template->setType(type_s.toString().toStdString());
                         }
@@ -3915,6 +3923,13 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
         QStringRef regeneration_s = reader.attributes().value("regeneration");
         int regeneration = parseInt(regeneration_s.toString(), true);
         npc->setRegeneration(regeneration);
+        QStringRef death_explodes_s = reader.attributes().value("death_explodes");
+        bool death_explodes = parseBool(death_explodes_s.toString(), true);
+        if( death_explodes ) {
+            QStringRef death_explodes_damage_s = reader.attributes().value("death_explodes_damage");
+            int death_explodes_damage = parseInt(death_explodes_damage_s.toString());
+            npc->setDeathExplodes(death_explodes_damage);
+        }
         QStringRef image_size_s = reader.attributes().value("image_size");
         if( image_size_s.length() > 0 ) {
             float image_size = parseFloat(image_size_s.toString());
@@ -6317,6 +6332,7 @@ void PlayingGamestate::update() {
         Character *character = *iter;
         LOG("character has died: %s\n", character->getName().c_str());
         c_location->removeCharacter(character);
+        //LOG("done removing character from location\n");
 
         for(set<Character *>::iterator iter3 = c_location->charactersBegin(); iter3 != c_location->charactersEnd(); ++iter3) {
             Character *ch = *iter3;
@@ -6330,6 +6346,7 @@ void PlayingGamestate::update() {
         }
 
         if( character == this->player ) {
+            //LOG("player has died\n");
             if( this->permadeath && this->permadeath_has_savefilename ) {
                 QString full_path = this->permadeath_savefilename;
                 if( QFile::remove(full_path) ) {
@@ -6355,6 +6372,7 @@ void PlayingGamestate::update() {
             }
             death_message << "<p><b>Achieved Level:</b> " << player->getLevel() << "<br/><b>Achieved XP:</b> " << player->getXP() << "</p>";
             game_g->playSound(music_key_game_over_c, false);
+            music_mode = MUSICMODE_SILENCE;
             this->showInfoDialog(death_message.str(), string(DEPLOYMENT_PATH) + "gfx/scenes/death.jpg");
 
             this->player = NULL;
@@ -6362,6 +6380,7 @@ void PlayingGamestate::update() {
             game_g->pushMessage(game_message);
         }
         else {
+            //LOG("npc has died\n");
             if( music_mode == MUSICMODE_COMBAT ) {
                 if( !c_location->hasEnemies(this) ) {
                     // immediately stop music after killing the last nearby enemy
@@ -6370,7 +6389,9 @@ void PlayingGamestate::update() {
                 }
             }
         }
+        //LOG("about to delete: %s\n", character->getName().c_str());
         delete character; // also removes character from the QGraphicsScene, via the listeners
+        //LOG("done delete character\n");
     }
     if( this->player != NULL && delete_characters.size() > 0 ) {
         this->checkQuestComplete();
@@ -7736,6 +7757,10 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
             if( character->getRegeneration() != 0 ) {
                 stream << " regeneration=\"" << character->getRegeneration() << "\"";
             }
+            if( character->getDeathExplodes() ) {
+                stream << " death_explodes=\"true\"";
+                stream << " death_explodes_damage=\"" << character->getDeathExplodesDamage() << "\"";
+            }
             //fprintf(file, " name=\"%s\"", character->getName().c_str());
             stream << " name=\"" << character->getName().c_str() << "\"";
             if( character->isDead() ) {
@@ -8118,6 +8143,7 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
         //fprintf(file, "\n");
         stream << "\n";
 
+
         //fprintf(file, "</location>\n\n");
         stream << "</location>\n\n";
     }
@@ -8313,7 +8339,23 @@ QGraphicsItem *PlayingGamestate::addSpellGraphic(Vector2D pos) {
     ps->setBirthRate(50.0f);
     ps->setPos(pos.x, pos.y);
     ps->setZValue(pos.y + 2000.0f);
-    float item_scale = 1.0f / smoke_pixmap.width();
+    float item_scale = 1.0f / fireball_pixmap.width();
+    ps->setScale(item_scale);
+    scene->addItem(ps);
+    return ps;
+}
+
+QGraphicsItem *PlayingGamestate::addExplosionGraphic(Vector2D pos) {
+    qDebug("PlayingGamestate::addExplosionGraphic(%f, %f)", pos.x, pos.y);
+    SmokeParticleSystem *ps = new SmokeParticleSystem(fireball_pixmap);
+    ps->setType(SmokeParticleSystem::TYPE_RADIAL);
+    ps->setBirthRate(200.0f);
+    ps->setLifeExp(500);
+    ps->setSystemLifeExp(100);
+    ps->setSize(1.0f, 0.0f);
+    ps->setPos(pos.x, pos.y);
+    ps->setZValue(pos.y + 2000.0f);
+    float item_scale = 1.0f / fireball_pixmap.width();
     ps->setScale(item_scale);
     scene->addItem(ps);
     return ps;

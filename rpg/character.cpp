@@ -132,7 +132,7 @@ CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int B
     profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max),
     //has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0)
+    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0), death_explodes(false), death_explodes_damage(0)
 {
 }
 
@@ -159,7 +159,7 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
-    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0),
+    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0), death_explodes(false), death_explodes_damage(0),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
@@ -185,7 +185,7 @@ Character::Character(const string &name, bool is_ai, const CharacterTemplate &ch
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
     static_image(character_template.isStaticImage()),
-    bounce(character_template.isBounce()), image_size(character_template.getImageSize()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()), regeneration(character_template.getRegeneration()),
+    bounce(character_template.isBounce()), image_size(character_template.getImageSize()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()), regeneration(character_template.getRegeneration()), death_explodes(character_template.getDeathExplodes()), death_explodes_damage(character_template.getDeathExplodesDamage()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
     //has_destination(false),
@@ -1126,6 +1126,23 @@ void Character::kill(PlayingGamestate *playing_gamestate) {
     }
     if( this == playing_gamestate->getPlayer() ) {
         playing_gamestate->getView()->getGUIOverlay()->setFadeOut();
+    }
+    if( this->death_explodes && this->location != NULL ) {
+        if( this->death_explodes_damage > 0 ) {
+            for(set<Character *>::iterator iter = this->location->charactersBegin(); iter != this->location->charactersEnd(); ++iter) {
+                Character *character = *iter;
+                if( character != this && !character->isDead() ) {
+                    double dist = (character->getPos() - this->getPos()).magnitude();
+                    if( dist <= 1.0f ) {
+                        int damage = rollDice(this->death_explodes_damage, 6, 0);
+                        if( character->decreaseHealth(playing_gamestate, damage, false, false) ) {
+                            character->addPainTextEffect(playing_gamestate);
+                        }
+                    }
+                }
+            }
+        }
+        playing_gamestate->addExplosionGraphic(this->pos);
     }
 }
 

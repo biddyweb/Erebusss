@@ -530,6 +530,7 @@ public:
     void addGraphicsItem(QGraphicsItem *object, float width, bool undo_3d);
     QGraphicsItem *addPixmapGraphic(const QPixmap &pixmap, Vector2D pos, float width, bool undo_3d, bool on_ground);
     QGraphicsItem *addSpellGraphic(Vector2D pos);
+    QGraphicsItem *addExplosionGraphic(Vector2D pos);
 
     void addStandardItem(Item *item);
     Item *cloneStandardItem(const string &name) const;

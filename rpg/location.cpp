@@ -732,8 +732,15 @@ float Location::distanceOfPath(Vector2D src, const vector<Vector2D> &path, bool 
 
 bool Location::hasEnemies(const PlayingGamestate *playing_gamestate) const {
     bool has_enemies = false;
+    //qDebug("Location:hasEnemies()");
+    if( playing_gamestate->getPlayer() == NULL ) {
+        // protect against RTE!
+        return false;
+    }
     for(set<Character *>::const_iterator iter = this->characters.begin(); iter != this->characters.end() && !has_enemies; ++iter) {
         const Character *character = *iter;
+        //qDebug("    character: %d", character);
+        //qDebug("    character: %s", character->getName().c_str());
         if( character->isHostile() ) {
             // n.b., we don't use the visibility test - so it isn't sufficient to just be out of sight, but we also need to be a sufficient distance
             // we care about the distance by path, rather than euclidean distance - but we can check the euclidean distance first as a quick check
@@ -1370,6 +1377,7 @@ void Location::intersectSweptSquareWithBoundaries(bool *done, bool *hit, float *
         const Polygon2D *boundary = &*iter;
         /*if( ignore_all_scenery && boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
             continue;
+
         }*/
         if( boundary->getSourceType() == (int)SOURCETYPE_SCENERY ) {
             const Scenery *scenery = static_cast<const Scenery *>(boundary->getSource());

@@ -160,6 +160,8 @@ protected:
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
     string type; // monster type, e.g., goblinoid (may be empty)
     int regeneration; // if non-zero, the character will heal 1 health per regeneration ms
+    bool death_explodes; // whether explodes on death
+    int death_explodes_damage; // n-D6 damage due to exploding
 
 public:
     CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max);
@@ -268,6 +270,16 @@ public:
     int getRegeneration() const {
         return this->regeneration;
     }
+    void setDeathExplodes(int death_explodes_damage) {
+        this->death_explodes = true;
+        this->death_explodes_damage = death_explodes_damage;
+    }
+    bool getDeathExplodes() const {
+        return this->death_explodes;
+    }
+    int getDeathExplodesDamage() const {
+        return this->death_explodes_damage;
+    }
     void setType(const string &type) {
         this->type = type;
     }
@@ -310,6 +322,8 @@ class Character {
     int weapon_resist_percentage; // damage to that weapon class is scaled by this amount (so lower means less damage; set to greater than 100 for more damage)
     string type; // monster type, e.g., goblinoid (may be empty)
     int regeneration; // if non-zero, the character will heal 1 health per regeneration ms
+    bool death_explodes; // whether explodes on death
+    int death_explodes_damage; // n-D6 damage due to exploding
 
     // basic info
     string name;
@@ -522,6 +536,16 @@ public:
     }
     int getRegeneration() const {
         return this->regeneration;
+    }
+    void setDeathExplodes(int death_explodes_damage) {
+        this->death_explodes = true;
+        this->death_explodes_damage = death_explodes_damage;
+    }
+    bool getDeathExplodes() const {
+        return this->death_explodes;
+    }
+    int getDeathExplodesDamage() const {
+        return this->death_explodes_damage;
     }
     //
 
