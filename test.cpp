@@ -353,6 +353,21 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         if( npc->getRegeneration() == 0 ) {
             throw string("Troll doesn't have regeneration");
         }
+
+        location = playing_gamestate->getQuest()->findLocation("level_5");
+        if( location == NULL ) {
+            throw string("can't find level_5");
+        }
+        npc = location->findCharacter("Fire Ant");
+        if( npc == NULL ) {
+            throw string("can't find Fire Ant");
+        }
+        if( !npc->getDeathExplodes() ) {
+            throw string("Fire Ant doesn't have death_explodes");
+        }
+        if( npc->getDeathExplodesDamage() <= 0 ) {
+            throw string("Fire Ant doesn't have death_explodes_damage");
+        }
     }
     else if( test_id == TEST_LOADSAVEQUEST_3 ) {
         // check quest not completed
