@@ -656,7 +656,7 @@ cdddddddde
 
 <floorregion shape="rect" rect_x="44.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
 
-<!--<player_start x="16.0" y="40.0"/>-->
+<player_start x="16.0" y="40.0"/>
 
 <!--<player_start x="26.0" y="40.0"/>-->
 
@@ -670,7 +670,7 @@ cdddddddde
 
 <!-- town, west side -->
 
-<scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" locked="true"/>
+<scenery name="Private Home" image_name="building2" x="28.5" y="26.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
 
 <scenery name="The Sword and Talisman" image_name="building" x="30.5" y="34.5" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="The Sword and Talisman, Middleham" exit_location_x="2.5" exit_location_y="9.5"/>
 
@@ -686,7 +686,7 @@ cdddddddde
 
 <!-- town, east side -->
 
-<scenery name="Stairs" image_name="stairsdown_outdoors" x="41.0" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
+<scenery name="Stairs" image_name="stairsdown_outdoors" x="42.5" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
 
 <scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" locked="true"/>
 
@@ -699,6 +699,24 @@ cdddddddde
 <scenery name="Jail" image_name="building4" x="39.5" y="50.5" size="3.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.7344" smoke_y="0.0574" exit_location="Jail, Middleham" exit_location_x="2.5" exit_location_y="5.5"/>
 
 <scenery name="Gallows" image_name="gallows" x="42.0" y="55.0" size="2.0" blocking="true"/>
+
+<!-- town, north side -->
+
+<scenery name="Private Home" image_name="building2" x="32.0" y="24.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Private Home" image_name="building2" x="36.0" y="24.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Temple" image_name="building" x="39.5" y="28.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Temple, Middleham" exit_location_x="2.5" exit_location_y="4.5"/>
+
+<scenery name="Private Home" image_name="building2" x="32.5" y="30.0" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Private Home" image_name="building2" x="36.5" y="31.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
+
+<!-- town, south side -->
+
+<scenery name="Private Home" image_name="building2" x="32.5" y="56.0" size="3.43" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
+
+<scenery name="Private Home" image_name="house_brick" x="36.5" y="56.5" size="3.0" boundary_iso="true" boundary_iso_ratio="0.567" blocking="true" block_visibility="true" locked="true"/>
 
 </location>
 
@@ -863,6 +881,39 @@ cdddddddde
 
 </location>
 
+<location name="Temple, Middleham" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="3.0" rect_h="5.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="0.0" rect_w="2.0" rect_h="4.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="5.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="40.5" exit_location_y="30.0"/>
+
+<scenery name="Table" image_name="table" x="3.5" y="0.5" size="0.8" blocking="true"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<scenery name="Fire" image_name="fire" x="4.5" y="2.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<npc name="Priest" animation_name="peasant_man" static_image="true" x="1.5" y="1.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+>
+<opening_initial>I'm afraid I'm too busy to talk right now - too many people dying from unnatural disease, and now strange haunting noises from the vaults. The gods have cursed us!
+</opening_initial>
+<opening_later>I'm afraid I'm too busy to talk right now - too many people dying from unnatural disease, and now strange haunting noises from the vaults. The gods have cursed us!
+</opening_later>
+</npc>
+
+</location>
+
 <location name="Jail, Middleham" display_name="true">
 
 <floor image_name="floor_paved"/>
@@ -928,7 +979,7 @@ blah blah
 
 <scenery name="Torch" image_name="torch" x="26.0" y="19.55" w="0.75" h="0.75"/>
 
-<scenery name="Stairs" image_name="stairsup_indoors" x="24.0" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Middleham" exit_location_x="41.0" exit_location_y="25.5"/>
+<scenery name="Stairs" image_name="stairsup_indoors" x="24.0" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Middleham" exit_location_x="42.5" exit_location_y="25.5"/>
 
 <!--<player_start x="24.0" y="25.5"/>-->
 
@@ -980,7 +1031,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<player_start x="16.0" y="22.0"/>
+<!--<player_start x="16.0" y="22.0"/>-->
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the town of Middleham?"
