@@ -6928,12 +6928,20 @@ bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *s
                 music_mode = MUSICMODE_SILENCE;
                 this->moveToLocation(new_location, scenery->getExitLocationPos());
                 *move = false;
-                if( scenery->getExitTravelTime() >= 24 ) {
-                    int travel_time_days = scenery->getExitTravelTime() / 24;
+                int travel_time_hours = scenery->getExitTravelTime();
+                if( travel_time_hours > 0 ) {
+                    int travel_time_days = travel_time_hours / 24;
                     stringstream str;
-                    str << "Journey took " << travel_time_days << " day";
-                    if( travel_time_days > 1 )
-                        str << "s";
+                    if( travel_time_days > 0 ) {
+                        str << "Journey took " << travel_time_days << " day";
+                        if( travel_time_days > 1 )
+                            str << "s";
+                    }
+                    else {
+                        str << "Journey took " << travel_time_hours << " hour";
+                        if( travel_time_hours > 1 )
+                            str << "s";
+                    }
                     this->addTextEffect(str.str(), player->getPos(), 2000);
                 }
             }
