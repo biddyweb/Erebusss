@@ -648,6 +648,12 @@ cdddddddde
 cdddddddde
 </tilemap>
 
+<scenery name="Tree" image_name="tree5" x="47.0" y="37.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree2" x="48.5" y="36.5" size="3.0"/>
+
+<scenery name="Plant" image_name="plant" x="24.0" y="41.1" size="0.5" draw_type="background"/>
+
 <!-- town -->
 
 <floorregion shape="rect" rect_x="25.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
@@ -656,7 +662,7 @@ cdddddddde
 
 <floorregion shape="rect" rect_x="44.0" rect_y="39.5" rect_w="1.0" rect_h="1.0" image_name="floor_paved"/>
 
-<player_start x="16.0" y="40.0"/>
+<!--<player_start x="16.0" y="40.0"/>-->
 
 <!--<player_start x="26.0" y="40.0"/>-->
 
@@ -666,6 +672,10 @@ cdddddddde
 
 <scenery name="Signpost" image_name="signpost" x="53.0" y="40.0" size="1.0" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
     confirm_text="Do you wish to travel east to the village of Stockton?"
+/>
+
+<scenery name="Signpost" image_name="signpost" x="53.0" y="20.0" size="1.0" blocking="false" block_visibility="false" exit_location="Oakley Farm" exit_location_x="10.0" exit_location_y="19.0" exit_travel_time="1"
+    confirm_text="Do you wish to travel north to Oakley Farm?"
 />
 
 <!-- town, west side -->
@@ -686,6 +696,10 @@ cdddddddde
 
 <!-- town, east side -->
 
+<scenery name="Tree" image_name="tree5" x="43.5" y="21.8" size="3.0"/>
+
+<scenery name="Plant" image_name="plant" x="42.0" y="25.5" size="0.5" draw_type="background"/>
+
 <scenery name="Stairs" image_name="stairsdown_outdoors" x="42.5" y="24.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Vaults, Middleham" exit_location_x="24.0" exit_location_y="25.5"/>
 
 <scenery name="Private Home" image_name="building3" x="41.5" y="33.5" size="3.43" boundary_iso="true" boundary_iso_ratio="0.429" blocking="true" block_visibility="true" locked="true"/>
@@ -698,7 +712,15 @@ cdddddddde
 
 <scenery name="Jail" image_name="building4" x="39.5" y="50.5" size="3.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.7344" smoke_y="0.0574" exit_location="Jail, Middleham" exit_location_x="2.5" exit_location_y="5.5"/>
 
+<scenery name="Plant" image_name="plant" x="37.5" y="48.5" size="0.5" draw_type="background"/>
+
+<scenery name="Plant" image_name="plant" x="36.5" y="52.5" size="0.5" draw_type="background"/>
+
 <scenery name="Gallows" image_name="gallows" x="42.0" y="55.0" size="2.0" blocking="true"/>
+
+<scenery name="Tree" image_name="tree3" x="40.5" y="57.5" size="3.0"/>
+
+<scenery name="Tree" image_name="tree3" x="43.5" y="57.0" size="3.0"/>
 
 <!-- town, north side -->
 
@@ -1020,6 +1042,58 @@ blah blah
 <scenery name="Tomb" image_name="tomb" x="16.0" y="35.0" size="1.0" blocking="true">
     <trap type="acid" rating="16"/>
 </scenery>
+
+</location>
+
+<location name="Oakley Farm" display_name="true" lighting_min="120" geo_type="outdoors">
+
+<floor image_name="grass"/>
+<wall image_name="wall"/>
+<background image_name="background_green"/>
+
+<floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="20.0" rect_h="20.0"/>
+
+<player_start x="10.0" y="19.0"/>
+
+<tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="9.0" y="10.0">
+68
+9b
+9b
+9b
+9b
+9b
+9b
+9b
+9b
+ce
+</tilemap>
+
+<scenery name="Signpost" image_name="signpost" x="9.5" y="19.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="20.0" exit_travel_time="1"
+    confirm_text="Do you wish to travel south to the town of Middleham?"
+/>
+
+<scenery name="Oakley Farmhouse" image_name="building" x="10.5" y="10.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Oakley Farmhouse" exit_location_x="2.5" exit_location_y="9.5"/>
+
+</location>
+
+<location name="Oakley Farmhouse" display_name="true">
+
+<floor image_name="floor_paved"/>
+<wall image_name="wall"/>
+<background image_name="background_dark"/>
+
+<!--<player_start x="2.5" y="9.5"/>-->
+
+<floorregion shape="rect" rect_x="0.0" rect_y="1.0" rect_w="3.0" rect_h="9.0"/>
+<floorregion shape="rect" rect_x="3.0" rect_y="1.0" rect_w="2.0" rect_h="8.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="2.5" y="10.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Oakley Farm" exit_location_x="10.0" exit_location_y="12.5"/>
+
+<scenery name="Torch" image_name="torch" x="4.0" y="0.55" w="0.75" h="0.75"/>
+
+<scenery name="Fire" image_name="fire" x="0.5" y="3.5" size="1.0" blocking="true" has_smoke="true"/>
+
+<scenery name="Table" image_name="table" x="2.5" y="3.0" size="1.2" blocking="true"/>
 
 </location>
 
