@@ -1,3 +1,7 @@
+#ifdef _DEBUG
+#include <cassert>
+#endif
+
 #include "test.h"
 #include "game.h"
 #include "playinggamestate.h"
