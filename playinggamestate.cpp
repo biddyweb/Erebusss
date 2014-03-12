@@ -3093,7 +3093,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 // further test for Stockton, after killing all zombies and returning heirloom:
                 /*{
                     // set profile directly
-                    player->setXP(3290);
+                    player->setXP(3580);
                     player->setLevel(7);
                     player->addProfile(3, 2, 1, 0, 2, 1, 3, 0.52f);
                     player->increaseMaxHealth(26);
@@ -3105,7 +3105,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 // further test for Wentbridge Fort, start of Dungeons:
                 {
                     // set profile directly
-                    player->setXP(3405);
+                    player->setXP(3695);
                     player->setLevel(7);
                     player->addProfile(3, 2, 1, 0, 2, 1, 3, 0.52f);
                     player->increaseMaxHealth(26);
@@ -3524,7 +3524,7 @@ void PlayingGamestate::moveToLocation(Location *location, Vector2D pos) {
 }
 
 void PlayingGamestate::setupView() {
-    qDebug("PlayingGamestate::setupView()");
+    LOG("PlayingGamestate::setupView()\n");
     // set up the view on the RPG world
     MainWindow *window = game_g->getMainWindow();
 
@@ -6944,6 +6944,7 @@ bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *s
                     }
                     this->addTextEffect(str.str(), player->getPos(), 2000);
                 }
+                LOG("moved okay\n");
             }
         }
         else if( scenery->getInteractType().length() > 0 ) {
