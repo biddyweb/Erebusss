@@ -1074,19 +1074,19 @@ ce
 
 <scenery name="Oakley Farmhouse" image_name="building" x="10.5" y="10.0" size="4.0" blocking="true" block_visibility="true" has_smoke="true" smoke_x="0.337" smoke_y="0.0147" exit_location="Oakley Farmhouse" exit_location_x="2.5" exit_location_y="9.5"/>
 
-<npc name="Skeleton" template="Skeleton" x="12.0" y="13.0"/>
+<npc name="Skeleton" template="Skeleton" x="12.0" y="13.0" objective_id="Oakley Farm"/>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="16.0" y="1.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" x="16.0" y="1.0" objective_id="Oakley Farm">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
 
-<npc name="Skeleton Archer" template="Skeleton Archer" x="17.0" y="2.0">
+<npc name="Skeleton Archer" template="Skeleton Archer" x="17.0" y="2.0" objective_id="Oakley Farm">
     <item template="Longbow"/>
     <item template="Arrows"/>
 </npc>
 
-<npc name="Skeleton" template="Skeleton" x="17.5" y="1.0"/>
+<npc name="Skeleton" template="Skeleton" x="17.5" y="1.0" objective_id="Oakley Farm"/>
 
 </location>
 
@@ -1108,6 +1108,35 @@ ce
 <scenery name="Fire" image_name="fire" x="0.5" y="3.5" size="1.0" blocking="true" has_smoke="true"/>
 
 <scenery name="Table" image_name="table" x="2.5" y="3.0" size="1.2" blocking="true"/>
+
+<npc name="Farmer" animation_name="peasant_man" static_image="true" x="1.5" y="4.0"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"
+    can_talk="true"
+    interaction_type="KILL_NPCS"
+    interaction_data="Oakley Farm"
+    interaction_xp="50"
+    interaction_journal="I killed the Skeletons outside Oakley Farm."
+>
+<opening_initial>
+</opening_initial>
+<opening_later>
+</opening_later>
+<opening_interaction_complete>Hello, again. Thank you for destroying those skeletons!
+</opening_interaction_complete>
+<talk question="I have killed the skeletons outside." objective="true">
+</talk>
+</npc>
+
+<npc name="Farmer" animation_name="peasant_woman" static_image="true" x="4.0" y="3.5"
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    natural_damageX="0" natural_damageY="0" natural_damageZ="0"
+    health="10" max_health="10"
+    is_hostile="false"
+    xp_worth="0"/>
 
 </location>
 
