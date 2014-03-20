@@ -1053,7 +1053,7 @@ blah blah
 
 <floorregion shape="rect" rect_x="0.0" rect_y="0.0" rect_w="20.0" rect_h="20.0"/>
 
-<player_start x="10.0" y="19.0"/>
+<!--<player_start x="10.0" y="19.0"/>-->
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="9.0" y="10.0">
 68
@@ -1148,7 +1148,7 @@ ce
 
 <floorregion shape="rect" rect_x="15.0" rect_y="5.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <scenery name="Signpost" image_name="signpost" x="15.5" y="22.0" size="1.0" blocking="false" block_visibility="false" exit_location="Middleham" exit_location_x="52.5" exit_location_y="40.0" exit_travel_time="24"
     confirm_text="Do you wish to travel west to the town of Middleham?"
@@ -1250,7 +1250,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 </location>
 
-<location name="Peasant Hut, Stockton">
+<location name="Peasant Hut, Stockton" display_name="true">
 
 <floor image_name="floor_dirt"/>
 <wall image_name="wall"/>
@@ -1261,7 +1261,7 @@ Thank you! Here, have 25 gold pieces as a reward.
 
 <scenery name="Torch" image_name="torch" x="2.0" y="0.55" w="0.75" h="0.75"/>
 
-<scenery name="Door" image_name="door_wood_n" x="1.0" y="3.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" exit_location="Stockton" exit_location_x="23.5" exit_location_y="27.75"/>
+<scenery name="Door" image_name="door_wood_n" x="1.0" y="4.05" w="1.0" h="0.1" visual_h="0.9" blocking="false" block_visibility="false" exit_location="Stockton" exit_location_x="23.5" exit_location_y="27.75"/>
 
 <npc name="Zombie" template="Zombie" x="2.5" y="1.5"/>
 
@@ -1564,6 +1564,8 @@ This is a tattered old journal, its pages worn from age, whilst spatters of bloo
 
 <scenery name="Torch" image_name="torch" x="34.0" y="34.55" w="0.75" h="0.75"/>
 
+<scenery name="Fire" image_name="fire" x="30.0" y="36.0" size="1.0" blocking="true" has_smoke="true"/>
+
 <npc name="Shopkeeper" animation_name="peasant_woman" static_image="true" x="31.0" y="43.0"
     FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
     natural_damageX="0" natural_damageY="0" natural_damageZ="0"
@@ -1617,6 +1619,29 @@ I doubt the thugs can even read, it's no use to them. I don't suppose a brave wa
 Thank you! Here, have 50 gold pieces as a reward.
 </talk>
 </npc>
+
+<!-- west route to haunted room -->
+
+<floorregion shape="rect" rect_x="24.0" rect_y="39.0" rect_w="5.0" rect_h="2.0"/>
+
+<floorregion shape="rect" rect_x="24.0" rect_y="34.0" rect_w="1.0" rect_h="5.0"/>
+
+<floorregion shape="rect" rect_x="22.0" rect_y="29.0" rect_w="5.0" rect_h="5.0"/>
+
+<scenery name="Door" image_name="door_wood_n" x="24.5" y="34.05" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
+
+<scenery name="Bed" image_name="bed" x="24.5" y="31.0" size="1.2" blocking="true"/>
+
+<scenery name="Cabinet" image_name="cabinet" x="23.0" y="30.0" size="0.8" blocking="true">
+    <gold amount="7"/>
+    <item template="Plain Ring"/>
+</scenery>
+
+<scenery name="Table" image_name="table" x="26.0" y="30.0" size="0.8" blocking="true"/>
+
+<scenery name="Torch" image_name="torch" x="26.0" y="28.55" w="0.75" h="0.75"/>
+
+<!-- east route to upper level -->
 
 <floorregion shape="rect" rect_x="36.0" rect_y="39.0" rect_w="5.0" rect_h="2.0"/>
 
