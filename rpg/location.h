@@ -600,6 +600,8 @@ protected:
     int wandering_monster_time_ms; // Poisson distribution - if non-zero, mean of one monster produced every wandering_monster_time_ms time interval
     int wandering_monster_rest_chance; // percentage change of having a wandering monster disturb the player when resting
 
+    string rest_summon_location; // summons all NPCs from this location when resting
+
     vector<FloorRegion *> floor_regions;
     vector<Polygon2D> boundaries;
 
@@ -715,6 +717,12 @@ public:
         return this->wandering_monster_rest_chance;
     }
     int getWanderingMonsterRestChance(const Character *player) const;
+    void setRestSummonLocation(const string &rest_summon_location) {
+        this->rest_summon_location = rest_summon_location;
+    }
+    string getRestSummonLocation() const {
+        return this->rest_summon_location;
+    }
     void addFloorRegion(FloorRegion *floorRegion);
     const FloorRegion *getFloorRegion(size_t i) const {
         return this->floor_regions.at(i);

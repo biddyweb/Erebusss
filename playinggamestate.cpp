@@ -4585,6 +4585,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     QStringRef geo_type_s = reader.attributes().value("geo_type");
                     QStringRef lighting_min_s = reader.attributes().value("lighting_min");
                     QStringRef display_name_s = reader.attributes().value("display_name");
+                    QStringRef rest_summon_location_s = reader.attributes().value("rest_summon_location");
                     location = new Location(name_s.toString().toStdString());
                     if( type_s.length() > 0 ) {
                         if( type_s.toString() == "indoors" ) {
@@ -4622,6 +4623,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     }
                     bool display_name = parseBool(display_name_s.toString(), true);
                     location->setDisplayName(display_name);
+                    location->setRestSummonLocation(rest_summon_location_s.toString().toStdString());
                     quest->addLocation(location);
                 }
                 else if( reader.name() == "floor" ) {
@@ -5808,6 +5810,34 @@ void PlayingGamestate::clickedRest() {
     }
     if( this->askQuestionDialog(tr("Rest until fully healed?").toStdString()) ) {
         bool rest_ok = true;
+        if( c_location->getRestSummonLocation().length() > 0 ) {
+            Location *summon_location = this->quest->findLocation(c_location->getRestSummonLocation());
+            if( summon_location == NULL ) {
+                LOG("can't find summon_location!: %s\n", c_location->getRestSummonLocation().c_str());
+            }
+            else if( summon_location == c_location ) {
+                LOG("already in summon_location!: %s\n", c_location->getRestSummonLocation().c_str());
+            }
+            else if( summon_location->getNCharacters() == 0 ) {
+                LOG("no NPCs in summon_location!: %s\n", c_location->getRestSummonLocation().c_str());
+            }
+            else {
+                rest_ok = false;
+                c_location->setRestSummonLocation("");
+
+                set<Character *> npcs;
+                while( summon_location->getNCharacters() > 0 ) {
+                    Character *npc = *summon_location->charactersBegin();
+                    summon_location->removeCharacter(npc);
+                    npcs.insert(npc);
+                }
+                for(set<Character *>::iterator iter = npcs.begin(); iter != npcs.end(); ++iter) {
+                    Character *npc = *iter;
+                    c_location->addCharacter(npc, npc->getX(), npc->getY());
+                }
+                this->addTextEffect(tr("Your rest is disturbed...").toStdString(), player->getPos(), 2000);
+            }
+        }
         if( c_location->getWanderingMonsterTemplate().length() > 0 && c_location->getWanderingMonsterRestChance(player) > 0 ) {
             int chance = c_location->getWanderingMonsterRestChance(player);
             if( rand() % 100 < chance ) {
@@ -7667,6 +7697,9 @@ bool PlayingGamestate::saveGame(const QString &filename, bool already_fullpath) 
         stream << "<location name=\"" << location->getName().c_str() << "\" type=\"" << type_str.c_str() << "\" geo_type=\"" << geo_type_str.c_str() << "\" lighting_min=\"" << static_cast<int>(location->getLightingMin()) << "\"";
         if( location->isDisplayName() ) {
             stream << " display_name=\"true\"";
+        }
+        if( location->getRestSummonLocation().length() > 0 ) {
+            stream << " rest_summon_location=\"" << location->getRestSummonLocation().c_str() << "\"";
         }
         stream << ">\n\n";
 
