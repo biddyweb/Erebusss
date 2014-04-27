@@ -130,7 +130,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
         return -1;
     }
 
-    qDebug("JNI_OnLoad enter");
+    qDebug("JNI_OnLoad exit");
     return JNI_VERSION_1_6;
 }
 #endif
