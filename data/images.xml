@@ -286,5 +286,6 @@
 <image type="npc" name="soldier" filename="gfx/textures/npcs/soldier.png"/>
 <image type="npc" name="spearman" filename="gfx/textures/npcs/spearman.png"/>
 <image type="npc" name="wizard" filename="gfx/textures/npcs/wizard.png"/>
+<image type="npc" name="farmer" filename="gfx/textures/npcs/farmer.png"/>
 
 </images>
