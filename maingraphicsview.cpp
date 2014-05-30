@@ -168,63 +168,67 @@ void MainGraphicsView::mouseMove(int m_x, int m_y) {
     }
 }
 
+void MainGraphicsView::processTouchEvent(QTouchEvent *touchEvent) {
+    QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+    //qDebug("touch event %d count %d", event->type(), touchPoints.count());
+    if( touchPoints.count() > 1 ) {
+        this->has_kinetic_scroll = false;
+        this->single_left_mouse_down = false;
+        // can't trust last mouse position if more that one touch!
+        this->has_last_mouse = false;
+    }
+#if QT_VERSION >= 0x050000
+#ifdef Q_OS_ANDROID
+    // on Android with Qt 5, mouse events are never received, instead it's done purely via touch events
+    if( touchPoints.count() == 1 ) {
+        QTouchEvent::TouchPoint touchPoint = touchPoints.at(0);
+        int m_x = touchPoint.pos().x();
+        int m_y = touchPoint.pos().y();
+        if( event->type() == QEvent::TouchBegin ) {
+            this->mousePress(m_x, m_y);
+        }
+        else if( event->type() == QEvent::TouchEnd ) {
+            this->mouseRelease(m_x, m_y);
+        }
+        else if( event->type() == QEvent::TouchUpdate ) {
+            this->mouseMove(m_x, m_y);
+        }
+    }
+#endif
+#endif
+    if( touchPoints.count() == 2 ) {
+        // determine scale factor
+        const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
+        const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
+        /*float scale_factor =
+                QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+                / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();*/
+        QPointF touch_centre = (touchPoint0.pos() + touchPoint1.pos())*0.5;
+        QPointF zoom_centre = this->mapToScene(QPoint(touch_centre.x(), touch_centre.y()));
+        float scale_factor =
+                QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+                / QLineF(touchPoint0.lastPos(), touchPoint1.lastPos()).length();
+        /*if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
+            // if one of the fingers is released, remember the current scale
+            // factor so that adding another finger later will continue zooming
+            // by adding new scale factor to the existing remembered value.
+            totalScaleFactor *= currentScaleFactor;
+            currentScaleFactor = 1;
+        }*/
+        /*setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
+                                        totalScaleFactor * currentScaleFactor));*/
+        float n_scale = c_scale *scale_factor;
+        LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
+        this->setScale(zoom_centre, n_scale);
+    }
+}
+
 bool MainGraphicsView::viewportEvent(QEvent *event) {
     //qDebug("MainGraphicsView::viewportEvent() type %d\n", event->type());
     // multitouch done by touch events manually - gestures don't seem to work properly on my Android phone?
     if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
         QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
-        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
-        //qDebug("touch event %d count %d", event->type(), touchPoints.count());
-        if( touchPoints.count() > 1 ) {
-            this->has_kinetic_scroll = false;
-            this->single_left_mouse_down = false;
-            // can't trust last mouse position if more that one touch!
-            this->has_last_mouse = false;
-        }
-#if QT_VERSION >= 0x050000
-#ifdef Q_OS_ANDROID
-        // on Android with Qt 5, mouse events are never received, instead it's done purely via touch events
-        if( touchPoints.count() == 1 ) {
-            QTouchEvent::TouchPoint touchPoint = touchPoints.at(0);
-            int m_x = touchPoint.pos().x();
-            int m_y = touchPoint.pos().y();
-            if( event->type() == QEvent::TouchBegin ) {
-                this->mousePress(m_x, m_y);
-            }
-            else if( event->type() == QEvent::TouchEnd ) {
-                this->mouseRelease(m_x, m_y);
-            }
-            else if( event->type() == QEvent::TouchUpdate ) {
-                this->mouseMove(m_x, m_y);
-            }
-        }
-#endif
-#endif
-        if( touchPoints.count() == 2 ) {
-            // determine scale factor
-            const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
-            const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
-            /*float scale_factor =
-                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
-                    / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();*/
-            QPointF touch_centre = (touchPoint0.pos() + touchPoint1.pos())*0.5;
-            QPointF zoom_centre = this->mapToScene(QPoint(touch_centre.x(), touch_centre.y()));
-            float scale_factor =
-                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
-                    / QLineF(touchPoint0.lastPos(), touchPoint1.lastPos()).length();
-            /*if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
-                // if one of the fingers is released, remember the current scale
-                // factor so that adding another finger later will continue zooming
-                // by adding new scale factor to the existing remembered value.
-                totalScaleFactor *= currentScaleFactor;
-                currentScaleFactor = 1;
-            }*/
-            /*setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
-                                            totalScaleFactor * currentScaleFactor));*/
-            float n_scale = c_scale *scale_factor;
-            LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
-            this->setScale(zoom_centre, n_scale);
-        }
+        processTouchEvent(touchEvent);
         return true;
     }
     /*else if( event->type() == QEvent::Gesture ) {
@@ -396,7 +400,8 @@ void MainGraphicsView::paintEvent(QPaintEvent *event) {
             int time_ms = fps_timer.elapsed();
             if( time_ms > 1000 ) {
                 float fps = (fps_frame_count*1000.0f)/(float)time_ms;
-                this->gui_overlay->setFPS(fps);
+                if( gui_overlay != NULL )
+                    this->gui_overlay->setFPS(fps);
                 fps_timer.start();
                 fps_frame_count = 0;
             }
@@ -567,6 +572,12 @@ void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     QPointF new_view_centre = centre + diff / scale_factor;
     qDebug("new_view_centre: %f, %f", new_view_centre.x(), new_view_centre.y());
     this->centerOn(new_view_centre);
+
+#ifndef Q_OS_ANDROID
+    // needed so that the view is updated, when doing zoom either with multitouch on Windows touchscreen, or two-finger mouse wheel gesture - otherwise we seem to get stuck processing events until the gesture ends
+    // not needed for Android, and indeed seems to make things more jerky there
+    qApp->processEvents();
+#endif
 }
 
 void MainGraphicsView::addTextEffect(TextEffect *text_effect) {
@@ -629,7 +640,12 @@ GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *vi
     fps(-1.0f),
     has_fade(false), fade_in(false), fade_time_start_ms(0)
 {
-    //this->setAttribute(Qt::WA_NoSystemBackground);
+#ifndef Q_OS_ANDROID
+    // accept touch events so we can pass them through - as WA_TransparentForMouseEvents doesn't seem to pass through touch events
+    // not needed for Android, as the MainGraphicsView viewport reviews receive touch events directly
+    this->setAttribute(Qt::WA_AcceptTouchEvents);
+#endif
+    this->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 void GUIOverlay::paintEvent(QPaintEvent *event) {
@@ -722,6 +738,22 @@ void GUIOverlay::paintEvent(QPaintEvent *event) {
         painter.drawText(bar_x*width(), (bar_y + bar_h)*height() + font_height, playing_gamestate->getCLocation()->getName().c_str());
     }
 
+}
+
+bool GUIOverlay::event(QEvent *event) {
+    //qDebug("GUIOverlay::event() type %d\n", event->type());
+#ifndef Q_OS_ANDROID
+    // hack as WA_TransparentForMouseEvents doesn't seem to pass through touch events
+    // not needed for Android, as the MainGraphicsView viewport reviews receive touch events directly
+    if( event->type() == QEvent::TouchBegin || event->type() == QEvent::TouchUpdate || event->type() == QEvent::TouchEnd ) {
+        QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
+        //QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+        //qDebug("touch event %d count %d", event->type(), touchPoints.count());
+        playing_gamestate->processTouchEvent(touchEvent);
+        return true;
+    }
+#endif
+    return QWidget::event(event);
 }
 
 void GUIOverlay::drawBar(QPainter &painter, float fx, float fy, float fwidth, float fheight, float fraction, QColor color) {

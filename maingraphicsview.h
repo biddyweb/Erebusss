@@ -6,6 +6,7 @@ using std::set;
 #include <QGraphicsView>
 #include <QGraphicsTextItem>
 #include <QElapsedTimer>
+#include <QTouchEvent>
 
 #include "common.h"
 
@@ -117,6 +118,7 @@ public:
     bool keyDown(KeyCode code) {
         return this->key_down[(int)code];
     }
+    void processTouchEvent(QTouchEvent *touchEvent);
 
 public slots:
     void zoomOut();
@@ -131,6 +133,7 @@ class GUIOverlay : public QWidget {
     /*virtual QSize sizeHint() const {
         return QSize(640, 360);
     }*/
+    virtual bool event(QEvent *event);
 
     bool display_progress;
     string progress_message;

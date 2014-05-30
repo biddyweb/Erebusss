@@ -2191,7 +2191,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         view->showFullScreen();
 
         gui_overlay = new GUIOverlay(this, view);
-        gui_overlay->setAttribute(Qt::WA_TransparentForMouseEvents);
         view->setGUIOverlay(gui_overlay);
         gui_overlay->setFadeIn();
 
@@ -6472,9 +6471,9 @@ void PlayingGamestate::updateInput() {
             scrolled = true;
         }
     }
-    if( !scrolled && !touchscreen_c ) {
+    if( !scrolled && !touchscreen_c && (qApp->mouseButtons() & Qt::LeftButton)==0 ) {
         // scroll due to player near the edge
-        // disabed for touchscreens, as makes drag-scrolling harder
+        // disabled for touchscreens, as makes drag-scrolling harder
         QPoint player_pos = this->view->mapFromScene(this->player->getX(), this->player->getY());
         if( player_pos.x() >= 0 && player_pos.x() < this->view->width() && player_pos.y() > 0 && player_pos.y() < this->view->height() ) {
             const int wid = 64;
@@ -6507,6 +6506,7 @@ void PlayingGamestate::updateInput() {
 
 void PlayingGamestate::render() {
     // n.b., won't render immediately, but schedules for repainting from Qt's main event loop
+    //qDebug("render");
     this->view->viewport()->update();
 }
 
@@ -6527,6 +6527,10 @@ void PlayingGamestate::activate(bool active, bool newly_paused) {
     if( newly_paused ) {
         this->displayPausedMessage();
     }
+}
+
+void PlayingGamestate::processTouchEvent(QTouchEvent *touchEvent) {
+    this->view->processTouchEvent(touchEvent);
 }
 
 void PlayingGamestate::checkQuestComplete() {

@@ -462,6 +462,9 @@ public:
     virtual void render();
     virtual void activate(bool active, bool newly_paused);
     //virtual void mouseClick(int m_x, int m_y);
+
+    void processTouchEvent(QTouchEvent *touchEvent);
+
     void checkQuestComplete();
 
     virtual void characterUpdateGraphics(const Character *character, void *user_data);
