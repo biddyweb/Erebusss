@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<manifest android:versionCode="7" package="net.sourceforge.erebusrpg" android:installLocation="auto" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.13">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.14" package="net.sourceforge.erebusrpg" android:installLocation="auto" android:versionCode="8">
     <application android:name="org.kde.necessitas.origo.QtApplication" android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name="org.kde.necessitas.origo.QtActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:configChanges="orientation|locale|fontScale|keyboard|keyboardHidden" android:screenOrientation="landscape" android:label="@string/app_name">
+        <activity android:name="org.kde.necessitas.origo.QtActivity" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:screenOrientation="landscape" android:configChanges="orientation|locale|fontScale|keyboard|keyboardHidden" android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -50,7 +50,8 @@
         <screen android:screenSize="xlarge" android:screenDensity="213"/>
         <screen android:screenSize="xlarge" android:screenDensity="480"/>
     </compatible-screens>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-sdk android:minSdkVersion="10"/>
-    <uses-sdk android:targetSdkVersion="12"/><!-- 13 or higher causes black screen bug when screen goes blank; 16 or higher causes bug with textfields, can't delete!-->
+    <uses-sdk android:targetSdkVersion="12"/>
+    <!-- 13 or higher causes black screen bug when screen goes blank; 16 or higher causes bug with textfields, can't delete!-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 </manifest>
