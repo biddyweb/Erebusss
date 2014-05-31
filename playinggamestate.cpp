@@ -80,8 +80,10 @@ CharacterAction::~CharacterAction() {
 }
 
 void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
+    qDebug("CharacterAction::implement()");
     if( target_npc == NULL ) {
         // target no longer exists
+        qDebug("target no longer exists");
         return;
     }
     if( type == CHARACTERACTION_RANGED_WEAPON ) {
@@ -93,6 +95,7 @@ void CharacterAction::implement(PlayingGamestate *playing_gamestate) const {
         ASSERT_LOGGER( spell != NULL );
         spell->castOn(playing_gamestate, source, target_npc);
     }
+    qDebug("CharacterAction::implement() done");
 }
 
 void CharacterAction::update() {
@@ -137,6 +140,7 @@ CharacterAction *CharacterAction::createSpellAction(PlayingGamestate *playing_ga
 }
 
 CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playing_gamestate, Character *source, Character *target_npc, bool hits, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage, const string &projectile_key, float icon_width) {
+    qDebug("CharacterAction::createProjectileAction()");
     CharacterAction *character_action = new CharacterAction(CHARACTERACTION_RANGED_WEAPON, source, target_npc, -0.75f);
     //character_action->duration_ms = 250;
     const float speed = 0.02f; // units per ms
@@ -156,6 +160,7 @@ CharacterAction *CharacterAction::createProjectileAction(PlayingGamestate *playi
     object->setDimension(direction);
 
     character_action->update(); // set position, z-value
+    qDebug("CharacterAction::createProjectileAction() exit");
     return character_action;
 }
 
@@ -7287,6 +7292,7 @@ void PlayingGamestate::requestPlayerMove(Vector2D dest, const void *ignore) {
 }
 
 void PlayingGamestate::hitEnemy(Character *source, Character *target, bool is_ranged, bool weapon_no_effect_magical, bool weapon_no_effect_holy, int weapon_damage) {
+    qDebug("PlayingGamestate::hitEnemy()");
     // source may be NULL, if attacker is no longer alive (for ranged attacks)
     if( weapon_no_effect_magical ) {
         if( source == this->getPlayer() ) {
@@ -7311,6 +7317,7 @@ void PlayingGamestate::hitEnemy(Character *source, Character *target, bool is_ra
     if( !target->isDead() && !is_ranged ) {
         source->handleSpecialHitEffects(this, target);
     }
+    qDebug("PlayingGamestate::hitEnemy() exit");
 }
 
 void PlayingGamestate::updateVisibilityForFloorRegion(FloorRegion *floor_region) {
