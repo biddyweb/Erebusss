@@ -286,10 +286,11 @@ int Character::findItemCount(const string &key) const {
     return count;
 }
 
-
 Ammo *Character::findAmmo(const string &key) {
     if( this->current_ammo != NULL ) {
         if( this->current_ammo->getAmmoType() == key ) {
+            // check we actually own the current_ammo! (also guards against bug where current_ammo has been deleted, but we've forgotten to set current_ammo to NULL)
+            ASSERT_LOGGER( this->items.find(current_ammo) != this->items.end() );
             return this->current_ammo;
         }
         this->current_ammo = NULL;
@@ -309,6 +310,7 @@ Ammo *Character::findAmmo(const string &key) {
 
 bool Character::useAmmo(Ammo *ammo) {
     // n.b., must be an item owned by Character!
+    ASSERT_LOGGER( this->items.find(ammo) != this->items.end() );
     bool used_up = false;
     int amount = ammo->getAmount();
 
@@ -319,6 +321,9 @@ bool Character::useAmmo(Ammo *ammo) {
     }
     else {
         this->items.erase(ammo);
+        if( this->current_ammo == ammo ) {
+            this->current_ammo = NULL;
+        }
         delete ammo;
         used_up = true;
     }
@@ -574,6 +579,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                         else {
                             Ammo *ammo = NULL;
                             if( this->getCurrentWeapon() != NULL && this->getCurrentWeapon()->getRequiresAmmo() ) {
+                                qDebug("obtain ammo");
                                 // obtain the ammo - and make sure we still have some!
                                 // note, it's better to use up the ammo now, rather than we first decide to fire, so that we still have the information on the ammo
                                 string ammo_key = this->getCurrentWeapon()->getAmmoKey();
@@ -583,6 +589,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     // run out of ammo!
                                     can_hit = false;
                                     // no need to change weapon, this will happen when Character next tries to hit
+                                    qDebug("ran out of ammo");
                                 }
                                 /*else {
                                     if( item->getType() != ITEMTYPE_AMMO ) {
@@ -601,6 +608,7 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
 
                                 if( is_ranged ) {
                                     // fire off an action
+                                    qDebug("fire off an action for ranged combat");
                                     string projectile_key;
                                     float projectile_icon_width = 0.0f;
                                     ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
