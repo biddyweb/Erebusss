@@ -75,7 +75,7 @@ public:
     int getRating() const {
         return this->rating;
     }
-    void setDifficulty(int diffculty) {
+    void setDifficulty(int difficulty) {
         this->difficulty = difficulty;
     }
     int getDifficulty() const {
