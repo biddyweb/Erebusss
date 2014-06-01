@@ -14,11 +14,11 @@ public:
     }
     virtual void render() {
     }
-    virtual void activate(bool active, bool newly_paused) {
+    virtual void activate(bool, bool) {
     }
     /*virtual void mouseClick(int m_x, int m_y) {
     }*/
-    virtual void keyPress(QKeyEvent *key_event) {
+    virtual void keyPress(QKeyEvent *) {
     }
 };
 

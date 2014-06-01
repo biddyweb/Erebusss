@@ -1061,7 +1061,7 @@ void Game::fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filena
             (*list)->setSelectionMode(QAbstractItemView::SingleSelection);
         }
 
-        for(size_t i=0;i<files.size();i++) {
+        for(int i=0;i<files.size();i++) {
             QFileInfo file_info = files.at(i);
             filenames->push_back(file_info.fileName());
             QString file_str = file_info.fileName();

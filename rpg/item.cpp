@@ -246,12 +246,12 @@ float Item::getRawProfileBonusFloatProperty(const string &key) const {
     return value;
 }
 
-int Item::getProfileBonusIntProperty(const Character *character, const string &key) const {
+int Item::getProfileBonusIntProperty(const Character *, const string &key) const {
     // default for item is that profile bonus is always active
     return this->getRawProfileBonusIntProperty(key);
 }
 
-float Item::getProfileBonusFloatProperty(const Character *character, const string &key) const {
+float Item::getProfileBonusFloatProperty(const Character *, const string &key) const {
     // default for item is that profile bonus is always active
     return this->getRawProfileBonusFloatProperty(key);
 }

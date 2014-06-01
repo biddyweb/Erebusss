@@ -26,12 +26,12 @@ void ParticleSystem::advance(int phase) {
 
 void ParticleSystem::moveParticles() {
     int real_loop_time = game_g->getGameTimeFrameMS();
-    for(int i=0;i<particles.size();i++) {
+    for(size_t i=0;i<particles.size();i++) {
         particles.at(i).move(real_loop_time);
     }
 }
 
-void ParticleSystem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void ParticleSystem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //qDebug("draw %d particles", particles.size());
     //const float size = 31.0f;
     const float base_size = 31.0f;
@@ -79,7 +79,7 @@ void SmokeParticleSystem::updatePS() {
     if( type == TYPE_RISE ) {
         int real_loop_time = game_g->getGameTimeFrameMS();
         // update particle speed
-        for(int i=0;i<particles.size();i++) {
+        for(size_t i=0;i<particles.size();i++) {
             int prob = poisson(100, real_loop_time);
             if( rand() % RAND_MAX <= prob ) {
                 float xspeed = particles.at(i).getXSpeed();
@@ -92,7 +92,7 @@ void SmokeParticleSystem::updatePS() {
 
     if( this->vary_size ) {
         // set size
-        for(int i=0;i<particles.size();i++) {
+        for(size_t i=0;i<particles.size();i++) {
             float alpha = (time_now - particles.at(i).getBirthTime()) / (float)life_exp;
             float size = (1.0f-alpha)*this->size_st + alpha*this->size_nd;
             particles.at(i).setSize(size);

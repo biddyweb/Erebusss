@@ -614,7 +614,6 @@ bool Character::update(PlayingGamestate *playing_gamestate) {
                                     ASSERT_LOGGER( this->getCurrentWeapon() != NULL );
                                     if( this->getCurrentWeapon()->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
                                         projectile_key = this->getCurrentWeapon()->getAmmoKey();
-                                        const Item *projectile_item = playing_gamestate->getStandardItem(projectile_key);
                                         ASSERT_LOGGER( ammo != NULL );
                                         projectile_icon_width = ammo->getIconWidth();
                                     }
@@ -1578,6 +1577,7 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
             catch(const string &err) {
                 // catch it, as better than crashing at runtime if the data isn't correct
                 LOG("### error, unknown interaction_reward_item: %s\n", interaction_reward_item.c_str());
+                LOG("error: %s", err.c_str());
                 ASSERT_LOGGER(false);
             }
         }

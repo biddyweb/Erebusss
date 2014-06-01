@@ -21,7 +21,7 @@ void WebViewEventFilter::setTextEdit(QTextEdit *textEdit) {
 }
 
 // returns true to filter the event
-bool WebViewEventFilter::eventFilter(QObject *obj, QEvent *event) {
+bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
     //qDebug("eventFilter type: %d", event->type());
     switch( event->type() ) {
         case QEvent::Timer:

@@ -676,7 +676,6 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
 
             if( scenery_corner != NULL ) {
-                int dir_i = rand() % 4;
                 int sign_x = (rand() % 2)==0 ? -1 : 1;
                 int sign_y = (rand() % 2)==0 ? -1 : 1;
                 Vector2D scenery_pos;

@@ -648,7 +648,7 @@ GUIOverlay::GUIOverlay(PlayingGamestate *playing_gamestate, MainGraphicsView *vi
     this->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
-void GUIOverlay::paintEvent(QPaintEvent *event) {
+void GUIOverlay::paintEvent(QPaintEvent *) {
     //qDebug("GUIOverlay::paintEvent()");
 
     QPainter painter(this);

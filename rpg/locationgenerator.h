@@ -45,10 +45,10 @@ class NPCGroup {
     vector<Character *> npcs;
 
     // rule of three
-    NPCGroup& operator=(const NPCGroup &npc_group) {
+    NPCGroup& operator=(const NPCGroup &) {
         throw string("NPCGroup assignment operator disallowed");
     }
-    NPCGroup(const NPCGroup &npc_group) {
+    NPCGroup(const NPCGroup &) {
         throw string("NPCGroup copy constructor disallowed");
     }
 public:
@@ -80,10 +80,10 @@ class NPCTableLevel {
     vector<NPCGroup *> npc_groups;
 
     // rule of three
-    NPCTableLevel& operator=(const NPCTableLevel &npc_table_level) {
+    NPCTableLevel& operator=(const NPCTableLevel &) {
         throw string("NPCTableLevel assignment operator disallowed");
     }
-    NPCTableLevel(const NPCTableLevel &npc_table_level) {
+    NPCTableLevel(const NPCTableLevel &) {
         throw string("NPCTableLevel copy constructor disallowed");
     }
 public:
@@ -113,10 +113,10 @@ class NPCTable {
     }
 
     // rule of three
-    NPCTable& operator=(const NPCTable &npc_table) {
+    NPCTable& operator=(const NPCTable &) {
         throw string("NPCTable assignment operator disallowed");
     }
-    NPCTable(const NPCTable &npc_table) {
+    NPCTable(const NPCTable &) {
         throw string("NPCTable copy constructor disallowed");
     }
 public:

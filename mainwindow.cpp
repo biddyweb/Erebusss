@@ -23,7 +23,7 @@ MainWindow::~MainWindow()
     }
 }*/
 
-void MainWindow::setOrientation(ScreenOrientation orientation)
+void MainWindow::setOrientation(ScreenOrientation)
 {
 #if defined(Q_OS_SYMBIAN)
     // If the version of Qt on the device is < 4.7.2, that attribute won't work

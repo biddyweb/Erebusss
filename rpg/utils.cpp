@@ -121,7 +121,7 @@ Vector2D Polygon2D::offsetInwards(size_t indx, float dist) const {
     Vector2D normal_from_wall1 = d1.perpendicularYToX();
     Vector2D inwards = normal_from_wall0 + normal_from_wall1;
     if( inwards.magnitude() > E_TOL_MACHINE ) {
-        float angle = acos(normal_from_wall0 % normal_from_wall1);
+        //float angle = acos(normal_from_wall0 % normal_from_wall1);
         //float ratio = cos( 0.5f * angle );
         inwards.normalise();
         point += inwards * dist;

@@ -147,10 +147,10 @@ protected:
     string description;
 
     // rule of three
-    Scenery& operator=(const Scenery &scenery) {
+    Scenery& operator=(const Scenery &) {
         throw string("Scenery assignment operator disallowed");
     }
-    Scenery(const Scenery &scenery) {
+    Scenery(const Scenery &) {
         throw string("Scenery copy constructor disallowed");
     }
 public:
@@ -635,10 +635,10 @@ protected:
     void createBoundaryForRect(Vector2D pos, float width, float height, bool boundary_iso, float boundary_iso_ratio, void *source, int source_type);
 
     // rule of three
-    Location& operator=(const Location &location) {
+    Location& operator=(const Location &) {
         throw string("Location assignment operator disallowed");
     }
-    Location(const Location &location) {
+    Location(const Location &) {
         throw string("Location copy constructor disallowed");
     }
 public:
@@ -892,10 +892,10 @@ class Quest {
     set<string> flags;
 
     // rule of three
-    Quest& operator=(const Quest &quest) {
+    Quest& operator=(const Quest &) {
         throw string("Quest assignment operator disallowed");
     }
-    Quest(const Quest &quest) {
+    Quest(const Quest &) {
         throw string("Quest copy constructor disallowed");
     }
 public:

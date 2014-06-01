@@ -143,7 +143,7 @@ void InfoDialog::reject() {
 void InfoDialog::clicked() {
     int result = -1;
     QPushButton *button_sender = static_cast<QPushButton *>(this->sender());
-    for(int i=0;i<buttons_list.size();i++) {
+    for(size_t i=0;i<buttons_list.size();i++) {
         const QPushButton *button = buttons_list[i];
         if( button_sender == button ) {
             result = i;

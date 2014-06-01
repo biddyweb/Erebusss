@@ -216,7 +216,7 @@ QRectF AnimatedObject::boundingRect() const {
     return QRectF(0.0f, 0.0f, width, height);
 }
 
-void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void AnimatedObject::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     //painter->setRenderHint(QPainter::SmoothPixmapTransform);
     //qDebug("paint");

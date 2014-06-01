@@ -365,10 +365,10 @@ public:
     void setAmount(int amount) {
         this->amount = amount;
     }
-    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const {
+    virtual int getProfileBonusIntProperty(const Character *, const string &) const {
         return 0;
     }
-    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    virtual float getProfileBonusFloatProperty(const Character *, const string &) const {
         return 0;
     }
 };
@@ -392,10 +392,10 @@ public:
     void setValue(int value) {
         this->value = value;
     }
-    virtual int getProfileBonusIntProperty(const Character *character, const string &key) const {
+    virtual int getProfileBonusIntProperty(const Character *, const string &) const {
         return 0;
     }
-    virtual float getProfileBonusFloatProperty(const Character *character, const string &key) const {
+    virtual float getProfileBonusFloatProperty(const Character *, const string &) const {
         return 0;
     }
 };
