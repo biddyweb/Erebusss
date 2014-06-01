@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 
     Game game;
     if( runtests ) {
-        game.runTests();
+        game.runTests(fullscreen);
     }
     else {
         game.run(fullscreen);
