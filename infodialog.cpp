@@ -162,12 +162,14 @@ void InfoDialog::scrollToBottom() {
 }
 
 int InfoDialog::exec() {
+    game_g->setPaused(true, true);
+    int result = 0;
     if( game_g->isTesting() ) {
         game_g->recordTestInfoDialog();
-        return 0;
     }
-    game_g->setPaused(true, true);
-    int result = QDialog::exec();
+    else {
+        result = QDialog::exec();
+    }
     game_g->setPaused(false, true);
     return result;
 }
