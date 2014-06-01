@@ -870,6 +870,8 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
 
 void Test::runTest(const string &filename, int test_id) {
     LOG(">>> Run Test: %d\n", test_id);
+    n_assertion_failures = 0;
+
     ASSERT_LOGGER(test_id >= 0);
     ASSERT_LOGGER(test_id < N_TESTS);
 
@@ -1421,6 +1423,24 @@ void Test::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed()) / ((double)n_times);
             score /= 1000.0;
         }
+        else if( test_id == TEST_USE_AMMO ) {
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Ranger", "name", false, false, 0);
+            game_g->setGamestate(playing_gamestate);
+
+            Character *player = playing_gamestate->getPlayer();
+            player->addItem( playing_gamestate->cloneStandardItem("Arrows") );
+            player->armWeapon( static_cast<Weapon *>(player->findItem("Shortbow")) );
+            while( true ) {
+                Ammo *ammo = player->findAmmo("Arrows");
+                if( ammo == NULL )
+                    break;
+                player->useAmmo(ammo);
+            }
+
+            delete playing_gamestate;
+            game_g->setGamestate(NULL);
+            playing_gamestate = NULL;
+        }
         else if( test_id == TEST_LOADSAVEQUEST_0 || test_id == TEST_LOADSAVEQUEST_1 || test_id == TEST_LOADSAVEQUEST_2 || test_id == TEST_LOADSAVEQUEST_3 ) {
             // load, check, save, load, check
             QElapsedTimer timer;
@@ -1727,6 +1747,10 @@ void Test::runTest(const string &filename, int test_id) {
         // final checks
         if( game_g->getTestNInfoDialog() != test_expected_n_info_dialog ) {
             throw string("unexpected test_n_info_dialog; expected: ") + numberToString(test_expected_n_info_dialog) + string(" actual: ") + numberToString(game_g->getTestNInfoDialog());
+        }
+
+        if( n_assertion_failures > 0 ) {
+            throw string("assertion failure");
         }
 
         fprintf(testfile, "PASSED,");

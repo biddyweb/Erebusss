@@ -16,6 +16,7 @@ const bool LOGGING = true; // enable logging even for release builds, for now
   *   In debug versions, writes the test, file and line to the log, and exits (via assert).
   *   In release versions, we still write to the log file, but then continue.
   */
+extern int n_assertion_failures;
 #ifndef ASSERT_LOGGER
 #ifdef _DEBUG
 
@@ -24,6 +25,7 @@ const bool LOGGING = true; // enable logging even for release builds, for now
         if( v )                                        \
                 ((void)0);                             \
         else {                                         \
+                n_assertion_failures++;                \
                 LOG("ASSERTION FAILED:\n");            \
                 LOG("%s\n", #test);                    \
                 LOG("File: %s\n", __FILE__);           \
@@ -39,6 +41,7 @@ const bool LOGGING = true; // enable logging even for release builds, for now
         if( v )                                        \
                 ((void)0);                             \
         else {                                         \
+                n_assertion_failures++;                \
                 LOG("ASSERTION FAILED:\n");            \
                 LOG("%s\n", #test);                    \
                 LOG("File: %s\n", __FILE__);           \

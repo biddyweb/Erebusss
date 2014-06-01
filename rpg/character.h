@@ -419,8 +419,6 @@ class Character {
 
     string objective_id;
 
-    bool useAmmo(Ammo *ammo);
-
     // rule of three
     /*Character& operator=(const Character &character) {
         throw string("Character assignment operator disallowed");
@@ -862,6 +860,7 @@ public:
     const Item *findItem(const string &key) const;
     int findItemCount(const string &key) const;
     Ammo *findAmmo(const string &key);
+    bool useAmmo(Ammo *ammo);
     int getGold() const {
         return this->gold;
     }
