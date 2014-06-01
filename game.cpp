@@ -461,13 +461,14 @@ void Game::run(bool fullscreen) {
         return;
     }
 
+    screen->initMainLoop();
     screen->runMainLoop();
 
     delete gamestate;
     gamestate = NULL;
 }
 
-void Game::runTests() {
+void Game::runTests(bool fullscreen) {
     string filename = "test_results.csv";
     {
         FILE *testfile = fopen(filename.c_str(), "wt+");
@@ -482,15 +483,11 @@ void Game::runTests() {
         fclose(testfile);
     }
 
-    this->init(true); // some tests need a Screen etc
+    this->init(fullscreen); // some tests need a Screen etc
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LOADSAVEQUEST_2);
-    //Test::runTest(filename, ::TEST_MEMORYQUEST_0);
-    //Test::runTest(filename, ::TEST_MEMORYQUEST_1);
-    //Test::runTest(filename, ::TEST_MEMORYQUEST_2);
-    //Test::runTest(filename, ::TEST_MEMORYQUEST_3);
+    //Test::runTest(filename, ::TEST_LEVEL_UP);
 }
 
 void Game::initButton(QWidget *button) const {
@@ -607,6 +604,7 @@ void Game::handleMessages() {
 }
 
 void Game::update() {
+    //qDebug("Game::update");
     this->handleMessages(); // needed to process any messages from earlier update call
     if( this->current_stream_sound_effect.length() > 0 ) {
 #ifndef Q_OS_ANDROID

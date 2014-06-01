@@ -50,8 +50,6 @@ class Screen : public QObject {
     GameClock game_clock; // used for real-world game action
     GameClock input_clock; // used for input - as we still want to allow, e.g., changing viewpoint, even when game action is paused
 
-    int getElapsedMS() const;
-
 private slots:
     void update();
 
@@ -68,6 +66,7 @@ public:
     const MainWindow *getMainWindow() const {
         return mainWindow;
     }
+    void initMainLoop();
     void runMainLoop();
     bool isPaused() const {
         return this->game_clock.isPaused();
@@ -76,6 +75,7 @@ public:
     void togglePaused() {
         this->setPaused( !this->isPaused(), false );
     }
+    int getElapsedMS() const;
     void restartElapsedTimer();
     void enableUpdateTimer(bool enabled);
     int getGameTimeFrameMS() const {

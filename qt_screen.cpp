@@ -112,13 +112,16 @@ int Screen::getElapsedMS() const {
     return static_cast<int>(elapsed_timer.elapsed());
 }
 
-void Screen::runMainLoop() {
-    qDebug("run main loop...");
+void Screen::initMainLoop() {
+    qDebug("init main loop...");
     //QObject::connect(&timer, SIGNAL(timeout()), &mainWindow, SLOT(updateScene()));
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(time_per_frame_c);
     elapsed_timer.start();
+}
 
+void Screen::runMainLoop() {
+    qDebug("run main loop...");
     qApp->exec();
 }
 
@@ -127,6 +130,7 @@ void Screen::update() {
     //qDebug("Screen::update()");
 
     int time_now_ms = this->getElapsedMS();
+    //qDebug("time_now_ms: %d", time_now_ms);
 
     {
         int n_updates = game_clock.update(time_now_ms);

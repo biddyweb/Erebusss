@@ -2,9 +2,12 @@
 #include <cassert>
 #endif
 
+#include <QApplication>
+
 #include "test.h"
 #include "game.h"
 #include "playinggamestate.h"
+#include "qt_screen.h"
 #include "logiface.h"
 #include "rpg/rpgengine.h"
 
@@ -1435,6 +1438,36 @@ void Test::runTest(const string &filename, int test_id) {
                 if( ammo == NULL )
                     break;
                 player->useAmmo(ammo);
+            }
+
+            delete playing_gamestate;
+            game_g->setGamestate(NULL);
+            playing_gamestate = NULL;
+        }
+        else if( test_id == TEST_LEVEL_UP ) {
+            PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_CAMPAIGN, "Ranger", "name", false, false, 0);
+            game_g->setGamestate(playing_gamestate);
+
+            playing_gamestate->loadQuest(DEPLOYMENT_PATH + QString("data/quest_kill_goblins.xml"), false);
+
+            Character *player = playing_gamestate->getPlayer();
+            if( player->getLevel() != 1 ) {
+                throw string("player created with level != 1");
+            }
+            player->addXP(playing_gamestate, 150);
+            // level up should take place in main loop
+            if( player->getLevel() != 1 ) {
+                throw string("player should still be at level 1");
+            }
+
+            game_g->getScreen()->initMainLoop();
+            game_g->setPaused(false, true);
+            while( game_g->getScreen()->getElapsedMS() < 500 ) {
+                qApp->processEvents();
+            }
+
+            if( player->getLevel() != 2 ) {
+                throw string("player didn't level up to level 2");
             }
 
             delete playing_gamestate;

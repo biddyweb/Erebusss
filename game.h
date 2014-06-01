@@ -216,7 +216,7 @@ public:
     void update();
     void updateInput();
     void render();
-    void runTests();
+    void runTests(bool fullscreen);
 
     void activate(bool active);
     void keyPress(QKeyEvent *key_event);
