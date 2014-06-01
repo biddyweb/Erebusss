@@ -5665,7 +5665,7 @@ void PlayingGamestate::locationUpdateScenery(Scenery *scenery) {
     }
 }
 
-void PlayingGamestate::locationAddCharacter(const Location *location, Character *character) {
+void PlayingGamestate::locationAddCharacter(const Location *, Character *character) {
     AnimatedObject *object = new AnimatedObject();
     object->setBounce( character->isBounce() );
     this->characterUpdateGraphics(character, object);
@@ -6072,7 +6072,7 @@ void PlayingGamestate::update() {
     const int complex_update_time_ms = 100;
 #endif
     //qDebug("time: compare: %d vs %d", elapsed_ms, time_last_complex_update_ms);
-    if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
+    if( elapsed_ms - this->time_last_complex_update_ms > complex_update_time_ms ) {
         if( time_last_complex_update_ms == 0 ) {
             complex_time_ms = game_g->getGameTimeFrameMS();
         }
@@ -6530,7 +6530,7 @@ void PlayingGamestate::displayPausedMessage() {
     this->addTextEffect(paused_message, 0); // 0 time, so the message disappears as soon as the game is unpaused
 }
 
-void PlayingGamestate::activate(bool active, bool newly_paused) {
+void PlayingGamestate::activate(bool, bool newly_paused) {
     // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
     /*if( !active ) {
         this->autoSave();
@@ -6654,7 +6654,7 @@ void PlayingGamestate::characterMoved(Character *character, void *user_data) {
 
 }
 
-void PlayingGamestate::characterSetAnimation(const Character *character, void *user_data, const string &name, bool force_restart) {
+void PlayingGamestate::characterSetAnimation(const Character *, void *user_data, const string &name, bool force_restart) {
     //LOG("PlayingGamestate::characterSetAnimation(%s, %d, %s, %d)\n", character->getName().c_str(), user_data, name.c_str(), force_restart);
     //LOG("    at %d\n", game_g->getScreen()->getGameTimeTotalMS());
     AnimatedObject *object = static_cast<AnimatedObject *>(user_data);
@@ -8515,7 +8515,7 @@ QString PlayingGamestate::getItemString(const Item *item, bool want_weight) cons
     else if( this->getPlayer()->getCurrentRing() == item ) {
         item_str += " [Worn]";
     }
-    if( item->getWeight() > 0 ) {
+    if( want_weight && item->getWeight() > 0 ) {
         item_str += " (Weight " + QString::number(item->getWeight()) + ")";
     }
     return item_str;
