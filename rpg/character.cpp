@@ -288,9 +288,9 @@ int Character::findItemCount(const string &key) const {
 
 Ammo *Character::findAmmo(const string &key) {
     if( this->current_ammo != NULL ) {
+        // check we actually own the current_ammo! (also guards against bug where current_ammo has been deleted, but we've forgotten to set current_ammo to NULL)
+        ASSERT_LOGGER( this->items.find(current_ammo) != this->items.end() );
         if( this->current_ammo->getAmmoType() == key ) {
-            // check we actually own the current_ammo! (also guards against bug where current_ammo has been deleted, but we've forgotten to set current_ammo to NULL)
-            ASSERT_LOGGER( this->items.find(current_ammo) != this->items.end() );
             return this->current_ammo;
         }
         this->current_ammo = NULL;
@@ -1556,7 +1556,7 @@ void Character::completeInteraction(PlayingGamestate *playing_gamestate) {
             delete item;
         }
     }
-    else if( this->interaction_type == "WANT_OBJECT" ) {
+    else if( this->interaction_type == "KILL_NPCS" ) {
         // no special code
     }
     else {
