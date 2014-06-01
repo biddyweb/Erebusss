@@ -122,7 +122,7 @@ Vector2D Polygon2D::offsetInwards(size_t indx, float dist) const {
     Vector2D inwards = normal_from_wall0 + normal_from_wall1;
     if( inwards.magnitude() > E_TOL_MACHINE ) {
         float angle = acos(normal_from_wall0 % normal_from_wall1);
-        float ratio = cos( 0.5f * angle );
+        //float ratio = cos( 0.5f * angle );
         inwards.normalise();
         point += inwards * dist;
     }
@@ -244,7 +244,7 @@ float Polygon2D::distanceFrom(Vector2D pvec) const {
             Vector2D proj_pvec = pvec;
             proj_pvec.dropOnLine(p0, dir);
             float edge_dist = (proj_pvec - p0).magnitude();
-            if( edge_dist > -E_TOL_LINEAR & edge_dist < edge_len + E_TOL_LINEAR ) {
+            if( edge_dist > -E_TOL_LINEAR && edge_dist < edge_len + E_TOL_LINEAR ) {
                 // projects onto line
                 float perp_dist = (pvec - proj_pvec).magnitude();
                 if( perp_dist < min_dist - E_TOL_LINEAR ) {
