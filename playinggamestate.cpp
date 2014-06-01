@@ -6061,7 +6061,7 @@ void PlayingGamestate::update() {
 
     const int elapsed_ms = game_g->getGameTimeTotalMS();
 
-    //qDebug("PlayingGamestate::update()");
+    //qDebug("PlayingGamestate::update() have player");
     bool do_complex_update = false;
     int complex_time_ms = 0; // time since last "complex" update
 
@@ -6071,6 +6071,7 @@ void PlayingGamestate::update() {
 #else
     const int complex_update_time_ms = 100;
 #endif
+    //qDebug("time: compare: %d vs %d", elapsed_ms, time_last_complex_update_ms);
     if( elapsed_ms - this->time_last_complex_update_ms > 100 ) {
         if( time_last_complex_update_ms == 0 ) {
             complex_time_ms = game_g->getGameTimeFrameMS();
@@ -6093,6 +6094,7 @@ void PlayingGamestate::update() {
 
         {
             int next_level_xp = this->player->getXPForNextLevel();
+            //qDebug("compare: %d vs %d", this->player->getXP(), next_level_xp);
             if( this->player->getXP() >= next_level_xp ) {
                 // we only advance one level at any given increase
                 this->player->advanceLevel(this);
@@ -6201,6 +6203,7 @@ void PlayingGamestate::update() {
             }
         }
 
+        //qDebug("complex update done");
 #ifdef TIMING_INFO
         qDebug("complex update took %d", timer_complex.elapsed());
 #endif
@@ -6211,6 +6214,7 @@ void PlayingGamestate::update() {
         QElapsedTimer timer_kinput;
         timer_kinput.start();
 #endif
+        //qDebug("update due to keyboard input");
         // update due to keyboard input
         // note that this doesn't actually move the player directly, but sets a target direction to move to
 
@@ -6299,6 +6303,7 @@ void PlayingGamestate::update() {
             this->is_keyboard_moving = false;
             this->player->setStateIdle(); // needed, as for keyboard movement this may not have been done by the Character::update()
         }
+        //qDebug("keyboard input done");
 #ifdef TIMING_INFO
         qDebug("keyboard input took %d", timer_kinput.elapsed());
 #endif
@@ -6308,7 +6313,9 @@ void PlayingGamestate::update() {
     QElapsedTimer timer_advance;
     timer_advance.start();
 #endif
+    //qDebug("advance scene");
     scene->advance();
+    //qDebug("advance scene done");
 #ifdef TIMING_INFO
     qDebug("scene advance took %d", timer_advance.elapsed());
 #endif
