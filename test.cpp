@@ -79,6 +79,7 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH - test for 3rd quest: interact with Anmareth
   TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR - test for 3rd quest: interact with Glenthor
   TEST_LOADSAVEWRITEQUEST_2_ITEMS - test for 3rd quest: check attributes for various items
+  TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT - test for 3rd quest: test fire ant exploding when killed
   */
 
 Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_owner, PlayingGamestate *playing_gamestate, Location *location, const string &item_name, bool owned_by_scenery, bool owned_by_npc, bool owned_by_player, bool allow_multiple) {
@@ -864,6 +865,25 @@ void Test::checkSaveGameWrite(PlayingGamestate *playing_gamestate, int test_id) 
         }
         if( armour->getRating() != 4 ) {
             throw string("armour rating is not as expected");
+        }
+    }
+    else if( test_id == TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT ) {
+        Location *location = playing_gamestate->getQuest()->findLocation("level_5");
+        if( location == NULL ) {
+            throw string("can't find location with fire ant");
+        }
+        if( location != playing_gamestate->getCLocation() ) {
+            playing_gamestate->moveToLocation(location, Vector2D(23.5f, 28.5f));
+        }
+        Character *npc = location->findCharacter("Fire Ant");
+        if( npc == NULL ) {
+            throw string("can't find location with fire ant");
+        }
+        int player_health = playing_gamestate->getPlayer()->getHealth();
+        npc->kill(playing_gamestate);
+        int new_player_health = playing_gamestate->getPlayer()->getHealth();
+        if( new_player_health >= player_health ) {
+            throw string("player wasn't harmed by explosion");
         }
     }
     else {
@@ -1685,7 +1705,8 @@ void Test::runTest(const string &filename, int test_id) {
                  test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH ||
                  test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR ||
-                 test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ||
+                 test_id == TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT ) {
             // load, check, load, save, load, check
             QElapsedTimer timer;
             timer.start();
@@ -1711,7 +1732,7 @@ void Test::runTest(const string &filename, int test_id) {
             else if( test_id == TEST_LOADSAVEWRITEQUEST_1_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_CALBERT || test_id == TEST_LOADSAVEWRITEQUEST_1_NPC_GHOST || test_id == TEST_LOADSAVEWRITEQUEST_1_ELF || test_id == TEST_LOADSAVEWRITEQUEST_1_RANGER || test_id == TEST_LOADSAVEWRITEQUEST_1_HALFLING || test_id == TEST_LOADSAVEWRITEQUEST_1_REVEAL || test_id == TEST_LOADSAVEWRITEQUEST_1_ITEMS ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_wizard_dungeon_find_item.xml");
             }
-            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR || test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS ) {
+            else if( test_id == TEST_LOADSAVEWRITEQUEST_2_COMPLETE || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_ANMARETH || test_id == TEST_LOADSAVEWRITEQUEST_2_NPC_GLENTHOR || test_id == TEST_LOADSAVEWRITEQUEST_2_ITEMS || test_id == TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT ) {
                 qt_filename = DEPLOYMENT_PATH + QString("data/quest_through_mountains.xml");
             }
 
