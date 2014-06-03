@@ -487,7 +487,9 @@ void Game::runTests(bool fullscreen) {
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LEVEL_UP);
+    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_0);
+    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_1);
+    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_2);
 }
 
 void Game::initButton(QWidget *button) const {
