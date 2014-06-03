@@ -7118,7 +7118,7 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
                 }
             }
             if( target_npc == NULL && player->getCurrentWeapon() != NULL && player->getCurrentWeapon()->isRangedOrThrown() ) {
-                // for ranged weapons, pick closest visible enemy to player
+                // for ranged weapons, pick closest visible enemy to player in the direction the player is facing
                 for(set<Character *>::iterator iter = c_location->charactersBegin(); iter != c_location->charactersEnd(); ++iter) {
                     Character *character = *iter;
                     if( character == player )
@@ -7127,11 +7127,15 @@ void PlayingGamestate::actionCommand(bool pickup_only) {
                         continue;
                     if( !character->isHostile() )
                         continue;
-                    float dist_from_player = (player->getPos() - character->getPos()).magnitude();
-                    if( target_npc == NULL || dist_from_player < min_dist ) {
-                        done = true;
-                        target_npc = character;
-                        min_dist = dist_from_player;
+                    Vector2D diff = character->getPos() - player->getPos();
+                    float dist_from_player = diff.magnitude();
+                    Vector2D player_dir = player->getDirection();
+                    if( player_dir % diff >= -E_TOL_LINEAR ) {
+                        if( target_npc == NULL || dist_from_player < min_dist ) {
+                            done = true;
+                            target_npc = character;
+                            min_dist = dist_from_player;
+                        }
                     }
                 }
             }

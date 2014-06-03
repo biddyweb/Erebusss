@@ -214,9 +214,9 @@ them. Note that at the moment you don't get a choice if there is more than one
 diagonally), or the numeric keypad.</li>
 <li><b>Action</b> - Press space or return/enter for a generic action, which will be:
 attack or talk to an NPC in front of you (or otherwise attack the nearest enemy
-if you are armed with a ranged weapon); open a door in front of you; interact
-with scenery (or open a container) in front of you, or picking up items at your
-feet.</li>
+in the direction you are facing if you are armed with a ranged weapon); open a door
+in front of you; interact with scenery (or open a container) in front of you, or
+picking up items at your feet.</li>
 <li><b>Force pick up</b> - You can also pick up items at your feet by pressing
 "U" (normally pressing space/enter will work, but not if there's also something
 in front to interact with).</li>
@@ -564,6 +564,9 @@ FIXED   View shouldn't follow the player's position if close to edge of screen,
         when scrolling/zooming with mouse or touchscreen.
 FIXED   Trap difficulty attribute was being ignored.
 ADDED   New enemy Fire Ant, added to 3rd quest.
+UPDATED Pressing space/return when armed with a ranged weapon now only targets
+        enemies in the direction you are facing (so makes it possible to cancel
+        an attack when running away, when using keyboard control).
 UPDATED Don't display item weights in player sell list when trading.
 
 Version 0.13 (2014/02/10)
