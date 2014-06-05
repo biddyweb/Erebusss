@@ -129,10 +129,15 @@ void Spell::castOn(PlayingGamestate *playing_gamestate, Character *source, Chara
 }
 
 CharacterTemplate::CharacterTemplate(const string &animation_name, int FP, int BS, int S, int A, int M, int D, int B, float Sp, int health_min, int health_max, int gold_min, int gold_max) :
-    profile(FP, BS, S, A, M, D, B, Sp), health_min(health_min), health_max(health_max),
+    health_min(health_min), health_max(health_max),
+    gold_min(gold_min), gold_max(gold_max),
+    profile(FP, BS, S, A, M, D, B, Sp),
     //has_natural_damage(false), natural_damageX(0), natural_damageY(0), natural_damageZ(0),
     natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    can_fly(false), gold_min(gold_min), gold_max(gold_max), xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false), requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0), death_explodes(false), death_explodes_damage(0)
+    can_fly(false),
+    xp_worth(0), causes_terror(false), terror_effect(0), causes_disease(false), causes_paralysis(false),
+    requires_magical(false), unholy(false), animation_name(animation_name), static_image(false), bounce(false),
+    image_size(0.5f), weapon_resist_percentage(50), regeneration(0), death_explodes(false), death_explodes_damage(0)
 {
 }
 
@@ -156,23 +161,34 @@ ProfileEffect::ProfileEffect(const Profile &profile, int duration_ms) : profile(
 
 // this is not the only Character constructor!
 Character::Character(const string &name, string animation_name, bool is_ai) :
+    natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
+    can_fly(false),
+    xp_worth(0),
+    causes_terror(false), terror_effect(0),
+    causes_disease(0), causes_paralysis(0),
+    requires_magical(false), unholy(false),
+    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f),
+    weapon_resist_percentage(50),
+    regeneration(0),
+    death_explodes(false), death_explodes_damage(0),
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
-    animation_name(animation_name), static_image(false), bounce(false), image_size(0.5f), weapon_resist_percentage(50), regeneration(0), death_explodes(false), death_explodes_damage(0),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
-    //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), time_last_complex_update_ms(0), time_last_regenerated_ms(0), has_default_position(false), has_last_known_player_position(false),
-    //FP(0), BS(0), S(0), A(0), M(0), D(0), B(0), Sp(0.0f),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false),
+    casting_spell(NULL), casting_spell_target(NULL),
+    time_last_complex_update_ms(0), time_last_regenerated_ms(0),
+    has_default_position(false), has_last_known_player_position(false),
     health(0), max_health(0),
-    natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    can_fly(false),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
     initial_level(0),
-    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL),
+    gold(0),
+    level(1), xp(0), done_terror(false),
+    is_fleeing(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_reward_gold(0), interaction_completed(false)
 {
     // ensure we always have default properties set
@@ -181,41 +197,39 @@ Character::Character(const string &name, string animation_name, bool is_ai) :
 
 // this is not the only Character constructor!
 Character::Character(const string &name, bool is_ai, const CharacterTemplate &character_template) :
+    profile(*character_template.getProfile()),
+    natural_damageX(character_template.getNaturalDamageX()), natural_damageY(character_template.getNaturalDamageY()), natural_damageZ(character_template.getNaturalDamageZ()),
+    can_fly(character_template.canFly()),
+    xp_worth(character_template.getXPWorth()),
+    causes_terror(character_template.getCausesTerror()), terror_effect(character_template.getTerrorEffect()),
+    causes_disease(character_template.getCausesDisease()), causes_paralysis(character_template.getCausesParalysis()),
+    requires_magical(character_template.requiresMagical()), unholy(character_template.isUnholy()),
+    animation_name(character_template.getAnimationName()), static_image(character_template.isStaticImage()), bounce(character_template.isBounce()), image_size(character_template.getImageSize()),
+    weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()),
+    type(character_template.getType()),
+    regeneration(character_template.getRegeneration()),
+    death_explodes(character_template.getDeathExplodes()), death_explodes_damage(character_template.getDeathExplodesDamage()),
     name(name),
     is_ai(is_ai), is_hostile(is_ai), // AI NPCs default to being hostile
     is_fixed(false),
-    static_image(character_template.isStaticImage()),
-    bounce(character_template.isBounce()), image_size(character_template.getImageSize()), weapon_resist_class(character_template.getWeaponResistClass()), weapon_resist_percentage(character_template.getWeaponResistPercentage()), regeneration(character_template.getRegeneration()), death_explodes(character_template.getDeathExplodes()), death_explodes_damage(character_template.getDeathExplodesDamage()),
     location(NULL), listener(NULL), listener_data(NULL),
     is_dead(false), time_of_death_ms(0), direction(Vector2D(1.0f, 0.0f)), has_charge_pos(false), is_visible(false),
-    //has_destination(false),
     has_path(false),
-    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false), casting_spell(NULL), casting_spell_target(NULL), time_last_complex_update_ms(0), time_last_regenerated_ms(0), has_default_position(false), has_last_known_player_position(false),
-    profile(*character_template.getProfile()),
+    target_npc(NULL), time_last_action_ms(0), action(ACTION_NONE), has_charged(false),
+    casting_spell(NULL), casting_spell_target(NULL),
+    time_last_complex_update_ms(0), time_last_regenerated_ms(0),
+    has_default_position(false), has_last_known_player_position(false),
     health(0), max_health(0),
-    //natural_damageX(default_natural_damageX), natural_damageY(default_natural_damageY), natural_damageZ(default_natural_damageZ),
-    natural_damageX(character_template.getNaturalDamageX()), natural_damageY(character_template.getNaturalDamageY()), natural_damageZ(character_template.getNaturalDamageZ()),
-    can_fly(character_template.canFly()),
     is_paralysed(false), paralysed_until(0),
     is_diseased(false),
     initial_level(0),
-    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL), gold(0), level(1), xp(0), xp_worth(0), causes_terror(false), terror_effect(0), done_terror(false), is_fleeing(false), causes_disease(0), causes_paralysis(0), requires_magical(false), unholy(false),
+    current_weapon(NULL), current_ammo(NULL), current_shield(NULL), current_armour(NULL), current_ring(NULL),
+    gold(character_template.getTemplateGold()),
+    level(1), xp(0), done_terror(false),
+    is_fleeing(false),
     can_talk(false), has_talked(false), interaction_xp(0), interaction_reward_gold(0), interaction_completed(false)
 {
-    this->animation_name = character_template.getAnimationName();
-    this->type = character_template.getType();
     this->initialiseHealth( character_template.getTemplateHealth() );
-    /*if( character_template.hasNaturalDamage() ) {
-        character_template.getNaturalDamage(&natural_damageX, &natural_damageY, &natural_damageZ);
-    }*/
-    this->gold = character_template.getTemplateGold();
-    this->xp_worth = character_template.getXPWorth();
-    this->causes_terror = character_template.getCausesTerror();
-    this->terror_effect = character_template.getTerrorEffect();
-    this->causes_disease = character_template.getCausesDisease();
-    this->causes_paralysis = character_template.getCausesParalysis();
-    this->requires_magical = character_template.requiresMagical();
-    this->unholy = character_template.isUnholy();
     this->initial_level = this->level;
     this->initial_profile = this->profile;
 }
@@ -960,7 +974,7 @@ void Character::setTargetNPC(Character *target_npc) {
         if( this->action != ACTION_NONE ) {
             this->action = ACTION_NONE;
             this->has_charged = false;
-            qDebug("%s: setTargetNPC to different target: %d", this->name.c_str(), target_npc);
+            qDebug("%s: setTargetNPC to different target: %p", this->name.c_str(), target_npc);
             if( this->listener != NULL ) {
                 this->listener->characterSetAnimation(this, this->listener_data, "", true);
             }

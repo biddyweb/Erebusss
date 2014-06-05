@@ -448,6 +448,8 @@ protected:
 public:
     FloorRegion() : Polygon2D(), is_visible(false) {
     }
+    virtual ~FloorRegion() {
+    }
 
     virtual void addPoint(Vector2D point) {
         Polygon2D::addPoint(point);

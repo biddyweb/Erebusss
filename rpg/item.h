@@ -53,6 +53,8 @@ protected:
 
 public:
     Item(const string &name, const string &image_name, int weight);
+    virtual ~Item() {
+    }
 
     virtual ItemType getType() const {
         return ITEMTYPE_GENERAL;
@@ -408,7 +410,7 @@ class Shop {
     bool campaign; // whether to appear on campaign screens
 public:
     Shop(const string &name);
-    ~Shop();
+    virtual ~Shop();
 
     virtual string getName() const {
         return this->name;

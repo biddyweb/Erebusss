@@ -241,6 +241,8 @@ protected:
 public:
     Polygon2D() : source_type(0), source(NULL) {
     }
+    virtual ~Polygon2D() {
+    }
 
     Vector2D getPoint(size_t i) const {
         return points.at(i);

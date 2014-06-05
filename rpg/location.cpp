@@ -17,7 +17,7 @@ using std::swap;
 #include "../logiface.h"
 
 Scenery::Scenery(const string &name, const string &image_name, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio) :
-    location(NULL), name(name), image_name(image_name), user_data_gfx(NULL),
+    location(NULL), name(name), image_name(image_name),
     is_blocking(false), blocks_visibility(false), is_door(false), is_exit(false), exit_travel_time(0), is_locked(false), locked_silent(false), locked_used_up(false), key_always_needed(false), unlock_xp(20),
     draw_type(DRAWTYPE_NORMAL), opacity(1.0f), has_smoke(false), width(width), height(height), visual_height(visual_height), boundary_iso(boundary_iso), boundary_iso_ratio(boundary_iso_ratio),
     action_last_time(0), action_delay(0), action_value(0),

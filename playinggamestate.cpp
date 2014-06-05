@@ -3181,13 +3181,13 @@ void PlayingGamestate::cleanup() {
     }
     for(map<string, Item *>::iterator iter = this->standard_items.begin(); iter != this->standard_items.end(); ++iter) {
         Item *item = iter->second;
-        qDebug("about to delete standard item: %d", item);
+        qDebug("about to delete standard item: %p", item);
         qDebug("    name: %s", item->getName().c_str());
         delete item;
     }
     for(map<string, CharacterTemplate *>::iterator iter = this->character_templates.begin(); iter != this->character_templates.end(); ++iter) {
         CharacterTemplate *character_template = iter->second;
-        qDebug("about to delete character template: %d", character_template);
+        qDebug("about to delete character template: %p", character_template);
         delete character_template;
     }
     for(vector<Shop *>::iterator iter = shops.begin(); iter != shops.end(); ++iter) {
@@ -5383,7 +5383,7 @@ void PlayingGamestate::createRandomQuest() {
     string previous_level_name;
     Scenery *previous_exit_down = NULL;
     Vector2D first_player_start;
-    Location *first_location;
+    Location *first_location = NULL;
     for(int level=0;;level++) {
         float progress = ((float)level) / ((float)n_levels_c);
         stringstream progress_message;
@@ -5428,6 +5428,7 @@ void PlayingGamestate::createRandomQuest() {
         delete npc_table;
     }
 
+    ASSERT_LOGGER(first_location != NULL);
     this->c_location = first_location;
     this->c_location->addCharacter(player, first_player_start.x, first_player_start.y);
 

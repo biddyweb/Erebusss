@@ -508,7 +508,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 else if( r == 5 || r == 6 || r == 7 ) {
                     // shrine, bell or pool
                     string scenery_name, scenery_image_name, interact_type;
-                    int interact_state;
+                    int interact_state = 0;
                     if( r == 5 ) {
                         scenery_name = "Shrine";
                         scenery_image_name = "shrine";
@@ -1094,7 +1094,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     }
 
     // passage end
-    bool has_end = false;
+    //bool has_end = false;
     bool left_turn = false;
     bool right_turn = false;
     {
@@ -1103,15 +1103,15 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
         if( roll >= 4 && roll <= 8 ) {
         }
         else if( roll >= 9 && roll <= 11 ) {
-            has_end = true;
+            //has_end = true;
             left_turn = true;
         }
         else if( roll >= 15 && roll <= 17 ) {
-            has_end = true;
+            //has_end = true;
             right_turn = true;
         }
         else {
-            has_end = true;
+            //has_end = true;
             left_turn = true;
             right_turn = true;
         }
