@@ -5466,6 +5466,9 @@ void PlayingGamestate::createRandomQuest() {
         this->writeJournal("</p>");
     }
 
+    // test:
+    //this->c_location->revealMap(this);
+
     qDebug("View is transformed? %d", view->isTransformed());
     LOG("done\n");
 }
