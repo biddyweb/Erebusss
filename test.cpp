@@ -1504,7 +1504,6 @@ void Test::runTest(const string &filename, int test_id) {
                 throw string("player should still be at level 1");
             }
 
-            game_g->getScreen()->initMainLoop();
             game_g->setPaused(false, true);
             while( game_g->getScreen()->getElapsedMS() < 500 ) {
                 qApp->processEvents();

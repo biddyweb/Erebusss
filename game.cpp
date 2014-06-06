@@ -484,12 +484,11 @@ void Game::runTests(bool fullscreen) {
     }
 
     this->init(fullscreen); // some tests need a Screen etc
+    screen->initMainLoop(); // needed to avoid failures of tests TEST_USE_AMMO etc on Linux due to Screen::elapsed_timer not being initialised; also needed for TEST_LEVEL_UP
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_0);
-    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_1);
-    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_FIRE_ANT_2);
+    //Test::runTest(filename, ::TEST_LEVEL_UP);
 }
 
 void Game::initButton(QWidget *button) const {
