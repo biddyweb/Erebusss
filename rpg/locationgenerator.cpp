@@ -767,6 +767,11 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             slot_filled[(n_slots_h-1)*n_slots_w + 0] = true;
             slot_filled[(n_slots_h-1)*n_slots_w + (n_slots_w-1)] = true;
             slot_filled[((n_slots_h-1)/2)*n_slots_w + ((n_slots_w-1)/2)] = true;
+            // also don't allow blocking of doors
+            slot_filled[0*n_slots_w + ((n_slots_w-1)/2)] = true;
+            slot_filled[(n_slots_h-1)*n_slots_w + ((n_slots_w-1)/2)] = true;
+            slot_filled[((n_slots_h-1)/2)*n_slots_w + 0] = true;
+            slot_filled[((n_slots_h-1)/2)*n_slots_w + (n_slots_w-1)] = true;
             float slot_scale_x = room_size_w/(float)base_room_size;
             float slot_scale_y = room_size_h/(float)base_room_size;
             if( rollDice(1, 2, 0) == 1 ) {
