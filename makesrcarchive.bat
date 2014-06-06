@@ -107,4 +107,7 @@ xcopy %src%\android %dst%\android /E /Y
 mkdir %dst%\ts\
 copy %src%\ts\ %dst%\ts\
 
+mkdir %dst%\_test_savegames\
+copy %src%\_test_savegames\ %dst%\_test_savegames\
+
 REM exit
