@@ -404,6 +404,7 @@ void Game::setGameTimeMultiplier(int multiplier) {
 
 void Game::setTextEdit(QTextEdit *textEdit) {
     // need to set colours for Android at least
+    // also allows setting of things such as background
     QPalette p = textEdit->palette();
     p.setColor(QPalette::Base, Qt::white);
     p.setColor(QPalette::Text, Qt::black);
@@ -423,6 +424,7 @@ void Game::setTextEdit(QTextEdit *textEdit) {
     textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 #endif
+    textEdit->setStyleSheet("background-image: url(\"gfx/textures/paper.png\");");
     this->webViewEventFilter->setTextEdit(textEdit);
 }
 
