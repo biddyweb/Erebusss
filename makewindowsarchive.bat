@@ -7,7 +7,8 @@ REM set dllsrc="..\_windows_release_dlls_4_7_3_msvc2008\"
 set dllsrc="..\_windows_release_dlls_4_8_5_msvc2008\"
 set dst="c:\temp\erebus"
 
-copy ..\erebus-build-desktop\release\erebus.exe %dst%\erebus.exe
+REM copy ..\erebus-build-desktop\release\erebus.exe %dst%\erebus.exe
+copy ..\build-erebus-desktop-Release\release\erebus.exe %dst%\erebus.exe
 
 copy %dllsrc%\QtCore4.dll %dst%
 copy %dllsrc%\QtGui4.dll %dst%
