@@ -647,33 +647,33 @@ wandering monster!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6719"/>
+        <location filename="../playinggamestate.cpp" line="6720"/>
         <source>Goodbye</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="6924"/>
+        <location filename="../playinggamestate.cpp" line="6925"/>
         <source>Opening door...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7301"/>
+        <location filename="../playinggamestate.cpp" line="7302"/>
         <source>You are carrying too much weight to move!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7304"/>
+        <location filename="../playinggamestate.cpp" line="7305"/>
         <source>The armour you are wearing is
 too heavy for you to move!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7314"/>
+        <location filename="../playinggamestate.cpp" line="7315"/>
         <source>Weapon has no effect!</source>
         <translation>Cette arme n&apos;a aucun effet!</translation>
     </message>
     <message>
-        <location filename="../playinggamestate.cpp" line="7319"/>
+        <location filename="../playinggamestate.cpp" line="7320"/>
         <source>Holy weapon has no effect!</source>
         <translation type="unfinished"></translation>
     </message>
