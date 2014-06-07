@@ -6461,8 +6461,9 @@ void PlayingGamestate::updateInput() {
         // scroll due to mouse at edge of screen
         int m_x = QCursor::pos().x();
         int m_y = QCursor::pos().y();
-        int screen_width = QApplication::desktop()->availableGeometry().width();
-        int screen_height = QApplication::desktop()->availableGeometry().height();
+        // use screenGeometry() instead of availableGeometry(), as we don't care about the taskbar etc (we want to detect if mouse is at the edge of the screen, not below the taskbar - which will be hidden in fullscreen mode anyway)
+        int screen_width = QApplication::desktop()->screenGeometry().width();
+        int screen_height = QApplication::desktop()->screenGeometry().height();
         //qDebug("mouse at %d, %d", m_x, m_y);
         //qDebug("screen size %d x %d", screen_width, screen_height);
         QPointF centre = this->view->mapToScene( this->view->rect() ).boundingRect().center();
