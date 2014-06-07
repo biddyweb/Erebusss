@@ -424,7 +424,10 @@ void Game::setTextEdit(QTextEdit *textEdit) {
     textEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     textEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 #endif
-    textEdit->setStyleSheet("background-image: url(\"gfx/textures/paper.png\");");
+    QString background_filename = DEPLOYMENT_PATH + QString("gfx/textures/paper.png");
+    QString stylesheet_string = "background-image: url(\"" + background_filename + "\");";
+    LOG("stylesheet string: %s\n", stylesheet_string.toStdString().c_str());
+    textEdit->setStyleSheet(stylesheet_string);
     this->webViewEventFilter->setTextEdit(textEdit);
 }
 
