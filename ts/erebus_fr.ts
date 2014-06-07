@@ -1069,27 +1069,27 @@ A bomb blows your body to pieces...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../game.cpp" line="944"/>
+        <location filename="../game.cpp" line="947"/>
         <source>You grew up in distant lands to the west, and have lived much of your life in the outdoors. You were trained from an early age in the arts of combat. You have travelled east in search of noble quests.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../game.cpp" line="954"/>
+        <location filename="../game.cpp" line="957"/>
         <source>You come from the White Willow Forest, where you lived in a great Elven city built in the treetops. Many Elves prefer to never meddle with humans, but you have ventured out to explore the wider world.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../game.cpp" line="965"/>
+        <location filename="../game.cpp" line="968"/>
         <source>Halflings do not make great warriors and make unlikely adventurers, but they are suprisingly hardy, and their special skills can help them succeed where others might fail.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../game.cpp" line="975"/>
+        <location filename="../game.cpp" line="978"/>
         <source>You prefer the country life to cities. You are used to living and surviving independently, and you have had much time to hone your skills such as your proficiency with the bow.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../game.cpp" line="984"/>
+        <location filename="../game.cpp" line="987"/>
         <source>You come from the great city of Eastport. At a young age, you joined the army where you were trained how to fight, and saw combat in wars with Orcs to the north. After completing your service of seven years, you now work independently, hoping to find riches in return for your services.</source>
         <translation type="unfinished"></translation>
     </message>
