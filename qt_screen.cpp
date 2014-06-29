@@ -67,12 +67,18 @@ int GameClock::update(int time_now_ms) {
         // Semi-fixed timestep
         // (Fixed timestep has problems that if time_per_frame_c is too small, we have trouble updating and end up in a death spiral due to calling update() too many times per frame;
         // if time_per_frame_c is too large, we don't get smooth update on faster platforms.)
-        // Note that a proper implementation of semi-fixed timestep would have some interval T0 < elapsed_time_ms < T1 where we would call the update functions multiple times (with game_time_frame_ms=T0, except for 1 call to handle the remainder time); and for elapsed_time_ms > T1 we would set elapsed_time_ms = T1.
-        // But here we are effectively setting T0=T1. In practice on slow systems, we are just as likely to be update-bound rather than render-bound, so there isn't any benefit to this.
+        // Note that a proper implementation of semi-fixed timestep would typically have a smaller value for max_interval_c,
+        // and then do the sufficient number of updates to catch up (of length max_interval_c, except for 1 iteration to do handle the remainder time),
+        // with a max number of iterations to prevent a "death spiral". However here we're setting a largish value of max_interval_c,
+        // and effectively setting a max iteration of 1.
+        // In practice on slow systems, we are just as likely to be update-bound rather than render-bound, so there isn't any benefit to using a smaller value,
+        // and testing as shown that the update is stable up to 200ms.
+        // We pick a max_interval_c of 200ms, as (a) we should still be safe with a timestep of this size; (b) Nokia 5800 with lighting effects can sometimes have FPS of just under 10, so we want something larger than 100ms.
+        // Also note: normally it would be good practice to only call the update if at least time_per_frame_c has passed, but with Qt we already have this function being called on a timer.
+        const int max_interval_c = 200;
         int elapsed_time_ms = time_now_ms - this->saved_elapsed_time_ms;
         elapsed_time_ms *= multiplier;
-        elapsed_time_ms = std::min(elapsed_time_ms, 200); // prevent too large a timestep being sent to the update, to avoid instability
-        // We pick 200ms, as (a) we should still be safe with a timestep of this size; (b) Nokia 5800 with lighting effects can sometimes have FPS of just under 10, so we want something larger than 100ms.
+        elapsed_time_ms = std::min(elapsed_time_ms, max_interval_c); // prevent too large a timestep being sent to the update, to avoid instability
         this->saved_elapsed_time_ms = time_now_ms;
         if( elapsed_time_ms > 0 ) {
             this->game_time_frame_ms = elapsed_time_ms;
