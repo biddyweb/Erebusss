@@ -36,6 +36,56 @@ const NPCGroup *NPCTable::chooseGroup(int level) const {
     return npc_group;
 }
 
+LocationGeneratorInfo::LocationGeneratorInfo(const map<string, NPCTable *> &npc_tables) : npc_tables(npc_tables),
+    n_rooms_normal(0), n_rooms_hazard(0), n_rooms_lair(0), n_rooms_quest(0)
+{
+    this->room_weights[ROOMTYPE_NORMAL] = 3;
+    this->room_weights[ROOMTYPE_HAZARD] = 1;
+    this->room_weights[ROOMTYPE_LAIR] = 1;
+    this->room_weights[ROOMTYPE_QUEST] = 1;
+
+    // default
+    {
+        this->n_room_doorsX = 1;
+        this->n_room_doorsY = 2;
+        this->n_room_doorsZ = 0;
+
+        this->percentage_chance_passageway = 50;
+
+        this->n_door_weights.push_back(70);
+        this->n_door_weights.push_back(20);
+        this->n_door_weights.push_back(10);
+
+        this->n_door_weights_initial.push_back(25);
+        this->n_door_weights_initial.push_back(65);
+        this->n_door_weights_initial.push_back(10);
+
+        this->n_rooms_until_quest = 5;
+    }
+
+    // room-heavy
+    /*{
+        this->n_room_doorsX = 0;
+        this->n_room_doorsY = 0;
+        this->n_room_doorsZ = 2;
+
+        this->percentage_chance_passageway = 10;
+
+        this->n_door_weights.push_back(10);
+        this->n_door_weights.push_back(30);
+        this->n_door_weights.push_back(60);
+
+        this->n_door_weights_initial.push_back(0);
+        this->n_door_weights_initial.push_back(5);
+        this->n_door_weights_initial.push_back(95);
+
+        this->n_rooms_until_quest = 15;
+    }*/
+}
+
+LocationGeneratorInfo::~LocationGeneratorInfo() {
+}
+
 Direction4 rotateDirection4(Direction4 dir, int turn) {
     int i_dir = (int)dir;
     i_dir += turn;
@@ -298,7 +348,7 @@ Item *LocationGenerator::getRandomTreasure(const PlayingGamestate *playing_games
     return item;
 }
 
-void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
+void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, int level, int n_levels, LocationGeneratorInfo *generator_info) {
     Vector2D room_dir_vec = directionFromEnum(seed.dir);
     Vector2D door_centre = seed.pos + room_dir_vec * 0.5f * door_depth;
     Vector2D door_size = ( seed.dir == DIRECTION4_NORTH || seed.dir == DIRECTION4_SOUTH ) ? Vector2D(door_width, door_depth) : Vector2D(door_depth, door_width);
@@ -309,19 +359,10 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         return;
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
-        enum RoomType {
-            ROOMTYPE_NORMAL = 0,
-            ROOMTYPE_HAZARD = 1,
-            ROOMTYPE_LAIR = 2,
-            ROOMTYPE_QUEST = 3
-        };
-        RoomType room_type = ROOMTYPE_NORMAL;
         float room_size_w = base_room_size;
         float room_size_h = base_room_size;
+        /*RoomType room_type = ROOMTYPE_NORMAL;
         int roll = rollDice(1, 12, 0);
-        /*if( rollDice(1, 2, 0) == 1 ) {
-            roll = 8; // test
-        }*/
         if( roll <= 6 ) {
             // normal room
             room_type = ROOMTYPE_NORMAL;
@@ -337,14 +378,15 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         else {
             // quest room
             room_type = ROOMTYPE_QUEST;
-        }
+        }*/
+        RoomType room_type = (RoomType)rollDiceChoice(generator_info->room_weights, N_ROOMTYPES);
 
         if( room_type == ROOMTYPE_QUEST && generator_info->n_rooms_quest > 0 ) {
             // only 1 quest room per level
             room_type = ROOMTYPE_LAIR;
         }
-        else if( room_type == ROOMTYPE_QUEST && ( generator_info->n_rooms_normal == 0 || generator_info->n_rooms_hazard == 0 || generator_info->n_rooms_lair == 0 ) ) {
-            // need at least 1 of each of the other room types, before having a quest room
+        else if( room_type == ROOMTYPE_QUEST && ( generator_info->n_rooms_normal == 0 || generator_info->n_rooms_hazard == 0 || generator_info->n_rooms_lair == 0 || generator_info->nRooms() < generator_info->n_rooms_until_quest ) ) {
+            // need at least 1 of each of the other room types, and at least before having a quest room
             if( generator_info->n_rooms_normal == 0 ) {
                 room_type = ROOMTYPE_NORMAL;
             }
@@ -808,8 +850,8 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 location->addScenery(scenery, scenery_pos.x, scenery_pos.y);
             }
             if( enemy_table.length() > 0 ) {
-                map<string, NPCTable *>::const_iterator iter = npc_tables.find(enemy_table);
-                if( iter != npc_tables.end() ) {
+                map<string, NPCTable *>::const_iterator iter = generator_info->npc_tables.find(enemy_table);
+                if( iter != generator_info->npc_tables.end() ) {
                     const NPCTable *npc_table = iter->second;
                     const NPCGroup *npc_group = npc_table->chooseGroup(level);
                     int count = 0;
@@ -840,7 +882,9 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             }
 
             //int n_room_doors = rollDice(1, 3, -1);
-            int n_room_doors = rollDice(1, 2, 0); // not necessarily the actual number of doors, as we may fail to find room, when exploring from the seed
+            //int n_room_doors = rollDice(1, 2, 0); // not necessarily the actual number of doors, as we may fail to find room, when exploring from the seed
+            // not necessarily the actual number of doors, as we may fail to find room, when exploring from the seed
+            int n_room_doors = rollDice(generator_info->n_room_doorsX, generator_info->n_room_doorsY, generator_info->n_room_doorsZ);
             vector<Direction4> done_dirs;
             done_dirs.push_back( rotateDirection4(seed.dir, 2) );
             for(int j=0;j<n_room_doors;j++) {
@@ -866,7 +910,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 Vector2D new_room_dir_vec = directionFromEnum(new_room_dir);
                 float door_dist = ( new_room_dir == DIRECTION4_NORTH || new_room_dir == DIRECTION4_SOUTH ) ? room_size_h : room_size_w;
                 Vector2D door_pos = room_centre + new_room_dir_vec * 0.5 * door_dist;
-                Seed::Type seed_type = rollDice(1, 2, 0) == 1 ? Seed::TYPE_X_ROOM : Seed::TYPE_ROOM_PASSAGEWAY;
+                Seed::Type seed_type = rollDice(1, 100, 0) <= generator_info->percentage_chance_passageway ? Seed::TYPE_X_ROOM : Seed::TYPE_ROOM_PASSAGEWAY;
                 Seed new_seed(seed_type, door_pos, new_room_dir);
                 new_seed.addIgnoreRect(room_rect);
                 qDebug("    add new room from room at %f, %f", new_seed.pos.x, new_seed.pos.y);
@@ -876,11 +920,11 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
     }
 }
 
-void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info) {
+void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, int level, int n_levels, LocationGeneratorInfo *generator_info) {
     Vector2D dir_vec = directionFromEnum(seed.dir);
     qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     if( seed.type == Seed::TYPE_X_ROOM ) {
-        exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, npc_tables, level, n_levels, generator_info);
+        exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, level, n_levels, generator_info);
         return;
     }
     else if( seed.type == Seed::TYPE_ROOM_PASSAGEWAY ) {
@@ -982,7 +1026,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     {
         {
             // doors
-            int roll = rollDice(1, 100, 0);
+            /*int roll = rollDice(1, 100, 0);
             if( roll <= 20 ) {
                 n_doors = 1;
             }
@@ -994,6 +1038,12 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
                 if( generator_info->nRooms() == 0 ) {
                     n_doors = 1;
                 }
+            }*/
+            if( generator_info->nRooms() == 0 ) {
+                n_doors = rollDiceChoice(&generator_info->n_door_weights_initial.front(), generator_info->n_door_weights_initial.size());
+            }
+            else {
+                n_doors = rollDiceChoice(&generator_info->n_door_weights.front(), generator_info->n_door_weights.size());
             }
         }
         {
@@ -1044,8 +1094,8 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
             int roll = rollDice(1, 100, 0);
             if( roll <= 25 ) {
                 int passage_section = rand() % passage_length_i;
-                map<string, NPCTable *>::const_iterator iter = npc_tables.find("isolated");
-                if( iter != npc_tables.end() ) {
+                map<string, NPCTable *>::const_iterator iter = generator_info->npc_tables.find("isolated");
+                if( iter != generator_info->npc_tables.end() ) {
                     const NPCTable *npc_table = iter->second;
                     const NPCGroup *npc_group = npc_table->chooseGroup(level);
                     int count = 0;
@@ -1236,7 +1286,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         seeds.push_back(seed);
         vector<Rect2D> floor_regions_rects;
 
-        LocationGeneratorInfo generator_info;
+        LocationGeneratorInfo generator_info(npc_tables);
 
         for(int count=0;count<8 && seeds.size() > 0;count++) {
             vector<Seed> c_seeds;
@@ -1248,7 +1298,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
 
             for(vector<Seed>::iterator iter = c_seeds.begin(); iter != c_seeds.end(); ++iter) {
                 Seed seed = *iter;
-                exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, npc_tables, level, n_levels, &generator_info);
+                exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, level, n_levels, &generator_info);
             }
         }
 

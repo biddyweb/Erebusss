@@ -130,19 +130,32 @@ public:
     const NPCGroup *chooseGroup(int level) const;
 };
 
+enum RoomType {
+    ROOMTYPE_NORMAL = 0,
+    ROOMTYPE_HAZARD = 1,
+    ROOMTYPE_LAIR = 2,
+    ROOMTYPE_QUEST = 3,
+    N_ROOMTYPES = 4
+};
+
 class LocationGeneratorInfo {
 public:
+    const map<string, NPCTable *> &npc_tables;
+
+    int room_weights[N_ROOMTYPES];
+    int n_room_doorsX, n_room_doorsY, n_room_doorsZ; // not necessarily the actual number of doors, as we may fail to find room, when exploring from the seed
+    int percentage_chance_passageway; // percentage chance of room door opening to a passageway (rather than a room)
+    vector<int> n_door_weights;
+    vector<int> n_door_weights_initial;
+    int n_rooms_until_quest;
+
     int n_rooms_normal;
     int n_rooms_hazard;
     int n_rooms_lair;
     int n_rooms_quest;
 
-    LocationGeneratorInfo() {
-        n_rooms_normal = 0;
-        n_rooms_hazard = 0;
-        n_rooms_lair = 0;
-        n_rooms_quest = 0;
-    }
+    LocationGeneratorInfo(const map<string, NPCTable *> &npc_tables);
+    ~LocationGeneratorInfo();
 
     int nRooms() const {
         return n_rooms_normal + n_rooms_hazard + n_rooms_lair + n_rooms_quest;
@@ -155,8 +168,8 @@ class LocationGenerator {
 
     static bool collidesWithFloorRegions(const vector<Rect2D> *floor_regions_rects, const vector<Rect2D> *ignore_rects, Rect2D rect, float gap);
     static void exploreFromSeedRoomPassageway(Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects);
-    static void exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info);
-    static void exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, const map<string, NPCTable *> &npc_tables, int level, int n_levels, LocationGeneratorInfo *generator_info);
+    static void exploreFromSeedXRoom(Scenery **exit_down, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, int level, int n_levels, LocationGeneratorInfo *generator_info);
+    static void exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, int level, int n_levels, LocationGeneratorInfo *generator_info);
 
 public:
     static Location *generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels);

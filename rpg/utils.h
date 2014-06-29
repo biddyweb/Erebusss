@@ -365,6 +365,7 @@ public:
 };
 
 int rollDice(int X, int Y, int Z);
+int rollDiceChoice(const int *weights, int n_choices);
 
 //float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos);
 

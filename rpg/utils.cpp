@@ -418,6 +418,23 @@ int rollDice(int X, int Y, int Z) {
     return value;
 }
 
+int rollDiceChoice(const int *weights, int n_choices) {
+    int n_total = 0;
+    for(int i=0;i<n_choices;i++) {
+        //qDebug("rollDiceChoice: %d : %d", i, weights[i]);
+        n_total += weights[i];
+    }
+    int roll = rand() % n_total;
+    //qDebug("rolled %d out of %d\n", roll, n_total);
+    int choice = 0;
+    while( choice < n_choices && roll >= weights[choice] ) {
+        roll -= weights[choice];
+        choice++;
+    }
+    //qDebug("choice %d\n", choice);
+    return choice;
+}
+
 /*float distFromBox2D(const Vector2D &centre, float width, float height, const Vector2D &pos) {
     float dist_x = 0.0f, dist_y = 0.0f;
 
