@@ -218,17 +218,6 @@ void LocationGenerator::exploreFromSeedPassagewayPassageway(Scenery **exit_up, P
         floor_regions_rects->push_back(floor_region_rect);
         ignore_rects.push_back(floor_region_rect);
     }
-    if( first ) {
-        string name = "Stairs";
-        string image_name = "stairsup_indoors";
-        float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
-        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
-        Scenery *scenery_stairs_up = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
-        scenery_stairs_up->setBlocking(true, false);
-        Vector2D scenery_pos = seed.pos + dir_vec*size_w*0.5f;
-        location->addScenery(scenery_stairs_up, scenery_pos.x, scenery_pos.y);
-        *exit_up = scenery_stairs_up;
-    }
 
     // contents
     int n_doors = 0;
@@ -1227,17 +1216,25 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     qDebug("explore from seed type %d at %f, %f ; direction %d: %f, %f", seed.type, seed.pos.x, seed.pos.y, seed.dir, dir_vec.x, dir_vec.y);
     if( seed.type == Seed::TYPE_PASSAGEWAY_PASSAGEWAY ) {
         exploreFromSeedPassagewayPassageway(exit_up, playing_gamestate, location, seed, seeds, floor_regions_rects, first, level, generator_info);
-        return;
     }
     else if( seed.type == Seed::TYPE_ROOM_PASSAGEWAY ) {
         exploreFromSeedRoomPassageway(location, seed, seeds, floor_regions_rects);
-        return;
     }
     else if( seed.type == Seed::TYPE_X_ROOM ) {
         exploreFromSeedXRoom(exit_down, playing_gamestate, location, seed, seeds, floor_regions_rects, level, n_levels, generator_info);
-        return;
     }
 
+    if( first ) {
+        string name = "Stairs";
+        string image_name = "stairsup_indoors";
+        float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
+        playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
+        Scenery *scenery_stairs_up = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
+        scenery_stairs_up->setBlocking(true, false);
+        Vector2D scenery_pos = seed.pos + dir_vec*size_w*0.5f;
+        location->addScenery(scenery_stairs_up, scenery_pos.x, scenery_pos.y);
+        *exit_up = scenery_stairs_up;
+    }
 }
 
 Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels) {
@@ -1290,12 +1287,21 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         location->setWallImageName(wall_name);
 
         vector<Seed> seeds;
-        Direction4 direction = rollDice(1, 2, 0) == 1 ? DIRECTION4_EAST : DIRECTION4_SOUTH;
-        Vector2D start_pos(100.0f, 100.0f);
-        start_pos -= directionFromEnum(direction) * 100.0f;
-        Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, direction);
-        seeds.push_back(seed);
-        *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
+        if( rollDice(1, 2, 0) == 1 ) {
+            Direction4 direction = rollDice(1, 2, 0) == 1 ? DIRECTION4_EAST : DIRECTION4_SOUTH;
+            Vector2D start_pos(100.0f, 100.0f);
+            start_pos -= directionFromEnum(direction) * 100.0f;
+            Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, direction);
+            seeds.push_back(seed);
+            *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
+        }
+        else {
+            Vector2D start_pos(100.0f, 100.0f);
+            Direction4 direction = (Direction4)rollDice(1, 4, 0);
+            Seed seed(Seed::TYPE_X_ROOM, start_pos, direction);
+            seeds.push_back(seed);
+            *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
+        }
 
         vector<Rect2D> floor_regions_rects;
 
@@ -1313,7 +1319,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
                 Seed seed = *iter;
                 exploreFromSeed(exit_down, exit_up, playing_gamestate, location, seed, &seeds, &floor_regions_rects, count==0, level, n_levels, &generator_info);
             }
-            if( generator_info.n_rooms_quest > 0 ) {
+            if( generator_info.n_rooms_quest > 0 && generator_info.nRooms() > 20 ) {
                 // quit to limit size
                 break;
             }
