@@ -888,6 +888,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
             vector<Direction4> done_dirs;
             done_dirs.push_back( rotateDirection4(seed.dir, 2) );
             for(int j=0;j<n_room_doors;j++) {
+                //qDebug("j = %d / %d", j, n_room_doors);
                 Direction4 new_room_dir;
                 bool done = false;
                 while( !done ) {
@@ -895,9 +896,10 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     if( j == 0 )
                         new_room_dir = seed.dir;
                     else {
-                        int turn = rollDice(1, 2, 1) == 1 ? 1 : -1;
+                        int turn = rollDice(1, 2, 0) == 1 ? 1 : -1;
                         new_room_dir = rotateDirection4(seed.dir, turn);
                     }
+                    //qDebug("    chose dir %d", new_room_dir);
                     done = true;
                     for(vector<Direction4>::iterator iter = done_dirs.begin(); iter != done_dirs.end() && done; ++iter) {
                         Direction4 done_dir = *iter;
