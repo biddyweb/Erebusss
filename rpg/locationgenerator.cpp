@@ -44,8 +44,10 @@ LocationGeneratorInfo::LocationGeneratorInfo(const map<string, NPCTable *> &npc_
     this->room_weights[ROOMTYPE_LAIR] = 1;
     this->room_weights[ROOMTYPE_QUEST] = 1;
 
-    // default
-    {
+    int type = rollDice(1, 2, 0);
+    LOG("type: %d\n", type);
+    if( type == 1 ) {
+        LOG("default\n");
         this->n_room_doorsX = 1;
         this->n_room_doorsY = 2;
         this->n_room_doorsZ = 0;
@@ -62,12 +64,11 @@ LocationGeneratorInfo::LocationGeneratorInfo(const map<string, NPCTable *> &npc_
 
         this->n_rooms_until_quest = 5;
     }
-
-    // room-heavy
-    /*{
-        this->n_room_doorsX = 0;
-        this->n_room_doorsY = 0;
-        this->n_room_doorsZ = 2;
+    else {
+        LOG("room-heavy");
+        this->n_room_doorsX = 1;
+        this->n_room_doorsY = 2;
+        this->n_room_doorsZ = 1;
 
         this->percentage_chance_passageway = 10;
 
@@ -80,7 +81,7 @@ LocationGeneratorInfo::LocationGeneratorInfo(const map<string, NPCTable *> &npc_
         this->n_door_weights_initial.push_back(95);
 
         this->n_rooms_until_quest = 15;
-    }*/
+    }
 }
 
 LocationGeneratorInfo::~LocationGeneratorInfo() {
@@ -912,7 +913,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 Vector2D new_room_dir_vec = directionFromEnum(new_room_dir);
                 float door_dist = ( new_room_dir == DIRECTION4_NORTH || new_room_dir == DIRECTION4_SOUTH ) ? room_size_h : room_size_w;
                 Vector2D door_pos = room_centre + new_room_dir_vec * 0.5 * door_dist;
-                Seed::Type seed_type = rollDice(1, 100, 0) <= generator_info->percentage_chance_passageway ? Seed::TYPE_X_ROOM : Seed::TYPE_ROOM_PASSAGEWAY;
+                Seed::Type seed_type = rollDice(1, 100, 0) <= generator_info->percentage_chance_passageway ? Seed::TYPE_ROOM_PASSAGEWAY : Seed::TYPE_X_ROOM;
                 Seed new_seed(seed_type, door_pos, new_room_dir);
                 new_seed.addIgnoreRect(room_rect);
                 qDebug("    add new room from room at %f, %f", new_seed.pos.x, new_seed.pos.y);
