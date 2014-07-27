@@ -52,7 +52,7 @@ bool RPGEngine::combat(int &weapon_damage, bool &weapon_no_effect_magical, bool 
                 weapon_no_effect_holy = true;
             }
             else {
-                weapon_damage = attacker->getCurrentWeapon() != NULL ? attacker->getCurrentWeapon()->getDamage() : attacker->getNaturalDamage();
+                weapon_damage = attacker->getCurrentWeapon() != NULL ? attacker->getCurrentWeapon()->getDamage(defender) : attacker->getNaturalDamage();
                 if( !is_ranged && rollDice(2, 6, 0) <= a_str ) {
                     qDebug("    extra strong hit!");
                     int extra_damage = rollDice(1, 3, 0);

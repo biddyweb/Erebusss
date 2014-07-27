@@ -379,3 +379,5 @@ string numberToString(T number) {
     ss << number;
     return ss.str();
 }
+
+string getDiceRollString(int X, int Y, int Z);

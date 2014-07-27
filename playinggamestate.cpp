@@ -315,13 +315,7 @@ StatsWindow::StatsWindow(PlayingGamestate *playing_gamestate) :
         str << "<b>Damage: </b>";
         str << "</td>";
         str << "<td>";
-        if( damageZ != 0 ) {
-            char sign = damageZ > 0 ? '+' : '-';
-            str << damageX << "D" << damageY << sign << abs(damageZ);;
-        }
-        else {
-            str << damageX << "D" << damageY;
-        }
+        str << getDiceRollString(damageX, damageY, damageZ);
         //str << "<br/>";
         str << " ";
         str << "</td>";
@@ -3369,6 +3363,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         QStringRef damageZ_s = reader.attributes().value("damageZ");
         QStringRef min_strength_s = reader.attributes().value("min_strength");
         QStringRef unholy_only_s = reader.attributes().value("unholy_only");
+        QStringRef unholy_bonus_s = reader.attributes().value("unholy_bonus");
         /*qDebug("    name: %s", name_s.toString().toStdString().c_str());
         qDebug("    image_name: %s", image_name_s.toString().toStdString().c_str());
         qDebug("    animation_name: %s", animation_name_s.toString().toStdString().c_str());
@@ -3384,6 +3379,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         int damageZ = parseInt(damageZ_s.toString());
         int min_strength = parseInt(min_strength_s.toString(), true);
         bool unholy_only = parseBool(unholy_only_s.toString(), true);
+        int unholy_bonus = parseInt(unholy_bonus_s.toString(), true);
         Weapon *weapon = new Weapon(name_s.toString().toStdString(), image_name_s.toString().toStdString(), weight, animation_name_s.toString().toStdString(), damageX, damageY, damageZ);
         item = weapon;
         weapon->setTwoHanded(two_handed);
@@ -3405,6 +3401,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         }
         weapon->setMinStrength(min_strength);
         weapon->setUnholyOnly(unholy_only);
+        weapon->setUnholyBonus(unholy_bonus);
 
         QStringRef weapon_class_s = reader.attributes().value("weapon_class");
         if( weapon_class_s.length() > 0 ) {
@@ -7516,6 +7513,9 @@ void PlayingGamestate::saveItem(QTextStream &stream, const Item *item, const Cha
         }
         if( weapon->isUnholyOnly() ) {
             stream << " unholy_only=\"true\"";
+        }
+        if( weapon->getUnholyBonus() != 0 ) {
+            stream << " unholy_bonus=\"" << weapon->getUnholyBonus() << "\"";
         }
         if( weapon->getWeaponClass().length() > 0 ) {
             stream << " weapon_class=\"" << weapon->getWeaponClass().c_str() << "\"";

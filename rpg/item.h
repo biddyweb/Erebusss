@@ -206,6 +206,7 @@ private:
     int damageX, damageY, damageZ;
     int min_strength;
     bool unholy_only;
+    int unholy_bonus;
     string weapon_class;
 public:
     Weapon(const string &name, const string &image_name, int weight, const string &animation_name, int damageX, int damageY, int damageZ);
@@ -256,7 +257,7 @@ public:
         *damageY = this->damageY;
         *damageZ = this->damageZ;
     }
-    int getDamage() const;
+    int getDamage(const Character *defender) const;
     void setMinStrength(int min_strength) {
         this->min_strength = min_strength;
     }
@@ -268,6 +269,12 @@ public:
     }
     bool isUnholyOnly() const {
         return this->unholy_only;
+    }
+    void setUnholyBonus(int unholy_bonus) {
+        this->unholy_bonus = unholy_bonus;
+    }
+    int getUnholyBonus() const {
+        return this->unholy_bonus;
     }
     void setWeaponClass(const string weapon_class) {
         this->weapon_class = weapon_class;

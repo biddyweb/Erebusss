@@ -1,6 +1,9 @@
 #include <string>
 using std::string;
 
+#include <sstream>
+using std::stringstream;
+
 #include <queue>
 using std::priority_queue;
 
@@ -580,4 +583,16 @@ float perlin_noise2(float vec[2]) {
     b = lerp(sx, u, v);
 
     return lerp(sy, a, b);
+}
+
+string getDiceRollString(int X, int Y, int Z) {
+    stringstream str;
+    if( Z != 0 ) {
+        char sign = Z > 0 ? '+' : '-';
+        str << X << "D" << Y << sign << abs(Z);
+    }
+    else {
+        str << X << "D" << Y;
+    }
+    return str.str();
 }

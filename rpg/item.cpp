@@ -151,12 +151,10 @@ string Item::getDetailedDescription(const Character *player) const {
         const Weapon *weapon = static_cast<const Weapon *>(this);
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
-        if( damageZ != 0 ) {
-            char sign = damageZ > 0 ? '+' : '-';
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << sign << abs(damageZ) << "<br/>";
-        }
-        else {
-            str << "<b>Damage:</b> " << damageX << "D" << damageY << "<br/>";
+        str << "<b>Damage:</b> " << getDiceRollString(damageX, damageY, damageZ) << "<br/>";
+        if( weapon->getUnholyBonus() != 0 ) {
+            int mod_damageZ = damageZ + weapon->getUnholyBonus();
+            str << "<b>Damage vs Unholy Creatures:</b> " << getDiceRollString(damageX, damageY, mod_damageZ) << "<br/>";
         }
         str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
         if( weapon->getMinStrength() > 0 ) {
@@ -278,8 +276,12 @@ Weapon *Weapon::clone() const {
     return new Weapon(*this);
 }
 
-int Weapon::getDamage() const {
+int Weapon::getDamage(const Character *defender) const {
     int roll = rollDice(damageX, damageY, damageZ);
+    if( this->unholy_bonus != 0 && defender->isUnholy() )
+        roll += this->unholy_bonus;
+    if( roll < 0 )
+        roll = 0;
     return roll;
 }
 
