@@ -1965,7 +1965,7 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <wandering_monster template="Orc" time="300000" rest_chance="20"/>
 
-<!--<player_start x="41.5" y="6.0"/>-->
+<player_start x="41.5" y="6.0"/>
 
 <floorregion shape="rect" rect_x="42.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
 
@@ -1985,13 +1985,24 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <scenery name="Skeleton" image_name="skeleton" x="43.5" y="22.3" size="0.7" draw_type="background"/>
 
+<scenery name="Chest" image_name="chest" x="41.5" y="21.0" size="0.8" blocking="true">
+    <weapon name="Blessed Long Sword" image_name="longsword" weight="14"
+        damageX="2" damageY="10" damageZ="0"
+        unholy_bonus="4"
+        min_strength="7"
+        animation_name="longsword"
+        magical="true"
+        base_template="Long Sword" worth_bonus="300"
+        />
+</scenery>
+
 <!-- main part -->
 
 <floorregion shape="rect" rect_x="47.0" rect_y="26.0" rect_w="4.0" rect_h="4.0"/>
 
 <scenery name="Stairs" image_name="stairsup_indoors" x="49.0" y="28.0" size="2.0" boundary_iso="true" boundary_iso_ratio="0.5" blocking="true" exit_location="Dungeons, Wentbridge Fort" exit_location_x="49.0" exit_location_y="29.5"/>
 
-<player_start x="49.0" y="29.5"/>
+<!--<player_start x="49.0" y="29.5"/>-->
 
 <!-- north route, past human prisoners -->
 
