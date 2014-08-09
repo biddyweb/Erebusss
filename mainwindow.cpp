@@ -78,13 +78,20 @@ void MainWindow::showExpanded(bool fullscreen)
     if( smallscreen_c || fullscreen ) {
         // smallscreen platforms always fullscreen
 #ifdef Q_OS_ANDROID
-        this->resize(QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height()); // workaround for Android Qt 5 bug where windows open at 640x480?! See http://www.qtcentre.org/threads/55453-Android-screen-res-problem-(it-s-always-640x480-instead-of-maximized)-Qt-5-1-XP
-#endif
+        // problem on Android Qt 5.x where neither showMaximized() nor showFullscreen() working
+        // use desktop()->size rather than desktop()->availableGeometry (the latter returns 0x0 on Qt 5.3)
+        this->resize(QApplication::desktop()->size());
+        // prefer showMaximized(); showFullScreen() enables the new "immersive" mode which we don't yet want
+        showMaximized();
+#else
         showFullScreen();
+#endif
     }
     else {
         show();
     }
+    LOG("desktop size %d x %d\n", QApplication::desktop()->width(), QApplication::desktop()->height());
+    LOG("desktop available size %d x %d\n", QApplication::desktop()->availableGeometry().width(), QApplication::desktop()->availableGeometry().height());
     LOG("window size %d x %d\n", this->width(), this->height());
 }
 
@@ -132,6 +139,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     qDebug("mainwindow key press: %d", event->key());
+#ifdef Q_OS_ANDROID
+#if QT_VERSION >= 0x050000
+    // Standard Android behaviour for back button is to send a quit signal, which works on Qt 4.x.
+    // However in Qt 5.3.1, we need to ignore the Key_Back event for this to work this way (see http://qt-project.org/wiki/Qt_for_Android_known_issues )
+    if( event->key() == Qt::Key_Back ) {
+        event->ignore();
+        return;
+    }
+#endif
+#endif
     if( game_g != NULL && game_g->getScreen() != NULL ) {
         game_g->keyPress(event);
     }
