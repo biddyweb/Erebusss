@@ -285,6 +285,7 @@ void Game::init(bool fullscreen) {
     {
         qDebug("setting up fonts for Android");
         QFont new_font = window->font();
+#if QT_VERSION < 0x050000
         // n.b., need to set font size directly, as new_font.pointSize() returns -1 on Android!
         if( screen_w <= 480 ) {
             // optimise for smaller screens
@@ -305,7 +306,14 @@ void Game::init(bool fullscreen) {
             this->font_big = QFont(new_font);
             this->font_big.setPointSize(13);
         }
-
+#else
+        // don't have Android look-and-feel when not using necessitas with Qt 5
+        this->font_scene = new_font;
+        this->font_small = QFont(new_font);
+        this->font_small.setPointSize(font_small.pointSize() - 2);
+        this->font_std = new_font;
+        this->font_big = new_font;
+#endif
     }
 #else
     if( smallscreen_c ) {
