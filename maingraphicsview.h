@@ -66,6 +66,8 @@ private:
     unsigned char darkness_alpha;
     int fps_frame_count;
     QElapsedTimer fps_timer;
+    bool has_new_center_on;
+    QPointF new_center_on;
 
     bool key_down[N_KEYS];
 
@@ -74,6 +76,7 @@ private:
     const static float min_zoom_c;
     const static float max_zoom_c;
 
+    QPointF getCenter() const;
     void zoom(QPointF zoom_centre, bool in);
     void mousePress(int m_x, int m_y);
     void mouseRelease(int m_x, int m_y);

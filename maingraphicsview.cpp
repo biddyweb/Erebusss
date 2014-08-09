@@ -47,7 +47,8 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0)
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0),
+    has_new_center_on(false)
 {
     this->fps_timer.invalidate();
     this->resetKeyboard();
@@ -62,13 +63,13 @@ void MainGraphicsView::resetKeyboard() {
 
 void MainGraphicsView::zoomOut() {
     playing_gamestate->zoomoutButton->clearFocus(); // workaround for Android still showing selection
-    QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    QPointF zoom_centre = this->getCenter();
     this->zoom(zoom_centre, false);
 }
 
 void MainGraphicsView::zoomIn() {
     playing_gamestate->zoominButton->clearFocus(); // workaround for Android still showing selection
-    QPointF zoom_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    QPointF zoom_centre = this->getCenter();
     this->zoom(zoom_centre, true);
 }
 
@@ -77,6 +78,13 @@ void MainGraphicsView::centreOnPlayer() {
     Character *character = playing_gamestate->getPlayer();
     AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
     this->centerOn(object);
+}
+
+QPointF MainGraphicsView::getCenter() const {
+    if( has_new_center_on )
+        return new_center_on;
+    QPointF center = this->mapToScene( this->rect() ).boundingRect().center();
+    return center;
 }
 
 void MainGraphicsView::zoom(QPointF zoom_centre, bool in) {
@@ -97,6 +105,10 @@ void MainGraphicsView::mousePress(int m_x, int m_y) {
     this->mouse_down_x = m_x;
     this->mouse_down_y = m_y;
     this->has_kinetic_scroll = false;
+
+    this->has_last_mouse = true;
+    this->last_mouse_x = m_x;
+    this->last_mouse_y = m_y;
 }
 
 // On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
@@ -130,17 +142,22 @@ void MainGraphicsView::mouseMove(int m_x, int m_y) {
             //qDebug("    has last mouse");
             /*QPointF old_pos = this->mapToScene(this->last_mouse_x, this->last_mouse_y);
             QPointF new_pos = this->mapToScene(event->x(), event->y());*/
+            //qDebug("%d, %d -> %d, %d", last_mouse_x, last_mouse_y, m_x, m_y);
             QPointF old_pos(this->last_mouse_x, this->last_mouse_y);
             QPointF new_pos(m_x, m_y);
             QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
 
             // drag - we do this ourselves rather than using drag mode QGraphicsView::ScrollHandDrag, to avoid conflict with multitouch
-            QPointF centre = this->mapToScene( this->rect() ).boundingRect().center();
+            QPointF centre = this->getCenter();
             QPoint centre_pixels = this->mapFromScene(centre);
             centre_pixels.setX( centre_pixels.x() + diff.x() );
             centre_pixels.setY( centre_pixels.y() + diff.y() );
             centre = this->mapToScene(centre_pixels);
-            this->centerOn(centre);
+            //this->centerOn(centre);
+            // have problems on Android with Qt 5.3 if we try to call centerOn() directly from an event callback (the screen doesn't update during the touch operation)
+            this->has_new_center_on = true;
+            this->new_center_on = centre;
+            //qDebug("        post centre on: %f, %f", new_center_on.x(), new_center_on.y());
 
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
@@ -158,6 +175,7 @@ void MainGraphicsView::mouseMove(int m_x, int m_y) {
             else {
                 this->has_kinetic_scroll = false;
             }
+            //qDebug("    has last mouse done");
         }
         else {
             this->has_kinetic_scroll = false;
@@ -393,6 +411,7 @@ void MainGraphicsView::resizeEvent(QResizeEvent *event) {
 }
 
 void MainGraphicsView::paintEvent(QPaintEvent *event) {
+    //LOG("paint\n");
     if( !smallscreen_c )
     {
         if( fps_timer.isValid() ) {
@@ -500,7 +519,7 @@ void MainGraphicsView::updateInput() {
         /*int time_ms = game_g->getScreen()->getGameTimeFrameMS();
         float speed = (4.0f * time_ms)/1000.0f;*/
         //if( fabs(this->kinetic_scroll_x) >= 0.0f && fabs(this->kinetic_scroll_y) >= 0.0f ) {
-        if( this->has_kinetic_scroll ) {
+        if( this->has_kinetic_scroll && !has_new_center_on ) {
             int time_ms = game_g->getInputTimeFrameMS();
             //qDebug("centre was: %f, %f", centre.x(), centre.y());
             float step = time_ms*this->kinetic_scroll_speed;
@@ -508,7 +527,7 @@ void MainGraphicsView::updateInput() {
             float move_y = step * this->kinetic_scroll_dir.y;
             //qDebug("    move: %f, %f", move_x, move_y);
 
-            QPointF centre = this->mapToScene( this->rect() ).boundingRect().center();
+            QPointF centre = this->getCenter();
             QPoint centre_pixels = this->mapFromScene(centre);
 
             //centre.setX( centre.x() + move_x );
@@ -517,7 +536,7 @@ void MainGraphicsView::updateInput() {
             centre_pixels.setY( centre_pixels.y() + move_y );
 
             centre = this->mapToScene(centre_pixels);
-            //qDebug("    now: %f, %f", centre.x(), centre.y());
+            //qDebug("    kinetic scroll to: %f, %f", centre.x(), centre.y());
             this->centerOn(centre);
             float decel = 0.001f * (float)time_ms;
             this->kinetic_scroll_speed -= decel;
@@ -527,6 +546,12 @@ void MainGraphicsView::updateInput() {
             }
             //qDebug("    kinetic is now %f, %f", this->kinetic_scroll_x, this->kinetic_scroll_y);
         }
+    }
+
+    if( has_new_center_on ) {
+        //qDebug("centre on: %f, %f", new_center_on.x(), new_center_on.y());
+        this->centerOn(new_center_on);
+        has_new_center_on = false;
     }
 }
 
@@ -549,7 +574,7 @@ void MainGraphicsView::setScale(float c_scale) {
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
     float old_scale = this->c_scale;
-    QPointF view_centre = this->mapToScene( this->rect() ).boundingRect().center();
+    QPointF view_centre = this->getCenter();
 
     /*this->calculated_lighting_pixmap_scaled = false;
     this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getScreen()->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
@@ -571,7 +596,11 @@ void MainGraphicsView::setScale(QPointF centre, float c_scale) {
 
     QPointF new_view_centre = centre + diff / scale_factor;
     qDebug("new_view_centre: %f, %f", new_view_centre.x(), new_view_centre.y());
-    this->centerOn(new_view_centre);
+    //this->centerOn(new_view_centre);
+    // have problems on Android with Qt 5.3 if we try to call centerOn() directly from an event callback (the screen doesn't update during the touch operation)
+    this->has_new_center_on = true;
+    this->new_center_on = new_view_centre;
+    //qDebug("        scale: post centre on: %f, %f", new_center_on.x(), new_center_on.y());
 
 #ifndef Q_OS_ANDROID
     // needed so that the view is updated, when doing zoom either with multitouch on Windows touchscreen, or two-finger mouse wheel gesture - otherwise we seem to get stuck processing events until the gesture ends
