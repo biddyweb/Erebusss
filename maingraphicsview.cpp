@@ -184,13 +184,13 @@ void MainGraphicsView::processTouchEvent(QTouchEvent *touchEvent) {
         QTouchEvent::TouchPoint touchPoint = touchPoints.at(0);
         int m_x = touchPoint.pos().x();
         int m_y = touchPoint.pos().y();
-        if( event->type() == QEvent::TouchBegin ) {
+        if( touchEvent->type() == QEvent::TouchBegin ) {
             this->mousePress(m_x, m_y);
         }
-        else if( event->type() == QEvent::TouchEnd ) {
+        else if( touchEvent->type() == QEvent::TouchEnd ) {
             this->mouseRelease(m_x, m_y);
         }
-        else if( event->type() == QEvent::TouchUpdate ) {
+        else if( touchEvent->type() == QEvent::TouchUpdate ) {
             this->mouseMove(m_x, m_y);
         }
     }
