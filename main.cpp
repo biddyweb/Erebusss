@@ -111,7 +111,8 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/) {
 
     // search for our class
 #if QT_VERSION >= 0x050000
-    jclass clazz=env->FindClass("org/qtproject/qt5/android/bindings/QtActivity");
+    //jclass clazz=env->FindClass("org/qtproject/qt5/android/bindings/QtActivity");
+    jclass clazz=env->FindClass("net/sourceforge/erebusrpg/ErebusActivity");
 #else
     jclass clazz=env->FindClass("org/kde/necessitas/origo/QtActivity");
 #endif
