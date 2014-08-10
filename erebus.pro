@@ -58,6 +58,7 @@ USING_WEBKIT {
     QT += webkit
 }
 QT += xml
+//QT += opengl
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

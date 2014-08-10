@@ -9,6 +9,11 @@
 #include <QTextEdit>
 #include <QUrl>
 
+/*#include <QGLWidget>
+
+#undef min
+#undef max*/
+
 #if QT_VERSION < 0x050000
 #include <QFile>
 #include <qmath.h>
@@ -2060,8 +2065,10 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         scene = new QGraphicsScene(window);
         //scene->setSceneRect(0, 0, scene_w_c, scene_h_c);
         //scene->setItemIndexMethod(QGraphicsScene::NoIndex); // doesn't seem to help
+
         //view = new QGraphicsView(scene, window);
         view = new MainGraphicsView(this, scene, window);
+
         view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view->setBackgroundBrush(QBrush(Qt::black));
@@ -2076,6 +2083,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         view->setViewportUpdateMode(QGraphicsView::NoViewportUpdate); // we manually force full update every time (better performance than FullViewportUpdate)
         view->setAttribute(Qt::WA_TranslucentBackground, false); // may help with performance?
         //view->setDragMode(QGraphicsView::ScrollHandDrag);
+        view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+        view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+
+        /*QGLFormat fmt = QGLFormat::defaultFormat();
+        fmt.setDoubleBuffer(true);
+        fmt.setSwapInterval(1);
+        QGLWidget *glWidget = new QGLWidget(fmt);
+        view->setViewport(glWidget);*/
 
         /*QWidget *centralWidget = new QWidget(window);
         this->mainwindow = centralWidget;
@@ -2189,6 +2204,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         layout->addWidget(view);
         view->showFullScreen();
 
+        //gui_overlay = new GUIOverlay(this, NULL);
         gui_overlay = new GUIOverlay(this, view);
         view->setGUIOverlay(gui_overlay);
         gui_overlay->setFadeIn();
