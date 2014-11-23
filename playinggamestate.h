@@ -13,7 +13,6 @@ using std::map;
 #include <QLabel>
 #include <QScrollBar>
 #include <QListWidget>
-#include <QCheckBox>
 #include <QXmlStreamReader>
 
 #include "common.h"
@@ -251,7 +250,7 @@ class LevelUpWindow : public UncloseWidget {
     map<string, QAbstractButton *> check_boxes;
     vector<QAbstractButton *> selected;
 
-    QAbstractButton *addProfileCheckBox(const string &key);
+    QAbstractButton *addProfileCheckBox(const string &key, const string &help);
 
 private slots:
     void toggledCheckBox(bool checked);

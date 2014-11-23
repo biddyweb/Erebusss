@@ -1411,31 +1411,31 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         layout->addLayout(g_layout);
 
         int row = 0;
-        g_layout->addWidget( addProfileCheckBox(profile_key_FP_c), row++, 0 );
+        g_layout->addWidget( addProfileCheckBox(profile_key_FP_c, tr("Hand-to-hand combat").toStdString()), row++, 0 );
         // mobile platforms may be too small to fit the labels (e.g., Symbian 640x360)
         // also need to be careful not to make the labels too long, for low resolution non-mobiles (e.g., 1024x600 netbooks)
-        if( !smallscreen_c ) {
+        /*if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("Hand-to-hand combat")), row++, 0 );
-        }
-        g_layout->addWidget( addProfileCheckBox(profile_key_BS_c), row++, 0 );
-        if( !smallscreen_c ) {
+        }*/
+        g_layout->addWidget( addProfileCheckBox(profile_key_BS_c, tr("Ranged combat").toStdString()), row++, 0 );
+        /*if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("Ranged combat")), row++, 0 );
-        }
-        g_layout->addWidget( addProfileCheckBox(profile_key_S_c), row++, 0 );
-        if( !smallscreen_c ) {
+        }*/
+        g_layout->addWidget( addProfileCheckBox(profile_key_S_c, tr("How strong you are").toStdString()), row++, 0 );
+        /*if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("How strong you are")), row++, 0 );
-        }
+        }*/
 
         row = 0;
-        g_layout->addWidget( addProfileCheckBox(profile_key_M_c), row++, 1 );
-        if( !smallscreen_c ) {
+        g_layout->addWidget( addProfileCheckBox(profile_key_M_c, tr("Mental and psychic abilities").toStdString()), row++, 1 );
+        /*if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("Mental and psychic abilities")), row++, 1 );
-        }
-        g_layout->addWidget( addProfileCheckBox(profile_key_D_c), row++, 1 );
-        if( !smallscreen_c ) {
+        }*/
+        g_layout->addWidget( addProfileCheckBox(profile_key_D_c, tr("For avoiding traps").toStdString()), row++, 1 );
+        /*if( !smallscreen_c ) {
             g_layout->addWidget( new QLabel(tr("For avoiding traps")), row++, 1 );
-        }
-        g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
+        }*/
+        g_layout->addWidget( addProfileCheckBox(profile_key_B_c, tr("Your courage in the face of terrifying enemies").toStdString()), row++, 1 );
     }
 
     int initial_level = player->getInitialLevel();
@@ -1532,15 +1532,26 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedLevelUp()));
 }
 
-QAbstractButton *LevelUpWindow::addProfileCheckBox(const string &key) {
+QAbstractButton *LevelUpWindow::addProfileCheckBox(const string &key, const string &help) {
+    // n.b., actually returns QPushButton rather than QCheckBox - looks nicer, and check boxes don't work properly on Android if not using necessitas
     string long_string = getProfileLongString(key);
-#ifdef Q_OS_ANDROID
+/*#ifdef Q_OS_ANDROID
     // problem on Android that text overlaps with checkbox
     QString android_hack = "            ";
 #else
     QString android_hack = "";
 #endif
-    QCheckBox * check_box = new QCheckBox(android_hack + long_string.c_str());
+    QCheckBox * check_box = new QCheckBox(android_hack + long_string.c_str());*/
+    QPushButton *check_box = new QPushButton(long_string.c_str());
+    check_box->setCheckable(true);
+#ifndef Q_OS_ANDROID
+    // for some reason, this sometimes shows on Android when it shouldn't?
+    if( help.length() > 0 ) {
+        check_box->setToolTip(help.c_str());
+    }
+#endif
+    check_box->setStyleSheet("QPushButton:checked {color: black; background-color: green;}"); // needed as Android default style isn't very clear whether a button is enabled or not
+    check_box->setFont(game_g->getFontStd());
     check_boxes[key] = check_box;
     return check_box;
 }
