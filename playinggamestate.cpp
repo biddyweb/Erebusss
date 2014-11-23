@@ -9,6 +9,11 @@
 #include <QTextEdit>
 #include <QUrl>
 
+/*#include <QtOpenGL>
+
+#undef min
+#undef max*/
+
 /*#include <QGLWidget>
 
 #undef min
@@ -2089,6 +2094,14 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         fmt.setSwapInterval(1);
         QGLWidget *glWidget = new QGLWidget(fmt);
         view->setViewport(glWidget);*/
+        /*if( QGLFormat::hasOpenGL() ) {
+            LOG("enable OpenGL\n");
+            view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+            view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate); // force full update every time
+        }
+        else {
+            LOG("OpenGL not available\n");
+        }*/
 
         /*QWidget *centralWidget = new QWidget(window);
         this->mainwindow = centralWidget;
@@ -3301,7 +3314,7 @@ void PlayingGamestate::quickSave() {
         quickSaveButton->clearFocus(); // workaround for Android still showing selection
     }
     if( !this->permadeath ) {
-        if( this->canSaveHere() ) {
+        if( !this->canSaveHere() ) {
             this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
             return;
         }
@@ -5909,12 +5922,13 @@ void PlayingGamestate::clickedRest() {
 }
 
 bool PlayingGamestate::canSaveHere() {
-    return c_location->hasEnemies(this);
+    // check for c_location != NULL just in case (as this is called e.g. from ::activate())
+    return c_location != NULL && !c_location->hasEnemies(this);
 }
 
 void PlayingGamestate::clickedSave() {
     LOG("PlayingGamestate::clickedSave()\n");
-    if( this->canSaveHere() ) {
+    if( !this->canSaveHere() ) {
         this->showInfoDialog(tr("You cannot save here - enemies are nearby.").toStdString());
         this->closeSubWindow();
         return;
@@ -6557,11 +6571,11 @@ void PlayingGamestate::displayPausedMessage() {
     this->addTextEffect(paused_message, 0); // 0 time, so the message disappears as soon as the game is unpaused
 }
 
-void PlayingGamestate::activate(bool, bool newly_paused) {
-    // n.b., don't autosave for now - if we ever allow this, we need to make sure that it doesn't autosave if enemies are nearby (as with normal save game rules!)
-    /*if( !active ) {
+void PlayingGamestate::activate(bool active, bool newly_paused) {
+    if( !active && this->canSaveHere() ) {
+        LOG("save game due to going inactive\n");
         this->autoSave();
-    }*/
+    }
     //this->addTextEffect(active ? "activated" : "deactivated", 10000);
     if( newly_paused ) {
         this->displayPausedMessage();
