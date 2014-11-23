@@ -248,13 +248,13 @@ class LevelUpWindow : public UncloseWidget {
 
     PlayingGamestate *playing_gamestate;
     QPushButton *closeButton;
-    map<string, QCheckBox *> check_boxes;
-    vector<QCheckBox *> selected;
+    map<string, QAbstractButton *> check_boxes;
+    vector<QAbstractButton *> selected;
 
-    QCheckBox *addProfileCheckBox(const string &key);
+    QAbstractButton *addProfileCheckBox(const string &key);
 
 private slots:
-    void clickedCheckBox(int state);
+    void toggledCheckBox(bool checked);
     void clickedLevelUp();
 
 public:

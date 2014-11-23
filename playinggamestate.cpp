@@ -1436,17 +1436,9 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
             g_layout->addWidget( new QLabel(tr("For avoiding traps")), row++, 1 );
         }
         g_layout->addWidget( addProfileCheckBox(profile_key_B_c), row++, 1 );
-        /*if( !smallscreen_c ) {
-            g_layout->addWidget( new QLabel(tr("")), row++, 1 );
-        }*/
     }
 
     int initial_level = player->getInitialLevel();
-    /*map<string, bool> is_enabled; // needed as we can't seem to check with isEnabled() at this stage (perhaps because GUI isn't yet created?)
-    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-        string key = (*iter).first;
-        is_enabled[key] = true;
-    }*/
     if( initial_level != 0 ) {
         // see which can be improved
         int n_levels = player->getLevel() - initial_level;
@@ -1454,7 +1446,7 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         int max_stat_inc = (n_levels+1)/3;
         max_stat_inc++;
         qDebug("max_stat_inc = %d", max_stat_inc);
-        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
             string key = (*iter).first;
             int initial_val = player->getInitialBaseProfile()->getIntProperty(key);
             int val = player->getBaseProfileIntProperty(key);
@@ -1462,15 +1454,12 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
             if( val - initial_val >= max_stat_inc ) {
                 // already increased to max
                 (*iter).second->setEnabled(false);
-                //is_enabled[key] = false;
             }
         }
 
         // check we haven't disabled too many!
         int n_enabled = 0;
-        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-            //string key = (*iter).first;
-            //if( is_enabled[key] ) {
+        for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
             if( (*iter).second->isEnabled() ) {
                 n_enabled++;
             }
@@ -1479,10 +1468,8 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         if( n_enabled < n_level_up_stats_c ) {
             // runtime workaround
             LOG("error, not enough available level up stats: %d vs %d\n", n_enabled, n_level_up_stats_c);
-            for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-                string key = (*iter).first;
+            for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
                 (*iter).second->setEnabled(true);
-                //is_enabled[key] = true;
             }
         }
     }
@@ -1491,11 +1478,9 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
     {
         int max_val = -1, min_val = -1;
         string min_key, max_key;
-        for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
             string key = (*iter).first;
             //qDebug("### check stat: %s", key.c_str());
-            //qDebug("enabled? %d", is_enabled[key]);
-            //if( !is_enabled[key] ) {
             if( !(*iter).second->isEnabled() ) {
                 continue;
             }
@@ -1512,13 +1497,13 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         if( min_val == max_val ) {
             // all the same, set some defaults
             int count = 0;
-            for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-                string key = (*iter).first;
-                if( !(*iter).second->isEnabled() ) {
+            for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+                QAbstractButton *check_box = (*iter).second;
+                if( !check_box->isEnabled() ) {
                     continue;
                 }
-                check_boxes[key]->setChecked(true);
-                selected.push_back(check_boxes[key]);
+                check_box->setChecked(true);
+                selected.push_back(check_box);
                 count++;
                 if( count == n_level_up_stats_c ) {
                     break;
@@ -1533,9 +1518,11 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
         }
     }
 
-    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-        QCheckBox *check_box = (*iter).second;
-        connect(check_box, SIGNAL(stateChanged(int)), this, SLOT(clickedCheckBox(int)));
+    for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QAbstractButton *check_box = (*iter).second;
+        //connect(check_box, SIGNAL(stateChanged(int)), this, SLOT(clickedCheckBox(int)));
+        connect(check_box, SIGNAL(toggled(bool)), this, SLOT(toggledCheckBox(bool)));
+        //connect(check_box, SIGNAL(clicked(bool)), this, SLOT(toggledCheckBox(bool)));
     }
 
     closeButton = new QPushButton(tr("Level Up!"));
@@ -1545,7 +1532,7 @@ LevelUpWindow::LevelUpWindow(PlayingGamestate *playing_gamestate) :
     connect(closeButton, SIGNAL(clicked()), this, SLOT(clickedLevelUp()));
 }
 
-QCheckBox *LevelUpWindow::addProfileCheckBox(const string &key) {
+QAbstractButton *LevelUpWindow::addProfileCheckBox(const string &key) {
     string long_string = getProfileLongString(key);
 #ifdef Q_OS_ANDROID
     // problem on Android that text overlaps with checkbox
@@ -1558,38 +1545,38 @@ QCheckBox *LevelUpWindow::addProfileCheckBox(const string &key) {
     return check_box;
 }
 
-void LevelUpWindow::clickedCheckBox(int state) {
-    qDebug("LevelUpWindow::clickedCheckBox(%d)", state);
+void LevelUpWindow::toggledCheckBox(bool checked) {
+    qDebug("LevelUpWindow::toggledCheckBox(%d)", checked);
     QObject *sender = this->sender();
     ASSERT_LOGGER( sender != NULL );
     // count how many now selected (includes this one)
     int count = 0;
-    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-        QCheckBox *check_box = (*iter).second;
-        if( check_box->checkState() == Qt::Checked ) {
+    for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QAbstractButton *check_box = (*iter).second;
+        if( check_box->isChecked() ) {
             count++;
         }
     }
     qDebug("    count = %d", count);
-    if( state == Qt::Unchecked ) {
+    if( !checked ) {
         // still have to check count, as this function is called when we uncheck a state (because there are too many), rather than the user unchecking
         ASSERT_LOGGER( count <= n_level_up_stats_c );
         if( count < n_level_up_stats_c ) {
             this->closeButton->setEnabled(false);
         }
         // remove from the selected list
-        for(vector<QCheckBox *>::iterator iter = selected.begin(); iter != selected.end(); ++iter) {
-            QCheckBox *check_box = *iter;
+        for(vector<QAbstractButton *>::iterator iter = selected.begin(); iter != selected.end(); ++iter) {
+            QAbstractButton *check_box = *iter;
             if( sender == check_box ) {
                 selected.erase(iter);
                 break;
             }
         }
     }
-    else if( state == Qt::Checked ) {
+    else {
         ASSERT_LOGGER( count > 0 );
         ASSERT_LOGGER( count <= n_level_up_stats_c+1 );
-        selected.push_back( static_cast<QCheckBox *>(sender) );
+        selected.push_back( static_cast<QAbstractButton *>(sender) );
         if( count >= n_level_up_stats_c ) {
             // can re-enable
             this->closeButton->setEnabled(true);
@@ -1597,9 +1584,9 @@ void LevelUpWindow::clickedCheckBox(int state) {
         if( count > n_level_up_stats_c ) {
             // need to unselect one!
             ASSERT_LOGGER( selected.size() >= n_level_up_stats_c+1 );
-            QCheckBox *check_box = selected.at( selected.size() - n_level_up_stats_c - 1 );
-            ASSERT_LOGGER( check_box->checkState() == Qt::Checked );
-            check_box->setCheckState(Qt::Unchecked);
+            QAbstractButton *check_box = selected.at( selected.size() - n_level_up_stats_c - 1 );
+            ASSERT_LOGGER( check_box->isChecked() );
+            check_box->setChecked(false);
         }
     }
 }
@@ -1609,9 +1596,9 @@ void LevelUpWindow::clickedLevelUp() {
     Character *player = playing_gamestate->getPlayer();
 
     int count = 0;
-    for(map<string, QCheckBox *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
-        QCheckBox *check_box = (*iter).second;
-        if( check_box->checkState() == Qt::Checked ) {
+    for(map<string, QAbstractButton *>::iterator iter = check_boxes.begin(); iter != check_boxes.end(); ++iter) {
+        QAbstractButton *check_box = (*iter).second;
+        if( check_box->isChecked() ) {
             count++;
             string key = (*iter).first;
             player->changeBaseProfileIntProperty(key, 1);
@@ -2991,7 +2978,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         if( !is_savegame ) {
             //this->player->initialiseHealth(600); // CHEAT
             //player->addGold( 1000 ); // CHEAT
-            //player->addXP(this, 96); // CHEAT
+            //player->addXP(this, 200); // CHEAT
         }
         if( !is_savegame && this->cheat_mode ) {
             this->c_quest_indx = cheat_start_level % this->quest_list.size();
