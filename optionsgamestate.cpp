@@ -103,7 +103,7 @@ void CharacterHelp::changedGameType(int index) {
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), portraitLabel(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathCheckBox(NULL),
+    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), portraitLabel(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathComboBox(NULL),
     nameLineEdit(NULL),
     load_list(NULL),
 #ifndef Q_OS_ANDROID
@@ -111,7 +111,7 @@ OptionsGamestate::OptionsGamestate() :
     soundSliderMusic(NULL),
     soundSliderEffects(NULL),
 #endif
-    lightingCheck(NULL),
+    lightingComboBox(NULL),
     cheat_mode(false), cheat_start_level(0)
 {
     try {
@@ -406,9 +406,9 @@ void OptionsGamestate::clickedStart() {
             label = new QLabel(tr("Difficulty: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
             difficultyComboBox = new QComboBox();
-    #ifdef Q_OS_ANDROID
+#ifdef Q_OS_ANDROID
             difficultyComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
-    #endif
+#endif
             difficultyComboBox->setFont(game_g->getFontBig());
             for(int i=0;i<N_DIFFICULTIES;i++) {
                 Difficulty test_difficulty = (Difficulty)i;
@@ -421,14 +421,17 @@ void OptionsGamestate::clickedStart() {
 
             label = new QLabel(tr("Permadeath: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
-    #ifdef Q_OS_ANDROID
-            permadeathCheckBox = new QCheckBox("        "); // needed for workaround due to Android bug
-            permadeathCheckBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
-    #else
-            permadeathCheckBox = new QCheckBox("");
-    #endif
-            permadeathCheckBox->setToolTip(tr("If checked, then once your player dies,\nyou won't be able to restore from a save game!"));
-            g_layout->addWidget(permadeathCheckBox, n_row, 1);
+            permadeathComboBox = new QComboBox();
+#ifdef Q_OS_ANDROID
+            difficultyComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
+            permadeathComboBox->setFont(game_g->getFontBig());
+            permadeathComboBox->addItem("Disabled");
+            permadeathComboBox->addItem("Enabled");
+            permadeathComboBox->setCurrentIndex(0);
+            permadeathComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            permadeathComboBox->setToolTip(tr("If enabled, then once your player dies,\nyou won't be able to restore from a save game!"));
+            g_layout->addWidget(permadeathComboBox, n_row, 1);
             n_row++;
         }
     }
@@ -492,7 +495,7 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(difficulty_id < (int)N_DIFFICULTIES);
     Difficulty difficulty = (Difficulty)difficulty_id;
 
-    bool permadeath = this->permadeathCheckBox->isChecked();
+    bool permadeath = this->permadeathComboBox->currentIndex() == 1;
 
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
@@ -697,16 +700,18 @@ void OptionsGamestate::clickedOptions() {
         n_row++;
 #endif
 
-        label = new QLabel(tr("Lighting (uncheck if too slow): "));
+        label = new QLabel(tr("Lighting (disable if too slow): "));
         g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+        lightingComboBox = new QComboBox();
 #ifdef Q_OS_ANDROID
-        lightingCheck = new QCheckBox("        "); // needed for workaround due to Android bug
-        lightingCheck->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // needed otherwise appears too small
-#else
-        lightingCheck = new QCheckBox("");
+        lightingComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
 #endif
-        lightingCheck->setChecked(game_g->isLightingEnabled());
-        g_layout->addWidget(lightingCheck, n_row, 1);
+        lightingComboBox->setFont(game_g->getFontBig());
+        lightingComboBox->addItem("Disabled");
+        lightingComboBox->addItem("Enabled");
+        lightingComboBox->setCurrentIndex(game_g->isLightingEnabled() ? 1 : 0);
+        lightingComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        g_layout->addWidget(lightingComboBox, n_row, 1);
         n_row++;
     }
 
@@ -745,7 +750,7 @@ void OptionsGamestate::clickedOptionsOkay() {
     game_g->updateSoundVolume("music_intro");
 #endif
 
-    bool new_lighting_enabled = lightingCheck->isChecked();
+    bool new_lighting_enabled = lightingComboBox->currentIndex() == 1;
     if( new_lighting_enabled != game_g->isLightingEnabled() ) {
         game_g->setLightingEnabled(new_lighting_enabled);
     }

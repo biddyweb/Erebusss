@@ -5,7 +5,6 @@ using std::vector;
 
 #include <QStackedWidget>
 #include <QComboBox>
-#include <QCheckBox>
 #include <QLabel>
 #include <QTextEdit>
 
@@ -30,7 +29,7 @@ class OptionsGamestate : public Gamestate {
     QLabel *portraitLabel;
     QComboBox *difficultyComboBox;
     //QButtonGroup *difficultyButtonGroup;
-    QCheckBox *permadeathCheckBox;
+    QComboBox *permadeathComboBox;
 
     QLineEdit *nameLineEdit;
 
@@ -42,7 +41,7 @@ class OptionsGamestate : public Gamestate {
     QSlider *soundSliderMusic;
     QSlider *soundSliderEffects;
 #endif
-    QCheckBox *lightingCheck;
+    QComboBox *lightingComboBox;
 
     bool cheat_mode;
     int cheat_start_level;
