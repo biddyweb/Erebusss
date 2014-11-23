@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<manifest android:installLocation="auto" xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="8" android:versionName="0.14" package="net.sourceforge.erebusrpg">
+<manifest android:installLocation="auto" xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="9" android:versionName="0.15" package="net.sourceforge.erebusrpg">
     <application android:label="@string/app_name" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:icon="@drawable/icon">
         <activity android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:screenOrientation="landscape" android:label="@string/app_name" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|locale|fontScale|keyboard|keyboardHidden|navigation" android:name="net.sourceforge.erebusrpg.ErebusActivity">
             <intent-filter>
