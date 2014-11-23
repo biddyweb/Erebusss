@@ -5802,6 +5802,17 @@ void PlayingGamestate::clickedOptions() {
     layout->addWidget(saveButton);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(clickedSave()));
 
+#ifndef Q_OS_ANDROID
+    // Because Qt's fullscreen is a bit unusual, it's useful to have a built in option to minimise to desktop
+    // This is especially important for Windows 8 tablets, where there is no way to minimise a fullscrreen Qt application
+    QPushButton *minimiseButton = new QPushButton(tr("Minimise to desktop"));
+    game_g->initButton(minimiseButton);
+    minimiseButton->setFont(game_g->getFontBig());
+    minimiseButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(minimiseButton);
+    connect(minimiseButton, SIGNAL(clicked()), game_g->getMainWindow(), SLOT(showMinimized()));
+#endif
+
     QPushButton *closeButton = new QPushButton(tr("Back to game"));
     game_g->initButton(closeButton);
     closeButton->setShortcut(QKeySequence(Qt::Key_Escape));
