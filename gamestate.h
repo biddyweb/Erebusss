@@ -14,7 +14,7 @@ public:
     }
     virtual void render() {
     }
-    virtual void activate(bool, bool) {
+    virtual void activate(bool active, bool newly_paused) {
     }
     /*virtual void mouseClick(int m_x, int m_y) {
     }*/
