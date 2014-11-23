@@ -1,4 +1,4 @@
-Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. Windows and Linux use SFML 2 ( http://www.sfml-dev.org/ ) for the audio. The Linux version can also be built more easily from the command line. Qt version 4.7.3 or higher is required.
+Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. Windows and Linux use SFML 2 ( http://www.sfml-dev.org/ ) for the audio. The Linux version can also be built more easily from the command line. Qt version 4.8.5 or higher is required.
 
 Linux
 =====
@@ -33,7 +33,7 @@ This means you can launch erebus from the application menu.
 
 The Linux version has been tested on Ubuntu 14.04 64-bit. This also works for the Open Pandora.
 
-Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to have version 4.6.3 of libqt4-dev, where as Erebus requires 4.7.3 or later. You need to download from the testing or unstable repositories. This should be fixed in version 7.0 "wheezy".
+Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to have version 4.6.3 of libqt4-dev, where as Erebus requires 4.8.5 or later. You need to download from the testing or unstable repositories. This should be fixed in version 7.0 "wheezy".
 
 Windows
 =======
@@ -50,7 +50,7 @@ You also need SFML 2, which should be installed as follows:
 Android
 =======
 
-Use necessitas to compile for Android ( http://necessitas.kde.org/ ). This has been tested with Necessitas alpha 4 (also referred to as "beta 1"), compiled on Windows 8. You need to compile against Android API target of at least 10 (due to use of Open SLES for sound).
+The Android version is compiled using Qt 5.3.1.
 
 Symbian
 =======
@@ -67,6 +67,7 @@ History
 
 Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
 
+0.15 - Android version now compiled using Qt 5.3.1 rather than Necessitas.
 0.11 - Symbian port dropped. Switched from using Phonon to SFML for audio. Dependency on QtWebKit removed. Windows version now compiled with Qt 4.8.5.
 0.6 - Added "make install" support for Linux. Also ported to Pandora.
 0.2 - Switched to using Necessitas alpha 4 for Android.
@@ -89,4 +90,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 24 November 2013
+Mark Harman 23 November 2014
