@@ -394,7 +394,7 @@ void OptionsGamestate::clickedStart() {
             g_layout->addWidget(nameLineEdit, n_row, 1);
             n_row++;
             nameLineEdit->setFocus();
-            nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard, and makes Swype crash); probably useful on other platforms
+            nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard - problem that pressing "Finished" we don't pick up latest text, and makes Swype crash); probably useful on other platforms
             nameLineEdit->selectAll();
             /*if( options_page_index == n_options_pages-1 ) {
                 connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
