@@ -2909,6 +2909,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             turboButton->setShortcut(QKeySequence(Qt::Key_T));
             turboButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             turboButton->setIconSize(QSize(icon_size, icon_size));
+            turboButton->setStyleSheet("QPushButton:checked {color: black; background-color: coral;}"); // needed as Android default style isn't very clear whether a button is enabled or not
             turboButton->setMinimumSize(button_size, button_size);
             turboButton->setMaximumSize(button_size, button_size);
 #ifndef Q_OS_ANDROID
