@@ -433,6 +433,24 @@ void OptionsGamestate::clickedStart() {
             permadeathComboBox->setToolTip(tr("If enabled, then once your player dies,\nyou won't be able to restore from a save game!"));
             g_layout->addWidget(permadeathComboBox, n_row, 1);
             n_row++;
+
+            this->portraitLabel = new QLabel();
+            {
+                string player = this->characterComboBox->currentText().toStdString();
+                Character *character = game_g->createPlayer(player, "");
+                QPixmap pixmap = game_g->getPortraitImage(character->getPortrait());
+                int height = QApplication::desktop()->availableGeometry().height();
+                int max_pic_height = height/2;
+                qDebug("pixmap height %d , height %d , max_pic_height %d", pixmap.height(), height, max_pic_height);
+                if( pixmap.height() > max_pic_height ) {
+                    qDebug("    scale...");
+                    pixmap = pixmap.scaledToHeight(max_pic_height, Qt::SmoothTransformation);
+                }
+                this->portraitLabel->setPixmap(pixmap);
+                delete character;
+            }
+            g_layout->addWidget(portraitLabel, n_row, 1, Qt::AlignLeft);
+            n_row++;
         }
     }
 
