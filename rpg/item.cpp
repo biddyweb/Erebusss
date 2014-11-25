@@ -127,7 +127,7 @@ string Item::getProfileBonusDescriptionInt(const string &key) const {
         return "";
     }
     stringstream str;
-    str << "<b>" << key << " Bonus</b>: " << value << "<br/>";
+    str << "<br/><b>" << key << " Bonus</b>: " << value;
     return str.str();
 }
 
@@ -137,7 +137,7 @@ string Item::getProfileBonusDescriptionFloat(const string &key) const {
         return "";
     }
     stringstream str;
-    str << "<b>" << key << " Bonus</b>: " << value << "<br/>";
+    str << "<br/><b>" << key << " Bonus</b>: " << value;
     return str.str();
 }
 
@@ -147,63 +147,61 @@ string Item::getDetailedDescription(const Character *player) const {
     str << "<h2>" << this->getName() << "</h2>";
     str << "<p>";
     if( this->getType() == ITEMTYPE_WEAPON ) {
-        str << "<b>Type:</b> Weapon<br/>";
+        str << "<b>Type:</b> Weapon";
         const Weapon *weapon = static_cast<const Weapon *>(this);
         int damageX = 0, damageY = 0, damageZ = 0;
         weapon->getDamage(&damageX, &damageY, &damageZ);
-        str << "<b>Damage:</b> " << getDiceRollString(damageX, damageY, damageZ) << "<br/>";
+        str << "<br/><b>Damage:</b> " << getDiceRollString(damageX, damageY, damageZ);
         if( weapon->getUnholyBonus() != 0 ) {
             int mod_damageZ = damageZ + weapon->getUnholyBonus();
-            str << "<b>Damage vs Unholy Creatures:</b> " << getDiceRollString(damageX, damageY, mod_damageZ) << "<br/>";
+            str << "<br/><b>Damage vs Unholy Creatures:</b> " << getDiceRollString(damageX, damageY, mod_damageZ);
         }
-        str << "<b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No") << "<br/>";
+        str << "<br/><b>Two Handed?:</b> " << (weapon->isTwoHanded() ? "Yes" : "No");
         if( weapon->getMinStrength() > 0 ) {
-            str << "<b>Min Strength:</b> " << weapon->getMinStrength();
+            str << "<br/><b>Min Strength:</b> " << weapon->getMinStrength();
             if( weapon->getMinStrength() > player->getProfileIntProperty(profile_key_S_c) ) {
                 str << "<font color=\"#ff0000\"> (You are too weak to use this weapon)</font>";
             }
-            str << "<br/>";
         }
         if( weapon->getWeaponType() == Weapon::WEAPONTYPE_HAND ) {
-            str << "<b>Weapon Type:</b> Hand to Hand<br/>";
+            str << "<br/><b>Weapon Type:</b> Hand to Hand";
         }
         else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_RANGED ) {
-            str << "<b>Weapon Type:</b> Ranged<br/>";
-            str << "<b>Ammo:</b> " << weapon->getAmmoKey() << "<br/>";
+            str << "<br/><b>Weapon Type:</b> Ranged";
+            str << "<br/><b>Ammo:</b> " << weapon->getAmmoKey();
         }
         else if( weapon->getWeaponType() == Weapon::WEAPONTYPE_THROWN ) {
-            str << "<b>Weapon Type:</b> Thrown<br/>";
+            str << "<br/><b>Weapon Type:</b> Thrown";
         }
     }
     else if( this->getType() == ITEMTYPE_SHIELD ) {
-        str << "<b>Type:</b> Shield<br/>";
+        str << "<b>Type:</b> Shield";
         //const Shield *shield = static_cast<const Shield *>(this);
     }
     else if( this->getType() == ITEMTYPE_ARMOUR ) {
-        str << "<b>Type:</b> Armour<br/>";
+        str << "<b>Type:</b> Armour";
         const Armour *armour = static_cast<const Armour *>(this);
         if( armour->getMinStrength() > 0 ) {
-            str << "<b>Min Strength:</b> " << armour->getMinStrength();
+            str << "<br/><b>Min Strength:</b> " << armour->getMinStrength();
             if( armour->getMinStrength() > player->getProfileIntProperty(profile_key_S_c) ) {
                 str << "<font color=\"#ff0000\"> (You are too weak to wear this armour)</font>";
             }
-            str << "<br/>";
         }
     }
     else if( this->getType() == ITEMTYPE_RING ) {
-        str << "<b>Type:</b> Ring<br/>";
+        str << "<b>Type:</b> Ring";
         //const Ring *ring = static_cast<const Ring *>(this);
     }
     else if( this->getType() == ITEMTYPE_AMMO ) {
-        str << "<b>Type:</b> Ammo<br/>";
+        str << "<b>Type:</b> Ammo";
         const Ammo *ammo = static_cast<const Ammo *>(this);
-        str << "<b>Base Ammo Type:</b> " << ammo->getAmmoType() << "<br/>";
-        str << "<b>Amount:</b> " << ammo->getAmount() << "<br/>";
+        str << "<br/><b>Base Ammo Type:</b> " << ammo->getAmmoType();
+        str << "<br/><b>Amount:</b> " << ammo->getAmount();
     }
-    str << "<b>Weight: </b>" << this->getWeight() << "<br/>";
-    str << "<b>Magical: </b>" << (this->isMagical() ? "Yes" : "No") << "<br/>";
+    str << "<br/><b>Weight: </b>" << this->getWeight();
+    str << "<br/><b>Magical: </b>" << (this->isMagical() ? "Yes" : "No");
     if( this->getRating() > 0 ) {
-        str << "<b>Rating:</b> " << this->getRating() << "<br/>";
+        str << "<br/><b>Rating:</b> " << this->getRating();
     }
     str << this->getProfileBonusDescriptionInt(profile_key_FP_c);
     str << this->getProfileBonusDescriptionInt(profile_key_BS_c);
@@ -222,7 +220,9 @@ string Item::getDetailedDescription(const Character *player) const {
         //desc.replace(" ", "&nbsp;"); // commented out as causes text to no longer word-wrap!
         desc.replace("\n", "<br/>");
         str << desc.toStdString();*/
+        str << "<p>";
         str << this->getDescription();
+        str << "</p>";
         /*str << "initial text<br/>initial text with new line<br/>";
         //str << this->getDescription();
         QString desc = this->getDescription().c_str();

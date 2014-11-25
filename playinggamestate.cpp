@@ -3511,6 +3511,10 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
 
         // must be done last
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
+        // get rid of initial whitespace
+        while( description.length() > 0 && description.at(0).isSpace() ) {
+            description = description.mid(1);
+        }
         item->setDescription(description.toStdString());
     }
     return item;
