@@ -982,7 +982,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                     }
                     else if( *exit_down == NULL ) {
                         // also place stairs down, if not already found
-                        name = "Stairs";
+                        name = "Stairs down";
                         image_name = "stairsdown_indoors";
                         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
                         Scenery *scenery_stairs_down = new Scenery(name, image_name, size_w, size_h, visual_h, false, 0.0f);
@@ -1225,7 +1225,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     }
 
     if( first ) {
-        string name = "Stairs";
+        string name = "Stairs up";
         string image_name = "stairsup_indoors";
         float size_w = 0.0f, size_h = 0.0f, visual_h = 0.0f;
         playing_gamestate->querySceneryImage(&size_w, &size_h, &visual_h, image_name, true, 1.0f, 0.0f, 0.0f, false, 0.0f);
@@ -1287,8 +1287,13 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         location->setWallImageName(wall_name);
 
         vector<Seed> seeds;
-        if( rollDice(1, 2, 0) == 1 ) {
+        bool passageway_start_type = rollDice(1, 2, 0) == 1;
+        //passageway_start_type = false; // test
+        //passageway_start_type = true; // test
+        if( passageway_start_type ) {
             Direction4 direction = rollDice(1, 2, 0) == 1 ? DIRECTION4_EAST : DIRECTION4_SOUTH;
+            //direction = DIRECTION4_SOUTH; // test
+            LOG("passageway start type, direction: %d\n", direction);
             Vector2D start_pos(100.0f, 100.0f);
             start_pos -= directionFromEnum(direction) * 100.0f;
             Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, direction);
@@ -1298,6 +1303,9 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         else {
             Vector2D start_pos(100.0f, 100.0f);
             Direction4 direction = (Direction4)rollDice(1, 4, 0);
+            //direction = DIRECTION4_SOUTH; // test
+            //direction = DIRECTION4_EAST; // test
+            LOG("room start type, direction: %d\n", direction);
             Seed seed(Seed::TYPE_X_ROOM, start_pos, direction);
             seeds.push_back(seed);
             *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
