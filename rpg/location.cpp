@@ -1178,7 +1178,7 @@ void Location::createBoundariesForScenery() {
             Vector2D pvec = boundary.getPoint(i);
             if( this->findFloorRegionAt(pvec) == NULL ) {
                 LOG("can't find floor region for scenery %s , %d th boundary point at: %f, %f\n", scenery->getName().c_str(), i, pvec.x, pvec.y);
-                LOG("scenery at at %f, %f\n", scenery->getX(), scenery->getY());
+                LOG("scenery at %f, %f\n", scenery->getX(), scenery->getY());
                 throw string("can't find floor region for scenery boundary point");
             }
         }
