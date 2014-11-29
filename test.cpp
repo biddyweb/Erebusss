@@ -128,6 +128,13 @@ Item *Test::checkFindSingleItem(Scenery **scenery_owner, Character **character_o
 }
 
 void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &location_key_name, const string &location_doors_name, const string &key_name, int n_doors, bool key_owned_by_scenery, bool key_owned_by_npc, bool key_owned_by_player) {
+    LOG("location_key_name: %s\n", location_key_name.c_str());
+    LOG("location_doors_name: %s\n", location_doors_name.c_str());
+    LOG("key_name: %s\n", key_name.c_str());
+    LOG("n_doors: %d\n", n_doors);
+    LOG("key_owned_by_scenery: %d\n", key_owned_by_scenery);
+    LOG("key_owned_by_npc: %d\n", key_owned_by_npc);
+    LOG("key_owned_by_player: %d\n", key_owned_by_player);
     if( key_owned_by_scenery && ( key_owned_by_npc || key_owned_by_player ) ) {
         throw string("test error: key can't be owned by scenery and npc/player");
     }
@@ -144,6 +151,7 @@ void Test::checkLockedDoors(PlayingGamestate *playing_gamestate, const string &l
     }
     set<Scenery *> scenerys = location_doors->getSceneryUnlockedBy(key_name);
     if( scenerys.size() != n_doors ) {
+        LOG("scenerys size: %d\n", scenerys.size());
         throw string("unexpected number of locked scenerys");
     }
     for(set<Scenery *>::iterator iter = scenerys.begin(); iter != scenerys.end(); ++iter) {
@@ -395,7 +403,7 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         checkLockedDoors(playing_gamestate, "Dungeons near Axbury", "Dungeons near Axbury", "Axbury Dungeon Key", 2, false, true, false);
         checkLockedDoors(playing_gamestate, "Upper Level, Wentbridge Fort", "Ground Level, Wentbridge Fort", "Wentbridge Dungeon Key", 1, true, false, false);
         checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false, false);
-        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons Lower Level, Wentbridge Fort", "Wentbridge Cell Key", 1, true, false, false);
+        checkLockedDoors(playing_gamestate, "Dungeons, Wentbridge Fort", "Dungeons Lower Level, Wentbridge Fort", "Wentbridge Cell Key", 3, true, false, false);
     }
     else if( test_id == TEST_LOADSAVE_QUEST_1_COMPLETED ) {
         // check quest is completed
