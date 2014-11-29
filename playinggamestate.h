@@ -453,6 +453,7 @@ public:
     void querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h);
     void loadQuest(const QString &filename, bool is_savegame);
     void createRandomQuest();
+    void createRandomQuest(bool force_start, bool passageway_start_type, Direction4 start_direction);
     bool saveGame(const QString &filename, bool already_fullpath);
 
     virtual void quitGame();

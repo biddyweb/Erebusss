@@ -1237,7 +1237,7 @@ void LocationGenerator::exploreFromSeed(Scenery **exit_down, Scenery **exit_up, 
     }
 }
 
-Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels) {
+Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels, bool force_start, bool passageway_start_type, Direction4 start_direction) {
     LOG("LocationGenerator::generateLocation create level %d\n", level);
     stringstream str;
     str << "Level " << (level+1);
@@ -1287,28 +1287,35 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
         location->setWallImageName(wall_name);
 
         vector<Seed> seeds;
-        bool passageway_start_type = rollDice(1, 2, 0) == 1;
+        LOG("force_start? %d\n", force_start);
+        if( !force_start )
+            passageway_start_type = rollDice(1, 2, 0) == 1;
         //passageway_start_type = false; // test
         //passageway_start_type = true; // test
         if( passageway_start_type ) {
-            Direction4 direction = rollDice(1, 2, 0) == 1 ? DIRECTION4_EAST : DIRECTION4_SOUTH;
+            if( !force_start )
+                start_direction = rollDice(1, 2, 0) == 1 ? DIRECTION4_EAST : DIRECTION4_SOUTH;
             //direction = DIRECTION4_SOUTH; // test
-            LOG("passageway start type, direction: %d\n", direction);
+            LOG("passageway start type, direction: %d\n", start_direction);
+            if( start_direction == DIRECTION4_NORTH || start_direction == DIRECTION4_WEST ) {
+                throw string("start direction north/south not allowed with passageway start type");
+            }
             Vector2D start_pos(100.0f, 100.0f);
-            start_pos -= directionFromEnum(direction) * 100.0f;
-            Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, direction);
+            start_pos -= directionFromEnum(start_direction) * 100.0f;
+            Seed seed(Seed::TYPE_PASSAGEWAY_PASSAGEWAY, start_pos, start_direction);
             seeds.push_back(seed);
-            *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
+            *player_start = Vector2D(start_pos + directionFromEnum(start_direction) * 1.5f);
         }
         else {
             Vector2D start_pos(100.0f, 100.0f);
-            Direction4 direction = (Direction4)rollDice(1, 4, 0);
+            if( !force_start )
+                start_direction = (Direction4)rollDice(1, 4, 0);
             //direction = DIRECTION4_SOUTH; // test
             //direction = DIRECTION4_EAST; // test
-            LOG("room start type, direction: %d\n", direction);
-            Seed seed(Seed::TYPE_X_ROOM, start_pos, direction);
+            LOG("room start type, direction: %d\n", start_direction);
+            Seed seed(Seed::TYPE_X_ROOM, start_pos, start_direction);
             seeds.push_back(seed);
-            *player_start = Vector2D(start_pos + directionFromEnum(direction) * 1.5f);
+            *player_start = Vector2D(start_pos + directionFromEnum(start_direction) * 1.5f);
         }
 
         vector<Rect2D> floor_regions_rects;

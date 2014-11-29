@@ -5276,6 +5276,10 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
 }
 
 void PlayingGamestate::createRandomQuest() {
+    createRandomQuest(false, false, DIRECTION4_NORTH);
+}
+
+void PlayingGamestate::createRandomQuest(bool force_start, bool passageway_start_type, Direction4 start_direction) {
     LOG("PlayingGamestate::createRandomQuest()\n");
     ASSERT_LOGGER(gameType == GAMETYPE_RANDOM);
 
@@ -5422,7 +5426,7 @@ void PlayingGamestate::createRandomQuest() {
 
         Vector2D player_start;
         Scenery *exit_down = NULL, *exit_up = NULL;
-        Location *location = LocationGenerator::generateLocation(&exit_down, &exit_up, this, &player_start, npc_tables, level, n_levels_c);
+        Location *location = LocationGenerator::generateLocation(&exit_down, &exit_up, this, &player_start, npc_tables, level, n_levels_c, force_start, passageway_start_type, start_direction);
         this->quest->addLocation(location);
         if( level == 0 ) {
             first_player_start = player_start;

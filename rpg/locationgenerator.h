@@ -15,13 +15,6 @@ class Scenery;
 class Item;
 class PlayingGamestate;
 
-enum Direction4 {
-    DIRECTION4_NORTH = 0,
-    DIRECTION4_EAST = 1,
-    DIRECTION4_SOUTH = 2,
-    DIRECTION4_WEST = 3
-};
-
 class Seed {
 public:
     enum Type {
@@ -173,5 +166,5 @@ class LocationGenerator {
     static void exploreFromSeed(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Location *location, const Seed &seed, vector<Seed> *seeds, vector<Rect2D> *floor_regions_rects, bool first, int level, int n_levels, LocationGeneratorInfo *generator_info);
 
 public:
-    static Location *generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels);
+    static Location *generateLocation(Scenery **exit_down, Scenery **exit_up, PlayingGamestate *playing_gamestate, Vector2D *player_start, const map<string, NPCTable *> &npc_tables, int level, int n_levels, bool force_start, bool passageway_start_type, Direction4 start_direction);
 };

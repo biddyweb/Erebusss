@@ -59,6 +59,12 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_PERF_NUDGE_14 - performance test for nudging: clicking near 90 degree corner
   TEST_LOADSAVEQUEST_n - tests that we can load the nth quest, then test saving, then test loading the save game; also some additional checks specific to each quest
   TEST_LOADSAVERANDOMQUEST_0 - tests that we can create a random quest, then test saving, then test loading the save game
+  TEST_LOADSAVERANDOMQUEST_1 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with passageway, direction east
+  TEST_LOADSAVERANDOMQUEST_2 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with passageway, direction south
+  TEST_LOADSAVERANDOMQUEST_3 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with room, direction north
+  TEST_LOADSAVERANDOMQUEST_4 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with room, direction east
+  TEST_LOADSAVERANDOMQUEST_5 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with room, direction south
+  TEST_LOADSAVERANDOMQUEST_6 - as TEST_LOADSAVERANDOMQUEST_0, but forces to start with room, direction west
   TEST_MEMORYQUEST_n - loads the nth quest, forces all NPCs and scenery to be instantiated, and checks the memory usage (we do this as a separate test, due to forcing all images to be loaded)
   TEST_LOADSAVE_QUEST_1_COMPLETED - test for when 1st quest is completed, and door unlocked
   TEST_LOADSAVE_ACTION_LAST_TIME_BUG - tests load/save/load cycle for _test_savegames/action_last_time_bug.xml (this protects against a bug where we were writing out invalid html for the action_last_time attribute for Scenery; in this case, the save game file is valid
@@ -1587,7 +1593,7 @@ void Test::runTest(const string &filename, int test_id) {
             score = ((double)timer.elapsed());
             score /= 1000.0;
         }
-        else if( test_id == TEST_LOADSAVERANDOMQUEST_0 ) {
+        else if( test_id == TEST_LOADSAVERANDOMQUEST_0 || test_id == TEST_LOADSAVERANDOMQUEST_1 || test_id == TEST_LOADSAVERANDOMQUEST_2 || test_id == TEST_LOADSAVERANDOMQUEST_3 || test_id == TEST_LOADSAVERANDOMQUEST_4 || test_id == TEST_LOADSAVERANDOMQUEST_5 || test_id == TEST_LOADSAVERANDOMQUEST_6 ) {
             // load, save, load
             QElapsedTimer timer;
             timer.start();
@@ -1596,7 +1602,40 @@ void Test::runTest(const string &filename, int test_id) {
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_RANDOM, "Warrior", "name", false, false, 0);
             game_g->setGamestate(playing_gamestate);
 
-            playing_gamestate->createRandomQuest();
+            bool force_start = false;
+            bool passageway_start_type = false;
+            Direction4 start_direction = DIRECTION4_NORTH;
+            if( test_id == TEST_LOADSAVERANDOMQUEST_1 ) {
+                force_start = true;
+                passageway_start_type = true;
+                start_direction = DIRECTION4_EAST;
+            }
+            else if( test_id == TEST_LOADSAVERANDOMQUEST_2 ) {
+                force_start = true;
+                passageway_start_type = true;
+                start_direction = DIRECTION4_SOUTH;
+            }
+            else if( test_id == TEST_LOADSAVERANDOMQUEST_3 ) {
+                force_start = true;
+                passageway_start_type = false;
+                start_direction = DIRECTION4_NORTH;
+            }
+            else if( test_id == TEST_LOADSAVERANDOMQUEST_4 ) {
+                force_start = true;
+                passageway_start_type = false;
+                start_direction = DIRECTION4_EAST;
+            }
+            else if( test_id == TEST_LOADSAVERANDOMQUEST_5 ) {
+                force_start = true;
+                passageway_start_type = false;
+                start_direction = DIRECTION4_SOUTH;
+            }
+            else if( test_id == TEST_LOADSAVERANDOMQUEST_6 ) {
+                force_start = true;
+                passageway_start_type = false;
+                start_direction = DIRECTION4_WEST;
+            }
+            playing_gamestate->createRandomQuest(force_start, passageway_start_type, start_direction);
             if( playing_gamestate->getGameType() != GAMETYPE_RANDOM ) {
                 throw string("expected GAMETYPE_RANDOM");
             }

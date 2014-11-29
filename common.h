@@ -24,3 +24,10 @@ enum Difficulty {
     DIFFICULTY_HARD = 2,
     N_DIFFICULTIES = 3
 };
+
+enum Direction4 {
+    DIRECTION4_NORTH = 0,
+    DIRECTION4_EAST = 1,
+    DIRECTION4_SOUTH = 2,
+    DIRECTION4_WEST = 3
+};
