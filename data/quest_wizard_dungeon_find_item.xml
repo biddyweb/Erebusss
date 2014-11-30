@@ -89,8 +89,9 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 <scenery name="Door" image_name="door_wood_n" x="32.5" y="13.95" w="1.0" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <floorregion shape="rect" rect_x="33.0" rect_y="10.0" rect_w="8.0" rect_h="1.0" />
 
-<scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="0.9999" h="7.9999" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
-<scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="7.9999" h="0.9999" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="1500"/>
+<!-- should be more than E_TOL_LINEAR away from adjacent floorregions, so width/height must be reduced by more than 2*E_TOL_LINEAR -->
+<scenery name="Poison Fog" image_name="fog_red" x="32.5" y="10.0" w="0.996" h="7.996" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="2000"/>
+<scenery name="Poison Fog" image_name="fog_red" x="37.0" y="10.5" w="7.996" h="0.996" blocking="false" block_visibility="false" opacity="0.6" draw_type="floating" action_type="harm_player" action_value="1" action_delay="1500"/>
 
 <!--eastern rooms, goblins-->
     <floorregion shape="rect" rect_x="37.0" rect_y="3.5" rect_w="0.5" rect_h="1.0" />
@@ -482,7 +483,7 @@ This painting is titled, "The Fortress".
 <!--<player_start x="21.5" y="11.5"/>-->
 
 <!--room behind mirror door-->
-<scenery name="Door" image_name="door_mirror" x="23.4999" y="11.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
+<scenery name="Door" image_name="door_mirror" x="23.5" y="11.5" w="0.2" h="1.0" blocking="true" block_visibility="true" door="true"
     locked="true" unlocked_by_template="Hand Mirror" locked_silent="true" locked_text="none" unlock_text="The mirror shatters before you!"
     />
 

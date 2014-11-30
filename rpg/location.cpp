@@ -629,6 +629,12 @@ int Location::getWanderingMonsterRestChance(const Character *player) const {
 }
 
 void Location::addFloorRegion(FloorRegion *floorRegion) {
+    Vector2D top_left = floorRegion->getTopLeft();
+    Vector2D bottom_right = floorRegion->getTopLeft();
+    // floor region should be within sensible limits - important for floating point precision
+    if( top_left.x < -E_TOL_LINEAR || bottom_right.x > E_TOL_LARGE || top_left.y < -E_TOL_LINEAR || bottom_right.y > E_TOL_LARGE ) {
+        throw string("floor region outside of allowed range");
+    }
     this->floor_regions.push_back(floorRegion);
 }
 

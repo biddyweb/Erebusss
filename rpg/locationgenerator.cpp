@@ -175,10 +175,22 @@ void LocationGenerator::exploreFromSeedPassagewayPassageway(Scenery **exit_up, P
             rect_size = Vector2D(passage_width, passage_length);
         }
         else if( seed.dir == DIRECTION4_EAST ) {
+            if( seed.pos.x - passage_length >= E_TOL_LARGE ) {
+                length_ok = false;
+            }
+            if( seed.pos.x - (passage_length+passage_width) >= E_TOL_LARGE ) {
+                room_for_junction = false;
+            }
             rect_pos = Vector2D(seed.pos.x, seed.pos.y - passage_hwidth);
             rect_size = Vector2D(passage_length, passage_width);
         }
         else if( seed.dir == DIRECTION4_SOUTH ) {
+            if( seed.pos.y + passage_length >= E_TOL_LARGE ) {
+                length_ok = false;
+            }
+            if( seed.pos.y + (passage_length+passage_width) >= E_TOL_LARGE ) {
+                room_for_junction = false;
+            }
             rect_pos = Vector2D(seed.pos.x - passage_hwidth, seed.pos.y);
             rect_size = Vector2D(passage_width, passage_length);
         }
@@ -437,7 +449,11 @@ void LocationGenerator::exploreFromSeedRoomPassageway(Location *location, const 
     Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
     if( door_rect.getX() < 0.0f )
         return;
+    if( door_rect.getX() + door_rect.getWidth() >= E_TOL_LARGE )
+        return;
     if( door_rect.getY() < 0.0f )
+        return;
+    if( door_rect.getY() + door_rect.getHeight() >= E_TOL_LARGE )
         return;
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
@@ -644,7 +660,11 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
     Rect2D door_rect(door_centre - door_size*0.5f, door_centre + door_size*0.5f);
     if( door_rect.getX() < 0.0f )
         return;
+    if( door_rect.getX() + door_rect.getWidth() >= E_TOL_LARGE )
+        return;
     if( door_rect.getY() < 0.0f )
+        return;
+    if( door_rect.getY() + door_rect.getHeight() >= E_TOL_LARGE )
         return;
     bool collides_door = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, &seed.ignore_rects, door_rect, 1.0f);
     if( !collides_door ) {
@@ -709,7 +729,11 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
         Rect2D room_rect(room_centre - Vector2D(0.5f*room_size_w, 0.5f*room_size_h), room_centre + Vector2D(0.5f*room_size_w, 0.5f*room_size_h));
         if( room_rect.getX() < 0.0f )
             return;
+        if( room_rect.getX() + room_rect.getWidth() >= E_TOL_LARGE )
+            return;
         if( room_rect.getY() < 0.0f )
+            return;
+        if( room_rect.getY() + room_rect.getHeight() >= E_TOL_LARGE )
             return;
         bool collides_room = LocationGenerator::collidesWithFloorRegions(floor_regions_rects, NULL, room_rect, 1.0f);
         if( !collides_room ) {
@@ -1046,7 +1070,7 @@ void LocationGenerator::exploreFromSeedXRoom(Scenery **exit_down, PlayingGamesta
                 }
                 else if( r <= 70 ) {
                     scenery_name = "grass";
-                    scenery_size = 1.0f;
+                    scenery_size = 0.9f; // should be less than 1.0f, so that we don't risk being aligned with the edge of the floorregion
                 }
                 else if( r <= 75 ) {
                     scenery_name = "plant";

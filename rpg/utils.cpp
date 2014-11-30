@@ -146,7 +146,7 @@ Vector2D Polygon2D::findCentre() const {
 }
 
 bool Polygon2D::pointInside(Vector2D pvec) const {
-    if( pvec.x < this->top_left.x || pvec.x > this->bottom_right.x || pvec.y < this->top_left.y || pvec.y > this->bottom_right.y ) {
+    if( pvec.x < this->top_left.x - E_TOL_LINEAR || pvec.x > this->bottom_right.x + E_TOL_LINEAR || pvec.y < this->top_left.y - E_TOL_LINEAR || pvec.y > this->bottom_right.y + E_TOL_LINEAR ) {
         return false;
     }
     if( this->getNPoints() == 0 ) {
@@ -157,10 +157,24 @@ bool Polygon2D::pointInside(Vector2D pvec) const {
         Vector2D pi = points.at(i);
         Vector2D pj = points.at(j);
         // first exclude case where the pvec lies on the polygon boundary
-        if( (pvec.x-pi.x)*(pj.y-pi.y) == (pj.x-pi.x)*(pvec.y-pi.y) ) {
+        /*if( (pvec.x-pi.x)*(pj.y-pi.y) == (pj.x-pi.x)*(pvec.y-pi.y) ) {
             // lies on line, but need to test extent
             if( (pvec.x >= pi.x && pvec.x <= pj.x) || (pvec.x >= pj.x && pvec.x <= pi.x) ) {
                 if( (pvec.y >= pi.y && pvec.y <= pj.y) || (pvec.y >= pj.y && pvec.y <= pi.y) ) {
+                    c = true;
+                    break;
+                }
+            }
+        }*/
+        // now do a tolerant check
+        Vector2D line_dir = pj - pi;
+        line_dir.normalise();
+        float dist = pvec.distFromLine(pi, line_dir);
+        //LOG("### %f %f from %f %f to %f %f : dist %f\n", pvec.x, pvec.y, pi.x, pi.y, pj.x, pj.y, dist);
+        if( dist <= E_TOL_LINEAR ) {
+            // lies on line, but need to test extent
+            if( (pvec.x >= pi.x - E_TOL_LINEAR && pvec.x <= pj.x + E_TOL_LINEAR) || (pvec.x >= pj.x - E_TOL_LINEAR && pvec.x <= pi.x + E_TOL_LINEAR) ) {
+                if( (pvec.y >= pi.y - E_TOL_LINEAR && pvec.y <= pj.y + E_TOL_LINEAR) || (pvec.y >= pj.y - E_TOL_LINEAR && pvec.y <= pi.y + E_TOL_LINEAR) ) {
                     c = true;
                     break;
                 }

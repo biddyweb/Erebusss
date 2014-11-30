@@ -17,7 +17,10 @@ using std::string;
 
 const float E_TOL_MACHINE = 1.0e-12f;
 const float E_TOL_ANGULAR = 1.0e-6f;
-const float E_TOL_LINEAR = 1.0e-4f;
+// We want to allow areas of size ~100s, but floats may only have 6 significant figures, so minimum precision is 1000/1.0e6.
+// See TEST_LOADSAVERANDOMQUEST_* for floating point issues, 1.0e-4 was too small.
+const float E_TOL_LARGE = 1000.0f;
+const float E_TOL_LINEAR = 1.0e-3f;
 
 class Vector2D {
 public:
