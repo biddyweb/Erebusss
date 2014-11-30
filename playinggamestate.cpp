@@ -1852,7 +1852,6 @@ void SaveGameWindow::requestNewSaveGame() {
     layout->addWidget(edit);
     this->edit->setFocus();
     this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard - problem that pressing "Finished" we don't pick up latest text, and makes Swype crash); probably useful on other platforms
-    connect(this->edit, SIGNAL(returnPressed()), this, SLOT(clickedSaveNew()));
 
     QPushButton *saveButton = new QPushButton(tr("Save game"));
     game_g->initButton(saveButton);
@@ -1928,6 +1927,12 @@ void SaveGameWindow::clickedDelete() {
 void SaveGameWindow::clickedSaveNew() {
     LOG("SaveGameWindow::clickedSaveNew()\n");
     ASSERT_LOGGER(this->edit != NULL);
+#if QT_VERSION >= 0x050000
+    if( qApp->inputMethod() != NULL ) {
+        // needed on Android, Galaxy Nexus, otherwise intermittent crashes when saving game by pressing "Finished" on on-screen-keyboard
+        qApp->inputMethod()->hide();
+    }
+#endif
     QString filename = this->edit->text();
 
     if( filename.length() == 0 ) {

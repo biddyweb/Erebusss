@@ -396,12 +396,6 @@ void OptionsGamestate::clickedStart() {
             nameLineEdit->setFocus();
             nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard - problem that pressing "Finished" we don't pick up latest text, and makes Swype crash); probably useful on other platforms
             nameLineEdit->selectAll();
-            /*if( options_page_index == n_options_pages-1 ) {
-                connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedStartGame()));
-            }
-            else {
-                connect(nameLineEdit, SIGNAL(returnPressed()), this, SLOT(clickedNext()));
-            }*/
 
             label = new QLabel(tr("Difficulty: "));
             g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
@@ -489,6 +483,12 @@ void OptionsGamestate::clickedStart() {
 }
 
 void OptionsGamestate::clickedNext() {
+#if QT_VERSION >= 0x050000
+    if( qApp->inputMethod() != NULL ) {
+        // just to be safe - see note in SaveGameWindow::clickedSaveNew() for Android Galaxy Nexus crashes
+        qApp->inputMethod()->hide();
+    }
+#endif
     this->options_page_index++;
     this->clickedStart();
 }
@@ -500,6 +500,12 @@ void OptionsGamestate::clickedCancel() {
 
 void OptionsGamestate::clickedStartGame() {
     LOG("OptionsGamestate::clickedStartGame()\n");
+#if QT_VERSION >= 0x050000
+    if( qApp->inputMethod() != NULL ) {
+        // just to be safe - see note in SaveGameWindow::clickedSaveNew() for Android Galaxy Nexus crashes
+        qApp->inputMethod()->hide();
+    }
+#endif
     game_g->getMainWindow()->setCursor(Qt::WaitCursor);
     int gametype_id = this->gametypeComboBox->currentIndex();
     LOG("gametype_id: %d\n", gametype_id);
