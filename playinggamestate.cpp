@@ -6604,7 +6604,7 @@ void PlayingGamestate::checkQuestComplete() {
     qDebug("PlayingGamestate::checkQuestComplete()");
     if( !this->quest->isCompleted() && this->quest->testIfComplete(this) ) {
         //game_g->showInfoDialog("Quest complete", "You have completed the quest! Now return to the dungeon exit.");
-        this->showInfoDialog("Quest complete!\n\nYou have completed the quest! Now return to the dungeon exit.");
+        this->showInfoDialog(tr("Quest complete!\n\nYou have completed the quest, you should now return to the dungeon exit.").toStdString());
     }
     //qDebug("PlayingGamestate::checkQuestComplete() end");
 }

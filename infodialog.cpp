@@ -111,7 +111,7 @@ InfoDialog::InfoDialog(const string &text, const string &picture, const QPixmap 
 
 InfoDialog *InfoDialog::createInfoDialogOkay(const string &text, const string &picture) {
     vector<string> buttons;
-    buttons.push_back("Okay");
+    buttons.push_back(tr("Okay").toStdString());
     return new InfoDialog(text, picture, NULL, buttons, true, false, false);
 }
 
@@ -121,14 +121,14 @@ InfoDialog *InfoDialog::createInfoDialogOkay(const string &text) {
 
 InfoDialog *InfoDialog::createInfoDialogOkay(const string &text, const QPixmap *pixmap) {
     vector<string> buttons;
-    buttons.push_back("Okay");
+    buttons.push_back(tr("Okay").toStdString());
     return new InfoDialog(text, "", pixmap, buttons, true, false, false);
 }
 
 InfoDialog *InfoDialog::createInfoDialogYesNo(const string &text) {
     vector<string> buttons;
-    buttons.push_back("Yes");
-    buttons.push_back("No");
+    buttons.push_back(tr("Yes").toStdString());
+    buttons.push_back(tr("No").toStdString());
     return new InfoDialog(text, "", NULL, buttons, true, false, false);
 }
 
