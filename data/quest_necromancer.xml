@@ -27,7 +27,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <floorregion shape="rect" rect_x="15.0" rect_y="10.0" rect_w="30.0" rect_h="40.0"/>
 
-<!--<player_start x="16.0" y="22.0"/>-->
+<player_start x="16.0" y="22.0"/>
 
 <tilemap imagemap="dirt_extended" tile_width="32" tile_height="32" x="15.0" y="17.0">
          68           68
@@ -1154,7 +1154,7 @@ ce
     confirm_text="Do you wish to travel west to the town of Middleham?"
 />
 
-<scenery name="Signpost" image_name="signpost" x="44.5" y="20.0" size="1.0" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="16.0" exit_location_y="22.0" exit_travel_time="24"
+<scenery name="Signpost" image_name="signpost" x="44.5" y="20.0" size="1.0" blocking="false" block_visibility="false" exit_location="Wentbridge Fort" exit_location_x="16.0" exit_location_y="42.0" exit_travel_time="24"
     confirm_text="Do you wish to travel east to Wentbridge Fort?"
 />
 
@@ -1965,7 +1965,7 @@ The ring is plain, except for a symbol of a small pair of wings.
 
 <wandering_monster template="Orc" time="300000" rest_chance="20"/>
 
-<player_start x="41.5" y="6.0"/>
+<!--<player_start x="41.5" y="6.0"/>-->
 
 <floorregion shape="rect" rect_x="42.0" rect_y="6.5" rect_w="1.0" rect_h="1.0"/>
 
