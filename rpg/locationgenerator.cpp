@@ -1269,6 +1269,7 @@ Location *LocationGenerator::generateLocation(Scenery **exit_down, Scenery **exi
 
     for(;;) {
         *exit_down = *exit_up = NULL;
+        player_start->set(0.0f, 0.0f);
         location = new Location(str.str());
         location->setDisplayName(true);
 

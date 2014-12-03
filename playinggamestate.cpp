@@ -5447,8 +5447,7 @@ void PlayingGamestate::createRandomQuest(bool force_start, bool passageway_start
                 Vector2D previous_exit_down_pos = previous_exit_down->getPos() + Vector2D(1.0f, 0.0f);
                 exit_up->setExitLocation(previous_level_name, previous_exit_down_pos, 0);
 
-                Vector2D exit_up_pos = exit_up->getPos() + Vector2D(1.0f, 0.0f);
-                previous_exit_down->setExitLocation(location->getName(), exit_up_pos, 0);
+                previous_exit_down->setExitLocation(location->getName(), player_start, 0);
             }
         }
         if( exit_down == NULL ) {
