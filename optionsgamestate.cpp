@@ -615,7 +615,7 @@ void OptionsGamestate::clickedImportButton() {
         return;
     }
 
-    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(tr("Do you want to import save game files from external storage (files with same name will be overwritten)?"));
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(tr("Do you want to import save game files from external storage (files with same name will be overwritten)?").toStdString());
     this->main_stacked_widget->addWidget(dialog);
     this->main_stacked_widget->setCurrentWidget(dialog);
     int result = dialog->exec();
@@ -624,7 +624,7 @@ void OptionsGamestate::clickedImportButton() {
     if( result == 0 ) {
         int count = game_g->importFilesToSDCard();
         stringstream str;
-        str << tr("Successfully imported") << " " << count << " " << tr("save game files.");
+        str << tr("Successfully imported").toStdString() << " " << count << " " << tr("save game files.").toStdString();
         dialog = InfoDialog::createInfoDialogOkay(str.str());
         this->main_stacked_widget->addWidget(dialog);
         this->main_stacked_widget->setCurrentWidget(dialog);
@@ -652,7 +652,7 @@ void OptionsGamestate::clickedExportButton() {
         return;
     }
 
-    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(tr("Do you want to export save game files to external storage (files with same name will be overwritten)?"));
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo(tr("Do you want to export save game files to external storage (files with same name will be overwritten)?").toStdString());
     this->main_stacked_widget->addWidget(dialog);
     this->main_stacked_widget->setCurrentWidget(dialog);
     int result = dialog->exec();
@@ -666,7 +666,7 @@ void OptionsGamestate::clickedExportButton() {
         }
 
         stringstream str;
-        str << tr("Successfully exported") << " " << load_filenames.size() << " " << tr("save game files.");
+        str << tr("Successfully exported").toStdString() << " " << load_filenames.size() << " " << tr("save game files.").toStdString();
         dialog = InfoDialog::createInfoDialogOkay(str.str());
         this->main_stacked_widget->addWidget(dialog);
         this->main_stacked_widget->setCurrentWidget(dialog);
