@@ -311,6 +311,27 @@ void Test::interactNPCKill(PlayingGamestate *playing_gamestate, const string &lo
   */
 void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
     LOG("checkSaveGame\n");
+
+    // general checks
+    // check location exits all point to valid locations
+    for(vector<Location *>::const_iterator iter = playing_gamestate->getQuest()->locationsBegin(); iter != playing_gamestate->getQuest()->locationsEnd(); ++iter) {
+        const Location *location = *iter;
+        for(set<Scenery *>::const_iterator iter2 = location->scenerysBegin(); iter2 != location->scenerysEnd(); ++iter2) {
+            const Scenery *scenery = *iter2;
+            string exit_location_name = scenery->getExitLocation();
+            if( exit_location_name.length() > 0 ) {
+                Location *exit_location = playing_gamestate->getQuest()->findLocation(exit_location_name);
+                if( exit_location == NULL ) {
+                    throw string("can't find location " + exit_location_name + " for exit " + scenery->getName());
+                }
+                Vector2D exit_pos = scenery->getExitLocationPos();
+                if( exit_location->findFloorRegionsAt(exit_pos, npc_radius_c, npc_radius_c).size() == 0 ) {
+                    throw string("exit pos isn't valid location in " + exit_location_name + " for exit " + scenery->getName());
+                }
+            }
+        }
+    }
+
     if( test_id == TEST_LOADSAVEQUEST_0 ) {
         // check quest not completed
         if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
@@ -425,7 +446,10 @@ void Test::checkSaveGame(PlayingGamestate *playing_gamestate, int test_id) {
         }
     }
     else {
-        throw string("unknown test_id");
+        // by default, check quest not completed
+        if( playing_gamestate->getQuest()->testIfComplete(playing_gamestate) ) {
+            throw string("didn't expect quest to already be completed");
+        }
     }
 }
 
@@ -1594,11 +1618,11 @@ void Test::runTest(const string &filename, int test_id) {
             score /= 1000.0;
         }
         else if( test_id == TEST_LOADSAVERANDOMQUEST_0 || test_id == TEST_LOADSAVERANDOMQUEST_1 || test_id == TEST_LOADSAVERANDOMQUEST_2 || test_id == TEST_LOADSAVERANDOMQUEST_3 || test_id == TEST_LOADSAVERANDOMQUEST_4 || test_id == TEST_LOADSAVERANDOMQUEST_5 || test_id == TEST_LOADSAVERANDOMQUEST_6 ) {
-            // load, save, load
+            // create, check, save, load, check
             QElapsedTimer timer;
             timer.start();
 
-            // load
+            // create
             PlayingGamestate *playing_gamestate = new PlayingGamestate(false, GAMETYPE_RANDOM, "Warrior", "name", false, false, 0);
             game_g->setGamestate(playing_gamestate);
 
@@ -1640,6 +1664,9 @@ void Test::runTest(const string &filename, int test_id) {
                 throw string("expected GAMETYPE_RANDOM");
             }
 
+            // check
+            checkSaveGame(playing_gamestate, test_id);
+
             // save
             QString filename = "EREBUSTEST_" + QString::number(test_id) + ".xml";
             LOG("try saving as %s\n", filename.toStdString().c_str());
@@ -1661,6 +1688,9 @@ void Test::runTest(const string &filename, int test_id) {
             if( playing_gamestate->getGameType() != GAMETYPE_RANDOM ) {
                 throw string("expected GAMETYPE_RANDOM");
             }
+
+            // check
+            checkSaveGame(playing_gamestate, test_id);
 
             delete playing_gamestate;
             game_g->setGamestate(NULL);
