@@ -652,7 +652,7 @@ void OptionsGamestate::clickedExportButton() {
         return;
     }
 
-    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo("Do you want to import save game files from external storage (files with same name will be overwritten)?");
+    InfoDialog *dialog = InfoDialog::createInfoDialogYesNo("Do you want to export save game files to external storage (files with same name will be overwritten)?");
     this->main_stacked_widget->addWidget(dialog);
     this->main_stacked_widget->setCurrentWidget(dialog);
     int result = dialog->exec();
