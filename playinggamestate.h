@@ -380,11 +380,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibility(Vector2D pos);
     void setupView();
-    void autoSave() {
-        if( !this->permadeath ) {
-            this->saveGame("autosave.xml", false);
-        }
-    }
     void displayPausedMessage();
     void requestPlayerMove(Vector2D dest, const void *ignore);
     void clickedOnNPC(Character *character);
@@ -455,6 +450,11 @@ public:
     void createRandomQuest();
     void createRandomQuest(bool force_start, bool passageway_start_type, Direction4 start_direction);
     bool saveGame(const QString &filename, bool already_fullpath);
+    void autoSave() {
+        if( !this->permadeath ) {
+            this->saveGame("autosave.xml", false);
+        }
+    }
 
     virtual void quitGame();
     virtual void update();

@@ -1710,9 +1710,9 @@ void CampaignWindow::clickedClose() {
             playing_gamestate->loadQuest(qt_filename, false);
         }
     }
-    /*else {
-        this->playing_gamestate->closeSubWindow();
-    }*/
+#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
+    playing_gamestate->autoSave();
+#endif
     game_g->cancelCurrentStream();
     //game_g->playSound(music_key_ingame_c, true);
 }
@@ -6987,6 +6987,9 @@ bool PlayingGamestate::interactWithScenery(bool *move, void **ignore, Scenery *s
                 this->playSound("door");
             }
             this->closeSubWindow(); // just in case
+#if !defined(Q_OS_SYMBIAN) // autosave disabled due to being slow on Nokia 5800 at least
+            this->autoSave();
+#endif
             if( this->quest->getQuestObjective() != NULL && this->quest->getQuestObjective()->getType() == "find_exit" && this->quest->getQuestObjective()->getArg1() == scenery->getName() ) {
                 this->quest->setCompleted(true);
             }
