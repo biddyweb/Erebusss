@@ -33,6 +33,10 @@ int Test::test_expected_n_info_dialog = 0;
   TEST_POINTINPOLYGON_9 - tests that a point is inside a concave polygon (L-shape)
   TEST_POINTINPOLYGON_10 - tests that a point is on a concave polygon (L-shape)
   TEST_POINTINPOLYGON_11 - tests that a point is not inside a concave polygon (L-shape)
+  TEST_POINTINPOLYGON_12 - tests that a point is tolerantly inside a concave polygon (L-shape)
+  TEST_POINTINPOLYGON_13 - tests that a point is tolerantly outside (so still on) a concave polygon (L-shape)
+  TEST_POINTINPOLYGON_14 - tests that a point is just more than tolerantly outside a concave polygon (L-shape)
+  TEST_FLOORREGIONS_0 - tests that a scenery on the boundary of one floor region is put into both floor regions
   TEST_PERF_POINTINPOLYGON_0 - performance test version of TEST_POINTINPOLYGON_9
   TEST_PERF_POINTINPOLYGON_1 - performance test version of TEST_POINTINPOLYGON_11
   TEST_PERF_POINTINPOLYGON_2 - as TEST_PERF_POINTINPOLYGON_1, but point is now outside of AABB
@@ -1147,7 +1151,7 @@ void Test::runTest(const string &filename, int test_id) {
                 throw string("failed point inside polygon test");
             }
         }
-        else if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ||
+        else if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 || test_id == TEST_POINTINPOLYGON_12 || test_id == TEST_POINTINPOLYGON_13 || test_id == TEST_POINTINPOLYGON_14 ||
                  test_id == TEST_PERF_POINTINPOLYGON_0 || test_id == TEST_PERF_POINTINPOLYGON_1 || test_id == TEST_PERF_POINTINPOLYGON_2
                  ) {
             Polygon2D poly;
@@ -1171,13 +1175,33 @@ void Test::runTest(const string &filename, int test_id) {
                 test_pt.set(1.1f, 0.1f);
                 exp_inside = false;
             }
+            else if( test_id == TEST_POINTINPOLYGON_12 ) {
+                test_pt.set(1.4f, 3.0f - 0.5f*E_TOL_LINEAR);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_13 ) {
+                test_pt.set(1.4f, 3.0f + 0.5f*E_TOL_LINEAR);
+                exp_inside = true;
+            }
+            else if( test_id == TEST_POINTINPOLYGON_14 ) {
+                test_pt.set(1.4f, 3.0f + 1.5f*E_TOL_LINEAR);
+                exp_inside = false;
+            }
             else {
                 test_pt.set(1.1f, -0.1f);
                 exp_inside = false;
             }
 
-            if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 ) {
+            if( test_id == TEST_POINTINPOLYGON_9 || test_id == TEST_POINTINPOLYGON_10 || test_id == TEST_POINTINPOLYGON_11 || test_id == TEST_POINTINPOLYGON_12 || test_id == TEST_POINTINPOLYGON_13 || test_id == TEST_POINTINPOLYGON_14 ) {
                 bool inside = poly.pointInside(test_pt);
+                if( inside != exp_inside ) {
+                    throw string("failed point inside polygon test");
+                }
+                // now test again with offset
+                Vector2D offset(101.34564732f, 301.453464f);
+                poly += offset;
+                test_pt += offset;
+                inside = poly.pointInside(test_pt);
                 if( inside != exp_inside ) {
                     throw string("failed point inside polygon test");
                 }
@@ -1197,6 +1221,34 @@ void Test::runTest(const string &filename, int test_id) {
                 //score = ((double)(clock() - time_s)) / (double)n_times;
                 score = ((double)timer.elapsed()) / ((double)n_times);
                 score /= 1000.0;
+            }
+        }
+        else if( test_id == TEST_FLOORREGIONS_0 ) {
+            Location location("");
+
+            FloorRegion *floor_region = NULL;
+            floor_region = FloorRegion::createRectangle(101.0f, 102.0f, 102.0f, 103.0f);
+            location.addFloorRegion(floor_region);
+            floor_region = FloorRegion::createRectangle(101.0f, 103.0f, 105.0f, 107.0f);
+            location.addFloorRegion(floor_region);
+
+            Scenery *scenery = NULL;
+            scenery = new Scenery("", "", 1.0f, 0.1f, 0.9f, false, 0.0f);
+            scenery->setBlocking(true, true);
+            location.addScenery(scenery, 101.5f, 102.95f);
+
+            vector<FloorRegion *> floor_regions = location.findFloorRegionsAt(scenery);
+            if( floor_regions.size() != 2 ) {
+                LOG("expected scenery to be in 2 floor regions not %d\n", floor_regions.size());
+                for(size_t i=0;i<floor_regions.size();i++) {
+                    floor_region = floor_regions.at(i);
+                    Vector2D top_left = floor_region->getTopLeft();
+                    Vector2D bottom_right = floor_region->getBottomRight();
+                    LOG("floor region %d:\n", i);
+                    LOG("    top left: %f, %f\n", top_left.x, top_left.y);
+                    LOG("    bottom right: %f, %f\n", bottom_right.x, bottom_right.y);
+                }
+                throw string("expected scenery to be in 2 floor regions");
             }
         }
         else if( test_id == TEST_PERF_DISTANCEGRAPH_0 || test_id == TEST_PERF_PATHFINDING_0 || test_id == TEST_PERF_REMOVE_SCENERY_0 || test_id == TEST_PERF_REMOVE_SCENERY_1 || test_id == TEST_PERF_REMOVE_SCENERY_2 || test_id == TEST_PERF_UPDATE_VISIBILITY_0 ) {

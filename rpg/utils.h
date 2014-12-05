@@ -255,6 +255,14 @@ public:
     }
     virtual void addPoint(Vector2D point);
     virtual void insertPoint(size_t indx, Vector2D point);
+    Polygon2D& operator+= (const Vector2D& v) {
+        for(size_t i=0;i<points.size();i++) {
+            points.at(i) += v;
+        }
+        top_left += v;
+        bottom_right += v;
+        return *this;
+    }
     Vector2D getTopLeft() const {
         return this->top_left;
     }
