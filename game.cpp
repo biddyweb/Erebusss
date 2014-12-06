@@ -501,7 +501,19 @@ void Game::runTests(bool fullscreen) {
     for(int i=0;i<N_TESTS;i++) {
         Test::runTest(filename, i);
     }
-    //Test::runTest(filename, ::TEST_LEVEL_UP);
+    //Test::runTest(filename, ::TEST_LOADSAVEWRITEQUEST_2_ITEMS);
+    //Test::runTest(filename, ::TEST_POINTINPOLYGON_11);
+    //Test::runTest(filename, ::TEST_POINTINPOLYGON_12);
+    //Test::runTest(filename, ::TEST_POINTINPOLYGON_13);
+    //Test::runTest(filename, ::TEST_POINTINPOLYGON_14);
+    //Test::runTest(filename, ::TEST_FLOORREGIONS_0);
+    /*Test::runTest(filename, ::TEST_LOADSAVEQUEST_3);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_1);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_2);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_3);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_4);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_5);
+    Test::runTest(filename, ::TEST_LOADSAVERANDOMQUEST_6);*/
 }
 
 void Game::initButton(QWidget *button) const {
