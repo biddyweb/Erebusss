@@ -78,6 +78,7 @@ void MainGraphicsView::centreOnPlayer() {
     Character *character = playing_gamestate->getPlayer();
     AnimatedObject *object = static_cast<AnimatedObject *>(character->getListenerData());
     this->centerOn(object);
+    this->has_new_center_on = false;
 }
 
 QPointF MainGraphicsView::getCenter() const {
@@ -538,6 +539,7 @@ void MainGraphicsView::updateInput() {
             centre = this->mapToScene(centre_pixels);
             //qDebug("    kinetic scroll to: %f, %f", centre.x(), centre.y());
             this->centerOn(centre);
+            this->has_new_center_on = false; // should already be false (see above), but just to be safe
             float decel = 0.001f * (float)time_ms;
             this->kinetic_scroll_speed -= decel;
             if( this->kinetic_scroll_speed <= 0.0f ) {
