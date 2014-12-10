@@ -159,6 +159,7 @@ class ItemsWindow : public CloseSubWindowWidget {
     ViewType view_type;
 
     void refreshList();
+    void refreshListTexts();
     void changeView(ViewType view_type);
     void setWeightLabel();
     void itemIsDeleted(size_t index);
@@ -552,7 +553,7 @@ public:
 
     AnimationLayer *getProjectileAnimationLayer(const string &name);
     QPixmap &getItemImage(const string &name);
-    QString getItemString(const Item *item, bool want_weight) const;
+    QString getItemString(const Item *item, bool want_weight, bool newlines) const;
 
     void showInfoDialog(const string &message);
     void showInfoDialog(const string &message, const string &picture);

@@ -379,6 +379,9 @@ QString StatsWindow::writeStat(const string &stat_key, bool is_float) const {
     return html;
 }
 
+bool items_icon_mode = false;
+//bool items_icon_mode = true;
+
 ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     CloseSubWindowWidget(playing_gamestate), list(NULL), weightLabel(NULL),
     armButton(NULL), wearButton(NULL), useButton(NULL), dropButton(NULL), infoButton(NULL),
@@ -478,18 +481,30 @@ ItemsWindow::ItemsWindow(PlayingGamestate *playing_gamestate) :
     }
 
     list = new ScrollingListWidget();
-    //list->setViewMode(QListView::IconMode);
-    if( !smallscreen_c ) {
-        QFont list_font = list->font();
-        list_font.setPointSize( list_font.pointSize() + 8 );
-        list->setFont(list_font);
+    if( items_icon_mode ) {
+        list->setViewMode(QListView::IconMode);
+        //list->setMovement(QListView::Static);
+        list->setWordWrap(true);
+    }
+    else {
+        if( !smallscreen_c ) {
+            QFont list_font = list->font();
+            list_font.setPointSize( list_font.pointSize() + 8 );
+            list->setFont(list_font);
+        }
     }
     {
         QFontMetrics fm(list->font());
         int icon_size = fm.height();
         //int icon_size = fm.width("LONGSWORD");
+        if( items_icon_mode ) {
+            icon_size *= 4;
+        }
         list->setIconSize(QSize(icon_size, icon_size));
-        LOG("icon size now %f, %f\n", list->iconSize().width(), list->iconSize().height());
+        LOG("icon size now %d, %d\n", list->iconSize().width(), list->iconSize().height());
+        if( items_icon_mode ) {
+            list->setGridSize(QSize(2*icon_size, 2*icon_size));
+        }
     }
     layout->addWidget(list);
     list->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -610,16 +625,27 @@ void ItemsWindow::refreshList() {
         else if( view_type == VIEWTYPE_MISC && !( ( item->getType() == ITEMTYPE_GENERAL || item->getType() == ITEMTYPE_RING ) && !item->isMagical() ) ) {
             continue;
         }
-        QString item_str = playing_gamestate->getItemString(item, true);
+        QString item_str = playing_gamestate->getItemString(item, true, items_icon_mode);
         //list->addItem( item_str );
         QListWidgetItem *list_item = new QListWidgetItem(item_str);
-        QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+        QPixmap pixmap = playing_gamestate->getItemImage( item->getImageName() );
+        pixmap = pixmap.scaledToHeight(list->iconSize().height());
+        QIcon icon( pixmap );
         list_item->setIcon(icon);
         list->addItem(list_item);
         list_items.push_back(item);
     }
     if( list->count() > 0 ) {
         list->setCurrentRow(0);
+    }
+}
+
+void ItemsWindow::refreshListTexts() {
+    qDebug("ItemsWindow::refreshListTexts()");
+    for(size_t i=0;i<list_items.size();i++) {
+        const Item *item = list_items.at(i);
+        QListWidgetItem *item_widget = list->item(i);
+        item_widget->setText( playing_gamestate->getItemString(item, true, items_icon_mode) );
     }
 }
 
@@ -794,13 +820,7 @@ void ItemsWindow::clickedArmWeapon() {
         LOG("not a weapon or shield?!\n");
     }
 
-    /*QListWidgetItem *item_widget = list->item(index);
-    item_widget->setText( this->getItemString(item) );*/
-    for(size_t i=0;i<list_items.size();i++) {
-        const Item *item = list_items.at(i);
-        QListWidgetItem *item_widget = list->item(i);
-        item_widget->setText( playing_gamestate->getItemString(item, true) );
-    }
+    this->refreshListTexts();
     this->changedSelectedItem(index);
 }
 
@@ -841,13 +861,7 @@ void ItemsWindow::clickedWear() {
         LOG("not an armour or ring?!\n");
     }
 
-    /*QListWidgetItem *item_widget = list->item(index);
-    item_widget->setText( this->getItemString(item) );*/
-    for(size_t i=0;i<list_items.size();i++) {
-        const Item *item = list_items.at(i);
-        QListWidgetItem *item_widget = list->item(i);
-        item_widget->setText( playing_gamestate->getItemString(item, true) );
-    }
+    this->refreshListTexts();
     this->changedSelectedItem(index);
 }
 
@@ -1015,7 +1029,9 @@ TradeWindow::TradeWindow(PlayingGamestate *playing_gamestate, const vector<const
             int cost = costs.at(i);
             QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(cost) + QString(" " + tr("gold") + ")");
             QListWidgetItem *list_item = new QListWidgetItem(item_str);
-            QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+            QPixmap pixmap = playing_gamestate->getItemImage( item->getImageName() );
+            pixmap = pixmap.scaledToHeight(list->iconSize().height());
+            QIcon icon( pixmap );
             list_item->setIcon(icon);
             list->addItem(list_item);
         }
@@ -1085,13 +1101,15 @@ void TradeWindow::setWeightLabel() {
 void TradeWindow::addPlayerItem(Item *item, int buy_cost) {
     buy_cost *= 0.5f;
     //QString item_str = QString(item->getName().c_str()) + QString(" (") + QString::number(buy_cost) + QString(" gold)");
-    QString item_str = playing_gamestate->getItemString(item, false) + QString(" (") + QString::number(buy_cost) + QString(" " + tr("gold") + ")");
+    QString item_str = playing_gamestate->getItemString(item, false, false) + QString(" (") + QString::number(buy_cost) + QString(" " + tr("gold") + ")");
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
     if( buy_cost == 0 ) {
         list_item->setTextColor(Qt::gray);
         list_item->setFlags( list_item->flags() & ~Qt::ItemIsSelectable );
     }
-    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    QPixmap pixmap = playing_gamestate->getItemImage( item->getImageName() );
+    pixmap = pixmap.scaledToHeight(player_list->iconSize().height());
+    QIcon icon( pixmap );
     list_item->setIcon(icon);
     player_list->addItem(list_item);
     player_items.push_back(item);
@@ -1287,7 +1305,9 @@ ItemsPickerWindow::ItemsPickerWindow(PlayingGamestate *playing_gamestate, vector
 void ItemsPickerWindow::addGroundItem(const Item *item) {
     QString item_str = QString(item->getName().c_str());
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
-    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    QPixmap pixmap = playing_gamestate->getItemImage( item->getImageName() );
+    pixmap = pixmap.scaledToHeight(list->iconSize().height());
+    QIcon icon( pixmap );
     list_item->setIcon(icon);
     list->addItem(list_item);
     // n.b., don't add to items list - should already be there, or otherwise caller should add it manually
@@ -1296,7 +1316,9 @@ void ItemsPickerWindow::addGroundItem(const Item *item) {
 void ItemsPickerWindow::addPlayerItem(Item *item) {
     QString item_str = QString(item->getName().c_str());
     QListWidgetItem *list_item = new QListWidgetItem(item_str);
-    QIcon icon( playing_gamestate->getItemImage( item->getImageName() ) );
+    QPixmap pixmap = playing_gamestate->getItemImage( item->getImageName() );
+    pixmap = pixmap.scaledToHeight(player_list->iconSize().height());
+    QIcon icon( pixmap );
     list_item->setIcon(icon);
     player_list->addItem(list_item);
     player_items.push_back(item);
@@ -8564,7 +8586,7 @@ QPixmap &PlayingGamestate::getItemImage(const string &name) {
     return image_iter->second;
 }
 
-QString PlayingGamestate::getItemString(const Item *item, bool want_weight) const {
+QString PlayingGamestate::getItemString(const Item *item, bool want_weight, bool newlines) const {
     QString item_str = item->getName().c_str();
     if( this->getPlayer()->getCurrentWeapon() == item ) {
         item_str += " [Armed]";
@@ -8582,7 +8604,11 @@ QString PlayingGamestate::getItemString(const Item *item, bool want_weight) cons
         item_str += " [Worn]";
     }
     if( want_weight && item->getWeight() > 0 ) {
-        item_str += " (Weight " + QString::number(item->getWeight()) + ")";
+        if( newlines )
+            item_str += "\n";
+        else
+            item_str += " ";
+        item_str += "(Weight " + QString::number(item->getWeight()) + ")";
     }
     return item_str;
 }
