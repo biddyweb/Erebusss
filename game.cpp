@@ -406,6 +406,10 @@ int Game::getInputTimeFrameMS() const {
     return this->screen->getInputTimeFrameMS();
 }
 
+int Game::getElapsedFrameMS() const {
+    return this->screen->getElapsedFrameMS();
+}
+
 void Game::setGameTimeMultiplier(int multiplier) {
     this->screen->setGameTimeMultiplier(multiplier);
 }

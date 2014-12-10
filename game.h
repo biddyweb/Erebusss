@@ -180,6 +180,7 @@ public:
     int getGameTimeFrameMS() const;
     int getGameTimeTotalMS() const;
     int getInputTimeFrameMS() const;
+    int getElapsedFrameMS() const;
     void setGameTimeMultiplier(int multiplier);
 
     QFont getFontScene() const {

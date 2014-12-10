@@ -46,9 +46,11 @@ class Screen : public QObject {
     QTimer timer; // used to call update() per frame
     MainWindow *mainWindow;
     QElapsedTimer elapsed_timer; // used to measure game time
+    int last_time_ms;
+    int elapsed_frame_ms;
 
     GameClock game_clock; // used for real-world game action
-    GameClock input_clock; // used for input - as we still want to allow, e.g., changing viewpoint, even when game action is paused
+    GameClock input_clock; // used for input - as we still want to allow, e.g., changing viewpoint, even when game action is paused, but we might want to pause things like kinetic scrolling of map when sub-windows open
 
 private slots:
     void update();
@@ -76,6 +78,7 @@ public:
         this->setPaused( !this->isPaused(), false );
     }
     int getElapsedMS() const;
+    int getElapsedFrameMS() const;
     void restartElapsedTimer();
     void enableUpdateTimer(bool enabled);
     int getGameTimeFrameMS() const {

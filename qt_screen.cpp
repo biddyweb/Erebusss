@@ -100,7 +100,7 @@ void GameClock::restart() {
 }
 
 Screen::Screen(bool fullscreen) :
-    fullscreen(fullscreen), mainWindow(NULL)
+    fullscreen(fullscreen), mainWindow(NULL), last_time_ms(-1), elapsed_frame_ms(0)
 {
     LOG("Screen::Screen()\n");
     mainWindow = new MainWindow();
@@ -118,9 +118,14 @@ int Screen::getElapsedMS() const {
     return static_cast<int>(elapsed_timer.elapsed());
 }
 
+int Screen::getElapsedFrameMS() const {
+    return elapsed_frame_ms;
+}
+
 void Screen::initMainLoop() {
     qDebug("init main loop...");
     //QObject::connect(&timer, SIGNAL(timeout()), &mainWindow, SLOT(updateScene()));
+    last_time_ms = -1;
     QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     timer.start(time_per_frame_c);
     elapsed_timer.start();
@@ -137,6 +142,10 @@ void Screen::update() {
 
     int time_now_ms = this->getElapsedMS();
     //qDebug("time_now_ms: %d", time_now_ms);
+    if( last_time_ms != -1 ) {
+        elapsed_frame_ms = time_now_ms - last_time_ms;
+    }
+    last_time_ms = time_now_ms;
 
     {
         int n_updates = game_clock.update(time_now_ms);
