@@ -1,8 +1,6 @@
 #include <QPainter>
 
-#if QT_VERSION < 0x050000
-#include <qmath.h>
-#endif
+#include <qmath.h> // for M_PI
 
 #include "particlesystem.h"
 #include "game.h"
