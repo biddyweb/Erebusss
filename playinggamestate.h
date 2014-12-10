@@ -377,6 +377,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     MusicMode music_mode;
     int time_combat_ended;
 
+    bool is_created; // whether fully started/loaded
+
     void loadPlayerAnimation();
     void processLocations(int progress_lo, int progress_hi);
     void updateVisibility(Vector2D pos);

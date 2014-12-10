@@ -9,6 +9,8 @@
 #include <QTextEdit>
 #include <QUrl>
 
+#include <qmath.h> // for M_PI
+
 /*#include <QtOpenGL>
 
 #undef min
@@ -1999,7 +2001,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
     cheat_mode(cheat_mode),
     need_visibility_update(false),
     has_ingame_music(false),
-    music_mode(MUSICMODE_SILENCE), time_combat_ended(-1)
+    music_mode(MUSICMODE_SILENCE), time_combat_ended(-1),
+    is_created(false)
 {
     // n.b., if we're loading a game, gameType will default to GAMETYPE_CAMPAIGN and will be set to the actual type when we load the quest
     try {
@@ -5279,6 +5282,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
     window->setEnabled(true);
     game_g->setPaused(false, true);
     game_g->restartElapsedTimer();
+    is_created = true;
 
     //qApp->processEvents();
 
@@ -5505,6 +5509,7 @@ void PlayingGamestate::createRandomQuest(bool force_start, bool passageway_start
     window->setEnabled(true);
     game_g->setPaused(false, true);
     game_g->restartElapsedTimer();
+    is_created = true;
 
     //qApp->processEvents();
 
@@ -7296,6 +7301,10 @@ void PlayingGamestate::cycleTargetNPC() {
 }
 
 void PlayingGamestate::clickedMainView(float scene_x, float scene_y) {
+    if( !is_created ) {
+        // on Android with Qt 5 at least, this can be called while still loading/creating
+        return;
+    }
     if( game_g->isPaused() ) {
         game_g->setPaused(false, false);
     }
