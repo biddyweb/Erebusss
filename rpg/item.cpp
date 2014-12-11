@@ -276,6 +276,10 @@ Weapon *Weapon::clone() const {
     return new Weapon(*this);
 }
 
+int Weapon::getDamageScore() const {
+    return rollScore(damageX, damageY, damageZ);
+}
+
 int Weapon::getDamage(const Character *defender) const {
     int roll = rollDice(damageX, damageY, damageZ);
     if( this->unholy_bonus != 0 && defender->isUnholy() )

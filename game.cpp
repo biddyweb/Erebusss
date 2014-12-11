@@ -548,7 +548,7 @@ void Game::handleMessages() {
                 if( start_message->getGametype() == GAMETYPE_CAMPAIGN ) {
                     const QuestInfo &c_quest_info = playing_gamestate->getCQuestInfo();
                     QString qt_filename = DEPLOYMENT_PATH + QString(c_quest_info.getFilename().c_str());
-                    playing_gamestate->loadQuest(qt_filename, false);
+                    playing_gamestate->loadQuest(qt_filename, false, start_message->getCheatMode());
                 }
                 else if( start_message->getGametype() == GAMETYPE_RANDOM ) {
                     playing_gamestate->createRandomQuest();

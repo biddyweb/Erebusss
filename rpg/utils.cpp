@@ -425,6 +425,13 @@ vector<GraphVertex *> Graph::shortestPath(size_t start, size_t end) {
     return path;
 }
 
+// returns a "score" that's proportional to an average
+int rollScore(int X, int Y, int Z) {
+    // X DY + Z
+    int score = X * (Y+1) + Z;
+    return score;
+}
+
 int rollDice(int X, int Y, int Z) {
     // X DY + Z
     int value = Z;

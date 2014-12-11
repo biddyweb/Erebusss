@@ -19,6 +19,19 @@ The village elders ask you to enter his dungeon, and retrieve the skull, lest it
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="300"/>
 
+<start_bonus
+    FP="0" BS="0" S="0" A="0" M="0" D="0" B="0" Sp="0.0"
+    bonus_health="0"
+    XP="70">
+    <gold amount="134"/>
+    <item template="Shield"/>
+    <item template="Chain Mail Armour"/>
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+</start_bonus>
+
 <location name="entrance">
 
 <floor image_name="floor_paved"/>

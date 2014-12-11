@@ -365,8 +365,6 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
 
     int time_last_complex_update_ms; // see update() for details
 
-    bool cheat_mode;
-
     bool need_visibility_update;
 
     bool has_ingame_music;
@@ -403,7 +401,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     void parseXMLItemProfileAttributeFloat(Item *item, const QXmlStreamReader &reader, const string &key) const;
     Item *parseXMLItem(QXmlStreamReader &reader) const;
     Character *loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const;
-    Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const;
+    Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc, bool start_bonus_item) const;
 
     void cleanup();
 
@@ -449,7 +447,10 @@ public:
         return this->permadeath_savefilename;
     }
     void querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h);
-    void loadQuest(const QString &filename, bool is_savegame);
+    void loadQuest(const QString &filename, bool is_savegame) {
+        loadQuest(filename, is_savegame, false);
+    }
+    void loadQuest(const QString &filename, bool is_savegame, bool cheat_mode);
     void createRandomQuest();
     void createRandomQuest(bool force_start, bool passageway_start_type, Direction4 start_direction);
     bool saveGame(const QString &filename, bool already_fullpath);

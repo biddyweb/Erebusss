@@ -15,6 +15,26 @@ You will receive three hundred gold pieces for completing the quest.
 
 <quest_objective type="find_exit" arg1="North Exit" gold="350"/>
 
+<start_bonus
+    FP="2" BS="1" S="1" A="0" M="2" D="1" B="1" Sp="0.4"
+    bonus_health="24"
+    XP="1140">
+    <gold amount="1564"/>
+    <item template="Shield"/>
+    <item template="Plate Armour"/>
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+    <weapon name="Magic Long Sword" image_name="longsword" weight="12"
+        damageX="2" damageY="10" damageZ="2"
+        min_strength="7"
+        animation_name="longsword"
+        magical="true"
+        base_template="Long Sword" worth_bonus="300"
+        />
+</start_bonus>
+
 <location name="entrance">
 
 <floor image_name="floor_rock"/>

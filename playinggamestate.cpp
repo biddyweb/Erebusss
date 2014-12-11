@@ -1998,7 +1998,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
     is_keyboard_moving(false),
     target_animation_layer(NULL), target_item(NULL),
     time_last_complex_update_ms(0),
-    cheat_mode(cheat_mode),
     need_visibility_update(false),
     has_ingame_music(false),
     music_mode(MUSICMODE_SILENCE), time_combat_ended(-1),
@@ -3035,8 +3034,9 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             //player->addGold( 1000 ); // CHEAT
             //player->addXP(this, 200); // CHEAT
         }
-        if( !is_savegame && this->cheat_mode ) {
+        if( !is_savegame && cheat_mode ) {
             this->c_quest_indx = cheat_start_level % this->quest_list.size();
+#if 0
             if( this->c_quest_indx == 1 ) {
                 // CHEAT, simulate start of quest 2:
                 player->setXP(70);
@@ -3174,6 +3174,7 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                 player->addItem(this->cloneStandardItem("Potion of Cure Disease"), true);
                 player->addItem(this->cloneStandardItem("Potion of Healing"), true);
             }
+#endif
         }
     }
     catch(...) {
@@ -4208,7 +4209,7 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
             }
             else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
                 Vector2D pos;
-                this->loadItem(&pos, reader, NULL, npc);
+                this->loadItem(&pos, reader, NULL, npc, false);
             }
         }
         else if( reader.isEndElement() ) {
@@ -4232,7 +4233,8 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
     return npc;
 }
 
-Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc) const {
+Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc, bool start_bonus_item) const {
+    qDebug("PlayingGamestate::loadItem");
     Item *item = NULL;
     pos->set(0.0f, 0.0f);
 
@@ -4258,6 +4260,8 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
         QStringRef current_ring_s = reader.attributes().value("current_ring");
         current_ring = parseBool(current_ring_s.toString(), true);
     }
+    else if( start_bonus_item ) {
+    }
     else {
         QStringRef pos_x_s = reader.attributes().value("x");
         float pos_x = parseFloat(pos_x_s.toString());
@@ -4268,6 +4272,7 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
 
     if( reader.name() == "gold" ) {
         // special case
+        qDebug("gold");
         QStringRef amount_s = reader.attributes().value("amount");
         int amount = parseInt(amount_s.toString());
         item = this->cloneGoldItem(amount);
@@ -4287,6 +4292,7 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
         }
     }
     else {
+        qDebug("load item");
         item = parseXMLItem(reader); // n.b., reader will advance to end element!
         if( item == NULL ) {
             LOG("error at line %d\n", reader.lineNumber());
@@ -4400,7 +4406,7 @@ void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, f
     *ret_visual_h = visual_h;
 }
 
-void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
+void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool cheat_mode) {
     LOG("PlayingGamestate::loadQuest(%s)\n", filename.toUtf8().data());
     // filename should be full path
 
@@ -4453,7 +4459,8 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
             QUEST_XML_TYPE_SCENERY = 2,
-            QUEST_XML_TYPE_FLOORREGION = 3
+            QUEST_XML_TYPE_FLOORREGION = 3,
+            QUEST_XML_TYPE_STARTBONUS = 4
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         Scenery *scenery = NULL;
@@ -4943,20 +4950,41 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     location->addCharacter(npc, pos.x, pos.y);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_STARTBONUS ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
                     }
 
                     Vector2D pos;
-                    Item *item = this->loadItem(&pos, reader, scenery, NULL);
-
-                    if( questXMLType == QUEST_XML_TYPE_NONE ) {
-                        if( location == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("unexpected quest xml: item element outside of location");
+                    if( questXMLType == QUEST_XML_TYPE_STARTBONUS ) {
+                        if( cheat_mode ) {
+                            Item *item = this->loadItem(&pos, reader, NULL, NULL, true);
+                            if( item->getType() == ITEMTYPE_WEAPON ) {
+                                if( player->getCurrentWeapon() != NULL && !static_cast<Weapon *>(item)->isRangedOrThrown() && player->getCurrentWeapon()->getDamageScore() < static_cast<Weapon *>(item)->getDamageScore() ) {
+                                    player->armWeapon(NULL);
+                                    if( static_cast<Weapon *>(item)->isTwoHanded() ) {
+                                        player->armShield(NULL);
+                                    }
+                                }
+                            }
+                            else if( item->getType() == ITEMTYPE_ARMOUR ) {
+                                if( player->getCurrentArmour() != NULL && player->getCurrentArmour()->getRating() < static_cast<Armour *>(item)->getRating() ) {
+                                    player->wearArmour(NULL);
+                                }
+                            }
+                            player->addItem(item, true);
                         }
-                        location->addItem(item, pos.x, pos.y);
+                    }
+                    else {
+                        Item *item = this->loadItem(&pos, reader, scenery, NULL, false);
+
+                        if( questXMLType == QUEST_XML_TYPE_NONE ) {
+                            if( location == NULL ) {
+                                LOG("error at line %d\n", reader.lineNumber());
+                                throw string("unexpected quest xml: item element outside of location");
+                            }
+                            location->addItem(item, pos.x, pos.y);
+                        }
                     }
                 }
                 else if( reader.name() == "scenery" ) {
@@ -5201,6 +5229,57 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                         location->addTrap(trap, pos_x, pos_y);
                     }
                 }
+                else if( reader.name() == "start_bonus" ) {
+                    if( is_savegame ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: start_bonus element not expected in save games");
+                    }
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: start_bonus element wasn't expected here");
+                    }
+
+                    if( cheat_mode ) {
+                        QStringRef FP_s = reader.attributes().value("FP");
+                        int FP = parseInt(FP_s.toString());
+                        QStringRef BS_s = reader.attributes().value("BS");
+                        int BS = parseInt(BS_s.toString());
+                        QStringRef S_s = reader.attributes().value("S");
+                        int S = parseInt(S_s.toString());
+                        QStringRef A_s = reader.attributes().value("A");
+                        int A = parseInt(A_s.toString());
+                        QStringRef M_s = reader.attributes().value("M");
+                        int M = parseInt(M_s.toString());
+                        QStringRef D_s = reader.attributes().value("D");
+                        int D = parseInt(D_s.toString());
+                        QStringRef B_s = reader.attributes().value("B");
+                        int B = parseInt(B_s.toString());
+                        QStringRef Sp_s = reader.attributes().value("Sp");
+                        float Sp = parseFloat(Sp_s.toString());
+                        player->addProfile(FP, BS, S, A, M, D, B, Sp);
+
+                        QStringRef bonus_health_s = reader.attributes().value("bonus_health");
+                        int bonus_health = parseInt(bonus_health_s.toString());
+                        player->increaseMaxHealth(bonus_health);
+
+                        QStringRef XP_s = reader.attributes().value("XP");
+                        int XP = parseInt(XP_s.toString());
+                        player->setXP(XP);
+                        for(;;) {
+                            int next_level_xp = this->player->getXPForNextLevel();
+                            //qDebug("compare: %d vs %d", this->player->getXP(), next_level_xp);
+                            if( this->player->getXP() >= next_level_xp ) {
+                                // don't call advanceLevel(), as we set the increased profile and health directly
+                                this->player->setLevel( this->player->getLevel()+1 );
+                            }
+                            else {
+                                break;
+                            }
+                        }
+                    }
+
+                    questXMLType = QUEST_XML_TYPE_STARTBONUS;
+                }
             }
             else if( reader.isEndElement() ) {
                 if( reader.name() == "location" ) {
@@ -5234,6 +5313,13 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame) {
                     }
                     location->addFloorRegion(floor_region);
                     floor_region = NULL;
+                    questXMLType = QUEST_XML_TYPE_NONE;
+                }
+                else if( reader.name() == "start_bonus" ) {
+                    if( questXMLType != QUEST_XML_TYPE_STARTBONUS ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: start_bonus end element wasn't expected here");
+                    }
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
             }

@@ -375,6 +375,7 @@ public:
     vector<GraphVertex *> shortestPath(size_t start, size_t end);
 };
 
+int rollScore(int X, int Y, int Z);
 int rollDice(int X, int Y, int Z);
 int rollDiceChoice(const int *weights, int n_choices);
 

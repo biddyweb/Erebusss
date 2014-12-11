@@ -257,6 +257,7 @@ public:
         *damageY = this->damageY;
         *damageZ = this->damageZ;
     }
+    int getDamageScore() const;
     int getDamage(const Character *defender) const;
     void setMinStrength(int min_strength) {
         this->min_strength = min_strength;

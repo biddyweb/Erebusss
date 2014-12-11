@@ -19,6 +19,46 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="500"/>
 
+<start_bonus
+    FP="2" BS="2" S="1" A="0" M="2" D="1" B="2" Sp="0.5"
+    bonus_health="24"
+    XP="2110">
+    <gold amount="2371"/>
+    <item template="Shield"/>
+    <item template="Longbow"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+    <item template="Arrows"/>
+    <weapon name="Long Sword" image_name="longsword" weight="10"
+        damageX="2" damageY="10" damageZ="2"
+        min_strength="7"
+        animation_name="longsword"
+        base_template="Long Sword" worth_bonus="150"
+        />
+    <weapon name="Magic Long Sword" image_name="longsword" weight="12"
+        damageX="2" damageY="10" damageZ="2"
+        min_strength="7"
+        animation_name="longsword"
+        magical="true"
+        base_template="Long Sword" worth_bonus="300"
+        />
+    <armour name="Derrin's Armour" image_name="metal_armour" x="29.0" y="38.0" weight="200"
+        min_strength="8" rating="7" magical="true"
+        base_template="Plate Armour" worth_bonus="200">
+This plate armour is blessed with ancient Dwarven magic, offering greater protection, though it is just as heavy.
+    </armour>
+    <ring name="Derrin's Ring" image_name="ring_gold" weight="0" magical="true" bonus_D="1"
+        base_template="Gold Ring" worth_bonus="250"
+        />
+    <ammo name="Arrows +1" ammo_type="Arrows" image_name="arrow" projectile_image_name="arrow" weight="1"
+        rating="2"
+        magical="true"
+        base_template="Arrows" worth_bonus="100"
+        amount="10"
+        x="8.5" y="17.5"
+        />
+</start_bonus>
+
 <location name="Axbury" display_name="true" lighting_min="160" geo_type="outdoors">
 
 <floor image_name="grass"/>
