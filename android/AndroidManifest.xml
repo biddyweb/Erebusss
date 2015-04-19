@@ -35,7 +35,7 @@
         Although Google recommend the use of supports-screens rather than compatible-screens, it gives us no way to restrict based on resolution or density.
         We use compatible-screens to rule out low density "normal"-sized devices (which should mean blocking 480x320 or less).
         This also has the side-effect to blocking most low memory devices (e.g., less than 512MB RAM) which Erebus may have problems on (though for v0.13, 2nd quest works okay on 384MB emulated 480x320 Android 2.3 Galaxy Ace).
-        "213" is a hack needed for Google Nexus 7 (2012) (tvdpi); "480" is used for xxhdpi.
+        "213" is a hack needed for Google Nexus 7 (2012) (tvdpi); "480" is used for xxhdpi; "560" is needed for Google Nexus 6.
         See:
             http://stackoverflow.com/questions/12234221/specifying-android-market-ram-in-the-manifest
             http://stackoverflow.com/questions/11691775/why-my-app-is-not-showing-up-on-tablets-in-google-play
@@ -47,6 +47,7 @@
         <screen android:screenSize="normal" android:screenDensity="xhdpi"/>
         <screen android:screenSize="normal" android:screenDensity="213"/>
         <screen android:screenSize="normal" android:screenDensity="480"/>
+        <screen android:screenSize="normal" android:screenDensity="560"/>
         <!-- all large size screens -->
         <screen android:screenSize="large" android:screenDensity="ldpi"/>
         <screen android:screenSize="large" android:screenDensity="mdpi"/>
@@ -54,6 +55,7 @@
         <screen android:screenSize="large" android:screenDensity="xhdpi"/>
         <screen android:screenSize="large" android:screenDensity="213"/>
         <screen android:screenSize="large" android:screenDensity="480"/>
+        <screen android:screenSize="large" android:screenDensity="560"/>
         <!-- all xlarge size screens -->
         <screen android:screenSize="xlarge" android:screenDensity="ldpi"/>
         <screen android:screenSize="xlarge" android:screenDensity="mdpi"/>
@@ -61,6 +63,7 @@
         <screen android:screenSize="xlarge" android:screenDensity="xhdpi"/>
         <screen android:screenSize="xlarge" android:screenDensity="213"/>
         <screen android:screenSize="xlarge" android:screenDensity="480"/>
+        <screen android:screenSize="xlarge" android:screenDensity="560"/>
     </compatible-screens>
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="18"/>
     <!-- %%INSERT_PERMISSIONS -->
