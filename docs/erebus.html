@@ -471,11 +471,11 @@ gripped with feelings of terror and dread, and unable to move, for 10 seconds.</
 <p>On non-mobile platforms, Erebus can be run in windowed mode by running from the command line
 with the argument "-windowed". E.g., on Windows, run with:
 
-<pre>erebus.exe -windowed</pre></p>
+<code>erebus.exe -windowed</code></p>
 
 <p>You can also set the folder for where data will be loaded from, e.g., on Linux:
 
-<pre>./erebus -datafolder=/home/my_user/Documents/erebussrc/</pre></p>
+<code>./erebus -datafolder=/home/my_user/Documents/erebussrc/</code></p>
 
 <p><a name="contact"><h2>Contacting me (bugs etc)</h2></p>
 
@@ -530,9 +530,12 @@ with the argument "-windowed". E.g., on Windows, run with:
 <li><b>Porting</b> - Feel free to port Erebus to other platforms - it should be easy to port to any OS that supports Qt. If code changes are required, if you send me the files I can integrate them into the main source (please check the Git repository on Sourceforge for the latest version to work with).</li>
 <li><b>Tell people about it!</b> - If you like the game, then please feel free to tell other people about it, on your blog/Twitter/website/etc :)
 Feel free to link with the following HTML code (or just do a plain text link if you prefer):
-<pre>&lt;a href="http://erebusrpg.sourceforge.net/"&gt;
+<!-- we use a textarea rather than pre, so that we don't have problems on mobile devices where the width is too wide for the screen - having a horizontal scrollbar seems nicer than having wordwrapping. -->
+<textarea readonly rows="4" style="width:100%; white-space: pre; word-wrap: normal; overflow-x: auto">
+&lt;a href="http://erebusrpg.sourceforge.net/"&gt;
 &lt;img src="http://erebusrpg.sourceforge.net/erebus_logo1.png" title="erebus"&gt;
-&lt;/a&gt;</pre>
+&lt;/a&gt;
+</textarea>
 </li>
 <li><b>Give me a nice rating :)</b> (On Nokia/Android stores, or other hosting sites...)</li>
 <li><b>Videos</b> - videos of the gameplay (e.g., on YouTube) would be useful to have, partly to help raise awareness, and also to act as gameplay tutorials.</li>
@@ -982,6 +985,9 @@ First public release.
 <a href="http://www.gnu.org/copyleft/gpl.html">GPL v3 or later</a>, except the
 following files:<ul>
 
+<!-- use &#8203; to limit widths on continuous text to 30 characters, to avoid messing up view on mobile devices -->
+<!-- also use small to further reduce chance of problem on mobile devices, and reduce amount of space taken up -->
+<small>
 <li><b>Graphics</b></li>
 <li>items/bullet.png, items/casket.png, items/dagger.png, items/gold.png, items/leather_armor.png, items/longbow.png, items/longsword.png, items/metal_armor.png, items/shield.png,
     npcs/goblin.png, npcs/goblin_champion.png, npcs/peasant_man.png, npcs/peasant_woman.png, npcs/skeleton.png, npcs/skeleton_archer.png,
@@ -1008,15 +1014,15 @@ following files:<ul>
 <li>items/egg.png - from http://commons.wikimedia.org/wiki/File:Vejce07220.JPG , by Dendrofil, under <a href="http://creativecommons.org/licenses/by-sa/3.0/deed.en">CC BY-SA 3.0</a>.</li>
 <li>items/gem_*.png, items/ring_plain.png, items/ring_gold.png - from http://opengameart.org/content/loot , by sunburn, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>items/hand_mirror.png - from http://www.clker.com/clipart-130192.html , Public Domain.</li>
-<li>items/key.png - from http://commons.wikimedia.org/wiki/File:Cl%C3%A9_b%C3%A9narde4-Lastours.jpg , by Pinpin, under GNU FDL 1.2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
-<li>items/leaf.png - from http://commons.wikimedia.org/wiki/File:Folla_Caqui_002eue.jpg , by Luis Miguel Bugallo Sánchez, under GNU FDL 1.2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
-<li>items/leaf_dire.png - from http://commons.wikimedia.org/wiki/File:Japanese_Yew_Taxus_cuspidata_Leaf_Closeup_3008px.jpg , by Derek Ramsey, under GNU FDL 1.2, <a href="http://creativecommons.org/licenses/by-sa/1.0/deed.en">CC BY-SA 1.0</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/deed.en">CC BY-SA 2.0</a> or <a href="http://creativecommons.org/licenses/by-sa/2.5/deed.en">CC BY-SA 2.5</a>.</li>
+<li>items/key.png - from http://commons.wikimedia.org/&#8203;wiki/File:&#8203;Cl%C3%A9_b%C3%A9narde4-Lastours.jpg , by Pinpin, under GNU FDL 1.2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
+<li>items/leaf.png - from http://commons.wikimedia.org/&#8203;wiki/File:Folla_Caqui_002eue.jpg , by Luis Miguel Bugallo Sánchez, under GNU FDL 1.2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
+<li>items/leaf_dire.png - from http://commons.wikimedia.org/&#8203;wiki/File:Japanese_Yew_Taxus_&#8203;cuspidata_Leaf_Closeup_3008px.&#8203;jpg , by Derek Ramsey, under GNU FDL 1.2, <a href="http://creativecommons.org/licenses/by-sa/1.0/deed.en">CC BY-SA 1.0</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/deed.en">CC BY-SA 2.0</a> or <a href="http://creativecommons.org/licenses/by-sa/2.5/deed.en">CC BY-SA 2.5</a>.</li>
 <li>items/orb.png, items/orb_broken.png - from http://opengameart.org/content/shiny-orbs-64x64 , by Mumu, under CC0 (Public Domain).</li>
 <li>items/pitcher.png - from http://opengameart.org/content/ceramic-bear-mug , by Aare, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>items/potion_red/green/blue.png - from Potion_icon.jpg - from http://commons.wikimedia.org/wiki/File:Potion_icon.jpg / http://f.hatena.ne.jp/tanemori/20101128112804 , by Tanemori , <a href="http://creativecommons.org/licenses/by/2.1/jp/deed.en">CC BY 2.1 Japan</a>.</li>
 <li>items/ring_gem_red.png - from http://opengameart.org/content/flare-compatible-jewelry , by Stephen Challener (Redshrike), under GPL 2, GPL 3 or <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>items/skull.png - from http://commons.wikimedia.org/wiki/File:Scull_of_Cro-Magnon_1.jpg - Public Domain.</li>
-<li>items/talisman.png - from http://en.wikipedia.org/wiki/File:Talisman_de_Charlemagne_Tau.jpg - Public Domain.</li>
+<li>items/talisman.png - from http://en.wikipedia.org/&#8203;wiki/File:Talisman_de_&#8203;Charlemagne_Tau.jpg - Public Domain.</li>
 <li>items/vial.png, items/vial_green.png - from http://opengameart.org/content/32x32-fantasy-tileset , by Jerom, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> or later.</li>
 <li>npcs/farmer.png - from http://opengameart.org/content/farmer-bleeds-game-art , by Bleed ( http://remusprites.carbonmade.com ), under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
 <li>npcs/fire_ant.png - from http://opengameart.org/content/antlion , by Clint Bellanger, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
@@ -1033,8 +1039,8 @@ following files:<ul>
 <li>npcs/wraith.png - from http://commons.wikimedia.org/wiki/File:Undead-shadow.png / <a href="http://www.wesnoth.org/">Battle for Wesnoth</a>, under GPL 2 or later.</li>
 <li>scenery/building.png, scenery/building2.png, scenery/building3.png - from http://opengameart.org/content/medieval-building-tiles , by Clint Bellanger, under GPL v2 or later, or <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> or later (also uses texture by Sindwiller).</li>
 <li>scenery/building4.png - from http://opengameart.org/content/housing , by Narzilian, under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
-<li>scenery/cabinet.png - from http://commons.wikimedia.org/wiki/File:Bookcase_(Ferapontov).jpg , by shakko, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
-<li>scenery/carpet.png - from http://commons.wikimedia.org/wiki/File:Alpan_xal%C3%A7as%C4%B1_2.jpg , CC0 (Public Domain).</li>
+<li>scenery/cabinet.png - from http://commons.wikimedia.org/&#8203;wiki/File:Bookcase_&#8203;(Ferapontov).jpg , by shakko, under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>.</li>
+<li>scenery/carpet.png - from http://commons.wikimedia.org/&#8203;wiki/File:Alpan_&#8203;xal%C3%A7as%C4%B1_2.jpg , CC0 (Public Domain).</li>
 <li>scenery/church.png - from http://opengameart.org/content/church , by yd, under CC0 (Public Domain).</li>
 <li>scenery/church_bell.png - from http://opengameart.org/content/high-poly-church-bell , by Lamoot, CC0 (Public Domain).</li>
 <li>scenery/deadtree*.png - from <a href="http://opengameart.org/content/widelands-dead-trees">http://opengameart.org/content/widelands-dead-trees</a>, taken from <a href="http://wl.widelands.org/">Widelands</a>, under the GPL v2 or v3.</li>
@@ -1083,6 +1089,7 @@ following files:<ul>
 <li>stepdirt_1.wav - from http://opengameart.org/content/foot-walking-step-sounds-on-stone-water-snow-wood-and-dirt , by Jute, under GPL 2 or later.</li>
 <li>turn_page.wav - from http://opengameart.org/content/inventory-sound-effects , by artisticdude, CC0 (Public Domain).</li>
 
+</small>
 </ul>
 
 <p>Erebus uses <a href="http://qt-project.org/">Qt</a> (under the LGPL) and <a href="http://www.sfml-dev.org/">SFML</a> (under the zlib licence).</p>
