@@ -871,7 +871,9 @@ public:
     bool carryingTooMuch() const;
     string getWeightString() const;
     bool tooWeakForArmour() const;
+    bool tooWeakForArmour(const Armour *armour) const;
     bool tooWeakForWeapon() const;
+    bool tooWeakForWeapon(const Weapon *weapon) const;
     bool canMove() const;
     void addSpell(const string &spell, int count) {
         this->spells[spell] = this->spells[spell] + count;

@@ -15,6 +15,7 @@ You will receive three hundred gold pieces for completing the quest.
 
 <quest_objective type="find_exit" arg1="North Exit" gold="350"/>
 
+<!-- need to ensure all Characters can carry the weight, and have weapons they can use -->
 <start_bonus
     FP="2" BS="1" S="1" A="0" M="2" D="1" B="1" Sp="0.4"
     bonus_health="24"

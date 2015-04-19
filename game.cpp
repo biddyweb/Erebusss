@@ -50,6 +50,9 @@ const int default_lighting_enabled_c = false; // lighting effects can be a bit t
 const int default_lighting_enabled_c = true;
 #endif
 
+QuestInfo::QuestInfo(const string &filename, const string &name) : filename(filename), name(name) {
+}
+
 Game::Game() : is_testing(false), test_n_info_dialog(0), settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
 #ifdef Q_OS_ANDROID
     sdcard_ok(false),
@@ -1023,6 +1026,41 @@ Character *Game::createPlayer(const string &player_type, const string &player_na
     //character->addGold( 1000 ); // CHEAT
 
     return character;
+}
+
+vector<QuestInfo> Game::loadQuests() const {
+    vector<QuestInfo> quest_list;
+    QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
+    if( !file.open(QFile::ReadOnly | QFile::Text) ) {
+        throw string("Failed to open quests xml file");
+    }
+    QXmlStreamReader reader(&file);
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        if( reader.isStartElement() )
+        {
+            if( reader.name() == "quest" ) {
+                QStringRef filename_s = reader.attributes().value("filename");
+                QStringRef name_s = reader.attributes().value("name");
+                qDebug("found quest: %s name: %s", filename_s.toString().toStdString().c_str(), name_s.toString().toStdString().c_str());
+                if( filename_s.length() == 0 ) {
+                    LOG("error at line %d\n", reader.lineNumber());
+                    throw string("quest doesn't have filename info");
+                }
+                QuestInfo quest_info(filename_s.toString().toStdString(), name_s.toString().toStdString());
+                quest_list.push_back(quest_info);
+            }
+        }
+    }
+    if( reader.hasError() ) {
+        LOG("error at line %d\n", reader.lineNumber());
+        LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
+        throw string("error reading quests xml file");
+    }
+    if( quest_list.size() == 0 ) {
+        throw string("failed to find any quests");
+    }
+    return quest_list;
 }
 
 void Game::showErrorDialog(const string &message) {

@@ -21,6 +21,7 @@ using std::map;
 #include "rpg/location.h"
 #include "rpg/item.h"
 
+#include "game.h"
 #include "gamestate.h"
 #include "scrollinglistwidget.h"
 #include "animatedobject.h"

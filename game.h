@@ -44,6 +44,20 @@ class Scenery;
 const QString savegame_ext = ".xml";
 const QString savegame_folder = "savegames/";
 
+class QuestInfo {
+    string filename;
+    string name;
+public:
+    QuestInfo(const string &filename, const string &name);
+
+    string getFilename() const {
+        return filename;
+    }
+    string getName() const {
+        return name;
+    }
+};
+
 // used for passing messages
 class GameMessage {
 public:
@@ -288,6 +302,7 @@ public:
         return player_types.at(i);
     }
     Character *createPlayer(const string &player_type, const string &player_name) const;
+    vector<QuestInfo> loadQuests() const;
     void fillSaveGameFiles(ScrollingListWidget **list, vector<QString> *filenames) const;
 
     void showErrorDialog(const string &message);

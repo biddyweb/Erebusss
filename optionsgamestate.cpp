@@ -103,7 +103,7 @@ void CharacterHelp::changedGameType(int index) {
 OptionsGamestate *OptionsGamestate::optionsGamestate = NULL;
 
 OptionsGamestate::OptionsGamestate() :
-    main_stacked_widget(NULL), options_page_index(0), gametypeComboBox(NULL), characterComboBox(NULL), portraitLabel(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathComboBox(NULL),
+    main_stacked_widget(NULL), options_page_index(0), n_options_pages(0), gametypeComboBox(NULL), characterComboBox(NULL), portraitLabel(NULL), difficultyComboBox(NULL), /*difficultyButtonGroup(NULL),*/ permadeathComboBox(NULL), firstQuestComboBox(NULL),
     nameLineEdit(NULL),
     load_list(NULL),
 #ifndef Q_OS_ANDROID
@@ -111,12 +111,9 @@ OptionsGamestate::OptionsGamestate() :
     soundSliderMusic(NULL),
     soundSliderEffects(NULL),
 #endif
-    lightingComboBox(NULL),
-    cheat_mode(false), cheat_start_level(0)
+    lightingComboBox(NULL)
 {
     try {
-        //cheat_mode = true;
-        //cheat_start_level = 1;
         LOG("OptionsGamestate::OptionsGamestate()\n");
         optionsGamestate = this;
 
@@ -273,19 +270,8 @@ void OptionsGamestate::quitGame() {
     }
 }
 
-void OptionsGamestate::keyPress(QKeyEvent *key_event) {
-    if( key_event->key() == Qt::Key_F12 ) {
-        qApp->beep();
-        if( !cheat_mode ) {
-            cheat_mode = true;
-            LOG("enabled cheat mode\n");
-        }
-        cheat_start_level++;
-        LOG("set cheat start level to %d\n", cheat_start_level);
-    }
+void OptionsGamestate::keyPress(QKeyEvent *) {
 }
-
-const int n_options_pages = 3;
 
 void OptionsGamestate::clickedStart() {
     LOG("OptionsGamestate::clickedStart()\n");
@@ -293,6 +279,17 @@ void OptionsGamestate::clickedStart() {
     /*game_g->getScreen()->getMainWindow()->setCursor(Qt::WaitCursor);
     GameMessage *game_message = new GameMessage(GameMessage::GAMEMESSAGETYPE_NEWGAMESTATE_PLAYING);
     game_g->pushMessage(game_message);*/
+
+    n_options_pages = 4;
+    if( this->options_page_index > 0 ) {
+        if( gametypeComboBox->currentIndex() == GAMETYPE_RANDOM ) {
+            // skip choice of first quest
+            n_options_pages--;
+            if( options_page_index == 3 ) // n.b., needed for if/when we add later options pages
+                options_page_index++;
+        }
+    }
+
     ASSERT_LOGGER(options_page_index >= 0 && options_page_index < n_options_pages);
 
     QWidget *widget = new QWidget();
@@ -447,6 +444,30 @@ void OptionsGamestate::clickedStart() {
             n_row++;
         }
     }
+    else if( options_page_index == 3 ) {
+        {
+            vector<QuestInfo> quest_list = game_g->loadQuests();
+
+            int n_row = 0;
+            QGridLayout *g_layout = new QGridLayout();
+            layout->addLayout(g_layout);
+
+            QLabel *label = new QLabel(tr("First quest: "));
+            g_layout->addWidget(label, n_row, 0, Qt::AlignRight);
+            firstQuestComboBox = new QComboBox();
+#ifdef Q_OS_ANDROID
+            firstQuestComboBox->setStyleSheet("color: black; background-color: white"); // workaround for Android colour problem
+#endif
+            firstQuestComboBox->setFont(game_g->getFontBig());
+            for(size_t i=0;i<quest_list.size();i++) {
+                firstQuestComboBox->addItem(quest_list.at(i).getName().c_str());
+            }
+            firstQuestComboBox->setCurrentIndex(0);
+            firstQuestComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            g_layout->addWidget(firstQuestComboBox, n_row, 1);
+            n_row++;
+        }
+    }
 
     {
         QHBoxLayout *h_layout = new QHBoxLayout();
@@ -524,6 +545,11 @@ void OptionsGamestate::clickedStartGame() {
     ASSERT_LOGGER(this->characterComboBox->currentIndex() >= 0);
     ASSERT_LOGGER(this->characterComboBox->currentIndex() < game_g->getNPlayerTypes());
 
+    int cheat_start_level = 0;
+    if( firstQuestComboBox != NULL ) {
+        cheat_start_level = firstQuestComboBox->currentIndex();
+    }
+    bool cheat_mode = cheat_start_level > 0;
     StartGameMessage *game_message = new StartGameMessage(gametype, difficulty, this->characterComboBox->currentText().toStdString(), permadeath, this->nameLineEdit->text().toStdString(), cheat_mode, cheat_start_level);
     game_g->pushMessage(game_message);
 }

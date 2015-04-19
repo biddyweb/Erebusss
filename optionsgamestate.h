@@ -23,6 +23,7 @@ class OptionsGamestate : public Gamestate {
     QStackedWidget *main_stacked_widget;
 
     int options_page_index;
+    int n_options_pages;
 
     QComboBox *gametypeComboBox;
     QComboBox *characterComboBox;
@@ -30,6 +31,7 @@ class OptionsGamestate : public Gamestate {
     QComboBox *difficultyComboBox;
     //QButtonGroup *difficultyButtonGroup;
     QComboBox *permadeathComboBox;
+    QComboBox *firstQuestComboBox;
 
     QLineEdit *nameLineEdit;
 
@@ -42,9 +44,6 @@ class OptionsGamestate : public Gamestate {
     QSlider *soundSliderEffects;
 #endif
     QComboBox *lightingComboBox;
-
-    bool cheat_mode;
-    int cheat_start_level;
 
     void cleanup();
 

@@ -966,13 +966,3 @@ public:
         this->is_completed = is_completed;
     }
 };
-
-class QuestInfo {
-    string filename;
-public:
-    QuestInfo(const string &filename);
-
-    string getFilename() const {
-        return filename;
-    }
-};

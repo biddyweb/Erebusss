@@ -2316,6 +2316,3 @@ bool Quest::testIfComplete(const PlayingGamestate *playing_gamestate) {
     }
     return false;
 }
-
-QuestInfo::QuestInfo(const string &filename) : filename(filename) {
-}

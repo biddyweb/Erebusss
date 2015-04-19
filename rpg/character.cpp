@@ -1433,7 +1433,14 @@ string Character::getWeightString() const {
 }
 
 bool Character::tooWeakForArmour() const {
-    if( this->getCurrentArmour() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentArmour()->getMinStrength() ) {
+    if( this->getCurrentArmour() != NULL ) {
+        return tooWeakForArmour(this->getCurrentArmour());
+    }
+    return false;
+}
+
+bool Character::tooWeakForArmour(const Armour *armour) const {
+    if( this->getProfileIntProperty(profile_key_S_c) < armour->getMinStrength() ) {
         return true;
     }
     return false;
@@ -1441,7 +1448,14 @@ bool Character::tooWeakForArmour() const {
 }
 
 bool Character::tooWeakForWeapon() const {
-    if( this->getCurrentWeapon() != NULL && this->getProfileIntProperty(profile_key_S_c) < this->getCurrentWeapon()->getMinStrength() ) {
+    if( this->getCurrentWeapon() != NULL ) {
+        return tooWeakForWeapon(this->getCurrentWeapon());
+    }
+    return false;
+}
+
+bool Character::tooWeakForWeapon(const Weapon *weapon) const {
+    if( this->getProfileIntProperty(profile_key_S_c) < weapon->getMinStrength() ) {
         return true;
     }
     return false;

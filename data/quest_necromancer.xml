@@ -19,6 +19,7 @@ You are eager to do what you can to help. You head east towards the village of A
 
 <quest_objective type="find_item" arg1="Vespar's Skull" gold="500"/>
 
+<!-- need to ensure all Characters can carry the weight, and have weapons they can use -->
 <start_bonus
     FP="2" BS="2" S="1" A="0" M="2" D="1" B="2" Sp="0.5"
     bonus_health="24"

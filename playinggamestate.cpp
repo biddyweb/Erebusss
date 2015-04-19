@@ -2882,37 +2882,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
         qApp->processEvents();
 
         LOG("load quests\n");
-        {
-            QFile file(QString(DEPLOYMENT_PATH) + "data/quests.xml");
-            if( !file.open(QFile::ReadOnly | QFile::Text) ) {
-                throw string("Failed to open quests xml file");
-            }
-            QXmlStreamReader reader(&file);
-            while( !reader.atEnd() && !reader.hasError() ) {
-                reader.readNext();
-                if( reader.isStartElement() )
-                {
-                    if( reader.name() == "quest" ) {
-                        QStringRef filename_s = reader.attributes().value("filename");
-                        qDebug("found quest: %s", filename_s.toString().toStdString().c_str());
-                        if( filename_s.length() == 0 ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("quest doesn't have filename info");
-                        }
-                        QuestInfo quest_info(filename_s.toString().toStdString());
-                        this->quest_list.push_back(quest_info);
-                    }
-                }
-            }
-            if( reader.hasError() ) {
-                LOG("error at line %d\n", reader.lineNumber());
-                LOG("error reading quests.xml %d: %s", reader.error(), reader.errorString().toStdString().c_str());
-                throw string("error reading quests xml file");
-            }
-        }
-        if( this->quest_list.size() == 0 ) {
-            throw string("failed to find any quests");
-        }
+        this->quest_list = game_g->loadQuests();
+
         gui_overlay->setProgress(100);
         qApp->processEvents();
 
@@ -4959,8 +4930,12 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     if( questXMLType == QUEST_XML_TYPE_STARTBONUS ) {
                         if( cheat_mode ) {
                             Item *item = this->loadItem(&pos, reader, NULL, NULL, true);
+                            bool item_is_useful = true;
                             if( item->getType() == ITEMTYPE_WEAPON ) {
-                                if( player->getCurrentWeapon() != NULL && !static_cast<Weapon *>(item)->isRangedOrThrown() && player->getCurrentWeapon()->getDamageScore() < static_cast<Weapon *>(item)->getDamageScore() ) {
+                                if( player->tooWeakForWeapon(static_cast<Weapon *>(item)) ) {
+                                    item_is_useful = false;
+                                }
+                                else if( player->getCurrentWeapon() != NULL && !static_cast<Weapon *>(item)->isRangedOrThrown() && player->getCurrentWeapon()->getDamageScore() < static_cast<Weapon *>(item)->getDamageScore() ) {
                                     player->armWeapon(NULL);
                                     if( static_cast<Weapon *>(item)->isTwoHanded() ) {
                                         player->armShield(NULL);
@@ -4968,11 +4943,37 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                                 }
                             }
                             else if( item->getType() == ITEMTYPE_ARMOUR ) {
-                                if( player->getCurrentArmour() != NULL && player->getCurrentArmour()->getRating() < static_cast<Armour *>(item)->getRating() ) {
+                                if( player->tooWeakForArmour(static_cast<Armour *>(item)) ) {
+                                    item_is_useful = false;
+                                }
+                                else if( player->getCurrentArmour() != NULL && player->getCurrentArmour()->getRating() < static_cast<Armour *>(item)->getRating() ) {
                                     player->wearArmour(NULL);
                                 }
                             }
-                            player->addItem(item, true);
+                            if( item_is_useful ) {
+                                player->addItem(item, true);
+
+                                while( player->carryingTooMuch() ) {
+                                    Item *lose_item = NULL;
+                                    for(set<Item *>::iterator iter = player->itemsBegin(); iter != player->itemsEnd(); ++iter) {
+                                        Item *item = *iter;
+                                        if( item->getType() == ITEMTYPE_ARMOUR && item != player->getCurrentArmour() ) {
+                                            lose_item = item;
+                                            break;
+                                        }
+                                    }
+                                    if( lose_item ) {
+                                        player->takeItem(lose_item);
+                                        delete lose_item;
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                }
+                            }
+                            else {
+                                delete item;
+                            }
                         }
                     }
                     else {
