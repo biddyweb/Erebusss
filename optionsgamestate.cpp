@@ -466,6 +466,12 @@ void OptionsGamestate::clickedStart() {
             firstQuestComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
             g_layout->addWidget(firstQuestComboBox, n_row, 1);
             n_row++;
+
+            QTextEdit *text_edit = new QTextEdit();
+            game_g->setTextEdit(text_edit);
+            text_edit->setText("Select which quest you want to start with. Normally you'll want to start playing the campaign from the first quest, but if you prefer, you can jump straight in and start playing from a later quest. If you do, your character will have their stats/items/gold improved to reflect the experience you would have gained playing the earlier quests that you've skipped.");
+            g_layout->addWidget(text_edit, n_row, 1);
+            n_row++;
         }
     }
 
