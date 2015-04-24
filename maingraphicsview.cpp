@@ -9,9 +9,6 @@
 #include "game.h"
 #include "logiface.h"
 
-const float MainGraphicsView::min_zoom_c = 10.0f;
-const float MainGraphicsView::max_zoom_c = 200.0f;
-
 TextEffect::TextEffect(MainGraphicsView *view, const QString &text, int duration_ms, const QColor &color) :
     QGraphicsTextItem(text), time_expire(0), view(view) {
 
@@ -47,7 +44,7 @@ void TextEffect::advance(int phase) {
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
     QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
-    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0),
+    /*gui_overlay_item(NULL),*/ gui_overlay(NULL), has_init_zoom(false), min_zoom(0.0f), max_zoom(0.0f), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0),
     has_new_center_on(false)
 {
     this->fps_timer.invalidate();
@@ -559,11 +556,14 @@ void MainGraphicsView::updateInput() {
 
 void MainGraphicsView::setScale(float c_scale) {
     LOG("MainGraphicsView::setScale(%f)\n", c_scale);
+    if( !has_init_zoom ) {
+        throw new string("didn't initialise zoom");
+    }
     this->calculated_lighting_pixmap_scaled = false;
     this->lasttime_calculated_lighting_pixmap_scaled_ms = game_g->getGameTimeTotalMS(); // although we haven't calculated it here, we want to postpone the time when we next recalculate it
     this->c_scale = c_scale;
-    this->c_scale = std::min(this->c_scale, max_zoom_c);
-    this->c_scale = std::max(this->c_scale, min_zoom_c);
+    this->c_scale = std::min(this->c_scale, max_zoom);
+    this->c_scale = std::max(this->c_scale, min_zoom);
     this->resetTransform();
     if( this->playing_gamestate->isTransform3D() ) {
         this->scale(this->c_scale, 0.5f*this->c_scale);
@@ -609,6 +609,26 @@ void MainGraphicsView::setScale(QPointF centre, float c_scale) {
     // not needed for Android, and indeed seems to make things more jerky there
     qApp->processEvents();
 #endif
+}
+
+void MainGraphicsView::setInitialScale(int window_width, bool is_3d) {
+
+    this->has_init_zoom = true;
+    //this->min_zoom = 10.0f;
+    //this->max_zoom = 200.0f;
+    this->min_zoom = window_width / 192.0f;
+    this->max_zoom = window_width / 9.6f;
+    if( smallscreen_c )
+        this->max_zoom *= 2.0f;
+
+    float desired_width_c = smallscreen_c ? 10.0f : 20.0f; // this is the desired width of the screen in units - so smaller value means more zoomed in
+    if( is_3d ) {
+        desired_width_c /= 1.5f;
+    }
+    float initial_scale = window_width / desired_width_c;
+    LOG("width: %d\n", window_width);
+    LOG("initial_scale: %f\n", initial_scale);
+    this->setScale(initial_scale);
 }
 
 void MainGraphicsView::addTextEffect(TextEffect *text_effect) {

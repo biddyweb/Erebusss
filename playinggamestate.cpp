@@ -3572,16 +3572,7 @@ void PlayingGamestate::setupView() {
     const float extra_offset_c = 5.0f; // so we can still scroll slightly past the boundary, and also that multitouch works beyond the boundary
     //scene->setSceneRect(0, -offset_y, location_width, location_height + 2*offset_y);
     scene->setSceneRect(-extra_offset_c, -offset_y-extra_offset_c, location_width+2*extra_offset_c, location_height + 2*offset_y + 2*extra_offset_c);
-    {
-        float desired_width_c = smallscreen_c ? 10.0f : 20.0f;
-        if( this->view_transform_3d ) {
-            desired_width_c /= 1.5f;
-        }
-        float initial_scale = window->width() / desired_width_c;
-        LOG("width: %d\n", window->width());
-        LOG("initial_scale: %f\n", initial_scale);
-        view->setScale(initial_scale);
-    }
+    view->setInitialScale(window->width(), this->view_transform_3d);
 
     QBrush floor_brush(builtin_images[c_location->getFloorImageName()]);
 

@@ -56,6 +56,9 @@ private:
     float kinetic_scroll_speed;
     //QGraphicsProxyWidget *gui_overlay_item;
     GUIOverlay *gui_overlay;
+    bool has_init_zoom;
+    float min_zoom;
+    float max_zoom;
     float c_scale;
     set<TextEffect *> text_effects;
     bool calculated_lighting_pixmap;
@@ -73,11 +76,10 @@ private:
 
     bool handleKey(const QKeyEvent *event, bool down);
 
-    const static float min_zoom_c;
-    const static float max_zoom_c;
-
     QPointF getCenter() const;
     void zoom(QPointF zoom_centre, bool in);
+    void setScale(float c_scale);
+    void setScale(QPointF centre, float c_scale);
     void mousePress(int m_x, int m_y);
     void mouseRelease(int m_x, int m_y);
     void mouseMove(int m_x, int m_y);
@@ -107,8 +109,7 @@ public:
     void createLightingMap(unsigned char lighting_min);
     void updateInput();
     void resetKeyboard();
-    void setScale(float c_scale);
-    void setScale(QPointF centre, float c_scale);
+    void setInitialScale(int window_width, bool is_3d);
     float getScale() const {
         return this->c_scale;
     }
