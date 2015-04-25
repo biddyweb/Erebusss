@@ -234,7 +234,7 @@ void MainGraphicsView::processTouchEvent(QTouchEvent *touchEvent) {
         /*setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
                                         totalScaleFactor * currentScaleFactor));*/
         float n_scale = c_scale *scale_factor;
-        LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
+        //LOG("multitouch scale: %f : %f\n", scale_factor, n_scale);
         this->setScale(zoom_centre, n_scale);
     }
 }
@@ -555,7 +555,7 @@ void MainGraphicsView::updateInput() {
 }
 
 void MainGraphicsView::setScale(float c_scale) {
-    LOG("MainGraphicsView::setScale(%f)\n", c_scale);
+    //LOG("MainGraphicsView::setScale(%f)\n", c_scale);
     if( !has_init_zoom ) {
         throw new string("didn't initialise zoom");
     }
@@ -574,7 +574,7 @@ void MainGraphicsView::setScale(float c_scale) {
 }
 
 void MainGraphicsView::setScale(QPointF centre, float c_scale) {
-    LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
+    //LOG("MainGraphicsView::setScale((%f, %f), %f)\n", centre.x(), centre.y(), c_scale);
     float old_scale = this->c_scale;
     QPointF view_centre = this->getCenter();
 
