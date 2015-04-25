@@ -241,6 +241,7 @@ Game::~Game() {
     if( webViewEventFilter != NULL ) {
         LOG("delete webViewEventFilter");
         delete webViewEventFilter;
+        webViewEventFilter = NULL;
     }
 
     if( style != NULL ) {
@@ -657,6 +658,9 @@ void Game::updateInput() {
     this->handleMessages(); // needed to process any messages from earlier updateInput call
     if( gamestate != NULL ) {
         gamestate->updateInput();
+    }
+    if( this->webViewEventFilter != NULL ) {
+        webViewEventFilter->updateInput();
     }
 }
 
