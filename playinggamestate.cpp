@@ -6141,19 +6141,29 @@ void PlayingGamestate::closeSubWindow() {
 }
 
 void PlayingGamestate::closeAllSubWindows() {
-    LOG("PlayingGamestate::closeAllSubWindows");
+    LOG("PlayingGamestate::closeAllSubWindows\n");
     while( this->widget_stack.size() > 1 ) {
+        LOG("stack size %d\n", this->widget_stack.size());
         QWidget *subwindow = this->widget_stack.at(this->widget_stack.size()-1);
+        LOG("delete later: %d\n", subwindow);
         /*if( this->main_stacked_widget != NULL ) {
             this->main_stacked_widget->removeWidget(subwindow);
         }*/
-        subwindow->deleteLater();
         this->widget_stack.erase(this->widget_stack.begin()+this->widget_stack.size()-1);
+        subwindow->hide();
+        subwindow->deleteLater();
+        LOG("deleted\n");
     }
+    LOG("done deleting windows\n");
     game_g->setPaused(false, true);
+    LOG("view: %d\n", this->view);
+    LOG("about to set enabled\n");
     this->view->setEnabled(true);
+    LOG("about to grab keyboard\n");
     this->view->grabKeyboard();
+    LOG("about to reset keyboard\n");
     this->view->resetKeyboard();
+    LOG("PlayingGamestate::closeAllSubWindows done\n");
 }
 
 void PlayingGamestate::quitGame() {
