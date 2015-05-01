@@ -9,6 +9,17 @@
 #include "game.h"
 #include "logiface.h"
 
+const int update_interval_c = 16;
+
+WebViewEventFilter::WebViewEventFilter(QObject *parent) : QObject(parent),
+    textEdit(NULL),
+    filterMouseMove(false), orig_mouse_x(0), orig_mouse_y(0), saved_mouse_x(0), saved_mouse_y(0), saved_mouse_ms(0), last_scroll_y(-1),
+    has_kinetic_scroll(false), kinetic_scroll_speed(0.0f) {
+
+    QObject::connect(&timer, SIGNAL(timeout()), this, SLOT(timerSlot()));
+    timer.start(update_interval_c);
+}
+
 void WebViewEventFilter::setTextEdit(QTextEdit *textEdit) {
     qDebug("setTextEdit");
     if( this->textEdit != NULL ) {
@@ -22,6 +33,7 @@ void WebViewEventFilter::setTextEdit(QTextEdit *textEdit) {
     this->orig_mouse_y = 0;
     this->saved_mouse_x = 0;
     this->saved_mouse_y = 0;
+    this->saved_mouse_ms = 0;
     this->last_scroll_y = -1;
 
     connect(textEdit, SIGNAL(destroyed(QObject *)), this, SLOT(textEditDestroyed(QObject *)));
@@ -55,6 +67,7 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
                         filterMouseMove = true;
                         orig_mouse_x = saved_mouse_x = mouseEvent->globalX();
                         orig_mouse_y = saved_mouse_y = mouseEvent->globalY();
+                        saved_mouse_ms = game_g->getElapsedMS();
                         has_kinetic_scroll = false;
                     }
                 }
@@ -158,9 +171,10 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
                         QPointF old_pos(this->saved_mouse_x, this->saved_mouse_y);
                         QPointF new_pos(new_mouse_x, new_mouse_y);
                         QPointF diff = old_pos - new_pos; // n.b., scene scrolls in opposite direction to mouse movement
-                        // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
-                        if( fabs(diff.x()) > tolerance || fabs(diff.y()) > tolerance ) {
-                            int time_ms = game_g->getInputTimeFrameMS();
+                        qDebug("    diff: %f, %f", diff.x(), diff.y());
+                        if( fabs(diff.x()) > 0 || fabs(diff.y()) > 0 ) {
+                            int time_ms = game_g->getElapsedMS() - saved_mouse_ms; // we don't use getElapsedFrameMS(), as we don't know how many times we have received mouse move event per frame
+                            qDebug("    time_ms: %d", time_ms);
                             if( time_ms > 0 ) {
                                 diff /= (float)time_ms;
                                 this->has_kinetic_scroll = true;
@@ -168,7 +182,7 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
                                 this->kinetic_scroll_speed = this->kinetic_scroll_dir.magnitude();
                                 this->kinetic_scroll_dir /= this->kinetic_scroll_speed;
                                 //this->kinetic_scroll_speed = std::min(this->kinetic_scroll_speed, 1.0f);
-                                //qDebug("    speed: %f", this->kinetic_scroll_speed);
+                                qDebug("    speed: %f", this->kinetic_scroll_speed);
                             }
                         }
                         else {
@@ -177,6 +191,7 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
 
                         saved_mouse_x = new_mouse_x;
                         saved_mouse_y = new_mouse_y;
+                        saved_mouse_ms = game_g->getElapsedMS();
                     }
                     return true;
                 }
@@ -195,14 +210,15 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
     return false;
 }
 
-void WebViewEventFilter::updateInput() {
+void WebViewEventFilter::timerSlot() {
     if( (qApp->mouseButtons() & Qt::LeftButton) == 0 && has_kinetic_scroll && textEdit != NULL ) {
-        int time_ms = game_g->getInputTimeFrameMS();
+        int time_ms = game_g->getElapsedFrameMS();
         //qDebug("centre was: %f, %f", centre.x(), centre.y());
         float step = time_ms*this->kinetic_scroll_speed;
+        qDebug("kinetic scroll: %f", step);
         //float move_x = step * this->kinetic_scroll_dir.x;
         float move_y = step * this->kinetic_scroll_dir.y;
-        //qDebug("    move: %f, %f", move_x, move_y);
+        qDebug("    move_y: %f", move_y);
 
         int value_y = textEdit->verticalScrollBar()->value();
         value_y += (int)move_y;

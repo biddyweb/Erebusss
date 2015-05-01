@@ -410,6 +410,10 @@ int Game::getInputTimeFrameMS() const {
     return this->screen->getInputTimeFrameMS();
 }
 
+int Game::getElapsedMS() const {
+    return this->screen->getElapsedMS();
+}
+
 int Game::getElapsedFrameMS() const {
     return this->screen->getElapsedFrameMS();
 }
@@ -658,9 +662,6 @@ void Game::updateInput() {
     this->handleMessages(); // needed to process any messages from earlier updateInput call
     if( gamestate != NULL ) {
         gamestate->updateInput();
-    }
-    if( this->webViewEventFilter != NULL ) {
-        webViewEventFilter->updateInput();
     }
 }
 

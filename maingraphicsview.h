@@ -50,6 +50,7 @@ private:
     bool single_left_mouse_down; // if left mouse button is down, and not a multitouch operation
     bool has_last_mouse;
     int last_mouse_x, last_mouse_y;
+    int last_mouse_ms;
     //float kinetic_scroll_x, kinetic_scroll_y;
     bool has_kinetic_scroll;
     Vector2D kinetic_scroll_dir;

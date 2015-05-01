@@ -43,7 +43,7 @@ void TextEffect::advance(int phase) {
 }
 
 MainGraphicsView::MainGraphicsView(PlayingGamestate *playing_gamestate, QGraphicsScene *scene, QWidget *parent) :
-    QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
+    QGraphicsView(scene, parent), playing_gamestate(playing_gamestate), mouse_down_x(0), mouse_down_y(0), single_left_mouse_down(false), has_last_mouse(false), last_mouse_x(0), last_mouse_y(0), last_mouse_ms(0), has_kinetic_scroll(false), kinetic_scroll_speed(0.0f),
     /*gui_overlay_item(NULL),*/ gui_overlay(NULL), has_init_zoom(false), min_zoom(0.0f), max_zoom(0.0f), c_scale(1.0f), calculated_lighting_pixmap(false), calculated_lighting_pixmap_scaled(false), lasttime_calculated_lighting_pixmap_scaled_ms(0), darkness_alpha(0), fps_frame_count(0),
     has_new_center_on(false)
 {
@@ -107,6 +107,7 @@ void MainGraphicsView::mousePress(int m_x, int m_y) {
     this->has_last_mouse = true;
     this->last_mouse_x = m_x;
     this->last_mouse_y = m_y;
+    this->last_mouse_ms = game_g->getElapsedMS();
 }
 
 // On a touchscreen phone, it's very hard to press and release without causing a drag, so need to allow some tolerance!
@@ -159,7 +160,7 @@ void MainGraphicsView::mouseMove(int m_x, int m_y) {
 
             // need to check against drag_tol_c, otherwise simply clicking can cause us to move with kinetic motion (at least on Android)
             if( fabs(diff.x()) > drag_tol_c || fabs(diff.y()) > drag_tol_c ) {
-                int time_ms = game_g->getInputTimeFrameMS();
+                int time_ms = game_g->getElapsedMS() - last_mouse_ms; // we don't use getElapsedFrameMS(), as we don't know how many times mouseMove() may have been called per frame
                 if( time_ms > 0 ) {
                     diff /= (float)time_ms;
                     this->has_kinetic_scroll = true;
@@ -181,6 +182,7 @@ void MainGraphicsView::mouseMove(int m_x, int m_y) {
         this->has_last_mouse = true;
         this->last_mouse_x = m_x;
         this->last_mouse_y = m_y;
+        this->last_mouse_ms = game_g->getElapsedMS();
     }
 }
 

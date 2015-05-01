@@ -10,8 +10,9 @@ class ScrollingListWidget : public QListWidget {
 
     QTimer timer;
 
-    int saved_x;
-    int saved_y;
+    int saved_mouse_x;
+    int saved_mouse_y;
+    int saved_mouse_ms;
     bool has_kinetic_scroll;
     float kinetic_scroll_speed;
 
