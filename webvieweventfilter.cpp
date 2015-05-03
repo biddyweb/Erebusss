@@ -52,7 +52,7 @@ bool WebViewEventFilter::eventFilter(QObject *, QEvent *event) {
     switch( event->type() ) {
         case QEvent::Timer:
             {
-                // hack to fix problem where when drag-scrolling with mouse or touch, when mouse/pointer moves outside the textedit, it starts scrolling in the opposte direction
+                // hack to fix problem where when drag-scrolling with mouse or touch, when mouse/pointer moves outside the textedit, it starts scrolling in the opposite direction
                 return true;
                 break;
             }
