@@ -2446,8 +2446,6 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
                         }
 
                         if( type == "generic") {
-
-
                             if( animation_layer_definition.size() > 0 ) {
                                 LOG("error at line %d\n", reader.lineNumber());
                                 throw string("animations not supported for this animation type");
