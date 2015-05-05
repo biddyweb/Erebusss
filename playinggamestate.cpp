@@ -1867,15 +1867,23 @@ void SaveGameWindow::requestNewSaveGame() {
     QLabel *label = new QLabel(tr("Choose a filename:"));
     layout->addWidget(label);
 
+    QHBoxLayout *h_layout = new QHBoxLayout();
+    layout->addLayout(h_layout);
+
     this->edit = new QLineEdit(filename);
     edit->grabKeyboard(); // needed, due to previously having set the savegame list to grab the keyboard
     // disallow: \ / : * ? " < > |
     QRegExp rx("[^\\\\/:*?\"<>|]*");
     QValidator *validator = new QRegExpValidator(rx, this);
     this->edit->setValidator(validator);
-    layout->addWidget(edit);
+    h_layout->addWidget(edit);
     this->edit->setFocus();
     this->edit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard - problem that pressing "Finished" we don't pick up latest text, and makes Swype crash); probably useful on other platforms
+
+#if defined(_WIN32)
+    QPushButton *oskButton = game_g->createOSKButton(edit);
+    h_layout->addWidget(oskButton);
+#endif
 
     QPushButton *saveButton = new QPushButton(tr("Save game"));
     game_g->initButton(saveButton);
@@ -2892,15 +2900,8 @@ PlayingGamestate::PlayingGamestate(bool is_savegame, GameType gameType, const st
             layout->setColumnStretch(0, 1);
             layout->setRowStretch(1, 1);
             int col = 1;
-            MainWindow *window = game_g->getMainWindow();
-            const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
-            const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
-            const int icon_size = (icon_resolution_independent_size*window->width())/640;
-            const int button_size = (button_resolution_independent_size*window->width())/640;
-            LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
-            LOG("button_resolution_independent_size: %d\n", button_resolution_independent_size);
-            LOG("icon_size: %d\n", icon_size);
-            LOG("button_size: %d\n", button_size);
+            const int icon_size = game_g->getIconSize();
+            const int button_size = game_g->getIconSize();
 
             QIcon turboIcon(this->builtin_images["gui_time"]);
             turboButton = new QPushButton(turboIcon, "");
@@ -6140,6 +6141,9 @@ void PlayingGamestate::closeSubWindow() {
 
 void PlayingGamestate::closeAllSubWindows() {
     LOG("PlayingGamestate::closeAllSubWindows\n");
+#if defined(_WIN32)
+    game_g->clearOSKButton();
+#endif
     while( this->widget_stack.size() > 1 ) {
         LOG("stack size %d\n", this->widget_stack.size());
         QWidget *subwindow = this->widget_stack.at(this->widget_stack.size()-1);

@@ -241,6 +241,9 @@ OptionsGamestate::~OptionsGamestate() {
 void OptionsGamestate::cleanup() {
     LOG("OptionsGamestate::cleanup()\n");
     game_g->freeSound("music_intro");
+#if defined(_WIN32)
+    game_g->clearOSKButton();
+#endif
 
     MainWindow *window = game_g->getMainWindow();
     window->centralWidget()->deleteLater();
@@ -389,6 +392,10 @@ void OptionsGamestate::clickedStart() {
             int character_id = this->characterComboBox->currentIndex();
             nameLineEdit = new QLineEdit( game_g->getPlayerType(character_id).c_str() );
             g_layout->addWidget(nameLineEdit, n_row, 1);
+#if defined(_WIN32)
+            QPushButton *oskButton = game_g->createOSKButton(nameLineEdit);
+            g_layout->addWidget(oskButton, n_row, 2);
+#endif
             n_row++;
             nameLineEdit->setFocus();
             nameLineEdit->setInputMethodHints(Qt::ImhNoPredictiveText); // needed on Android at least due to buggy behaviour (both with default keyboard - problem that pressing "Finished" we don't pick up latest text, and makes Swype crash); probably useful on other platforms
@@ -861,6 +868,9 @@ void OptionsGamestate::closeSubWindow() {
 
 void OptionsGamestate::closeAllSubWindows() {
     LOG("OptionsGamestate::closeAllSubWindows\n");
+#if defined(_WIN32)
+    game_g->clearOSKButton();
+#endif
     while( this->main_stacked_widget->count() > 1 ) {
         QWidget *subwindow = this->main_stacked_widget->widget(this->main_stacked_widget->count()-1);
         this->main_stacked_widget->removeWidget(subwindow);

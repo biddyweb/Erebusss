@@ -16,6 +16,8 @@
 #include <QDir>
 #include <QDateTime>
 #include <QTextEdit>
+#include <QLineEdit>
+#include <QProcess>
 
 #if QT_VERSION < 0x050000
 #include <QWindowsStyle>
@@ -53,7 +55,7 @@ const int default_lighting_enabled_c = true;
 QuestInfo::QuestInfo(const string &filename, const string &name) : filename(filename), name(name) {
 }
 
-Game::Game() : is_testing(false), test_n_info_dialog(0), settings(NULL), style(NULL), webViewEventFilter(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
+Game::Game() : is_testing(false), test_n_info_dialog(0), settings(NULL), style(NULL), webViewEventFilter(NULL), osk_lineEdit(NULL), gamestate(NULL), screen(NULL), /*sound_enabled(default_sound_enabled_c),*/
 #ifdef Q_OS_ANDROID
     sdcard_ok(false),
 #else
@@ -382,6 +384,24 @@ const MainWindow *Game::getMainWindow() const {
     return this->screen->getMainWindow();
 }
 
+int Game::getIconSize() const {
+    MainWindow *window = game_g->getMainWindow();
+    const int icon_resolution_independent_size = smallscreen_c ? 24 : 18;
+    const int icon_size = (icon_resolution_independent_size*window->width())/640;
+    LOG("icon_resolution_independent_size: %d\n", icon_resolution_independent_size);
+    LOG("icon_size: %d\n", icon_size);
+    return icon_size;
+}
+
+int Game::getButtonSize() const {
+    MainWindow *window = game_g->getMainWindow();
+    const int button_resolution_independent_size = smallscreen_c ? 32 : 24;
+    const int button_size = (button_resolution_independent_size*window->width())/640;
+    LOG("button_resolution_independent_size: %d\n", button_resolution_independent_size);
+    LOG("button_size: %d\n", button_size);
+    return button_size;
+}
+
 bool Game::isPaused() const {
     return this->screen->isPaused();
 }
@@ -534,6 +554,37 @@ void Game::initButton(QWidget *button) const {
     button->setStyle(style);
     button->setAutoFillBackground(true);
     button->setPalette(this->gui_palette);
+}
+
+#if defined(_WIN32)
+QPushButton *Game::createOSKButton(QLineEdit *lineEdit) {
+    this->osk_lineEdit = lineEdit;
+
+    const int icon_size = this->getIconSize();
+    QPixmap oskPixmap = this->loadImage("gfx/textures/gui/touchkeyboard.png");
+    QIcon oskIcon(oskPixmap);
+    QPushButton *oskButton = new QPushButton(oskIcon, "");
+    oskButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    oskButton->setIconSize(QSize(icon_size, icon_size));
+    oskButton->setToolTip(tr("Display on screen keyboard"));
+    connect(oskButton, SIGNAL(clicked()), this, SLOT(showOSK()));
+    return oskButton;
+}
+
+void Game::clearOSKButton() {
+    this->osk_lineEdit = NULL;
+}
+#endif
+
+void Game::showOSK() {
+#if defined(_WIN32)
+    LOG("Game::clickedOSK");
+    if( osk_lineEdit != NULL ) {
+        osk_lineEdit->selectAll();
+        osk_lineEdit->setFocus();
+    }
+    QProcess::startDetached("explorer.exe", QStringList() << "C:\\Program Files\\Common Files\\Microsoft Shared\\ink\\TabTip.exe");
+#endif
 }
 
 void Game::handleMessages() {

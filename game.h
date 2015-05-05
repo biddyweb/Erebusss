@@ -17,6 +17,7 @@ using std::pair;
 using std::string;
 
 #include <QSettings>
+#include <QPushButton>
 #include <QTextEdit>
 
 #include "common.h"
@@ -127,7 +128,9 @@ public:
     }
 };
 
-class Game {
+class Game : public QObject {
+    Q_OBJECT
+
 protected:
     bool is_testing;
     int test_n_info_dialog;
@@ -153,6 +156,8 @@ protected:
 
     WebViewEventFilter *webViewEventFilter;
 
+    QLineEdit *osk_lineEdit;
+
     QPalette gui_palette;
     QBrush gui_brush_buttons;
 
@@ -174,6 +179,9 @@ protected:
     void createPlayerNames();
     void loadPortraits();
 
+private slots:
+    void showOSK();
+
 public:
     Game();
     ~Game();
@@ -187,6 +195,8 @@ public:
     bool isFullscreen() const;
     MainWindow *getMainWindow();
     const MainWindow *getMainWindow() const;
+    int getIconSize() const;
+    int getButtonSize() const;
     bool isPaused() const;
     void setPaused(bool paused, bool also_input);
     void togglePaused();
@@ -216,6 +226,10 @@ public:
     QPixmap &getPortraitImage(const string &name);
 
     void initButton(QWidget *button) const;
+#if defined(_WIN32)
+    QPushButton *createOSKButton(QLineEdit *lineEdit);
+    void clearOSKButton();
+#endif
 
     void pushMessage(GameMessage *message) {
         message_queue.push(message);
