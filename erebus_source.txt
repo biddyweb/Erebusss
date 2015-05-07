@@ -3,12 +3,13 @@ Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linu
 Linux
 =====
 
-To compile from the command line, you need to install Qt 4 and SFML 2. On Ubuntu and Debian, you can install the required Qt libraries with:
+To compile from the command line, you need to install Qt 4 and SFML 2. On Ubuntu and Debian, you can install the required libraries with:
 
 sudo apt-get install g++
 sudo apt-get install libqt4-dev
+sudo apt-get install libsfml-dev
 
-And SFML can be installed as follows - this needs version 2, which isn't currently available in Ubuntu, hence you need to add the PPA as follows:
+If you get an error when trying to install libsfml-dev, try the following commands:
 
 sudo apt-add-repository ppa:sonkun/sfml-stable
 sudo apt-get update
@@ -90,4 +91,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 23 November 2014
+Mark Harman 7 May 2015
