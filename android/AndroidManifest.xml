@@ -66,7 +66,6 @@
         <screen android:screenSize="xlarge" android:screenDensity="560"/>
     </compatible-screens>
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>
-    <!-- %%INSERT_PERMISSIONS -->
-    <!-- %%INSERT_FEATURES -->
+	<!-- we don't use Qt's INSERT_PERMISSIONS and INSERT_FEATURES, as it adds Internet permission! -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 </manifest>
