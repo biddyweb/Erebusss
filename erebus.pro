@@ -104,6 +104,7 @@ android {
 else {
     # SFML:
     win32 {
+        INCLUDEPATH += $$PWD # add the source folder for headers (needed for Qt 5)
         LIBS += -L$$PWD # add the source folder for libs
     }
     CONFIG(debug, debug|release) {
