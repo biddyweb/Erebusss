@@ -3845,6 +3845,9 @@ void PlayingGamestate::refreshDebugItems() {
     {
         // DEBUG ONLY
         QPen wall_pen(Qt::red);
+        // the pen width is affected by the transformation, but setting 0 forces it to ignore the transformation
+        // note that in Qt 4, QPen defaulted to width 0, but in Qt 5 it defaults to width 1, so we set it explicitly
+        wall_pen.setWidth(0);
         for(size_t i=0;i<c_location->getNBoundaries();i++) {
             const Polygon2D *boundary = c_location->getBoundary(i);
             //qDebug("boundary %d:", i);
@@ -3862,6 +3865,9 @@ void PlayingGamestate::refreshDebugItems() {
     {
         // DEBUG ONLY
         QPen wall_pen(Qt::yellow);
+        // the pen width is affected by the transformation, but setting 0 forces it to ignore the transformation
+        // note that in Qt 4, QPen defaulted to width 0, but in Qt 5 it defaults to width 1, so we set it explicitly
+        wall_pen.setWidth(0);
         const Graph *distance_graph = c_location->getDistanceGraph();
         for(size_t i=0;i<distance_graph->getNVertices();i++) {
             const GraphVertex *vertex = distance_graph->getVertex(i);
@@ -5680,6 +5686,9 @@ void PlayingGamestate::locationAddItem(const Location *location, Item *item, boo
         /*{
             // DEBUG
             QPen pen(Qt::red);
+            // the pen width is affected by the transformation, but setting 0 forces it to ignore the transformation
+            // note that in Qt 4, QPen defaulted to width 0, but in Qt 5 it defaults to width 1, so we set it explicitly
+            pen.setWidth(0);
             scene->addEllipse(item->getX() - 0.5f*item_width, item->getY() - 0.5f*item_width, item_width, item_width, pen);
             //scene->addEllipse(item->getX() - 0.05f, item->getY() - 0.05f, 0.1f, 0.1f, pen);
         }*/
