@@ -25,7 +25,7 @@ erebus.rss
 erebus_exe.mmp
 erebus_harmattan.desktop
 erebus_reg.rss
-erebus.pro.user
+erebus.pro.user*
 Thumbs.db
 
 *.dll

@@ -1,12 +1,12 @@
-Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. Windows and Linux use SFML 2 ( http://www.sfml-dev.org/ ) for the audio. The Linux version can also be built more easily from the command line. Qt version 4.8.5 or higher is required.
+Erebus is built using Qt ( http://qt-project.org/ ), available for Windows, Linux and OS X. Windows and Linux use SFML 2 ( http://www.sfml-dev.org/ ) for the audio. The Linux version can also be built more easily from the command line.
 
 Linux
 =====
 
-To compile from the command line, you need to install Qt 4 and SFML 2. On Ubuntu and Debian, you can install the required libraries with:
+To compile from the command line, you need to install Qt 5 and SFML 2. On Ubuntu and Debian, you can install the required libraries with:
 
 sudo apt-get install g++
-sudo apt-get install libqt4-dev
+sudo apt-get install qt5-default
 sudo apt-get install libsfml-dev
 
 If you get an error when trying to install libsfml-dev, try the following commands:
@@ -34,24 +34,24 @@ This means you can launch erebus from the application menu.
 
 The Linux version has been tested on Ubuntu 14.04 64-bit. This also works for the Open Pandora.
 
-Note that the current versions of Debian (6.0 "squeeze" or earlier) only seem to have version 4.6.3 of libqt4-dev, where as Erebus requires 4.8.5 or later. You need to download from the testing or unstable repositories. This should be fixed in version 7.0 "wheezy".
+Note that Erebus may still work with Qt 4.8.5, but this is untested.
 
 Windows
 =======
 
-Use the full Qt SDK with Qt Creator to compile for Windows. This has been tested on Windows 7 and Windows 8. This should also work for Linux. The Windows version is compiled with Qt 4.8.5.
+Use the full Qt SDK with Qt Creator to compile for Windows. This has been tested on Windows 8. This should also work for Linux. The Windows version is compiled with Qt 5.3.
 
-You also need SFML 2, which should be installed as follows:
+You also need SFML 2 (tested with 2.3), which should be installed as follows:
 
-* Download the version that matches bit-ness and compiler being used in Qt (I use 32-bit, VS 2008).
+* Download the version that matches bit-ness and compiler being used in Qt (I use 32-bit, VS 2012).
 * Copy the Audio.hpp, Config.hpp and System.hpp files, and the Audio/ and System/ folders, from include/SFML/ to a SFML/ folder in the erebus/ folder (or copy the whole SFML include folder if you prefer; or alternatively, add the SFML include/ path to the .pro file)
 * Copy the sfml-audio.lib and sfml-system.lib files, and the "-d.lib" versions of those files, to the erebus/ folder (or add the SFML/ lib path the .pro file).
-* Copy the DLLs libsndfile-1.dll, openal32.dll, sfml-audio-2.dll, sfml-audio-d-2.dll, sfml-system-2.dll and sfml-system-d-2.dll to the erebus/ folder.
+* Copy the DLLs openal32.dll, sfml-audio-2.dll, sfml-audio-d-2.dll, sfml-system-2.dll and sfml-system-d-2.dll to the erebus/ folder.
 
 Android
 =======
 
-The Android version is compiled using Qt 5.3.1.
+The Android version is compiled using Qt 5.3.
 
 Symbian
 =======
@@ -68,7 +68,8 @@ History
 
 Note, this history is only for changes related to the source code. See the Erebus readme or homepage for a full history.
 
-0.15 - Android version now compiled using Qt 5.3.1 rather than Necessitas.
+0.16 - Windows version now compiled using Qt 5.3 and Visual Studio 2012 rather than Qt 4.8.5 and Visual Studio 2008.
+0.15 - Android version now compiled using Qt 5.3 rather than Qt 4.8.5 with Necessitas.
 0.11 - Symbian port dropped. Switched from using Phonon to SFML for audio. Dependency on QtWebKit removed. Windows version now compiled with Qt 4.8.5.
 0.6 - Added "make install" support for Linux. Also ported to Pandora.
 0.2 - Switched to using Necessitas alpha 4 for Android.
@@ -91,4 +92,4 @@ Please contact me if you have suggestions, bug fixes or whatever: mark dot harma
 
 Erebus homepage: http://erebusrpg.sourceforge.net
 
-Mark Harman 7 May 2015
+Mark Harman 27 June 2015
