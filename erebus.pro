@@ -71,7 +71,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 # For use with Nokia Ovi Store only:
 symbian:TARGET.UID3 = 0x2006dbd2
 
-VERSION = 0.15 # remember to update version in common.h, and for Android/necessitas!
+VERSION = 0.16 # remember to update version in common.h, and for AndroidManifest.xml!
 
 # Smart Installer package's UID
 # This UID is from the protected range 

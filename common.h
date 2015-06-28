@@ -11,7 +11,7 @@ extern char *DEPLOYMENT_PATH; // defined in main.cpp
 
 // remember to update version in PRO file, and for Android/necessitas!
 const int versionMajor = 0;
-const int versionMinor = 15;
+const int versionMinor = 16;
 
 enum GameType {
     GAMETYPE_CAMPAIGN = 0,
