@@ -3510,7 +3510,7 @@ Item *PlayingGamestate::parseXMLItem(QXmlStreamReader &reader) const {
         this->parseXMLItemProfileAttributeInt(item, reader, profile_key_B_c);
         this->parseXMLItemProfileAttributeFloat(item, reader, profile_key_Sp_c);
 
-        // must be done last
+        // must be done last - will read to the end element
         QString description = reader.readElementText(QXmlStreamReader::IncludeChildElements);
         // get rid of initial whitespace
         while( description.length() > 0 && description.at(0).isSpace() ) {
@@ -4239,6 +4239,8 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
         QStringRef amount_s = reader.attributes().value("amount");
         int amount = parseInt(amount_s.toString());
         item = this->cloneGoldItem(amount);
+        // read until end tag
+        reader.readElementText();
     }
     else if( template_s.length() > 0 ) {
         // load from template
@@ -4253,6 +4255,8 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
             LOG("can't find item: %s\n", template_s.toString().toStdString().c_str());
             throw string("can't find item");
         }
+        // read until end tag
+        reader.readElementText();
     }
     else {
         qDebug("load item");
@@ -4543,6 +4547,7 @@ Scenery *PlayingGamestate::loadScenery(QXmlStreamReader &reader) const {
 }
 
 Trap *PlayingGamestate::loadTrap(QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadTrap");
     QStringRef type_s = reader.attributes().value("type");
     QStringRef rating_s = reader.attributes().value("rating");
     int rating = parseInt(rating_s.toString(), true);
@@ -4553,7 +4558,82 @@ Trap *PlayingGamestate::loadTrap(QXmlStreamReader &reader) const {
     trap->setRating(rating);
     trap->setDifficulty(difficulty);
 
+    // read until end tag
+    reader.readElementText();
+
     return trap;
+}
+
+FloorRegion *PlayingGamestate::loadFloorRegion(QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadFloorRegion");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
+    FloorRegion *floor_region = NULL;
+
+    bool is_polygon = false;
+    QStringRef shape_s = reader.attributes().value("shape");
+    if( shape_s == "rect" ) {
+        QStringRef rect_x_s = reader.attributes().value("rect_x");
+        float rect_x = parseFloat(rect_x_s.toString());
+        QStringRef rect_y_s = reader.attributes().value("rect_y");
+        float rect_y = parseFloat(rect_y_s.toString());
+        QStringRef rect_w_s = reader.attributes().value("rect_w");
+        float rect_w = parseFloat(rect_w_s.toString());
+        QStringRef rect_h_s = reader.attributes().value("rect_h");
+        float rect_h = parseFloat(rect_h_s.toString());
+        //qDebug("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
+        floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
+        // will be added to location when doing the end floorregion element
+    }
+    else if( shape_s == "polygon" ) {
+        is_polygon = true;
+        floor_region = new FloorRegion();
+    }
+    else {
+        LOG("error at line %d\n", reader.lineNumber());
+        throw string("floorregion has unknown shape");
+    }
+    QStringRef visible_s = reader.attributes().value("visible");
+    if( visible_s.length() > 0 ) {
+        bool visible = parseBool(visible_s.toString());
+        floor_region->setVisible(visible);
+    }
+    QStringRef image_name_s = reader.attributes().value("image_name");
+    if( image_name_s.length() > 0 ) {
+        floor_region->setFloorImageName(image_name_s.toString().toStdString());
+    }
+
+    // now read remaining elements
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+        if( reader.isStartElement() ) {
+            if( reader.name() == "floorregion_point" ) {
+                if( !is_polygon ) {
+                    LOG("error at line %d\n", reader.lineNumber());
+                    throw string("floorregion_point not supported for this shape");
+                }
+                QStringRef x_s = reader.attributes().value("x");
+                float x = parseFloat(x_s.toString());
+                QStringRef y_s = reader.attributes().value("y");
+                float y = parseFloat(y_s.toString());
+                floor_region->addPoint(Vector2D(x, y));
+            }
+        }
+        else if( reader.isEndElement() ) {
+            if( reader.name() == attribute_name ) {
+                if( floor_region->getNPoints() < 3 ) {
+                    LOG("floorregion only has %d points\n", floor_region->getNPoints());
+                    LOG("error at line %d\n", reader.lineNumber());
+                    throw string("floorregion has insufficient points");
+                }
+                break;
+            }
+        }
+    }
+
+    return floor_region;
 }
 
 /*XXX *PlayingGamestate::loadXXX(QXmlStreamReader &reader) const {
@@ -4577,6 +4657,8 @@ Trap *PlayingGamestate::loadTrap(QXmlStreamReader &reader) const {
             }
         }
     }
+    // read until end tag
+    //reader.readElementText();
 
     return xxx;
 }*/
@@ -4689,12 +4771,10 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
         bool done_player_start = false;
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
-            QUEST_XML_TYPE_FLOORREGION = 1,
-            QUEST_XML_TYPE_STARTBONUS = 2,
-            QUEST_XML_TYPE_RANDOMSCENERY = 3
+            QUEST_XML_TYPE_STARTBONUS = 1,
+            QUEST_XML_TYPE_RANDOMSCENERY = 2
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
-        FloorRegion *floor_region = NULL;
         QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
@@ -5016,49 +5096,12 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: floorregion element wasn't expected here");
                     }
-                    QStringRef shape_s = reader.attributes().value("shape");
-                    if( shape_s == "rect" ) {
-                        QStringRef rect_x_s = reader.attributes().value("rect_x");
-                        float rect_x = parseFloat(rect_x_s.toString());
-                        QStringRef rect_y_s = reader.attributes().value("rect_y");
-                        float rect_y = parseFloat(rect_y_s.toString());
-                        QStringRef rect_w_s = reader.attributes().value("rect_w");
-                        float rect_w = parseFloat(rect_w_s.toString());
-                        QStringRef rect_h_s = reader.attributes().value("rect_h");
-                        float rect_h = parseFloat(rect_h_s.toString());
-                        //qDebug("found floor region: %f, %f, %f, %f\n", rect_x, rect_y, rect_w, rect_h);
-                        questXMLType = QUEST_XML_TYPE_FLOORREGION;
-                        floor_region = FloorRegion::createRectangle(rect_x, rect_y, rect_w, rect_h);
-                        // will be added to location when doing the end floorregion element
-                    }
-                    else if( shape_s == "polygon" ) {
-                        questXMLType = QUEST_XML_TYPE_FLOORREGION;
-                        floor_region = new FloorRegion();
-                    }
-                    else {
+                    FloorRegion *floor_region = loadFloorRegion(reader);
+                    if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
-                        throw string("floorregion has unknown shape");
+                        throw string("unexpected quest xml: floorregion end element outside of location");
                     }
-                    QStringRef visible_s = reader.attributes().value("visible");
-                    if( visible_s.length() > 0 ) {
-                        bool visible = parseBool(visible_s.toString());
-                        floor_region->setVisible(visible);
-                    }
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    if( image_name_s.length() > 0 ) {
-                        floor_region->setFloorImageName(image_name_s.toString().toStdString());
-                    }
-                }
-                else if( reader.name() == "floorregion_point" ) {
-                    if( questXMLType != QUEST_XML_TYPE_FLOORREGION ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: floorregion_point element wasn't expected here");
-                    }
-                    QStringRef x_s = reader.attributes().value("x");
-                    float x = parseFloat(x_s.toString());
-                    QStringRef y_s = reader.attributes().value("y");
-                    float y = parseFloat(y_s.toString());
-                    floor_region->addPoint(Vector2D(x, y));
+                    location->addFloorRegion(floor_region);
                 }
                 else if( reader.name() == "tilemap" ) {
                     if( location == NULL ) {
@@ -5352,24 +5395,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         throw string("unexpected quest xml: location end element wasn't expected here");
                     }
                     location = NULL;
-                }
-                else if( reader.name() == "floorregion" ) {
-                    if( questXMLType != QUEST_XML_TYPE_FLOORREGION ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: floorregion end element wasn't expected here");
-                    }
-                    if( floor_region->getNPoints() < 3 ) {
-                        LOG("floorregion only has %d points\n", floor_region->getNPoints());
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("floorregion has insufficient points");
-                    }
-                    if( location == NULL ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: floorregion end element outside of location");
-                    }
-                    location->addFloorRegion(floor_region);
-                    floor_region = NULL;
-                    questXMLType = QUEST_XML_TYPE_NONE;
                 }
                 else if( reader.name() == "start_bonus" ) {
                     if( questXMLType != QUEST_XML_TYPE_STARTBONUS ) {

@@ -405,6 +405,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc, bool start_bonus_item) const;
     Scenery *loadScenery(QXmlStreamReader &reader) const;
     Trap *loadTrap(QXmlStreamReader &reader) const;
+    FloorRegion *loadFloorRegion(QXmlStreamReader &reader) const;
 
     void cleanup();
 
