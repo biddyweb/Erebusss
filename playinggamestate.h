@@ -406,6 +406,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Scenery *loadScenery(QXmlStreamReader &reader) const;
     Trap *loadTrap(QXmlStreamReader &reader) const;
     FloorRegion *loadFloorRegion(QXmlStreamReader &reader) const;
+    void loadStartBonus(QXmlStreamReader &reader, bool cheat_mode) const;
 
     void cleanup();
 
