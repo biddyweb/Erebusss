@@ -4901,10 +4901,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
     {
         int progress_lo = 10, progress_hi = 50;
         bool done_player_start = false;
-        enum QuestXMLType {
-            QUEST_XML_TYPE_NONE = 0
-        };
-        QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
             throw string("Failed to open quest xml file");
@@ -4924,15 +4920,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     qApp->processEvents();
                 }
 
-                qDebug("read start element: %s (questXMLType=%d)", reader.name().toString().toStdString().c_str(), questXMLType);
+                qDebug("read start element: %s", reader.name().toString().toStdString().c_str());
                 if( reader.name() == "quest" ) {
                     if( is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: quest element not expected in save games");
-                    }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: quest element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     quest->setName(name_s.toString().toStdString());
@@ -4942,19 +4934,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: info element not expected in save games");
                     }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: info element wasn't expected here");
-                    }
                     QString info = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     qDebug("quest info: %s\n", info.toStdString().c_str());
                     quest->setInfo(info.toStdString());
                 }
                 else if( reader.name() == "completed_text" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: completed_text element wasn't expected here");
-                    }
                     QString completed_text = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     qDebug("quest completed_text: %s\n", completed_text.toStdString().c_str());
                     quest->setCompletedText(completed_text.toStdString());
@@ -4963,10 +4947,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     if( !is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: savegame element only allowed in save games");
-                    }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: savegame element wasn't expected here");
                     }
                     QStringRef savegame_version_s = reader.attributes().value("savegame_version");
                     int savegame_version = parseInt(savegame_version_s.toString());
@@ -4980,10 +4960,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     if( !is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: current_quest element only allowed in save games");
-                    }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: current_quest element wasn't expected here");
                     }
                     QStringRef name_s = reader.attributes().value("name");
                     bool found = false;
@@ -5005,10 +4981,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: journal element only allowed in save games");
                     }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: journal element wasn't expected here");
-                    }
                     QString encoded = reader.readElementText(QXmlStreamReader::IncludeChildElements);
                     QByteArray journal = QByteArray::fromPercentEncoding(encoded.toLatin1());
                     this->journal_ss.clear();
@@ -5019,10 +4991,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: time_hours element only allowed in save games");
                     }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: time_hours element wasn't expected here");
-                    }
                     QStringRef time_hours_s = reader.attributes().value("value");
                     this->time_hours = parseInt(time_hours_s.toString());
                     LOG("time_hours = %d\n", time_hours);
@@ -5031,10 +4999,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     if( !is_savegame ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: game element only allowed in save games");
-                    }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: game element wasn't expected here");
                     }
 
                     QStringRef difficulty_s = reader.attributes().value("difficulty");
@@ -5137,10 +5101,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     quest->addLocation(location);
                 }
                 else if( reader.name() == "floor" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: floor element wasn't expected here");
-                    }
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     if( image_name_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5153,10 +5113,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->setFloorImageName(image_name_s.toString().toStdString());
                 }
                 else if( reader.name() == "wall" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: wall element wasn't expected here");
-                    }
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5172,10 +5128,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     }
                 }
                 else if( reader.name() == "dropwall" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: dropwall element wasn't expected here");
-                    }
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5186,10 +5138,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     }
                 }
                 else if( reader.name() == "background" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: background element wasn't expected here");
-                    }
                     QStringRef image_name_s = reader.attributes().value("image_name");
                     if( image_name_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5202,10 +5150,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->setBackgroundImageName(image_name_s.toString().toStdString());
                 }
                 else if( reader.name() == "wandering_monster" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: wandering_monster element wasn't expected here");
-                    }
                     QStringRef template_s = reader.attributes().value("template");
                     if( template_s.length() == 0 ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5222,10 +5166,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->setWanderingMonster(template_s.toString().toStdString(), time, rest_chance);
                 }
                 else if( reader.name() == "floorregion" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: floorregion element wasn't expected here");
-                    }
                     FloorRegion *floor_region = loadFloorRegion(reader);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
@@ -5269,9 +5209,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     }
                 }
                 /*else if( reader.name() == "boundary" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        throw string("unexpected quest xml");
-                    }
                     questXMLType = QUEST_XML_TYPE_BOUNDARY;
                     boundary = Polygon2D(); // reset
                 }
@@ -5287,10 +5224,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     boundary.addPoint(Vector2D(point_x, point_y));
                 }*/
                 else if( reader.name() == "player_start" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: player_start element wasn't expected here");
-                    }
                     if( done_player_start ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: duplicate player_start element");
@@ -5325,10 +5258,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     this->quest->setCompleted(complete);
                 }
                 else if( reader.name() == "npc" || reader.name() == "player" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: npc/player element wasn't expected here");
-                    }
 
                     bool is_player = false;
                     Vector2D pos;
@@ -5353,11 +5282,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->addCharacter(npc, pos.x, pos.y);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: item element wasn't expected here");
-                    }
-
                     Vector2D pos;
                     Item *item = this->loadItem(&pos, reader, NULL, NULL, false);
 
@@ -5368,10 +5292,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->addItem(item, pos.x, pos.y);
                 }
                 else if( reader.name() == "scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: scenery element wasn't expected here");
-                    }
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
@@ -5384,10 +5304,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->addScenery(scenery, pos_x, pos_y);
                 }
                 else if( reader.name() == "trap" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: trap element wasn't expected here");
-                    }
                     QStringRef pos_x_s = reader.attributes().value("x");
                     float pos_x = parseFloat(pos_x_s.toString());
                     QStringRef pos_y_s = reader.attributes().value("y");
@@ -5409,17 +5325,9 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: start_bonus element not expected in save games");
                     }
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: start_bonus element wasn't expected here");
-                    }
                     loadStartBonus(reader, cheat_mode);
                 }
                 else if( reader.name() == "random_scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: random_scenery element wasn't expected here");
-                    }
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: random_scenery element outside of location");
