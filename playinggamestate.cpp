@@ -4744,6 +4744,30 @@ void PlayingGamestate::loadStartBonus(QXmlStreamReader &reader, bool cheat_mode)
     }
 }
 
+void PlayingGamestate::loadRandomScenery(QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadRandomScenery");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
+    // now read remaining elements
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+        if( reader.isStartElement() ) {
+            if( reader.name() == "scenery" ) {
+                Scenery *scenery = loadScenery(reader);
+                // TODO - add to a random list to return
+                // we'll actually convert the random list into actual scenery after the location is loaded (in case the floor regions haven't been fully defined yet)
+            }
+        }
+        else if( reader.isEndElement() ) {
+            if( reader.name() == attribute_name ) {
+                break;
+            }
+        }
+    }
+}
+
 /*XXX *PlayingGamestate::loadXXX(QXmlStreamReader &reader) const {
     qDebug("PlayingGamestate::loadXXX");
     QString attribute_name = reader.name().toString();
@@ -4878,8 +4902,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
         int progress_lo = 10, progress_hi = 50;
         bool done_player_start = false;
         enum QuestXMLType {
-            QUEST_XML_TYPE_NONE = 0,
-            QUEST_XML_TYPE_RANDOMSCENERY = 1
+            QUEST_XML_TYPE_NONE = 0
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
         QFile file(filename);
@@ -5345,7 +5368,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->addItem(item, pos.x, pos.y);
                 }
                 else if( reader.name() == "scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_RANDOMSCENERY ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element wasn't expected here");
                     }
@@ -5401,7 +5424,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: random_scenery element outside of location");
                     }
-                    questXMLType = QUEST_XML_TYPE_RANDOMSCENERY;
+                    loadRandomScenery(reader);
                 }
             }
             else if( reader.isEndElement() ) {
@@ -5411,13 +5434,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         throw string("unexpected quest xml: location end element wasn't expected here");
                     }
                     location = NULL;
-                }
-                else if( reader.name() == "random_scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_RANDOMSCENERY ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: random_scenery end element wasn't expected here");
-                    }
-                    questXMLType = QUEST_XML_TYPE_NONE;
                 }
             }
         }
