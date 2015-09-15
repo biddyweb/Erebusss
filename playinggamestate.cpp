@@ -3893,6 +3893,10 @@ void PlayingGamestate::refreshDebugItems() {
 #endif
 
 Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadNPC");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
     Character *npc = NULL;
     *is_player = false;
     pos->set(0.0f, 0.0f);
@@ -4180,18 +4184,7 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
             }
         }
         else if( reader.isEndElement() ) {
-            if( reader.name() == "npc" ) {
-                if( *is_player ) {
-                    LOG("error at line %d\n", reader.lineNumber());
-                    throw string("mismatched tag: opened with player, closed with npc");
-                }
-                break;
-            }
-            else if( reader.name() == "player" ) {
-                if( !(*is_player) ) {
-                    LOG("error at line %d\n", reader.lineNumber());
-                    throw string("mismatched tag: opened with npc, closed with player");
-                }
+            if( reader.name() == attribute_name ) {
                 break;
             }
         }
@@ -4202,6 +4195,9 @@ Character *PlayingGamestate::loadNPC(bool *is_player, Vector2D *pos, QXmlStreamR
 
 Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc, bool start_bonus_item) const {
     qDebug("PlayingGamestate::loadItem");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
     Item *item = NULL;
     pos->set(0.0f, 0.0f);
 
@@ -4317,7 +4313,275 @@ Item *PlayingGamestate::loadItem(Vector2D *pos, QXmlStreamReader &reader, Scener
     return item;
 }
 
-void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h) {
+Scenery *PlayingGamestate::loadScenery(QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadScenery");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
+    QStringRef name_s = reader.attributes().value("name");
+    QStringRef image_name_s = reader.attributes().value("image_name");
+    QStringRef big_image_name_s = reader.attributes().value("big_image_name");
+    QStringRef opacity_s = reader.attributes().value("opacity");
+    QStringRef has_smoke_s = reader.attributes().value("has_smoke");
+    QStringRef smoke_x_s = reader.attributes().value("smoke_x");
+    QStringRef smoke_y_s = reader.attributes().value("smoke_y");
+    QStringRef draw_type_s = reader.attributes().value("draw_type");
+    //QStringRef action_last_time_s = reader.attributes().value("action_last_time");
+    QStringRef action_delay_s = reader.attributes().value("action_delay");
+    QStringRef action_type_s = reader.attributes().value("action_type");
+    QStringRef action_value_s = reader.attributes().value("action_value");
+    QStringRef interact_type_s = reader.attributes().value("interact_type");
+    QStringRef interact_state_s = reader.attributes().value("interact_state");
+    QStringRef requires_flag_s = reader.attributes().value("requires_flag");
+    QStringRef blocking_s = reader.attributes().value("blocking");
+    bool blocking = parseBool(blocking_s.toString(), true);
+    QStringRef block_visibility_s = reader.attributes().value("block_visibility");
+    bool block_visibility = parseBool(block_visibility_s.toString(), true);
+    QStringRef is_opened_s = reader.attributes().value("is_opened");
+    bool is_opened = parseBool(is_opened_s.toString(), true);
+    QStringRef door_s = reader.attributes().value("door");
+    bool door = parseBool(door_s.toString(), true);
+    QStringRef exit_s = reader.attributes().value("exit");
+    bool exit = parseBool(exit_s.toString(), true);
+    QStringRef exit_location_s = reader.attributes().value("exit_location");
+    QStringRef locked_s = reader.attributes().value("locked");
+    bool locked = parseBool(locked_s.toString(), true);
+    QStringRef locked_silent_s = reader.attributes().value("locked_silent");
+    bool locked_silent = parseBool(locked_silent_s.toString(), true);
+    QStringRef locked_text_s = reader.attributes().value("locked_text");
+    QStringRef locked_used_up_s = reader.attributes().value("locked_used_up");
+    bool locked_used_up = parseBool(locked_used_up_s.toString(), true);
+    QStringRef key_always_needed_s = reader.attributes().value("key_always_needed");
+    bool key_always_needed = parseBool(key_always_needed_s.toString(), true);
+    QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
+    QStringRef unlock_text_s = reader.attributes().value("unlock_text");
+    QStringRef unlock_xp_s = reader.attributes().value("unlock_xp");
+    QStringRef confirm_text_s = reader.attributes().value("confirm_text");
+    QStringRef size_s = reader.attributes().value("size");
+
+    bool has_size = false;
+    float size = 0.0f, size_w = 0.0f, size_h = 0.0f;
+    if( size_s.length() > 0 ) {
+        has_size = true;
+        size = parseFloat(size_s.toString());
+    }
+    else {
+        QStringRef size_w_s = reader.attributes().value("w");
+        QStringRef size_h_s = reader.attributes().value("h");
+        size_w = parseFloat(size_w_s.toString());
+        size_h = parseFloat(size_h_s.toString());
+    }
+    bool has_visual_h = false;
+    float visual_h = 0.0f;
+    QStringRef visual_h_s = reader.attributes().value("visual_h");
+    if( visual_h_s.length() > 0 ) {
+        has_visual_h = true;
+        visual_h = parseFloat(visual_h_s.toString());
+    }
+    bool boundary_iso = false;
+    float boundary_iso_ratio = 0.0f;
+    QStringRef boundary_iso_s = reader.attributes().value("boundary_iso");
+    if( boundary_iso_s.length() > 0 ) {
+        boundary_iso = parseBool(boundary_iso_s.toString());
+        QStringRef boundary_iso_ratio_s = reader.attributes().value("boundary_iso_ratio");
+        boundary_iso_ratio = parseFloat(boundary_iso_ratio_s.toString());
+    }
+
+    this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
+
+    Scenery *scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h, visual_h, boundary_iso, boundary_iso_ratio);
+
+    if( door && exit ) {
+        LOG("error at line %d\n", reader.lineNumber());
+        throw string("scenery can't be both a door and an exit");
+    }
+    else if( exit && exit_location_s.length() > 0 ) {
+        LOG("error at line %d\n", reader.lineNumber());
+        throw string("scenery can't be both an exit and an exit_location");
+    }
+    else if( exit_location_s.length() > 0 && door ) {
+        LOG("error at line %d\n", reader.lineNumber());
+        throw string("scenery can't be both an exit_location and a door");
+    }
+
+    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
+    if( animation_iter == this->scenery_animation_layers.end() ) {
+        LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
+        LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
+        throw string("Failed to find scenery's image");
+    }
+    const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
+    if( animation_layer->getAnimationSet("opened") != NULL ) {
+        scenery->setCanBeOpened(true);
+    }
+
+    if( big_image_name_s.length() > 0 ) {
+        scenery->setBigImageName(big_image_name_s.toString().toStdString());
+    }
+    scenery->setBlocking(blocking, block_visibility);
+    if( is_opened && !scenery->canBeOpened() ) {
+        qDebug("trying to set is_opened on scenery that can't be opened: %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
+    }
+    scenery->setOpened(is_opened);
+    if( opacity_s.length() > 0 ) {
+        float opacity = parseFloat(opacity_s.toString());
+        scenery->setOpacity(opacity);
+    }
+    if( has_smoke_s.length() > 0 ) {
+        bool has_smoke = parseBool(has_smoke_s.toString());
+        // we allow a default for backwards compatibility, for when the smoke positio was hardcoded for the campfire
+        Vector2D smoke_pos(0.5f, 0.4167f);
+        if( smoke_x_s.length() > 0 ) {
+            smoke_pos.x = parseFloat(smoke_x_s.toString());
+        }
+        if( smoke_y_s.length() > 0 ) {
+            smoke_pos.y = parseFloat(smoke_y_s.toString());
+        }
+        scenery->setHasSmoke(has_smoke, smoke_pos);
+    }
+    if( draw_type_s.length() > 0 ) {
+        if( draw_type_s == "floating" ) {
+            scenery->setDrawType(Scenery::DRAWTYPE_FLOATING);
+        }
+        else if( draw_type_s == "background" ) {
+            scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
+        }
+        else {
+            LOG("unrecognised draw_type: %s\n", draw_type_s.toString().toStdString().c_str());
+            LOG("error at line %d\n", reader.lineNumber());
+            throw string("unrecognised draw_type for scenery");
+        }
+    }
+    // not saved:
+    /*if( action_last_time_s.length() > 0 ) {
+        int action_last_time = parseInt(action_last_time_s.toString());
+        scenery->setActionLastTime(action_last_time);
+    }*/
+    if( action_delay_s.length() > 0 ) {
+        int action_delay = parseInt(action_delay_s.toString());
+        scenery->setActionDelay(action_delay);
+    }
+    if( action_type_s.length() > 0 ) {
+        scenery->setActionType(action_type_s.toString().toStdString());
+    }
+    if( action_value_s.length() > 0 ) {
+        int action_value = parseInt(action_value_s.toString());
+        scenery->setActionValue(action_value);
+    }
+    if( interact_type_s.length() > 0 ) {
+        scenery->setInteractType(interact_type_s.toString().toStdString());
+    }
+    if( interact_state_s.length() > 0 ) {
+        int interact_state = parseInt(interact_state_s.toString());
+        scenery->setInteractState(interact_state);
+    }
+    if( requires_flag_s.length() > 0 ) {
+        scenery->setRequiresFlag(requires_flag_s.toString().toStdString());
+    }
+    scenery->setDoor(door);
+    scenery->setExit(exit);
+    if( exit_location_s.length() > 0 ) {
+        QStringRef exit_location_x_s = reader.attributes().value("exit_location_x");
+        float exit_location_x = parseFloat(exit_location_x_s.toString());
+        QStringRef exit_location_y_s = reader.attributes().value("exit_location_y");
+        float exit_location_y = parseFloat(exit_location_y_s.toString());
+        QStringRef exit_travel_time_s = reader.attributes().value("exit_travel_time");
+        int exit_travel_time = parseInt(exit_travel_time_s.toString(), true);
+        scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y), exit_travel_time);
+    }
+    scenery->setLocked(locked);
+    scenery->setLockedSilent(locked_silent);
+    if( locked_text_s.length() > 0 ) {
+        scenery->setLockedText(locked_text_s.toString().toStdString());
+    }
+    scenery->setLockedUsedUp(locked_used_up);
+    scenery->setKeyAlwaysNeeded(key_always_needed);
+    if( unlock_item_name_s.length() > 0 ) {
+        scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
+    }
+    if( unlock_text_s.length() > 0 ) {
+        scenery->setUnlockText(unlock_text_s.toString().toStdString());
+    }
+
+    if( unlock_xp_s.length() > 0 ) {
+        int unlock_xp = parseInt(unlock_xp_s.toString());
+        scenery->setUnlockXP(unlock_xp);
+    }
+    if( confirm_text_s.length() > 0 ) {
+        scenery->setConfirmText(confirm_text_s.toString().toStdString());
+    }
+
+    // now read remaining elements
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+        if( reader.isStartElement() ) {
+            if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
+                Vector2D pos;
+                this->loadItem(&pos, reader, scenery, NULL, false);
+            }
+            else if( reader.name() == "trap" ) {
+                Trap *trap = loadTrap(reader);
+                scenery->setTrap(trap);
+            }
+        }
+        else if( reader.isEndElement() ) {
+            if( reader.name() == attribute_name ) {
+                break;
+            }
+        }
+        else {
+            QStringRef text = reader.text();
+            if( stringAnyNonWhitespace(text.toString().toStdString()) ) {
+                //qDebug("### : %s", text.toString().toStdString().c_str());
+                scenery->setDescription(text.toString().toStdString());
+            }
+        }
+    }
+
+    return scenery;
+}
+
+Trap *PlayingGamestate::loadTrap(QXmlStreamReader &reader) const {
+    QStringRef type_s = reader.attributes().value("type");
+    QStringRef rating_s = reader.attributes().value("rating");
+    int rating = parseInt(rating_s.toString(), true);
+    QStringRef difficulty_s = reader.attributes().value("difficulty");
+    int difficulty = parseInt(difficulty_s.toString(), true);
+
+    Trap *trap = new Trap(type_s.toString().toStdString());
+    trap->setRating(rating);
+    trap->setDifficulty(difficulty);
+
+    return trap;
+}
+
+/*XXX *PlayingGamestate::loadXXX(QXmlStreamReader &reader) const {
+    qDebug("PlayingGamestate::loadXXX");
+    QString attribute_name = reader.name().toString();
+    qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
+    XXX *xxx = NULL;
+
+    // now read remaining elements
+    while( !reader.atEnd() && !reader.hasError() ) {
+        reader.readNext();
+        //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
+        if( reader.isStartElement() ) {
+            if( reader.name() == "" ) {
+            }
+        }
+        else if( reader.isEndElement() ) {
+            if( reader.name() == attribute_name ) {
+                break;
+            }
+        }
+    }
+
+    return xxx;
+}*/
+
+void PlayingGamestate::querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h) const {
     // side-effect: pre-loads any lazy images
     map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name);
     if( animation_iter == this->scenery_animation_layers.end() ) {
@@ -4425,12 +4689,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
         bool done_player_start = false;
         enum QuestXMLType {
             QUEST_XML_TYPE_NONE = 0,
-            QUEST_XML_TYPE_SCENERY = 2,
-            QUEST_XML_TYPE_FLOORREGION = 3,
-            QUEST_XML_TYPE_STARTBONUS = 4
+            QUEST_XML_TYPE_FLOORREGION = 1,
+            QUEST_XML_TYPE_STARTBONUS = 2,
+            QUEST_XML_TYPE_RANDOMSCENERY = 3
         };
         QuestXMLType questXMLType = QUEST_XML_TYPE_NONE;
-        Scenery *scenery = NULL;
         FloorRegion *floor_region = NULL;
         QFile file(filename);
         if( !file.open(QFile::ReadOnly | QFile::Text) ) {
@@ -4917,7 +5180,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     location->addCharacter(npc, pos.x, pos.y);
                 }
                 else if( reader.name() == "item" || reader.name() == "weapon" || reader.name() == "shield" || reader.name() == "armour" || reader.name() == "ring" || reader.name() == "ammo" || reader.name() == "currency" || reader.name() == "gold" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY && questXMLType != QUEST_XML_TYPE_STARTBONUS ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_STARTBONUS ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: item element wasn't expected here");
                     }
@@ -4973,258 +5236,51 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         }
                     }
                     else {
-                        Item *item = this->loadItem(&pos, reader, scenery, NULL, false);
+                        Item *item = this->loadItem(&pos, reader, NULL, NULL, false);
 
-                        if( questXMLType == QUEST_XML_TYPE_NONE ) {
-                            if( location == NULL ) {
-                                LOG("error at line %d\n", reader.lineNumber());
-                                throw string("unexpected quest xml: item element outside of location");
-                            }
-                            location->addItem(item, pos.x, pos.y);
+                        if( location == NULL ) {
+                            LOG("error at line %d\n", reader.lineNumber());
+                            throw string("unexpected quest xml: item element outside of location");
                         }
+                        location->addItem(item, pos.x, pos.y);
                     }
                 }
                 else if( reader.name() == "scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_RANDOMSCENERY ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element wasn't expected here");
                     }
-                    QStringRef name_s = reader.attributes().value("name");
-                    QStringRef image_name_s = reader.attributes().value("image_name");
-                    QStringRef big_image_name_s = reader.attributes().value("big_image_name");
-                    QStringRef pos_x_s = reader.attributes().value("x");
-                    float pos_x = parseFloat(pos_x_s.toString());
-                    QStringRef pos_y_s = reader.attributes().value("y");
-                    float pos_y = parseFloat(pos_y_s.toString());
-                    QStringRef opacity_s = reader.attributes().value("opacity");
-                    QStringRef has_smoke_s = reader.attributes().value("has_smoke");
-                    QStringRef smoke_x_s = reader.attributes().value("smoke_x");
-                    QStringRef smoke_y_s = reader.attributes().value("smoke_y");
-                    QStringRef draw_type_s = reader.attributes().value("draw_type");
-                    QStringRef action_last_time_s = reader.attributes().value("action_last_time");
-                    QStringRef action_delay_s = reader.attributes().value("action_delay");
-                    QStringRef action_type_s = reader.attributes().value("action_type");
-                    QStringRef action_value_s = reader.attributes().value("action_value");
-                    QStringRef interact_type_s = reader.attributes().value("interact_type");
-                    QStringRef interact_state_s = reader.attributes().value("interact_state");
-                    QStringRef requires_flag_s = reader.attributes().value("requires_flag");
-                    QStringRef blocking_s = reader.attributes().value("blocking");
-                    bool blocking = parseBool(blocking_s.toString(), true);
-                    QStringRef block_visibility_s = reader.attributes().value("block_visibility");
-                    bool block_visibility = parseBool(block_visibility_s.toString(), true);
-                    QStringRef is_opened_s = reader.attributes().value("is_opened");
-                    bool is_opened = parseBool(is_opened_s.toString(), true);
-                    QStringRef door_s = reader.attributes().value("door");
-                    bool door = parseBool(door_s.toString(), true);
-                    QStringRef exit_s = reader.attributes().value("exit");
-                    bool exit = parseBool(exit_s.toString(), true);
-                    QStringRef exit_location_s = reader.attributes().value("exit_location");
-                    QStringRef locked_s = reader.attributes().value("locked");
-                    bool locked = parseBool(locked_s.toString(), true);
-                    QStringRef locked_silent_s = reader.attributes().value("locked_silent");
-                    bool locked_silent = parseBool(locked_silent_s.toString(), true);
-                    QStringRef locked_text_s = reader.attributes().value("locked_text");
-                    QStringRef locked_used_up_s = reader.attributes().value("locked_used_up");
-                    bool locked_used_up = parseBool(locked_used_up_s.toString(), true);
-                    QStringRef key_always_needed_s = reader.attributes().value("key_always_needed");
-                    bool key_always_needed = parseBool(key_always_needed_s.toString(), true);
-                    QStringRef unlock_item_name_s = reader.attributes().value("unlocked_by_template");
-                    QStringRef unlock_text_s = reader.attributes().value("unlock_text");
-                    QStringRef unlock_xp_s = reader.attributes().value("unlock_xp");
-                    QStringRef confirm_text_s = reader.attributes().value("confirm_text");
-                    QStringRef size_s = reader.attributes().value("size");
-
-                    bool has_size = false;
-                    float size = 0.0f, size_w = 0.0f, size_h = 0.0f;
-                    if( size_s.length() > 0 ) {
-                        has_size = true;
-                        size = parseFloat(size_s.toString());
-                    }
-                    else {
-                        QStringRef size_w_s = reader.attributes().value("w");
-                        QStringRef size_h_s = reader.attributes().value("h");
-                        size_w = parseFloat(size_w_s.toString());
-                        size_h = parseFloat(size_h_s.toString());
-                    }
-                    bool has_visual_h = false;
-                    float visual_h = 0.0f;
-                    QStringRef visual_h_s = reader.attributes().value("visual_h");
-                    if( visual_h_s.length() > 0 ) {
-                        has_visual_h = true;
-                        visual_h = parseFloat(visual_h_s.toString());
-                    }
-                    bool boundary_iso = false;
-                    float boundary_iso_ratio = 0.0f;
-                    QStringRef boundary_iso_s = reader.attributes().value("boundary_iso");
-                    if( boundary_iso_s.length() > 0 ) {
-                        boundary_iso = parseBool(boundary_iso_s.toString());
-                        QStringRef boundary_iso_ratio_s = reader.attributes().value("boundary_iso_ratio");
-                        boundary_iso_ratio = parseFloat(boundary_iso_ratio_s.toString());
-                    }
-
-                    this->querySceneryImage(&size_w, &size_h, &visual_h, image_name_s.toString().toStdString(), has_size, size, size_w, size_h, has_visual_h, visual_h);
-
-                    scenery = new Scenery(name_s.toString().toStdString(), image_name_s.toString().toStdString(), size_w, size_h, visual_h, boundary_iso, boundary_iso_ratio);
                     if( location == NULL ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: scenery element outside of location");
                     }
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    Scenery *scenery = loadScenery(reader);
                     location->addScenery(scenery, pos_x, pos_y);
-                    if( door && exit ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("scenery can't be both a door and an exit");
-                    }
-                    else if( exit && exit_location_s.length() > 0 ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("scenery can't be both an exit and an exit_location");
-                    }
-                    else if( exit_location_s.length() > 0 && door ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("scenery can't be both an exit_location and a door");
-                    }
-
-                    map<string, LazyAnimationLayer *>::const_iterator animation_iter = this->scenery_animation_layers.find(image_name_s.toString().toStdString());
-                    if( animation_iter == this->scenery_animation_layers.end() ) {
-                        LOG("failed to find image for scenery: %s\n", name_s.toString().toStdString().c_str());
-                        LOG("    image name: %s\n", image_name_s.toString().toStdString().c_str());
-                        throw string("Failed to find scenery's image");
-                    }
-                    const AnimationLayer *animation_layer = animation_iter->second->getAnimationLayer();
-                    if( animation_layer->getAnimationSet("opened") != NULL ) {
-                        scenery->setCanBeOpened(true);
-                    }
-
-                    if( big_image_name_s.length() > 0 ) {
-                        scenery->setBigImageName(big_image_name_s.toString().toStdString());
-                    }
-                    scenery->setBlocking(blocking, block_visibility);
-                    if( is_opened && !scenery->canBeOpened() ) {
-                        qDebug("trying to set is_opened on scenery that can't be opened: %s at %f, %f", scenery->getName().c_str(), scenery->getX(), scenery->getY());
-                    }
-                    scenery->setOpened(is_opened);
-                    if( opacity_s.length() > 0 ) {
-                        float opacity = parseFloat(opacity_s.toString());
-                        scenery->setOpacity(opacity);
-                    }
-                    if( has_smoke_s.length() > 0 ) {
-                        bool has_smoke = parseBool(has_smoke_s.toString());
-                        // we allow a default for backwards compatibility, for when the smoke positio was hardcoded for the campfire
-                        Vector2D smoke_pos(0.5f, 0.4167f);
-                        if( smoke_x_s.length() > 0 ) {
-                            smoke_pos.x = parseFloat(smoke_x_s.toString());
-                        }
-                        if( smoke_y_s.length() > 0 ) {
-                            smoke_pos.y = parseFloat(smoke_y_s.toString());
-                        }
-                        scenery->setHasSmoke(has_smoke, smoke_pos);
-                    }
-                    if( draw_type_s.length() > 0 ) {
-                        if( draw_type_s == "floating" ) {
-                            scenery->setDrawType(Scenery::DRAWTYPE_FLOATING);
-                        }
-                        else if( draw_type_s == "background" ) {
-                            scenery->setDrawType(Scenery::DRAWTYPE_BACKGROUND);
-                        }
-                        else {
-                            LOG("unrecognised draw_type: %s\n", draw_type_s.toString().toStdString().c_str());
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("unrecognised draw_type for scenery");
-                        }
-                    }
-                    // not saved:
-                    /*if( action_last_time_s.length() > 0 ) {
-                        int action_last_time = parseInt(action_last_time_s.toString());
-                        scenery->setActionLastTime(action_last_time);
-                    }*/
-                    if( action_delay_s.length() > 0 ) {
-                        int action_delay = parseInt(action_delay_s.toString());
-                        scenery->setActionDelay(action_delay);
-                    }
-                    if( action_type_s.length() > 0 ) {
-                        scenery->setActionType(action_type_s.toString().toStdString());
-                    }
-                    if( action_value_s.length() > 0 ) {
-                        int action_value = parseInt(action_value_s.toString());
-                        scenery->setActionValue(action_value);
-                    }
-                    if( interact_type_s.length() > 0 ) {
-                        scenery->setInteractType(interact_type_s.toString().toStdString());
-                    }
-                    if( interact_state_s.length() > 0 ) {
-                        int interact_state = parseInt(interact_state_s.toString());
-                        scenery->setInteractState(interact_state);
-                    }
-                    if( requires_flag_s.length() > 0 ) {
-                        scenery->setRequiresFlag(requires_flag_s.toString().toStdString());
-                    }
-                    scenery->setDoor(door);
-                    scenery->setExit(exit);
-                    if( exit_location_s.length() > 0 ) {
-                        QStringRef exit_location_x_s = reader.attributes().value("exit_location_x");
-                        float exit_location_x = parseFloat(exit_location_x_s.toString());
-                        QStringRef exit_location_y_s = reader.attributes().value("exit_location_y");
-                        float exit_location_y = parseFloat(exit_location_y_s.toString());
-                        QStringRef exit_travel_time_s = reader.attributes().value("exit_travel_time");
-                        int exit_travel_time = parseInt(exit_travel_time_s.toString(), true);
-                        scenery->setExitLocation(exit_location_s.toString().toStdString(), Vector2D(exit_location_x, exit_location_y), exit_travel_time);
-                    }
-                    scenery->setLocked(locked);
-                    scenery->setLockedSilent(locked_silent);
-                    if( locked_text_s.length() > 0 ) {
-                        scenery->setLockedText(locked_text_s.toString().toStdString());
-                    }
-                    scenery->setLockedUsedUp(locked_used_up);
-                    scenery->setKeyAlwaysNeeded(key_always_needed);
-                    if( unlock_item_name_s.length() > 0 ) {
-                        scenery->setUnlockItemName(unlock_item_name_s.toString().toStdString());
-                    }
-                    if( unlock_text_s.length() > 0 ) {
-                        scenery->setUnlockText(unlock_text_s.toString().toStdString());
-                    }
-
-                    if( unlock_xp_s.length() > 0 ) {
-                        int unlock_xp = parseInt(unlock_xp_s.toString());
-                        scenery->setUnlockXP(unlock_xp);
-                    }
-                    if( confirm_text_s.length() > 0 ) {
-                        scenery->setConfirmText(confirm_text_s.toString().toStdString());
-                    }
-                    questXMLType = QUEST_XML_TYPE_SCENERY;
                 }
                 else if( reader.name() == "trap" ) {
-                    if( questXMLType != QUEST_XML_TYPE_NONE && questXMLType != QUEST_XML_TYPE_SCENERY ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: trap element wasn't expected here");
                     }
-                    QStringRef type_s = reader.attributes().value("type");
-                    QStringRef rating_s = reader.attributes().value("rating");
-                    int rating = parseInt(rating_s.toString(), true);
-                    QStringRef difficulty_s = reader.attributes().value("difficulty");
-                    int difficulty = parseInt(difficulty_s.toString(), true);
-                    if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
-                        Trap *trap = new Trap(type_s.toString().toStdString());
-                        trap->setRating(rating);
-                        trap->setDifficulty(difficulty);
-                        scenery->setTrap(trap);
+                    QStringRef pos_x_s = reader.attributes().value("x");
+                    float pos_x = parseFloat(pos_x_s.toString());
+                    QStringRef pos_y_s = reader.attributes().value("y");
+                    float pos_y = parseFloat(pos_y_s.toString());
+                    QStringRef size_w_s = reader.attributes().value("w");
+                    float size_w = parseFloat(size_w_s.toString());
+                    QStringRef size_h_s = reader.attributes().value("h");
+                    float size_h = parseFloat(size_h_s.toString());
+                    Trap *trap = loadTrap(reader);
+                    trap->setSize(size_w, size_h);
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: trap element outside of location");
                     }
-                    else {
-                        QStringRef pos_x_s = reader.attributes().value("x");
-                        float pos_x = parseFloat(pos_x_s.toString());
-                        QStringRef pos_y_s = reader.attributes().value("y");
-                        float pos_y = parseFloat(pos_y_s.toString());
-                        QStringRef size_w_s = reader.attributes().value("w");
-                        float size_w = parseFloat(size_w_s.toString());
-                        QStringRef size_h_s = reader.attributes().value("h");
-                        float size_h = parseFloat(size_h_s.toString());
-                        Trap *trap = new Trap(type_s.toString().toStdString(), size_w, size_h);
-                        trap->setRating(rating);
-                        trap->setDifficulty(difficulty);
-                        if( location == NULL ) {
-                            LOG("error at line %d\n", reader.lineNumber());
-                            throw string("unexpected quest xml: trap element outside of location");
-                        }
-                        location->addTrap(trap, pos_x, pos_y);
-                    }
+                    location->addTrap(trap, pos_x, pos_y);
                 }
                 else if( reader.name() == "start_bonus" ) {
                     if( is_savegame ) {
@@ -5277,6 +5333,17 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
 
                     questXMLType = QUEST_XML_TYPE_STARTBONUS;
                 }
+                else if( reader.name() == "random_scenery" ) {
+                    if( questXMLType != QUEST_XML_TYPE_NONE ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: random_scenery element wasn't expected here");
+                    }
+                    if( location == NULL ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: random_scenery element outside of location");
+                    }
+                    questXMLType = QUEST_XML_TYPE_RANDOMSCENERY;
+                }
             }
             else if( reader.isEndElement() ) {
                 if( reader.name() == "location" ) {
@@ -5285,14 +5352,6 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         throw string("unexpected quest xml: location end element wasn't expected here");
                     }
                     location = NULL;
-                }
-                else if( reader.name() == "scenery" ) {
-                    if( questXMLType != QUEST_XML_TYPE_SCENERY ) {
-                        LOG("error at line %d\n", reader.lineNumber());
-                        throw string("unexpected quest xml: scenery end element wasn't expected here");
-                    }
-                    scenery = NULL;
-                    questXMLType = QUEST_XML_TYPE_NONE;
                 }
                 else if( reader.name() == "floorregion" ) {
                     if( questXMLType != QUEST_XML_TYPE_FLOORREGION ) {
@@ -5319,14 +5378,12 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                     }
                     questXMLType = QUEST_XML_TYPE_NONE;
                 }
-            }
-            else {
-                if( questXMLType == QUEST_XML_TYPE_SCENERY ) {
-                    QStringRef text = reader.text();
-                    if( stringAnyNonWhitespace(text.toString().toStdString()) ) {
-                        //qDebug("### : %s", text.toString().toStdString().c_str());
-                        scenery->setDescription(text.toString().toStdString());
+                else if( reader.name() == "random_scenery" ) {
+                    if( questXMLType != QUEST_XML_TYPE_RANDOMSCENERY ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: random_scenery end element wasn't expected here");
                     }
+                    questXMLType = QUEST_XML_TYPE_NONE;
                 }
             }
         }

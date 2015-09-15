@@ -52,7 +52,13 @@ public:
         return this->type;
     }
     void setPos(float xpos, float ypos) {
+        this->has_position = true;
         this->pos.set(xpos, ypos);
+    }
+    void setSize(float width, float height) {
+        this->has_position = true;
+        this->width = width;
+        this->height = height;
     }
     float getX() const {
         return this->pos.x;

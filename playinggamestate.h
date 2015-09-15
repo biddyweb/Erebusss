@@ -403,6 +403,8 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Item *parseXMLItem(QXmlStreamReader &reader) const;
     Character *loadNPC(bool *is_player, Vector2D *pos, QXmlStreamReader &reader) const;
     Item *loadItem(Vector2D *pos, QXmlStreamReader &reader, Scenery *scenery, Character *npc, bool start_bonus_item) const;
+    Scenery *loadScenery(QXmlStreamReader &reader) const;
+    Trap *loadTrap(QXmlStreamReader &reader) const;
 
     void cleanup();
 
@@ -447,7 +449,7 @@ public:
     QString getPermadeathSavefilename() const {
         return this->permadeath_savefilename;
     }
-    void querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h);
+    void querySceneryImage(float *ret_size_w, float *ret_size_h, float *ret_visual_h, const string &image_name, bool has_size, float size, float size_w, float size_h, bool has_visual_h, float visual_h) const;
     void loadQuest(const QString &filename, bool is_savegame) {
         loadQuest(filename, is_savegame, false);
     }
