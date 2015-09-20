@@ -5370,7 +5370,7 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                                 const float precision = 100.0f;
                                 float pos_x = rollDice(1, (int)(location_width*precision), -1) / precision;
                                 float pos_y = rollDice(1, (int)(location_height*precision), -1) / precision;
-                                FloorRegion *floor_region = location->findFloorRegionAt(Vector2D(pos_x, pos_y));
+                                FloorRegion *floor_region = location->findFloorRegionInside(Vector2D(pos_x, pos_y), scenery->getWidth(), scenery->getHeight());
                                 if( floor_region != NULL ) {
                                     Scenery *new_scenery = scenery->clone();
                                     location->addScenery(new_scenery, pos_x, pos_y);

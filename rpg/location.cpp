@@ -654,9 +654,27 @@ void Location::calculateSize(float *w, float *h) const {
     }
 }
 
-FloorRegion *Location::findFloorRegionAt(Vector2D pos) {
+FloorRegion *Location::findFloorRegionInside(Vector2D pos, float width, float height) const {
+    width *= 0.5f;
+    height *= 0.5f;
+    // n.b., finds a floor region that fully contains the box
     FloorRegion *result = NULL;
-    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end() && result==NULL; ++iter) {
+    for(vector<FloorRegion *>::const_iterator iter = floor_regions.begin(); iter != floor_regions.end() && result==NULL; ++iter) {
+        FloorRegion *floor_region = *iter;
+        if( floor_region->pointInside(pos) &&
+                floor_region->pointInside(pos + Vector2D(-width, -height)) &&
+                floor_region->pointInside(pos + Vector2D(width, -height)) &&
+                floor_region->pointInside(pos + Vector2D(-width, height)) &&
+                floor_region->pointInside(pos + Vector2D(width, height)) ) {
+            result = floor_region;
+        }
+    }
+    return result;
+}
+
+FloorRegion *Location::findFloorRegionAt(Vector2D pos) const {
+    FloorRegion *result = NULL;
+    for(vector<FloorRegion *>::const_iterator iter = floor_regions.begin(); iter != floor_regions.end() && result==NULL; ++iter) {
         FloorRegion *floor_region = *iter;
         if( floor_region->pointInside(pos) ) {
             result = floor_region;
@@ -665,9 +683,9 @@ FloorRegion *Location::findFloorRegionAt(Vector2D pos) {
     return result;
 }
 
-vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
+vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) const {
     vector<FloorRegion *> result_floor_regions;
-    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+    for(vector<FloorRegion *>::const_iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         if( floor_region->pointInside(pos) ) {
             result_floor_regions.push_back(floor_region);
@@ -676,12 +694,12 @@ vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos) {
     return result_floor_regions;
 }
 
-vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos, float width, float height) {
+vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos, float width, float height) const {
     width *= 0.5f;
     height *= 0.5f;
     // n.b., also includes floor regions that the scenery only just touches
     vector<FloorRegion *> result_floor_regions;
-    for(vector<FloorRegion *>::iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
+    for(vector<FloorRegion *>::const_iterator iter = floor_regions.begin(); iter != floor_regions.end(); ++iter) {
         FloorRegion *floor_region = *iter;
         if( floor_region->pointInside(pos) ||
                 floor_region->pointInside(pos + Vector2D(-width, -height)) ||
@@ -694,7 +712,7 @@ vector<FloorRegion *> Location::findFloorRegionsAt(Vector2D pos, float width, fl
     return result_floor_regions;
 }
 
-vector<FloorRegion *> Location::findFloorRegionsAt(const Scenery *scenery) {
+vector<FloorRegion *> Location::findFloorRegionsAt(const Scenery *scenery) const {
     vector<FloorRegion *> result_floor_regions = this->findFloorRegionsAt(scenery->getPos(), scenery->getWidth(), scenery->getHeight());
     if( result_floor_regions.size() == 0 ) {
         // for sceneries on a wall

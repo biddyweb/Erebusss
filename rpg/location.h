@@ -744,10 +744,11 @@ public:
         return this->floor_regions.size();
     }
     void calculateSize(float *w, float *h) const;
-    FloorRegion *findFloorRegionAt(Vector2D pos);
-    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos);
-    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos, float width, float height);
-    vector<FloorRegion *> findFloorRegionsAt(const Scenery *scenery);
+    FloorRegion *findFloorRegionInside(Vector2D pos, float width, float height) const;
+    FloorRegion *findFloorRegionAt(Vector2D pos) const;
+    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos) const;
+    vector<FloorRegion *> findFloorRegionsAt(Vector2D pos, float width, float height) const;
+    vector<FloorRegion *> findFloorRegionsAt(const Scenery *scenery) const;
 
     void addBoundary(Polygon2D boundary) {
         this->boundaries.push_back(boundary);
