@@ -15,6 +15,12 @@
 <wall image_name="wall"/>
 <background image_name="background_brown"/>
 
+<random_scenery>
+<scenery name="Rock" image_name="rock1" size="0.2" draw_type="background" density="0.05"/>
+<scenery name="Skulls" image_name="skulls" size="0.3" draw_type="background" density="0.1"/>
+<scenery name="Bones" image_name="bones" size="0.5" draw_type="background" density="0.1"/>
+</random_scenery>
+
 <!--<wandering_monster template="Goblin" time="120000" rest_chance="10"/>-->
 
 <player_start x="0.5" y="9.0"/>
@@ -84,7 +90,6 @@
 <scenery name="Big Boulder" image_name="bigboulder" x="13.0" y="1.0" size="0.58" blocking="true"/>
 <item template="Mushroom" x="12.0" y="5.0"/>
 <scenery name="Fire" image_name="fire" x="14.0" y="3.0" size="1.0" blocking="true" has_smoke="true"/>
-<scenery name="Rock" image_name="rock1" x="14.5" y="5.7" size="0.2" draw_type="background"/>
 
 <scenery name="Crate" image_name="crate" x="15.0" y="5.0" size="0.8" blocking="true">
     <gold amount="20"/>
@@ -122,9 +127,6 @@
     <floorregion_point x="9.0" y="6.5" />
 </floorregion>
 
-<scenery name="Rock" image_name="rock1" x="8.5" y="7.1" size="0.2" draw_type="background"/>
-<scenery name="Skulls" image_name="skulls" x="7.75" y="8.0" size="0.3" draw_type="background"/>
-
 <npc name="Goblin" template="Goblin" x="8.0" y="8.0">
     <item template="Leather Armour"/>
     <item template="Red Gem"/>
@@ -145,7 +147,6 @@
 <floorregion shape="rect" rect_x="12.5" rect_y="7.5" rect_w="2.0" rect_h="3.5" />
 
 <scenery name="Campfire" image_name="campfire" x="14.0" y="8.5" size="0.8" blocking="true"/>
-<scenery name="Bones" image_name="bones" x="13.5" y="9.5" size="0.5" draw_type="background"/>
 
     <floorregion shape="rect" rect_x="10.5" rect_y="13.6" rect_w="0.5" rect_h="0.8" />
 <floorregion shape="rect" rect_x="7.5" rect_y="12.5" rect_w="3.0" rect_h="3.0" />
@@ -192,8 +193,6 @@
     />
 <scenery name="Door" image_name="door_wood_n" x="20.0" y="16.9" w="0.8" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
 <scenery name="Door" image_name="door_wood_n" x="20.0" y="12.4" w="0.8" h="0.1" visual_h="0.9" blocking="true" block_visibility="true" door="true"/>
-
-<scenery name="Rock" image_name="rock1" x="2.0" y="10.7" size="0.2" draw_type="background"/>
 
 <scenery name="Barrel" image_name="barrel" x="15.5" y="15.0" size="0.8" blocking="true">
     <gold amount="25"/>

@@ -156,12 +156,14 @@ protected:
     Scenery& operator=(const Scenery &) {
         throw string("Scenery assignment operator disallowed");
     }
-    Scenery(const Scenery &) {
+    /*Scenery(const Scenery &) {
         throw string("Scenery copy constructor disallowed");
-    }
+    }*/
 public:
     Scenery(const string &name, const string &image_name, float width, float height, float visual_height, bool boundary_iso, float boundary_iso_ratio);
     virtual ~Scenery();
+
+    virtual Scenery *clone() const; // virtual copy constructor
 
     void setLocation(Location *location) {
         this->location = location;

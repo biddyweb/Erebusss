@@ -301,6 +301,22 @@ public:
     void requestNewSaveGame();
 };
 
+class RandomScenery {
+    Scenery *scenery;
+    float density; // average number per unit square
+
+public:
+    RandomScenery(Scenery *scenery, float density) : scenery(scenery), density(density) {
+    }
+
+    Scenery *getScenery() const {
+        return scenery;
+    }
+    float getDensity() const {
+        return density;
+    }
+};
+
 class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Q_OBJECT
 
@@ -407,7 +423,7 @@ class PlayingGamestate : public Gamestate, CharacterListener, LocationListener {
     Trap *loadTrap(QXmlStreamReader &reader) const;
     FloorRegion *loadFloorRegion(QXmlStreamReader &reader) const;
     void loadStartBonus(QXmlStreamReader &reader, bool cheat_mode) const;
-    void loadRandomScenery(QXmlStreamReader &reader) const;
+    vector<RandomScenery> loadRandomScenery(QXmlStreamReader &reader) const;
 
     void cleanup();
 

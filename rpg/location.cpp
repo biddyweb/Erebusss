@@ -35,7 +35,10 @@ Scenery::~Scenery() {
     if( trap != NULL ) {
         delete trap;
     }
+}
 
+Scenery *Scenery::clone() const {
+    return new Scenery(*this);
 }
 
 void Scenery::setPos(float xpos, float ypos) {

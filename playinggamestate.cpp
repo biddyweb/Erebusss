@@ -4744,10 +4744,12 @@ void PlayingGamestate::loadStartBonus(QXmlStreamReader &reader, bool cheat_mode)
     }
 }
 
-void PlayingGamestate::loadRandomScenery(QXmlStreamReader &reader) const {
+vector<RandomScenery> PlayingGamestate::loadRandomScenery(QXmlStreamReader &reader) const {
     qDebug("PlayingGamestate::loadRandomScenery");
     QString attribute_name = reader.name().toString();
     qDebug("attribute_name: %s", attribute_name.toStdString().c_str());
+
+    vector<RandomScenery> random_scenery;
 
     // now read remaining elements
     while( !reader.atEnd() && !reader.hasError() ) {
@@ -4755,8 +4757,10 @@ void PlayingGamestate::loadRandomScenery(QXmlStreamReader &reader) const {
         //qDebug("read %d element: %s", reader.tokenType(), reader.name().toString().toStdString().c_str());
         if( reader.isStartElement() ) {
             if( reader.name() == "scenery" ) {
+                QStringRef density_s = reader.attributes().value("density");
+                float density = parseFloat(density_s.toString());
                 Scenery *scenery = loadScenery(reader);
-                // TODO - add to a random list to return
+                random_scenery.push_back(RandomScenery(scenery, density));
                 // we'll actually convert the random list into actual scenery after the location is loaded (in case the floor regions haven't been fully defined yet)
             }
         }
@@ -4766,6 +4770,8 @@ void PlayingGamestate::loadRandomScenery(QXmlStreamReader &reader) const {
             }
         }
     }
+
+    return random_scenery;
 }
 
 /*XXX *PlayingGamestate::loadXXX(QXmlStreamReader &reader) const {
@@ -4893,12 +4899,13 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
 
     /*Location *location = new Location();
     this->quest->addLocation(location);*/
-    Location *location = NULL;
-
     gui_overlay->setProgress(10);
     qApp->processEvents();
 
     {
+        Location *location = NULL;
+        vector<RandomScenery> random_scenery;
+
         int progress_lo = 10, progress_hi = 50;
         bool done_player_start = false;
         QFile file(filename);
@@ -5332,7 +5339,11 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: random_scenery element outside of location");
                     }
-                    loadRandomScenery(reader);
+                    if( random_scenery.size() > 0 ) {
+                        LOG("error at line %d\n", reader.lineNumber());
+                        throw string("unexpected quest xml: random_scenery already defined");
+                    }
+                    random_scenery = loadRandomScenery(reader);
                 }
             }
             else if( reader.isEndElement() ) {
@@ -5341,6 +5352,38 @@ void PlayingGamestate::loadQuest(const QString &filename, bool is_savegame, bool
                         LOG("error at line %d\n", reader.lineNumber());
                         throw string("unexpected quest xml: location end element wasn't expected here");
                     }
+                    // n.b., we can't make use of some location methods here, e.g., boundaries haven't been created yet
+                    // (and if we did create them here, we'd have to ensure we update that information if we ever say add random NPCs or blocking scenery
+                    float location_width = 0.0f, location_height = 0.0f;
+                    location->calculateSize(&location_width, &location_height);
+                    for(vector<RandomScenery>::const_iterator iter = random_scenery.begin(); iter != random_scenery.end(); ++iter) {
+                        RandomScenery random_scenery = *iter;
+                        const Scenery *scenery = random_scenery.getScenery();
+                        if( scenery->isBlocking() ) {
+                            throw string("unexpected quest xml: random_scenery shouldn't be blocking");
+                        }
+                        float density = random_scenery.getDensity();
+                        int count = (int)(density * location_width * location_height);
+                        count += rollDice(1, 3, -1);
+                        if( count > 0 ) {
+                            for(int i=0;i<count;i++) {
+                                const float precision = 100.0f;
+                                float pos_x = rollDice(1, (int)(location_width*precision), -1) / precision;
+                                float pos_y = rollDice(1, (int)(location_height*precision), -1) / precision;
+                                FloorRegion *floor_region = location->findFloorRegionAt(Vector2D(pos_x, pos_y));
+                                if( floor_region != NULL ) {
+                                    Scenery *new_scenery = scenery->clone();
+                                    location->addScenery(new_scenery, pos_x, pos_y);
+                                }
+                            }
+                        }
+                    }
+
+                    for(vector<RandomScenery>::const_iterator iter = random_scenery.begin(); iter != random_scenery.end(); ++iter) {
+                        RandomScenery random_scenery = *iter;
+                        delete random_scenery.getScenery();
+                    }
+                    random_scenery.clear();
                     location = NULL;
                 }
             }
